@@ -1,0 +1,1 @@
+Expected a decorator as a name, but got: some_module.some_decorator

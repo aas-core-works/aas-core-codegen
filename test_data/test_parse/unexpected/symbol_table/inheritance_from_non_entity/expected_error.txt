@@ -1,0 +1,1 @@
+Expected the entity Something to inherit from an abstract entity, but it inherits from a symbol of type Enumeration: Some_enum

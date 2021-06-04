@@ -1,0 +1,17 @@
+UnverifiedSymbolTable(
+  symbols=[
+    Enumeration(
+      name='Some_enum',
+      literals=[
+        EnumerationLiteral(
+          name='LITERAL',
+          value='Literal',
+          description='This is a literal.',
+          node=...),
+        EnumerationLiteral(
+          name='LITERAL_WITHOUT_DOC',
+          value='LiteralWithoutDoc',
+          description=None,
+          node=...)],
+      description='Represent something.\n\n    Indented.',
+      node=...)])

@@ -1,0 +1,1 @@
+Among all dunder methods, only ``__init__`` is expected, but got: __eq__

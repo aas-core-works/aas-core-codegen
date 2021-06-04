@@ -1,0 +1,1 @@
+Unexpected ``Final`` in the type annotation of the method argument x: List[Final[int]]

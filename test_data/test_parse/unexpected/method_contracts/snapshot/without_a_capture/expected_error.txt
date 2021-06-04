@@ -1,0 +1,1 @@
+Expected the capture to be defined for a snapshot

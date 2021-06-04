@@ -1,0 +1,30 @@
+UnverifiedSymbolTable(
+  symbols=[
+    ConcreteEntity(
+      name='Something',
+      is_implementation_specific=False,
+      inheritances=[],
+      properties=[],
+      property_map=...,
+      methods=[
+        Method(
+          name='__init__',
+          is_implementation_specific=False,
+          arguments=[
+            Argument(
+              name='self',
+              type_annotation=SelfTypeAnnotation(),
+              default=None,
+              node=...)],
+          argument_map=...,
+          returns=None,
+          description='Do something.',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          body=...,
+          node=...)],
+      method_map=...,
+      description=None,
+      node=...)])

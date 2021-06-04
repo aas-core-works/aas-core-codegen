@@ -1,0 +1,23 @@
+UnverifiedSymbolTable(
+  symbols=[
+    AbstractEntity(
+      name='Parent',
+      is_implementation_specific=False,
+      inheritances=[],
+      properties=[],
+      property_map=...,
+      methods=[],
+      method_map=...,
+      description=None,
+      node=...),
+    ConcreteEntity(
+      name='Something',
+      is_implementation_specific=False,
+      inheritances=[
+        'Parent'],
+      properties=[],
+      property_map=...,
+      methods=[],
+      method_map=...,
+      description=None,
+      node=...)])

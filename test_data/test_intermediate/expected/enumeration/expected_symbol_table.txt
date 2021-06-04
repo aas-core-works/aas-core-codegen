@@ -1,0 +1,12 @@
+SymbolTable(
+  symbols=[
+    Enumeration(
+      name='Some_enum',
+      literals=[
+        EnumerationLiteral(
+          name='some_literal',
+          value='SomeLiteral',
+          description='Represent something.',
+          parsed=...)],
+      description='Enumerate something.',
+      parsed=...)])

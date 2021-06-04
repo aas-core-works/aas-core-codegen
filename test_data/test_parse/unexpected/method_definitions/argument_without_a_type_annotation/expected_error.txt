@@ -1,0 +1,1 @@
+Unexpected method argument without a type annotation: x

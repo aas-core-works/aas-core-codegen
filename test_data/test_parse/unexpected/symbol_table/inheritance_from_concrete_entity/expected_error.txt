@@ -1,0 +1,1 @@
+Expected the entity Another_concrete to inherit from an abstract entity, but it inherits from a non-abstract one: Concrete

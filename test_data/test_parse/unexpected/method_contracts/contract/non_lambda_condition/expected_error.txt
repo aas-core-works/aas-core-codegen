@@ -1,0 +1,1 @@
+Expected a lambda function as a contract condition, but got: some_condition_function

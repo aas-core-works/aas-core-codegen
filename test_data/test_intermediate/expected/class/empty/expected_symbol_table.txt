@@ -1,0 +1,18 @@
+SymbolTable(
+  symbols=[
+    Class(
+      name='Concrete',
+      interfaces=[],
+      is_implementation_specific=False,
+      properties=[],
+      methods=[],
+      constructor=Constructor(
+        arguments=[],
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        is_implementation_specific=False,
+        statements=...),
+      description=None,
+      parsed=...)])

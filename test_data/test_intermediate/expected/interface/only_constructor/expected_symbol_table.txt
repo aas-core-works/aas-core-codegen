@@ -1,0 +1,17 @@
+SymbolTable(
+  symbols=[
+    Interface(
+      name='Abstract',
+      inheritances=[],
+      signatures=[],
+      properties=[
+        Property(
+          name='x',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='int',
+            parsed=...),
+          description=None,
+          is_readonly=False,
+          parsed=...)],
+      is_implementation_specific=False,
+      parsed=...)])

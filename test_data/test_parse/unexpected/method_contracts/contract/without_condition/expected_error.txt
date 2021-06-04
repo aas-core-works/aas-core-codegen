@@ -1,0 +1,1 @@
+Expected the condition to be defined for a contract

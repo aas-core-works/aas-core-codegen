@@ -1,0 +1,22 @@
+UnverifiedSymbolTable(
+  symbols=[
+    ConcreteEntity(
+      name='Something',
+      is_implementation_specific=False,
+      inheritances=[],
+      properties=[
+        Property(
+          name='some_property',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='Optional',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='int')]),
+          description=None,
+          is_readonly=False,
+          node=...)],
+      property_map=...,
+      methods=[],
+      method_map=...,
+      description=None,
+      node=...)])

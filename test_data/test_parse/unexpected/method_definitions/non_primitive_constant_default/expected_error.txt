@@ -1,0 +1,1 @@
+Expected a constant of type int, float, bool, or a None literal as a default value, but got: b'xyz'

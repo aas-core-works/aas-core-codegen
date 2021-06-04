@@ -1,0 +1,1 @@
+Expected a constant in the enumeration assignment, but got: str(3 + 7)

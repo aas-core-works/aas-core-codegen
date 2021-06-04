@@ -1,0 +1,1 @@
+Expected a constant as a default value, but got: some_func()

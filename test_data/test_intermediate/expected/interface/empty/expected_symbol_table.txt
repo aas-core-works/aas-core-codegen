@@ -1,0 +1,9 @@
+SymbolTable(
+  symbols=[
+    Interface(
+      name='Abstract',
+      inheritances=[],
+      signatures=[],
+      properties=[],
+      is_implementation_specific=False,
+      parsed=...)])
