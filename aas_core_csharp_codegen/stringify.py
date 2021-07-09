@@ -11,15 +11,15 @@ from aas_core_csharp_codegen.common import assert_never
 
 # We have to separate Stringifiable and Sequence[Stringifiable] since recursive types
 # are not supported in mypy, see https://github.com/python/mypy/issues/731.
-Stringifiable = Union[bool, int, float, str, "Entity", None]
+PrimitiveStringifiable = Union[bool, int, float, str, "Entity", None]
 
-StringifiableOrSequence = Union[Stringifiable, Sequence[Stringifiable]]
+Stringifiable = Union[PrimitiveStringifiable, Sequence[PrimitiveStringifiable]]
 
 
 class Property:
     """Represent a property of an entity to be stringified."""
 
-    def __init__(self, name: str, value: StringifiableOrSequence) -> None:
+    def __init__(self, name: str, value: Stringifiable) -> None:
         self.name = name
         self.value = value
 
@@ -60,7 +60,7 @@ def _indent_but_first_line(text: str, spaces: int) -> str:
     )
 
 
-def dump(stringifiable: StringifiableOrSequence) -> str:
+def dump(stringifiable: Stringifiable) -> str:
     """Produce a string representation of ``stringifiable`` for debugging or testing."""
     if isinstance(stringifiable, (bool, int, float, str)):
         return repr(stringifiable)
