@@ -12,7 +12,7 @@ from typing import (
     Union,
     Iterator,
     Sequence,
-    NoReturn,
+    NoReturn, Mapping,
 )
 
 import asttokens
@@ -38,7 +38,8 @@ class Error:
     """
 
     def __init__(
-        self, node: ast.AST, message: str, underlying: Optional[List["Error"]] = None
+            self, node: ast.AST, message: str,
+            underlying: Optional[List["Error"]] = None
     ) -> None:
         self.node = node
         self.message = message
@@ -166,3 +167,15 @@ def assert_never(value: NoReturn) -> NoReturn:
     https://hakibenita.com/python-mypy-exhaustive-checking
     """
     assert False, f"Unhandled value: {value} ({type(value).__name__})"
+
+
+LEADING_WHITESPACE_RE = re.compile(r'^\s+')
+TRAILING_WHITESPACE_RE = re.compile(r'\s+\Z')
+
+class Code(str):
+    """Represent an implementation-specific code."""
+
+    @require(lambda code: not LEADING_WHITESPACE_RE.match(code))
+    @require(lambda code: not TRAILING_WHITESPACE_RE.match(code))
+    def __new__(cls, code: str) -> 'Code':
+        return cast(Code, code)

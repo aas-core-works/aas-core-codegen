@@ -4,12 +4,15 @@
       <w>anno</w>
       <w>atok</w>
       <w>classdef</w>
+      <w>codegen</w>
       <w>columner</w>
+      <w>csharp</w>
       <w>dedented</w>
       <w>dumpable</w>
       <w>dunder</w>
       <w>dunders</w>
       <w>icontract</w>
+      <w>intra</w>
       <w>irdi</w>
       <w>lineno</w>
       <w>mristin</w>
