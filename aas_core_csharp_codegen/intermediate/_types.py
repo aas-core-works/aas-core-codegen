@@ -312,7 +312,7 @@ class EnumerationLiteral:
     def __init__(
         self,
         name: Identifier,
-        value: str,
+        value: Identifier,
         description: Optional[str],
         parsed: parse.EnumerationLiteral,
     ) -> None:

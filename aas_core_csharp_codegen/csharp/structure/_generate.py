@@ -184,7 +184,7 @@ class Block(str):
         return cast(Block, block)
 
 
-@require(lambda intermediate_symbol: not intermediate_symbol.is_implementation_specific)
+@require(lambda enum_symbol: not enum_symbol.is_implementation_specific)
 def _generate_enum(enum_symbol: intermediate.Enumeration) -> Code:
     """Generate the C# code for the enum."""
     enum_name = naming.enum_name(enum_symbol.name)
@@ -198,12 +198,20 @@ def _generate_enum(enum_symbol: intermediate.Enumeration) -> Code:
             writer.write(",\n\n")
 
         writer.write(
-            f'    [EnumMember(Value = {csharp_common.string_literal(literal.value)})\n'
+            f'    [EnumMember(Value = {csharp_common.string_literal(literal.value)})]\n'
             f'    {naming.enum_literal_name(literal.name)}')
 
     writer.write("\n}}")
 
     return Code(writer.getvalue())
+
+
+def _generate_interface(
+        intermediate_symbol: intermediate.Symbol,
+        spec_impls: specific_implementations.SpecificImplementations
+) -> Code:
+    """Generate C# code for the given interface."""
+    raise NotImplementedError()
 
 
 # fmt: off
@@ -249,14 +257,16 @@ def generate(
         code = None  # type: Optional[Code]
 
         if intermediate_symbol.is_implementation_specific:
+            # TODO: test
             code = spec_impls[
                 specific_implementations.ImplementationKey(
                     intermediate_symbol.name)]
         else:
             if isinstance(intermediate_symbol, intermediate.Enumeration):
+                # TODO: test
                 code = _generate_enum(enum_symbol=intermediate_symbol)
             elif isinstance(intermediate_symbol, intermediate.Interface):
-                # TODO: impl
+                # TODO: test
                 code = _generate_interface(
                     intermediate_symbol=intermediate_symbol,
                     spec_impls=spec_impls)

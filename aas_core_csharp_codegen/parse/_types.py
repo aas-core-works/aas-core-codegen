@@ -39,7 +39,7 @@ class SubscriptedTypeAnnotation:
     """Represent a subscripted type annotation such as ``Optional[...]``."""
 
     def __init__(
-        self, identifier: Identifier, subscripts: Sequence["TypeAnnotation"]
+            self, identifier: Identifier, subscripts: Sequence["TypeAnnotation"]
     ) -> None:
         self.identifier = identifier
         self.subscripts = subscripts
@@ -103,12 +103,12 @@ class Property:
     )
     # fmt: on
     def __init__(
-        self,
-        name: Identifier,
-        type_annotation: TypeAnnotation,
-        description: Optional[str],
-        is_readonly: bool,
-        node: ast.AnnAssign,
+            self,
+            name: Identifier,
+            type_annotation: TypeAnnotation,
+            description: Optional[str],
+            is_readonly: bool,
+            node: ast.AnnAssign,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -134,11 +134,11 @@ class Argument:
         "No type qualifier ``Final`` expected in the type annotation of an argument",
     )
     def __init__(
-        self,
-        name: Identifier,
-        type_annotation: TypeAnnotation,
-        default: Optional[Default],
-        node: ast.arg,
+            self,
+            name: Identifier,
+            type_annotation: TypeAnnotation,
+            default: Optional[Default],
+            node: ast.arg,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -151,11 +151,11 @@ class Contract:
     """Represent a contract of a method."""
 
     def __init__(
-        self,
-        args: Sequence[Identifier],
-        description: Optional[str],
-        body: ast.AST,
-        condition_node: ast.Lambda,
+            self,
+            args: Sequence[Identifier],
+            description: Optional[str],
+            body: ast.AST,
+            condition_node: ast.Lambda,
     ) -> None:
         self.args = args
         self.description = description
@@ -167,11 +167,11 @@ class Snapshot:
     """Represent a snapshot of an OLD value capture before the method execution."""
 
     def __init__(
-        self,
-        args: Sequence[Identifier],
-        body: ast.AST,
-        name: Identifier,
-        capture_node: ast.Lambda,
+            self,
+            args: Sequence[Identifier],
+            body: ast.AST,
+            name: Identifier,
+            capture_node: ast.Lambda,
     ) -> None:
         """Initialize with the given values."""
         self.args = args
@@ -184,10 +184,10 @@ class Contracts:
     """Represent the set of contracts for a method."""
 
     def __init__(
-        self,
-        preconditions: Sequence[Contract],
-        snapshots: Sequence[Snapshot],
-        postconditions: Sequence[Contract],
+            self,
+            preconditions: Sequence[Contract],
+            snapshots: Sequence[Snapshot],
+            postconditions: Sequence[Contract],
     ) -> None:
         """Initialize with the given values."""
         self.preconditions = preconditions
@@ -198,9 +198,9 @@ class Contracts:
 def is_string_expr(expr: ast.AST) -> bool:
     """Check that the expression is a string literal."""
     return (
-        isinstance(expr, ast.Expr)
-        and isinstance(expr.value, ast.Constant)
-        and isinstance(expr.value.value, str)
+            isinstance(expr, ast.Expr)
+            and isinstance(expr.value, ast.Constant)
+            and isinstance(expr.value.value, str)
     )
 
 
@@ -243,15 +243,15 @@ class Method:
     )
     # fmt: on
     def __init__(
-        self,
-        name: Identifier,
-        is_implementation_specific: bool,
-        arguments: Sequence[Argument],
-        returns: Optional[TypeAnnotation],
-        description: Optional[str],
-        contracts: Contracts,
-        body: Sequence[ast.AST],
-        node: ast.AST,
+            self,
+            name: Identifier,
+            is_implementation_specific: bool,
+            arguments: Sequence[Argument],
+            returns: Optional[TypeAnnotation],
+            description: Optional[str],
+            contracts: Contracts,
+            body: Sequence[ast.AST],
+            node: ast.AST,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -296,14 +296,14 @@ class Entity:
     )
     # fmt: on
     def __init__(
-        self,
-        name: Identifier,
-        is_implementation_specific: bool,
-        inheritances: Sequence[Identifier],
-        properties: Sequence[Property],
-        methods: Sequence[Method],
-        description: Optional[str],
-        node: ast.ClassDef,
+            self,
+            name: Identifier,
+            is_implementation_specific: bool,
+            inheritances: Sequence[Identifier],
+            properties: Sequence[Property],
+            methods: Sequence[Method],
+            description: Optional[str],
+            node: ast.ClassDef,
     ) -> None:
         self.name = name
         self.is_implementation_specific = is_implementation_specific
@@ -355,7 +355,11 @@ class EnumerationLiteral:
     """Represent a single enumeration literal."""
 
     def __init__(
-        self, name: Identifier, value: str, description: Optional[str], node: ast.Assign
+            self,
+            name: Identifier,
+            value: Identifier,
+            description: Optional[str],
+            node: ast.Assign
     ) -> None:
         self.name = name
         self.value = value
@@ -367,11 +371,11 @@ class Enumeration:
     """Represent an enumeration."""
 
     def __init__(
-        self,
-        name: Identifier,
-        literals: Sequence[EnumerationLiteral],
-        description: Optional[str],
-        node: ast.ClassDef,
+            self,
+            name: Identifier,
+            literals: Sequence[EnumerationLiteral],
+            description: Optional[str],
+            node: ast.ClassDef,
     ) -> None:
         self.name = name
         self.literals = literals
@@ -394,8 +398,8 @@ class UnverifiedSymbolTable(DBC):
 
     @require(
         lambda symbols: (
-            names := [symbol.name for symbol in symbols],
-            len(names) == len(set(names)),
+                names := [symbol.name for symbol in symbols],
+                len(names) == len(set(names)),
         )[1],
         "Symbol names unique",
     )
