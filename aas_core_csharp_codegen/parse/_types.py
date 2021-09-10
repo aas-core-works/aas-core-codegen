@@ -9,13 +9,25 @@ from aas_core_csharp_codegen.common import Identifier, assert_never
 
 _MODULE_NAME = pathlib.Path(__file__).parent.name
 
+BUILTIN_ATOMIC_TYPES = {"bool", "int", "float", "str"}
+
+BUILTIN_COMPOSITE_TYPES = {
+    "List",
+    "Sequence",
+    "Set",
+    "Mapping",
+    "MutableMapping",
+    "Optional"
+}
+
 
 class AtomicTypeAnnotation:
     """Represent an atomic type annotation, such as ``Asset`` or ``int``."""
 
-    def __init__(self, identifier: Identifier) -> None:
+    def __init__(self, identifier: Identifier, node: ast.AST) -> None:
         """Initialize with the given values."""
         self.identifier = identifier
+        self.node = node
 
     def __str__(self) -> str:
         return self.identifier
@@ -39,12 +51,16 @@ class SubscriptedTypeAnnotation:
     """Represent a subscripted type annotation such as ``Optional[...]``."""
 
     def __init__(
-            self, identifier: Identifier, subscripts: Sequence["TypeAnnotation"]
+            self, identifier: Identifier, subscripts: Sequence["TypeAnnotation"],
+            node: ast.AST
     ) -> None:
+        """Initialize with the given values."""
         self.identifier = identifier
         self.subscripts = subscripts
+        self.node = node
 
     def __str__(self) -> str:
+        """Represent by reconstructing the type annotation heuristically."""
         return "".join(
             [self.identifier, "["]
             + [", ".join([str(subscript) for subscript in self.subscripts])]

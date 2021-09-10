@@ -36,13 +36,13 @@ from aas_core_csharp_codegen.parse._types import (
     Symbol,
     SymbolTable,
     TypeAnnotation,
-    UnverifiedSymbolTable,
+    UnverifiedSymbolTable, BUILTIN_ATOMIC_TYPES, BUILTIN_COMPOSITE_TYPES,
 )
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def source_to_atok(
-    source: str,
+        source: str,
 ) -> Tuple[Optional[asttokens.ASTTokens], Optional[Exception]]:
     """
     Parse the Python code.
@@ -70,7 +70,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             Error(
                 node=node,
                 message=f"Unexpected ``import ...``. "
-                f"Only ``from ... import...`` statements are expected.",
+                        f"Only ``from ... import...`` statements are expected.",
             )
         )
 
@@ -100,7 +100,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
                     Error(
                         node=name,
                         message=f"Unexpected ``from ... import ... as ...``. "
-                        f"Only ``from ... import...`` statements are expected.",
+                                f"Only ``from ... import...`` statements are expected.",
                     )
                 )
             else:
@@ -119,8 +119,8 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
                             Error(
                                 node=name,
                                 message=f"Expected to import {name.name!r} "
-                                f"from the module {expected_module}, "
-                                f"but it is imported from {node.module}.",
+                                        f"from the module {expected_module}, "
+                                        f"but it is imported from {node.module}.",
                             )
                         )
 
@@ -145,7 +145,7 @@ def check_expected_imports(atok: asttokens.ASTTokens) -> List[str]:
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _enum_to_symbol(
-    node: ast.ClassDef, atok: asttokens.ASTTokens
+        node: ast.ClassDef, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Enumeration], Optional[Error]]:
     """Interpret a class which defines an enumeration."""
     if len(node.body) == 0:
@@ -183,7 +183,7 @@ def _enum_to_symbol(
                     Error(
                         node=assign,
                         message=f"Expected a single target in the assignment, "
-                        f"but got: {len(assign.targets)}",
+                                f"but got: {len(assign.targets)}",
                     ),
                 )
 
@@ -193,7 +193,7 @@ def _enum_to_symbol(
                     Error(
                         node=assign.targets[0],
                         message=f"Expected a name as a target of the assignment, "
-                        f"but got: {assign.targets[0]}",
+                                f"but got: {assign.targets[0]}",
                     ),
                 )
 
@@ -203,7 +203,7 @@ def _enum_to_symbol(
                     Error(
                         node=assign.value,
                         message=f"Expected a constant in the enumeration assignment, "
-                        f"but got: {atok.get_text(assign.value)}",
+                                f"but got: {atok.get_text(assign.value)}",
                     ),
                 )
 
@@ -213,7 +213,7 @@ def _enum_to_symbol(
                     Error(
                         node=assign.value,
                         message=f"Expected a string literal in the enumeration, "
-                        f"but got: {assign.value.value}",
+                                f"but got: {assign.value.value}",
                     ),
                 )
 
@@ -231,7 +231,7 @@ def _enum_to_symbol(
             enumeration_literals.append(
                 EnumerationLiteral(
                     name=literal_name,
-                    value=literal_value,
+                    value=Identifier(literal_value),
                     description=literal_description,
                     node=assign,
                 )
@@ -245,8 +245,8 @@ def _enum_to_symbol(
                 Error(
                     node=node.body[cursor],
                     message=f"Expected either a docstring or an assignment "
-                    f"in an enumeration, "
-                    f"but got: {atok.get_text(node.body[cursor])}",
+                            f"in an enumeration, "
+                            f"but got: {atok.get_text(node.body[cursor])}",
                 ),
             )
 
@@ -265,7 +265,7 @@ def _enum_to_symbol(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _type_annotation(
-    node: ast.AST, atok: asttokens.ASTTokens
+        node: ast.AST, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[TypeAnnotation], Optional[Error]]:
     """Parse the type annotation."""
     if isinstance(node, ast.Name):
@@ -279,7 +279,7 @@ def _type_annotation(
                 ),
             )
 
-        return AtomicTypeAnnotation(identifier=Identifier(node.id)), None
+        return AtomicTypeAnnotation(identifier=Identifier(node.id), node=node), None
 
     elif isinstance(node, ast.Constant):
         if not isinstance(node.value, str):
@@ -288,13 +288,13 @@ def _type_annotation(
                 Error(
                     node=node.value,
                     message=f"Expected a string literal "
-                    f"if the type annotation is given as a constant, "
-                    f"but got: "
-                    f"{node.value!r} (as {type(node.value)})",
+                            f"if the type annotation is given as a constant, "
+                            f"but got: "
+                            f"{node.value!r} (as {type(node.value)})",
                 ),
             )
 
-        return AtomicTypeAnnotation(identifier=Identifier(node.value)), None
+        return AtomicTypeAnnotation(identifier=Identifier(node.value), node=node), None
 
     elif isinstance(node, ast.Subscript):
         if not isinstance(node.value, ast.Name):
@@ -303,8 +303,8 @@ def _type_annotation(
                 Error(
                     node=node.value,
                     message=f"Expected a name to define "
-                    f"a subscripted type annotation,"
-                    f"but got: {atok.get_text(node.value)}",
+                            f"a subscripted type annotation,"
+                            f"but got: {atok.get_text(node.value)}",
                 ),
             )
 
@@ -345,7 +345,8 @@ def _type_annotation(
 
             return (
                 SubscriptedTypeAnnotation(
-                    identifier=Identifier(node.value.id), subscripts=subscripts
+                    identifier=Identifier(node.value.id), subscripts=subscripts,
+                    node=node
                 ),
                 None,
             )
@@ -356,8 +357,8 @@ def _type_annotation(
                 Error(
                     node=node.slice,
                     message=f"Expected an index to define "
-                    f"a subscripted type annotation, "
-                    f"but got: {atok.get_text(node.slice)}",
+                            f"a subscripted type annotation, "
+                            f"but got: {atok.get_text(node.slice)}",
                 ),
             )
     else:
@@ -374,7 +375,7 @@ def _type_annotation(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _ann_assign_to_property(
-    node: ast.AnnAssign, description: Optional[str], atok: asttokens.ASTTokens
+        node: ast.AnnAssign, description: Optional[str], atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Property], Optional[Error]]:
     if not isinstance(node.target, ast.Name):
         return (
@@ -415,8 +416,8 @@ def _ann_assign_to_property(
 
     is_readonly = False
     if (
-        isinstance(type_annotation, SubscriptedTypeAnnotation)
-        and type_annotation.identifier == "Final"
+            isinstance(type_annotation, SubscriptedTypeAnnotation)
+            and type_annotation.identifier == "Final"
     ):
         if len(type_annotation.subscripts) != 1:
             return (
@@ -455,7 +456,7 @@ def _ann_assign_to_property(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _args_to_arguments(
-    node: ast.arguments, atok: asttokens.ASTTokens
+        node: ast.arguments, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[List[Argument]], Optional[Error]]:
     """Parse arguments of a method."""
     if hasattr(node, "posonlyargs") and len(node.posonlyargs) > 0:
@@ -575,8 +576,8 @@ def _args_to_arguments(
                 )
 
             if not (
-                default_node.value is None
-                or isinstance(default_node.value, (bool, int, float, str))
+                    default_node.value is None
+                    or isinstance(default_node.value, (bool, int, float, str))
             ):
                 return (
                     None,
@@ -613,7 +614,7 @@ def _args_to_arguments(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _parse_contract_condition(
-    node: ast.Call, atok: asttokens.ASTTokens
+        node: ast.Call, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Contract], Optional[Error]]:
     """Parse the contract decorator."""
     condition_node = None  # type: Optional[ast.AST]
@@ -653,8 +654,8 @@ def _parse_contract_condition(
         )
 
     if description_node is not None and not (
-        isinstance(description_node, ast.Constant)
-        and isinstance(description_node.value, str)
+            isinstance(description_node, ast.Constant)
+            and isinstance(description_node.value, str)
     ):
         return (
             None,
@@ -678,7 +679,7 @@ def _parse_contract_condition(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _parse_snapshot(
-    node: ast.Call, atok: asttokens.ASTTokens
+        node: ast.Call, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Snapshot], Optional[Error]]:
     """Parse the snapshot decorator."""
     capture_node = None  # type: Optional[ast.AST]
@@ -702,7 +703,7 @@ def _parse_snapshot(
             pass
 
     if capture_node is None:
-        return (None, Error(node, "Expected the capture to be defined for a snapshot"))
+        return None, Error(node, "Expected the capture to be defined for a snapshot")
 
     if not isinstance(capture_node, ast.Lambda):
         return (
@@ -715,7 +716,7 @@ def _parse_snapshot(
         )
 
     if name_node is not None and not (
-        isinstance(name_node, ast.Constant) and isinstance(name_node.value, str)
+            isinstance(name_node, ast.Constant) and isinstance(name_node.value, str)
     ):
         return (
             None,
@@ -768,7 +769,7 @@ def _parse_snapshot(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _function_def_to_method(
-    node: ast.FunctionDef, atok: asttokens.ASTTokens
+        node: ast.FunctionDef, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Method], Optional[Error]]:
     """Parse the function definition into an entity method."""
     name = node.name
@@ -1023,7 +1024,7 @@ def _string_expr_to_text(expr: ast.Expr) -> str:
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _classdef_to_symbol(
-    node: ast.ClassDef, atok: asttokens.ASTTokens
+        node: ast.ClassDef, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Symbol], Optional[Error]]:
     """Interpret the class definition as a symbol."""
     underlying_errors = []  # type: List[Error]
@@ -1035,7 +1036,7 @@ def _classdef_to_symbol(
                 Error(
                     node=base,
                     message=f"Expected a base as a name, "
-                    f"but got: {atok.get_text(base)}",
+                            f"but got: {atok.get_text(base)}",
                 )
             )
         else:
@@ -1057,7 +1058,7 @@ def _classdef_to_symbol(
             Error(
                 node=node,
                 message=f"Expected an enumeration to only inherit from ``Enum``, "
-                f"but it inherits from: {base_names}",
+                        f"but it inherits from: {base_names}",
             ),
         )
 
@@ -1085,7 +1086,7 @@ def _classdef_to_symbol(
                 Error(
                     node=decorator,
                     message=f"Expected a decorator as a name, "
-                    f"but got: {atok.get_text(decorator)}",
+                            f"but got: {atok.get_text(decorator)}",
                 ),
             )
 
@@ -1171,8 +1172,8 @@ def _classdef_to_symbol(
                 Error(
                     node=expr,
                     message=f"Expected only either "
-                    f"properties explicitly annotated with types or "
-                    f"instance methods, but got: {atok.get_text(expr)}",
+                            f"properties explicitly annotated with types or "
+                            f"instance methods, but got: {atok.get_text(expr)}",
                 ),
             )
 
@@ -1199,6 +1200,39 @@ def _classdef_to_symbol(
     )
 
 
+def _verify_arity_of_type_annotation_subscript(
+        type_annotation: SubscriptedTypeAnnotation
+) -> Optional[Error]:
+    """
+    Check that the subscripted type annotation has the expected number of arguments.
+
+    :return: error message, if any
+    """
+    expected_arity_map = {
+        "List": 1,
+        "Sequence": 1,
+        "Set": 1,
+        "Mapping": 2,
+        "MutableMapping": 2,
+        "Optional": 1,
+        "Final": 1
+    }
+    expected_arity = expected_arity_map.get(type_annotation.identifier, None)
+    if expected_arity is None:
+        raise AssertionError(
+            f"Unexpected subscripted type annotation: {type_annotation}")
+
+    assert expected_arity >= 0
+    if len(type_annotation.subscripts) != expected_arity:
+        return Error(
+            type_annotation.node,
+            f"Expected {expected_arity} arguments of "
+            f"a subscripted type annotation {type_annotation.identifier!r}, "
+            f"but got {len(type_annotation.subscripts)}: {type_annotation}")
+
+    return None
+
+
 # fmt: off
 @ensure(
     lambda result:
@@ -1208,7 +1242,7 @@ def _classdef_to_symbol(
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 # fmt: on
 def _verify_symbol_table(
-    symbol_table: UnverifiedSymbolTable,
+        symbol_table: UnverifiedSymbolTable,
 ) -> Tuple[Optional[SymbolTable], Optional[List[Error]]]:
     """
     Check that the symbol table is consistent.
@@ -1260,33 +1294,26 @@ def _verify_symbol_table(
 
     # endregion
 
-    # region Check for dangling type annotations in properties and method signatures
+    # region Check type annotations in properties and method signatures
 
-    expected_atomic_types = {"int", "float", "str", "bool"}
-    expected_subscripted_types = {
-        "List",
-        "Sequence",
-        "Set",
-        "Mapping",
-        "MutableMapping",
-        "Optional",
-        "Final",
-    }
+    expected_subscripted_types = BUILTIN_COMPOSITE_TYPES.copy()
+    expected_subscripted_types.add("Final")
 
     def verify_no_dangling_references_in_type_annotation(
-        type_annotation: TypeAnnotation,
-    ) -> Optional[str]:
+            type_annotation: TypeAnnotation,
+    ) -> Optional[Error]:
         """
         Check that the type annotation contains no dangling references.
 
         :return: error message, if any
         """
         if isinstance(type_annotation, AtomicTypeAnnotation):
-            if type_annotation.identifier in expected_atomic_types:
+            if type_annotation.identifier in BUILTIN_ATOMIC_TYPES:
                 return None
 
             if type_annotation.identifier in expected_subscripted_types:
-                return (
+                return Error(
+                    type_annotation.node,
                     f"The type annotation is expected with subscript(s), "
                     f"but got none: {type_annotation.identifier}"
                 )
@@ -1294,21 +1321,24 @@ def _verify_symbol_table(
             if symbol_table.find(type_annotation.identifier) is not None:
                 return None
 
-            return (
+            return Error(
+                type_annotation.node,
                 f"The type annotation could not be found "
                 f"in the symbol table: {type_annotation.identifier}"
             )
 
         elif isinstance(type_annotation, SubscriptedTypeAnnotation):
             if type_annotation.identifier not in expected_subscripted_types:
-                return f"Unexpected subscripted type: {type_annotation.identifier}"
+                return Error(
+                    type_annotation.node,
+                    f"Unexpected subscripted type: {type_annotation.identifier}")
 
             for subscript in type_annotation.subscripts:
-                error = verify_no_dangling_references_in_type_annotation(
+                error_in_subscript = verify_no_dangling_references_in_type_annotation(
                     type_annotation=subscript
                 )
-                if error is not None:
-                    return error
+                if error_in_subscript is not None:
+                    return error_in_subscript
 
             return None
 
@@ -1324,21 +1354,52 @@ def _verify_symbol_table(
             continue
 
         for prop in symbol.properties:
-            error_message = verify_no_dangling_references_in_type_annotation(
+            error = verify_no_dangling_references_in_type_annotation(
                 type_annotation=prop.type_annotation
             )
 
-            if error_message is not None:
-                errors.append(Error(prop.node, error_message))
+            if error is not None:
+                errors.append(error)
+            else:
+                # TODO: test
+                if isinstance(prop.type_annotation, SubscriptedTypeAnnotation):
+                    error = _verify_arity_of_type_annotation_subscript(
+                        prop.type_annotation)
+
+                    if error is not None:
+                        errors.append(error)
 
         for method in symbol.methods:
             for arg in method.arguments:
-                error_message = verify_no_dangling_references_in_type_annotation(
-                    type_annotation=arg.type_annotation
-                )
+                error = verify_no_dangling_references_in_type_annotation(
+                    type_annotation=arg.type_annotation)
 
-                if error_message is not None:
-                    errors.append(Error(arg.node, error_message))
+                if error is not None:
+                    errors.append(error)
+                else:
+                    # TODO: test
+                    if isinstance(arg.type_annotation, SubscriptedTypeAnnotation):
+                        error = _verify_arity_of_type_annotation_subscript(
+                            arg.type_annotation)
+
+                        if error is not None:
+                            errors.append(error)
+
+            if method.returns is not None:
+                # TODO: test
+                error = verify_no_dangling_references_in_type_annotation(
+                    type_annotation=method.returns
+                )
+                if error is not None:
+                    errors.append(error)
+                else:
+                    # TODO: test
+                    if isinstance(method.returns, SubscriptedTypeAnnotation):
+                        error = _verify_arity_of_type_annotation_subscript(
+                            method.returns)
+
+                        if error is not None:
+                            errors.append(error)
 
     if len(errors) > 0:
         return None, errors
@@ -1351,7 +1412,7 @@ def _verify_symbol_table(
 @require(lambda atok: isinstance(atok.tree, ast.Module))
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _atok_to_symbol_table(
-    atok: asttokens.ASTTokens,
+        atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[SymbolTable], Optional[Error]]:
     symbols = []  # type: List[Symbol]
     underlying_errors = []  # type: List[Error]
@@ -1372,7 +1433,7 @@ def _atok_to_symbol_table(
                 symbols.append(symbol)
 
     if len(underlying_errors) > 0:
-        return (None, Error(atok.tree, "Failed to parse the AST", underlying_errors))
+        return None, Error(atok.tree, "Failed to parse the AST", underlying_errors)
 
     unverified_symbol_table = UnverifiedSymbolTable(symbols=symbols)
 
@@ -1393,7 +1454,7 @@ def _atok_to_symbol_table(
 @require(lambda atok: isinstance(atok.tree, ast.Module))
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def atok_to_symbol_table(
-    atok: asttokens.ASTTokens,
+        atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[SymbolTable], Optional[Error]]:
     """Construct the symbol table based on the parsed AST."""
     table, error = _atok_to_symbol_table(atok=atok)

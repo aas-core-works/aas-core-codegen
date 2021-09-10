@@ -1,10 +1,12 @@
 """Provide common functions shared among difference C# code generation modules."""
-from typing import List, Union
+from typing import List, Union, Tuple, Optional
 
 from icontract import ensure
 
-from aas_core_csharp_codegen import intermediate
-from aas_core_csharp_codegen.common import Code
+from aas_core_csharp_codegen import intermediate, parse
+from aas_core_csharp_codegen.common import Code, Error, assert_never
+from aas_core_csharp_codegen.csharp import naming
+from aas_core_csharp_codegen.intermediate._types import ListTypeAnnotation
 
 
 @ensure(lambda result: result.startswith('"'))
@@ -38,6 +40,16 @@ def string_literal(text: str) -> str:
     return '"{}"'.format("".join(escaped))
 
 
+_ATOMIC_TYPE_MAP = {
+    "bool": Code("bool"),
+    "int": Code("int"),
+    "float": Code("float"),
+    "str": Code("string")
+}
+assert list(_ATOMIC_TYPE_MAP.keys()) == list(parse.BUILTIN_ATOMIC_TYPES), \
+    "Expected complete mapping of primitive types to implementation-specific types"
+
+
 def generate_type(
         type_annotation: Union[
             intermediate.SubscriptedTypeAnnotation, intermediate.AtomicTypeAnnotation]
@@ -45,8 +57,40 @@ def generate_type(
     """
     Generate the C# type for the given type annotation.
 
-    This function is oblivious whether the type is valid.
+    The type annotations are expected to be non-dangling.
+    If a type does not belong to
+    :attr:`aas_core_csharp_codegen.parse.BUILTIN_ATOMIC_TYPES` and
+    :attr:`aas_core_csharp_codegen.parse.BUILTIN_COMPOSITE_TYPES`, it is assumed to be
+    a type defined in the meta-model.
     """
+    if isinstance(type_annotation, intermediate.AtomicTypeAnnotation):
+        maybe_primitive_type = _ATOMIC_TYPE_MAP.get(type_annotation.identifier, None)
+        if maybe_primitive_type is not None:
+            return maybe_primitive_type
+        # TODO: once intermediate fixed, we need to introduce naming for the symbol 🠒 dispatch here to csharp.naming
+        return naming.class_name()
+
+        return _ATOMIC_TYPE_MAP[type_annotation.identifier], None
+
+    elif isinstance(type_annotation, intermediate.SubscriptedTypeAnnotation):
+        if isinstance(type_annotation, ListTypeAnnotation):
+            items, error = generate_type(type_annotation.items)
+            if error is not None:
+                return error
+
+            return f"List<{}>"
+
+            #     "List",
+        #     "Sequence",
+        #     "Set",
+        #     "Mapping",
+        #     "MutableMapping",
+        #     "Optional"
+        else:
+            assert_never(type_annotation)
+
+    else:
+        assert_never(type_annotation)
     # TODO: impl this, then go back to _generate
     # TODO: test with general snippets, do not test in isolation
     raise NotImplementedError()

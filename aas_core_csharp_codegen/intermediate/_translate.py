@@ -15,7 +15,6 @@ from aas_core_csharp_codegen.intermediate._types import (
     EnumerationLiteral,
     TypeAnnotation,
     AtomicTypeAnnotation,
-    SubscriptedTypeAnnotation,
     SelfTypeAnnotation,
     Argument,
     Default,
@@ -28,7 +27,8 @@ from aas_core_csharp_codegen.intermediate._types import (
     Method,
     Class,
     Constructor,
-    Symbol,
+    Symbol, ListTypeAnnotation, SequenceTypeAnnotation, SetTypeAnnotation,
+    MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
 )
 
 
@@ -58,14 +58,73 @@ def _parsed_type_annotation_to_annotation(
         return AtomicTypeAnnotation(identifier=parsed.identifier, parsed=parsed)
 
     elif isinstance(parsed, parse.SubscriptedTypeAnnotation):
-        return SubscriptedTypeAnnotation(
-            identifier=parsed.identifier,
-            subscripts=[
-                _parsed_type_annotation_to_annotation(subscript)
-                for subscript in parsed.subscripts
-            ],
-            parsed=parsed,
-        )
+        if parsed.identifier == 'Final':
+            raise AssertionError(
+                "Unexpected ``Final`` type annotation at this stage. "
+                "This type annotation should have been processed before.")
+            
+        elif parsed.identifier == 'List':
+            assert len(parsed.subscripts) == 1, (
+                f"Expected exactly one subscript for the List type annotation, "
+                f"but got: {parsed}; this should have been caught before!")
+            
+            return ListTypeAnnotation(
+                items=_parsed_type_annotation_to_annotation(parsed.subscripts[0]),
+                parsed=parsed)
+
+        elif parsed.identifier == 'Sequence':
+            assert len(parsed.subscripts) == 1, (
+                f"Expected exactly one subscript for the Sequence type annotation, "
+                f"but got: {parsed}; this should have been caught before!")
+
+            return SequenceTypeAnnotation(
+                items=_parsed_type_annotation_to_annotation(parsed.subscripts[0]),
+                parsed=parsed)
+
+        elif parsed.identifier == 'Set':
+            assert len(parsed.subscripts) == 1, (
+                f"Expected exactly one subscript for the Set type annotation, "
+                f"but got: {parsed}; this should have been caught before!")
+
+            return SetTypeAnnotation(
+                items=_parsed_type_annotation_to_annotation(parsed.subscripts[0]),
+                parsed=parsed)
+        
+        elif parsed.identifier == 'Mapping':
+            assert len(parsed.subscripts) == 2, (
+                f"Expected exactly two subscripts for the Mapping type annotation, "
+                f"but got: {parsed}; this should have been caught before!")
+
+            return MappingTypeAnnotation(
+                keys=_parsed_type_annotation_to_annotation(parsed.subscripts[0]),
+                values=_parsed_type_annotation_to_annotation(parsed.subscripts[1]),
+                parsed=parsed)
+
+        elif parsed.identifier == 'MutableMapping':
+            assert len(parsed.subscripts) == 2, (
+                f"Expected exactly two subscripts "
+                f"for the MutableMapping type annotation, "
+                f"but got: {parsed}; this should have been caught before!")
+
+            return MutableMappingTypeAnnotation(
+                keys=_parsed_type_annotation_to_annotation(parsed.subscripts[0]),
+                values=_parsed_type_annotation_to_annotation(parsed.subscripts[1]),
+                parsed=parsed)
+
+        elif parsed.identifier == 'Optional':
+            assert len(parsed.subscripts) == 1, (
+                f"Expected exactly one subscript for the Optional type annotation, "
+                f"but got: {parsed}; this should have been caught before!")
+
+            return OptionalTypeAnnotation(
+                value=_parsed_type_annotation_to_annotation(parsed.subscripts[0]),
+                parsed=parsed)
+
+        else:
+            raise AssertionError(
+                f"Unexpected subscripted type annotation identifier: "
+                f"{parsed.identifier}. "
+                f"This should have been handled or caught before!")
 
     elif isinstance(parsed, parse.SelfTypeAnnotation):
         return SelfTypeAnnotation()
@@ -94,6 +153,7 @@ def _parsed_arguments_to_arguments(parsed: Sequence[parse.Argument]) -> List[Arg
 
 def _parsed_abstract_entity_to_interface(parsed: parse.AbstractEntity) -> Interface:
     """Translate an abstract entity of a meta-model to an intermediate interface."""
+    # noinspection PyTypeChecker
     return Interface(
         name=parsed.name,
         inheritances=parsed.inheritances,

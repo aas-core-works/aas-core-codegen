@@ -28,6 +28,9 @@ EnumerationLiteral = _types.EnumerationLiteral
 Enumeration = _types.Enumeration
 SymbolTable = _types.SymbolTable
 
+BUILTIN_ATOMIC_TYPES = _types.BUILTIN_ATOMIC_TYPES
+BUILTIN_COMPOSITE_TYPES = _types.BUILTIN_COMPOSITE_TYPES
+
 source_to_atok = _translate.source_to_atok
 check_expected_imports = _translate.check_expected_imports
 atok_to_symbol_table = _translate.atok_to_symbol_table

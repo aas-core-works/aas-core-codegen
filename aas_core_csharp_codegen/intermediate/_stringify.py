@@ -22,7 +22,8 @@ from aas_core_csharp_codegen.intermediate._types import (
     SubscriptedTypeAnnotation,
     Symbol,
     SymbolTable,
-    TypeAnnotation,
+    TypeAnnotation, ListTypeAnnotation, SequenceTypeAnnotation, SetTypeAnnotation,
+    MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
 )
 
 
@@ -57,21 +58,64 @@ def _stringify_atomic_type_annotation(
 def _stringify_subscripted_type_annotation(
     type_annotation: SubscriptedTypeAnnotation,
 ) -> stringify.Entity:
-    result = stringify.Entity(
-        name=SubscriptedTypeAnnotation.__name__,
-        properties=[
-            stringify.Property("identifier", type_annotation.identifier),
-            stringify.Property(
-                "subscripts",
-                [
-                    _stringify_type_annotation(subscript)
-                    for subscript in type_annotation.subscripts
-                ],
-            ),
-            stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-        ],
-    )
+    result = None  # type: Optional[stringify.Entity]
+    
+    if isinstance(type_annotation, ListTypeAnnotation):
+        result = stringify.Entity(
+            name=ListTypeAnnotation.__name__,
+            properties=[
+                stringify.Property(
+                    "items", _stringify_type_annotation(type_annotation.items)),
+                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
+            ])
+    elif isinstance(type_annotation, SequenceTypeAnnotation):
+        result = stringify.Entity(
+            name=SequenceTypeAnnotation.__name__,
+            properties=[
+                stringify.Property(
+                    "items", _stringify_type_annotation(type_annotation.items)),
+                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
+            ])
+    elif isinstance(type_annotation, SetTypeAnnotation):
+        result = stringify.Entity(
+            name=SetTypeAnnotation.__name__,
+            properties=[
+                stringify.Property(
+                    "items", _stringify_type_annotation(type_annotation.items)),
+                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
+            ])
+    elif isinstance(type_annotation, MappingTypeAnnotation):
+        result = stringify.Entity(
+            name=MappingTypeAnnotation.__name__,
+            properties=[
+                stringify.Property(
+                    "keys", _stringify_type_annotation(type_annotation.keys)),
+                stringify.Property(
+                    "values", _stringify_type_annotation(type_annotation.values)),
+                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
+            ])
+    elif isinstance(type_annotation, MutableMappingTypeAnnotation):
+        result = stringify.Entity(
+            name=MutableMappingTypeAnnotation.__name__,
+            properties=[
+                stringify.Property(
+                    "keys", _stringify_type_annotation(type_annotation.keys)),
+                stringify.Property(
+                    "values", _stringify_type_annotation(type_annotation.values)),
+                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
+            ])
+    elif isinstance(type_annotation, OptionalTypeAnnotation):
+        result = stringify.Entity(
+            name=OptionalTypeAnnotation.__name__,
+            properties=[
+                stringify.Property(
+                    "value", _stringify_type_annotation(type_annotation.value)),
+                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
+            ])
+    else:
+        assert_never(type_annotation)
 
+    assert result is not None
     stringify.assert_compares_against_dict(result, type_annotation)
     return result
 
