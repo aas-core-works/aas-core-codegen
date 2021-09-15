@@ -1,30 +1,72 @@
 """Provide types of the intermediate representation."""
 import ast
+import enum
 import pathlib
-from typing import Sequence, Optional, Union, TypeVar
+from typing import Sequence, Optional, Union, TypeVar, Mapping
 
 from icontract import require
 
 import aas_core_csharp_codegen.understand.constructor as understand_constructor
 from aas_core_csharp_codegen import parse
 from aas_core_csharp_codegen.common import Identifier
+from aas_core_csharp_codegen.parse import BUILTIN_ATOMIC_TYPES
 
 _MODULE_NAME = pathlib.Path(__file__).parent.name
 
-# TODO: refactor into PrimitiveTypeAnnotation and OurTypeAnnotation — for structures defined in the meta-model;
-#   OurTypeAnnotation needs to reference a symbol!
-# TODO: propagate the refactoring to _stringify
-class AtomicTypeAnnotation:
-    """Represent an atomic type annotation, such as ``Asset`` or ``int``."""
 
-    @require(lambda identifier: identifier != "Final", "Unexpected Final at this stage")
-    def __init__(self, identifier: Identifier, parsed: parse.TypeAnnotation) -> None:
+class AtomicTypeAnnotation:
+    """
+    Represent an atomic non-composite type annotation.
+
+    For example, ``Asset`` or ``int``.
+    """
+
+
+class BuiltinAtomicType(enum.Enum):
+    """List primitive built-in types."""
+
+    BOOL = "bool"
+    INT = "int"
+    FLOAT = "float"
+    STR = "str"
+
+
+assert (
+        sorted(literal.value for literal in BuiltinAtomicType) ==
+        sorted(BUILTIN_ATOMIC_TYPES)
+), "All built-in atomic types specified in the intermediate layer"
+
+STR_TO_BUILTIN_ATOMIC_TYPE = {
+    literal.value: literal for literal in BuiltinAtomicType
+}  # type: Mapping[str, BuiltinAtomicType]
+
+
+class BuiltinAtomicTypeAnnotation(AtomicTypeAnnotation):
+    """Represent a built-in atomic type such as ``int``."""
+
+    def __init__(self, a_type: BuiltinAtomicType, parsed: parse.TypeAnnotation) -> None:
         """Initialize with the given values."""
-        self.identifier = identifier
+        self.a_type = a_type
         self.parsed = parsed
 
     def __str__(self) -> str:
-        return self.identifier
+        return str(self.a_type.value)
+
+
+class OurAtomicTypeAnnotation(AtomicTypeAnnotation):
+    """
+    Represent an atomic annotation defined by a symbol in the meta-model.
+
+     For example, ``Asset``.
+     """
+
+    def __init__(self, symbol: 'Symbol', parsed: parse.TypeAnnotation) -> None:
+        """Initialize with the given values."""
+        self.symbol = symbol
+        self.parsed = parsed
+
+    def __str__(self) -> str:
+        return self.symbol.name
 
 
 class SelfTypeAnnotation:
@@ -34,8 +76,6 @@ class SelfTypeAnnotation:
         return "SELF"
 
 
-# TODO: look out for usages!
-# TODO: see what happened with ``parsed``
 class SubscriptedTypeAnnotation:
     """Represent a subscripted type annotation such as ``Mapping[..., ...]``."""
 

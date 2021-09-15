@@ -14,7 +14,6 @@ from aas_core_csharp_codegen.intermediate._types import (
     Enumeration,
     EnumerationLiteral,
     TypeAnnotation,
-    AtomicTypeAnnotation,
     SelfTypeAnnotation,
     Argument,
     Default,
@@ -29,6 +28,7 @@ from aas_core_csharp_codegen.intermediate._types import (
     Constructor,
     Symbol, ListTypeAnnotation, SequenceTypeAnnotation, SetTypeAnnotation,
     MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
+    OurAtomicTypeAnnotation, STR_TO_BUILTIN_ATOMIC_TYPE, BuiltinAtomicTypeAnnotation,
 )
 
 
@@ -50,98 +50,141 @@ def _parsed_enumeration_to_enumeration(parsed: parse.Enumeration) -> Enumeration
     )
 
 
-def _parsed_type_annotation_to_annotation(
-    parsed: parse.TypeAnnotation,
-) -> TypeAnnotation:
-    """Translate the parsed type annotation into the intermediate one."""
-    if isinstance(parsed, parse.AtomicTypeAnnotation):
-        return AtomicTypeAnnotation(identifier=parsed.identifier, parsed=parsed)
+class _PlaceholderSymbol(Symbol):
+    """Reference a symbol which will be resolved once the table is built."""
 
-    elif isinstance(parsed, parse.SubscriptedTypeAnnotation):
-        if parsed.identifier == 'Final':
-            raise AssertionError(
-                "Unexpected ``Final`` type annotation at this stage. "
-                "This type annotation should have been processed before.")
-            
-        elif parsed.identifier == 'List':
-            assert len(parsed.subscripts) == 1, (
-                f"Expected exactly one subscript for the List type annotation, "
-                f"but got: {parsed}; this should have been caught before!")
-            
-            return ListTypeAnnotation(
-                items=_parsed_type_annotation_to_annotation(parsed.subscripts[0]),
-                parsed=parsed)
+    def __init__(self, identifier: Identifier) -> None:
+        self.identifier = identifier
 
-        elif parsed.identifier == 'Sequence':
-            assert len(parsed.subscripts) == 1, (
-                f"Expected exactly one subscript for the Sequence type annotation, "
-                f"but got: {parsed}; this should have been caught before!")
 
-            return SequenceTypeAnnotation(
-                items=_parsed_type_annotation_to_annotation(parsed.subscripts[0]),
-                parsed=parsed)
+class _FirstPassTypeAnnotator:
+    """
+    Translate parsed type annotations to temporary type annotation.
 
-        elif parsed.identifier == 'Set':
-            assert len(parsed.subscripts) == 1, (
-                f"Expected exactly one subscript for the Set type annotation, "
-                f"but got: {parsed}; this should have been caught before!")
+    We need a two-pass translation to translate atomic type annotations to
+    intermediate ones. Namely, we are translating the type annotations as we are
+    building the symbol table. At that point, the atomic type annotations referring to
+    meta-model entities can not be resolved (as the symbol table is not completely
+    built yet). Therefore, we use placeholders which are eventually resolved in the
+    second pass.
 
-            return SetTypeAnnotation(
-                items=_parsed_type_annotation_to_annotation(parsed.subscripts[0]),
-                parsed=parsed)
-        
-        elif parsed.identifier == 'Mapping':
-            assert len(parsed.subscripts) == 2, (
-                f"Expected exactly two subscripts for the Mapping type annotation, "
-                f"but got: {parsed}; this should have been caught before!")
+    This annotator provides the translations for the first pass, and keeps track of
+    all the pending type annotations which need to be resolved in the second pass.
+    """
 
-            return MappingTypeAnnotation(
-                keys=_parsed_type_annotation_to_annotation(parsed.subscripts[0]),
-                values=_parsed_type_annotation_to_annotation(parsed.subscripts[1]),
-                parsed=parsed)
+    def __init__(self) -> None:
+        # Map ``identifier`` 🠒 unfinished type annotation that needs to be resolved
+        # in the second pass
+        self.to_be_resolved = dict(
+        )  # type: MutableMapping[str, OurAtomicTypeAnnotation]
 
-        elif parsed.identifier == 'MutableMapping':
-            assert len(parsed.subscripts) == 2, (
-                f"Expected exactly two subscripts "
-                f"for the MutableMapping type annotation, "
-                f"but got: {parsed}; this should have been caught before!")
+    def translate(self, parsed: parse.TypeAnnotation) -> TypeAnnotation:
+        """Translate the parsed type annotation into the intermediate one."""
+        if isinstance(parsed, parse.AtomicTypeAnnotation):
+            builtin_atomic_type = STR_TO_BUILTIN_ATOMIC_TYPE.get(
+                parsed.identifier, None)
 
-            return MutableMappingTypeAnnotation(
-                keys=_parsed_type_annotation_to_annotation(parsed.subscripts[0]),
-                values=_parsed_type_annotation_to_annotation(parsed.subscripts[1]),
-                parsed=parsed)
+            if builtin_atomic_type is not None:
+                return BuiltinAtomicTypeAnnotation(
+                    a_type=builtin_atomic_type, parsed=parsed)
 
-        elif parsed.identifier == 'Optional':
-            assert len(parsed.subscripts) == 1, (
-                f"Expected exactly one subscript for the Optional type annotation, "
-                f"but got: {parsed}; this should have been caught before!")
+            our_type_annotation = self.to_be_resolved.get(parsed.identifier, None)
+            if our_type_annotation is None:
+                our_type_annotation = OurAtomicTypeAnnotation(
+                    symbol=_PlaceholderSymbol(identifier=parsed.identifier),
+                    parsed=parsed)
 
-            return OptionalTypeAnnotation(
-                value=_parsed_type_annotation_to_annotation(parsed.subscripts[0]),
-                parsed=parsed)
+                self.to_be_resolved[parsed.identifier] = our_type_annotation
+
+            return our_type_annotation
+
+        elif isinstance(parsed, parse.SubscriptedTypeAnnotation):
+            if parsed.identifier == 'Final':
+                raise AssertionError(
+                    "Unexpected ``Final`` type annotation at this stage. "
+                    "This type annotation should have been processed before.")
+
+            elif parsed.identifier == 'List':
+                assert len(parsed.subscripts) == 1, (
+                    f"Expected exactly one subscript for the List type annotation, "
+                    f"but got: {parsed}; this should have been caught before!")
+
+                return ListTypeAnnotation(
+                    items=self.translate(parsed.subscripts[0]),
+                    parsed=parsed)
+
+            elif parsed.identifier == 'Sequence':
+                assert len(parsed.subscripts) == 1, (
+                    f"Expected exactly one subscript for the Sequence type annotation, "
+                    f"but got: {parsed}; this should have been caught before!")
+
+                return SequenceTypeAnnotation(
+                    items=self.translate(parsed.subscripts[0]),
+                    parsed=parsed)
+
+            elif parsed.identifier == 'Set':
+                assert len(parsed.subscripts) == 1, (
+                    f"Expected exactly one subscript for the Set type annotation, "
+                    f"but got: {parsed}; this should have been caught before!")
+
+                return SetTypeAnnotation(
+                    items=self.translate(parsed.subscripts[0]),
+                    parsed=parsed)
+
+            elif parsed.identifier == 'Mapping':
+                assert len(parsed.subscripts) == 2, (
+                    f"Expected exactly two subscripts for the Mapping type annotation, "
+                    f"but got: {parsed}; this should have been caught before!")
+
+                return MappingTypeAnnotation(
+                    keys=self.translate(parsed.subscripts[0]),
+                    values=self.translate(parsed.subscripts[1]),
+                    parsed=parsed)
+
+            elif parsed.identifier == 'MutableMapping':
+                assert len(parsed.subscripts) == 2, (
+                    f"Expected exactly two subscripts "
+                    f"for the MutableMapping type annotation, "
+                    f"but got: {parsed}; this should have been caught before!")
+
+                return MutableMappingTypeAnnotation(
+                    keys=self.translate(parsed.subscripts[0]),
+                    values=self.translate(parsed.subscripts[1]),
+                    parsed=parsed)
+
+            elif parsed.identifier == 'Optional':
+                assert len(parsed.subscripts) == 1, (
+                    f"Expected exactly one subscript for the Optional type annotation, "
+                    f"but got: {parsed}; this should have been caught before!")
+
+                return OptionalTypeAnnotation(
+                    value=self.translate(parsed.subscripts[0]),
+                    parsed=parsed)
+
+            else:
+                raise AssertionError(
+                    f"Unexpected subscripted type annotation identifier: "
+                    f"{parsed.identifier}. "
+                    f"This should have been handled or caught before!")
+
+        elif isinstance(parsed, parse.SelfTypeAnnotation):
+            return SelfTypeAnnotation()
 
         else:
-            raise AssertionError(
-                f"Unexpected subscripted type annotation identifier: "
-                f"{parsed.identifier}. "
-                f"This should have been handled or caught before!")
-
-    elif isinstance(parsed, parse.SelfTypeAnnotation):
-        return SelfTypeAnnotation()
-
-    else:
-        assert_never(parsed)
-        raise AssertionError(parsed)
+            assert_never(parsed)
+            raise AssertionError(parsed)
 
 
-def _parsed_arguments_to_arguments(parsed: Sequence[parse.Argument]) -> List[Argument]:
+def _parsed_arguments_to_arguments(
+        parsed: Sequence[parse.Argument],
+        first_pass_type_annotator: _FirstPassTypeAnnotator
+) -> List[Argument]:
     """Translate the arguments of a method in meta-model to the intermediate ones."""
     return [
         Argument(
             name=parsed_arg.name,
-            type_annotation=_parsed_type_annotation_to_annotation(
-                parsed_arg.type_annotation
-            ),
+            type_annotation=first_pass_type_annotator.translate(
+                parsed_arg.type_annotation),
             default=Default(value=parsed_arg.default.value, parsed=parsed_arg.default)
             if parsed_arg.default is not None
             else None,
@@ -151,7 +194,10 @@ def _parsed_arguments_to_arguments(parsed: Sequence[parse.Argument]) -> List[Arg
     ]
 
 
-def _parsed_abstract_entity_to_interface(parsed: parse.AbstractEntity) -> Interface:
+def _parsed_abstract_entity_to_interface(
+        parsed: parse.AbstractEntity,
+        first_pass_type_annotator: _FirstPassTypeAnnotator
+) -> Interface:
     """Translate an abstract entity of a meta-model to an intermediate interface."""
     # noinspection PyTypeChecker
     return Interface(
@@ -161,12 +207,13 @@ def _parsed_abstract_entity_to_interface(parsed: parse.AbstractEntity) -> Interf
             Signature(
                 name=parsed_method.name,
                 arguments=_parsed_arguments_to_arguments(
-                    parsed=parsed_method.arguments
+                    parsed=parsed_method.arguments,
+                    first_pass_type_annotator=first_pass_type_annotator
                 ),
                 returns=(
                     None
                     if parsed_method.returns is None
-                    else _parsed_type_annotation_to_annotation(parsed_method.returns)
+                    else first_pass_type_annotator.translate(parsed_method.returns)
                 ),
                 description=parsed_method.description,
                 parsed=parsed_method,
@@ -175,7 +222,10 @@ def _parsed_abstract_entity_to_interface(parsed: parse.AbstractEntity) -> Interf
             if parsed_method.name != "__init__"
         ],
         properties=[
-            _parsed_property_to_property(parsed_prop)
+            _parsed_property_to_property(
+                parsed=parsed_prop,
+                first_pass_type_annotator=first_pass_type_annotator
+            )
             for parsed_prop in parsed.properties
         ],
         is_implementation_specific=parsed.is_implementation_specific,
@@ -183,11 +233,14 @@ def _parsed_abstract_entity_to_interface(parsed: parse.AbstractEntity) -> Interf
     )
 
 
-def _parsed_property_to_property(parsed: parse.Property) -> Property:
+def _parsed_property_to_property(
+        parsed: parse.Property,
+        first_pass_type_annotator: _FirstPassTypeAnnotator
+) -> Property:
     """Translate a parsed property of a class to an intermediate one."""
     return Property(
         name=parsed.name,
-        type_annotation=_parsed_type_annotation_to_annotation(parsed.type_annotation),
+        type_annotation=first_pass_type_annotator.translate(parsed.type_annotation),
         description=parsed.description,
         is_readonly=parsed.is_readonly,
         parsed=parsed,
@@ -234,16 +287,22 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
     "Constructors are expected to be handled in a special way"
 )
 # fmt: on
-def _parsed_method_to_method(parsed: parse.Method) -> Method:
+def _parsed_method_to_method(
+        parsed: parse.Method,
+        first_pass_type_annotator: _FirstPassTypeAnnotator
+) -> Method:
     """Translate the parsed method into an intermediate representation."""
     return Method(
         name=parsed.name,
         is_implementation_specific=parsed.is_implementation_specific,
-        arguments=_parsed_arguments_to_arguments(parsed.arguments),
+        arguments=_parsed_arguments_to_arguments(
+            parsed=parsed.arguments,
+            first_pass_type_annotator=first_pass_type_annotator
+        ),
         returns=(
             None
             if parsed.returns is None
-            else _parsed_type_annotation_to_annotation(parsed.returns)
+            else first_pass_type_annotator.translate(parsed.returns)
         ),
         description=parsed.description,
         contracts=_parsed_contracts_to_contracts(parsed.contracts),
@@ -253,9 +312,9 @@ def _parsed_method_to_method(parsed: parse.Method) -> Method:
 
 
 def _in_line_constructors(
-    parsed_symbol_table: parse.SymbolTable,
-    ontology: understand_hierarchy.Ontology,
-    constructor_table: understand_constructor.ConstructorTable,
+        parsed_symbol_table: parse.SymbolTable,
+        ontology: understand_hierarchy.Ontology,
+        constructor_table: understand_constructor.ConstructorTable,
 ) -> Mapping[parse.Entity, Sequence[understand_constructor.AssignProperty]]:
     """In-line recursively all the constructor bodies."""
     result = (
@@ -313,11 +372,12 @@ def _stack_contracts(contracts: Contracts, other: Contracts) -> Contracts:
 
 
 def _parsed_entity_to_class(
-    parsed: parse.ConcreteEntity,
-    ontology: understand_hierarchy.Ontology,
-    in_lined_constructors: Mapping[
-        parse.Entity, Sequence[understand_constructor.AssignProperty]
-    ],
+        parsed: parse.ConcreteEntity,
+        ontology: understand_hierarchy.Ontology,
+        in_lined_constructors: Mapping[
+            parse.Entity, Sequence[understand_constructor.AssignProperty]
+        ],
+        first_pass_type_annotator: _FirstPassTypeAnnotator
 ) -> Class:
     """Translate a concrete entity to an intermediate class."""
     antecedents = ontology.list_antecedents(entity=parsed)
@@ -331,12 +391,18 @@ def _parsed_entity_to_class(
 
     for antecedent in antecedents:
         properties.extend(
-            _parsed_property_to_property(parsed_prop)
+            _parsed_property_to_property(
+                parsed=parsed_prop,
+                first_pass_type_annotator=first_pass_type_annotator
+            )
             for parsed_prop in antecedent.properties
         )
 
     for parsed_prop in parsed.properties:
-        properties.append(_parsed_property_to_property(parsed_prop))
+        properties.append(
+            _parsed_property_to_property(
+                parsed=parsed_prop,
+                first_pass_type_annotator=first_pass_type_annotator))
 
     # endregion
 
@@ -358,8 +424,13 @@ def _parsed_entity_to_class(
 
     parsed_entity_init = parsed.method_map.get(Identifier("__init__"), None)
     if parsed_entity_init is not None:
-        arguments = _parsed_arguments_to_arguments(parsed_entity_init.arguments)
+        arguments = _parsed_arguments_to_arguments(
+            parsed=parsed_entity_init.arguments,
+            first_pass_type_annotator=first_pass_type_annotator
+        )
+
         is_implementation_specific = parsed_entity_init.is_implementation_specific
+
         contracts = _stack_contracts(
             contracts, _parsed_contracts_to_contracts(parsed_entity_init.contracts)
         )
@@ -411,13 +482,17 @@ def _parsed_entity_to_class(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def translate(
-    parsed_symbol_table: parse.SymbolTable,
-    ontology: understand_hierarchy.Ontology,
-    constructor_table: understand_constructor.ConstructorTable,
-    atok: asttokens.ASTTokens,
+        parsed_symbol_table: parse.SymbolTable,
+        ontology: understand_hierarchy.Ontology,
+        constructor_table: understand_constructor.ConstructorTable,
+        atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[SymbolTable], Optional[Error]]:
     """Translate the parsed symbols into intermediate symbols."""
     underlying_errors = []  # type: List[Error]
+
+    first_pass_type_annotator = _FirstPassTypeAnnotator()
+
+    # region First pass of translation; type annotations reference placeholder symbols
 
     in_lined_constructors = _in_line_constructors(
         parsed_symbol_table=parsed_symbol_table,
@@ -433,13 +508,16 @@ def translate(
             symbol = _parsed_enumeration_to_enumeration(parsed=parsed_symbol)
 
         elif isinstance(parsed_symbol, parse.AbstractEntity):
-            symbol = _parsed_abstract_entity_to_interface(parsed=parsed_symbol)
+            symbol = _parsed_abstract_entity_to_interface(
+                parsed=parsed_symbol,
+                first_pass_type_annotator=first_pass_type_annotator)
 
         elif isinstance(parsed_symbol, parse.ConcreteEntity):
             symbol = _parsed_entity_to_class(
                 parsed=parsed_symbol,
                 ontology=ontology,
                 in_lined_constructors=in_lined_constructors,
+                first_pass_type_annotator=first_pass_type_annotator
             )
 
         else:
@@ -447,6 +525,29 @@ def translate(
 
         assert symbol is not None
         symbols.append(symbol)
+
+    symbol_table = SymbolTable(symbols=symbols)
+
+    # endregion
+
+    # region Second pass to resolve the symbols in the atomic types
+
+    for our_type_annotation in first_pass_type_annotator.to_be_resolved.values():
+        assert isinstance(our_type_annotation.symbol, _PlaceholderSymbol), \
+            "Expected only placeholder symbols to be assigned in the first pass"
+
+        symbol = symbol_table.find(our_type_annotation.symbol.identifier)
+
+        assert symbol is not None, \
+            (
+                f"The symbol {our_type_annotation.symbol.identifier} is not available "
+                f"in the symbol table, but was assigned "
+                f"in the first pass of the translation of the type annotations"
+            )
+
+        our_type_annotation.symbol = symbol
+
+    # endregion
 
     if len(underlying_errors) > 0:
         return (
@@ -459,5 +560,4 @@ def translate(
             ),
         )
 
-    symbol_table = SymbolTable(symbols=symbols)
     return symbol_table, None

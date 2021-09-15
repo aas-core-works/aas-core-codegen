@@ -24,6 +24,7 @@ from aas_core_csharp_codegen.intermediate._types import (
     SymbolTable,
     TypeAnnotation, ListTypeAnnotation, SequenceTypeAnnotation, SetTypeAnnotation,
     MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
+    BuiltinAtomicTypeAnnotation, OurAtomicTypeAnnotation
 )
 
 
@@ -41,25 +42,37 @@ def _stringify_default(default: Default) -> stringify.Entity:
 
 
 def _stringify_atomic_type_annotation(
-    type_annotation: AtomicTypeAnnotation,
+        type_annotation: AtomicTypeAnnotation,
 ) -> stringify.Entity:
-    result = stringify.Entity(
-        name=AtomicTypeAnnotation.__name__,
-        properties=[
-            stringify.Property("identifier", type_annotation.identifier),
-            stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-        ],
-    )
+    result = None  # type: Optional[stringify.Entity]
 
+    if isinstance(type_annotation, BuiltinAtomicTypeAnnotation):
+        result = stringify.Entity(
+            name=AtomicTypeAnnotation.__name__,
+            properties=[
+                stringify.Property("a_type", type_annotation.a_type.value),
+                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
+            ])
+    elif isinstance(type_annotation, OurAtomicTypeAnnotation):
+        result = stringify.Entity(
+            name=AtomicTypeAnnotation.__name__,
+            properties=[
+                stringify.Property("symbol", type_annotation.symbol.name),
+                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
+            ])
+    else:
+        assert_never(type_annotation)
+
+    assert result is not None
     stringify.assert_compares_against_dict(result, type_annotation)
     return result
 
 
 def _stringify_subscripted_type_annotation(
-    type_annotation: SubscriptedTypeAnnotation,
+        type_annotation: SubscriptedTypeAnnotation,
 ) -> stringify.Entity:
     result = None  # type: Optional[stringify.Entity]
-    
+
     if isinstance(type_annotation, ListTypeAnnotation):
         result = stringify.Entity(
             name=ListTypeAnnotation.__name__,
@@ -227,7 +240,7 @@ def _stringify_interface(interface: Interface) -> stringify.Entity:
 
 
 def _stringify_enumeration_literal(
-    enumeration_literal: EnumerationLiteral,
+        enumeration_literal: EnumerationLiteral,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=EnumerationLiteral.__name__,
@@ -482,7 +495,8 @@ def dump(dumpable: Dumpable) -> str:
     elif isinstance(dumpable, SymbolTable):
         stringified = _stringify_symbol_table(dumpable)
     elif isinstance(
-        dumpable, (AtomicTypeAnnotation, SubscriptedTypeAnnotation, SelfTypeAnnotation)
+            dumpable,
+            (AtomicTypeAnnotation, SubscriptedTypeAnnotation, SelfTypeAnnotation)
     ):
         stringified = _stringify_type_annotation(dumpable)
     else:

@@ -1,12 +1,11 @@
 """Provide common functions shared among difference C# code generation modules."""
-from typing import List, Union, Tuple, Optional
+from typing import List, Union
 
 from icontract import ensure
 
-from aas_core_csharp_codegen import intermediate, parse
-from aas_core_csharp_codegen.common import Code, Error, assert_never
+from aas_core_csharp_codegen import intermediate
+from aas_core_csharp_codegen.common import Code, assert_never
 from aas_core_csharp_codegen.csharp import naming
-from aas_core_csharp_codegen.intermediate._types import ListTypeAnnotation
 
 
 @ensure(lambda result: result.startswith('"'))
@@ -40,57 +39,71 @@ def string_literal(text: str) -> str:
     return '"{}"'.format("".join(escaped))
 
 
-_ATOMIC_TYPE_MAP = {
-    "bool": Code("bool"),
-    "int": Code("int"),
-    "float": Code("float"),
-    "str": Code("string")
+_BUILTING_ATOMIC_TYPE_MAP = {
+    intermediate.BuiltinAtomicType.BOOL: Code("bool"),
+    intermediate.BuiltinAtomicType.INT: Code("int"),
+    intermediate.BuiltinAtomicType.FLOAT: Code("float"),
+    intermediate.BuiltinAtomicType.STR: Code("string")
 }
-assert list(_ATOMIC_TYPE_MAP.keys()) == list(parse.BUILTIN_ATOMIC_TYPES), \
-    "Expected complete mapping of primitive types to implementation-specific types"
+
+# noinspection PyTypeChecker
+assert sorted(_BUILTING_ATOMIC_TYPE_MAP.keys()) == sorted(intermediate.BuiltinAtomicType), \
+    (
+        "Expected complete mapping of built-in types to implementation-specific types"
+    )  # type: ignore
 
 
 def generate_type(
         type_annotation: Union[
             intermediate.SubscriptedTypeAnnotation, intermediate.AtomicTypeAnnotation]
 ) -> Code:
-    """
-    Generate the C# type for the given type annotation.
-
-    The type annotations are expected to be non-dangling.
-    If a type does not belong to
-    :attr:`aas_core_csharp_codegen.parse.BUILTIN_ATOMIC_TYPES` and
-    :attr:`aas_core_csharp_codegen.parse.BUILTIN_COMPOSITE_TYPES`, it is assumed to be
-    a type defined in the meta-model.
-    """
+    """Generate the C# type for the given type annotation."""
+    # TODO: test with general snippets, do not test in isolation
     if isinstance(type_annotation, intermediate.AtomicTypeAnnotation):
-        maybe_primitive_type = _ATOMIC_TYPE_MAP.get(type_annotation.identifier, None)
-        if maybe_primitive_type is not None:
-            return maybe_primitive_type
-        # TODO: once intermediate fixed, we need to introduce naming for the symbol 🠒 dispatch here to csharp.naming
-        return naming.class_name()
+        if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
+            return _BUILTING_ATOMIC_TYPE_MAP[type_annotation.a_type]
 
-        return _ATOMIC_TYPE_MAP[type_annotation.identifier], None
+        elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
+            if isinstance(type_annotation.symbol, intermediate.Enumeration):
+                return Code(naming.enum_name(type_annotation.symbol.name))
+
+            elif isinstance(type_annotation.symbol, intermediate.Interface):
+                return Code(naming.interface_name(type_annotation.symbol.name))
+
+            elif isinstance(type_annotation.symbol, intermediate.Class):
+                return Code(naming.class_name(type_annotation.symbol.name))
+
+            else:
+                assert_never(type_annotation.symbol)
+
+        else:
+            assert_never(type_annotation)
 
     elif isinstance(type_annotation, intermediate.SubscriptedTypeAnnotation):
-        if isinstance(type_annotation, ListTypeAnnotation):
-            items, error = generate_type(type_annotation.items)
-            if error is not None:
-                return error
+        if isinstance(type_annotation, intermediate.ListTypeAnnotation):
+            return Code(f"List<{generate_type(type_annotation.items)}>")
 
-            return f"List<{}>"
+        elif isinstance(type_annotation, intermediate.SequenceTypeAnnotation):
+            return Code(f"ReadOnlyCollection<{generate_type(type_annotation.items)}>")
 
-            #     "List",
-        #     "Sequence",
-        #     "Set",
-        #     "Mapping",
-        #     "MutableMapping",
-        #     "Optional"
+        elif isinstance(type_annotation, intermediate.MappingTypeAnnotation):
+            keys = generate_type(type_annotation.keys)
+            values = generate_type(type_annotation.values)
+            return Code(f"ReadOnlyDictionary<{keys}, {values}>")
+
+        elif isinstance(type_annotation, intermediate.MutableMappingTypeAnnotation):
+            keys = generate_type(type_annotation.keys)
+            values = generate_type(type_annotation.values)
+            return Code(f"IDictionary<{keys}, {values}>")
+
+        elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
+            value = generate_type(type_annotation.value)
+            return Code(f"{value}?")
+
         else:
             assert_never(type_annotation)
 
     else:
         assert_never(type_annotation)
-    # TODO: impl this, then go back to _generate
-    # TODO: test with general snippets, do not test in isolation
-    raise NotImplementedError()
+
+
