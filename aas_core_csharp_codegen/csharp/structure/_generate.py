@@ -211,6 +211,7 @@ def _generate_interface(
         spec_impls: specific_implementations.SpecificImplementations
 ) -> Code:
     """Generate C# code for the given interface."""
+    # TODO: continue here
     raise NotImplementedError()
 
 

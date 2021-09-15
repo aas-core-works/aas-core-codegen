@@ -94,7 +94,7 @@ def generate_type(
         elif isinstance(type_annotation, intermediate.MutableMappingTypeAnnotation):
             keys = generate_type(type_annotation.keys)
             values = generate_type(type_annotation.values)
-            return Code(f"IDictionary<{keys}, {values}>")
+            return Code(f"Dictionary<{keys}, {values}>")
 
         elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
             value = generate_type(type_annotation.value)
@@ -105,5 +105,4 @@ def generate_type(
 
     else:
         assert_never(type_annotation)
-
 
