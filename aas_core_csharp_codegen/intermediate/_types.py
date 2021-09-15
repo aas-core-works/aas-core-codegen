@@ -201,12 +201,14 @@ class Argument:
             name: Identifier,
             type_annotation: TypeAnnotation,
             default: Optional[Default],
+            description: Optional[str],
             parsed: parse.Argument,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
         self.type_annotation = type_annotation
         self.default = default
+        self.description = description
         self.parsed = parsed
 
 

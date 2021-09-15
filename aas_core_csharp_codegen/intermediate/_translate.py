@@ -188,6 +188,8 @@ def _parsed_arguments_to_arguments(
             default=Default(value=parsed_arg.default.value, parsed=parsed_arg.default)
             if parsed_arg.default is not None
             else None,
+            # TODO: finish here once parsed done
+            description=parsed_arg.
             parsed=parsed_arg,
         )
         for parsed_arg in parsed

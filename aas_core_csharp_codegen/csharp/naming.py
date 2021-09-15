@@ -63,58 +63,63 @@ def class_name(identifier: Identifier) -> Identifier:
     return Identifier("{}".format(''.join(part.capitalize() for part in parts)))
 
 
-def private_property(identifier: Identifier) -> Identifier:
+def property_name(identifier: Identifier) -> Identifier:
     """
-    Generate a C# name for a private property based on its meta-model ``identifier``.
+    Generate a C# name for a public property based on its meta-model ``identifier``.
 
-    >>> private_property(Identifier("something"))
-    '_something'
+    >>> property_name(Identifier("something"))
+    'Something'
 
-    >>> private_property(Identifier("something_to_URL"))
-    '_somethingToUrl'
+    >>> property_name(Identifier("something_to_URL"))
+    'SomethingToUrl'
     """
     parts = identifier.split('_')
 
     if len(parts) == 1:
-        return Identifier("_{}".format(parts[0].lower()))
+        return Identifier(parts[0].capitalize())
 
     return Identifier(
-        "_{}{}".format(parts[0], ''.join(part.capitalize() for part in parts[1:])))
+        "{}{}".format(
+            parts[0].capitalize(),
+            ''.join(part.capitalize() for part in parts[1:])))
 
 
-def getter_name(identifier: Identifier) -> Identifier:
+def method_name(identifier: Identifier) -> Identifier:
     """
-    Generate a C# name for a getter based on the ``identifier`` of a property.
+    Generate a C# name for a member method based on its meta-model ``identifier``.
 
-    >>> getter_name(Identifier("something"))
+    >>> method_name(Identifier("do_something"))
+    'DoSomething'
+
+    >>> method_name(Identifier("do_something_to_URL"))
+    'DoSomethingToUrl'
+    """
+    parts = identifier.split('_')
+
+    if len(parts) == 1:
+        return Identifier(parts[0].capitalize())
+
+    return Identifier(
+        "{}{}".format(
+            parts[0].capitalize(),
+            ''.join(part.capitalize() for part in parts[1:])))
+
+def argument_name(identifier: Identifier) -> Identifier:
+    """
+    Generate a C# name for an argument based on its meta-model ``identifier``.
+
+    >>> argument_name(Identifier("something"))
     'something'
 
-    >>> getter_name(Identifier("something_to_URL"))
+    >>> argument_name(Identifier("something_to_URL"))
     'somethingToUrl'
     """
     parts = identifier.split('_')
 
     if len(parts) == 1:
-        return Identifier(parts[0].lower())
+        return Identifier(parts[0].capitalize())
 
     return Identifier(
-        "{}{}".format(parts[0], ''.join(part.capitalize() for part in parts[1:])))
-
-
-def setter_name(identifier: Identifier) -> Identifier:
-    """
-    Generate a C# name for a setter based on the ``identifier`` of a property.
-
-    >>> setter_name(Identifier("something"))
-    'setSomething'
-
-    >>> setter_name(Identifier("something_to_URL"))
-    'setSomethingToUrl'
-    """
-    parts = identifier.split('_')
-
-    if len(parts) == 1:
-        return Identifier("set{}".format(parts[0].capitalize()))
-
-    return Identifier(
-        "set{}".format(''.join(part.capitalize() for part in parts)))
+        "{}{}".format(
+            parts[0].capitalize(),
+            ''.join(part.capitalize() for part in parts[1:])))

@@ -193,15 +193,14 @@ class Block(str):
 # fmt: on
 def _description_comment(description: str) -> Code:
     """Generate a block comment."""
-    result_lines = ["/**"]  # type: List[str]
+    result_lines = []  # type: List[str]
 
     for line in description.splitlines():
-        if not common.LEADING_WHITESPACE_RE.match(line):
-            result_lines.append(f" * {line}")
+        stripped = line.strip()
+        if len(stripped) > 0:
+            result_lines.append(f"/// {stripped}")
         else:
-            result_lines.append(f" *")
-
-    result_lines.append("*/")
+            result_lines.append(f"///")
 
     return Code("\n".join(result_lines))
 
@@ -212,7 +211,10 @@ def _generate_enum(enum_symbol: intermediate.Enumeration) -> Code:
     writer = io.StringIO()
 
     if enum_symbol.description is not None:
-        writer.write(_description_comment(enum_symbol.description))
+        writer.write(
+            f"<summary>\n"
+            f"{_description_comment(enum_symbol.description.strip())}\n"
+            f"</summary>")
         writer.write("\n")
 
     name = naming.enum_name(enum_symbol.name)
@@ -245,7 +247,7 @@ def _generate_interface(
     writer = io.StringIO()
 
     if interface_symbol.description is not None:
-        writer.write(_description_comment(interface_symbol.description))
+        writer.write(_description_comment(interface_symbol.description.strip()))
         writer.write("\n")
 
     name = naming.interface_name(interface_symbol.name)
@@ -259,16 +261,46 @@ def _generate_interface(
 
     for prop in interface_symbol.properties:
         prop_type = csharp_common.generate_type(prop.type_annotation)
-        getter_name = naming.getter_name(prop.name)
+        prop_name = naming.property_name(prop.name)
 
         if prop.description is not None:
-            getter_comment = _description_comment(prop.description)
-            codes.append(Code(f"{getter_comment}\n{prop_type} {getter_name}();"))
+            prop_comment = _description_comment(prop.description.strip())
+            codes.append(
+                Code(f"{prop_comment}\n{prop_type} {prop_name} {{ get; set; }}"))
         else:
-            codes.append(Code(f"{prop_type} {getter_name}();"))
+            codes.append(Code(f"{prop_type} {prop_type} {{ get; set; }}"))
 
-        setter_name = naming.setter_name(prop.name)
-        codes.append(Code(f"void {setter_name}({prop_type} value);"))
+    for signature in interface_symbol.signatures:
+        description_blocks = []  # type: List[Block]
+        if signature.description is not None:
+            description_blocks.append(
+                Block(f"<summary>\n{signature.description.strip()}\n</summary>"))
+
+        if len(signature.arguments) > 0:
+            argument_lines = []  # type: List[Block]
+            for argument in signature.arguments:
+                # TODO: continue here
+                argument_description = argument.
+                argument_lines.append(Block(
+                    f'<param name="{naming.argument_name(argument.name)}">'
+                ))
+
+
+
+
+
+        # fmt: off
+        returns = (
+            csharp_common.generate_type(signature.returns)
+            if signature.returns is not None else "void"
+        )
+        # fmt: on
+
+        arg_codes = []  # type: List[Code]
+        for arg in signature.arguments:
+            arg_type = csharp_common.generate_type(arg.type_annotation)
+            arg_name = naming.argument_name(arg.name)
+
 
         # TODO: write for methods
 

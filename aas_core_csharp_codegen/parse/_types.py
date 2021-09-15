@@ -154,12 +154,14 @@ class Argument:
             name: Identifier,
             type_annotation: TypeAnnotation,
             default: Optional[Default],
+            description: Optional[str],
             node: ast.arg,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
         self.type_annotation = type_annotation
         self.default = default
+        self.description = description  # TODO: implement this!
         self.node = node
 
 

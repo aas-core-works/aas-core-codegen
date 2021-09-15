@@ -995,6 +995,12 @@ def _function_def_to_method(
         )
     # endregion
 
+    # TODO: implement _parse_sphinxdoc(text: str) and call it on Description
+    # TODO:  introduce Sphinxdoc into _types and parse module
+    # TODO:  🠒 add properties like ``params`` and ``returns``.
+    #  Split in summary (first line) and remarks (the other lines).
+    #  Tokenize CODE ("``") and see whatever ``:ref:`` we use.
+
     return (
         Method(
             name=Identifier(name),
