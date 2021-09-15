@@ -6,7 +6,7 @@ from typing import Optional, Dict, List, Tuple, cast, Mapping
 
 from icontract import ensure, require
 
-from aas_core_csharp_codegen import intermediate
+from aas_core_csharp_codegen import intermediate, common
 from aas_core_csharp_codegen import specific_implementations
 from aas_core_csharp_codegen.common import Error, Identifier, assert_never, \
     TRAILING_WHITESPACE_RE, Code
@@ -184,35 +184,109 @@ class Block(str):
         return cast(Block, block)
 
 
+# fmt: off
+@require(
+    lambda description:
+    description != "",
+    "All descriptions must describe something."
+)
+# fmt: on
+def _description_comment(description: str) -> Code:
+    """Generate a block comment."""
+    result_lines = ["/**"]  # type: List[str]
+
+    for line in description.splitlines():
+        if not common.LEADING_WHITESPACE_RE.match(line):
+            result_lines.append(f" * {line}")
+        else:
+            result_lines.append(f" *")
+
+    result_lines.append("*/")
+
+    return Code("\n".join(result_lines))
+
+
 @require(lambda enum_symbol: not enum_symbol.is_implementation_specific)
 def _generate_enum(enum_symbol: intermediate.Enumeration) -> Code:
     """Generate the C# code for the enum."""
-    enum_name = naming.enum_name(enum_symbol.name)
-    if len(enum_symbol.literals) == 0:
-        return Code(f"public enum {enum_name} {{}}")
-
     writer = io.StringIO()
-    writer.write(f"public enum {enum_name}\n{{")
+
+    if enum_symbol.description is not None:
+        writer.write(_description_comment(enum_symbol.description))
+        writer.write("\n")
+
+    name = naming.enum_name(enum_symbol.name)
+    if len(enum_symbol.literals) == 0:
+        writer.write(f"public enum {name}\n{{\n}}")
+        return Code(writer.getvalue())
+
+    writer.write(f"public enum {name}\n{{")
     for i, literal in enumerate(enum_symbol.literals):
         if i > 0:
             writer.write(",\n\n")
 
         writer.write(
-            f'    [EnumMember(Value = {csharp_common.string_literal(literal.value)})]\n'
-            f'    {naming.enum_literal_name(literal.name)}')
+            textwrap.indent(
+                f'[EnumMember(Value = {csharp_common.string_literal(literal.value)})]\n'
+                f'{naming.enum_literal_name(literal.name)}',
+                csharp_common.INDENT))
 
     writer.write("\n}}")
 
     return Code(writer.getvalue())
 
 
+@require(lambda enum_symbol: not enum_symbol.is_implementation_specific)
 def _generate_interface(
-        intermediate_symbol: intermediate.Symbol,
+        interface_symbol: intermediate.Interface,
         spec_impls: specific_implementations.SpecificImplementations
 ) -> Code:
     """Generate C# code for the given interface."""
-    # TODO: continue here
-    raise NotImplementedError()
+    writer = io.StringIO()
+
+    if interface_symbol.description is not None:
+        writer.write(_description_comment(interface_symbol.description))
+        writer.write("\n")
+
+    name = naming.interface_name(interface_symbol.name)
+
+    writer.write(f"public interface {name}\n{{\n")
+
+    # Code blocks separated by double newlines and indented once
+    codes = []  # type: List[Code]
+
+    # region Getters and setters
+
+    for prop in interface_symbol.properties:
+        prop_type = csharp_common.generate_type(prop.type_annotation)
+        getter_name = naming.getter_name(prop.name)
+
+        if prop.description is not None:
+            getter_comment = _description_comment(prop.description)
+            codes.append(Code(f"{getter_comment}\n{prop_type} {getter_name}();"))
+        else:
+            codes.append(Code(f"{prop_type} {getter_name}();"))
+
+        setter_name = naming.setter_name(prop.name)
+        codes.append(Code(f"void {setter_name}({prop_type} value);"))
+
+        # TODO: write for methods
+
+    # endregion
+
+    # region Methods
+
+    # endregion
+
+    for i, code in enumerate(codes):
+        if i > 0:
+            writer.write("\n\n")
+
+        writer.write(textwrap.indent(code, csharp_common.INDENT))
+    writer.write("\n\n".join(codes))
+    writer.write("\n}}")
+
+    return Code(writer.getvalue())
 
 
 # fmt: off

@@ -244,6 +244,7 @@ class Interface:
             signatures: Sequence[Signature],
             properties: Sequence[Property],
             is_implementation_specific: bool,
+            description: Optional[str],
             parsed: parse.Entity,
     ) -> None:
         """Initialize with the given values."""
@@ -252,6 +253,7 @@ class Interface:
         self.signatures = signatures
         self.properties = properties
         self.is_implementation_specific = is_implementation_specific
+        self.description = description
         self.parsed = parsed
 
 

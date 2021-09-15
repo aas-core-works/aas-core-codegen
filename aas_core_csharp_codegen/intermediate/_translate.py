@@ -229,6 +229,7 @@ def _parsed_abstract_entity_to_interface(
             for parsed_prop in parsed.properties
         ],
         is_implementation_specific=parsed.is_implementation_specific,
+        description=parsed.description,
         parsed=parsed,
     )
 
