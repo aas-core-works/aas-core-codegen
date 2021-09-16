@@ -67,13 +67,13 @@ def generate_type(
 
         elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
             if isinstance(type_annotation.symbol, intermediate.Enumeration):
-                return Code(naming.enum_name(type_annotation.symbol.name))
+                return Stripped(naming.enum_name(type_annotation.symbol.name))
 
             elif isinstance(type_annotation.symbol, intermediate.Interface):
-                return Code(naming.interface_name(type_annotation.symbol.name))
+                return Stripped(naming.interface_name(type_annotation.symbol.name))
 
             elif isinstance(type_annotation.symbol, intermediate.Class):
-                return Code(naming.class_name(type_annotation.symbol.name))
+                return Stripped(naming.class_name(type_annotation.symbol.name))
 
             else:
                 assert_never(type_annotation.symbol)
@@ -83,24 +83,25 @@ def generate_type(
 
     elif isinstance(type_annotation, intermediate.SubscriptedTypeAnnotation):
         if isinstance(type_annotation, intermediate.ListTypeAnnotation):
-            return Code(f"List<{generate_type(type_annotation.items)}>")
+            return Stripped(f"List<{generate_type(type_annotation.items)}>")
 
         elif isinstance(type_annotation, intermediate.SequenceTypeAnnotation):
-            return Code(f"ReadOnlyCollection<{generate_type(type_annotation.items)}>")
+            return Stripped(
+                f"ReadOnlyCollection<{generate_type(type_annotation.items)}>")
 
         elif isinstance(type_annotation, intermediate.MappingTypeAnnotation):
             keys = generate_type(type_annotation.keys)
             values = generate_type(type_annotation.values)
-            return Code(f"ReadOnlyDictionary<{keys}, {values}>")
+            return Stripped(f"ReadOnlyDictionary<{keys}, {values}>")
 
         elif isinstance(type_annotation, intermediate.MutableMappingTypeAnnotation):
             keys = generate_type(type_annotation.keys)
             values = generate_type(type_annotation.values)
-            return Code(f"Dictionary<{keys}, {values}>")
+            return Stripped(f"Dictionary<{keys}, {values}>")
 
         elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
             value = generate_type(type_annotation.value)
-            return Code(f"{value}?")
+            return Stripped(f"{value}?")
 
         else:
             assert_never(type_annotation)

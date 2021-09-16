@@ -172,20 +172,6 @@ class Referable(Has_extension):
         self.category = category
         self.description = description
 
-    @require(lambda id_short: is_id_short(id_short))
-    def set_id_short(self, id_short: str) -> None:
-        self.id_short = id_short
-
-    def set_display_name(self, display_name: Optional[Lang_string_set] = None) -> None:
-        self.display_name = display_name
-
-    def set_category(self, category: Optional[str] = None) -> None:
-        self.category = category
-
-    def set_description(self, description: Optional[Lang_string_set] = None) -> None:
-        self.description = description
-
-
 class Identifier_type(Enum):
     """Enumeration of different types of Identifiersfor global identification"""
 
@@ -533,6 +519,9 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
 
     # TODO (mristin, 2021-05-28): fields are missing, such as ``security`` and many others!
 
+    derived_from: Final[Optional['Asset_administration_shell']]
+    """The reference to the AAS this AAS was derived from."""
+
     def __init__(
             self,
             identification: Identifier,
@@ -556,7 +545,6 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
 
         Has_data_specification.__init__(self, data_specifications=data_specifications)
 
-        """The reference to the AAS this AAS was derived from."""
         self.derived_from = derived_from
 
 # TODO (mristin, 2021-05-28): This was the initial version

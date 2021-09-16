@@ -8,11 +8,12 @@ import docutils.nodes
 from icontract import ensure, require
 
 import aas_core_csharp_codegen.csharp.common as csharp_common
-from aas_core_csharp_codegen import intermediate
+import aas_core_csharp_codegen.csharp.naming as csharp_naming
+from aas_core_csharp_codegen import intermediate, naming
 from aas_core_csharp_codegen import specific_implementations
 from aas_core_csharp_codegen.common import Error, Identifier, assert_never, \
-    Stripped
-from aas_core_csharp_codegen.csharp import naming
+    Stripped, Rstripped
+
 
 
 # region Checks
@@ -29,11 +30,11 @@ def _verify_structure_name_collisions(
         name = None  # type: Optional[Identifier]
 
         if isinstance(symbol, intermediate.Class):
-            name = naming.class_name(symbol.name)
+            name = csharp_naming.class_name(symbol.name)
         elif isinstance(symbol, intermediate.Enumeration):
-            name = naming.enum_name(symbol.name)
+            name = csharp_naming.enum_name(symbol.name)
         elif isinstance(symbol, intermediate.Interface):
-            name = naming.interface_name(symbol.name)
+            name = csharp_naming.interface_name(symbol.name)
         else:
             assert_never(symbol)
 
@@ -71,7 +72,7 @@ def _verify_intra_structure_collisions(
         observed_member_names = {}  # type: Dict[Identifier, str]
 
         for prop in intermediate_symbol.properties:
-            prop_name = naming.property_name(prop.name)
+            prop_name = csharp_naming.property_name(prop.name)
             if prop_name in observed_member_names:
                 # TODO: test
                 errors.append(
@@ -87,7 +88,7 @@ def _verify_intra_structure_collisions(
                     f"the meta-model property {prop.name!r}")
 
         for method in intermediate_symbol.methods:
-            method_name = naming.method_name(method.name)
+            method_name = csharp_naming.method_name(method.name)
 
             if method_name in observed_member_names:
                 # TODO: test
@@ -351,7 +352,7 @@ def _description_comment(
                 directive, directive_arg = name_parts
 
                 if directive == 'param':
-                    arg_name = naming.argument_name(directive_arg)
+                    arg_name = csharp_naming.argument_name(directive_arg)
 
                     if body != "":
                         indented_body = textwrap.indent(body, csharp_common.INDENT)
@@ -388,120 +389,306 @@ def _description_comment(
     return text, None
 
 
-@require(lambda enum_symbol: not enum_symbol.is_implementation_specific)
-def _generate_enum(enum_symbol: intermediate.Enumeration) -> Stripped:
+@require(lambda symbol: not symbol.is_implementation_specific)
+@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
+def _generate_enum(
+        symbol: intermediate.Enumeration
+) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the C# code for the enum."""
     writer = io.StringIO()
 
-    if enum_symbol.description is not None:
-        comment = _description_comment(enum_symbol.description)
-        writer.write(_description_comment(enum_symbol.description))
+    if symbol.description is not None:
+        comment, error = _description_comment(symbol.description)
+        if error:
+            return None, error
+
+        writer.write(comment)
         writer.write('\n')
 
-    # TODO: continue here
-    name = naming.enum_name(enum_symbol.name)
-    if len(enum_symbol.literals) == 0:
+    name = csharp_naming.enum_name(symbol.name)
+    if len(symbol.literals) == 0:
         writer.write(f"public enum {name}\n{{\n}}")
-        return Stripped(writer.getvalue())
+        return Stripped(writer.getvalue()), None
 
     writer.write(f"public enum {name}\n{{")
-    for i, literal in enumerate(enum_symbol.literals):
+    for i, literal in enumerate(symbol.literals):
         if i > 0:
             writer.write(",\n\n")
+
+        if literal.description:
+            literal_comment, error = _description_comment(literal.description)
+            if error:
+                return None, error
+
+            writer.write(textwrap.indent(literal_comment, csharp_common.INDENT))
+            writer.write('\n')
 
         writer.write(
             textwrap.indent(
                 f'[EnumMember(Value = {csharp_common.string_literal(literal.value)})]\n'
-                f'{naming.enum_literal_name(literal.name)}',
+                f'{csharp_naming.enum_literal_name(literal.name)}',
                 csharp_common.INDENT))
 
     writer.write("\n}}")
 
-    return Stripped(writer.getvalue())
+    return Stripped(writer.getvalue()), None
 
 
-@require(lambda enum_symbol: not enum_symbol.is_implementation_specific)
+@require(lambda symbol: not symbol.is_implementation_specific)
+@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_interface(
-        interface_symbol: intermediate.Interface,
-        spec_impls: specific_implementations.SpecificImplementations
-) -> Stripped:
+        symbol: intermediate.Interface
+) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate C# code for the given interface."""
     writer = io.StringIO()
 
-    # TODO: continue here once we figured out the description
-    raise NotImplementedError()
+    if symbol.description is not None:
+        comment, error = _description_comment(symbol.description)
+        if error:
+            return None, error
 
-    # if interface_symbol.description is not None:
-    #     writer.write(_description_comment(interface_symbol.description.strip()))
-    #     writer.write("\n")
-    #
-    # name = naming.interface_name(interface_symbol.name)
-    #
-    # writer.write(f"public interface {name}\n{{\n")
-    #
-    # # Code blocks separated by double newlines and indented once
-    # codes = []  # type: List[Stripped]
-    #
-    # # region Getters and setters
-    #
-    # for prop in interface_symbol.properties:
-    #     prop_type = csharp_common.generate_type(prop.type_annotation)
-    #     prop_name = naming.property_name(prop.name)
-    #
-    #     if prop.description is not None:
-    #         prop_comment = _description_comment(prop.description.strip())
-    #         codes.append(
-    #             Stripped(f"{prop_comment}\n{prop_type} {prop_name} {{ get; set; }}"))
-    #     else:
-    #         codes.append(Code(f"{prop_type} {prop_type} {{ get; set; }}"))
-    #
-    # for signature in interface_symbol.signatures:
-    #     description_blocks = []  # type: List[Rstripped]
-    #     if signature.description is not None:
-    #         description_blocks.append(
-    #             Rstripped(f"<summary>\n{signature.description.strip()}\n</summary>"))
-    #
-    #     if len(signature.arguments) > 0:
-    #         argument_lines = []  # type: List[Rstripped]
-    #         for argument in signature.arguments:
-    #             # TODO: continue here
-    #             raise NotImplementedError()
-    #
-    #     # fmt: off
-    #     returns = (
-    #         csharp_common.generate_type(signature.returns)
-    #         if signature.returns is not None else "void"
-    #     )
-    #     # fmt: on
-    #
-    #     arg_codes = []  # type: List[Stripped]
-    #     for arg in signature.arguments:
-    #         arg_type = csharp_common.generate_type(arg.type_annotation)
-    #         arg_name = naming.argument_name(arg.name)
-    #
-    #     # TODO: write for methods
-    #
-    # # endregion
-    #
-    # # region Methods
-    #
-    # # endregion
-    #
-    # for i, code in enumerate(codes):
-    #     if i > 0:
-    #         writer.write("\n\n")
-    #
-    #     writer.write(textwrap.indent(code, csharp_common.INDENT))
-    # writer.write("\n\n".join(codes))
-    # writer.write("\n}}")
-    #
-    # return Code(writer.getvalue())
+        writer.write(comment)
+        writer.write("\n")
+
+    name = csharp_naming.interface_name(symbol.name)
+
+    if len(symbol.inheritances) == 0:
+        writer.write(f"public interface {name}\n{{\n")
+    elif len(symbol.inheritances) == 1:
+        inheritance = csharp_naming.interface_name(symbol.inheritances[0])
+        writer.write(f"public interface {name} : {inheritance}\n{{\n")
+    else:
+        writer.write(f"public class {name} :\n")
+        for i, inheritance in enumerate(
+                map(csharp_naming.interface_name, symbol.inheritances)):
+            if i > 0:
+                writer.write(",\n")
+
+            writer.write(textwrap.indent(inheritance, csharp_common.INDENT * 2))
+
+        writer.write("\n{{\n")
+
+    # Code blocks separated by double newlines and indented once
+    codes = []  # type: List[Stripped]
+
+    # region Getters and setters
+
+    for prop in symbol.properties:
+        prop_type = csharp_common.generate_type(prop.type_annotation)
+        prop_name = csharp_naming.property_name(prop.name)
+
+        if prop.description is not None:
+            prop_comment, error = _description_comment(prop.description)
+            if error:
+                return None, error
+
+            codes.append(
+                Stripped(f"{prop_comment}\n{prop_type} {prop_name} {{ get; set; }}"))
+        else:
+            codes.append(Stripped(f"{prop_type} {prop_type} {{ get; set; }}"))
+
+    # endregion
+
+    # region Methods
+
+    for signature in symbol.signatures:
+        signature_blocks = []  # type: List[Stripped]
+
+        if signature.description is not None:
+            signature_comment, error = _description_comment(signature.description)
+            if error:
+                return None, error
+
+            signature_blocks.append(signature_comment)
+
+        # fmt: off
+        returns = (
+            csharp_common.generate_type(signature.returns)
+            if signature.returns is not None else "void"
+        )
+        # fmt: on
+
+        arg_codes = []  # type: List[Stripped]
+        for arg in signature.arguments:
+            arg_type = csharp_common.generate_type(arg.type_annotation)
+            arg_name = csharp_naming.argument_name(arg.name)
+            arg_codes.append(Stripped(f'{arg_type} {arg_name}'))
+
+        signature_name = csharp_naming.method_name(signature.name)
+        if len(arg_codes) > 2:
+            arg_block = ",\n".join(arg_codes)
+            arg_block_indented = textwrap.indent(arg_block, csharp_common.INDENT)
+            signature_blocks.append(
+                Stripped(f"{returns} {signature_name}(\n{arg_block_indented});"))
+        elif len(arg_codes) == 1:
+            signature_blocks.append(
+                Stripped(f"{returns} {signature_name}({arg_codes[0]});"))
+        else:
+            assert len(arg_codes) == 0
+            signature_blocks.append(Stripped(f"{returns} {signature_name}();"))
+
+        codes.append(Stripped("\n".join(signature_blocks)))
+
+    # endregion
+
+    for i, code in enumerate(codes):
+        if i > 0:
+            writer.write("\n\n")
+
+        writer.write(textwrap.indent(code, csharp_common.INDENT))
+    writer.write("\n\n".join(codes))
+    writer.write("\n}}")
+
+    return Stripped(writer.getvalue()), None
+
+
+@require(lambda symbol: not symbol.is_implementation_specific)
+@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
+def _generate_class(
+        symbol: intermediate.Class,
+        spec_impls: specific_implementations.SpecificImplementations
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate C# code for the given class."""
+    writer = io.StringIO()
+
+    if symbol.description is not None:
+        comment, error = _description_comment(symbol.description)
+        if error:
+            return None, error
+
+        writer.write(comment)
+        writer.write("\n")
+
+    name = csharp_naming.class_name(symbol.name)
+
+    if len(symbol.interfaces) == 0:
+        writer.write(f"public class {name}\n{{\n")
+    elif len(symbol.interfaces) == 1:
+        interface_name = csharp_naming.interface_name(symbol.interfaces[0])
+        writer.write(f"public class {name} : {interface_name}\n{{\n")
+    else:
+        writer.write(f"public class {name} :\n")
+        for i, interface_name in enumerate(
+                map(csharp_naming.interface_name, symbol.interfaces)):
+            if i > 0:
+                writer.write(",\n")
+
+            writer.write(textwrap.indent(interface_name, csharp_common.INDENT * 2))
+
+        writer.write("\n{{\n")
+
+    # Code blocks separated by double newlines and indented once
+    codes = []  # type: List[Stripped]
+
+    # region Getters and setters
+
+    for prop in symbol.properties:
+        prop_type = csharp_common.generate_type(prop.type_annotation)
+        prop_name = csharp_naming.property_name(prop.name)
+
+        prop_blocks = []  # type: List[Stripped]
+
+        if prop.description is not None:
+            prop_comment, error = _description_comment(prop.description)
+            if error:
+                return None, error
+
+            prop_blocks.append(prop_comment)
+
+        json_name = naming.json_name(prop.name)
+        prop_blocks.append(
+            Stripped(f'[JsonPropertyName({csharp_common.string_literal(json_name)})]'))
+
+        prop_blocks.append(Stripped(f"{prop_type} {prop_name} {{ get; set; }}"))
+
+        codes.append(Stripped('\n'.join(prop_blocks)))
+
+    # endregion
+
+    # region Methods
+
+    for method in symbol.methods:
+        if method.is_implementation_specific:
+            code = spec_impls[
+                specific_implementations.ImplementationKey(
+                    f"{symbol.name}/{method.name}")]
+
+            codes.append(code)
+        else:
+            # (mristin, 2021-09-16):
+            # At the moment, we do not transpile the method body and its contracts.
+            # We want to finish the meta-model for the V3 and fix de/serialization
+            # before taking on this rather hard task.
+
+            return (
+                None,
+                Error(
+                    symbol.parsed.node,
+                    "At the moment, we do not transpile the method body and "
+                    "its contracts."))
+
+    # endregion
+
+    # region Constructor
+
+    if symbol.constructor.is_implementation_specific:
+        code = spec_impls[
+            specific_implementations.ImplementationKey(
+                f"{symbol.name}/__init__")]
+
+        codes.append(code)
+    else:
+        constructor_blocks = []  # type: List[Stripped]
+
+        arg_codes = []  # type: List[Stripped]
+        for arg in symbol.constructor.arguments:
+            arg_type = csharp_common.generate_type(arg.type_annotation)
+            arg_name = csharp_naming.argument_name(arg.name)
+            arg_codes.append(Stripped(f'{arg_type} {arg_name}'))
+
+        if len(arg_codes) > 2:
+            arg_block = ",\n".join(arg_codes)
+            arg_block_indented = textwrap.indent(arg_block, csharp_common.INDENT)
+            constructor_blocks.append(
+                Stripped(f"{name}(\n{arg_block_indented})\n{{"))
+        elif len(arg_codes) == 1:
+            constructor_blocks.append(
+                Stripped(f"{name}({arg_codes[0]})\n{{"))
+        else:
+            assert len(arg_codes) == 0
+
+            return (
+                None,
+                Error(
+                    symbol.parsed.node,
+                    "At the moment, we do not transpile constructors "
+                    "without arguments."))
+
+        # TODO: continue here
+        # TODO: transpile the constructor body here
+
+        constructor_blocks.append("}}")
+
+        codes.append(Stripped("\n".join(constructor_blocks)))
+
+    # endregion
+
+    for i, code in enumerate(codes):
+        if i > 0:
+            writer.write("\n\n")
+
+        writer.write(textwrap.indent(code, csharp_common.INDENT))
+    writer.write("\n\n".join(codes))
+    writer.write("\n}}")
+
+    return Stripped(writer.getvalue()), None
 
 
 # fmt: off
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 @ensure(
     lambda result:
-    result.endswith('\n'),
+    not (result[0] is not None) or result.endswith('\n'),
     "Trailing newline mandatory for valid end-of-files"
 )
 # fmt: on
@@ -509,69 +696,75 @@ def generate(
         intermediate_symbol_table: VerifiedIntermediateSymbolTable,
         namespace: Identifier,
         spec_impls: specific_implementations.SpecificImplementations
-) -> str:
+) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the C# code of the structures based on the symbol table.
 
     The ``namespace`` defines the C# namespace.
     """
-    # TODO: implement once we figured out the description
-    raise NotImplementedError()
-    # warning = Stripped(textwrap.dedent("""\
-    #     /*
-    #      * This code has been automatically generated by aas-core-csharp-codegen.
-    #      * Do NOT edit or append.
-    #      */"""))
-    #
-    # blocks = [warning]  # type: List[Rstripped]
-    #
-    # using_directives = []  # type: List[str]
-    # if any(
-    #         isinstance(symbol, intermediate.Enumeration)
-    #         for symbol in intermediate_symbol_table.symbols
-    # ):
-    #     using_directives.append(
-    #         "using EnumMemberAttribute = "
-    #         "System.Runtime.Serialization.EnumMemberAttribute;")
-    #
-    # if len(using_directives) > 0:
-    #     blocks.append(Stripped("\n".join(using_directives)))
-    #
-    # blocks.append(Stripped(f"namespace {namespace}\n{{"))
-    #
-    # for intermediate_symbol in intermediate_symbol_table.symbols:
-    #     code = None  # type: Optional[Stripped]
-    #
-    #     if intermediate_symbol.is_implementation_specific:
-    #         # TODO: test
-    #         code = spec_impls[
-    #             specific_implementations.ImplementationKey(
-    #                 intermediate_symbol.name)]
-    #     else:
-    #         if isinstance(intermediate_symbol, intermediate.Enumeration):
-    #             # TODO: test
-    #             code = _generate_enum(enum_symbol=intermediate_symbol)
-    #         elif isinstance(intermediate_symbol, intermediate.Interface):
-    #             # TODO: test
-    #             code = _generate_interface(
-    #                 intermediate_symbol=intermediate_symbol,
-    #                 spec_impls=spec_impls)
-    #         elif isinstance(intermediate_symbol, intermediate.Class):
-    #             # TODO: impl
-    #             code = _generate_class(
-    #                 intermediate_symbol=intermediate_symbol,
-    #                 spec_impls=spec_impls)
-    #         else:
-    #             assert_never(intermediate_symbol)
-    #
-    #     assert code is not None
-    #     blocks.append(Rstripped(textwrap.indent(code, '    ')))
-    #
-    # blocks.append(Rstripped(f"}}  // namespace {namespace}"))
-    #
-    # blocks.append(warning)
-    #
-    # return '\n\n'.join(blocks)
+    warning = Stripped(textwrap.dedent("""\
+        /*
+         * This code has been automatically generated by aas-core-csharp-codegen.
+         * Do NOT edit or append.
+         */"""))
+
+    blocks = [warning]  # type: List[Rstripped]
+
+    using_directives = [
+        "using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;",
+        ("using JsonPropertyNameAttribute = "
+         "System.Text.Json.Serialization.JsonPropertyNameAttribute;"),
+        "using System.Collections.Generic;  // can't alias"
+    ]  # type: List[str]
+
+    if len(using_directives) > 0:
+        blocks.append(Stripped("\n".join(using_directives)))
+
+    blocks.append(Stripped(f"namespace {namespace}\n{{"))
+
+    errors = []  # type: List[Error]
+
+    for intermediate_symbol in intermediate_symbol_table.symbols:
+        code = None  # type: Optional[Stripped]
+        error = None  # type: Optional[Error]
+
+        if intermediate_symbol.is_implementation_specific:
+            # TODO: test
+            code = spec_impls[
+                specific_implementations.ImplementationKey(
+                    intermediate_symbol.name)]
+        else:
+            if isinstance(intermediate_symbol, intermediate.Enumeration):
+                # TODO: test
+                code, error = _generate_enum(symbol=intermediate_symbol)
+            elif isinstance(intermediate_symbol, intermediate.Interface):
+                # TODO: test
+                code, error = _generate_interface(
+                    intermediate_symbol=intermediate_symbol)
+
+            elif isinstance(intermediate_symbol, intermediate.Class):
+                # TODO: impl
+                code, error = _generate_class(
+                    intermediate_symbol=intermediate_symbol,
+                    spec_impls=spec_impls)
+            else:
+                assert_never(intermediate_symbol)
+
+        assert (code is None) ^ (error is None)
+        if error is not None:
+            errors.append(error)
+        else:
+            assert code is not None
+            blocks.append(Rstripped(textwrap.indent(code, '    ')))
+
+    if len(errors) > 0:
+        return None, errors
+
+    blocks.append(Rstripped(f"}}  // namespace {namespace}"))
+
+    blocks.append(warning)
+
+    return '\n\n'.join(blocks), None
 
 # endregion
 

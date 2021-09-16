@@ -117,9 +117,9 @@ def argument_name(identifier: Identifier) -> Identifier:
     parts = identifier.split('_')
 
     if len(parts) == 1:
-        return Identifier(parts[0].capitalize())
+        return Identifier(parts[0].lower())
 
     return Identifier(
         "{}{}".format(
-            parts[0].capitalize(),
+            parts[0].lower(),
             ''.join(part.capitalize() for part in parts[1:])))
