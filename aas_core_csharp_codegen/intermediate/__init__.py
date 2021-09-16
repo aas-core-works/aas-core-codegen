@@ -17,6 +17,7 @@ SetTypeAnnotation = _types.SetTypeAnnotation
 MappingTypeAnnotation = _types.MappingTypeAnnotation
 MutableMappingTypeAnnotation = _types.MutableMappingTypeAnnotation
 OptionalTypeAnnotation = _types.OptionalTypeAnnotation
+Description = _types.Description
 Property = _types.Property
 Default = _types.Default
 Argument = _types.Argument

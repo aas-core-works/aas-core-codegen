@@ -185,20 +185,55 @@ class Block(str):
         return cast(Block, block)
 
 
-def _description_comment(description: docutils.nodes.document) -> Code:
+def _description_paragraph(
+        paragraph: docutils.nodes.paragraph
+) -> Tuple[Optional[Code], Optional[str]]:
+    """
+    Render the body of a description paragraph as documentation XML.
+
+    :param paragraph: to be rendered
+    :return: the generated code, or error if the paragraph could not be translated
+    """
+    # TODO: continue here
+
+@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
+def _description_comment(
+        description: intermediate.Description
+) -> Tuple[Optional[Code], Optional[Error]]:
     """Generate a documentation comment based on the docstring."""
+    summary = None  # type: Optional[docutils.nodes.paragraph]
+    remarks = None  # type: Optional[List[docutils.nodes.paragraph]]
+    tail = []  # type: List[docutils.nodes.General]
 
+    document = description.document
 
-    result_lines = []  # type: List[str]
+    # Try to match the summary and the remarks
+    if (
+            len(description.document.children) >= 2
+            and isinstance(description.document.children[0], docutils.nodes.paragraph)
+            and isinstance(description.document.children[1], docutils.nodes.paragraph)
+    ):
+        summary = description.document.children[0]
 
-    for line in description.splitlines():
-        stripped = line.strip()
-        if len(stripped) > 0:
-            result_lines.append(f"/// {stripped}")
-        else:
-            result_lines.append(f"///")
+        remarks = [description.document.children[1]]
+        last_remark_index = 1
+        for child in description.document.children[2:]:
+            if isinstance(child, docutils.nodes.paragraph):
+                remarks.append(child)
+                last_remark_index += 1
 
-    return Code("\n".join(result_lines))
+        tail = description.document.children[last_remark_index + 1:]
+    elif (
+            len(description.document.children) >= 1
+            and isinstance(description.document.children[0], docutils.nodes.paragraph)
+    ):
+        summary = description.document.children[0]
+        tail = description.document.children[1:]
+    else:
+        tail = description.document.children
+
+    # TODO: implement once we know how to render a paragraph body
+
 
 
 @require(lambda enum_symbol: not enum_symbol.is_implementation_specific)
