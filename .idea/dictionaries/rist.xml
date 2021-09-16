@@ -17,6 +17,7 @@
       <w>lineno</w>
       <w>mristin</w>
       <w>mypy</w>
+      <w>paramref</w>
       <w>posonlyargs</w>
       <w>postcondition</w>
       <w>postconditions</w>

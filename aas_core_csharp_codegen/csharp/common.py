@@ -4,7 +4,7 @@ from typing import List, Union
 from icontract import ensure
 
 from aas_core_csharp_codegen import intermediate
-from aas_core_csharp_codegen.common import Code, assert_never
+from aas_core_csharp_codegen.common import Stripped, assert_never
 from aas_core_csharp_codegen.csharp import naming
 
 
@@ -40,15 +40,17 @@ def string_literal(text: str) -> str:
 
 
 _BUILTING_ATOMIC_TYPE_MAP = {
-    intermediate.BuiltinAtomicType.BOOL: Code("bool"),
-    intermediate.BuiltinAtomicType.INT: Code("int"),
-    intermediate.BuiltinAtomicType.FLOAT: Code("float"),
-    intermediate.BuiltinAtomicType.STR: Code("string")
+    intermediate.BuiltinAtomicType.BOOL: Stripped("bool"),
+    intermediate.BuiltinAtomicType.INT: Stripped("int"),
+    intermediate.BuiltinAtomicType.FLOAT: Stripped("float"),
+    intermediate.BuiltinAtomicType.STR: Stripped("string")
 }
 
 # noinspection PyTypeChecker
-assert sorted(_BUILTING_ATOMIC_TYPE_MAP.keys()) == sorted(intermediate.BuiltinAtomicType), \
-    (
+assert (
+    sorted(literal.value for literal in _BUILTING_ATOMIC_TYPE_MAP.keys())
+    == sorted(literal.value for literal in intermediate.BuiltinAtomicType)
+), (
         "Expected complete mapping of built-in types to implementation-specific types"
     )  # type: ignore
 
@@ -56,7 +58,7 @@ assert sorted(_BUILTING_ATOMIC_TYPE_MAP.keys()) == sorted(intermediate.BuiltinAt
 def generate_type(
         type_annotation: Union[
             intermediate.SubscriptedTypeAnnotation, intermediate.AtomicTypeAnnotation]
-) -> Code:
+) -> Stripped:
     """Generate the C# type for the given type annotation."""
     # TODO: test with general snippets, do not test in isolation
     if isinstance(type_annotation, intermediate.AtomicTypeAnnotation):

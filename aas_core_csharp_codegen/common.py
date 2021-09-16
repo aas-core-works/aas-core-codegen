@@ -172,10 +172,27 @@ def assert_never(value: NoReturn) -> NoReturn:
 LEADING_WHITESPACE_RE = re.compile(r'^\s+')
 TRAILING_WHITESPACE_RE = re.compile(r'\s+\Z')
 
-class Code(str):
-    """Represent an implementation-specific code."""
+
+class Rstripped(str):
+    """
+    Represent a block of text without trailing whitespace.
+
+    The block can be both single-line or multi-line.
+    """
+
+    @require(lambda code: not TRAILING_WHITESPACE_RE.match(code))
+    def __new__(cls, block: str) -> 'Rstripped':
+        return cast(Rstripped, block)
+
+
+class Stripped(Rstripped):
+    """
+    Represent a block of text without leading and trailing whitespace.
+
+    The block of text can be both single-line and multi-line.
+    """
 
     @require(lambda code: not LEADING_WHITESPACE_RE.match(code))
     @require(lambda code: not TRAILING_WHITESPACE_RE.match(code))
-    def __new__(cls, code: str) -> 'Code':
-        return cast(Code, code)
+    def __new__(cls, code: str) -> 'Stripped':
+        return cast(Stripped, code)

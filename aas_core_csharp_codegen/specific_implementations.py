@@ -6,7 +6,7 @@ from typing import cast, Mapping, Optional, List
 from icontract import require
 
 from aas_core_csharp_codegen import intermediate
-from aas_core_csharp_codegen.common import Error, Code
+from aas_core_csharp_codegen.common import Error, Stripped
 
 IMPLEMENTATION_KEY_RE = re.compile('[a-zA-Z_][a-zA-Z_0-9]*(/[a-zA-Z_][a-zA-Z_0-9]*)+')
 
@@ -27,7 +27,7 @@ class ImplementationKey(str):
         return cast(ImplementationKey, key)
 
 
-SpecificImplementations = Mapping[ImplementationKey, Code]
+SpecificImplementations = Mapping[ImplementationKey, Stripped]
 
 
 def _verify_that_available_for_symbol(

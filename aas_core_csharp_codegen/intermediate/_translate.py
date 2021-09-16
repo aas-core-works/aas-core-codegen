@@ -65,7 +65,7 @@ def _parsed_enumeration_to_enumeration(
     )
 
 
-class _PlaceholderSymbol(Symbol):
+class _PlaceholderSymbol:
     """Reference a symbol which will be resolved once the table is built."""
 
     def __init__(self, identifier: Identifier) -> None:
@@ -105,8 +105,10 @@ class _FirstPassTypeAnnotator:
 
             our_type_annotation = self.to_be_resolved.get(parsed.identifier, None)
             if our_type_annotation is None:
+                # noinspection PyTypeChecker
                 our_type_annotation = OurAtomicTypeAnnotation(
-                    symbol=_PlaceholderSymbol(identifier=parsed.identifier),
+                    symbol=_PlaceholderSymbol(
+                        identifier=parsed.identifier),  # type: ignore
                     parsed=parsed)
 
                 self.to_be_resolved[parsed.identifier] = our_type_annotation
