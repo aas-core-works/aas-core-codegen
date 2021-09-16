@@ -4,6 +4,7 @@ import enum
 import pathlib
 from typing import Sequence, Optional, Union, TypeVar, Mapping
 
+import docutils.nodes
 from icontract import require
 
 import aas_core_csharp_codegen.understand.constructor as understand_constructor
@@ -157,6 +158,16 @@ TypeAnnotation = Union[
 ]
 
 
+class Description:
+    """Represent a docstring describing something in the meta-model."""
+
+    @require(lambda node: isinstance(node.value, str))
+    def __init__(self, document: docutils.nodes.document, node: ast.Constant) -> None:
+        """Initialize with the given values."""
+        self.document = document
+        self.node = node
+
+
 class Property:
     """Represent a property of a class."""
 
@@ -164,7 +175,7 @@ class Property:
             self,
             name: Identifier,
             type_annotation: TypeAnnotation,
-            description: Optional[str],
+            description: Optional[Description],
             is_readonly: bool,
             parsed: parse.Property,
     ) -> None:
@@ -201,14 +212,12 @@ class Argument:
             name: Identifier,
             type_annotation: TypeAnnotation,
             default: Optional[Default],
-            description: Optional[str],
             parsed: parse.Argument,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
         self.type_annotation = type_annotation
         self.default = default
-        self.description = description
         self.parsed = parsed
 
 
@@ -220,7 +229,7 @@ class Signature:
             name: Identifier,
             arguments: Sequence[Argument],
             returns: Optional[TypeAnnotation],
-            description: Optional[str],
+            description: Optional[Description],
             parsed: parse.Method,
     ) -> None:
         """Initialize with the given values."""
@@ -246,7 +255,7 @@ class Interface:
             signatures: Sequence[Signature],
             properties: Sequence[Property],
             is_implementation_specific: bool,
-            description: Optional[str],
+            description: Optional[Description],
             parsed: parse.Entity,
     ) -> None:
         """Initialize with the given values."""
@@ -265,7 +274,7 @@ class Contract:
     def __init__(
             self,
             args: Sequence[Identifier],
-            description: Optional[str],
+            description: Optional[Description],
             body: ast.AST,
             parsed: parse.Contract,
     ) -> None:
@@ -357,7 +366,7 @@ class Method:
             is_implementation_specific: bool,
             arguments: Sequence[Argument],
             returns: Optional[TypeAnnotation],
-            description: Optional[str],
+            description: Optional[Description],
             contracts: Contracts,
             body: Sequence[ast.AST],
             parsed: parse.Method,
@@ -415,7 +424,7 @@ class EnumerationLiteral:
             self,
             name: Identifier,
             value: Identifier,
-            description: Optional[str],
+            description: Optional[Description],
             parsed: parse.EnumerationLiteral,
     ) -> None:
         self.name = name
@@ -431,7 +440,7 @@ class Enumeration:
             self,
             name: Identifier,
             literals: Sequence[EnumerationLiteral],
-            description: Optional[str],
+            description: Optional[Description],
             parsed: parse.Enumeration,
     ) -> None:
         self.name = name
@@ -468,7 +477,7 @@ class Class:
             properties: Sequence[Property],
             methods: Sequence[Method],
             constructor: Constructor,
-            description: Optional[str],
+            description: Optional[Description],
             parsed: parse.Entity,
     ) -> None:
         """Initialize with the given values."""

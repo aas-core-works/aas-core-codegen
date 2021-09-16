@@ -1,17 +1,16 @@
 """Generate the C# data structures from the intermediate representation."""
 import io
-import re
 import textwrap
-from typing import Optional, Dict, List, Tuple, cast, Mapping
+from typing import Optional, Dict, List, Tuple, cast
 
+import docutils.nodes
 from icontract import ensure, require
 
-from aas_core_csharp_codegen import intermediate, common
+import aas_core_csharp_codegen.csharp.common as csharp_common
+from aas_core_csharp_codegen import intermediate
 from aas_core_csharp_codegen import specific_implementations
 from aas_core_csharp_codegen.common import Error, Identifier, assert_never, \
     TRAILING_WHITESPACE_RE, Code
-import aas_core_csharp_codegen.csharp.common as csharp_common
-
 # region Checks
 from aas_core_csharp_codegen.csharp import naming
 
@@ -65,6 +64,8 @@ def _verify_intra_structure_collisions(
 ) -> Optional[Error]:
     """Verify that no member names collide in the C# structure of the given symbol."""
     errors = []  # type: List[Error]
+
+    # TODO: revisit this method — it is outdated with the current implementation!
 
     # TODO: add method_name to _naming
     # TODO: include methods in this step
@@ -184,15 +185,10 @@ class Block(str):
         return cast(Block, block)
 
 
-# fmt: off
-@require(
-    lambda description:
-    description != "",
-    "All descriptions must describe something."
-)
-# fmt: on
-def _description_comment(description: str) -> Code:
-    """Generate a block comment."""
+def _description_comment(description: docutils.nodes.document) -> Code:
+    """Generate a documentation comment based on the docstring."""
+
+
     result_lines = []  # type: List[str]
 
     for line in description.splitlines():
@@ -285,10 +281,6 @@ def _generate_interface(
                     f'<param name="{naming.argument_name(argument.name)}">'
                 ))
 
-
-
-
-
         # fmt: off
         returns = (
             csharp_common.generate_type(signature.returns)
@@ -300,7 +292,6 @@ def _generate_interface(
         for arg in signature.arguments:
             arg_type = csharp_common.generate_type(arg.type_annotation)
             arg_name = naming.argument_name(arg.name)
-
 
         # TODO: write for methods
 

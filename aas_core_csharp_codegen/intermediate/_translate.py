@@ -29,10 +29,24 @@ from aas_core_csharp_codegen.intermediate._types import (
     Symbol, ListTypeAnnotation, SequenceTypeAnnotation, SetTypeAnnotation,
     MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
     OurAtomicTypeAnnotation, STR_TO_BUILTIN_ATOMIC_TYPE, BuiltinAtomicTypeAnnotation,
+    Description,
 )
 
 
-def _parsed_enumeration_to_enumeration(parsed: parse.Enumeration) -> Enumeration:
+def _parsed_description_to_description(parsed: parse.Description) -> Description:
+    """Translate the parsed description to an intermediate form."""
+    # This function makes a simple copy at the moment, which might seem pointless.
+    #
+    # However, we want to explicitly delineate layers (the parse and the intermediate
+    # layer, respectively). This simple copying thus helps the understanding
+    # of the general system and allows the reader to ignore, to a certain degree, the
+    # parse layer when examining the output of the intermediate layer.
+    return Description(document=parsed.document, node=parsed.node)
+
+
+def _parsed_enumeration_to_enumeration(
+        parsed: parse.Enumeration
+) -> Enumeration:
     """Translate an enumeration from the meta-model to an intermediate enumeration."""
     return Enumeration(
         name=parsed.name,
@@ -40,12 +54,13 @@ def _parsed_enumeration_to_enumeration(parsed: parse.Enumeration) -> Enumeration
             EnumerationLiteral(
                 name=parsed_literal.name,
                 value=parsed_literal.value,
-                description=parsed_literal.description,
+                description=_parsed_description_to_description(
+                    parsed_literal.description),
                 parsed=parsed_literal,
             )
             for parsed_literal in parsed.literals
         ],
-        description=parsed.description,
+        description=_parsed_description_to_description(parsed.description),
         parsed=parsed,
     )
 
@@ -188,8 +203,6 @@ def _parsed_arguments_to_arguments(
             default=Default(value=parsed_arg.default.value, parsed=parsed_arg.default)
             if parsed_arg.default is not None
             else None,
-            # TODO: finish here once parsed done
-            description=parsed_arg.
             parsed=parsed_arg,
         )
         for parsed_arg in parsed
@@ -217,7 +230,8 @@ def _parsed_abstract_entity_to_interface(
                     if parsed_method.returns is None
                     else first_pass_type_annotator.translate(parsed_method.returns)
                 ),
-                description=parsed_method.description,
+                description=_parsed_description_to_description(
+                    parsed_method.description),
                 parsed=parsed_method,
             )
             for parsed_method in parsed.methods
@@ -231,7 +245,7 @@ def _parsed_abstract_entity_to_interface(
             for parsed_prop in parsed.properties
         ],
         is_implementation_specific=parsed.is_implementation_specific,
-        description=parsed.description,
+        description=_parsed_description_to_description(parsed.description),
         parsed=parsed,
     )
 
@@ -244,7 +258,7 @@ def _parsed_property_to_property(
     return Property(
         name=parsed.name,
         type_annotation=first_pass_type_annotator.translate(parsed.type_annotation),
-        description=parsed.description,
+        description=_parsed_description_to_description(parsed.description),
         is_readonly=parsed.is_readonly,
         parsed=parsed,
     )
@@ -256,7 +270,7 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
         preconditions=[
             Contract(
                 args=parsed_pre.args,
-                description=parsed_pre.description,
+                description=_parsed_description_to_description(parsed_pre.description),
                 body=parsed_pre.body,
                 parsed=parsed_pre,
             )
@@ -274,7 +288,7 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
         postconditions=[
             Contract(
                 args=parsed_post.args,
-                description=parsed_post.description,
+                description=_parsed_description_to_description(parsed_post.description),
                 body=parsed_post.body,
                 parsed=parsed_post,
             )
@@ -307,7 +321,7 @@ def _parsed_method_to_method(
             if parsed.returns is None
             else first_pass_type_annotator.translate(parsed.returns)
         ),
-        description=parsed.description,
+        description=_parsed_description_to_description(parsed.description),
         contracts=_parsed_contracts_to_contracts(parsed.contracts),
         body=parsed.body,
         parsed=parsed,
@@ -478,7 +492,7 @@ def _parsed_entity_to_class(
         properties=properties,
         methods=methods,
         constructor=constructor,
-        description=parsed.description,
+        description=_parsed_description_to_description(parsed.description),
         parsed=parsed,
     )
 

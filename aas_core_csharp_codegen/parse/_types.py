@@ -3,6 +3,7 @@ import ast
 import pathlib
 from typing import Sequence, Optional, Union, Final, Mapping, Any
 
+import docutils.nodes
 from icontract import require, DBC
 
 from aas_core_csharp_codegen.common import Identifier, assert_never
@@ -108,6 +109,16 @@ def final_in_type_annotation(type_annotation: TypeAnnotation) -> bool:
         raise AssertionError(type_annotation)
 
 
+class Description:
+    """Represent a docstring describing something in the meta-model."""
+
+    @require(lambda node: isinstance(node.value, str))
+    def __init__(self, document: docutils.nodes.document, node: ast.Constant) -> None:
+        """Initialize with the given values."""
+        self.document = document
+        self.node = node
+
+
 class Property:
     """Represent a property of an entity."""
 
@@ -122,7 +133,7 @@ class Property:
             self,
             name: Identifier,
             type_annotation: TypeAnnotation,
-            description: Optional[str],
+            description: Optional[Description],
             is_readonly: bool,
             node: ast.AnnAssign,
     ) -> None:
@@ -154,7 +165,7 @@ class Argument:
             name: Identifier,
             type_annotation: TypeAnnotation,
             default: Optional[Default],
-            description: Optional[str],
+            description: Optional[Description],
             node: ast.arg,
     ) -> None:
         """Initialize with the given values."""
@@ -171,7 +182,7 @@ class Contract:
     def __init__(
             self,
             args: Sequence[Identifier],
-            description: Optional[str],
+            description: Optional[Description],
             body: ast.AST,
             condition_node: ast.Lambda,
     ) -> None:
@@ -266,7 +277,7 @@ class Method:
             is_implementation_specific: bool,
             arguments: Sequence[Argument],
             returns: Optional[TypeAnnotation],
-            description: Optional[str],
+            description: Optional[Description],
             contracts: Contracts,
             body: Sequence[ast.AST],
             node: ast.AST,
@@ -320,7 +331,7 @@ class Entity:
             inheritances: Sequence[Identifier],
             properties: Sequence[Property],
             methods: Sequence[Method],
-            description: Optional[str],
+            description: Optional[Description],
             node: ast.ClassDef,
     ) -> None:
         self.name = name
@@ -376,7 +387,7 @@ class EnumerationLiteral:
             self,
             name: Identifier,
             value: Identifier,
-            description: Optional[str],
+            description: Optional[Description],
             node: ast.Assign
     ) -> None:
         self.name = name
@@ -392,7 +403,7 @@ class Enumeration:
             self,
             name: Identifier,
             literals: Sequence[EnumerationLiteral],
-            description: Optional[str],
+            description: Optional[Description],
             node: ast.ClassDef,
     ) -> None:
         self.name = name

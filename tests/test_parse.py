@@ -10,6 +10,7 @@ import asttokens
 
 import tests.common
 from aas_core_csharp_codegen import parse
+import aas_core_csharp_codegen.parse._translate as parse_translate
 from aas_core_csharp_codegen.common import Error, LinenoColumner
 
 
@@ -104,6 +105,44 @@ class Test_checking_imports(unittest.TestCase):
             [
                 "At line 1 and column 1: Unexpected import of a name 'Else'."
             ], errors)
+
+
+# TODO: move to intermediate
+class Test_parsing_docstring(unittest.TestCase):
+    def test_empty(self) -> None:
+        # TODO: finish afterwards
+        docstring, err = parse_translate._parse_docstring("")
+        assert err is None
+        print(f"docstring is {docstring!r}")  # TODO: debug
+
+    def test_comprehensive(self) -> None:
+        docstring, err = parse_translate._parse_docstring(
+            textwrap.dedent("""\
+                Do something.
+
+                Really do ``something``.
+
+                >>> do_something('hello')
+                'world'
+
+                :param some_argument: really important argument
+                :param another_argument: 
+                    First paragraph.
+                    
+                    Another paragraph.
+                    
+                    .. code-block::
+                        
+                        some code
+                
+                    :param indented_field: some indented sub-field
+                    
+                Now here is some text.
+                
+                :return: some return
+                """))
+        assert err is None
+        print(f"docstring is {docstring!r}")  # TODO: debug
 
 
 class Test_against_recorded(unittest.TestCase):

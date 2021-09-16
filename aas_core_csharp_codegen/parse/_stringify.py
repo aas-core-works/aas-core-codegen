@@ -22,12 +22,12 @@ from aas_core_csharp_codegen.parse._types import (
     Symbol,
     SymbolTable,
     TypeAnnotation,
-    UnverifiedSymbolTable,
+    UnverifiedSymbolTable, Description,
 )
 
 
 def _stringify_atomic_type_annotation(
-    type_annotation: AtomicTypeAnnotation,
+        type_annotation: AtomicTypeAnnotation,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=AtomicTypeAnnotation.__name__,
@@ -39,7 +39,7 @@ def _stringify_atomic_type_annotation(
 
 
 def _stringify_subscripted_type_annotation(
-    type_annotation: SubscriptedTypeAnnotation,
+        type_annotation: SubscriptedTypeAnnotation,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=SubscriptedTypeAnnotation.__name__,
@@ -76,6 +76,15 @@ def _stringify_type_annotation(type_annotation: TypeAnnotation) -> stringify.Ent
         raise AssertionError(type_annotation)
 
 
+def _stringify_description(description: Description) -> stringify.Entity:
+    return stringify.Entity(
+        name=Description.__name__,
+        properties=[
+            stringify.PropertyEllipsis("document", description.document),
+            stringify.PropertyEllipsis("node", description.node)
+        ])
+
+
 def _stringify_property(prop: Property) -> stringify.Entity:
     result = stringify.Entity(
         name=Property.__name__,
@@ -84,7 +93,7 @@ def _stringify_property(prop: Property) -> stringify.Entity:
             stringify.Property(
                 "type_annotation", _stringify_type_annotation(prop.type_annotation)
             ),
-            stringify.Property("description", prop.description),
+            stringify.Property("description", _stringify_description(prop.description)),
             stringify.Property("is_readonly", prop.is_readonly),
             stringify.PropertyEllipsis("node", prop.node),
         ],
@@ -130,7 +139,8 @@ def _stringify_contract(contract: Contract) -> stringify.Entity:
         name=Contract.__name__,
         properties=[
             stringify.Property("args", contract.args),
-            stringify.Property("description", contract.description),
+            stringify.Property(
+                "description", _stringify_description(contract.description)),
             stringify.PropertyEllipsis("body", contract.body),
             stringify.PropertyEllipsis("condition_node", contract.condition_node),
         ],
@@ -200,7 +210,8 @@ def _stringify_method(method: Method) -> stringify.Entity:
                 if method.returns is None
                 else _stringify_type_annotation(method.returns),
             ),
-            stringify.Property("description", method.description),
+            stringify.Property(
+                "description", _stringify_description(method.description)),
             stringify.Property("contracts", _stringify_contracts(method.contracts)),
             stringify.PropertyEllipsis("body", method.body),
             stringify.PropertyEllipsis("node", method.node),
@@ -240,7 +251,8 @@ def _stringify_entity(entity: Entity) -> stringify.Entity:
                 "methods", [_stringify_method(method) for method in entity.methods]
             ),
             stringify.PropertyEllipsis("method_map", entity.method_map),
-            stringify.Property("description", entity.description),
+            stringify.Property(
+                "description", _stringify_description(entity.description)),
             stringify.PropertyEllipsis("node", entity.node),
         ],
     )
@@ -250,14 +262,15 @@ def _stringify_entity(entity: Entity) -> stringify.Entity:
 
 
 def _stringify_enumeration_literal(
-    enumeration_literal: EnumerationLiteral,
+        enumeration_literal: EnumerationLiteral,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=EnumerationLiteral.__name__,
         properties=[
             stringify.Property("name", enumeration_literal.name),
             stringify.Property("value", enumeration_literal.value),
-            stringify.Property("description", enumeration_literal.description),
+            stringify.Property(
+                "description", _stringify_description(enumeration_literal.description)),
             stringify.PropertyEllipsis("node", enumeration_literal.node),
         ],
     )
@@ -278,7 +291,8 @@ def _stringify_enumeration(enumeration: Enumeration) -> stringify.Entity:
                     for literal in enumeration.literals
                 ],
             ),
-            stringify.Property("description", enumeration.description),
+            stringify.Property(
+                "description", _stringify_description(enumeration.description)),
             stringify.PropertyEllipsis("node", enumeration.node),
         ],
     )
@@ -288,7 +302,7 @@ def _stringify_enumeration(enumeration: Enumeration) -> stringify.Entity:
 
 
 def _stringify_unverified_symbol_table(
-    unverified_symbol_table: UnverifiedSymbolTable,
+        unverified_symbol_table: UnverifiedSymbolTable,
 ) -> stringify.Entity:
     entity = stringify.Entity(
         name=UnverifiedSymbolTable.__name__,
@@ -374,7 +388,8 @@ def dump(dumpable: Dumpable) -> str:
     elif isinstance(dumpable, SymbolTable):
         stringified = _stringify_symbol_table(dumpable)
     elif isinstance(
-        dumpable, (AtomicTypeAnnotation, SubscriptedTypeAnnotation, SelfTypeAnnotation)
+            dumpable,
+            (AtomicTypeAnnotation, SubscriptedTypeAnnotation, SelfTypeAnnotation)
     ):
         stringified = _stringify_type_annotation(dumpable)
     elif isinstance(dumpable, UnverifiedSymbolTable):

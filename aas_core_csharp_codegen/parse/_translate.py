@@ -2,10 +2,11 @@
 
 import ast
 import collections
-import textwrap
 from typing import List, Any, Optional, cast, Type, Tuple, Union
 
 import asttokens
+import docutils.core
+import docutils.nodes
 from icontract import ensure, require
 
 from aas_core_csharp_codegen.common import (
@@ -36,7 +37,7 @@ from aas_core_csharp_codegen.parse._types import (
     Symbol,
     SymbolTable,
     TypeAnnotation,
-    UnverifiedSymbolTable, BUILTIN_ATOMIC_TYPES, BUILTIN_COMPOSITE_TYPES,
+    UnverifiedSymbolTable, BUILTIN_ATOMIC_TYPES, BUILTIN_COMPOSITE_TYPES, Description
 )
 
 
@@ -158,7 +159,7 @@ def _enum_to_symbol(
 
     enumeration_literals = []  # type: List[EnumerationLiteral]
 
-    description = None  # type: Optional[str]
+    description = None  # type: Optional[Description]
 
     cursor = 0
     while cursor < len(node.body):
@@ -168,7 +169,10 @@ def _enum_to_symbol(
 
         if cursor == 0 and is_string_expr(body_node):
             assert isinstance(body_node, ast.Expr)
-            description = _string_expr_to_text(body_node)
+            description, error = _string_constant_to_description(body_node.value)
+            if error is not None:
+                return None, error
+
             cursor += 1
 
         elif isinstance(body_node, ast.Pass):
@@ -220,12 +224,17 @@ def _enum_to_symbol(
             literal_name = Identifier(assign.targets[0].id)
             literal_value = assign.value.value
 
-            literal_description = None  # type: Optional[str]
+            literal_description = None  # type: Optional[Description]
             next_expr = node.body[cursor + 1] if cursor < len(node.body) - 1 else None
 
             if next_expr is not None and is_string_expr(next_expr):
                 assert isinstance(next_expr, ast.Expr)
-                literal_description = _string_expr_to_text(next_expr)
+                literal_description, error = _string_constant_to_description(
+                    next_expr.value)
+
+                if error is not None:
+                    return None, error
+
                 cursor += 1
 
             enumeration_literals.append(
@@ -653,28 +662,32 @@ def _parse_contract_condition(
             ),
         )
 
-    if description_node is not None and not (
+    description = None  # type: Optional[Description]
+    if description_node is not None:
+        if not (
             isinstance(description_node, ast.Constant)
             and isinstance(description_node.value, str)
-    ):
-        return (
-            None,
-            Error(
-                description_node,
-                f"Expected a string literal as a contract description, "
-                f"but got: {atok.get_text(description_node)!r}",
-            ),
-        )
+        ):
+            return (
+                None,
+                Error(
+                    description_node,
+                    f"Expected a string literal as a contract description, "
+                    f"but got: {atok.get_text(description_node)!r}",
+                ))
+
+        description, error = _string_constant_to_description(description_node)
+        if error is not None:
+            return None, error
 
     return (
         Contract(
             args=[Identifier(arg.arg) for arg in condition_node.args.args],
-            description=None if description_node is None else description_node.value,
+            description=description,
             body=condition_node.body,
             condition_node=condition_node,
         ),
-        None,
-    )
+        None)
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -712,7 +725,7 @@ def _parse_snapshot(
                 capture_node,
                 f"Expected a lambda function as a capture of a snapshot, "
                 f"but got: {atok.get_text(capture_node)}",
-            ),
+            )
         )
 
     if name_node is not None and not (
@@ -883,13 +896,16 @@ def _function_def_to_method(
 
     # region Parse arguments and body
 
-    description = None  # type: Optional[str]
+    description = None  # type: Optional[Description]
     body = node.body
 
     if len(node.body) >= 1 and is_string_expr(expr=node.body[0]):
         assert isinstance(node.body[0], ast.Expr)
 
-        description = _string_expr_to_text(expr=node.body[0])
+        description, error = _string_expr_to_description(expr=node.body[0])
+        if error is not None:
+            return None, error
+
         body = node.body[1:]
 
     arguments, error = _args_to_arguments(node=node.args, atok=atok)
@@ -995,12 +1011,6 @@ def _function_def_to_method(
         )
     # endregion
 
-    # TODO: implement _parse_sphinxdoc(text: str) and call it on Description
-    # TODO:  introduce Sphinxdoc into _types and parse module
-    # TODO:  🠒 add properties like ``params`` and ``returns``.
-    #  Split in summary (first line) and remarks (the other lines).
-    #  Tokenize CODE ("``") and see whatever ``:ref:`` we use.
-
     return (
         Method(
             name=Identifier(name),
@@ -1020,12 +1030,26 @@ def _function_def_to_method(
     )
 
 
-@require(lambda expr: is_string_expr(expr))
-def _string_expr_to_text(expr: ast.Expr) -> str:
-    """Extract the dedented docstring from the given expression."""
-    assert isinstance(expr.value, ast.Constant), f"{ast.dump(expr)=}"
+@require(lambda constant: isinstance(constant.value, str))
+@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
+def _string_constant_to_description(
+        constant: ast.Constant
+) -> Tuple[Optional[Description], Optional[Error]]:
+    """Extract the docstring from the given string constant."""
+    text = constant.value
+    assert isinstance(text, str), (
+        f"Expected a string constant node, but got: {ast.dump(constant)!r}")
 
-    return textwrap.dedent(expr.value.value).strip()
+    # noinspection PyUnusedLocal
+    document = None  # type: Optional[docutils.nodes.document]
+    try:
+        document = docutils.core.publish_doctree(text)
+    except Exception as err:
+        return None, Error(constant, str(err))
+
+    assert document is not None
+
+    return Description(document=document, node=constant), None
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -1110,7 +1134,7 @@ def _classdef_to_symbol(
             )
     # endregion
 
-    description = None  # type: Optional[str]
+    description = None  # type: Optional[Description]
 
     properties = []  # type: List[Property]
     methods = []  # type: List[Method]
@@ -1123,7 +1147,10 @@ def _classdef_to_symbol(
 
         if cursor == 0 and is_string_expr(expr):
             assert isinstance(expr, ast.Expr)
-            description = _string_expr_to_text(expr)
+            description, error = _string_constant_to_description(expr.value)
+            if error is not None:
+                return None, error
+
             cursor += 1
             continue
 
@@ -1132,12 +1159,17 @@ def _classdef_to_symbol(
             continue
 
         if isinstance(expr, ast.AnnAssign):
-            property_description = None  # type: Optional[str]
+            property_description = None  # type: Optional[Description]
 
             next_expr = node.body[cursor + 1] if cursor < len(node.body) - 1 else None
             if next_expr is not None and is_string_expr(next_expr):
                 assert isinstance(next_expr, ast.Expr)
-                property_description = _string_expr_to_text(next_expr)
+                property_description, error = _string_constant_to_description(
+                    next_expr.value)
+
+                if error is not None:
+                    return None, error
+
                 cursor += 1
 
             prop, error = _ann_assign_to_property(
