@@ -391,36 +391,33 @@ def _description_comment(
 @require(lambda enum_symbol: not enum_symbol.is_implementation_specific)
 def _generate_enum(enum_symbol: intermediate.Enumeration) -> Stripped:
     """Generate the C# code for the enum."""
-    # TODO: implement once we figured out the description
-    raise NotImplementedError()
-    # writer = io.StringIO()
-    #
-    # if enum_symbol.description is not None:
-    #     writer.write(
-    #         f"<summary>\n"
-    #         f"{_description_comment(enum_symbol.description.strip())}\n"
-    #         f"</summary>")
-    #     writer.write("\n")
-    #
-    # name = naming.enum_name(enum_symbol.name)
-    # if len(enum_symbol.literals) == 0:
-    #     writer.write(f"public enum {name}\n{{\n}}")
-    #     return Stripped(writer.getvalue())
-    #
-    # writer.write(f"public enum {name}\n{{")
-    # for i, literal in enumerate(enum_symbol.literals):
-    #     if i > 0:
-    #         writer.write(",\n\n")
-    #
-    #     writer.write(
-    #         textwrap.indent(
-    #             f'[EnumMember(Value = {csharp_common.string_literal(literal.value)})]\n'
-    #             f'{naming.enum_literal_name(literal.name)}',
-    #             csharp_common.INDENT))
-    #
-    # writer.write("\n}}")
-    #
-    # return Stripped(writer.getvalue())
+    writer = io.StringIO()
+
+    if enum_symbol.description is not None:
+        comment = _description_comment(enum_symbol.description)
+        writer.write(_description_comment(enum_symbol.description))
+        writer.write('\n')
+
+    # TODO: continue here
+    name = naming.enum_name(enum_symbol.name)
+    if len(enum_symbol.literals) == 0:
+        writer.write(f"public enum {name}\n{{\n}}")
+        return Stripped(writer.getvalue())
+
+    writer.write(f"public enum {name}\n{{")
+    for i, literal in enumerate(enum_symbol.literals):
+        if i > 0:
+            writer.write(",\n\n")
+
+        writer.write(
+            textwrap.indent(
+                f'[EnumMember(Value = {csharp_common.string_literal(literal.value)})]\n'
+                f'{naming.enum_literal_name(literal.name)}',
+                csharp_common.INDENT))
+
+    writer.write("\n}}")
+
+    return Stripped(writer.getvalue())
 
 
 @require(lambda enum_symbol: not enum_symbol.is_implementation_specific)
