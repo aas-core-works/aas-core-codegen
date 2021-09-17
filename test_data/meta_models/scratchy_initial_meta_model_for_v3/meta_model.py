@@ -547,6 +547,18 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
 
         self.derived_from = derived_from
 
+    # def from_jsonable(self, jsonable: Mapping[str, Any], errors: Errors)->None:
+    #     Identifiable.from_jsonable(self, jsonable, errors)
+    #     if not errors.empty():
+    #         return
+    #
+    #     self.category = jsonable.get('category', None)
+    #
+    # def to_jsonable(self, jsonable: MutableMapping[str, Any])->None:
+    #     Identifiable.to_jsonable(self, jsonable)
+    #
+    #     jsonable['category'] = self.category
+
 # TODO (mristin, 2021-05-28): This was the initial version
 #  before we really tackled the mix-ins properly.
 #

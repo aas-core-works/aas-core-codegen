@@ -32,6 +32,22 @@ from aas_core_csharp_codegen.intermediate._types import (
     Description,
 )
 
+# TODO: reference classes to symbols
+# def _reference_role(role, rawtext, text, lineno, inliner, options=None, content=None):
+#     if content is None:
+#         content = []
+#
+#     if options is None:
+#         options = {}
+#
+#     docutils.parsers.rst.roles.set_classes(options)
+#     node = docutils.nodes.reference(
+#         rawtext, docutils.utils.unescape(text), refuri=text, **options)
+#     return [node], []
+#
+#
+# docutils.parsers.rst.roles.register_local_role('class', _reference_role)
+
 
 def _parsed_description_to_description(parsed: parse.Description) -> Description:
     """Translate the parsed description to an intermediate form."""

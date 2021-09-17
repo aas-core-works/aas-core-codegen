@@ -35,6 +35,19 @@ class TestDescription(unittest.TestCase):
                 Do & drink something.
                 """)
         )
+
+        self.assertEqual(
+            textwrap.dedent('''\
+                /// <summary>
+                /// Do &amp; drink something.
+                /// </summary>'''), code)
+
+    def test_summary_with_class_reference(self) -> None:
+        code = TestDescription.render(
+            textwrap.dedent("""\
+                Do & drink :class:`Something_with_URL`.
+                """)
+        )
         self.assertEqual('', code)
 
     def test_summary_and_remarks(self) -> None:

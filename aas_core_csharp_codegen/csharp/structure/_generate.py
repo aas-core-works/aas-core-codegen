@@ -5,6 +5,8 @@ import xml.sax.saxutils
 from typing import Optional, Dict, List, Tuple, cast
 
 import docutils.nodes
+import docutils.parsers.rst.roles
+import docutils.utils
 from icontract import ensure, require
 
 import aas_core_csharp_codegen.csharp.common as csharp_common
@@ -13,7 +15,6 @@ from aas_core_csharp_codegen import intermediate, naming
 from aas_core_csharp_codegen import specific_implementations
 from aas_core_csharp_codegen.common import Error, Identifier, assert_never, \
     Stripped, Rstripped
-
 
 
 # region Checks
@@ -171,6 +172,10 @@ def _description_paragraph_as_text(
     :param paragraph: to be rendered
     :return: the generated code, or error if the paragraph could not be translated
     """
+    for child in paragraph.children:
+        print(f"type(child) is {type(child)!r}")  # TODO: debug
+        print(f"child is {child!r}")  # TODO: debug
+
     # TODO: test
     if len(paragraph.children) != 1:
         return (
@@ -595,10 +600,6 @@ def _generate_class(
 
             prop_blocks.append(prop_comment)
 
-        json_name = naming.json_name(prop.name)
-        prop_blocks.append(
-            Stripped(f'[JsonPropertyName({csharp_common.string_literal(json_name)})]'))
-
         prop_blocks.append(Stripped(f"{prop_type} {prop_name} {{ get; set; }}"))
 
         codes.append(Stripped('\n'.join(prop_blocks)))
@@ -646,23 +647,22 @@ def _generate_class(
             arg_name = csharp_naming.argument_name(arg.name)
             arg_codes.append(Stripped(f'{arg_type} {arg_name}'))
 
-        if len(arg_codes) > 2:
-            arg_block = ",\n".join(arg_codes)
-            arg_block_indented = textwrap.indent(arg_block, csharp_common.INDENT)
-            constructor_blocks.append(
-                Stripped(f"{name}(\n{arg_block_indented})\n{{"))
-        elif len(arg_codes) == 1:
-            constructor_blocks.append(
-                Stripped(f"{name}({arg_codes[0]})\n{{"))
-        else:
-            assert len(arg_codes) == 0
-
+        if len(arg_codes) == 0:
             return (
                 None,
                 Error(
                     symbol.parsed.node,
-                    "At the moment, we do not transpile constructors "
-                    "without arguments."))
+                    "An empty constructor is automatically generated, "
+                    "which conflicts with the empty constructor "
+                    "specified in the meta-model"))
+        elif len(arg_codes) == 1:
+            constructor_blocks.append(
+                Stripped(f"{name}({arg_codes[0]})\n{{"))
+        else:
+            arg_block = ",\n".join(arg_codes)
+            arg_block_indented = textwrap.indent(arg_block, csharp_common.INDENT)
+            constructor_blocks.append(
+                Stripped(f"{name}(\n{arg_block_indented})\n{{"))
 
         # TODO: continue here
         # TODO: transpile the constructor body here

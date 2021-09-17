@@ -59,6 +59,16 @@ def _verify_that_available_for_symbol(
                             f"for the method {method.name!r}, "
                             f"but it was declared implementation-specific"))
 
+        if intermediate_symbol.constructor.is_implementation_specific:
+            key = f"{intermediate_symbol.name}/__init__"
+            if key not in spec_impls:
+                errors.append(
+                    Error(
+                        intermediate_symbol.parsed.node,
+                        f"The implementation of the constructor with the key {key} "
+                        f"is missing for the symbol {intermediate_symbol.name!r}, "
+                        f"but it was declared implementation-specific"))
+
     if len(errors) > 0:
         return Error(
             intermediate_symbol.parsed.node,
