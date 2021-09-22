@@ -33,6 +33,8 @@ from aas_core_csharp_codegen.intermediate._types import (
 )
 
 # TODO: reference classes to symbols
+# TODO: de-reference the symbols in the next pass
+# TODO: introduce placeholder reference, to be replaced in the second pass
 # def _reference_role(role, rawtext, text, lineno, inliner, options=None, content=None):
 #     if content is None:
 #         content = []
