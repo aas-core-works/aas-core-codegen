@@ -529,3 +529,15 @@ class SymbolTable:
             )
 
         return result
+
+
+class SymbolReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
+    """Represent a reference in the documentation to a symbol in the symbol table."""
+
+    def __init__(
+            self, symbol: Symbol, rawsource='', text='', *children, **attributes
+    ) -> None:
+        """Initialize with the given symbol and propagate the rest to the parent."""
+        self.symbol = symbol
+        docutils.nodes.TextElement.__init__(
+            self, rawsource, text, *children, **attributes)

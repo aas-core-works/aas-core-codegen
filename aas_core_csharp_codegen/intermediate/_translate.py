@@ -3,6 +3,9 @@ import itertools
 from typing import Sequence, List, Mapping, Optional, MutableMapping, Tuple
 
 import asttokens
+import docutils.parsers.rst
+import docutils.nodes
+import docutils.utils
 from icontract import require, ensure
 
 import aas_core_csharp_codegen.understand.constructor as understand_constructor
@@ -29,27 +32,43 @@ from aas_core_csharp_codegen.intermediate._types import (
     Symbol, ListTypeAnnotation, SequenceTypeAnnotation, SetTypeAnnotation,
     MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
     OurAtomicTypeAnnotation, STR_TO_BUILTIN_ATOMIC_TYPE, BuiltinAtomicTypeAnnotation,
-    Description,
+    Description, SymbolReferenceInDoc,
 )
 
-# TODO: reference classes to symbols
-# TODO: de-reference the symbols in the next pass
-# TODO: introduce placeholder reference, to be replaced in the second pass
-# def _reference_role(role, rawtext, text, lineno, inliner, options=None, content=None):
-#     if content is None:
-#         content = []
-#
-#     if options is None:
-#         options = {}
-#
-#     docutils.parsers.rst.roles.set_classes(options)
-#     node = docutils.nodes.reference(
-#         rawtext, docutils.utils.unescape(text), refuri=text, **options)
-#     return [node], []
-#
-#
-# docutils.parsers.rst.roles.register_local_role('class', _reference_role)
 
+def _symbol_reference_role(
+        role, rawtext, text, lineno, inliner, options=None, content=None):
+    """Create an element of the description as a reference to a symbol."""
+    # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
+    if content is None:
+        content = []
+
+    if options is None:
+        options = {}
+
+    docutils.parsers.rst.roles.set_classes(options)
+
+    # We need to create a placeholder as the symbol table might not be fully created
+    # at the point when we translate the documentation.
+    #
+    # We have to resolve the placeholders in the second pass of the translation with
+    # the actual references to the symbol table.
+    symbol = _PlaceholderSymbol(identifier=text)
+
+    # noinspection PyTypeChecker
+    node = SymbolReferenceInDoc(
+        symbol, rawtext, docutils.utils.unescape(text), refuri=text, **options
+    )  # type: ignore
+    return [node], []
+
+# The global registration is unfortunate since it is unpredictable and might affect
+# other modules, but it is the only way to register the roles.
+#
+# See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
+docutils.parsers.rst.roles.register_local_role('class', _symbol_reference_role)
+
+# TODO: implement an iterator over the descriptions
+# TODO: implement the second pass over all descriptions
 
 def _parsed_description_to_description(parsed: parse.Description) -> Description:
     """Translate the parsed description to an intermediate form."""
@@ -86,7 +105,8 @@ def _parsed_enumeration_to_enumeration(
 class _PlaceholderSymbol:
     """Reference a symbol which will be resolved once the table is built."""
 
-    def __init__(self, identifier: Identifier) -> None:
+    def __init__(self, identifier: str) -> None:
+        """Initialize with the given values."""
         self.identifier = identifier
 
 
