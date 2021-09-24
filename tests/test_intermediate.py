@@ -95,6 +95,52 @@ class Test_in_lining_of_constructor_statements(unittest.TestCase):
             [stmt.name for stmt in concrete.constructor.statements])
 
 
+class Test_parsing_docstrings(unittest.TestCase):
+    def test_simple(self) -> None:
+        source = textwrap.dedent('''\
+            class SomeClass:
+                """This is some documentation."""
+            ''')
+
+        symbol_table, error = translate_source(source=source)
+        assert error is None, f"{error=}"
+
+        assert symbol_table is not None
+
+        some_class = symbol_table.must_find(Identifier('SomeClass'))
+        assert isinstance(some_class, intermediate.Class)
+
+        assert some_class.description is not None
+
+    def test_class_reference(self) -> None:
+        source = textwrap.dedent('''\
+            class SomeClass:
+                """
+                This is some documentation.
+                 
+                 * Nested reference :class:`.SomeClass`
+                 """
+            ''')
+
+        symbol_table, error = translate_source(source=source)
+        assert error is None, f"{error=}"
+
+        assert symbol_table is not None
+
+        some_class = symbol_table.must_find(Identifier('SomeClass'))
+        assert isinstance(some_class, intermediate.Class)
+
+        assert some_class.description is not None
+
+        symbol_references = list(
+            some_class.description.document.traverse(
+                condition=intermediate.SymbolReferenceInDoc))
+
+        self.assertEqual(1, len(symbol_references))
+        self.assertIsInstance(symbol_references[0].symbol, intermediate.Class)
+        # TODO: continue working on _generate 🠒 use <see>
+
+
 class Test_against_recorded(unittest.TestCase):
     # Set this variable to True if you want to re-record the test data,
     # without any checks
@@ -137,7 +183,6 @@ class Test_against_recorded(unittest.TestCase):
 
                 expected_error_str = expected_error_pth.read_text()
                 self.assertEqual(expected_error_str, error_str, f"{case_dir=}")
-
 
 
 if __name__ == "__main__":

@@ -33,6 +33,7 @@ EnumerationLiteral = _types.EnumerationLiteral
 Enumeration = _types.Enumeration
 Class = _types.Class
 SymbolTable = _types.SymbolTable
+SymbolReferenceInDoc = _types.SymbolReferenceInDoc
 
 translate = _translate.translate
 
