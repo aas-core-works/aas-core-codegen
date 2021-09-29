@@ -209,43 +209,49 @@ def verify(
 
 # region Generation
 
-def _description_paragraph_as_text(
-        paragraph: docutils.nodes.paragraph
+def _render_description_element(
+        element: docutils.nodes.Element
 ) -> Tuple[Optional[Stripped], Optional[str]]:
     """
-    Render the body of a description paragraph as documentation XML.
+    Render the element of a description as documentation XML.
 
     :param paragraph: to be rendered
     :return: the generated code, or error if the paragraph could not be translated
     """
-    parts = []  # type: List[str]
-    for child in paragraph.children:
-        if isinstance(child, docutils.nodes.Text):
-            parts.append(xml.sax.saxutils.escape(child.astext()))
-        elif isinstance(child, intermediate.SymbolReferenceInDoc):
-            name = None  # type: Optional[str]
-            if isinstance(child.symbol, intermediate.Enumeration):
-                name = csharp_naming.enum_name(child.symbol.name)
-            elif isinstance(child.symbol, intermediate.Interface):
-                name = csharp_naming.interface_name(child.symbol.name)
-            elif isinstance(child.symbol, intermediate.Class):
-                name = csharp_naming.class_name(child.symbol.name)
-            else:
-                assert_never(child.symbol)
-
-            assert name is not None
-            parts.append(f'<see cref={xml.sax.saxutils.quoteattr(name)} />')
-        elif isinstance(child, docutils.nodes.literal):
-            parts.append(f'<c>{xml.sax.saxutils.escape(child.astext())}</c>')
-        elif isinstance(child, intermediate.PropertyReferenceInDoc):
-            parts.append(
-                f'<see cref={xml.sax.saxutils.quoteattr(child.property_name)} />')
-        else:
-            raise NotImplementedError(
-                f"Unhandled child of a paragraph with type {type(child)}: "
-                f"{child} in paragraph {paragraph}")
-
-    return Stripped(''.join(parts).strip()), None
+    # TODO: include paragraph and then recursively call
+    # TODO: include bullet_list and then recursively call
+    raise NotImplementedError()
+    # parts = []  # type: List[str]
+    # for element in elements:
+    #     if isinstance(element, docutils.nodes.Text):
+    #         parts.append(xml.sax.saxutils.escape(element.astext()))
+    #     elif isinstance(element, intermediate.SymbolReferenceInDoc):
+    #         name = None  # type: Optional[str]
+    #         if isinstance(element.symbol, intermediate.Enumeration):
+    #             name = csharp_naming.enum_name(element.symbol.name)
+    #         elif isinstance(element.symbol, intermediate.Interface):
+    #             name = csharp_naming.interface_name(element.symbol.name)
+    #         elif isinstance(element.symbol, intermediate.Class):
+    #             name = csharp_naming.class_name(element.symbol.name)
+    #         else:
+    #             assert_never(element.symbol)
+    #
+    #         assert name is not None
+    #         parts.append(f'<see cref={xml.sax.saxutils.quoteattr(name)} />')
+    #     elif isinstance(element, docutils.nodes.literal):
+    #         parts.append(f'<c>{xml.sax.saxutils.escape(element.astext())}</c>')
+    #
+    #     # TODO: implement bullet_list
+    #
+    #     elif isinstance(element, intermediate.PropertyReferenceInDoc):
+    #         parts.append(
+    #             f'<see cref={xml.sax.saxutils.quoteattr(element.property_name)} />')
+    #     else:
+    #         raise NotImplementedError(
+    #             f"Unhandled element of a description with type {type(element)}: "
+    #             f"{element}")
+    #
+    # return Stripped(''.join(parts).strip()), None
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -264,14 +270,17 @@ def _description_comment(
     if (
             len(description.document.children) >= 2
             and isinstance(description.document.children[0], docutils.nodes.paragraph)
-            and isinstance(description.document.children[1], docutils.nodes.paragraph)
+            and isinstance(
+                description.document.children[1],
+                (docutils.nodes.paragraph, docutils.nodes.bullet_list))
     ):
         summary = description.document.children[0]
 
         remarks = [description.document.children[1]]
         last_remark_index = 1
         for child in description.document.children[2:]:
-            if isinstance(child, docutils.nodes.paragraph):
+            if isinstance(
+                    child, (docutils.nodes.paragraph, docutils.nodes.bullet_list)):
                 remarks.append(child)
                 last_remark_index += 1
 
@@ -297,7 +306,7 @@ def _description_comment(
     blocks = []  # type: List[Stripped]
 
     if summary:
-        summary_text, error = _description_paragraph_as_text(summary)
+        summary_text, error = _render_description_element(element=summary)
         if error:
             return None, Error(description.node, error)
 
@@ -310,7 +319,7 @@ def _description_comment(
     if remarks:
         remark_blocks = []  # type: List[Stripped]
         for remark in remarks:
-            remark_text, error = _description_paragraph_as_text(remark)
+            remark_text, error = _render_description_element(element=remark)
             if error:
                 return None, Error(description.node, error)
 
@@ -356,19 +365,11 @@ def _description_comment(
 
             body_blocks = []  # type: List[Stripped]
             for body_child in field_body.children:
-                if isinstance(body_child, docutils.nodes.paragraph):
-                    body_block, error = _description_paragraph_as_text(body_child)
-                    if error:
-                        return None, Error(description.node, error)
+                body_block, error = _render_description_element(body_child)
+                if error:
+                    return None, Error(description.node, error)
 
-                    body_blocks.append(body_block)
-                else:
-                    return (
-                        None,
-                        Error(
-                            description.node,
-                            f"Unhandled child of a field with name {field_name} "
-                            f"and body: {field_body}"))
+                body_blocks.append(body_block)
 
             if len(body_blocks) == 0:
                 body = ''

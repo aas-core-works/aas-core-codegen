@@ -36,7 +36,7 @@ class Lang_string(DBC):
     """Give a text in a specific language."""
 
     language: Final[str]
-    """Language of the ``text``"""
+    """Language of the :py:attr:`text`"""
 
     text: str
     """Content of the string"""
@@ -403,121 +403,6 @@ class Has_semantics(DBC):
 
     def __init__(self, semantic_id: Optional[Reference] = None) -> None:
         self.semantic_id = semantic_id
-
-
-# TODO (mristin, 2021-05-28): Uncomment and implement once the codegen is running. 
-# class Constraint(DBC):
-#     pass
-# 
-# 
-# QualifierType = str
-# 
-# 
-# class DataTypeDef(Enum):
-#     ANY_URI = "anyUri"
-#     # TODO: translate others
-#     # "base64Binary"
-#     # "boolean"
-#     # "date"
-#     # "dateTime"
-#     # "dateTimeStamp"
-#     # "decimal"
-#     # "integer"
-#     # "long"
-#     # "int"
-#     # "short"
-#     # "byte"
-#     # "nonNegativeInteger"
-#     # "positiveInteger"
-#     # "unsignedLong"
-#     # "unsignedInt"
-#     # "unsignedShort"
-#     # "unsignedByte"
-#     # "nonPositiveInteger"
-#     # "negativeInteger"
-#     # "double"
-#     # "duration"
-#     # "dayTimeDuration"
-#     # "yearMonthDuration"
-#     # "float"
-#     # "gDay"
-#     # "gMonth"
-#     # "gMonthDay"
-#     # "gYear"
-#     # "gYearMonth"
-#     # "hexBinary"
-#     # "NOTATION"
-#     # "QName"
-#     # "string"
-#     # "normalizedString"
-#     # "token"
-#     # "language"
-#     # "Name"
-#     # "NCName"
-#     # "ENTITY"
-#     # "ID"
-#     # "IDREF"
-#     # "NMTOKEN"
-#     # "time"
-# 
-# 
-# class ValueDataType(DBC):
-#     raise NeedToBeImplemented()
-# 
-# 
-# def is_of_type(value: ValueDataType, value_type: DataTypeDef) -> bool:
-#     raise NeedToBeImplemented()
-# 
-# 
-# class Qualifier(Constraint, HasSemantics):
-#     # fmt: off
-# 
-#     @require(
-#         lambda value_type, value:
-#         not (value is not None) or is_of_type(value, value_type),
-#         "Constraint AASd-020"
-#     )
-#     # fmt: on
-#     def __init__(
-#             self,
-#             qualifier_type: QualifierType,
-#             value_type: DataTypeDef,
-#             value: Optional[ValueDataType] = None,
-#             value_id: Optional[Reference] = None,
-#             semantic_id: Optional[Reference] = None) -> None:
-#         self.qualifier_type = qualifier_type
-#         self.value_type = value_type
-#         self.value = value
-#         self.value_id = value_id
-# 
-#         HasSemantics.__init__(self, semantic_id=semantic_id)
-# 
-# 
-# class Formula(Constraint):
-#     def __init__(self, depends_on: List[Reference]) -> None:
-#         self.depends_on = depends_on
-# 
-# 
-# # TODO (mristin, 2021-05-28): @Andreas: This is very confusing.
-# #   Should not the property be called ``constraints`` instead of ``qualifiers``?
-# #   Should not the class be called ``Constrainable``?
-# class Qualifiable(DBC):
-#     # fmt: off
-#     @require(
-#         lambda qualifiers:
-#         (
-#                 qualifier_types := [
-#                     constraint.qualifier_type
-#                     for constraint in qualifiers
-#                     if isinstance(constraint, Qualifier)
-#                 ],
-#                 len(set(qualifier_types)) == len(qualifier_types)
-#         )[1],
-#         "Constraint AASd-021"
-#     )
-#     # fmt: on
-#     def __init__(self, qualifiers: List[Constraint]) -> None:
-#         self.qualifiers = qualifiers
 
 
 @abstract
