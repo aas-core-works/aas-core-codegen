@@ -4,8 +4,8 @@ from typing import Sequence, List, Mapping, Optional, MutableMapping, Tuple, Uni
     Iterator
 
 import asttokens
-import docutils.parsers.rst
 import docutils.nodes
+import docutils.parsers.rst
 import docutils.utils
 from icontract import require, ensure
 
@@ -34,7 +34,8 @@ from aas_core_csharp_codegen.intermediate._types import (
     Symbol, ListTypeAnnotation, SequenceTypeAnnotation, SetTypeAnnotation,
     MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
     OurAtomicTypeAnnotation, STR_TO_BUILTIN_ATOMIC_TYPE, BuiltinAtomicTypeAnnotation,
-    Description, SymbolReferenceInDoc, BuiltinAtomicType, SubscriptedTypeAnnotation,
+    Description, PropertyReferenceInDoc, SymbolReferenceInDoc,
+    SubscriptedTypeAnnotation,
 )
 
 
@@ -64,12 +65,44 @@ def _symbol_reference_role(
     return [node], []
 
 
+def _property_reference_role(
+        role, rawtext, text, lineno, inliner, options=None, content=None):
+    """Create an element of the description as a reference to a property."""
+    # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
+    if content is None:
+        content = []
+
+    if options is None:
+        options = {}
+
+    docutils.parsers.rst.roles.set_classes(options)
+
+    # We need to create a placeholder as the symbol table might not be fully created
+    # at the point when we translate the documentation.
+    #
+    # We have to resolve the placeholders in the second pass of the translation with
+    # the actual references to the symbol table.
+    symbol = _PlaceholderSymbol(identifier=text)
+
+    # We strip the tilde based on the convention as we ignore the appearance.
+    # See: https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-syntax
+    property_name = text[1:] if text.startswith('~') else text
+
+    node = PropertyReferenceInDoc(
+        property_name, rawtext, docutils.utils.unescape(text), refuri=text, **options
+    )
+    return [node], []
+
+
 # The global registration is unfortunate since it is unpredictable and might affect
 # other modules, but it is the only way to register the roles.
 #
 # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
 docutils.parsers.rst.roles.register_local_role('class', _symbol_reference_role)
+docutils.parsers.rst.roles.register_local_role('py:attr', _property_reference_role)
 
+
+# TODO: add PropertyReferenceInDoc
 
 def _parsed_description_to_description(parsed: parse.Description) -> Description:
     """Translate the parsed description to an intermediate form."""
@@ -575,6 +608,49 @@ def _over_our_atomic_type_annotations(
                 yield from _over_our_atomic_type_annotations(signature.returns)
 
 
+def _over_descriptions(
+        something: Union[Class, Interface, Enumeration]
+) -> Iterator[Description]:
+    """Iterate over all the descriptions from the entity ``something``."""
+    if isinstance(something, Class):
+        if something.description is not None:
+            yield something.description
+
+        for prop in something.properties:
+            if prop.description is not None:
+                yield prop.description
+
+        for method in something.methods:
+            if method.description is not None:
+                yield method.description
+
+    elif isinstance(something, Interface):
+        if something.description is not None:
+            yield something.description
+
+        for prop in something.properties:
+            if prop.description is not None:
+                yield prop.description
+
+        for signature in something.signatures:
+            if signature.description is not None:
+                yield signature.description
+
+    elif isinstance(something, Enumeration):
+        if something.description is not None:
+            yield something.description
+
+        for literal in something.literals:
+            if literal.description is not None:
+                yield literal.description
+
+    elif isinstance(something, Description):
+        for node in something.document.traverse(condition=SymbolReferenceInDoc):
+            yield something, node
+    else:
+        assert_never(something)
+
+
 def _over_symbol_reference_in_doc(
         something: Union[Class, Interface, Enumeration, Description]
 ) -> Iterator[Tuple[Description, SymbolReferenceInDoc]]:
@@ -697,46 +773,72 @@ def translate(
     # region Second pass to resolve the symbols in the descriptions
 
     for symbol in symbols:
-        for description, symbol_reference_in_doc in _over_symbol_reference_in_doc(
-                symbol):
-            assert isinstance(symbol_reference_in_doc.symbol, _PlaceholderSymbol), (
-                "Expected all symbol references in the descriptions to be placeholder "
-                f"since only the first pass has been executed, "
-                f"but we got: {symbol_reference_in_doc.symbol}")
+        for description in _over_descriptions(symbol):
+            for symbol_ref_in_doc in description.document.traverse(
+                    condition=SymbolReferenceInDoc):
+                assert isinstance(
+                    symbol_ref_in_doc.symbol, _PlaceholderSymbol), (
+                    f"Expected all symbol references in the descriptions "
+                    f"to be placeholder since only the first pass has been executed, "
+                    f"but we got: {symbol_ref_in_doc.symbol}")
 
-            raw_identifier = symbol_reference_in_doc.symbol.identifier
-            if not raw_identifier.startswith("."):
-                underlying_errors.append(
-                    Error(
-                        description.node,
-                        f"The identifier of the symbol reference "
-                        f"is invalid: {raw_identifier}; "
-                        f"expected an identifier starting with a dot"))
-                continue
+                raw_identifier = symbol_ref_in_doc.symbol.identifier
+                if not raw_identifier.startswith("."):
+                    underlying_errors.append(
+                        Error(
+                            description.node,
+                            f"The identifier of the symbol reference "
+                            f"is invalid: {raw_identifier}; "
+                            f"expected an identifier starting with a dot"))
+                    continue
 
-            raw_identifier_no_dot = raw_identifier[1:]
+                raw_identifier_no_dot = raw_identifier[1:]
 
-            if not IDENTIFIER_RE.match(raw_identifier_no_dot):
-                underlying_errors.append(
-                    Error(
-                        description.node,
-                        f"The identifier of the symbol reference "
-                        f"is invalid: {raw_identifier_no_dot}"))
-                continue
+                if not IDENTIFIER_RE.match(raw_identifier_no_dot):
+                    underlying_errors.append(
+                        Error(
+                            description.node,
+                            f"The identifier of the symbol reference "
+                            f"is invalid: {raw_identifier_no_dot}"))
+                    continue
 
-            # Strip the dot
-            identifier = Identifier(raw_identifier_no_dot)
+                # Strip the dot
+                identifier = Identifier(raw_identifier_no_dot)
 
-            symbol = symbol_table.find(name=identifier)
-            if symbol is None:
-                underlying_errors.append(
-                    Error(
-                        description.node,
-                        f"The identifier of the symbol reference "
-                        f"could not be found in the symbol table: {identifier}"))
-                continue
+                symbol = symbol_table.find(name=identifier)
+                if symbol is None:
+                    underlying_errors.append(
+                        Error(
+                            description.node,
+                            f"The identifier of the symbol reference "
+                            f"could not be found in the symbol table: {identifier}"))
+                    continue
 
-            symbol_reference_in_doc.symbol = symbol
+                symbol_ref_in_doc.symbol = symbol
+
+    # endregion
+
+    # region Verify that all property references in the descriptions are valid
+
+    for symbol in symbols:
+        for description in _over_descriptions(symbol):
+            for prop_ref_in_doc in description.document.traverse(
+                    condition=PropertyReferenceInDoc):
+                if "." in prop_ref_in_doc.property_name:
+                    underlying_errors.append(
+                        Error(
+                            description.node,
+                            f"Unexpected complex reference to a property: "
+                            f"{prop_ref_in_doc.property_name}"))
+                    continue
+
+                if not IDENTIFIER_RE.match(prop_ref_in_doc.property_name):
+                    underlying_errors.append(
+                        Error(
+                            description.node,
+                            f"Invalid identifier of a property: "
+                            f"{prop_ref_in_doc.property_name}"))
+                    continue
 
     # endregion
 
