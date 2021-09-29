@@ -6,8 +6,10 @@ from typing import List, Tuple, Optional
 import asttokens
 from icontract import ensure
 
-from aas_core_csharp_codegen import parse
+from aas_core_csharp_codegen import parse, intermediate
 from aas_core_csharp_codegen.common import Error
+import aas_core_csharp_codegen.understand.constructor as understand_constructor
+import aas_core_csharp_codegen.understand.hierarchy as understand_hierarchy
 
 
 def most_underlying_message(error: Error) -> str:
@@ -95,3 +97,37 @@ def list_valid_meta_models_from_test_data() -> List[pathlib.Path]:
             result.append(meta_model_pth)
 
     return result
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def translate_source_to_intermediate(
+        source: str
+) -> Tuple[Optional[intermediate.SymbolTable], Optional[Error]]:
+    atok, parse_exception = parse.source_to_atok(source=source)
+    if parse_exception:
+        raise parse_exception
+
+    assert atok is not None
+
+    parsed_symbol_table, error = parse_atok(atok=atok)
+    assert error is None, f"{error=}"
+    assert parsed_symbol_table is not None
+
+    ontology, errors = understand_hierarchy.symbol_table_to_ontology(
+        symbol_table=parsed_symbol_table)
+    assert errors is None, f"{errors=}"
+    assert ontology is not None
+
+    constructor_table, error = understand_constructor.understand_all(
+        symbol_table=parsed_symbol_table,
+        atok=atok)
+
+    assert error is None, f"{error=}"
+    assert constructor_table is not None
+
+    return intermediate.translate(
+        parsed_symbol_table=parsed_symbol_table,
+        ontology=ontology,
+        constructor_table=constructor_table,
+        atok=atok
+    )

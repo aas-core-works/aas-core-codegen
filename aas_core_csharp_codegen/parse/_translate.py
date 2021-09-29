@@ -2,6 +2,7 @@
 
 import ast
 import collections
+import textwrap
 from typing import List, Any, Optional, cast, Type, Tuple, Union
 
 import asttokens
@@ -1043,7 +1044,7 @@ def _string_constant_to_description(
     # noinspection PyUnusedLocal
     document = None  # type: Optional[docutils.nodes.document]
     try:
-        document = docutils.core.publish_doctree(text)
+        document = docutils.core.publish_doctree(textwrap.dedent(text))
     except Exception as err:
         return None, Error(constant, str(err))
 

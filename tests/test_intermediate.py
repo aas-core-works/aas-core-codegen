@@ -2,49 +2,12 @@ import os
 import pathlib
 import textwrap
 import unittest
-from typing import Tuple, Optional
 
-from icontract import ensure
+import docutils.nodes
 
 import tests.common
-from aas_core_csharp_codegen import intermediate, parse
-from aas_core_csharp_codegen.common import Error, Identifier
-import aas_core_csharp_codegen.understand.constructor as understand_constructor
-import aas_core_csharp_codegen.understand.hierarchy as understand_hierarchy
-
-
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def translate_source(
-        source: str
-) -> Tuple[Optional[intermediate.SymbolTable], Optional[Error]]:
-    atok, parse_exception = parse.source_to_atok(source=source)
-    if parse_exception:
-        raise parse_exception
-
-    assert atok is not None
-
-    parsed_symbol_table, error = tests.common.parse_atok(atok=atok)
-    assert error is None, f"{error=}"
-    assert parsed_symbol_table is not None
-
-    ontology, errors = understand_hierarchy.symbol_table_to_ontology(
-        symbol_table=parsed_symbol_table)
-    assert errors is None, f"{errors=}"
-    assert ontology is not None
-
-    constructor_table, error = understand_constructor.understand_all(
-        symbol_table=parsed_symbol_table,
-        atok=atok)
-
-    assert error is None, f"{error=}"
-    assert constructor_table is not None
-
-    return intermediate.translate(
-        parsed_symbol_table=parsed_symbol_table,
-        ontology=ontology,
-        constructor_table=constructor_table,
-        atok=atok
-    )
+from aas_core_csharp_codegen import intermediate
+from aas_core_csharp_codegen.common import Identifier
 
 
 class Test_in_lining_of_constructor_statements(unittest.TestCase):
@@ -82,7 +45,8 @@ class Test_in_lining_of_constructor_statements(unittest.TestCase):
                     self.yet_another_property = yet_another_property
             """)
 
-        symbol_table, error = translate_source(source=source)
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source)
         assert error is None, f"{error=}"
 
         assert symbol_table is not None
@@ -96,38 +60,23 @@ class Test_in_lining_of_constructor_statements(unittest.TestCase):
 
 
 class Test_parsing_docstrings(unittest.TestCase):
-    def test_simple(self) -> None:
-        source = textwrap.dedent('''\
-            class SomeClass:
-                """This is some documentation."""
-            ''')
-
-        symbol_table, error = translate_source(source=source)
-        assert error is None, f"{error=}"
-
-        assert symbol_table is not None
-
-        some_class = symbol_table.must_find(Identifier('SomeClass'))
-        assert isinstance(some_class, intermediate.Class)
-
-        assert some_class.description is not None
-
     def test_class_reference(self) -> None:
         source = textwrap.dedent('''\
-            class SomeClass:
+            class Some_class:
                 """
                 This is some documentation.
-                 
-                 * Nested reference :class:`.SomeClass`
+
+                 * Nested reference :class:`.Some_class`
                  """
             ''')
 
-        symbol_table, error = translate_source(source=source)
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source)
         assert error is None, f"{error=}"
 
         assert symbol_table is not None
 
-        some_class = symbol_table.must_find(Identifier('SomeClass'))
+        some_class = symbol_table.must_find(Identifier('Some_class'))
         assert isinstance(some_class, intermediate.Class)
 
         assert some_class.description is not None
@@ -138,7 +87,6 @@ class Test_parsing_docstrings(unittest.TestCase):
 
         self.assertEqual(1, len(symbol_references))
         self.assertIsInstance(symbol_references[0].symbol, intermediate.Class)
-        # TODO: continue working on _generate 🠒 use <see>
 
 
 class Test_against_recorded(unittest.TestCase):
@@ -160,7 +108,8 @@ class Test_against_recorded(unittest.TestCase):
             expected_error_pth = case_dir / "expected_error.txt"
 
             source = source_pth.read_text()
-            symbol_table, error = translate_source(source=source)
+            symbol_table, error = tests.common.translate_source_to_intermediate(
+                source=source)
 
             symbol_table_str = (
                 "" if symbol_table is None

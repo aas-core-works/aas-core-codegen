@@ -172,25 +172,29 @@ def _description_paragraph_as_text(
     :param paragraph: to be rendered
     :return: the generated code, or error if the paragraph could not be translated
     """
+    parts = []  # type: List[str]
     for child in paragraph.children:
-        print(f"type(child) is {type(child)!r}")  # TODO: debug
-        print(f"child is {child!r}")  # TODO: debug
+        if isinstance(child, docutils.nodes.Text):
+            parts.append(xml.sax.saxutils.escape(child.astext()))
+        elif isinstance(child, intermediate.SymbolReferenceInDoc):
+            name = None  # type: Optional[str]
+            if isinstance(child.symbol, intermediate.Enumeration):
+                name = csharp_naming.enum_name(child.symbol.name)
+            elif isinstance(child.symbol, intermediate.Interface):
+                name = csharp_naming.interface_name(child.symbol.name)
+            elif isinstance(child.symbol, intermediate.Class):
+                name = csharp_naming.class_name(child.symbol.name)
+            else:
+                assert_never(child.symbol)
 
-    # TODO: test
-    if len(paragraph.children) != 1:
-        return (
-            None,
-            f"Expected a paragraph of a docstring to have a single child "
-            f"(a docutils text), but got: {paragraph}")
+            assert name is not None
+            parts.append(f'<see cref={xml.sax.saxutils.quoteattr(name)} />')
 
-    # TODO: test
-    if not isinstance(paragraph.children[0], docutils.nodes.Text):
-        return (
-            None,
-            f"Expected a paragraph of a docstring to consist only of text, "
-            f"but got: {paragraph}")
+        else:
+            raise NotImplementedError(
+                f"Unhandled child of a paragraph with type {type(child)}: {child}")
 
-    return paragraph.children[0].astext(), None
+    return Stripped(''.join(parts).strip()), None
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -230,7 +234,7 @@ def _description_comment(
     else:
         tail = description.document.children
 
-    # (2021-09-16, mristin)
+    # NOTE (2021-09-16, mristin):
     # We restrict ourselves here quite a lot. This function will need to evolve as
     # we add a larger variety of docstrings to the meta-model.
     #
@@ -249,7 +253,7 @@ def _description_comment(
         blocks.append(
             Stripped(
                 f'<summary>\n'
-                f'{xml.sax.saxutils.escape(summary_text)}\n'
+                f'{summary_text}\n'
                 f'</summary>'))
 
     if remarks:
@@ -268,11 +272,11 @@ def _description_comment(
             blocks.append(
                 Stripped(
                     f'<remarks>\n'
-                    f'{xml.sax.saxutils.escape(remark_blocks[0])}\n'
+                    f'{remark_blocks[0]}\n'
                     f'</remarks>'))
         else:
             remarks_paras = '\n'.join(
-                f'<para>{xml.sax.saxutils.escape(remark_block)}</para>'
+                f'<para>{remark_block}</para>'
                 for remark_block in remark_blocks)
 
             blocks.append(
@@ -318,10 +322,10 @@ def _description_comment(
             if len(body_blocks) == 0:
                 body = ''
             elif len(body_blocks) == 1:
-                body = xml.sax.saxutils.escape(body_blocks[0])
+                body = body_blocks[0]
             else:
                 body = '\n'.join(
-                    f'<para>{xml.sax.saxutils.escape(body_block)}</para>'
+                    f'<para>{body_block}</para>'
                     for body_block in body_blocks)
 
             # endregion
@@ -616,7 +620,7 @@ def _generate_class(
 
             codes.append(code)
         else:
-            # (mristin, 2021-09-16):
+            # NOTE (mristin, 2021-09-16):
             # At the moment, we do not transpile the method body and its contracts.
             # We want to finish the meta-model for the V3 and fix de/serialization
             # before taking on this rather hard task.

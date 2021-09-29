@@ -7,11 +7,12 @@ import unittest
 from typing import Optional, Tuple
 
 import asttokens
+import docutils.nodes
 
 import tests.common
 from aas_core_csharp_codegen import parse
 import aas_core_csharp_codegen.parse._translate as parse_translate
-from aas_core_csharp_codegen.common import Error, LinenoColumner
+from aas_core_csharp_codegen.common import Error, LinenoColumner, Identifier
 
 
 class Test_parsing_AST(unittest.TestCase):
@@ -107,42 +108,56 @@ class Test_checking_imports(unittest.TestCase):
             ], errors)
 
 
-# TODO: move to intermediate
 class Test_parsing_docstring(unittest.TestCase):
+    @staticmethod
+    def parse_and_extract_docstring(source: str) -> docutils.nodes.document:
+        """
+        Parse the ``source`` and extract a description.
+
+        The description is expected to belong to a single entity, ``Some_class``.
+        """
+        symbol_table, error = tests.common.parse_source(source)
+        assert error is None, f'{error}'
+
+        symbol = symbol_table.must_find_entity(Identifier('Some_class'))
+        return symbol.description.document
+
     def test_empty(self) -> None:
-        # TODO: finish afterwards
-        docstring, err = parse_translate._parse_docstring("")
-        assert err is None
-        print(f"docstring is {docstring!r}")  # TODO: debug
+        source = textwrap.dedent('''\
+            class Some_class:
+                """"""
+            ''')
 
-    def test_comprehensive(self) -> None:
-        docstring, err = parse_translate._parse_docstring(
-            textwrap.dedent("""\
-                Do something.
+        document = Test_parsing_docstring.parse_and_extract_docstring(source=source)
 
-                Really do ``something``.
+        self.assertEqual(0, len(document.children))
 
-                >>> do_something('hello')
-                'world'
+    def test_simple_single_line(self) -> None:
+        source = textwrap.dedent('''\
+            class Some_class:
+                """This is some documentation."""
+            ''')
 
-                :param some_argument: really important argument
-                :param another_argument: 
-                    First paragraph.
-                    
-                    Another paragraph.
-                    
-                    .. code-block::
-                        
-                        some code
-                
-                    :param indented_field: some indented sub-field
-                    
-                Now here is some text.
-                
-                :return: some return
-                """))
-        assert err is None
-        print(f"docstring is {docstring!r}")  # TODO: debug
+        document = Test_parsing_docstring.parse_and_extract_docstring(source=source)
+
+        self.assertEqual(1, len(document.children))
+        self.assertIsInstance(document.children[0], docutils.nodes.paragraph)
+
+    def test_that_multi_line_docstring_is_not_parsed_as_a_block_quote(self) -> None:
+        source = textwrap.dedent('''\
+            class Some_class:
+                """
+                This is some documentation.
+
+                Another paragraph.
+                """
+            ''')
+
+        document = Test_parsing_docstring.parse_and_extract_docstring(source=source)
+        self.assertEqual(2, len(document.children))
+        self.assertIsInstance(document.children[0], docutils.nodes.paragraph)
+        self.assertIsInstance(document.children[1], docutils.nodes.paragraph)
+
 
 
 class Test_against_recorded(unittest.TestCase):

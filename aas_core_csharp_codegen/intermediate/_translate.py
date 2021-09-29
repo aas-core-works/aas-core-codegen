@@ -92,13 +92,18 @@ def _parsed_enumeration_to_enumeration(
             EnumerationLiteral(
                 name=parsed_literal.name,
                 value=parsed_literal.value,
-                description=_parsed_description_to_description(
-                    parsed_literal.description),
+                description=(
+                    _parsed_description_to_description(parsed_literal.description)
+                    if parsed_literal.description is not None
+                    else None),
                 parsed=parsed_literal,
             )
             for parsed_literal in parsed.literals
         ],
-        description=_parsed_description_to_description(parsed.description),
+        description=(
+            _parsed_description_to_description(parsed.description)
+            if parsed.description is not None
+            else None),
         parsed=parsed,
     )
 
@@ -251,8 +256,10 @@ def _parsed_abstract_entity_to_interface(
                     else _parsed_type_annotation_to_type_annotation(
                         parsed_method.returns)
                 ),
-                description=_parsed_description_to_description(
-                    parsed_method.description),
+                description=(
+                    _parsed_description_to_description(parsed_method.description)
+                    if parsed_method.description is not None
+                    else None),
                 parsed=parsed_method,
             )
             for parsed_method in parsed.methods
@@ -263,7 +270,10 @@ def _parsed_abstract_entity_to_interface(
             for parsed_prop in parsed.properties
         ],
         is_implementation_specific=parsed.is_implementation_specific,
-        description=_parsed_description_to_description(parsed.description),
+        description=(
+            _parsed_description_to_description(parsed.description)
+            if parsed.description is not None
+            else None),
         parsed=parsed,
     )
 
@@ -274,7 +284,10 @@ def _parsed_property_to_property(parsed: parse.Property) -> Property:
         name=parsed.name,
         type_annotation=_parsed_type_annotation_to_type_annotation(
             parsed.type_annotation),
-        description=_parsed_description_to_description(parsed.description),
+        description=(
+            _parsed_description_to_description(parsed.description)
+            if parsed.description is not None
+            else None),
         is_readonly=parsed.is_readonly,
         parsed=parsed,
     )
@@ -286,7 +299,10 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
         preconditions=[
             Contract(
                 args=parsed_pre.args,
-                description=_parsed_description_to_description(parsed_pre.description),
+                description=(
+                    _parsed_description_to_description(parsed_pre.description)
+                    if parsed_pre.description is not None
+                    else None),
                 body=parsed_pre.body,
                 parsed=parsed_pre,
             )
@@ -304,7 +320,10 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
         postconditions=[
             Contract(
                 args=parsed_post.args,
-                description=_parsed_description_to_description(parsed_post.description),
+                description=(
+                    _parsed_description_to_description(parsed_post.description)
+                    if parsed_post.description is not None
+                    else None),
                 body=parsed_post.body,
                 parsed=parsed_post,
             )
@@ -331,7 +350,10 @@ def _parsed_method_to_method(parsed: parse.Method) -> Method:
             if parsed.returns is None
             else _parsed_type_annotation_to_type_annotation(parsed.returns)
         ),
-        description=_parsed_description_to_description(parsed.description),
+        description=(
+            _parsed_description_to_description(parsed.description)
+            if parsed.description is not None
+            else None),
         contracts=_parsed_contracts_to_contracts(parsed.contracts),
         body=parsed.body,
         parsed=parsed,
@@ -493,7 +515,10 @@ def _parsed_entity_to_class(
         properties=properties,
         methods=methods,
         constructor=constructor,
-        description=_parsed_description_to_description(parsed.description),
+        description=(
+            _parsed_description_to_description(parsed.description)
+            if parsed.description is not None
+            else None),
         parsed=parsed,
     )
 
