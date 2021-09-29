@@ -1,5 +1,3 @@
-import os
-import pathlib
 import textwrap
 import unittest.mock
 
@@ -157,58 +155,6 @@ class TestDescription(unittest.TestCase):
                 /// </returns>'''),
             comment_code)
 
-class Test_against_recorded(unittest.TestCase):
-    # Set this variable to True if you want to re-record the test data,
-    # without any checks
-    RERECORD = True  # TODO: undo
-
-    def test_on_meta_models(self) -> None:
-        this_dir = pathlib.Path(os.path.realpath(__file__)).parent
-        meta_models_dir = this_dir.parent / "test_data/meta_models"
-
-        assert meta_models_dir.exists(), f"{meta_models_dir=}"
-        assert meta_models_dir.is_dir(), f"{meta_models_dir=}"
-
-        for meta_model_dir in meta_models_dir.iterdir():
-            assert meta_model_dir.is_dir(), f"{meta_model_dir}"
-
-            meta_model_pth = meta_model_dir / "meta_model.py"
-
-            # TODO: move testing against meta-model to tests/csharp/test-end-to-end
-            # TODO: arrange the expected files accordingly
-
-
-        for source_pth in test_cases_dir.glob("**/source.py"):
-            case_dir = source_pth.parent
-
-            expected_symbol_table_pth = case_dir / "expected_symbol_table.txt"
-            expected_error_pth = case_dir / "expected_error.txt"
-
-            source = source_pth.read_text()
-            symbol_table, error = tests.common.translate_source_to_intermediate(
-                source=source)
-
-            symbol_table_str = (
-                "" if symbol_table is None
-                else intermediate.dump(symbol_table)
-            )
-
-            error_str = (
-                "" if error is None
-                else tests.common.most_underlying_message(error)
-            )
-
-            if Test_against_recorded.RERECORD:
-                expected_symbol_table_pth.write_text(symbol_table_str)
-                expected_error_pth.write_text(error_str)
-            else:
-                expected_symbol_table_str = expected_symbol_table_pth.read_text()
-                self.assertEqual(
-                    expected_symbol_table_str, symbol_table_str,
-                    f"{case_dir=}, {error=}")
-
-                expected_error_str = expected_error_pth.read_text()
-                self.assertEqual(expected_error_str, error_str, f"{case_dir=}")
 
 
 if __name__ == "__main__":

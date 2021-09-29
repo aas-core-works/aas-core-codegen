@@ -8,11 +8,15 @@ from typing import TextIO, Sequence
 from icontract import require
 
 import aas_core_csharp_codegen
-from aas_core_csharp_codegen import parse, intermediate
-from aas_core_csharp_codegen.common import LinenoColumner
+from aas_core_csharp_codegen import parse, intermediate, specific_implementations
+from aas_core_csharp_codegen.common import LinenoColumner, IDENTIFIER_RE, Identifier
 from aas_core_csharp_codegen.understand import (
     constructor as understand_constructor,
     hierarchy as understand_hierarchy,
+)
+from aas_core_csharp_codegen.csharp import (
+    specific_implementations as csharp_specific_implementations,
+    structure as csharp_structure
 )
 
 assert aas_core_csharp_codegen.__doc__ == __doc__
@@ -21,8 +25,17 @@ assert aas_core_csharp_codegen.__doc__ == __doc__
 class Parameters:
     """Represent the program parameters."""
 
-    def __init__(self, model_path: pathlib.Path, output_dir: pathlib.Path) -> None:
+    def __init__(
+            self,
+            model_path: pathlib.Path,
+            snippets_dir: pathlib.Path,
+            namespace: str,
+            output_dir: pathlib.Path
+    ) -> None:
+        """Initialize with the given values."""
         self.model_path = model_path
+        self.snippets_dir = snippets_dir
+        self.namespace = namespace
         self.output_dir = output_dir
 
 
@@ -61,14 +74,55 @@ def write_error_report(message: str, errors: Sequence[str], stderr: TextIO) -> N
 
 def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     """Run the program."""
+    # region Basic checks
     # TODO: test this failure case
     if not params.model_path.exists():
-        stderr.write(f"The model file does not exist: {params.model_path}\n")
+        stderr.write(f"The --model_path does not exist: {params.model_path}\n")
         return 1
 
     # TODO: test this failure case
     if not params.model_path.is_file():
-        stderr.write(f"The model path does not point to a file: {params.model_path}\n")
+        stderr.write(
+            f"The --model_path does not point to a file: {params.model_path}\n")
+        return 1
+
+    # TODO: test this failure case
+    if not params.snippets_dir.exists():
+        stderr.write(f"The --snippets_dir does not exist: {params.snippets_dir}\n")
+        return 1
+
+    # TODO: test this failure case
+    if not params.snippets_dir.is_dir():
+        stderr.write(
+            f"The --snippets_dir does not point to a directory: "
+            f"{params.snippets_dir}\n")
+        return 1
+
+    # TODO: test the happy path
+    if not params.output_dir.exists():
+        params.output_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        # TODO: test this failure case
+        if not params.snippets_dir.is_dir():
+            stderr.write(
+                f"The --output_dir does not point to a directory: "
+                f"{params.output_dir}\n")
+            return 1
+
+    if not IDENTIFIER_RE.match(params.namespace):
+        stderr.write(
+            f"The --namespace is not a valid identifier: {params.namespace}\n")
+        return 1
+
+    # endregion
+
+    spec_impls, spec_impls_errors = csharp_specific_implementations.read_from_directory(
+        snippets_dir=params.snippets_dir)
+    if spec_impls_errors:
+        write_error_report(
+            message="One or more unexpected imports in the meta-model",
+            errors=spec_impls_errors,
+            stderr=stderr)
         return 1
 
     text = params.model_path.read_text()
@@ -119,7 +173,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     if ontology_errors:
         write_error_report(
             message=f"Failed to construct the ontology based on the symbol table "
-            f"parsed from {params.model_path}",
+                    f"parsed from {params.model_path}",
             errors=[lineno_columner.error_message(error) for error in ontology_errors],
             stderr=stderr,
         )
@@ -132,7 +186,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     if constructor_error is not None:
         write_error_report(
             message=f"Failed to understand the constructors "
-            f"based on the symbol table parsed from {params.model_path}",
+                    f"based on the symbol table parsed from {params.model_path}",
             errors=[lineno_columner.error_message(constructor_error)],
             stderr=stderr,
         )
@@ -151,12 +205,52 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     if ir_error is not None:
         write_error_report(
             message=f"Failed to translate the parsed symbol table "
-            f"to intermediate symbol table "
-            f"based on {params.model_path}",
+                    f"to intermediate symbol table "
+                    f"based on {params.model_path}",
             errors=[lineno_columner.error_message(ir_error)],
             stderr=stderr,
         )
 
+        return 1
+
+    verified_ir_table, ir_for_csharp_errors = csharp_structure.verify(
+        intermediate_symbol_table=ir_symbol_table,
+        spec_impls=spec_impls)
+
+    if ir_for_csharp_errors is not None:
+        write_error_report(
+            message=f"Failed to verify the intermediate symbol table "
+                    f"for generation of C# code"
+                    f"based on {params.model_path}",
+            errors=[
+                lineno_columner.error_message(error)
+                for error in ir_for_csharp_errors
+            ],
+            stderr=stderr)
+        return 1
+
+    structure_code, structure_errors = csharp_structure.generate(
+        verified_ir_table,
+        namespace=Identifier(params.namespace))
+
+    if structure_errors is not None:
+        write_error_report(
+            message=f"Failed to generate the structures in the C# code "
+                    f"based on {params.model_path}",
+            errors=[lineno_columner.error_message(error) for error in structure_errors],
+            stderr=stderr)
+        return 1
+
+    assert structure_code is not None
+
+    structure_pth = params.output_dir / "types.cs"
+    try:
+        structure_pth.write_text(structure_code)
+    except Exception as exception:
+        write_error_report(
+            message=f"Failed to write the C# structures to {structure_pth}",
+            errors=[str(exception)],
+            stderr=stderr)
         return 1
 
     # TODO: implement further steps
@@ -175,12 +269,23 @@ def main(prog: str) -> int:
     parser = argparse.ArgumentParser(prog=prog, description=__doc__)
     parser.add_argument("--model_path", help="path to the meta-model", required=True)
     parser.add_argument(
+        "--snippets_dir",
+        help="path to the directory containing implementation-specific code snippets",
+        required=True)
+    parser.add_argument(
+        "--namespace",
+        help="namespace of the generated code",
+        required=True
+    )
+    parser.add_argument(
         "--output_dir", help="path to the generated code", required=True
     )
     args = parser.parse_args()
 
     params = Parameters(
         model_path=pathlib.Path(args.model_path),
+        snippets_dir=pathlib.Path(args.snippets_dir),
+        namespace=str(args.namespace),
         output_dir=pathlib.Path(args.output_dir),
     )
 
