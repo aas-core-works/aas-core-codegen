@@ -18,6 +18,7 @@ from icontract import ensure
 
 from aas_core_csharp_codegen import parse
 from aas_core_csharp_codegen.common import Identifier, Error
+from aas_core_csharp_codegen.parse import Method
 
 
 class CallSuperConstructor:
@@ -44,15 +45,33 @@ class AssignProperty:
         self.name = name
 
 
-Statement = Union[CallSuperConstructor, AssignProperty]
+class InitializeWithDefaultIfNone:
+    """Represent an assignment to a default value if the argument is ``None``."""
+
+    name: Identifier  #: Identifier of the property
+    argument: Identifier  #: Identifier of the argument
+    default_value: ast.AST
+
+    def __init__(
+            self,
+            name: Identifier,
+            argument: Identifier,
+            default_value: ast.AST) -> None:
+        """Initialize with the given values."""
+        self.name = name
+        self.argument = argument
+        self.default_value = default_value
+
+
+Statement = Union[CallSuperConstructor, AssignProperty, InitializeWithDefaultIfNone]
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _call_as_call_to_super_init(
-    call: ast.Call,
-    entity: parse.Entity,
-    symbol_table: parse.SymbolTable,
-    atok: asttokens.ASTTokens,
+        call: ast.Call,
+        entity: parse.Entity,
+        symbol_table: parse.SymbolTable,
+        atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[CallSuperConstructor], Optional[Error]]:
     """Understand a call as a call to the constructor of a super-class."""
     if not isinstance(call.func, ast.Attribute):
@@ -134,7 +153,7 @@ def _call_as_call_to_super_init(
     underlying_errors = []  # type: List[Error]
 
     for arg_node in itertools.chain(
-        call.args, (keyword.value for keyword in call.keywords)
+            call.args, (keyword.value for keyword in call.keywords)
     ):
         if not isinstance(arg_node, ast.Name):
             underlying_errors.append(
@@ -257,34 +276,33 @@ def _call_as_call_to_super_init(
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _assign_as_property_assignment(
-    assign: ast.Assign, entity: parse.Entity, atok: asttokens.ASTTokens
-) -> Tuple[Optional[AssignProperty], Optional[Error]]:
+def _understand_assignment(
+        assign: ast.Assign,
+        init: Method,
+        entity: parse.Entity,
+        atok: asttokens.ASTTokens
+) -> Tuple[Optional[Statement], Optional[Error]]:
     if len(assign.targets) > 1:
         return (
             None,
             Error(
                 assign,
                 f"Expected only a single target for property assignment, "
-                f"but got {len(assign.targets)} targets",
-            ),
-        )
+                f"but got {len(assign.targets)} targets"))
 
     target = assign.targets[0]
 
     if not (
-        isinstance(target, ast.Attribute)
-        and isinstance(target.value, ast.Name)
-        and target.value.id == "self"
+            isinstance(target, ast.Attribute)
+            and isinstance(target.value, ast.Name)
+            and target.value.id == "self"
     ):
         return (
             None,
             Error(
                 target,
                 f"Expected a property as the target of an assignment, "
-                f"but got: {atok.get_text(target)}",
-            ),
-        )
+                f"but got: {atok.get_text(target)}"))
 
     if target.attr not in entity.property_map:
         return (
@@ -292,37 +310,42 @@ def _assign_as_property_assignment(
             Error(
                 target.value,
                 f"The property has not been previously "
-                f"defined in {entity.name}: {target.attr}",
-            ),
-        )
+                f"defined in {entity.name}: {target.attr}"))
 
-    if not isinstance(assign.value, ast.Name):
-        return (
-            None,
-            Error(
-                assign.value,
-                f"Expected a name as the value to be assigned to the property, "
-                f"but got: {atok.get_text(assign.value)}",
-            ),
-        )
+    if isinstance(assign.value, ast.Name):
+        if assign.value.id not in init.argument_map:
+            return (
+                None,
+                Error(
+                    assign.value,
+                    f"Expected the property {target.attr} to be assigned "
+                    f"to an argument, but it was assigned to a non-argument variable: "
+                    f"{atok.get_text(assign.value)}"))
 
-    if target.attr != assign.value.id:
-        return (
-            None,
-            Error(
-                assign.value,
-                f"Expected the property {target.attr} to be assigned "
-                f"exactly the argument with the same name, "
-                f"but got: {atok.get_text(assign.value)}",
-            ),
-        )
+        if target.attr != assign.value.id:
+            return (
+                None,
+                Error(
+                    assign.value,
+                    f"Expected the property {target.attr} to be assigned "
+                    f"exactly the argument with the same name, "
+                    f"but got: {atok.get_text(assign.value)}"))
 
-    return AssignProperty(name=Identifier(target.attr)), None
+        return AssignProperty(name=Identifier(target.attr)), None
+    elif isinstance(assign.value, ast.IfExp):
+        if_exp = assign.value
+
+        
+
+    else:
+
+        print(f"ast.dump(assign) is {ast.dump(assign)!r}")  # TODO: debug
+        return None, Error(assign, "Unhandled constructor statement")
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _understand_body(
-    entity: parse.Entity, symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
+        entity: parse.Entity, symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[List[Statement]], Optional[Error]]:
     """Try to understand the body of the constructor for the given ``entity``."""
     init = None  # type: Optional[parse.Method]
@@ -352,9 +375,8 @@ def _understand_body(
                 result.append(call_super_init)
 
         elif isinstance(stmt, ast.Assign):
-            prop_assignment, error = _assign_as_property_assignment(
-                assign=stmt, entity=entity, atok=atok
-            )
+            prop_assignment, error = _understand_assignment(
+                assign=stmt, init=init, entity=entity, atok=atok)
 
             if error is not None:
                 errors.append(error)
@@ -375,7 +397,10 @@ def _understand_body(
     if len(errors) > 0:
         return (
             None,
-            Error(init.node, "Failed to understand the constructor", underlying=errors),
+            Error(
+                init.node,
+                f"Failed to understand the constructor of the entity {entity.name}",
+                underlying=errors),
         )
 
     return result, None
@@ -424,7 +449,7 @@ class ConstructorTable:
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def understand_all(
-    symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
+        symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[ConstructorTable], Optional[Error]]:
     """Understand the constructors of all the entities in the symbol table."""
     errors = []  # type: List[Error]

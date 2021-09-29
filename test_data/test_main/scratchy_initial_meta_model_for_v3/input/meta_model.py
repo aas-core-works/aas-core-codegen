@@ -189,10 +189,9 @@ class Identifier_type(Enum):
 
 
 class Identifier(DBC):
-    # TODO (mristin, 2021-05-28) @Andreas: Type Id is not defined in the book.
-    #  Shouldn't ``id`` be a string with constraints? Or is it meant that individual
-    #  implementations pick their own objects?
-    # fmt: off
+    id: str
+    id_type: Identifier_type
+
     @require(
         lambda id, id_type:
         not (id_type == Identifier_type.IRDI) or is_IRDI(id)
@@ -205,14 +204,16 @@ class Identifier(DBC):
     def __init__(
             self,
             id: str,
-            id_type: Identifier_type,
-
+            id_type: Identifier_type
     ) -> None:
         self.id = id
         self.id_type = id_type
 
 
 class Administrative_information(DBC):
+    version: Optional[str]
+    revision: Optional[str]
+
     @require(
         lambda version, revision:
         not (revision is not None) or version is not None
@@ -228,6 +229,9 @@ class Administrative_information(DBC):
 
 @abstract
 class Identifiable(Referable):
+    identification: Identifier
+    administration: Optional[Administrative_information]
+
     @require(lambda id_short: is_id_short(id_short))
     def __init__(
             self,
@@ -242,6 +246,7 @@ class Identifiable(Referable):
         self.administration = administration
 
         Referable.__init__(
+            self,
             id_short=id_short,
             display_name=display_name,
             category=category,
@@ -256,8 +261,8 @@ class Modeling_kind(Enum):
 
 @abstract
 class Has_kind(DBC):
-    # TODO (mristin, 2021-05-28): @Andreas, how can ``kind`` be optional
-    #  and have a default value?
+    kind: Modeling_kind
+
     def __init__(self, kind: Modeling_kind) -> None:
         self.kind = kind
 
@@ -347,6 +352,10 @@ class Key_elements(Enum):
 
 
 class Key(DBC):
+    type: Key_elements
+    value: str
+    id_type: Key_type
+
     # fmt: off
     @require(
         lambda value, id_type:
@@ -376,6 +385,8 @@ class Key(DBC):
 
 
 class Reference(DBC):
+    keys: List[Key]
+
     @require(lambda keys: len(keys) >= 1)
     def __init__(self, keys: List[Key]) -> None:
         self.keys = keys
@@ -387,6 +398,8 @@ class Reference(DBC):
 
 @abstract
 class Has_semantics(DBC):
+    semantic_id: Optional[Reference]
+
     def __init__(self, semantic_id: Optional[Reference] = None) -> None:
         self.semantic_id = semantic_id
 
@@ -508,6 +521,8 @@ class Has_semantics(DBC):
 
 @abstract
 class Has_data_specification(DBC):
+    data_specifications: List[Reference]
+
     def __init__(self, data_specifications: Optional[List[Reference]] = None) -> None:
         self.data_specifications = (
             data_specifications if data_specifications is not None else []

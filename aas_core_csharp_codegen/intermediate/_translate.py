@@ -820,6 +820,7 @@ def translate(
 
     # region Verify that all property references in the descriptions are valid
 
+    # TODO: test this
     for symbol in symbols:
         for description in _over_descriptions(symbol):
             for prop_ref_in_doc in description.document.traverse(
