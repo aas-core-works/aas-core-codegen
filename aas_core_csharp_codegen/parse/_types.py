@@ -4,7 +4,7 @@ import pathlib
 from typing import Sequence, Optional, Union, Final, Mapping, Any
 
 import docutils.nodes
-from icontract import require, DBC
+from icontract import require, DBC, ensure
 
 from aas_core_csharp_codegen.common import Identifier, assert_never
 
@@ -165,14 +165,12 @@ class Argument:
             name: Identifier,
             type_annotation: TypeAnnotation,
             default: Optional[Default],
-            description: Optional[Description],
             node: ast.arg,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
         self.type_annotation = type_annotation
         self.default = default
-        self.description = description  # TODO: implement this!
         self.node = node
 
 
@@ -224,6 +222,17 @@ class Contracts:
         self.postconditions = postconditions
 
 
+# fmt: off
+@ensure(
+    lambda expr, result:
+    not result
+    or (
+            isinstance(expr, ast.Expr)
+            and isinstance(expr.value, ast.Constant)
+            and isinstance(expr.value.value, str)
+    )
+)
+# fmt: on
 def is_string_expr(expr: ast.AST) -> bool:
     """Check that the expression is a string literal."""
     return (

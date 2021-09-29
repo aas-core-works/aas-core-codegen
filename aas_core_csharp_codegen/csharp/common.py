@@ -1,7 +1,8 @@
 """Provide common functions shared among difference C# code generation modules."""
-from typing import List, Union
+import re
+from typing import List, Union, cast
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_csharp_codegen import intermediate
 from aas_core_csharp_codegen.common import Stripped, assert_never
@@ -48,11 +49,11 @@ _BUILTING_ATOMIC_TYPE_MAP = {
 
 # noinspection PyTypeChecker
 assert (
-    sorted(literal.value for literal in _BUILTING_ATOMIC_TYPE_MAP.keys())
-    == sorted(literal.value for literal in intermediate.BuiltinAtomicType)
+        sorted(literal.value for literal in _BUILTING_ATOMIC_TYPE_MAP.keys())
+        == sorted(literal.value for literal in intermediate.BuiltinAtomicType)
 ), (
-        "Expected complete mapping of built-in types to implementation-specific types"
-    )  # type: ignore
+    "Expected complete mapping of built-in types to implementation-specific types"
+)  # type: ignore
 
 
 def generate_type(
@@ -109,4 +110,16 @@ def generate_type(
     else:
         assert_never(type_annotation)
 
+
 INDENT = "    "
+
+NAMESPACE_IDENTIFIER_RE = re.compile(
+    r'[a-zA-Z_][a-zA-Z_0-9]*(\.[a-zA-Z_][a-zA-Z_0-9]*)')
+
+
+class NamespaceIdentifier:
+    """Capture a namespace identifier."""
+
+    @require(lambda identifier: NAMESPACE_IDENTIFIER_RE.fullmatch(identifier))
+    def __new__(cls, identifier: str) -> 'NamespaceIdentifier':
+        return cast(NamespaceIdentifier, identifier)

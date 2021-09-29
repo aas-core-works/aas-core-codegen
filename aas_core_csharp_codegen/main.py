@@ -8,15 +8,16 @@ from typing import TextIO, Sequence
 from icontract import require
 
 import aas_core_csharp_codegen
-from aas_core_csharp_codegen import parse, intermediate, specific_implementations
-from aas_core_csharp_codegen.common import LinenoColumner, IDENTIFIER_RE, Identifier
+from aas_core_csharp_codegen import parse, intermediate
+from aas_core_csharp_codegen.common import LinenoColumner, Identifier
+from aas_core_csharp_codegen.csharp import (
+    common as csharp_common,
+    specific_implementations as csharp_specific_implementations,
+    structure as csharp_structure
+)
 from aas_core_csharp_codegen.understand import (
     constructor as understand_constructor,
     hierarchy as understand_hierarchy,
-)
-from aas_core_csharp_codegen.csharp import (
-    specific_implementations as csharp_specific_implementations,
-    structure as csharp_structure
 )
 
 assert aas_core_csharp_codegen.__doc__ == __doc__
@@ -109,9 +110,9 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
                 f"{params.output_dir}\n")
             return 1
 
-    if not IDENTIFIER_RE.match(params.namespace):
+    if not csharp_common.NAMESPACE_IDENTIFIER_RE.match(params.namespace):
         stderr.write(
-            f"The --namespace is not a valid identifier: {params.namespace}\n")
+            f"The --namespace is not a valid identifier: {params.namespace!r}\n")
         return 1
 
     # endregion
@@ -229,9 +230,11 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
             stderr=stderr)
         return 1
 
+    namespace = csharp_common.NamespaceIdentifier(params.namespace)
+
     structure_code, structure_errors = csharp_structure.generate(
         verified_ir_table,
-        namespace=Identifier(params.namespace))
+        namespace=namespace)
 
     if structure_errors is not None:
         write_error_report(

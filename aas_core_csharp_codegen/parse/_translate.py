@@ -666,8 +666,8 @@ def _parse_contract_condition(
     description = None  # type: Optional[Description]
     if description_node is not None:
         if not (
-            isinstance(description_node, ast.Constant)
-            and isinstance(description_node.value, str)
+                isinstance(description_node, ast.Constant)
+                and isinstance(description_node.value, str)
         ):
             return (
                 None,
@@ -902,8 +902,11 @@ def _function_def_to_method(
 
     if len(node.body) >= 1 and is_string_expr(expr=node.body[0]):
         assert isinstance(node.body[0], ast.Expr)
+        assert isinstance(node.body[0].value, ast.Constant)
 
-        description, error = _string_expr_to_description(expr=node.body[0])
+        description, error = _string_constant_to_description(
+            constant=node.body[0].value)
+
         if error is not None:
             return None, error
 

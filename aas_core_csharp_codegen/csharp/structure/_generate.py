@@ -698,7 +698,7 @@ def _generate_class(
 # fmt: on
 def generate(
         intermediate_symbol_table: VerifiedIntermediateSymbolTable,
-        namespace: Identifier,
+        namespace: csharp_common.NamespaceIdentifier,
         spec_impls: specific_implementations.SpecificImplementations
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
