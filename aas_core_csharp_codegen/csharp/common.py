@@ -106,7 +106,6 @@ def generate_type(
 
         else:
             assert_never(type_annotation)
-
     else:
         assert_never(type_annotation)
 

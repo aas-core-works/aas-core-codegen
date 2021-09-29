@@ -1,14 +1,14 @@
 """Read and prepare specific implementations."""
 import pathlib
 import re
-from typing import cast, Mapping, Optional, List
+from typing import cast, Mapping, Optional, List, Sequence, Union
 
 from icontract import require
 
 from aas_core_csharp_codegen import intermediate
-from aas_core_csharp_codegen.common import Error, Stripped
+from aas_core_csharp_codegen.common import Error, Stripped, assert_never
 
-IMPLEMENTATION_KEY_RE = re.compile('[a-zA-Z_][a-zA-Z_0-9]*(/[a-zA-Z_][a-zA-Z_0-9]*)+')
+IMPLEMENTATION_KEY_RE = re.compile('[a-zA-Z_][a-zA-Z_0-9]*(/[a-zA-Z_][a-zA-Z_0-9]*)*')
 
 
 class ImplementationKey(str):
@@ -37,8 +37,16 @@ def _verify_that_available_for_symbol(
     """Check that all the necessary implementations are provided for the symbol."""
     errors = []  # type: List[Error]
 
-    if intermediate_symbol.is_implementation_specific:
+    # TODO: we need to fix this. If we have an abstract implementation-specific
+    #  entity, we need to propagate the implementation to all the descendants!
+    #  The current solution is really buggy and misleading.
+
+    if (
+            isinstance(intermediate_symbol, intermediate.Class)
+            and intermediate_symbol.is_implementation_specific
+    ):
         key = intermediate_symbol.name
+
         if key not in spec_impls:
             errors.append(
                 Error(
@@ -47,7 +55,6 @@ def _verify_that_available_for_symbol(
                     f"for the whole symbol, "
                     f"but it was declared implementation-specific"))
 
-    else:
         for method in intermediate_symbol.methods:
             if method.is_implementation_specific:
                 key = f"{intermediate_symbol.name}/{method.name}"
@@ -68,6 +75,9 @@ def _verify_that_available_for_symbol(
                         f"The implementation of the constructor with the key {key} "
                         f"is missing for the symbol {intermediate_symbol.name!r}, "
                         f"but it was declared implementation-specific"))
+
+    else:
+        pass
 
     if len(errors) > 0:
         return Error(

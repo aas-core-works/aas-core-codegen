@@ -2,7 +2,7 @@
 import io
 import textwrap
 import xml.sax.saxutils
-from typing import Optional, Dict, List, Tuple, cast
+from typing import Optional, Dict, List, Tuple, cast, Union, Sequence
 
 import docutils.nodes
 import docutils.parsers.rst.roles
@@ -69,7 +69,7 @@ def _verify_intra_structure_collisions(
     """Verify that no member names collide in the C# structure of the given symbol."""
     errors = []  # type: List[Error]
 
-    if isinstance(intermediate_symbol, (intermediate.Class, intermediate.Interface)):
+    if isinstance(intermediate_symbol, intermediate.Interface):
         observed_member_names = {}  # type: Dict[Identifier, str]
 
         for prop in intermediate_symbol.properties:
@@ -88,22 +88,68 @@ def _verify_intra_structure_collisions(
                     f"C# property {prop_name!r} corresponding to "
                     f"the meta-model property {prop.name!r}")
 
-        for method in intermediate_symbol.methods:
-            method_name = csharp_naming.method_name(method.name)
+        for signature in intermediate_symbol.signatures:
+            method_name = csharp_naming.method_name(signature.name)
 
             if method_name in observed_member_names:
                 # TODO: test
                 errors.append(
                     Error(
-                        method.parsed.node,
+                        signature.parsed.node,
                         f"C# method {method_name!r} corresponding "
-                        f"to the meta-model method {method.name!r} collides with "
+                        f"to the meta-model method {signature.name!r} collides with "
                         f"the {observed_member_names[method_name]}"
                     ))
             else:
                 observed_member_names[method_name] = (
                     f"C# method {method_name!r} corresponding to "
-                    f"the meta-model method {method.name!r}")
+                    f"the meta-model method {signature.name!r}")
+
+    elif isinstance(intermediate_symbol, intermediate.Class):
+        observed_member_names = {}  # type: Dict[Identifier, str]
+
+        for prop in intermediate_symbol.properties:
+            prop_name = csharp_naming.property_name(prop.name)
+            if prop_name in observed_member_names:
+                # TODO: test
+                errors.append(
+                    Error(
+                        prop.parsed.node,
+                        f"C# property {prop_name!r} corresponding "
+                        f"to the meta-model property {prop.name!r} collides with "
+                        f"the {observed_member_names[prop_name]}"
+                    ))
+            else:
+                observed_member_names[prop_name] = (
+                    f"C# property {prop_name!r} corresponding to "
+                    f"the meta-model property {prop.name!r}")
+
+        methods_or_signatures = [
+        ]  # type: Sequence[Union[intermediate.Method, intermediate.Signature]]
+
+        if isinstance(intermediate_symbol, intermediate.Class):
+            methods_or_signatures = intermediate_symbol.methods
+        elif isinstance(intermediate_symbol, intermediate.Interface):
+            methods_or_signatures = intermediate_symbol.signatures
+        else:
+            assert_never(intermediate_symbol)
+
+        for signature in methods_or_signatures:
+            method_name = csharp_naming.method_name(signature.name)
+
+            if method_name in observed_member_names:
+                # TODO: test
+                errors.append(
+                    Error(
+                        signature.parsed.node,
+                        f"C# method {method_name!r} corresponding "
+                        f"to the meta-model method {signature.name!r} collides with "
+                        f"the {observed_member_names[method_name]}"
+                    ))
+            else:
+                observed_member_names[method_name] = (
+                    f"C# method {method_name!r} corresponding to "
+                    f"the meta-model method {signature.name!r}")
 
     elif isinstance(intermediate_symbol, intermediate.Enumeration):
         pass
@@ -156,7 +202,7 @@ def verify(
     if len(errors) > 0:
         return None, errors
 
-    return cast(VerifiedIntermediateSymbolTable, intermediate.SymbolTable), None
+    return cast(VerifiedIntermediateSymbolTable, intermediate_symbol_table), None
 
 
 # endregion
@@ -189,10 +235,15 @@ def _description_paragraph_as_text(
 
             assert name is not None
             parts.append(f'<see cref={xml.sax.saxutils.quoteattr(name)} />')
-
+        elif isinstance(child, docutils.nodes.literal):
+            parts.append(f'<c>{xml.sax.saxutils.escape(child.astext())}</c>')
+        elif isinstance(child, intermediate.PropertyReferenceInDoc):
+            parts.append(
+                f'<see cref={xml.sax.saxutils.quoteattr(child.property_name)} />')
         else:
             raise NotImplementedError(
-                f"Unhandled child of a paragraph with type {type(child)}: {child}")
+                f"Unhandled child of a paragraph with type {type(child)}: "
+                f"{child} in paragraph {paragraph}")
 
     return Stripped(''.join(parts).strip()), None
 
@@ -398,7 +449,6 @@ def _description_comment(
     return text, None
 
 
-@require(lambda symbol: not symbol.is_implementation_specific)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_enum(
         symbol: intermediate.Enumeration
@@ -519,6 +569,9 @@ def _generate_interface(
 
         arg_codes = []  # type: List[Stripped]
         for arg in signature.arguments:
+            if arg.name == "self":
+                continue
+
             arg_type = csharp_common.generate_type(arg.type_annotation)
             arg_name = csharp_naming.argument_name(arg.name)
             arg_codes.append(Stripped(f'{arg_type} {arg_name}'))
@@ -647,6 +700,9 @@ def _generate_class(
 
         arg_codes = []  # type: List[Stripped]
         for arg in symbol.constructor.arguments:
+            if arg.name == "self":
+                continue
+
             arg_type = csharp_common.generate_type(arg.type_annotation)
             arg_name = csharp_naming.argument_name(arg.name)
             arg_codes.append(Stripped(f'{arg_type} {arg_name}'))
@@ -732,8 +788,13 @@ def generate(
         code = None  # type: Optional[Stripped]
         error = None  # type: Optional[Error]
 
-        if intermediate_symbol.is_implementation_specific:
-            # TODO: test
+        # TODO: We need to handle is_implementation_specific from the parents as well.
+        #  The current implementation is buggy & misleading!
+
+        if (
+                isinstance(intermediate_symbol, intermediate.Class)
+                and intermediate_symbol.is_implementation_specific
+        ):
             code = spec_impls[
                 specific_implementations.ImplementationKey(
                     intermediate_symbol.name)]
@@ -744,12 +805,12 @@ def generate(
             elif isinstance(intermediate_symbol, intermediate.Interface):
                 # TODO: test
                 code, error = _generate_interface(
-                    intermediate_symbol=intermediate_symbol)
+                    symbol=intermediate_symbol)
 
             elif isinstance(intermediate_symbol, intermediate.Class):
                 # TODO: impl
                 code, error = _generate_class(
-                    intermediate_symbol=intermediate_symbol,
+                    symbol=intermediate_symbol,
                     spec_impls=spec_impls)
             else:
                 assert_never(intermediate_symbol)

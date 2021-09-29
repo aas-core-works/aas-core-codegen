@@ -34,6 +34,7 @@ Enumeration = _types.Enumeration
 Class = _types.Class
 SymbolTable = _types.SymbolTable
 SymbolReferenceInDoc = _types.SymbolReferenceInDoc
+PropertyReferenceInDoc = _types.PropertyReferenceInDoc
 
 translate = _translate.translate
 

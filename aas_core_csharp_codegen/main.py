@@ -121,7 +121,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         snippets_dir=params.snippets_dir)
     if spec_impls_errors:
         write_error_report(
-            message="One or more unexpected imports in the meta-model",
+            message="Failed to resolve the implementation-specific code snippets",
             errors=spec_impls_errors,
             stderr=stderr)
         return 1
@@ -233,8 +233,9 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     namespace = csharp_common.NamespaceIdentifier(params.namespace)
 
     structure_code, structure_errors = csharp_structure.generate(
-        verified_ir_table,
-        namespace=namespace)
+        intermediate_symbol_table=verified_ir_table,
+        namespace=namespace,
+        spec_impls=spec_impls)
 
     if structure_errors is not None:
         write_error_report(

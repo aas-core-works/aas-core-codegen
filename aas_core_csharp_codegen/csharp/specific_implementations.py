@@ -23,14 +23,16 @@ def read_from_directory(
 
     errors = []  # type: List[str]
     for pth in snippets_dir.glob("**/*"):
-        if pth.name.endswith(".cs"):
+        if not pth.name.endswith(".cs"):
             errors.append(
                 f"Expected only *.cs files in the implementations, but got: {pth}")
             continue
 
         maybe_key = (pth.relative_to(snippets_dir).parent / pth.stem).as_posix()
         if not IMPLEMENTATION_KEY_RE.match(maybe_key):
-            errors.append(f"The snippet key is not valid: {maybe_key}")
+            errors.append(
+                f"The snippet key is not valid "
+                f"according to {IMPLEMENTATION_KEY_RE.pattern}: {maybe_key}")
             continue
 
         key = ImplementationKey(maybe_key)

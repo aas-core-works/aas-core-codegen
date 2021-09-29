@@ -180,7 +180,7 @@ class Rstripped(str):
     The block can be both single-line or multi-line.
     """
 
-    @require(lambda code: not TRAILING_WHITESPACE_RE.match(code))
+    @require(lambda block: not TRAILING_WHITESPACE_RE.match(block))
     def __new__(cls, block: str) -> 'Rstripped':
         return cast(Rstripped, block)
 

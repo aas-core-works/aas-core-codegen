@@ -151,7 +151,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
 
 
 class Test_assign_property_ok(unittest.TestCase):
-    def test_simple(self) -> None:
+    def test_argument_assignment(self) -> None:
         source = textwrap.dedent(
             '''\
             class Something:
@@ -169,7 +169,7 @@ class Test_assign_property_ok(unittest.TestCase):
         self.assertEqual(1, len(statements))
 
         statement = statements[0]
-        assert isinstance(statement, constructor.AssignProperty)
+        assert isinstance(statement, constructor.AssignArgument)
         self.assertEqual("x", statement.name)
 
 

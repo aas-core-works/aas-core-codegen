@@ -172,6 +172,7 @@ class Referable(Has_extension):
         self.category = category
         self.description = description
 
+
 class Identifier_type(Enum):
     """Enumeration of different types of Identifiersfor global identification"""
 
@@ -530,9 +531,7 @@ class Has_data_specification(DBC):
 
 
 class Asset_administration_shell(Identifiable, Has_data_specification):
-    """Structure a digital representation of an :class:`.Asset`."""
-
-    # TODO (mristin, 2021-05-28): fields are missing, such as ``security`` and many others!
+    """Structure a digital representation of an Asset."""
 
     derived_from: Final[Optional['Asset_administration_shell']]
     """The reference to the AAS this AAS was derived from."""
@@ -561,124 +560,3 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
         Has_data_specification.__init__(self, data_specifications=data_specifications)
 
         self.derived_from = derived_from
-
-    # def from_jsonable(self, jsonable: Mapping[str, Any], errors: Errors)->None:
-    #     Identifiable.from_jsonable(self, jsonable, errors)
-    #     if not errors.empty():
-    #         return
-    #
-    #     self.category = jsonable.get('category', None)
-    #
-    # def to_jsonable(self, jsonable: MutableMapping[str, Any])->None:
-    #     Identifiable.to_jsonable(self, jsonable)
-    #
-    #     jsonable['category'] = self.category
-
-# TODO (mristin, 2021-05-28): This was the initial version
-#  before we really tackled the mix-ins properly.
-#
-#
-# class Asset(DBC, Identifiable, HasDataSpecification):
-#     @require(lambda id_short: is_id_short(id_short))
-#     @require(lambda id: id.id_type == ID_Type.IRI)
-#     def __init__(self, id: Identifier, id_short: str) -> None:
-#         Identifiable.__init__(self, id=id, id_short=id_short)
-#
-#
-# class Submodel(
-#     DBC, Identifiable, HasKind, HasSemantics, Quantifiable, HasDataSpecification):
-#     pass
-#
-#
-# class SubmodelTemplate(Submodel):
-#     # fmt: off
-#     @require(lambda id_short: is_id_short(id_short))
-#     @require(lambda id: id.id_type in (ID_Type.IRI, ID_Type.IRDI))
-#     @require(
-#         lambda semantic_id:
-#         semantic_id is None
-#         or semantic_id.id_type in (ID_Type.IRI, ID_Type.IRDI)
-#     )
-#     # fmt: on
-#     def __init__(
-#             self,
-#             id: Identifier,
-#             id_short: str,
-#             semantic_id: Optional[Identifier]
-#     ) -> None:
-#         Identifiable.__init__(self, id=id, id_short=id_short)
-#         self.semantic_id = semantic_id
-#
-#
-# class SubmodelInstance(Submodel):
-#     # fmt: off
-#     @require(lambda id_short: is_id_short(id_short))
-#     @require(lambda id: id.id_type in (ID_Type.IRI, ID_Type.CUSTOM))
-#     @require(
-#         lambda semantic_id:
-#         semantic_id is None
-#         or semantic_id.id_type in (ID_Type.IRI, ID_Type.IRDI)
-#     )
-#     # fmt: on
-#     def __init__(
-#             self,
-#             id: Identifier,
-#             id_short: str,
-#             semantic_id: Optional[Identifier]
-#     ) -> None:
-#         Identifiable.__init__(self, id=id, id_short=id_short)
-#         self.semantic_id = semantic_id
-#
-#
-# class SubmodelElement(Referable, HasSemantics):
-#     @require(lambda id_short: is_id_short(id_short))
-#     def __init__(
-#             self,
-#             id_short: str,
-#             semantic_id: Optional[Identifier]
-#     ) -> None:
-#         Referable.__init__(self, id_short=id_short)
-#         self.semantic_id = semantic_id
-#
-#
-# class ConceptDescription:
-#     raise NotImplementedError()
-#
-#
-# # TODO (mristin, 2021-05-28): @Andreas: ConceptDescription lacks ``definition`` property.
-# #   How are we supposed to retrieve it here?
-# #   See also `get_description`.
-# def get_display_name(
-#         language: str,
-#         referable: Referable,
-#         concept_description: Optional[ConceptDescription]) -> str:
-#     # TODO (mristin, 2021-05-28): Implement this once we defined ConceptDescirption.
-#     #  See the logic on p.51 Details.
-#     text: Optional[str] = referable.display_name.by_language.get(
-#         language, None)
-#
-#     if text is not None:
-#         return text
-#
-#     raise NotImplementedError()
-#
-#
-# def get_description(
-#         language: str,
-#         referable: Referable,
-#         concept_description: Optional[ConceptDescription]) -> str:
-#     # TODO (mristin, 2021-05-28): Implement this once we defined ConceptDescirption.
-#     #  See the logic on p.51 Details.
-#     raise NotImplementedError()
-
-# TODO: describe all entities
-# TODO: how can we deal with IRI/IRDI/CustomIdentifier such that they are just strings?
-# TODO: how should we deal with ``id``? ``id`` is a built-in — Nico will have a look in Aachen repo.
-# TODO: write readme
-
-# TODO (mristin, 2021-05-28): We need a ``verify`` function that checks
-#  for type=FragmentId.
-#  See https://www.plattform-i40.de/PI40/Redaktion/DE/Downloads/Publikation/Details_of_the_Asset_Administration_Shell_Part1_V3.pdf?__blob=publicationFile&v=5
-#  page 82, ``type`` row
-
-# TODO (mristin, 2021-05-28): We need to list the constraints which we could not implement.

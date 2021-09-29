@@ -397,22 +397,20 @@ def _in_line_constructors(
         parsed_symbol_table: parse.SymbolTable,
         ontology: understand_hierarchy.Ontology,
         constructor_table: understand_constructor.ConstructorTable,
-) -> Mapping[parse.Entity, Sequence[understand_constructor.AssignProperty]]:
+) -> Mapping[parse.Entity, Sequence[understand_constructor.AssignArgument]]:
     """In-line recursively all the constructor bodies."""
     result = (
         dict()
-    )  # type: MutableMapping[parse.Entity, List[understand_constructor.AssignProperty]]
+    )  # type: MutableMapping[parse.Entity, List[understand_constructor.AssignArgument]]
 
     for entity in ontology.entities:
         # We explicitly check at the stage of understand.constructor that all the calls
         # are calls to constructors of a super class or property assignments.
 
         constructor_body = constructor_table.must_find(entity)
-        in_lined = []  # type: List[understand_constructor.AssignProperty]
+        in_lined = []  # type: List[understand_constructor.AssignArgument]
         for statement in constructor_body:
-            if isinstance(statement, understand_constructor.AssignProperty):
-                in_lined.append(statement)
-            elif isinstance(statement, understand_constructor.CallSuperConstructor):
+            if isinstance(statement, understand_constructor.CallSuperConstructor):
                 antecedent = parsed_symbol_table.must_find_entity(statement.super_name)
 
                 in_lined_of_antecedent = result.get(antecedent, None)
@@ -427,7 +425,7 @@ def _in_line_constructors(
 
                 in_lined.extend(in_lined_of_antecedent)
             else:
-                assert_never(statement)
+                in_lined.append(statement)
 
         assert entity not in result, (
             f"Expected the entity {entity} not to be inserted into the registry of "
@@ -457,8 +455,7 @@ def _parsed_entity_to_class(
         parsed: parse.ConcreteEntity,
         ontology: understand_hierarchy.Ontology,
         in_lined_constructors: Mapping[
-            parse.Entity, Sequence[understand_constructor.AssignProperty]
-        ]
+            parse.Entity, Sequence[understand_constructor.AssignArgument]]
 ) -> Class:
     """Translate a concrete entity to an intermediate class."""
     antecedents = ontology.list_antecedents(entity=parsed)
@@ -577,6 +574,8 @@ def _over_our_atomic_type_annotations(
         elif isinstance(something, MutableMappingTypeAnnotation):
             yield from _over_our_atomic_type_annotations(something.keys)
             yield from _over_our_atomic_type_annotations(something.values)
+        elif isinstance(something, OptionalTypeAnnotation):
+            yield from _over_our_atomic_type_annotations(something.value)
         else:
             assert_never(something)
 

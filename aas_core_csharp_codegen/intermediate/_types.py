@@ -403,7 +403,7 @@ class Constructor:
             arguments: Sequence[Argument],
             contracts: Contracts,
             is_implementation_specific: bool,
-            statements: Sequence[understand_constructor.AssignProperty],
+            statements: Sequence[understand_constructor.AssignArgument],
     ) -> None:
         self.arguments = arguments
         self.contracts = contracts

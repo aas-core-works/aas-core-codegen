@@ -35,35 +35,25 @@ class CallSuperConstructor:
         self.super_name = super_name
 
 
-class AssignProperty:
+class AssignArgument:
     """Represent an assignment of an argument to ``__init__`` to a property."""
 
     name: Identifier  #: Identifier of the property
-
-    def __init__(self, name: Identifier) -> None:
-        """Initialize with the given values."""
-        self.name = name
-
-
-class InitializeWithDefaultIfNone:
-    """Represent an assignment to a default value if the argument is ``None``."""
-
-    name: Identifier  #: Identifier of the property
     argument: Identifier  #: Identifier of the argument
-    default_value: ast.AST
+    default_value: Optional[ast.AST]  #: Default value if the argument is None
 
     def __init__(
             self,
             name: Identifier,
             argument: Identifier,
-            default_value: ast.AST) -> None:
+            default: Optional[ast.AST]) -> None:
         """Initialize with the given values."""
         self.name = name
         self.argument = argument
-        self.default_value = default_value
+        self.default = default
 
 
-Statement = Union[CallSuperConstructor, AssignProperty, InitializeWithDefaultIfNone]
+Statement = Union[CallSuperConstructor, AssignArgument]
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -331,16 +321,33 @@ def _understand_assignment(
                     f"exactly the argument with the same name, "
                     f"but got: {atok.get_text(assign.value)}"))
 
-        return AssignProperty(name=Identifier(target.attr)), None
+        return AssignArgument(
+            name=Identifier(target.attr),
+            argument=Identifier(target.attr),
+            default=None), None
     elif isinstance(assign.value, ast.IfExp):
         if_exp = assign.value
+        if (
+                isinstance(if_exp.test, ast.Compare)
+                and isinstance(if_exp.test.left, ast.Name)
+                and isinstance(if_exp.test.left.ctx, ast.Load)
+                and if_exp.test.left.id in init.argument_map
+                and len(if_exp.test.ops) == 1
+                and isinstance(if_exp.test.ops[0], ast.IsNot)
+                and len(if_exp.test.comparators) == 1
+                and isinstance(if_exp.test.comparators[0], ast.Constant)
+                and if_exp.test.comparators[0].value is None
+                and isinstance(if_exp.body, ast.Name)
+                and isinstance(if_exp.body.ctx, ast.Load)
+                and if_exp.body.id == if_exp.test.left.id
+                and if_exp.orelse is not None
+        ):
+            return AssignArgument(
+                name=Identifier(target.attr),
+                argument=Identifier(if_exp.test.left.id),
+                default=if_exp.orelse), None
 
-        
-
-    else:
-
-        print(f"ast.dump(assign) is {ast.dump(assign)!r}")  # TODO: debug
-        return None, Error(assign, "Unhandled constructor statement")
+    return None, Error(assign, "Unhandled constructor statement")
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
