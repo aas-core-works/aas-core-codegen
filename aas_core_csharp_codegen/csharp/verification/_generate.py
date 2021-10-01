@@ -62,7 +62,7 @@ def _generate_pattern_class(
     return Stripped(writer.getvalue())
 
 
-def _generate_verify(
+def _generate_verify_class(
         cls: intermediate.Class,
         spec_impls: specific_implementations.SpecificImplementations
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -77,13 +77,19 @@ def _generate_verify(
 
     writer = io.StringIO()
 
-    verify_name = csharp_naming.method_name(Identifier(f"verify_{cls.name}"))
-
-    writer.write(f'public void {verify_name}(Errors errors)\n{{')
-
     body_blocks = []  # type: List[str]
 
-    # TODO: transpile the invariants into body_blocks
+    if len(cls.invariants) == 0:
+        body_blocks.append(
+            f"// There were no invariants specified "
+            f"for {csharp_naming.class_name(cls.name)}.\n"
+            f"return;")
+    else:
+        # TODO: transpile the invariants into body_blocks
+        pass
+
+    verify_name = csharp_naming.method_name(Identifier(f"verify_{cls.name}"))
+    writer.write(f'public void {verify_name}(Errors errors)\n{{\n')
 
     writer.write(
         textwrap.indent(Stripped('\n\n'.join(body_blocks)), csharp_common.INDENT))
@@ -92,6 +98,10 @@ def _generate_verify(
 
     return Stripped(writer.getvalue()), None
 
+# TODO: generate_verify_class_recursively 🠒 repeat the trick with spec_impls, append suffix "_recursively"
+
+# TODO: generate_verify_interface Verify{interface name} 🠒 dispatch to the corresponding class
+#   Needs ontology, pass in into the generate()
 
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -137,7 +147,7 @@ def generate(
 
     for symbol in intermediate_symbol_table.symbols:
         if isinstance(symbol, intermediate.Class):
-            verify_block, error = _generate_verify(cls=symbol, spec_impls=spec_impls)
+            verify_block, error = _generate_verify_class(cls=symbol, spec_impls=spec_impls)
             if error is not None:
                 errors.append(error)
                 continue

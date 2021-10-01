@@ -207,30 +207,38 @@ namespace AasCore.Aas3
 
         public void VerifyLangString(Errors errors)
         {
+            // There were no invariants specified for LangString.
+            return;
         }
 
         public void VerifyLangStringSet(Errors errors)
         {
+
         }
 
         public void VerifyIdentifier(Errors errors)
         {
+
         }
 
         public void VerifyAdministrativeInformation(Errors errors)
         {
+
         }
 
         public void VerifyKey(Errors errors)
         {
+
         }
 
         public void VerifyReference(Errors errors)
         {
+
         }
 
         public void VerifyAssetAdministrationShell(Errors errors)
         {
+
         }
     }  // class Verification
 }  // namespace AasCore.Aas3
