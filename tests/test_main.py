@@ -64,11 +64,14 @@ class Test_against_recorded(unittest.TestCase):
                     0, return_code, "Expected 0 return code on valid models")
 
                 stdout_pth = expected_output_dir / "stdout.txt"
+                normalized_stdout = stdout.getvalue().replace(
+                    str(output_dir), '<output dir>')
+
                 if Test_against_recorded.RERECORD:
-                    stdout_pth.write_text(stdout.getvalue())
+                    stdout_pth.write_text(normalized_stdout)
                 else:
                     self.assertEqual(
-                        stdout.getvalue(), stdout_pth.read_text(), stdout_pth)
+                        normalized_stdout, stdout_pth.read_text(), stdout_pth)
 
                 self.assertEqual(
                     (expected_output_dir / "types.cs").read_text(),

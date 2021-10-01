@@ -4,7 +4,6 @@
  */
 
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
-using JsonPropertyNameAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
 using System.Collections.Generic;  // can't alias
 
 namespace AasCore.Aas3
@@ -13,7 +12,7 @@ namespace AasCore.Aas3
     public interface IHasExtension
     {
 
-    }}
+    }
 
     /// <summary>
     /// Give a text in a specific language.
@@ -34,22 +33,8 @@ namespace AasCore.Aas3
             string language,
             string text)
         {
-        }}/// <summary>
-    /// Language of the <see cref="text" />
-    /// </summary>
-    string Language { get; set; }
-
-    /// <summary>
-    /// Content of the string
-    /// </summary>
-    string Text { get; set; }
-
-    LangString(
-        string language,
-        string text)
-    {
-    }}
-    }}
+        }
+    }
 
     public class LangStringSet {
         // This is just a dummy snippet.
@@ -108,52 +93,8 @@ namespace AasCore.Aas3
         /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
         /// in which context or which additional data specification templates are provided.
         /// </remarks>
-        LangStringSet? Description { get; set; }/// <summary>
-    /// In case of identifiables this attribute is a short name of the element.
-    /// In case of referable this id is an identifying string of
-    /// the element within its name space.
-    /// </summary>
-    string IdShort { get; set; }
-
-    /// <summary>
-    /// Display name. Can be provided in several languages.
-    /// </summary>
-    /// <remarks>
-    /// <para>If no display name is defined in the language requested by the application,
-    /// then the display name is selected in the following order if available:</para>
-    /// <para><ul>
-    /// <li>the preferred name in the requested language of the concept description defining
-    /// the semantics of the element</li>
-    /// <li>If there is a default language list defined in the application,
-    /// then the corresponding preferred name in the language is chosen
-    /// according to this order.</li>
-    /// <li>the English preferred name of the concept description defining
-    /// the semantics of the element</li>
-    /// <li>the short name of the concept description-the idShort of the element</li>
-    /// </ul></para>
-    /// </remarks>
-    LangStringSet? DisplayName { get; set; }
-
-    /// <summary>
-    /// The category is a value that gives further meta information
-    /// w.r.t. to the class of the element.
-    /// It affects the expected existence of attributes and the applicability of
-    /// constraints.
-    /// </summary>
-    string? Category { get; set; }
-
-    /// <summary>
-    /// Description or comments on the element.
-    /// </summary>
-    /// <remarks>
-    /// The description can be provided in several languages. If no description is defined,
-    /// then the definition of the concept description that defines the semantics
-    /// of the element is used. Additional information can be provided,
-    /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
-    /// in which context or which additional data specification templates are provided.
-    /// </remarks>
-    LangStringSet? Description { get; set; }
-    }}
+        LangStringSet? Description { get; set; }
+    }
 
     /// <summary>
     /// Enumeration of different types of Identifiersfor global identification
@@ -177,7 +118,7 @@ namespace AasCore.Aas3
         /// </summary>
         [EnumMember(Value = "Custom")]
         Custom
-    }}
+    }
 
     public class Identifier
     {
@@ -189,16 +130,8 @@ namespace AasCore.Aas3
             string id,
             IdentifierType idType)
         {
-        }}string Id { get; set; }
-
-    IdentifierType IdType { get; set; }
-
-    Identifier(
-        string id,
-        IdentifierType idType)
-    {
-    }}
-    }}
+        }
+    }
 
     public class AdministrativeInformation
     {
@@ -210,25 +143,15 @@ namespace AasCore.Aas3
             string? version,
             string? revision)
         {
-        }}string? Version { get; set; }
-
-    string? Revision { get; set; }
-
-    AdministrativeInformation(
-        string? version,
-        string? revision)
-    {
-    }}
-    }}
+        }
+    }
 
     public interface IIdentifiable : IReferable
     {
         Identifier Identifier { get; set; }
 
-        AdministrativeInformation? AdministrativeInformation? { get; set; }Identifier Identifier { get; set; }
-
-    AdministrativeInformation? AdministrativeInformation? { get; set; }
-    }}
+        AdministrativeInformation? AdministrativeInformation? { get; set; }
+    }
 
     public enum ModelingKind
     {    [EnumMember(Value = "Template")]
@@ -236,12 +159,12 @@ namespace AasCore.Aas3
 
         [EnumMember(Value = "Instance")]
         Instance
-    }}
+    }
 
     public interface IHasKind
     {
-        ModelingKind ModelingKind { get; set; }ModelingKind ModelingKind { get; set; }
-    }}
+        ModelingKind ModelingKind { get; set; }
+    }
 
     public enum LocalKeyType
     {    [EnumMember(Value = "IdShort")]
@@ -249,7 +172,7 @@ namespace AasCore.Aas3
 
         [EnumMember(Value = "FragmentId")]
         FragmentId
-    }}
+    }
 
     public enum KeyType
     {    [EnumMember(Value = "IdShort")]
@@ -266,7 +189,7 @@ namespace AasCore.Aas3
 
         [EnumMember(Value = "IRI")]
         Iri
-    }}
+    }
 
     public enum IdentifiableElements
     {    [EnumMember(Value = "Asset")]
@@ -280,7 +203,7 @@ namespace AasCore.Aas3
 
         [EnumMember(Value = "Submodel")]
         Submodel
-    }}
+    }
 
     public enum ReferableElements
     {    [EnumMember(Value = "AccessPermissionRule")]
@@ -351,7 +274,7 @@ namespace AasCore.Aas3
 
         [EnumMember(Value = "View")]
         View
-    }}
+    }
 
     public enum KeyElements
     {    [EnumMember(Value = "GlobalReference")]
@@ -428,7 +351,7 @@ namespace AasCore.Aas3
 
         [EnumMember(Value = "View")]
         View
-    }}
+    }
 
     public class Key
     {
@@ -443,19 +366,8 @@ namespace AasCore.Aas3
             string value,
             KeyType idType)
         {
-        }}KeyElements Type { get; set; }
-
-    string Value { get; set; }
-
-    KeyType IdType { get; set; }
-
-    Key(
-        KeyElements type,
-        string value,
-        KeyType idType)
-    {
-    }}
-    }}
+        }
+    }
 
     public class Reference
     {
@@ -463,22 +375,18 @@ namespace AasCore.Aas3
 
         Reference(List<Key> keys)
         {
-        }}List<Key> Keys { get; set; }
-
-    Reference(List<Key> keys)
-    {
-    }}
-    }}
+        }
+    }
 
     public interface IHasSemantics
     {
-        Reference? Reference? { get; set; }Reference? Reference? { get; set; }
-    }}
+        Reference? Reference? { get; set; }
+    }
 
     public interface IHasDataSpecification
     {
-        List<Reference> List<Reference> { get; set; }List<Reference> List<Reference> { get; set; }
-    }}
+        List<Reference> List<Reference> { get; set; }
+    }
 
     /// <summary>
     /// Structure a digital representation of an Asset.
@@ -554,75 +462,8 @@ namespace AasCore.Aas3
             List<Reference>? dataSpecifications,
             AssetAdministrationShell? derivedFrom)
         {
-        }}/// <summary>
-    /// In case of identifiables this attribute is a short name of the element.
-    /// In case of referable this id is an identifying string of
-    /// the element within its name space.
-    /// </summary>
-    string IdShort { get; set; }
-
-    /// <summary>
-    /// Display name. Can be provided in several languages.
-    /// </summary>
-    /// <remarks>
-    /// <para>If no display name is defined in the language requested by the application,
-    /// then the display name is selected in the following order if available:</para>
-    /// <para><ul>
-    /// <li>the preferred name in the requested language of the concept description defining
-    /// the semantics of the element</li>
-    /// <li>If there is a default language list defined in the application,
-    /// then the corresponding preferred name in the language is chosen
-    /// according to this order.</li>
-    /// <li>the English preferred name of the concept description defining
-    /// the semantics of the element</li>
-    /// <li>the short name of the concept description-the idShort of the element</li>
-    /// </ul></para>
-    /// </remarks>
-    LangStringSet? DisplayName { get; set; }
-
-    /// <summary>
-    /// The category is a value that gives further meta information
-    /// w.r.t. to the class of the element.
-    /// It affects the expected existence of attributes and the applicability of
-    /// constraints.
-    /// </summary>
-    string? Category { get; set; }
-
-    /// <summary>
-    /// Description or comments on the element.
-    /// </summary>
-    /// <remarks>
-    /// The description can be provided in several languages. If no description is defined,
-    /// then the definition of the concept description that defines the semantics
-    /// of the element is used. Additional information can be provided,
-    /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
-    /// in which context or which additional data specification templates are provided.
-    /// </remarks>
-    LangStringSet? Description { get; set; }
-
-    Identifier Identification { get; set; }
-
-    AdministrativeInformation? Administration { get; set; }
-
-    List<Reference> DataSpecifications { get; set; }
-
-    /// <summary>
-    /// The reference to the AAS this AAS was derived from.
-    /// </summary>
-    AssetAdministrationShell? DerivedFrom { get; set; }
-
-    AssetAdministrationShell(
-        Identifier identification,
-        string idShort,
-        LangStringSet? displayName,
-        string? category,
-        LangStringSet? description,
-        AdministrativeInformation? administration,
-        List<Reference>? dataSpecifications,
-        AssetAdministrationShell? derivedFrom)
-    {
-    }}
-    }}
+        }
+    }
 
 }  // namespace AasCore.Aas3
 

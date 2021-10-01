@@ -11,7 +11,7 @@ from icontract import ensure, require
 
 import aas_core_csharp_codegen.csharp.common as csharp_common
 import aas_core_csharp_codegen.csharp.naming as csharp_naming
-from aas_core_csharp_codegen import intermediate, naming
+from aas_core_csharp_codegen import intermediate
 from aas_core_csharp_codegen import specific_implementations
 from aas_core_csharp_codegen.common import Error, Identifier, assert_never, \
     Stripped, Rstripped
@@ -215,7 +215,7 @@ def _render_description_element(
     """
     Render the element of a description as documentation XML.
 
-    :param paragraph: to be rendered
+    :param element: to be rendered
     :return: the generated code, or error if the paragraph could not be translated
     """
     if isinstance(element, docutils.nodes.Text):
@@ -291,41 +291,6 @@ def _render_description_element(
             f"has not been implemented: {element}"
         )
 
-    # TODO: include paragraph and then recursively call
-    # TODO: include bullet_list and then recursively call
-    raise NotImplementedError()
-    # parts = []  # type: List[str]
-    # for element in elements:
-    #     if isinstance(element, docutils.nodes.Text):
-    #         parts.append(xml.sax.saxutils.escape(element.astext()))
-    #     elif isinstance(element, intermediate.SymbolReferenceInDoc):
-    #         name = None  # type: Optional[str]
-    #         if isinstance(element.symbol, intermediate.Enumeration):
-    #             name = csharp_naming.enum_name(element.symbol.name)
-    #         elif isinstance(element.symbol, intermediate.Interface):
-    #             name = csharp_naming.interface_name(element.symbol.name)
-    #         elif isinstance(element.symbol, intermediate.Class):
-    #             name = csharp_naming.class_name(element.symbol.name)
-    #         else:
-    #             assert_never(element.symbol)
-    #
-    #         assert name is not None
-    #         parts.append(f'<see cref={xml.sax.saxutils.quoteattr(name)} />')
-    #     elif isinstance(element, docutils.nodes.literal):
-    #         parts.append(f'<c>{xml.sax.saxutils.escape(element.astext())}</c>')
-    #
-    #     # TODO: implement bullet_list
-    #
-    #     elif isinstance(element, intermediate.PropertyReferenceInDoc):
-    #         parts.append(
-    #             f'<see cref={xml.sax.saxutils.quoteattr(element.property_name)} />')
-    #     else:
-    #         raise NotImplementedError(
-    #             f"Unhandled element of a description with type {type(element)}: "
-    #             f"{element}")
-    #
-    # return Stripped(''.join(parts).strip()), None
-
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _description_comment(
@@ -337,15 +302,15 @@ def _description_comment(
 
     summary = None  # type: Optional[docutils.nodes.paragraph]
     remarks = None  # type: Optional[List[docutils.nodes.paragraph]]
+    # noinspection PyUnusedLocal
     tail = []  # type: List[docutils.nodes.General]
 
     # Try to match the summary and the remarks
     if (
             len(description.document.children) >= 2
             and isinstance(description.document.children[0], docutils.nodes.paragraph)
-            and isinstance(
-        description.document.children[1],
-        (docutils.nodes.paragraph, docutils.nodes.bullet_list))
+            and isinstance(description.document.children[1],
+                           (docutils.nodes.paragraph, docutils.nodes.bullet_list))
     ):
         summary = description.document.children[0]
 
@@ -390,7 +355,7 @@ def _description_comment(
                 f'</summary>'))
 
     if remarks:
-        remark_blocks = []  # type: List[Stripped]
+        remark_blocks = []  # type: List[str]
         for remark in remarks:
             remark_text, error = _render_description_element(element=remark)
             if error:
@@ -436,7 +401,7 @@ def _description_comment(
 
             # region Generate field body
 
-            body_blocks = []  # type: List[Stripped]
+            body_blocks = []  # type: List[str]
             for body_child in field_body.children:
                 body_block, error = _render_description_element(body_child)
                 if error:
@@ -562,7 +527,7 @@ def _generate_enum(
                 f'{csharp_naming.enum_literal_name(literal.name)}',
                 csharp_common.INDENT))
 
-    writer.write("\n}}")
+    writer.write("\n}")
 
     return Stripped(writer.getvalue()), None
 
@@ -672,8 +637,8 @@ def _generate_interface(
             writer.write("\n\n")
 
         writer.write(textwrap.indent(code, csharp_common.INDENT))
-    writer.write("\n\n".join(codes))
-    writer.write("\n}}")
+
+    writer.write("\n}")
 
     return Stripped(writer.getvalue()), None
 
@@ -801,7 +766,7 @@ def _generate_class(
         # TODO: continue here
         # TODO: transpile the constructor body here
 
-        constructor_blocks.append("}}")
+        constructor_blocks.append(Stripped("}"))
 
         codes.append(Stripped("\n".join(constructor_blocks)))
 
@@ -812,8 +777,8 @@ def _generate_class(
             writer.write("\n\n")
 
         writer.write(textwrap.indent(code, csharp_common.INDENT))
-    writer.write("\n\n".join(codes))
-    writer.write("\n}}")
+
+    writer.write("\n}")
 
     return Stripped(writer.getvalue()), None
 
@@ -846,8 +811,6 @@ def generate(
 
     using_directives = [
         "using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;",
-        ("using JsonPropertyNameAttribute = "
-         "System.Text.Json.Serialization.JsonPropertyNameAttribute;"),
         "using System.Collections.Generic;  // can't alias"
     ]  # type: List[str]
 
