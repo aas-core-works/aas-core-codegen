@@ -2,26 +2,14 @@
 from enum import Enum
 from typing import Final, List, Optional
 
-from icontract import require, ensure, DBC
+from icontract import invariant, DBC
 
 from aas_core3_meta.marker import (
     abstract,
     implementation_specific,
     comment
 )
-from aas_core3_meta.pattern import is_IRI, is_IRDI, is_id_short
-
-
-# TODO (mristin, 2021-05-28): rename all enums, classes,
-#  properties according to snake case: abbreviations UPPERCASE, rest snake case
-# TODO (mristin):
-# * Work out the table on p.34 🠒 4.4.4 Tabelle 2: ConceptDescription, View, Qualifier
-# * Add descriptions to the classes
-# * Write a linter for the meta-model:
-#   * all properties require a docstring
-#   * all classes require a docstring
-#   * CamelCase is not good for classes — require snake_case
-#   * camelCase is not good for properties, functions and arguments — require snake_case
+from aas_core3_meta.pattern import is_IRI, is_IRDI, is_ID_short
 
 
 @abstract
@@ -46,7 +34,17 @@ class Lang_string(DBC):
         self.language = language
         self.text = text
 
-
+# fmt: off
+@invariant(lambda self: len(self.lang_strings) > 0)
+@invariant(
+    lambda self:
+    (
+            languages := [lang_string.language for lang_string in self.lang_strings],
+            len(languages) == len(set(languages))
+    )[1],
+    "No duplicate languages allowed"
+)
+# fmt: on
 @implementation_specific
 class Lang_string_set(DBC):
     """
@@ -58,19 +56,6 @@ class Lang_string_set(DBC):
     lang_strings: List[Lang_string]
     """Different translations of the string."""
 
-    # TODO (mristin, 2021-05-28): @Andreas: should the language be unique?
-    #  Or can we have duplicate entries for, say, "EN"?
-    # fmt: off
-    @require(lambda lang_strings: len(lang_strings) > 0)
-    @require(
-        lambda lang_strings:
-        (
-                languages := [lang_string.language for lang_string in lang_strings],
-                len(languages) == len(set(languages))
-        )[1],
-        "No duplicate languages allowed"
-    )
-    # fmt: on
     def __init__(self, lang_strings: List[Lang_string]) -> None:
         self.lang_strings = lang_strings
 
@@ -108,6 +93,7 @@ class Lang_string_set(DBC):
 
 
 @abstract
+@invariant(lambda self: is_ID_short(self.id_short), "Constraint AASd-002")
 class Referable(Has_extension):
     """
     An element that is referable by its :py:attr:`~id_short`.
@@ -159,7 +145,6 @@ class Referable(Has_extension):
     in which context or which additional data specification templates are provided.
     """
 
-    @require(lambda id_short: is_id_short(id_short), "Constraint AASd-002")
     def __init__(
             self,
             id_short: str,
@@ -188,20 +173,19 @@ class Identifier_type(Enum):
     CUSTOM = "Custom"
     """Custom identifiers like GUIDs (globally unique identifiers)"""
 
-
+@invariant(
+    lambda self:
+    not (self.id_type == Identifier_type.IRDI) or is_IRDI(self.id)
+)
+@invariant(
+    lambda self:
+    not (self.id_type == Identifier_type.IRI) or is_IRI(self.id)
+)
+# fmt: on
 class Identifier(DBC):
     id: str
     id_type: Identifier_type
 
-    @require(
-        lambda id, id_type:
-        not (id_type == Identifier_type.IRDI) or is_IRDI(id)
-    )
-    @require(
-        lambda id, id_type:
-        not (id_type == Identifier_type.IRI) or is_IRI(id)
-    )
-    # fmt: on
     def __init__(
             self,
             id: str,
@@ -211,14 +195,14 @@ class Identifier(DBC):
         self.id_type = id_type
 
 
+@invariant(
+    lambda self:
+    not (self.revision is not None) or self.version is not None
+)
 class Administrative_information(DBC):
     version: Optional[str]
     revision: Optional[str]
 
-    @require(
-        lambda version, revision:
-        not (revision is not None) or version is not None
-    )
     def __init__(
             self,
             version: Optional[str] = None,
@@ -229,11 +213,11 @@ class Administrative_information(DBC):
 
 
 @abstract
+@invariant(lambda self: is_ID_short(self.id_short))
 class Identifiable(Referable):
     identification: Identifier
     administration: Optional[Administrative_information]
 
-    @require(lambda id_short: is_id_short(id_short))
     def __init__(
             self,
             identification: Identifier,
@@ -351,44 +335,43 @@ class Key_elements(Enum):
 # TODO (mristin, 2021-05-28): add assertion that KeyElements also contains
 #  all ReferableElements
 
-
+# fmt: off
+@invariant(
+    lambda self:
+    not (self.id_type == Key_type.IRI) or is_IRI(self.value)
+)
+@invariant(
+    lambda self:
+    not (self.id_type == Key_type.IRDI) or is_IRDI(self.value)
+)
+@invariant(
+    lambda self:
+    not (self.type == Key_elements.GLOBAL_REFERENCE)
+    or (self.id_type != Key_type.ID_SHORT and self.id_type != Key_type.FRAGMENT_ID),
+    "Constraint AASd-080"
+)
+@invariant(
+    lambda self:
+    not (self.type == Key_elements.ASSET_ADMINISTRATION_SHELL)
+    or (self.id_type != Key_type.ID_SHORT and self.id_type != Key_type.FRAGMENT_ID),
+    "Constraint AASd-081"
+)
+# fmt: on
 class Key(DBC):
     type: Key_elements
     value: str
     id_type: Key_type
 
-    # fmt: off
-    @require(
-        lambda value, id_type:
-        not (id_type == Key_type.IRI) or is_IRI(value)
-    )
-    @require(
-        lambda value, id_type:
-        not (id_type == Key_type.IRDI) or is_IRDI(value)
-    )
-    @require(
-        lambda type, id_type:
-        not (type == Key_elements.GLOBAL_REFERENCE)
-        or (id_type != Key_type.ID_SHORT and id_type != Key_type.FRAGMENT_ID),
-        "Constraint AASd-080"
-    )
-    @require(
-        lambda type, id_type:
-        not (type == Key_elements.ASSET_ADMINISTRATION_SHELL)
-        or (id_type != Key_type.ID_SHORT and id_type != Key_type.FRAGMENT_ID),
-        "Constraint AASd-081"
-    )
-    # fmt: on
     def __init__(self, type: Key_elements, value: str, id_type: Key_type) -> None:
         self.type = type
         self.value = value
         self.id_type = id_type
 
 
+@invariant(lambda self: len(self.keys) >= 1)
 class Reference(DBC):
     keys: List[Key]
 
-    @require(lambda keys: len(keys) >= 1)
     def __init__(self, keys: List[Key]) -> None:
         self.keys = keys
 

@@ -82,15 +82,14 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("Final", "typing"),
             ("List", "typing"),
             ("Optional", "typing"),
-            ("require", "icontract"),
-            ("ensure", "icontract"),
             ("DBC", "icontract"),
+            ("invariant", "icontract"),
             ("abstract", "aas_core3_meta.marker"),
             ("implementation_specific", "aas_core3_meta.marker"),
             ("comment", "aas_core3_meta.marker"),
             ("is_IRI", "aas_core3_meta.pattern"),
             ("is_IRDI", "aas_core3_meta.pattern"),
-            ("is_id_short", "aas_core3_meta.pattern"),
+            ("is_ID_short", "aas_core3_meta.pattern"),
         ]
     )
 
