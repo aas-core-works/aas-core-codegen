@@ -9,7 +9,7 @@ from aas_core_csharp_codegen import intermediate
 import aas_core_csharp_codegen.csharp.common as csharp_common
 import aas_core_csharp_codegen.csharp.naming as csharp_naming
 
-from aas_core_csharp_codegen.common import Error, Stripped, Rstripped
+from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, Identifier
 from aas_core_csharp_codegen.csharp import specific_implementations
 
 # region Verify
@@ -55,10 +55,42 @@ def _generate_pattern_class(
     for i, block in enumerate(blocks):
         if i > 0:
             writer.write('\n\n')
-            writer.write(textwrap.indent(block.strip(), csharp_common.INDENT))
+
+        writer.write(textwrap.indent(block.strip(), csharp_common.INDENT))
 
     writer.write('\n}')
     return Stripped(writer.getvalue())
+
+
+def _generate_verify(
+        cls: intermediate.Class,
+        spec_impls: specific_implementations.SpecificImplementations
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate the verify function for the given class."""
+    # If a class is implementation-specific, check if there is a special verification
+    # for it.
+    if cls.implementation_key is not None:
+        verification_implementation_key = f"Verification/{cls.name}"
+        code = spec_impls.get(verification_implementation_key, None)
+        if code is not None:
+            return code, None
+
+    writer = io.StringIO()
+
+    verify_name = csharp_naming.method_name(Identifier(f"verify_{cls.name}"))
+
+    writer.write(f'public void {verify_name}(Errors errors)\n{{')
+
+    body_blocks = []  # type: List[str]
+
+    # TODO: transpile the invariants into body_blocks
+
+    writer.write(
+        textwrap.indent(Stripped('\n\n'.join(body_blocks)), csharp_common.INDENT))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
 
 
 # fmt: off
@@ -93,26 +125,45 @@ def generate(
         "using System.Collections.Generic;  // can't alias"
     ]  # type: List[str]
 
-    if len(using_directives) > 0:
-        blocks.append(Stripped("\n".join(using_directives)))
+    blocks.append(Stripped("\n".join(using_directives)))
 
-    blocks.append(Stripped(f"namespace {namespace}.Verification\n{{"))
-
-    blocks.append(
-        textwrap.indent(
-            _generate_pattern_class(spec_impls=spec_impls), csharp_common.INDENT))
-
-    blocks.append(spec_impls[ImplementationKey('Verification/Error')])
-    blocks.append(spec_impls[ImplementationKey('Verification/Errors')])
+    verification_blocks = [
+        _generate_pattern_class(spec_impls=spec_impls),
+        spec_impls[ImplementationKey('Verification/Error')],
+        spec_impls[ImplementationKey('Verification/Errors')]
+    ]  # type: List[Stripped]
 
     errors = []  # type: List[Error]
 
-    # TODO: implement
+    for symbol in intermediate_symbol_table.symbols:
+        if isinstance(symbol, intermediate.Class):
+            verify_block, error = _generate_verify(cls=symbol, spec_impls=spec_impls)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            verification_blocks.append(verify_block)
 
     if len(errors) > 0:
         return None, errors
 
-    blocks.append(Rstripped(f"}}  // namespace {namespace}"))
+    verification_writer = io.StringIO()
+    verification_writer.write(f"namespace {namespace}\n{{\n")
+    verification_writer.write(
+        f"{csharp_common.INDENT}static class Verification\n"
+        f"{csharp_common.INDENT}{{\n")
+
+    for i, verification_block in enumerate(verification_blocks):
+        if i > 0:
+            verification_writer.write('\n\n')
+
+        verification_writer.write(
+            textwrap.indent(verification_block, 2 * csharp_common.INDENT))
+
+    verification_writer.write(f"\n{csharp_common.INDENT}}}  // class Verification")
+    verification_writer.write(f"\n}}  // namespace {namespace}")
+
+    blocks.append(Stripped(verification_writer.getvalue()))
 
     blocks.append(warning)
 

@@ -7,126 +7,232 @@ using ArgumentException = System.ArgumentException;
 using Regex = System.Text.RegularExpressions.Regex;
 using System.Collections.Generic;  // can't alias
 
-namespace AasCore.Aas3.Verification
+namespace AasCore.Aas3
 {
-
-    public static class Pattern
+    static class Verification
     {
-
-
-        private static Regex _constructIrdiRegex()
+        public static class Pattern
         {
-            var numeric = "[0-9]";
-            var safeChar = "[A-Za-z0-9:_.]";
+            private static Regex _constructIriRe()
+            {
+                var scheme = "[a-zA-Z][a-zA-Z0-9+\\-.]*";
+                var ucschar = (
+                    "[\\xa0-\\ud7ff\\uf900-\\ufdcf\\ufdf0-\\uffef\\u10000-\\u1fffd"
+                    "\\u20000-\\u2fffd\\u30000-\\u3fffd\\u40000-\\u4fffd"
+                    "\\u50000-\\u5fffd\\u60000-\\u6fffd\\u70000-\\u7fffd"
+                    "\\u80000-\\u8fffd\\u90000-\\u9fffd\\ua0000-\\uafffd"
+                    "\\ub0000-\\ubfffd\\uc0000-\\ucfffd\\ud0000-\\udfffd"
+                    "\\ue1000-\\uefffd]"
+                );
+                var iunreserved = $"([a-zA-Z0-9\\-._~]|{ucschar})";
+                var pctEncoded = "%[0-9A-Fa-f][0-9A-Fa-f]";
+                var subDelims = $"[!$&'()*+,;=]";
+                var iuserinfo = $"({iunreserved}|{pctEncoded}|{subDelims}|:)*";
+                var h16 = "[0-9A-Fa-f]{1,4}";
+                var dec_octet = "([0-9]|[1-9][0-9]|1[0-9]{2,2}|2[0-4][0-9]|25[0-5])";
+                var ipv4address = $"{dec_octet}\\.{dec_octet}\\.{dec_octet}\\.{dec_octet}";
+                var ls32 = $"({h16}:{h16}|{ipv4address})";
+                var ipv6address = (
+                    f"(({h16}:){{6,6}}{ls32}|::({h16}:){{5,5}}{ls32}|({h16})?::({h16}"
+                    f":){{4,4}}{ls32}|(({h16}:)?{h16})?::({h16}:){{3,3}}{ls32}|(({h16}"
+                    f":){{2}}{h16})?::({h16}:){{2,2}}{ls32}|(({h16}:){{3}}{h16})?::{h16}:"
+                    f"{ls32}|(({h16}:){{4}}{h16})?::{ls32}|(({h16}:){{5}}{h16})?::{h16}|"
+                    f"(({h16}:){{6}}{h16})?::)"
+                );
+                var unreserved = "[a-zA-Z0-9\\-._~]";
+                var ipvfuture = $"[vV][0-9A-Fa-f]{{1,}}\\.({unreserved}|{subDelims}|:){{1,}}";
+                var ipLiteral = $"\\[({ipv6address}|{ipvfuture})\\]";
+                var iregName = $"({iunreserved}|{pctEncoded}|{subDelims})*";
+                var ihost = $"({ipLiteral}|{ipv4address}|{iregName})";
+                var port = "[0-9]*";
+                var iauthority = $"({iuserinfo}@)?{ihost}(:{port})?";
+                var ipchar = $"({iunreserved}|{pctEncoded}|{subDelims}|[:@])";
+                var isegment = $"({ipchar})*";
+                var ipath_abempty = $"(/{isegment})*";
+                var isegment_nz = $"({ipchar}){{1,}}";
+                var ipath_absolute = $"/({isegment_nz}(/{isegment})*)?";
+                var ipathRootless = $"{isegment_nz}(/{isegment})*";
+                var ipathEmpty = $"({ipchar}){{0,0}}";
+                var ihierPart = (
+                    f"(//{iauthority}{ipath_abempty}|{ipath_absolute}|"
+                    f"{ipathRootless}|{ipathEmpty})"
+                );
+                var iprivate = "[\\ue000-\\uf8ff\\uf0000-\\uffffd\\u100000-\\u10fffd]";
+                var iquery = $"({ipchar}|{iprivate}|[/?])*";
+                var absoluteIri = $"{scheme}:{ihierPart}(\\?{iquery})?";
+                var genDelims = "[:/?#\\[\\]@]";
+                var ifragment = $"({ipchar}|[/?])*";
+                var isegmentNzNc = $"({iunreserved}|{pctEncoded}|{subDelims}|@){{1,}}";
+                var ipathNoscheme = $"{isegmentNzNc}(/{isegment})*";
+                var ipath = (
+                    f"({ipath_abempty}|{ipath_absolute}|{ipathNoscheme}|"
+                    f"{ipathRootless}|{ipathEmpty})"
+                );
+                var irelativePart = (
+                    f"(//{iauthority}{ipath_abempty}|{ipath_absolute}|"
+                    f"{ipathNoscheme}|{ipathEmpty})"
+                );
+                var irelativeRef = $"{irelativePart}(\\?{iquery})?(\\#{ifragment})?";
+                var iri = $"{scheme}:{ihierPart}(\\?{iquery})?(\\#{ifragment})?";
+                var iriReference = $"({iri}|{irelativeRef})";
+    
+                return new Regex($"^{iriReference}$");
+            }
 
-            return new Regex(
-                $"^{numeric}{{4}}-{safeChar}{{1,35}}(-{safeChar}{{1,35}})?
-                $"#{safeChar}{{2}}-{safeChar}{{6}}
-                $"#{numeric}{{1,35}}$")
+            private static readonly Regex _IriRegex = _constructIriRe();
+
+            /// <summary>
+            /// Check that the <paramref name="text"/> is a valid IRI.
+            /// </summary>
+            /// <remarks>
+            /// Related RFC: https://datatracker.ietf.org/doc/html/rfc3987
+            /// </remarks>
+            public static bool IsIri(string text)
+            {
+                return _IriRegex.IsMatch(text);
+            }
+
+            private static Regex _constructIrdiRegex()
+            {
+                var numeric = "[0-9]";
+                var safeChar = "[A-Za-z0-9:_.]";
+
+                return new Regex(
+                    $"^{numeric}{{4}}-{safeChar}{{1,35}}(-{safeChar}{{1,35}})?
+                    $"#{safeChar}{{2}}-{safeChar}{{6}}
+                    $"#{numeric}{{1,35}}$")
+                );
+            }
+
+            private static readonly Regex _IrdiRegex = _constructIrdiRegex();
+
+            /// <summary>
+            /// Check that the <paramref name="text"/> is a valid IRDI.
+            /// </summary>
+            /// <remarks>
+            /// Related ISO standard: https://www.iso.org/standard/50773.html
+            /// </remarks>
+            public static bool IsIri(string text)
+            {
+                return _IrdiRegex.IsMatch(text);
+            }
+
+            private static readonly Regex _idShortRe = new Regex(
+                "^[a-zA-Z][a-zA-Z_0-9]*$"
             );
-        }
 
-        private static readonly Regex _IrdiRegex = _constructIrdiRegex();
+            /// <summary>
+            /// Check that the <paramref name="text"/> is a valid short ID.
+            /// </summary>
+            /// <remarks>
+            /// Related: Constraint AASd-002
+            /// </remarks>
+            public static bool IsIri(string text)
+            {
+                return _idShortRe.IsMatch(text);
+            }
+        }
 
         /// <summary>
-        /// Check that the <paramref name="text"/> is a valid IRDI.
+        /// Represent a verification error traceable to an entity or a property.
         /// </summary>
-        /// <remarks>
-        /// Related ISO standard: https://www.iso.org/standard/50773.html
-        /// </remarks>
-        public static bool IsIri(string text)
+        public class Error
         {
-            return _IrdiRegex.IsMatch(text);
-        }
+            /// <summary>
+            /// JSON-like path to the related object (an entity or a property)
+            /// </summary>
+            public readonly string Path;
 
-        private static readonly Regex _idShortRe = new Regex(
-            "^[a-zA-Z][a-zA-Z_0-9]*$"
-        );
+            /// <summary>
+            /// Cause or description of the error
+            /// </summary>
+            public readonly string Message;
+
+            public Error(string path, string message)
+            {
+                Path = path;
+                Message = message;
+            }
+        }
 
         /// <summary>
-        /// Check that the <paramref name="text"/> is a valid short ID.
+        /// Contain multiple errors observed during a verification.
         /// </summary>
-        /// <remarks>
-        /// Related: Constraint AASd-002
-        /// </remarks>
-        public static bool IsIri(string text)
+        public class Errors
         {
-            return _idShortRe.IsMatch(text);
-        }
-    }
+            /// <summary>
+            /// The maximum capacity of the container
+            /// </summary>
+            public readonly int Capacity;
 
-/// <summary>
-/// Represent a verification error traceable to an entity or a property.
-/// </summary>
-public class Error
-{
-    /// <summary>
-    /// JSON-like path to the related object (an entity or a property)
-    /// </summary>
-    public readonly string Path;
+            /// <summary>
+            /// Contained error items
+            /// </summary>
+            public readonly List<Error> Errors;
 
-    /// <summary>
-    /// Cause or description of the error
-    /// </summary>
-    public readonly string Message;
+            /// <summary>
+            /// Initialize the container with the given <paramref name="capacity" />.
+            /// </summary>
+            public Errors(int capacity)
+            {
+                if (capacity <= 0)
+                {
+                    throw new ArgumentException(
+                        $"Expected a strictly positive capacity, but got: {capacity}");
+                }
 
-    public Error(string path, string message)
-    {
-        Path = path;
-        Message = message;
-    }
-}
+                Capacity = capacity;
+                Errors = new List<Error>(Capacity);
+            }
 
-/// <summary>
-/// Contain multiple errors observed during a verification.
-/// </summary>
-public class Errors
-{
-    /// <summary>
-    /// The maximum capacity of the container
-    /// </summary>
-    public readonly int Capacity;
+            /// <summary>
+            /// Add the error to the container if the capacity has not been reached.
+            /// </summary>
+            public void Add(Error error)
+            {
+                if(Errors.Count <= Capacity)
+                {
+                    Errors.Add(error);
+                }
+            }
 
-    /// <summary>
-    /// Contained error items
-    /// </summary>
-    public readonly List<Error> Errors;
-
-    /// <summary>
-    /// Initialize the container with the given <paramref name="capacity" />.
-    /// </summary>
-    public Errors(int capacity)
-    {
-        if (capacity <= 0)
-        {
-            throw new ArgumentException(
-                $"Expected a strictly positive capacity, but got: {capacity}");
+            /// <summary>
+            /// True if the capacity has been reached.
+            /// </summary>
+            public boolean Full()
+            {
+                return Errors.Count == Capacity;
+            }
         }
 
-        Capacity = capacity;
-        Errors = new List<Error>(Capacity);
-    }
-
-    /// <summary>
-    /// Add the error to the container if the capacity has not been reached.
-    /// </summary>
-    public void Add(Error error)
-    {
-        if(Errors.Count <= Capacity)
+        public void VerifyLangString(Errors errors)
         {
-            Errors.Add(error);
         }
-    }
 
-    /// <summary>
-    /// True if the capacity has been reached.
-    /// </summary>
-    public boolean Full()
-    {
-        return Errors.Count == Capacity;
-    }
-}
+        public void VerifyLangStringSet(Errors errors)
+        {
+        }
 
+        public void VerifyIdentifier(Errors errors)
+        {
+        }
+
+        public void VerifyAdministrativeInformation(Errors errors)
+        {
+        }
+
+        public void VerifyKey(Errors errors)
+        {
+        }
+
+        public void VerifyReference(Errors errors)
+        {
+        }
+
+        public void VerifyAssetAdministrationShell(Errors errors)
+        {
+        }
+    }  // class Verification
 }  // namespace AasCore.Aas3
 
 /*
