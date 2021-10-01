@@ -211,13 +211,86 @@ def verify(
 
 def _render_description_element(
         element: docutils.nodes.Element
-) -> Tuple[Optional[Stripped], Optional[str]]:
+) -> Tuple[Optional[str], Optional[str]]:
     """
     Render the element of a description as documentation XML.
 
     :param paragraph: to be rendered
     :return: the generated code, or error if the paragraph could not be translated
     """
+    if isinstance(element, docutils.nodes.Text):
+        return xml.sax.saxutils.escape(element.astext()), None
+
+    elif isinstance(element, intermediate.SymbolReferenceInDoc):
+        name = None  # type: Optional[str]
+        if isinstance(element.symbol, intermediate.Enumeration):
+            name = csharp_naming.enum_name(element.symbol.name)
+        elif isinstance(element.symbol, intermediate.Interface):
+            name = csharp_naming.interface_name(element.symbol.name)
+        elif isinstance(element.symbol, intermediate.Class):
+            name = csharp_naming.class_name(element.symbol.name)
+        else:
+            assert_never(element.symbol)
+
+        assert name is not None
+        return f'<see cref={xml.sax.saxutils.quoteattr(name)} />', None
+    elif isinstance(element, intermediate.PropertyReferenceInDoc):
+        return f'<see cref={xml.sax.saxutils.quoteattr(element.property_name)} />', None
+
+    elif isinstance(element, docutils.nodes.literal):
+        return f'<c>{xml.sax.saxutils.escape(element.astext())}</c>', None
+
+    elif isinstance(element, docutils.nodes.paragraph):
+        parts = []  # type: List[str]
+        for child in element.children:
+            text, error = _render_description_element(child)
+            if error is not None:
+                return None, error
+
+            parts.append(text)
+
+        return ''.join(parts), None
+
+    elif isinstance(element, docutils.nodes.emphasis):
+        parts = []  # type: List[str]
+        for child in element.children:
+            text, error = _render_description_element(child)
+            if error is not None:
+                return None, error
+
+            parts.append(text)
+
+        return '<em>{}</em>'.format(''.join(parts)), None
+
+    elif isinstance(element, docutils.nodes.list_item):
+        parts = []  # type: List[str]
+        for child in element.children:
+            text, error = _render_description_element(child)
+            if error is not None:
+                return None, error
+
+            parts.append(text)
+
+        return '<li>{}</li>'.format(''.join(parts)), None
+
+    elif isinstance(element, docutils.nodes.bullet_list):
+        parts = ['<ul>\n']
+        for child in element.children:
+            text, error = _render_description_element(child)
+            if error is not None:
+                return None, error
+
+            parts.append(f'{text}\n')
+        parts.append('</ul>')
+
+        return ''.join(parts), None
+
+    else:
+        return None, (
+            f"Handling of the element of a description with type {type(element)} "
+            f"has not been implemented: {element}"
+        )
+
     # TODO: include paragraph and then recursively call
     # TODO: include bullet_list and then recursively call
     raise NotImplementedError()
@@ -271,8 +344,8 @@ def _description_comment(
             len(description.document.children) >= 2
             and isinstance(description.document.children[0], docutils.nodes.paragraph)
             and isinstance(
-                description.document.children[1],
-                (docutils.nodes.paragraph, docutils.nodes.bullet_list))
+        description.document.children[1],
+        (docutils.nodes.paragraph, docutils.nodes.bullet_list))
     ):
         summary = description.document.children[0]
 
@@ -749,7 +822,7 @@ def _generate_class(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 @ensure(
     lambda result:
-    not (result[0] is not None) or result.endswith('\n'),
+    not (result[0] is not None) or result[0].endswith('\n'),
     "Trailing newline mandatory for valid end-of-files"
 )
 # fmt: on
@@ -830,7 +903,16 @@ def generate(
 
     blocks.append(warning)
 
-    return '\n\n'.join(blocks), None
+    out = io.StringIO()
+    for i, block in enumerate(blocks):
+        if i > 0:
+            out.write('\n\n')
+
+        out.write(block)
+
+    out.write('\n')
+
+    return out.getvalue(), None
 
 # endregion
 

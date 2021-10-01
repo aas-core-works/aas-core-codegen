@@ -392,10 +392,6 @@ class Reference(DBC):
     def __init__(self, keys: List[Key]) -> None:
         self.keys = keys
 
-    @require(lambda keys: len(keys) >= 1)
-    def set_keys(self, keys: List[Key]) -> None:
-        self.keys = keys
-
 
 @abstract
 class Has_semantics(DBC):
