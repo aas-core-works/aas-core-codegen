@@ -23,6 +23,7 @@
       <w>postconditions</w>
       <w>prog</w>
       <w>pylint</w>
+      <w>rawsource</w>
       <w>stringifiable</w>
       <w>stringified</w>
       <w>subscripted</w>

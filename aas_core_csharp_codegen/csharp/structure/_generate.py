@@ -15,7 +15,8 @@ from aas_core_csharp_codegen import intermediate
 from aas_core_csharp_codegen import specific_implementations
 from aas_core_csharp_codegen.common import Error, Identifier, assert_never, \
     Stripped, Rstripped
-
+from aas_core_csharp_codegen.specific_implementations import (
+    verify as specific_implementations_verify)
 
 # region Checks
 
@@ -195,7 +196,7 @@ def verify(
             errors.append(error)
 
     errors.extend(
-        specific_implementations.verify_that_available_for_all_symbols(
+        specific_implementations_verify.that_available_for_all_symbols(
             intermediate_symbol_table=intermediate_symbol_table,
             spec_impls=spec_impls))
 
@@ -508,7 +509,7 @@ def _generate_enum(
         writer.write(f"public enum {name}\n{{\n}}")
         return Stripped(writer.getvalue()), None
 
-    writer.write(f"public enum {name}\n{{")
+    writer.write(f"public enum {name}\n{{\n")
     for i, literal in enumerate(symbol.literals):
         if i > 0:
             writer.write(",\n\n")
@@ -532,7 +533,6 @@ def _generate_enum(
     return Stripped(writer.getvalue()), None
 
 
-@require(lambda symbol: not symbol.is_implementation_specific)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_interface(
         symbol: intermediate.Interface
@@ -643,7 +643,7 @@ def _generate_interface(
     return Stripped(writer.getvalue()), None
 
 
-@require(lambda symbol: not symbol.is_implementation_specific)
+@require(lambda symbol: symbol.implementation_key is None)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
         symbol: intermediate.Class,
@@ -705,12 +705,8 @@ def _generate_class(
     # region Methods
 
     for method in symbol.methods:
-        if method.is_implementation_specific:
-            code = spec_impls[
-                specific_implementations.ImplementationKey(
-                    f"{symbol.name}/{method.name}")]
-
-            codes.append(code)
+        if method.implementation_key is not None:
+            codes.append(spec_impls[method.implementation_key])
         else:
             # NOTE (mristin, 2021-09-16):
             # At the moment, we do not transpile the method body and its contracts.
@@ -728,12 +724,8 @@ def _generate_class(
 
     # region Constructor
 
-    if symbol.constructor.is_implementation_specific:
-        code = spec_impls[
-            specific_implementations.ImplementationKey(
-                f"{symbol.name}/__init__")]
-
-        codes.append(code)
+    if symbol.constructor.implementation_key is not None:
+        codes.append(spec_impls[symbol.constructor.implementation_key])
     else:
         constructor_blocks = []  # type: List[Stripped]
 
@@ -825,16 +817,11 @@ def generate(
         code = None  # type: Optional[Stripped]
         error = None  # type: Optional[Error]
 
-        # TODO: We need to handle is_implementation_specific from the parents as well.
-        #  The current implementation is buggy & misleading!
-
         if (
                 isinstance(intermediate_symbol, intermediate.Class)
-                and intermediate_symbol.is_implementation_specific
+                and intermediate_symbol.implementation_key is not None
         ):
-            code = spec_impls[
-                specific_implementations.ImplementationKey(
-                    intermediate_symbol.name)]
+            code = spec_impls[intermediate_symbol.implementation_key]
         else:
             if isinstance(intermediate_symbol, intermediate.Enumeration):
                 # TODO: test
@@ -845,7 +832,6 @@ def generate(
                     symbol=intermediate_symbol)
 
             elif isinstance(intermediate_symbol, intermediate.Class):
-                # TODO: impl
                 code, error = _generate_class(
                     symbol=intermediate_symbol,
                     spec_impls=spec_impls)

@@ -11,6 +11,7 @@ import aas_core_csharp_codegen.understand.constructor as understand_constructor
 from aas_core_csharp_codegen import parse
 from aas_core_csharp_codegen.common import Identifier
 from aas_core_csharp_codegen.parse import BUILTIN_ATOMIC_TYPES
+from aas_core_csharp_codegen.specific_implementations import ImplementationKey
 
 _MODULE_NAME = pathlib.Path(__file__).parent.name
 
@@ -254,7 +255,6 @@ class Interface:
             inheritances: Sequence[Identifier],
             signatures: Sequence[Signature],
             properties: Sequence[Property],
-            is_implementation_specific: bool,
             description: Optional[Description],
             parsed: parse.Entity,
     ) -> None:
@@ -263,7 +263,6 @@ class Interface:
         self.inheritances = inheritances
         self.signatures = signatures
         self.properties = properties
-        self.is_implementation_specific = is_implementation_specific
         self.description = description
         self.parsed = parsed
 
@@ -318,7 +317,12 @@ class Contracts:
 
 
 class Method:
-    """Represent a method of a class."""
+    """
+    Represent a method of a class.
+
+    If :py:attr:`implementation_key` is specified, the method is considered
+    implementation-specific.
+    """
 
     # fmt: off
     @require(
@@ -363,7 +367,7 @@ class Method:
     def __init__(
             self,
             name: Identifier,
-            is_implementation_specific: bool,
+            implementation_key: Optional[ImplementationKey],
             arguments: Sequence[Argument],
             returns: Optional[TypeAnnotation],
             description: Optional[Description],
@@ -373,7 +377,7 @@ class Method:
     ) -> None:
         """Initialize with the given values."""
         self.name = name
-        self.is_implementation_specific = is_implementation_specific
+        self.implementation_key = implementation_key
         self.arguments = arguments
         self.returns = returns
         self.description = description
@@ -393,6 +397,9 @@ class Constructor:
     Represent an understood constructor of a class stacked.
 
     The constructor is expected to be stacked from the entity and all the antecedents.
+
+    If :py:attr:`implementation_key` is specified, the constructor is considered
+    implementation-specific.
     """
 
     @require(
@@ -402,12 +409,12 @@ class Constructor:
             self,
             arguments: Sequence[Argument],
             contracts: Contracts,
-            is_implementation_specific: bool,
+            implementation_key: Optional[ImplementationKey],
             statements: Sequence[understand_constructor.AssignArgument],
     ) -> None:
         self.arguments = arguments
         self.contracts = contracts
-        self.is_implementation_specific = is_implementation_specific
+        self.implementation_key = implementation_key
 
         # The calls to the super constructors must be in-lined before.
         self.statements = statements
@@ -450,7 +457,12 @@ class Enumeration:
 
 
 class Class:
-    """Represent a class implementing zero, one or more interfaces."""
+    """
+    Represent a class implementing zero, one or more interfaces.
+
+    If :py:attr:`implementation_key` is specified, the constructor is considered
+    implementation-specific.
+    """
 
     # fmt: off
     @require(
@@ -473,7 +485,7 @@ class Class:
             self,
             name: Identifier,
             interfaces: Sequence[Identifier],
-            is_implementation_specific: bool,
+            implementation_key: Optional[ImplementationKey],
             properties: Sequence[Property],
             methods: Sequence[Method],
             constructor: Constructor,
@@ -483,7 +495,7 @@ class Class:
         """Initialize with the given values."""
         self.name = name
         self.interfaces = interfaces
-        self.is_implementation_specific = is_implementation_specific
+        self.implementation_key = implementation_key
         self.properties = properties
         self.methods = methods
         self.constructor = constructor

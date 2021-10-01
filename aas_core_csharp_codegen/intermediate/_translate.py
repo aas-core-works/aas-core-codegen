@@ -38,7 +38,11 @@ from aas_core_csharp_codegen.intermediate._types import (
     SubscriptedTypeAnnotation,
 )
 
+# noinspection PyUnusedLocal
+from aas_core_csharp_codegen.specific_implementations import ImplementationKey
 
+
+# noinspection PyUnusedLocal
 def _symbol_reference_role(
         role, rawtext, text, lineno, inliner, options=None, content=None):
     """Create an element of the description as a reference to a symbol."""
@@ -65,6 +69,7 @@ def _symbol_reference_role(
     return [node], []
 
 
+# noinspection PyUnusedLocal
 def _property_reference_role(
         role, rawtext, text, lineno, inliner, options=None, content=None):
     """Create an element of the description as a reference to a property."""
@@ -302,7 +307,6 @@ def _parsed_abstract_entity_to_interface(
             _parsed_property_to_property(parsed=parsed_prop)
             for parsed_prop in parsed.properties
         ],
-        is_implementation_specific=parsed.is_implementation_specific,
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
@@ -372,11 +376,18 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
     "Constructors are expected to be handled in a special way"
 )
 # fmt: on
-def _parsed_method_to_method(parsed: parse.Method) -> Method:
+def _parsed_method_to_method(
+        parsed: parse.Method,
+        original_entity: parse.Entity
+) -> Method:
     """Translate the parsed method into an intermediate representation."""
+    implementation_key = None  # type: Optional[ImplementationKey]
+    if parsed.is_implementation_specific:
+        implementation_key = ImplementationKey(f"{original_entity.name}/{parsed.name}")
+
     return Method(
         name=parsed.name,
-        is_implementation_specific=parsed.is_implementation_specific,
+        implementation_key=implementation_key,
         arguments=_parsed_arguments_to_arguments(parsed=parsed.arguments),
         returns=(
             None
@@ -493,22 +504,26 @@ def _parsed_entity_to_class(
             )
 
     arguments = []
-    is_implementation_specific = False
+    init_is_implementation_specific = False
 
     parsed_entity_init = parsed.method_map.get(Identifier("__init__"), None)
     if parsed_entity_init is not None:
         arguments = _parsed_arguments_to_arguments(parsed=parsed_entity_init.arguments)
 
-        is_implementation_specific = parsed_entity_init.is_implementation_specific
+        init_is_implementation_specific = parsed_entity_init.is_implementation_specific
 
         contracts = _stack_contracts(
             contracts, _parsed_contracts_to_contracts(parsed_entity_init.contracts)
         )
 
+    init_implementation_key = None  # type: Optional[ImplementationKey]
+    if init_is_implementation_specific:
+        init_implementation_key = ImplementationKey(f"{parsed.name}/__init__")
+
     constructor = Constructor(
         arguments=arguments,
         contracts=contracts,
-        is_implementation_specific=is_implementation_specific,
+        implementation_key=init_implementation_key,
         statements=in_lined_constructors[parsed],
     )
 
@@ -523,7 +538,7 @@ def _parsed_entity_to_class(
 
     for antecedent in antecedents:
         methods.extend(
-            _parsed_method_to_method(parsed_method)
+            _parsed_method_to_method(parsed=parsed_method, original_entity=antecedent)
             for parsed_method in antecedent.methods
             if parsed_method.name != "__init__"
         )
@@ -534,14 +549,18 @@ def _parsed_entity_to_class(
             # :py:class:`Constructors`.
             continue
 
-        methods.append(_parsed_method_to_method(parsed_method))
+        methods.append(
+            _parsed_method_to_method(parsed=parsed_method, original_entity=parsed))
 
     # endregion
 
     return Class(
         name=parsed.name,
         interfaces=parsed.inheritances,
-        is_implementation_specific=parsed.is_implementation_specific,
+        implementation_key=(
+            ImplementationKey(parsed.name)
+            if parsed.is_implementation_specific
+            else None),
         properties=properties,
         methods=methods,
         constructor=constructor,

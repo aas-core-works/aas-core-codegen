@@ -1138,6 +1138,15 @@ def _classdef_to_symbol(
             )
     # endregion
 
+    if is_abstract and is_implementation_specific:
+        return (
+            None,
+            Error(
+                node=node,
+                message=f"Abstract entities can not be implementation-specific "
+                        f"at the same time "
+                        f"(otherwise we can not convert them to interfaces etc.)"))
+
     description = None  # type: Optional[Description]
 
     properties = []  # type: List[Property]

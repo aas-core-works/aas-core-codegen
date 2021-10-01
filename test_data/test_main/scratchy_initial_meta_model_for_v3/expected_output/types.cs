@@ -100,7 +100,8 @@ namespace AasCore.Aas3
     /// Enumeration of different types of Identifiersfor global identification
     /// </summary>
     public enum IdentifierType
-    {    /// <summary>
+    {
+        /// <summary>
         /// IRDI according to ISO29002-5 as an Identifier scheme for properties
         /// and classifications.
         /// </summary>
@@ -154,7 +155,8 @@ namespace AasCore.Aas3
     }
 
     public enum ModelingKind
-    {    [EnumMember(Value = "Template")]
+    {
+        [EnumMember(Value = "Template")]
         Template,
 
         [EnumMember(Value = "Instance")]
@@ -167,7 +169,8 @@ namespace AasCore.Aas3
     }
 
     public enum LocalKeyType
-    {    [EnumMember(Value = "IdShort")]
+    {
+        [EnumMember(Value = "IdShort")]
         IdShort,
 
         [EnumMember(Value = "FragmentId")]
@@ -175,7 +178,8 @@ namespace AasCore.Aas3
     }
 
     public enum KeyType
-    {    [EnumMember(Value = "IdShort")]
+    {
+        [EnumMember(Value = "IdShort")]
         IdShort,
 
         [EnumMember(Value = "FragmentId")]
@@ -192,7 +196,8 @@ namespace AasCore.Aas3
     }
 
     public enum IdentifiableElements
-    {    [EnumMember(Value = "Asset")]
+    {
+        [EnumMember(Value = "Asset")]
         Asset,
 
         [EnumMember(Value = "AssetAdministrationShell")]
@@ -206,7 +211,8 @@ namespace AasCore.Aas3
     }
 
     public enum ReferableElements
-    {    [EnumMember(Value = "AccessPermissionRule")]
+    {
+        [EnumMember(Value = "AccessPermissionRule")]
         AccessPermissionRule,
 
         [EnumMember(Value = "AnnotatedRelationshipElement")]
@@ -277,7 +283,8 @@ namespace AasCore.Aas3
     }
 
     public enum KeyElements
-    {    [EnumMember(Value = "GlobalReference")]
+    {
+        [EnumMember(Value = "GlobalReference")]
         GlobalReference,
 
         [EnumMember(Value = "FragmentReference")]
