@@ -1,4 +1,5 @@
-private static Regex _constructIriRe() {
+private static Regex _constructIriRe()
+{
     var scheme = "[a-zA-Z][a-zA-Z0-9+\\-.]*";
     var ucschar = (
         "[\\xa0-\\ud7ff\\uf900-\\ufdcf\\ufdf0-\\uffef\\u10000-\\u1fffd"
@@ -60,10 +61,10 @@ private static Regex _constructIriRe() {
     var iri = $"{scheme}:{ihierPart}(\\?{iquery})?(\\#{ifragment})?";
     var iriReference = $"({iri}|{irelativeRef})";
     
-    return new Regex(iri);
+    return new Regex($"^{iriReference}$");
 }
 
-private static Regex _IriRegex = _constructIriRe();
+private static readonly Regex _IriRegex = _constructIriRe();
 
 /// <summary>
 /// Check that the <paramref name="text"/> is a valid IRI.
@@ -71,6 +72,7 @@ private static Regex _IriRegex = _constructIriRe();
 /// <remarks>
 /// Related RFC: https://datatracker.ietf.org/doc/html/rfc3987
 /// </remarks>
-public static bool IsIri(string text) {
+public static bool IsIri(string text)
+{
     return _IriRegex.IsMatch(text);
 }
