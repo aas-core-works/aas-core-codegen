@@ -26,14 +26,14 @@ from aas_core_csharp_codegen.understand import (
 # region Checks
 
 def _verify_structure_name_collisions(
-        intermediate_symbol_table: intermediate.SymbolTable
+        symbol_table: intermediate.SymbolTable
 ) -> List[Error]:
     """Verify that the C# names of the structures do not collide."""
     observed_structure_names = {}  # type: Dict[Identifier, intermediate.Symbol]
 
     errors = []  # type: List[Error]
 
-    for symbol in intermediate_symbol_table.symbols:
+    for symbol in symbol_table.symbols:
         name = None  # type: Optional[Identifier]
 
         if isinstance(symbol, intermediate.Class):
@@ -60,7 +60,7 @@ def _verify_structure_name_collisions(
 
     # region Intra-structure collisions
 
-    for symbol in intermediate_symbol_table.symbols:
+    for symbol in symbol_table.symbols:
         collision_error = _verify_intra_structure_collisions(intermediate_symbol=symbol)
 
         if collision_error is not None:
@@ -177,38 +177,38 @@ class VerifiedIntermediateSymbolTable(intermediate.SymbolTable):
     """Represent a verified symbol table which can be used for code generation."""
 
     def __new__(
-            cls, intermediate_symbol_table: intermediate.SymbolTable
+            cls, symbol_table: intermediate.SymbolTable
     ) -> 'VerifiedIntermediateSymbolTable':
         raise AssertionError("Only for type annotation")
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def verify(
-        intermediate_symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
         spec_impls: specific_implementations.SpecificImplementations
 ) -> Tuple[Optional[VerifiedIntermediateSymbolTable], Optional[List[Error]]]:
-    """Verify that C# code can be generated from the ``intermediate_symbol_table``."""
+    """Verify that C# code can be generated from the ``symbol_table``."""
     errors = []  # type: List[Error]
 
     structure_name_collisions = _verify_structure_name_collisions(
-        intermediate_symbol_table=intermediate_symbol_table)
+        symbol_table=symbol_table)
 
     errors.extend(structure_name_collisions)
 
-    for symbol in intermediate_symbol_table.symbols:
+    for symbol in symbol_table.symbols:
         error = _verify_intra_structure_collisions(intermediate_symbol=symbol)
         if error is not None:
             errors.append(error)
 
     errors.extend(
         specific_implementations_verify.that_available_for_all_symbols(
-            intermediate_symbol_table=intermediate_symbol_table,
+            symbol_table=symbol_table,
             spec_impls=spec_impls))
 
     if len(errors) > 0:
         return None, errors
 
-    return cast(VerifiedIntermediateSymbolTable, intermediate_symbol_table), None
+    return cast(VerifiedIntermediateSymbolTable, symbol_table), None
 
 
 # endregion
@@ -833,7 +833,7 @@ def _generate_class(
 )
 # fmt: on
 def generate(
-        intermediate_symbol_table: VerifiedIntermediateSymbolTable,
+        symbol_table: VerifiedIntermediateSymbolTable,
         namespace: csharp_common.NamespaceIdentifier,
         spec_impls: specific_implementations.SpecificImplementations
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
@@ -862,7 +862,7 @@ def generate(
 
     errors = []  # type: List[Error]
 
-    for intermediate_symbol in intermediate_symbol_table.symbols:
+    for intermediate_symbol in symbol_table.symbols:
         code = None  # type: Optional[Stripped]
         error = None  # type: Optional[Error]
 

@@ -2,14 +2,14 @@
 import ast
 import enum
 import pathlib
-from typing import Sequence, Optional, Union, TypeVar, Mapping
+from typing import Sequence, Optional, Union, TypeVar, Mapping, MutableMapping, List
 
 import docutils.nodes
 from icontract import require
 
 import aas_core_csharp_codegen.understand.constructor as understand_constructor
 from aas_core_csharp_codegen import parse
-from aas_core_csharp_codegen.common import Identifier
+from aas_core_csharp_codegen.common import Identifier, assert_never
 from aas_core_csharp_codegen.parse import BUILTIN_ATOMIC_TYPES
 from aas_core_csharp_codegen.specific_implementations import ImplementationKey
 
@@ -269,6 +269,7 @@ class Interface:
 
 class Invariant:
     """Represent an invariant of a class."""
+
     def __init__(
             self,
             description: Optional[Description],
@@ -519,6 +520,7 @@ class Class:
 
         self.property_map = {prop.name: prop for prop in self.properties}
 
+
 Symbol = Union[Interface, Enumeration, Class]
 
 T = TypeVar("T")  # pylint: disable=invalid-name
@@ -539,6 +541,37 @@ class SymbolTable:
         self.symbols = symbols
         self._name_to_symbol = {symbol.name: symbol for symbol in symbols}
 
+        self._symbol_set = {id(symbol) for symbol in self.symbols}
+
+        self._interface_descendants = dict(
+        )  # type: MutableMapping[Interface, List[Union[Interface, Class]]]
+        for symbol in self.symbols:
+            if isinstance(symbol, Enumeration):
+                continue
+            elif isinstance(symbol, Class):
+                for interface in symbol.interfaces:
+                    lst = self._interface_descendants.get(interface, None)
+
+                    if lst is None:
+                        self._interface_descendants = [symbol]
+                    else:
+                        lst.append(symbol)
+            elif isinstance(symbol, Interface):
+                for inheritance in symbol.inheritances:
+                    interface = self.must_find(name=inheritance)
+                    lst = self._interface_descendants.get(interface, None)
+
+                    if lst is None:
+                        self._interface_descendants = [symbol]
+                    else:
+                        lst.append(symbol)
+            else:
+                assert_never(symbol)
+
+    def has(self, symbol: Symbol) -> bool:
+        """Return ``True`` if the symbol is contained in the symbol table."""
+        return id(symbol) in self._symbol_set
+
     def find(self, name: Identifier) -> Optional[Symbol]:
         """Find the symbol with the given ``name``."""
         return self._name_to_symbol.get(name, None)
@@ -557,6 +590,15 @@ class SymbolTable:
             )
 
         return result
+
+    @require(lambda self, interface: self.has(interface))
+    def must_find_interface_descendants(
+            self,
+            interface: Interface
+    ) -> Sequence[Union[Interface, Class]]:
+        """Find the direct descendants of the given interface."""
+        descendants = self._interface_descendants[interface]
+        return descendants
 
 
 class SymbolReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):

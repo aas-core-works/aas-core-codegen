@@ -216,7 +216,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         return 1
 
     verified_ir_table, ir_for_csharp_errors = csharp_structure.verify(
-        intermediate_symbol_table=ir_symbol_table,
+        symbol_table=ir_symbol_table,
         spec_impls=spec_impls)
 
     if ir_for_csharp_errors is not None:
@@ -234,7 +234,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     namespace = csharp_common.NamespaceIdentifier(params.namespace)
 
     structure_code, structure_errors = csharp_structure.generate(
-        intermediate_symbol_table=verified_ir_table,
+        symbol_table=verified_ir_table,
         namespace=namespace,
         spec_impls=spec_impls)
 
@@ -267,7 +267,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         return 1
 
     verification_code, verification_errors = csharp_verification.generate(
-        intermediate_symbol_table=verified_ir_table,
+        symbol_table=verified_ir_table,
         namespace=namespace,
         spec_impls=spec_impls)
 

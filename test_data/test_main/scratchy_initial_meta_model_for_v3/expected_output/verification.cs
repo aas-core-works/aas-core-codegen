@@ -205,40 +205,152 @@ namespace AasCore.Aas3
             }
         }
 
+        /// <summary>
+        /// Verify <see cref="LangString" />.
+        /// </summary>
+        /// <remarks>
+        /// Do not recurse to verify the children entities.
+        /// </remarks>
         public void VerifyLangString(Errors errors)
         {
             // There were no invariants specified for LangString.
             return;
         }
 
+        /// <summary>
+        /// Verify <see cref="LangString" /> and recurse into the contained children entities.
+        /// </summary>
+        public void VerifyRecursivelyLangString(Errors errors)
+        {
+            if (errors.Full()) return;
+
+            VerifyLangString(errors);
+        }
+
+        /// <summary>
+        /// Verify <see cref="LangStringSet" />.
+        /// </summary>
+        /// <remarks>
+        /// Do not recurse to verify the children entities.
+        /// </remarks>
         public void VerifyLangStringSet(Errors errors)
         {
-
+            if (errors.Full()) return;
         }
 
+        /// <summary>
+        /// Verify <see cref="LangStringSet" /> and recurse into the contained children entities.
+        /// </summary>
+        public void VerifyRecursivelyLangStringSet(Errors errors)
+        {
+            if (errors.Full()) return;
+
+            VerifyLangStringSet(errors);
+        }
+
+        /// <summary>
+        /// Verify <see cref="Identifier" />.
+        /// </summary>
+        /// <remarks>
+        /// Do not recurse to verify the children entities.
+        /// </remarks>
         public void VerifyIdentifier(Errors errors)
         {
-
+            if (errors.Full()) return;
         }
 
+        /// <summary>
+        /// Verify <see cref="Identifier" /> and recurse into the contained children entities.
+        /// </summary>
+        public void VerifyRecursivelyIdentifier(Errors errors)
+        {
+            if (errors.Full()) return;
+
+            VerifyIdentifier(errors);
+        }
+
+        /// <summary>
+        /// Verify <see cref="AdministrativeInformation" />.
+        /// </summary>
+        /// <remarks>
+        /// Do not recurse to verify the children entities.
+        /// </remarks>
         public void VerifyAdministrativeInformation(Errors errors)
         {
-
+            if (errors.Full()) return;
         }
 
+        /// <summary>
+        /// Verify <see cref="AdministrativeInformation" /> and recurse into the contained children entities.
+        /// </summary>
+        public void VerifyRecursivelyAdministrativeInformation(Errors errors)
+        {
+            if (errors.Full()) return;
+
+            VerifyAdministrativeInformation(errors);
+        }
+
+        /// <summary>
+        /// Verify <see cref="Key" />.
+        /// </summary>
+        /// <remarks>
+        /// Do not recurse to verify the children entities.
+        /// </remarks>
         public void VerifyKey(Errors errors)
         {
-
+            if (errors.Full()) return;
         }
 
+        /// <summary>
+        /// Verify <see cref="Key" /> and recurse into the contained children entities.
+        /// </summary>
+        public void VerifyRecursivelyKey(Errors errors)
+        {
+            if (errors.Full()) return;
+
+            VerifyKey(errors);
+        }
+
+        /// <summary>
+        /// Verify <see cref="Reference" />.
+        /// </summary>
+        /// <remarks>
+        /// Do not recurse to verify the children entities.
+        /// </remarks>
         public void VerifyReference(Errors errors)
         {
-
+            if (errors.Full()) return;
         }
 
+        /// <summary>
+        /// Verify <see cref="Reference" /> and recurse into the contained children entities.
+        /// </summary>
+        public void VerifyRecursivelyReference(Errors errors)
+        {
+            if (errors.Full()) return;
+
+            VerifyReference(errors);
+        }
+
+        /// <summary>
+        /// Verify <see cref="AssetAdministrationShell" />.
+        /// </summary>
+        /// <remarks>
+        /// Do not recurse to verify the children entities.
+        /// </remarks>
         public void VerifyAssetAdministrationShell(Errors errors)
         {
+            if (errors.Full()) return;
+        }
 
+        /// <summary>
+        /// Verify <see cref="AssetAdministrationShell" /> and recurse into the contained children entities.
+        /// </summary>
+        public void VerifyRecursivelyAssetAdministrationShell(Errors errors)
+        {
+            if (errors.Full()) return;
+
+            VerifyAssetAdministrationShell(errors);
         }
     }  // class Verification
 }  // namespace AasCore.Aas3

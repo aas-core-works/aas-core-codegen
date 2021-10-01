@@ -1,20 +1,21 @@
 """Generate the invariant verifiers from the intermediate representation."""
 import io
 import textwrap
-from typing import Tuple, Optional, List
+import xml.sax.saxutils
+from typing import Tuple, Optional, List, Union
 
-from icontract import require, ensure
+from icontract import ensure
 
-from aas_core_csharp_codegen import intermediate
 import aas_core_csharp_codegen.csharp.common as csharp_common
 import aas_core_csharp_codegen.csharp.naming as csharp_naming
-
-from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, Identifier
+from aas_core_csharp_codegen import intermediate
+from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, Identifier, \
+    assert_never
 from aas_core_csharp_codegen.csharp import specific_implementations
-
-# region Verify
 from aas_core_csharp_codegen.specific_implementations import ImplementationKey
 
+
+# region Verify
 
 def verify(
         spec_impls: specific_implementations.SpecificImplementations
@@ -77,31 +78,83 @@ def _generate_verify_class(
 
     writer = io.StringIO()
 
-    body_blocks = []  # type: List[str]
+    verify_blocks = []  # type: List[str]
 
     if len(cls.invariants) == 0:
-        body_blocks.append(
+        verify_blocks.append(
             f"// There were no invariants specified "
             f"for {csharp_naming.class_name(cls.name)}.\n"
             f"return;")
     else:
+        verify_blocks.append("if (errors.Full()) return;")
         # TODO: transpile the invariants into body_blocks
         pass
 
-    verify_name = csharp_naming.method_name(Identifier(f"verify_{cls.name}"))
-    writer.write(f'public void {verify_name}(Errors errors)\n{{\n')
+    cls_name = csharp_naming.class_name(cls.name)
+    verify_name = Identifier(f"Verify{cls_name}")
 
     writer.write(
-        textwrap.indent(Stripped('\n\n'.join(body_blocks)), csharp_common.INDENT))
+        textwrap.dedent(f'''\
+            /// <summary>
+            /// Verify <see cref={xml.sax.saxutils.quoteattr(cls_name)} />.
+            /// </summary>
+            /// <remarks>
+            /// Do not recurse to verify the children entities.
+            /// </remarks>
+            public void {verify_name}(Errors errors)
+            {{
+            '''))
+
+    writer.write(
+        textwrap.indent(
+            Stripped('\n\n'.join(verify_blocks)), csharp_common.INDENT))
+
+    writer.write("\n}\n\n")
+
+    verify_recursively_blocks = [
+        "if (errors.Full()) return;",
+        f"{verify_name}(errors);"
+    ]  # type: List[str]
+
+    # TODO: generate VerifyRecursively{cls}
+    #  🠒 unroll containers manually. This is a pain, but we lack the template specialization in C#.
+    #  🠒 See: https://stackoverflow.com/questions/600978/how-to-do-template-specialization-in-c-sharp
+
+    verify_recursively_name = Identifier(
+        f"VerifyRecursively{csharp_naming.class_name(cls.name)}")
+
+    writer.write(
+        textwrap.dedent(f'''\
+            /// <summary>
+            /// Verify <see cref={xml.sax.saxutils.quoteattr(cls_name)} /> and recurse into the contained children entities.
+            /// </summary>
+            public void {verify_recursively_name}(Errors errors)
+            {{
+            '''))
+
+    writer.write(
+        textwrap.indent(
+            Stripped('\n\n'.join(verify_recursively_blocks)), csharp_common.INDENT))
 
     writer.write("\n}")
 
     return Stripped(writer.getvalue()), None
 
-# TODO: generate_verify_class_recursively 🠒 repeat the trick with spec_impls, append suffix "_recursively"
 
-# TODO: generate_verify_interface Verify{interface name} 🠒 dispatch to the corresponding class
-#   Needs ontology, pass in into the generate()
+def _generate_verify_interface(
+        interface: intermediate.Interface,
+        symbol_table: intermediate.SymbolTable
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate the verify function for the given interface."""
+    verify_blocks = [
+        "if (errors.Full()) return;"
+    ]  # type: List[str]
+
+    # TODO: Verify{interface name} 🠒 dispatch to the corresponding class, use must_find_interface_descendants
+    # TODO: VerifyRecursively{interface name} 🠒 dispatch to the corresponding class, use must_find_interface_descendants
+
+
+_ClassOrInterface = Union[intermediate.Class, intermediate.Interface]
 
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -112,7 +165,7 @@ def _generate_verify_class(
 )
 # fmt: on
 def generate(
-        intermediate_symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
         namespace: csharp_common.NamespaceIdentifier,
         spec_impls: specific_implementations.SpecificImplementations
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
@@ -145,14 +198,25 @@ def generate(
 
     errors = []  # type: List[Error]
 
-    for symbol in intermediate_symbol_table.symbols:
-        if isinstance(symbol, intermediate.Class):
-            verify_block, error = _generate_verify_class(cls=symbol, spec_impls=spec_impls)
-            if error is not None:
-                errors.append(error)
-                continue
+    for symbol in symbol_table.symbols:
+        error = None  # type: Optional[Error]
+        verify_block = None  # type: Optional[Stripped]
 
-            verification_blocks.append(verify_block)
+        if isinstance(symbol, intermediate.Enumeration):
+            continue
+        elif isinstance(symbol, intermediate.Class):
+            verify_block, error = _generate_verify_class(cls=symbol, spec_impls=spec_impls)
+        elif isinstance(symbol, intermediate.Interface):
+            verify_block, error = _generate_verify_interface(
+                interface=symbol, symbol_table=symbol_table)
+        else:
+            assert_never(symbol)
+
+        if error is not None:
+            errors.append(error)
+            continue
+
+        verification_blocks.append(verify_block)
 
     if len(errors) > 0:
         return None, errors

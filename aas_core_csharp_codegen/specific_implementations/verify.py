@@ -68,11 +68,11 @@ def _that_available_for_symbol(
 
 
 def that_available_for_all_symbols(
-        intermediate_symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
         spec_impls: SpecificImplementations
 ) -> List[Error]:
     errors = []  # type: List[Error]
-    for symbol in intermediate_symbol_table.symbols:
+    for symbol in symbol_table.symbols:
         error = _that_available_for_symbol(
             intermediate_symbol=symbol, spec_impls=spec_impls)
 
