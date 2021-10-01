@@ -1159,16 +1159,18 @@ def _classdef_to_symbol(
     """Interpret the class definition as a symbol."""
     underlying_errors = []  # type: List[Error]
 
+    if node.name.lower() in ['verification']:
+        underlying_errors.append(Error(
+            node,
+            f"The name of the entity is reserved for "
+            f"aas-core: {node.name!r}"))
+
     base_names = []  # type: List[str]
     for base in node.bases:
         if not isinstance(base, ast.Name):
-            underlying_errors.append(
-                Error(
-                    node=base,
-                    message=f"Expected a base as a name, "
-                            f"but got: {atok.get_text(base)}",
-                )
-            )
+            underlying_errors.append(Error(
+                base,
+                f"Expected a base as a name, but got: {atok.get_text(base)}"))
         else:
             base_names.append(base.id)
 
@@ -1179,9 +1181,7 @@ def _classdef_to_symbol(
             underlying=underlying_errors))
 
     if "Enum" in base_names and len(base_names) > 1:
-        return (
-            None,
-            Error(
+        return (None, Error(
                 node=node,
                 message=f"Expected an enumeration to only inherit from ``Enum``, "
                         f"but it inherits from: {base_names}",

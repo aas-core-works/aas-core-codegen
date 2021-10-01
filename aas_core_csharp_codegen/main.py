@@ -13,7 +13,8 @@ from aas_core_csharp_codegen.common import LinenoColumner, Identifier
 from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
     specific_implementations as csharp_specific_implementations,
-    structure as csharp_structure
+    structure as csharp_structure,
+    verification as csharp_verification
 )
 from aas_core_csharp_codegen.understand import (
     constructor as understand_constructor,
@@ -253,6 +254,41 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     except Exception as exception:
         write_error_report(
             message=f"Failed to write the C# structures to {structure_pth}",
+            errors=[str(exception)],
+            stderr=stderr)
+        return 1
+
+    verification_spec_impl_errors = csharp_verification.verify(spec_impls=spec_impls)
+    if verification_spec_impl_errors is not None:
+        write_error_report(
+            message=f"Failed to write the C# structures to {structure_pth}",
+            errors=verification_spec_impl_errors,
+            stderr=stderr)
+        return 1
+
+    verification_code, verification_errors = csharp_verification.generate(
+        intermediate_symbol_table=verified_ir_table,
+        namespace=namespace,
+        spec_impls=spec_impls)
+
+    if verification_errors is not None:
+        write_error_report(
+            message=f"Failed to generate the verification C# code "
+                    f"based on {params.model_path}",
+            errors=[
+                lineno_columner.error_message(error)
+                for error in verification_errors],
+            stderr=stderr)
+        return 1
+
+    assert verification_code is not None
+
+    verification_pth = params.output_dir / "verification.cs"
+    try:
+        verification_pth.write_text(verification_code)
+    except Exception as exception:
+        write_error_report(
+            message=f"Failed to write the verification C# code to {verification_pth}",
             errors=[str(exception)],
             stderr=stderr)
         return 1
