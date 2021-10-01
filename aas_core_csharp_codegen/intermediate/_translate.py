@@ -25,6 +25,7 @@ from aas_core_csharp_codegen.intermediate._types import (
     Interface,
     Signature,
     Property,
+    Invariant,
     Contracts,
     Contract,
     Snapshot,
@@ -340,7 +341,7 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
                     _parsed_description_to_description(parsed_pre.description)
                     if parsed_pre.description is not None
                     else None),
-                body=parsed_pre.body,
+                body=parsed_pre.condition.body,
                 parsed=parsed_pre,
             )
             for parsed_pre in parsed.preconditions
@@ -348,7 +349,7 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
         snapshots=[
             Snapshot(
                 args=parsed_snap.args,
-                body=parsed_snap.body,
+                body=parsed_snap.capture.body,
                 name=parsed_snap.name,
                 parsed=parsed_snap,
             )
@@ -361,7 +362,7 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
                     _parsed_description_to_description(parsed_post.description)
                     if parsed_post.description is not None
                     else None),
-                body=parsed_post.body,
+                body=parsed_post.condition.body,
                 parsed=parsed_post,
             )
             for parsed_post in parsed.postconditions
@@ -554,6 +555,27 @@ def _parsed_entity_to_class(
 
     # endregion
 
+    # region Stack the invariants from the antecedents
+
+    invariants = []  # type: List[Invariant]
+
+    for antecedent in antecedents:
+        for parsed_invariant in antecedent.invariants:
+            invariants.append(
+                Invariant(
+                    description=parsed_invariant.description,
+                    body=parsed_invariant.condition.body,
+                    parsed=parsed_invariant))
+
+    for parsed_invariant in parsed.invariants:
+        invariants.append(
+            Invariant(
+                description=parsed_invariant.description,
+                body=parsed_invariant.condition.body,
+                parsed=parsed_invariant))
+
+    # endregion
+
     return Class(
         name=parsed.name,
         interfaces=parsed.inheritances,
@@ -564,6 +586,7 @@ def _parsed_entity_to_class(
         properties=properties,
         methods=methods,
         constructor=constructor,
+        invariants=invariants,
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None

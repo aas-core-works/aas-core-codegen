@@ -174,6 +174,20 @@ class Argument:
         self.node = node
 
 
+class Invariant:
+    """Represent an invariant of an entity."""
+
+    def __init__(
+            self,
+            description: Optional[Description],
+            condition: ast.Lambda,
+            node: ast.AST
+    ) -> None:
+        self.description = description
+        self.condition = condition
+        self.node = node
+
+
 class Contract:
     """Represent a contract of a method."""
 
@@ -181,13 +195,13 @@ class Contract:
             self,
             args: Sequence[Identifier],
             description: Optional[Description],
-            body: ast.AST,
-            condition_node: ast.Lambda,
+            condition: ast.Lambda,
+            node: ast.AST
     ) -> None:
         self.args = args
         self.description = description
-        self.body = body
-        self.condition_node = condition_node
+        self.condition = condition
+        self.node = node
 
 
 class Snapshot:
@@ -196,15 +210,15 @@ class Snapshot:
     def __init__(
             self,
             args: Sequence[Identifier],
-            body: ast.AST,
             name: Identifier,
-            capture_node: ast.Lambda,
+            capture: ast.Lambda,
+            node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         self.args = args
-        self.body = body
         self.name = name
-        self.capture_node = capture_node
+        self.capture = capture
+        self.node = node
 
 
 class Contracts:
@@ -340,6 +354,7 @@ class Entity:
             inheritances: Sequence[Identifier],
             properties: Sequence[Property],
             methods: Sequence[Method],
+            invariants: Sequence[Invariant],
             description: Optional[Description],
             node: ast.ClassDef,
     ) -> None:
@@ -348,6 +363,7 @@ class Entity:
         self.inheritances = inheritances
         self.properties = properties
         self.methods = methods
+        self.invariants = invariants
         self.description = description
         self.node = node
 

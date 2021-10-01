@@ -24,6 +24,7 @@ Argument = _types.Argument
 Signature = _types.Signature
 Symbol = _types.Symbol
 Interface = _types.Interface
+Invariant = _types.Invariant
 Contract = _types.Contract
 Snapshot = _types.Snapshot
 Contracts = _types.Contracts

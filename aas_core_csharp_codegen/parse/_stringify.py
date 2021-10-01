@@ -22,7 +22,7 @@ from aas_core_csharp_codegen.parse._types import (
     Symbol,
     SymbolTable,
     TypeAnnotation,
-    UnverifiedSymbolTable, Description,
+    UnverifiedSymbolTable, Description, Invariant,
 )
 
 
@@ -134,6 +134,21 @@ def _stringify_argument(argument: Argument) -> stringify.Entity:
     return result
 
 
+def _stringify_invariant(invariant: Invariant) -> stringify.Entity:
+    result = stringify.Entity(
+        name=Invariant.__name__,
+        properties=[
+            stringify.Property(
+                "description", _stringify_description(invariant.description)),
+            stringify.PropertyEllipsis("condition", invariant.condition),
+            stringify.PropertyEllipsis("node", invariant.node),
+        ],
+    )
+
+    stringify.assert_compares_against_dict(result, invariant)
+    return result
+
+
 def _stringify_contract(contract: Contract) -> stringify.Entity:
     result = stringify.Entity(
         name=Contract.__name__,
@@ -141,8 +156,8 @@ def _stringify_contract(contract: Contract) -> stringify.Entity:
             stringify.Property("args", contract.args),
             stringify.Property(
                 "description", _stringify_description(contract.description)),
-            stringify.PropertyEllipsis("body", contract.body),
-            stringify.PropertyEllipsis("condition_node", contract.condition_node),
+            stringify.PropertyEllipsis("condition", contract.condition),
+            stringify.PropertyEllipsis("node", contract.node),
         ],
     )
 
@@ -155,9 +170,9 @@ def _stringify_snapshot(snapshot: Snapshot) -> stringify.Entity:
         name=Snapshot.__name__,
         properties=[
             stringify.Property("args", snapshot.args),
-            stringify.PropertyEllipsis("body", snapshot.body),
             stringify.Property("name", snapshot.name),
-            stringify.PropertyEllipsis("capture_node", snapshot.capture_node),
+            stringify.PropertyEllipsis("capture", snapshot.capture),
+            stringify.PropertyEllipsis("node", snapshot.node),
         ],
     )
 
@@ -347,6 +362,7 @@ Dumpable = Union[
     Entity,
     Enumeration,
     EnumerationLiteral,
+    Invariant,
     Method,
     Property,
     SelfTypeAnnotation,
@@ -377,6 +393,8 @@ def dump(dumpable: Dumpable) -> str:
         stringified = _stringify_enumeration(dumpable)
     elif isinstance(dumpable, EnumerationLiteral):
         stringified = _stringify_enumeration_literal(dumpable)
+    elif isinstance(dumpable, Invariant):
+        stringified = _stringify_invariant(dumpable)
     elif isinstance(dumpable, Method):
         stringified = _stringify_method(dumpable)
     elif isinstance(dumpable, Property):

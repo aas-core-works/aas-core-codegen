@@ -24,7 +24,7 @@ from aas_core_csharp_codegen.intermediate._types import (
     SymbolTable,
     TypeAnnotation, ListTypeAnnotation, SequenceTypeAnnotation, SetTypeAnnotation,
     MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
-    BuiltinAtomicTypeAnnotation, OurAtomicTypeAnnotation, Description
+    BuiltinAtomicTypeAnnotation, OurAtomicTypeAnnotation, Description, Invariant
 )
 
 
@@ -238,9 +238,6 @@ def _stringify_interface(interface: Interface) -> stringify.Entity:
                 "properties",
                 [_stringify_property(prop) for prop in interface.properties],
             ),
-            stringify.Property(
-                "is_implementation_specific", interface.is_implementation_specific
-            ),
             stringify.PropertyEllipsis("parsed", interface.parsed),
         ],
     )
@@ -286,6 +283,21 @@ def _stringify_enumeration(enumeration: Enumeration) -> stringify.Entity:
     )
 
     stringify.assert_compares_against_dict(result, enumeration)
+    return result
+
+
+def _stringify_invariant(invariant: Invariant) -> stringify.Entity:
+    result = stringify.Entity(
+        name=Invariant.__name__,
+        properties=[
+            stringify.Property(
+                "description", _stringify_description(invariant.description)),
+            stringify.PropertyEllipsis("body", invariant.body),
+            stringify.PropertyEllipsis("parsed", invariant.parsed),
+        ],
+    )
+
+    stringify.assert_compares_against_dict(result, invariant)
     return result
 
 
@@ -352,7 +364,7 @@ def _stringify_method(method: Method) -> stringify.Entity:
         properties=[
             stringify.Property("name", method.name),
             stringify.Property(
-                "is_implementation_specific", method.is_implementation_specific
+                "implementation_key", method.implementation_key
             ),
             stringify.Property(
                 "arguments",
@@ -388,7 +400,7 @@ def _stringify_constructor(constructor: Constructor) -> stringify.Entity:
                 "contracts", _stringify_contracts(constructor.contracts)
             ),
             stringify.Property(
-                "is_implementation_specific", constructor.is_implementation_specific
+                "implementation_key", constructor.implementation_key
             ),
             stringify.PropertyEllipsis("statements", constructor.statements),
         ],
@@ -405,7 +417,7 @@ def _stringify_class(cls: Class) -> stringify.Entity:
             stringify.Property("name", cls.name),
             stringify.Property("interfaces", cls.interfaces),
             stringify.Property(
-                "is_implementation_specific", cls.is_implementation_specific
+                "implementation_key", cls.implementation_key
             ),
             stringify.Property(
                 "properties", [_stringify_property(prop) for prop in cls.properties]
@@ -462,6 +474,7 @@ Dumpable = Union[
     Enumeration,
     EnumerationLiteral,
     Interface,
+    Invariant,
     Method,
     Property,
     SelfTypeAnnotation,
@@ -496,6 +509,8 @@ def dump(dumpable: Dumpable) -> str:
         stringified = _stringify_enumeration_literal(dumpable)
     elif isinstance(dumpable, Interface):
         stringified = _stringify_interface(dumpable)
+    elif isinstance(dumpable, Invariant):
+        stringified = _stringify_invariant(dumpable)
     elif isinstance(dumpable, Method):
         stringified = _stringify_method(dumpable)
     elif isinstance(dumpable, Property):

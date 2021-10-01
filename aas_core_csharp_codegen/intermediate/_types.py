@@ -267,6 +267,19 @@ class Interface:
         self.parsed = parsed
 
 
+class Invariant:
+    """Represent an invariant of a class."""
+    def __init__(
+            self,
+            description: Optional[Description],
+            body: ast.AST,
+            parsed: parse.Invariant
+    ) -> None:
+        self.description = description
+        self.body = body
+        self.parsed = parsed
+
+
 class Contract:
     """Represent a contract of a method."""
 
@@ -489,6 +502,7 @@ class Class:
             properties: Sequence[Property],
             methods: Sequence[Method],
             constructor: Constructor,
+            invariants: Sequence[Invariant],
             description: Optional[Description],
             parsed: parse.Entity,
     ) -> None:
@@ -499,6 +513,7 @@ class Class:
         self.properties = properties
         self.methods = methods
         self.constructor = constructor
+        self.invariants = invariants
         self.description = description
         self.parsed = parsed
 

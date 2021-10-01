@@ -337,8 +337,9 @@ class Key_elements(Enum):
 
 # fmt: off
 @invariant(
-    lambda self:
-    not (self.id_type == Key_type.IRI) or is_IRI(self.value)
+    condition=lambda self:
+    not (self.id_type == Key_type.IRI) or is_IRI(self.value),
+    description="If ID type is IRI, it must be an IRI"
 )
 @invariant(
     lambda self:

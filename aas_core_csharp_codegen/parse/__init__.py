@@ -16,6 +16,7 @@ Description = _types.Description
 Property = _types.Property
 Default = _types.Default
 Argument = _types.Argument
+Invariant = _types.Invariant
 Contract = _types.Contract
 Snapshot = _types.Snapshot
 Contracts = _types.Contracts

@@ -2,6 +2,7 @@
 
 import ast
 import collections
+import enum
 import textwrap
 from typing import List, Any, Optional, cast, Type, Tuple, Union
 
@@ -22,6 +23,7 @@ from aas_core_csharp_codegen.parse._types import (
     Argument,
     AtomicTypeAnnotation,
     ConcreteEntity,
+    Invariant,
     Contract,
     Contracts,
     Default,
@@ -84,6 +86,8 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("Optional", "typing"),
             ("DBC", "icontract"),
             ("invariant", "icontract"),
+            ("ensure", "icontract"),
+            ("require", "icontract"),
             ("abstract", "aas_core3_meta.marker"),
             ("implementation_specific", "aas_core3_meta.marker"),
             ("comment", "aas_core3_meta.marker"),
@@ -684,8 +688,8 @@ def _parse_contract_condition(
         Contract(
             args=[Identifier(arg.arg) for arg in condition_node.args.args],
             description=description,
-            body=condition_node.body,
-            condition_node=condition_node,
+            condition=condition_node,
+            node=node
         ),
         None)
 
@@ -767,9 +771,9 @@ def _parse_snapshot(
     return (
         Snapshot(
             args=[Identifier(arg.arg) for arg in capture_node.args.args],
-            body=capture_node.body,
             name=Identifier(name),
-            capture_node=capture_node,
+            capture=capture_node,
+            node=node
         ),
         None,
     )
@@ -951,7 +955,7 @@ def _function_def_to_method(
                 return (
                     None,
                     Error(
-                        contract.condition_node,
+                        contract.condition,
                         f"The argument of the precondition is not provided "
                         f"in the method: {arg}",
                     ),
@@ -965,7 +969,7 @@ def _function_def_to_method(
                     return (
                         None,
                         Error(
-                            contract.condition_node,
+                            contract.condition,
                             f"The argument OLD of the postcondition is not provided "
                             f"since there were no snapshots defined "
                             f"for the method: {name}",
@@ -979,7 +983,7 @@ def _function_def_to_method(
                 return (
                     None,
                     Error(
-                        contract.condition_node,
+                        contract.condition,
                         f"The argument of the postcondition is not provided "
                         f"in the method: {arg}",
                     ),
@@ -1055,6 +1059,99 @@ def _string_constant_to_description(
     return Description(document=document, node=constant), None
 
 
+class _EntityMarker(enum.Enum):
+    ABSTRACT = "abstract"
+    IS_IMPLEMENTATION_SPECIFIC = "is_implementation_specific"
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _entity_decorator_to_marker(
+        decorator: ast.Name
+) -> Tuple[Optional[_EntityMarker], Optional[Error]]:
+    """Parse a simple decorator as an entity marker."""
+    if decorator.id == "abstract":
+        return _EntityMarker.ABSTRACT, None
+
+    elif decorator.id == "implementation_specific":
+        return _EntityMarker.IS_IMPLEMENTATION_SPECIFIC, None
+
+    else:
+        return (None, Error(
+            decorator,
+            f"The handling of the marker has not been implemented: {decorator.id!r}"
+        ))
+
+
+# fmt: off
+@require(
+    lambda decorator:
+    isinstance(decorator.func, ast.Name)
+    and isinstance(decorator.func.ctx, ast.Load)
+    and decorator.func.id == 'invariant'
+)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+# fmt: on
+def _entity_decorator_to_invariant(
+        decorator: ast.Call,
+        atok: asttokens.ASTTokens
+) -> Tuple[Optional[Invariant], Optional[Error]]:
+    """Parse the decorator node as a class invariant."""
+    condition_node = None  # type: Optional[ast.AST]
+    description_node = None  # type: Optional[ast.AST]
+
+    # TODO: test parsing of args and kwargs
+    if len(decorator.args) >= 1:
+        condition_node = decorator.args[0]
+
+    if len(decorator.args) >= 2:
+        description_node = decorator.args[1]
+
+    if len(decorator.keywords) > 0:
+        for kwarg in decorator.keywords:
+            if kwarg.arg == 'condition':
+                condition_node = kwarg.value
+            elif kwarg.arg == 'description':
+                description_node = kwarg.value
+            else:
+                return (
+                    None, Error(
+                        decorator,
+                        f"Handling of the keyword argument {kwarg.arg!r} "
+                        f"for the invariant has not been implemented"))
+
+    if not isinstance(condition_node, ast.Lambda):
+        return (None, Error(
+            decorator,
+            f"Expected the condition of an invariant to be a lambda, "
+            f"but got {type(condition_node)}: {atok.get_text(decorator)}"))
+
+    if (
+            description_node is not None
+            and (not isinstance(description_node, ast.Constant)
+                 or not isinstance(description_node.value, str))
+    ):
+        return (None, Error(
+            decorator,
+            f"Expected the description of an invariant to be "
+            f"a string literal, but got: {type(description_node)}"))
+
+    if (
+            len(condition_node.args.args) != 1
+            or condition_node.args.args[0].arg != 'self'
+    ):
+        return (None, Error(
+            decorator,
+            "Expected the invariant to have a single argument, ``self``"))
+
+    return (Invariant(
+        description=(
+            description_node.value
+            if description_node is not None
+            else None),
+        condition=condition_node,
+        node=decorator), None)
+
+
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _classdef_to_symbol(
         node: ast.ClassDef, atok: asttokens.ASTTokens
@@ -1076,14 +1173,10 @@ def _classdef_to_symbol(
             base_names.append(base.id)
 
     if len(underlying_errors) > 0:
-        return (
-            None,
-            Error(
-                node,
-                f"Failed to parse the class definition: {node.name}",
-                underlying=underlying_errors,
-            ),
-        )
+        return (None, Error(
+            node,
+            f"Failed to parse the class definition: {node.name}",
+            underlying=underlying_errors))
 
     if "Enum" in base_names and len(base_names) > 1:
         return (
@@ -1110,31 +1203,51 @@ def _classdef_to_symbol(
 
     # region Decorators
 
+    invariants = []  # type: List[Invariant]
+
     is_abstract = False
     is_implementation_specific = False
     for decorator in node.decorator_list:
-        if not isinstance(decorator, ast.Name):
-            return (
-                None,
-                Error(
-                    node=decorator,
-                    message=f"Expected a decorator as a name, "
-                            f"but got: {atok.get_text(decorator)}",
-                ),
-            )
+        if isinstance(decorator, ast.Name):
+            entity_marker, error = _entity_decorator_to_marker(decorator=decorator)
+            if error is not None:
+                underlying_errors.append(error)
+                continue
 
-        if decorator.id == "abstract":
-            is_abstract = True
-        elif decorator.id == "implementation_specific":
-            is_implementation_specific = True
+            if entity_marker == _EntityMarker.ABSTRACT:
+                is_abstract = True
+            elif entity_marker == _EntityMarker.IS_IMPLEMENTATION_SPECIFIC:
+                is_implementation_specific = True
+            else:
+                raise AssertionError(f"Unhandled enum: {entity_marker}")
+
+        elif (
+                isinstance(decorator, ast.Call)
+                and isinstance(decorator.func, ast.Name)
+                and isinstance(decorator.func.ctx, ast.Load)
+                and decorator.func.id == 'invariant'
+        ):
+            invariant, error = _entity_decorator_to_invariant(
+                decorator=decorator, atok=atok)
+
+            if error is not None:
+                underlying_errors.append(error)
+                continue
+
+            invariants.append(invariant)
         else:
-            return (
-                None,
+            underlying_errors.append(
                 Error(
                     node=decorator,
-                    message=f"Unexpected decorator for a class: {decorator.id!r}",
-                ),
-            )
+                    message=f"Handling of a decorator has not been "
+                            f"implemented: {decorator.id!r}"))
+
+    if len(underlying_errors) > 0:
+        return (None, Error(
+            node,
+            f"Failed to parse the class definition: {node.name}",
+            underlying=underlying_errors))
+
     # endregion
 
     if is_abstract and is_implementation_specific:
@@ -1243,6 +1356,7 @@ def _classdef_to_symbol(
             inheritances=inheritances,
             properties=properties,
             methods=methods,
+            invariants=invariants,
             description=description,
             node=node,
         ),
