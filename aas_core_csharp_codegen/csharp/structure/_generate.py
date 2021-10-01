@@ -1,4 +1,5 @@
 """Generate the C# data structures from the intermediate representation."""
+import ast
 import io
 import textwrap
 import xml.sax.saxutils
@@ -17,6 +18,10 @@ from aas_core_csharp_codegen.common import Error, Identifier, assert_never, \
     Stripped, Rstripped
 from aas_core_csharp_codegen.specific_implementations import (
     verify as specific_implementations_verify)
+from aas_core_csharp_codegen.understand import (
+    constructor as understand_constructor
+)
+
 
 # region Checks
 
@@ -727,9 +732,10 @@ def _generate_class(
     if symbol.constructor.implementation_key is not None:
         codes.append(spec_impls[symbol.constructor.implementation_key])
     else:
-        constructor_blocks = []  # type: List[Stripped]
+        constructor_blocks = []  # type: List[str]
 
-        arg_codes = []  # type: List[Stripped]
+        # TODO: handle default values
+        arg_codes = []  # type: List[str]
         for arg in symbol.constructor.arguments:
             if arg.name == "self":
                 continue
@@ -747,18 +753,61 @@ def _generate_class(
                     "which conflicts with the empty constructor "
                     "specified in the meta-model"))
         elif len(arg_codes) == 1:
-            constructor_blocks.append(
-                Stripped(f"{name}({arg_codes[0]})\n{{"))
+            constructor_blocks.append(f"{name}({arg_codes[0]})\n{{")
         else:
             arg_block = ",\n".join(arg_codes)
             arg_block_indented = textwrap.indent(arg_block, csharp_common.INDENT)
             constructor_blocks.append(
                 Stripped(f"{name}(\n{arg_block_indented})\n{{"))
 
-        # TODO: continue here
-        # TODO: transpile the constructor body here
+        body = []  # type: List[str]
+        for stmt in symbol.constructor.statements:
+            if isinstance(stmt, understand_constructor.AssignArgument):
+                if stmt.default is None:
+                    body.append(
+                        f'{csharp_naming.property_name(stmt.name)} = '
+                        f'{csharp_naming.argument_name(stmt.argument)};')
+                else:
+                    if isinstance(stmt.default, understand_constructor.EmptyList):
+                        prop = symbol.property_map[stmt.name]
+                        prop_type = csharp_common.generate_type(prop.type_annotation)
 
-        constructor_blocks.append(Stripped("}"))
+                        arg_name = csharp_naming.argument_name(stmt.argument)
+
+                        # Write the assignment as a ternary operator
+                        writer = io.StringIO()
+                        writer.write(f'{csharp_naming.property_name(stmt.name)} = ')
+                        writer.write(
+                            f'({arg_name} != null)\n')
+                        writer.write(
+                            textwrap.indent(f'? {arg_name}\n', csharp_common.INDENT))
+                        writer.write(
+                            textwrap.indent(
+                                f': new {prop_type}();', csharp_common.INDENT))
+
+                        body.append(writer.getvalue())
+                    elif isinstance(
+                            stmt.default, understand_constructor.DefaultEnumLiteral):
+                        literal_code = ".".join([
+                            csharp_naming.enum_name(stmt.default.enum.name),
+                            csharp_naming.enum_literal_name(stmt.default.literal.name)
+                        ])
+
+                        body.append(
+                            f'{csharp_naming.property_name(stmt.name)} = '
+                            f'{literal_code};')
+                    else:
+                        assert_never(stmt.default)
+
+            else:
+                assert_never(stmt)
+
+        constructor_blocks.append(
+            '\n'.join(
+                textwrap.indent(stmt_code, csharp_common.INDENT)
+                for stmt_code in body))
+
+        constructor_blocks.append("}")
 
         codes.append(Stripped("\n".join(constructor_blocks)))
 

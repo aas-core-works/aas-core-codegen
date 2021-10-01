@@ -33,6 +33,8 @@ namespace AasCore.Aas3
             string language,
             string text)
         {
+            Language = language;
+            Text = text;
         }
     }
 
@@ -131,6 +133,8 @@ namespace AasCore.Aas3
             string id,
             IdentifierType idType)
         {
+            Id = id;
+            IdType = idType;
         }
     }
 
@@ -144,6 +148,8 @@ namespace AasCore.Aas3
             string? version,
             string? revision)
         {
+            Version = version;
+            Revision = revision;
         }
     }
 
@@ -373,6 +379,9 @@ namespace AasCore.Aas3
             string value,
             KeyType idType)
         {
+            Type = type;
+            Value = value;
+            IdType = idType;
         }
     }
 
@@ -382,6 +391,7 @@ namespace AasCore.Aas3
 
         Reference(List<Key> keys)
         {
+            Keys = keys;
         }
     }
 
@@ -395,14 +405,9 @@ namespace AasCore.Aas3
         List<Reference> List<Reference> { get; set; }
     }
 
-    /// <summary>
-    /// Structure a digital representation of an Asset.
-    /// </summary>
-    public class AssetAdministrationShell :
-            IIdentifiable,
-            IHasDataSpecification
-    {{
-        /// <summary>
+    DataSpecifications = (dataSpecifications != null)
+        ? dataSpecifications
+        : new List<Reference>();    /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
         /// In case of referable this id is an identifying string of
         /// the element within its name space.
@@ -469,6 +474,16 @@ namespace AasCore.Aas3
             List<Reference>? dataSpecifications,
             AssetAdministrationShell? derivedFrom)
         {
+            Identification = identification;
+            Administration = administration;
+            IdShort = idShort;
+            DisplayName = displayName;
+            Category = category;
+            Description = description;
+            DataSpecifications = (dataSpecifications != null)
+                ? dataSpecifications
+                : new List<Reference>();
+            DerivedFrom = derivedFrom;
         }
     }
 

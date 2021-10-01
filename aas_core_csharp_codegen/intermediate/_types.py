@@ -502,6 +502,7 @@ class Class:
         self.description = description
         self.parsed = parsed
 
+        self.property_map = {prop.name: prop for prop in self.properties}
 
 Symbol = Union[Interface, Enumeration, Class]
 

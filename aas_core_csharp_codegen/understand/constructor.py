@@ -14,7 +14,7 @@ from typing import (
 )
 
 import asttokens
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_csharp_codegen import parse
 from aas_core_csharp_codegen.common import Identifier, Error
@@ -35,18 +35,46 @@ class CallSuperConstructor:
         self.super_name = super_name
 
 
+class Default:
+    """Represent a default value set to a property if an argument is unspecified."""
+
+    def __init__(self, node: ast.AST) -> None:
+        """Initialize with the given values."""
+        self.node = node
+
+
+class EmptyList(Default):
+    """Represent an empty list set to a property if the argument is unspecified."""
+
+
+class DefaultEnumLiteral(Default):
+    """Represent an enum literal set to a property if the argument is unspecified."""
+
+    @require(lambda enum, literal: literal in enum.literals)
+    def __init__(
+            self,
+            enum: parse.Enumeration,
+            literal: parse.EnumerationLiteral,
+            node: ast.AST
+    ) -> None:
+        """Initialize with the given values."""
+        Default.__init__(self, node=node)
+        self.enum = enum
+        self.literal = literal
+
+
 class AssignArgument:
     """Represent an assignment of an argument to ``__init__`` to a property."""
 
     name: Identifier  #: Identifier of the property
     argument: Identifier  #: Identifier of the argument
-    default_value: Optional[ast.AST]  #: Default value if the argument is None
+    default: Optional[Default]  #: Default value if the argument is None
 
     def __init__(
             self,
             name: Identifier,
             argument: Identifier,
-            default: Optional[ast.AST]) -> None:
+            default: Optional[Default]) -> None:
         """Initialize with the given values."""
         self.name = name
         self.argument = argument
@@ -270,6 +298,7 @@ def _understand_assignment(
         assign: ast.Assign,
         init: Method,
         entity: parse.Entity,
+        symbol_table: parse.SymbolTable,
         atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Statement], Optional[Error]]:
     if len(assign.targets) > 1:
@@ -342,12 +371,27 @@ def _understand_assignment(
                 and if_exp.body.id == if_exp.test.left.id
                 and if_exp.orelse is not None
         ):
+            default = None  # type: Optional[Default]
+            if (
+                    isinstance(if_exp.orelse, ast.List)
+                    and if_exp.orelse.elts == []
+                    and isinstance(if_exp.orelse.ctx, ast.Load)
+            ):
+                default = EmptyList(node=if_exp.orelse)
+            else:
+                return None, Error(
+                    if_exp.orelse,
+                    f"The handling of this default value for "
+                    f"the property {target.attr} has not been implemented")
+
+            assert default is not None
             return AssignArgument(
                 name=Identifier(target.attr),
                 argument=Identifier(if_exp.test.left.id),
-                default=if_exp.orelse), None
+                default=default), None
 
-    return None, Error(assign, "Unhandled constructor statement")
+    return None, Error(
+        assign, "The handling of the constructor statement has not been implemented")
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -383,7 +427,8 @@ def _understand_body(
 
         elif isinstance(stmt, ast.Assign):
             prop_assignment, error = _understand_assignment(
-                assign=stmt, init=init, entity=entity, atok=atok)
+                assign=stmt, init=init, entity=entity, symbol_table=symbol_table,
+                atok=atok)
 
             if error is not None:
                 errors.append(error)
