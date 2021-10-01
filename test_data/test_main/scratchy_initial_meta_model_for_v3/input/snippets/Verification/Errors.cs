@@ -20,8 +20,8 @@ public class Errors
     {
         if (capacity <= 0)
         {
-            throw new System.ArgumentException(
-                $"Expected a strictly positivie capacity, but got: {capacity}");
+            throw new ArgumentException(
+                $"Expected a strictly positive capacity, but got: {capacity}");
         }
 
         Capacity = capacity;

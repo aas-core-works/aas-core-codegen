@@ -1,4 +1,5 @@
 """Generate the invariant verifiers from the intermediate representation."""
+import io
 import textwrap
 from typing import Tuple, Optional, List
 
@@ -39,6 +40,27 @@ def verify(
 
 # region Generate
 
+def _generate_pattern_class(
+        spec_impls: specific_implementations.SpecificImplementations
+) -> Stripped:
+    """Generate the Pattern class used for verifying different patterns."""
+    blocks = [
+        spec_impls[ImplementationKey('Verification/is_IRI')],
+        spec_impls[ImplementationKey('Verification/is_IRDI')],
+        spec_impls[ImplementationKey('Verification/is_ID_short')]
+    ]  # type: List[str]
+
+    writer = io.StringIO()
+    writer.write('public static class Pattern\n{\n')
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write('\n\n')
+            writer.write(textwrap.indent(block.strip(), csharp_common.INDENT))
+
+    writer.write('\n}')
+    return Stripped(writer.getvalue())
+
+
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 @ensure(
@@ -66,7 +88,8 @@ def generate(
     blocks = [warning]  # type: List[Rstripped]
 
     using_directives = [
-        "using Regex = System.Text.RegularExpressions.Regex;"
+        "using ArgumentException = System.ArgumentException;\n"
+        "using Regex = System.Text.RegularExpressions.Regex;\n"
         "using System.Collections.Generic;  // can't alias"
     ]  # type: List[str]
 
@@ -75,39 +98,16 @@ def generate(
 
     blocks.append(Stripped(f"namespace {namespace}.Verification\n{{"))
 
+    blocks.append(
+        textwrap.indent(
+            _generate_pattern_class(spec_impls=spec_impls), csharp_common.INDENT))
+
+    blocks.append(spec_impls[ImplementationKey('Verification/Error')])
+    blocks.append(spec_impls[ImplementationKey('Verification/Errors')])
+
     errors = []  # type: List[Error]
 
-    for intermediate_symbol in intermediate_symbol_table.symbols:
-        code = None  # type: Optional[Stripped]
-        error = None  # type: Optional[Error]
-
-        if (
-                isinstance(intermediate_symbol, intermediate.Class)
-                and intermediate_symbol.implementation_key is not None
-        ):
-            code = spec_impls[intermediate_symbol.implementation_key]
-        else:
-            if isinstance(intermediate_symbol, intermediate.Enumeration):
-                # TODO: test
-                code, error = _generate_enum(symbol=intermediate_symbol)
-            elif isinstance(intermediate_symbol, intermediate.Interface):
-                # TODO: test
-                code, error = _generate_interface(
-                    symbol=intermediate_symbol)
-
-            elif isinstance(intermediate_symbol, intermediate.Class):
-                code, error = _generate_class(
-                    symbol=intermediate_symbol,
-                    spec_impls=spec_impls)
-            else:
-                assert_never(intermediate_symbol)
-
-        assert (code is None) ^ (error is None)
-        if error is not None:
-            errors.append(error)
-        else:
-            assert code is not None
-            blocks.append(Rstripped(textwrap.indent(code, '    ')))
+    # TODO: implement
 
     if len(errors) > 0:
         return None, errors
@@ -121,6 +121,8 @@ def generate(
         if i > 0:
             out.write('\n\n')
 
+        assert not block.startswith('\n')
+        assert not block.endswith('\n')
         out.write(block)
 
     out.write('\n')

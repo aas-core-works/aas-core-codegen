@@ -23,6 +23,9 @@ def read_from_directory(
 
     errors = []  # type: List[str]
     for pth in snippets_dir.glob("**/*"):
+        if pth.is_dir():
+            continue
+
         if not pth.name.endswith(".cs"):
             errors.append(
                 f"Expected only *.cs files in the implementations, but got: {pth}")
