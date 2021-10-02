@@ -123,3 +123,23 @@ def argument_name(identifier: Identifier) -> Identifier:
         "{}{}".format(
             parts[0].lower(),
             ''.join(part.capitalize() for part in parts[1:])))
+
+def variable_name(identifier: Identifier) -> Identifier:
+    """
+    Generate a C# name for a variable based on its meta-model ``identifier``.
+
+    >>> variable_name(Identifier("something"))
+    'something'
+
+    >>> variable_name(Identifier("something_to_URL"))
+    'somethingToUrl'
+    """
+    parts = identifier.split('_')
+
+    if len(parts) == 1:
+        return Identifier(parts[0].lower())
+
+    return Identifier(
+        "{}{}".format(
+            parts[0].lower(),
+            ''.join(part.capitalize() for part in parts[1:])))

@@ -37,6 +37,9 @@ SymbolTable = _types.SymbolTable
 SymbolReferenceInDoc = _types.SymbolReferenceInDoc
 PropertyReferenceInDoc = _types.PropertyReferenceInDoc
 
+InterfaceImplementers = _types.InterfaceImplementers
+map_interface_implementers = _types.map_interface_implementers
+
 translate = _translate.translate
 
 dump = _stringify.dump

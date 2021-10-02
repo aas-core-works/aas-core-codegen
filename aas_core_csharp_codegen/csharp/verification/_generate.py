@@ -92,6 +92,7 @@ def _generate_verify_class(
 
     cls_name = csharp_naming.class_name(cls.name)
     verify_name = Identifier(f"Verify{cls_name}")
+    arg_name = Identifier(csharp_naming.argument_name(cls.name))
 
     writer.write(
         textwrap.dedent(f'''\
@@ -101,7 +102,9 @@ def _generate_verify_class(
             /// <remarks>
             /// Do not recurse to verify the children entities.
             /// </remarks>
-            public void {verify_name}(Errors errors)
+            public void {verify_name}(
+                {cls_name} {arg_name},
+                Errors errors)
             {{
             '''))
 
@@ -128,7 +131,9 @@ def _generate_verify_class(
             /// <summary>
             /// Verify <see cref={xml.sax.saxutils.quoteattr(cls_name)} /> and recurse into the contained children entities.
             /// </summary>
-            public void {verify_recursively_name}(Errors errors)
+            public void VerifyRecursively{cls_name}(
+                {cls_name} {arg_name},
+                Errors errors)
             {{
             '''))
 
@@ -143,18 +148,37 @@ def _generate_verify_class(
 
 def _generate_verify_interface(
         interface: intermediate.Interface,
-        symbol_table: intermediate.SymbolTable
+        interface_implementers: intermediate.InterfaceImplementers
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verify function for the given interface."""
     verify_blocks = [
         "if (errors.Full()) return;"
     ]  # type: List[str]
 
+    interface_name = csharp_naming.interface_name(interface.name)
+    arg_name = csharp_naming.argument_name(interface.name)
+
+    implementers = interface_implementers[interface]
+    for implementer in implementers:
+        implementer_type = csharp_naming.class_name(implementer.name)
+        implementer_var = csharp_naming.variable_name(implementer.name)
+
+        # TODO: move switch up, case and verify as they are
+        verify_blocks.append(
+            textwrap.dedent(f'''\
+                {csharp_common.INDENT}switch ({arg_name})
+                {csharp_common.INDENT2}case {implementer_type} {implementer_var}:
+                {csharp_common.INDENT3}Verify{implementer_type}(
+                {csharp_common.INDENT4}{implementer_var}, errors);
+                {csharp_common.INDENT3}break;'''))
+
     # TODO: Verify{interface name} 🠒 dispatch to the corresponding class, use must_find_interface_descendants
+
     # TODO: VerifyRecursively{interface name} 🠒 dispatch to the corresponding class, use must_find_interface_descendants
 
 
 _ClassOrInterface = Union[intermediate.Class, intermediate.Interface]
+
 
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -167,7 +191,8 @@ _ClassOrInterface = Union[intermediate.Class, intermediate.Interface]
 def generate(
         symbol_table: intermediate.SymbolTable,
         namespace: csharp_common.NamespaceIdentifier,
-        spec_impls: specific_implementations.SpecificImplementations
+        spec_impls: specific_implementations.SpecificImplementations,
+        interface_implementers: intermediate.InterfaceImplementers
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the C# code of the structures based on the symbol table.
@@ -205,10 +230,12 @@ def generate(
         if isinstance(symbol, intermediate.Enumeration):
             continue
         elif isinstance(symbol, intermediate.Class):
-            verify_block, error = _generate_verify_class(cls=symbol, spec_impls=spec_impls)
+            verify_block, error = _generate_verify_class(
+                cls=symbol, spec_impls=spec_impls)
         elif isinstance(symbol, intermediate.Interface):
             verify_block, error = _generate_verify_interface(
-                interface=symbol, symbol_table=symbol_table)
+                interface=symbol,
+                interface_implementers=interface_implementers)
         else:
             assert_never(symbol)
 

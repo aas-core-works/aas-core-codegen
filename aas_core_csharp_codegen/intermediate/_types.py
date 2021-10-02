@@ -2,7 +2,8 @@
 import ast
 import enum
 import pathlib
-from typing import Sequence, Optional, Union, TypeVar, Mapping, MutableMapping, List
+from typing import Sequence, Optional, Union, TypeVar, Mapping, MutableMapping, List, \
+    Set
 
 import docutils.nodes
 from icontract import require
@@ -543,30 +544,18 @@ class SymbolTable:
 
         self._symbol_set = {id(symbol) for symbol in self.symbols}
 
-        self._interface_descendants = dict(
-        )  # type: MutableMapping[Interface, List[Union[Interface, Class]]]
+        self._interface_implementers = dict(
+        )  # type: MutableMapping[Interface, List[Class]]
+
         for symbol in self.symbols:
-            if isinstance(symbol, Enumeration):
+            if not isinstance(symbol, Class):
                 continue
-            elif isinstance(symbol, Class):
-                for interface in symbol.interfaces:
-                    lst = self._interface_descendants.get(interface, None)
 
-                    if lst is None:
-                        self._interface_descendants = [symbol]
-                    else:
-                        lst.append(symbol)
-            elif isinstance(symbol, Interface):
-                for inheritance in symbol.inheritances:
-                    interface = self.must_find(name=inheritance)
-                    lst = self._interface_descendants.get(interface, None)
+            assert isinstance(symbol, Class)
 
-                    if lst is None:
-                        self._interface_descendants = [symbol]
-                    else:
-                        lst.append(symbol)
-            else:
-                assert_never(symbol)
+            stack = []  # type: List[Interface]
+            for interface in symbol.interfaces:
+                stack.append(self.interface)
 
     def has(self, symbol: Symbol) -> bool:
         """Return ``True`` if the symbol is contained in the symbol table."""
@@ -591,14 +580,66 @@ class SymbolTable:
 
         return result
 
-    @require(lambda self, interface: self.has(interface))
-    def must_find_interface_descendants(
+    # fmt: off
+    @require(
+        lambda self, interface: self.has(interface),
+        error=lambda interface: KeyError(
+            f"The interface {interface.name} is not contained in the symbol table.")
+    )
+    # fmt: on
+    def must_find_interface_implementers(
             self,
             interface: Interface
-    ) -> Sequence[Union[Interface, Class]]:
+    ) -> Sequence[Class]:
         """Find the direct descendants of the given interface."""
-        descendants = self._interface_descendants[interface]
-        return descendants
+        implementers = self._interface_implementers.get(interface, None)
+        if implementers is None:
+            return []
+
+        return implementers
+
+
+InterfaceImplementers = MutableMapping[Interface, List[Class]]
+
+
+def map_interface_implementers(
+        symbol_table: SymbolTable
+) -> InterfaceImplementers:
+    """
+    Produce an inverted index from interfaces to implementing classes.
+
+    The tracing is transitive over interfaces. For example, assume interfaces ``A``
+    and ``B``, ``B extends A`` and a class ``C``, ``C implements B``. Then the class
+    ``C`` will both appear as an implementer of ``B`` as well as of ``A``.
+    """
+    mapping = dict()  # type: MutableMapping[Interface, List[Class]]
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Class):
+            continue
+
+        assert isinstance(symbol, Class)
+
+        stack = []  # type: List[Identifier]
+        for interface_id in symbol.interfaces:
+            stack.append(interface_id)
+
+        while len(stack) > 0:
+            interface_id = stack.pop()
+            interface = symbol_table.must_find(name=interface_id)
+            assert isinstance(interface, Interface), (
+                f"Expected an interface given its identifier: {interface_id}")
+
+            lst = mapping.get(interface, None)
+            if lst is None:
+                lst = []
+                mapping[interface] = lst
+
+            lst.append(symbol)
+
+            for parent_id in interface.inheritances:
+                stack.append(parent_id)
+
+    return mapping
 
 
 class SymbolReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):

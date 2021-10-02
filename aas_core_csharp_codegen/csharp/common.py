@@ -111,6 +111,9 @@ def generate_type(
 
 
 INDENT = "    "
+INDENT2 = INDENT * 2
+INDENT3 = INDENT * 3
+INDENT4 = INDENT * 4
 
 NAMESPACE_IDENTIFIER_RE = re.compile(
     r'[a-zA-Z_][a-zA-Z_0-9]*(\.[a-zA-Z_][a-zA-Z_0-9]*)')
