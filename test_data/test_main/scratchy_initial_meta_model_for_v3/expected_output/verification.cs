@@ -205,13 +205,34 @@ namespace AasCore.Aas3
             }
         }
 
+        public void VerifyIHasExtension(
+            IHasExtension hasExtension,
+            Errors errors)
+        {
+            if (errors.Full()) return;
+
+            switch (hasExtension)
+            {
+            case AssetAdministrationShell assetAdministrationShell:
+                VerifyAssetAdministrationShell(
+                    assetAdministrationShell, errors);
+                break;default:
+                throw new InvalidArgumentError(
+                    $"Unexpected implementing class of" 
+                    $"{nameof(IHasExtension)}: {hasExtension.GetType()}");
+                break;}}}
+
+
+
         /// <summary>
         /// Verify <see cref="LangString" />.
         /// </summary>
         /// <remarks>
         /// Do not recurse to verify the children entities.
         /// </remarks>
-        public void VerifyLangString(Errors errors)
+        public void VerifyLangString(
+            LangString langString,
+            Errors errors)
         {
             // There were no invariants specified for LangString.
             return;
@@ -220,7 +241,9 @@ namespace AasCore.Aas3
         /// <summary>
         /// Verify <see cref="LangString" /> and recurse into the contained children entities.
         /// </summary>
-        public void VerifyRecursivelyLangString(Errors errors)
+        public void VerifyRecursivelyLangString(
+            LangString langString,
+            Errors errors)
         {
             if (errors.Full()) return;
 
@@ -233,7 +256,9 @@ namespace AasCore.Aas3
         /// <remarks>
         /// Do not recurse to verify the children entities.
         /// </remarks>
-        public void VerifyLangStringSet(Errors errors)
+        public void VerifyLangStringSet(
+            LangStringSet langStringSet,
+            Errors errors)
         {
             if (errors.Full()) return;
         }
@@ -241,12 +266,33 @@ namespace AasCore.Aas3
         /// <summary>
         /// Verify <see cref="LangStringSet" /> and recurse into the contained children entities.
         /// </summary>
-        public void VerifyRecursivelyLangStringSet(Errors errors)
+        public void VerifyRecursivelyLangStringSet(
+            LangStringSet langStringSet,
+            Errors errors)
         {
             if (errors.Full()) return;
 
             VerifyLangStringSet(errors);
         }
+
+        public void VerifyIReferable(
+            IReferable referable,
+            Errors errors)
+        {
+            if (errors.Full()) return;
+
+            switch (referable)
+            {
+            case AssetAdministrationShell assetAdministrationShell:
+                VerifyAssetAdministrationShell(
+                    assetAdministrationShell, errors);
+                break;default:
+                throw new InvalidArgumentError(
+                    $"Unexpected implementing class of" 
+                    $"{nameof(IReferable)}: {referable.GetType()}");
+                break;}}}
+
+
 
         /// <summary>
         /// Verify <see cref="Identifier" />.
@@ -254,7 +300,9 @@ namespace AasCore.Aas3
         /// <remarks>
         /// Do not recurse to verify the children entities.
         /// </remarks>
-        public void VerifyIdentifier(Errors errors)
+        public void VerifyIdentifier(
+            Identifier identifier,
+            Errors errors)
         {
             if (errors.Full()) return;
         }
@@ -262,7 +310,9 @@ namespace AasCore.Aas3
         /// <summary>
         /// Verify <see cref="Identifier" /> and recurse into the contained children entities.
         /// </summary>
-        public void VerifyRecursivelyIdentifier(Errors errors)
+        public void VerifyRecursivelyIdentifier(
+            Identifier identifier,
+            Errors errors)
         {
             if (errors.Full()) return;
 
@@ -275,7 +325,9 @@ namespace AasCore.Aas3
         /// <remarks>
         /// Do not recurse to verify the children entities.
         /// </remarks>
-        public void VerifyAdministrativeInformation(Errors errors)
+        public void VerifyAdministrativeInformation(
+            AdministrativeInformation administrativeInformation,
+            Errors errors)
         {
             if (errors.Full()) return;
         }
@@ -283,11 +335,50 @@ namespace AasCore.Aas3
         /// <summary>
         /// Verify <see cref="AdministrativeInformation" /> and recurse into the contained children entities.
         /// </summary>
-        public void VerifyRecursivelyAdministrativeInformation(Errors errors)
+        public void VerifyRecursivelyAdministrativeInformation(
+            AdministrativeInformation administrativeInformation,
+            Errors errors)
         {
             if (errors.Full()) return;
 
             VerifyAdministrativeInformation(errors);
+        }
+
+        public void VerifyIIdentifiable(
+            IIdentifiable identifiable,
+            Errors errors)
+        {
+            if (errors.Full()) return;
+
+            switch (identifiable)
+            {
+            case AssetAdministrationShell assetAdministrationShell:
+                VerifyAssetAdministrationShell(
+                    assetAdministrationShell, errors);
+                break;default:
+                throw new InvalidArgumentError(
+                    $"Unexpected implementing class of" 
+                    $"{nameof(IIdentifiable)}: {identifiable.GetType()}");
+                break;}}}
+
+
+
+        public void VerifyIHasKind(
+            IHasKind hasKind,
+            Errors errors)
+        {
+            // There are no implementer classes for this interface,
+            // so there is no verification function to dispatch to.
+            return;
+        }
+
+        public void VerifyRecursivelyIHasKind(
+            IHasKind hasKind,
+            Errors errors)
+        {
+            // There are no implementer classes for this interface,
+            // so there is no verification function to dispatch to.
+            return;
         }
 
         /// <summary>
@@ -296,7 +387,9 @@ namespace AasCore.Aas3
         /// <remarks>
         /// Do not recurse to verify the children entities.
         /// </remarks>
-        public void VerifyKey(Errors errors)
+        public void VerifyKey(
+            Key key,
+            Errors errors)
         {
             if (errors.Full()) return;
         }
@@ -304,7 +397,9 @@ namespace AasCore.Aas3
         /// <summary>
         /// Verify <see cref="Key" /> and recurse into the contained children entities.
         /// </summary>
-        public void VerifyRecursivelyKey(Errors errors)
+        public void VerifyRecursivelyKey(
+            Key key,
+            Errors errors)
         {
             if (errors.Full()) return;
 
@@ -317,7 +412,9 @@ namespace AasCore.Aas3
         /// <remarks>
         /// Do not recurse to verify the children entities.
         /// </remarks>
-        public void VerifyReference(Errors errors)
+        public void VerifyReference(
+            Reference reference,
+            Errors errors)
         {
             if (errors.Full()) return;
         }
@@ -325,12 +422,51 @@ namespace AasCore.Aas3
         /// <summary>
         /// Verify <see cref="Reference" /> and recurse into the contained children entities.
         /// </summary>
-        public void VerifyRecursivelyReference(Errors errors)
+        public void VerifyRecursivelyReference(
+            Reference reference,
+            Errors errors)
         {
             if (errors.Full()) return;
 
             VerifyReference(errors);
         }
+
+        public void VerifyIHasSemantics(
+            IHasSemantics hasSemantics,
+            Errors errors)
+        {
+            // There are no implementer classes for this interface,
+            // so there is no verification function to dispatch to.
+            return;
+        }
+
+        public void VerifyRecursivelyIHasSemantics(
+            IHasSemantics hasSemantics,
+            Errors errors)
+        {
+            // There are no implementer classes for this interface,
+            // so there is no verification function to dispatch to.
+            return;
+        }
+
+        public void VerifyIHasDataSpecification(
+            IHasDataSpecification hasDataSpecification,
+            Errors errors)
+        {
+            if (errors.Full()) return;
+
+            switch (hasDataSpecification)
+            {
+            case AssetAdministrationShell assetAdministrationShell:
+                VerifyAssetAdministrationShell(
+                    assetAdministrationShell, errors);
+                break;default:
+                throw new InvalidArgumentError(
+                    $"Unexpected implementing class of" 
+                    $"{nameof(IHasDataSpecification)}: {hasDataSpecification.GetType()}");
+                break;}}}
+
+
 
         /// <summary>
         /// Verify <see cref="AssetAdministrationShell" />.
@@ -338,7 +474,9 @@ namespace AasCore.Aas3
         /// <remarks>
         /// Do not recurse to verify the children entities.
         /// </remarks>
-        public void VerifyAssetAdministrationShell(Errors errors)
+        public void VerifyAssetAdministrationShell(
+            AssetAdministrationShell assetAdministrationShell,
+            Errors errors)
         {
             if (errors.Full()) return;
         }
@@ -346,7 +484,9 @@ namespace AasCore.Aas3
         /// <summary>
         /// Verify <see cref="AssetAdministrationShell" /> and recurse into the contained children entities.
         /// </summary>
-        public void VerifyRecursivelyAssetAdministrationShell(Errors errors)
+        public void VerifyRecursivelyAssetAdministrationShell(
+            AssetAdministrationShell assetAdministrationShell,
+            Errors errors)
         {
             if (errors.Full()) return;
 

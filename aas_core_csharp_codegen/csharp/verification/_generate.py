@@ -151,7 +151,7 @@ def _generate_verify_interface(
         interface_implementers: intermediate.InterfaceImplementers
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verify function for the given interface."""
-    implementers = interface_implementers[interface]
+    implementers = interface_implementers.get(interface, [])
 
     interface_name = csharp_naming.interface_name(interface.name)
     arg_name = csharp_naming.argument_name(interface.name)
@@ -209,10 +209,30 @@ def _generate_verify_interface(
     writer.write("}")
     verify_blocks.append(writer.getvalue())
 
+    writer = io.StringIO()
+    writer.write(
+        textwrap.dedent(f'''\
+            public void Verify{interface_name}(
+            {csharp_common.INDENT}{interface_name} {arg_name},
+            {csharp_common.INDENT}Errors errors)
+            {{
+            '''))
+
+    for i, block in enumerate(verify_blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(block, csharp_common.INDENT))
+
+    writer.write("}}\n\n")
+
     # endregion
 
+    # region VerifyRecursively
     # TODO: VerifyRecursively{interface name} 🠒 dispatch to the corresponding class, use must_find_interface_descendants
 
+    # endregion
+
+    return Stripped(writer.getvalue()), None
 
 
 # fmt: off
