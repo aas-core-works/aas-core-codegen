@@ -63,6 +63,28 @@ def _generate_pattern_class(
     return Stripped(writer.getvalue())
 
 
+# fmt: off
+@require(lambda cls, prop: prop in cls.properties)
+@require(
+    lambda prop:
+    isinstance(prop.type_annotation, intermediate.SubscriptedTypeAnnotation)
+)
+# fmt: on
+def _generate_unrolling_for_recursive_verify(
+        cls: intermediate.Class,
+        prop: intermediate.Property
+) -> Stripped:
+    """
+    Generate the unrolling code that iterates over all the nested structures.
+
+    We have to manually unroll the subscripted types since C# does not support
+    proper template specialization.
+
+    See: https://stackoverflow.com/questions/600978/how-to-do-template-specialization-in-c-sharp
+    """
+    # TODO: continue here
+    raise NotImplementedError()
+
 def _generate_verify_class(
         cls: intermediate.Class,
         spec_impls: specific_implementations.SpecificImplementations
@@ -154,12 +176,9 @@ def _generate_verify_class(
                 assert_never(prop_symbol)
 
         elif isinstance(prop.type_annotation, intermediate.SubscriptedTypeAnnotation):
-            # NOTE (mristin, 2021-10-02):
-            # We have to manually unroll the subscripted types since C# does not support
-            # proper template specialization.
-            # See: https://stackoverflow.com/questions/600978/how-to-do-template-specialization-in-c-sharp
-            # TODO: implement
-            pass
+            verify_recursively_blocks.append(
+                _generate_unrolling_for_recursive_verify(cls=cls, prop=prop))
+
         elif isinstance(prop.type_annotation, intermediate.SelfTypeAnnotation):
             raise AssertionError(
                 f"Unexpected self type annotation for a property {prop.name!r} "
@@ -384,7 +403,8 @@ def generate(
         verification_writer.write(
             textwrap.indent(verification_block, 2 * csharp_common.INDENT))
 
-    verification_writer.write(f"\n{csharp_common.INDENT}}}  // class Verification")
+    verification_writer.write(
+        f"\n{csharp_common.INDENT}}}  // static class Verification")
     verification_writer.write(f"\n}}  // namespace {namespace}")
 
     blocks.append(Stripped(verification_writer.getvalue()))
