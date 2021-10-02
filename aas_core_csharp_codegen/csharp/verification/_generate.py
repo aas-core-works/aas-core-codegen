@@ -151,33 +151,68 @@ def _generate_verify_interface(
         interface_implementers: intermediate.InterfaceImplementers
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verify function for the given interface."""
-    verify_blocks = [
-        "if (errors.Full()) return;"
-    ]  # type: List[str]
+    implementers = interface_implementers[interface]
 
     interface_name = csharp_naming.interface_name(interface.name)
     arg_name = csharp_naming.argument_name(interface.name)
 
-    implementers = interface_implementers[interface]
+    if len(implementers) == 0:
+        code = textwrap.dedent(f'''\
+            public void Verify{interface_name}(
+            {csharp_common.INDENT}{interface_name} {arg_name},
+            {csharp_common.INDENT}Errors errors)
+            {{
+            {csharp_common.INDENT}// There are no implementer classes for this interface,
+            {csharp_common.INDENT}// so there is no verification function to dispatch to.
+            {csharp_common.INDENT}return;
+            }}
+
+            public void VerifyRecursively{interface_name}(
+            {csharp_common.INDENT}{interface_name} {arg_name},
+            {csharp_common.INDENT}Errors errors)
+            {{
+            {csharp_common.INDENT}// There are no implementer classes for this interface,
+            {csharp_common.INDENT}// so there is no verification function to dispatch to.
+            {csharp_common.INDENT}return;
+            }}''')
+
+        return Stripped(code), None
+
+    # region Verify
+
+    verify_blocks = [
+        "if (errors.Full()) return;"
+    ]  # type: List[str]
+
+    writer = io.StringIO()
+    writer.write(f"switch ({arg_name})\n{{\n")
+
     for implementer in implementers:
-        implementer_type = csharp_naming.class_name(implementer.name)
-        implementer_var = csharp_naming.variable_name(implementer.name)
+        cls_name = csharp_naming.class_name(implementer.name)
+        var_name = csharp_naming.variable_name(implementer.name)
 
-        # TODO: move switch up, case and verify as they are
-        verify_blocks.append(
+        writer.write(
             textwrap.dedent(f'''\
-                {csharp_common.INDENT}switch ({arg_name})
-                {csharp_common.INDENT2}case {implementer_type} {implementer_var}:
-                {csharp_common.INDENT3}Verify{implementer_type}(
-                {csharp_common.INDENT4}{implementer_var}, errors);
-                {csharp_common.INDENT3}break;'''))
+                {csharp_common.INDENT}case {cls_name} {var_name}:
+                {csharp_common.INDENT2}Verify{cls_name}(
+                {csharp_common.INDENT3}{var_name}, errors);
+                {csharp_common.INDENT2}break;'''))
 
-    # TODO: Verify{interface name} 🠒 dispatch to the corresponding class, use must_find_interface_descendants
+    writer.write(
+        textwrap.dedent(f'''\
+            {csharp_common.INDENT}default:
+            {csharp_common.INDENT2}throw new InvalidArgumentError(
+            {csharp_common.INDENT3}$"Unexpected implementing class of" 
+            {csharp_common.INDENT3}$"{{nameof({interface_name})}}: {{{arg_name}.GetType()}}");
+            {csharp_common.INDENT2}break;'''))
+
+    writer.write("}")
+    verify_blocks.append(writer.getvalue())
+
+    # endregion
 
     # TODO: VerifyRecursively{interface name} 🠒 dispatch to the corresponding class, use must_find_interface_descendants
 
-
-_ClassOrInterface = Union[intermediate.Class, intermediate.Interface]
 
 
 # fmt: off
