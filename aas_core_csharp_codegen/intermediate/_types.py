@@ -542,25 +542,6 @@ class SymbolTable:
         self.symbols = symbols
         self._name_to_symbol = {symbol.name: symbol for symbol in symbols}
 
-        self._symbol_set = {id(symbol) for symbol in self.symbols}
-
-        self._interface_implementers = dict(
-        )  # type: MutableMapping[Interface, List[Class]]
-
-        for symbol in self.symbols:
-            if not isinstance(symbol, Class):
-                continue
-
-            assert isinstance(symbol, Class)
-
-            stack = []  # type: List[Interface]
-            for interface in symbol.interfaces:
-                stack.append(self.interface)
-
-    def has(self, symbol: Symbol) -> bool:
-        """Return ``True`` if the symbol is contained in the symbol table."""
-        return id(symbol) in self._symbol_set
-
     def find(self, name: Identifier) -> Optional[Symbol]:
         """Find the symbol with the given ``name``."""
         return self._name_to_symbol.get(name, None)
@@ -580,23 +561,6 @@ class SymbolTable:
 
         return result
 
-    # fmt: off
-    @require(
-        lambda self, interface: self.has(interface),
-        error=lambda interface: KeyError(
-            f"The interface {interface.name} is not contained in the symbol table.")
-    )
-    # fmt: on
-    def must_find_interface_implementers(
-            self,
-            interface: Interface
-    ) -> Sequence[Class]:
-        """Find the direct descendants of the given interface."""
-        implementers = self._interface_implementers.get(interface, None)
-        if implementers is None:
-            return []
-
-        return implementers
 
 
 InterfaceImplementers = MutableMapping[Interface, List[Class]]
