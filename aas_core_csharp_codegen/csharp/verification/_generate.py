@@ -192,19 +192,25 @@ def _generate_verify_interface(
         var_name = csharp_naming.variable_name(implementer.name)
 
         writer.write(
-            textwrap.dedent(f'''\
-                {csharp_common.INDENT}case {cls_name} {var_name}:
-                {csharp_common.INDENT2}Verify{cls_name}(
-                {csharp_common.INDENT3}{var_name}, errors);
-                {csharp_common.INDENT2}break;'''))
+            textwrap.indent(
+                textwrap.dedent(f'''\
+                    case {cls_name} {var_name}:
+                    {csharp_common.INDENT}Verify{cls_name}(
+                    {csharp_common.INDENT2}{var_name}, errors);
+                    {csharp_common.INDENT}break;
+                    '''),
+                csharp_common.INDENT))
 
     writer.write(
-        textwrap.dedent(f'''\
-            {csharp_common.INDENT}default:
-            {csharp_common.INDENT2}throw new InvalidArgumentError(
-            {csharp_common.INDENT3}$"Unexpected implementing class of" 
-            {csharp_common.INDENT3}$"{{nameof({interface_name})}}: {{{arg_name}.GetType()}}");
-            {csharp_common.INDENT2}break;'''))
+        textwrap.indent(
+            textwrap.dedent(f'''\
+                default:
+                {csharp_common.INDENT}throw new InvalidArgumentException(
+                {csharp_common.INDENT2}$"Unexpected implementing class of" 
+                {csharp_common.INDENT2}$"{{nameof({interface_name})}}: {{{arg_name}.GetType()}}");
+                {csharp_common.INDENT}break;
+                '''),
+            csharp_common.INDENT))
 
     writer.write("}")
     verify_blocks.append(writer.getvalue())
@@ -212,6 +218,10 @@ def _generate_verify_interface(
     writer = io.StringIO()
     writer.write(
         textwrap.dedent(f'''\
+            /// <summary>
+            /// Dispatch dynamically to the corresponding concrete verifier of 
+            /// the underlying implementing class of {interface_name}.
+            /// </summary>
             public void Verify{interface_name}(
             {csharp_common.INDENT}{interface_name} {arg_name},
             {csharp_common.INDENT}Errors errors)
@@ -223,7 +233,7 @@ def _generate_verify_interface(
             writer.write("\n\n")
         writer.write(textwrap.indent(block, csharp_common.INDENT))
 
-    writer.write("}}\n\n")
+    writer.write("\n}\n\n")
 
     # endregion
 

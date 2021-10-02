@@ -205,6 +205,10 @@ namespace AasCore.Aas3
             }
         }
 
+        /// <summary>
+        /// Dispatch dynamically to the corresponding concrete verifier of 
+        /// the underlying implementing class of IHasExtension.
+        /// </summary>
         public void VerifyIHasExtension(
             IHasExtension hasExtension,
             Errors errors)
@@ -213,14 +217,17 @@ namespace AasCore.Aas3
 
             switch (hasExtension)
             {
-            case AssetAdministrationShell assetAdministrationShell:
-                VerifyAssetAdministrationShell(
-                    assetAdministrationShell, errors);
-                break;default:
-                throw new InvalidArgumentError(
-                    $"Unexpected implementing class of" 
-                    $"{nameof(IHasExtension)}: {hasExtension.GetType()}");
-                break;}}}
+                case AssetAdministrationShell assetAdministrationShell:
+                    VerifyAssetAdministrationShell(
+                        assetAdministrationShell, errors);
+                    break;
+                default:
+                    throw new InvalidArgumentException(
+                        $"Unexpected implementing class of" 
+                        $"{nameof(IHasExtension)}: {hasExtension.GetType()}");
+                    break;
+            }
+        }
 
 
 
@@ -275,6 +282,10 @@ namespace AasCore.Aas3
             VerifyLangStringSet(errors);
         }
 
+        /// <summary>
+        /// Dispatch dynamically to the corresponding concrete verifier of 
+        /// the underlying implementing class of IReferable.
+        /// </summary>
         public void VerifyIReferable(
             IReferable referable,
             Errors errors)
@@ -283,14 +294,17 @@ namespace AasCore.Aas3
 
             switch (referable)
             {
-            case AssetAdministrationShell assetAdministrationShell:
-                VerifyAssetAdministrationShell(
-                    assetAdministrationShell, errors);
-                break;default:
-                throw new InvalidArgumentError(
-                    $"Unexpected implementing class of" 
-                    $"{nameof(IReferable)}: {referable.GetType()}");
-                break;}}}
+                case AssetAdministrationShell assetAdministrationShell:
+                    VerifyAssetAdministrationShell(
+                        assetAdministrationShell, errors);
+                    break;
+                default:
+                    throw new InvalidArgumentException(
+                        $"Unexpected implementing class of" 
+                        $"{nameof(IReferable)}: {referable.GetType()}");
+                    break;
+            }
+        }
 
 
 
@@ -344,6 +358,10 @@ namespace AasCore.Aas3
             VerifyAdministrativeInformation(errors);
         }
 
+        /// <summary>
+        /// Dispatch dynamically to the corresponding concrete verifier of 
+        /// the underlying implementing class of IIdentifiable.
+        /// </summary>
         public void VerifyIIdentifiable(
             IIdentifiable identifiable,
             Errors errors)
@@ -352,14 +370,17 @@ namespace AasCore.Aas3
 
             switch (identifiable)
             {
-            case AssetAdministrationShell assetAdministrationShell:
-                VerifyAssetAdministrationShell(
-                    assetAdministrationShell, errors);
-                break;default:
-                throw new InvalidArgumentError(
-                    $"Unexpected implementing class of" 
-                    $"{nameof(IIdentifiable)}: {identifiable.GetType()}");
-                break;}}}
+                case AssetAdministrationShell assetAdministrationShell:
+                    VerifyAssetAdministrationShell(
+                        assetAdministrationShell, errors);
+                    break;
+                default:
+                    throw new InvalidArgumentException(
+                        $"Unexpected implementing class of" 
+                        $"{nameof(IIdentifiable)}: {identifiable.GetType()}");
+                    break;
+            }
+        }
 
 
 
@@ -449,6 +470,10 @@ namespace AasCore.Aas3
             return;
         }
 
+        /// <summary>
+        /// Dispatch dynamically to the corresponding concrete verifier of 
+        /// the underlying implementing class of IHasDataSpecification.
+        /// </summary>
         public void VerifyIHasDataSpecification(
             IHasDataSpecification hasDataSpecification,
             Errors errors)
@@ -457,14 +482,17 @@ namespace AasCore.Aas3
 
             switch (hasDataSpecification)
             {
-            case AssetAdministrationShell assetAdministrationShell:
-                VerifyAssetAdministrationShell(
-                    assetAdministrationShell, errors);
-                break;default:
-                throw new InvalidArgumentError(
-                    $"Unexpected implementing class of" 
-                    $"{nameof(IHasDataSpecification)}: {hasDataSpecification.GetType()}");
-                break;}}}
+                case AssetAdministrationShell assetAdministrationShell:
+                    VerifyAssetAdministrationShell(
+                        assetAdministrationShell, errors);
+                    break;
+                default:
+                    throw new InvalidArgumentException(
+                        $"Unexpected implementing class of" 
+                        $"{nameof(IHasDataSpecification)}: {hasDataSpecification.GetType()}");
+                    break;
+            }
+        }
 
 
 
