@@ -268,15 +268,15 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Verify <see cref="LangString" /> and recurse into the contained children entities.
+        /// Verify <see cref="LangString" /> and 
+        /// recurse into the contained children entities.
         /// </summary>
         public void VerifyRecursivelyLangString(
             LangString langString,
             Errors errors)
         {
-            if (errors.Full()) return;
-
             VerifyLangString(errors);
+            if (errors.Full()) return;
         }
 
         /// <summary>
@@ -293,15 +293,15 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Verify <see cref="LangStringSet" /> and recurse into the contained children entities.
+        /// Verify <see cref="LangStringSet" /> and 
+        /// recurse into the contained children entities.
         /// </summary>
         public void VerifyRecursivelyLangStringSet(
             LangStringSet langStringSet,
             Errors errors)
         {
-            if (errors.Full()) return;
-
             VerifyLangStringSet(errors);
+            if (errors.Full()) return;
         }
 
         /// <summary>
@@ -366,15 +366,15 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Verify <see cref="Identifier" /> and recurse into the contained children entities.
+        /// Verify <see cref="Identifier" /> and 
+        /// recurse into the contained children entities.
         /// </summary>
         public void VerifyRecursivelyIdentifier(
             Identifier identifier,
             Errors errors)
         {
-            if (errors.Full()) return;
-
             VerifyIdentifier(errors);
+            if (errors.Full()) return;
         }
 
         /// <summary>
@@ -391,15 +391,15 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Verify <see cref="AdministrativeInformation" /> and recurse into the contained children entities.
+        /// Verify <see cref="AdministrativeInformation" /> and 
+        /// recurse into the contained children entities.
         /// </summary>
         public void VerifyRecursivelyAdministrativeInformation(
             AdministrativeInformation administrativeInformation,
             Errors errors)
         {
-            if (errors.Full()) return;
-
             VerifyAdministrativeInformation(errors);
+            if (errors.Full()) return;
         }
 
         /// <summary>
@@ -482,15 +482,15 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Verify <see cref="Key" /> and recurse into the contained children entities.
+        /// Verify <see cref="Key" /> and 
+        /// recurse into the contained children entities.
         /// </summary>
         public void VerifyRecursivelyKey(
             Key key,
             Errors errors)
         {
-            if (errors.Full()) return;
-
             VerifyKey(errors);
+            if (errors.Full()) return;
         }
 
         /// <summary>
@@ -507,15 +507,15 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Verify <see cref="Reference" /> and recurse into the contained children entities.
+        /// Verify <see cref="Reference" /> and 
+        /// recurse into the contained children entities.
         /// </summary>
         public void VerifyRecursivelyReference(
             Reference reference,
             Errors errors)
         {
-            if (errors.Full()) return;
-
             VerifyReference(errors);
+            if (errors.Full()) return;
         }
 
         public void VerifyIHasSemantics(
@@ -598,15 +598,20 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Verify <see cref="AssetAdministrationShell" /> and recurse into the contained children entities.
+        /// Verify <see cref="AssetAdministrationShell" /> and 
+        /// recurse into the contained children entities.
         /// </summary>
         public void VerifyRecursivelyAssetAdministrationShell(
             AssetAdministrationShell assetAdministrationShell,
             Errors errors)
         {
+            VerifyAssetAdministrationShell(errors);
             if (errors.Full()) return;
 
-            VerifyAssetAdministrationShell(errors);
+            VerifyRecursivelyIdentifier(
+                assetAdministrationShell.Identification,
+                errors);
+            if (errors.Full()) return;
         }
     }  // class Verification
 }  // namespace AasCore.Aas3

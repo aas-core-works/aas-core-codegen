@@ -88,6 +88,8 @@ def _generate_verify_class(
     else:
         verify_blocks.append("if (errors.Full()) return;")
         # TODO: transpile the invariants into body_blocks
+
+        # TODO: check that all enumerations are in the valid range!
         pass
 
     cls_name = csharp_naming.class_name(cls.name)
@@ -115,21 +117,61 @@ def _generate_verify_class(
     writer.write("\n}\n\n")
 
     verify_recursively_blocks = [
-        "if (errors.Full()) return;",
-        f"{verify_name}(errors);"
+        f"{verify_name}(errors);\n"
+        "if (errors.Full()) return;"
     ]  # type: List[str]
 
-    # TODO: generate VerifyRecursively{cls}
-    #  🠒 unroll containers manually. This is a pain, but we lack the template specialization in C#.
-    #  🠒 See: https://stackoverflow.com/questions/600978/how-to-do-template-specialization-in-c-sharp
+    for prop in cls.properties:
+        if isinstance(prop.type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
+            continue
+        elif isinstance(prop.type_annotation, intermediate.OurAtomicTypeAnnotation):
+            prop_symbol = prop.type_annotation.symbol
 
-    verify_recursively_name = Identifier(
-        f"VerifyRecursively{csharp_naming.class_name(cls.name)}")
+            if isinstance(prop_symbol, intermediate.Enumeration):
+                continue
+            elif isinstance(prop_symbol, intermediate.Class):
+                prop_cls_name = csharp_naming.class_name(prop_symbol.name)
+                prop_name = csharp_naming.property_name(prop.name)
+
+                verify_recursively_blocks.append(
+                    textwrap.dedent(f'''\
+                        VerifyRecursively{prop_cls_name}(
+                        {csharp_common.INDENT}{arg_name}.{prop_name},
+                        {csharp_common.INDENT}errors);
+                        if (errors.Full()) return;'''))
+
+            elif isinstance(prop_symbol, intermediate.Interface):
+                prop_interface_name = csharp_naming.interface_name(prop_symbol.name)
+                prop_name = csharp_naming.property_name(prop.name)
+
+                verify_recursively_blocks.append(
+                    textwrap.dedent(f'''\
+                        VerifyRecursively{prop_interface_name}(
+                        {csharp_common.INDENT}{arg_name}.{prop_name},
+                        {csharp_common.INDENT}errors);
+                        if (errors.Full()) return;'''))
+            else:
+                assert_never(prop_symbol)
+
+        elif isinstance(prop.type_annotation, intermediate.SubscriptedTypeAnnotation):
+            # NOTE (mristin, 2021-10-02):
+            # We have to manually unroll the subscripted types since C# does not support
+            # proper template specialization.
+            # See: https://stackoverflow.com/questions/600978/how-to-do-template-specialization-in-c-sharp
+            # TODO: implement
+            pass
+        elif isinstance(prop.type_annotation, intermediate.SelfTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected self type annotation for a property {prop.name!r} "
+                f"of class {cls.name}")
+        else:
+            assert_never(prop.type_annotation)
 
     writer.write(
         textwrap.dedent(f'''\
             /// <summary>
-            /// Verify <see cref={xml.sax.saxutils.quoteattr(cls_name)} /> and recurse into the contained children entities.
+            /// Verify <see cref={xml.sax.saxutils.quoteattr(cls_name)} /> and 
+            /// recurse into the contained children entities.
             /// </summary>
             public void VerifyRecursively{cls_name}(
                 {cls_name} {arg_name},
