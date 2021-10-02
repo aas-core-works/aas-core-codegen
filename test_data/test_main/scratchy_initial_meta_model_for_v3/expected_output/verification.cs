@@ -223,13 +223,35 @@ namespace AasCore.Aas3
                     break;
                 default:
                     throw new InvalidArgumentException(
-                        $"Unexpected implementing class of" 
+                        $"Unexpected implementing class of "
                         $"{nameof(IHasExtension)}: {hasExtension.GetType()}");
                     break;
             }
         }
 
+        /// <summary>
+        /// Dispatch dynamically to the corresponding concrete recursive verifier of 
+        /// the underlying implementing class of IHasExtension.
+        /// </summary>
+        public void VerifyRecursivelyIHasExtension(
+            IHasExtension hasExtension,
+            Errors errors)
+        {
+            if (errors.Full()) return;
 
+            switch (hasExtension)
+            {
+                case AssetAdministrationShell assetAdministrationShell:
+                    VerifyRecursivelyAssetAdministrationShell(
+                        assetAdministrationShell, errors);
+                    break;
+                default:
+                    throw new InvalidArgumentException(
+                        $"Unexpected implementing class of "
+                        $"{nameof(IHasExtension)}: {hasExtension.GetType()}");
+                    break;
+            }
+        }
 
         /// <summary>
         /// Verify <see cref="LangString" />.
@@ -300,13 +322,35 @@ namespace AasCore.Aas3
                     break;
                 default:
                     throw new InvalidArgumentException(
-                        $"Unexpected implementing class of" 
+                        $"Unexpected implementing class of "
                         $"{nameof(IReferable)}: {referable.GetType()}");
                     break;
             }
         }
 
+        /// <summary>
+        /// Dispatch dynamically to the corresponding concrete recursive verifier of 
+        /// the underlying implementing class of IReferable.
+        /// </summary>
+        public void VerifyRecursivelyIReferable(
+            IReferable referable,
+            Errors errors)
+        {
+            if (errors.Full()) return;
 
+            switch (referable)
+            {
+                case AssetAdministrationShell assetAdministrationShell:
+                    VerifyRecursivelyAssetAdministrationShell(
+                        assetAdministrationShell, errors);
+                    break;
+                default:
+                    throw new InvalidArgumentException(
+                        $"Unexpected implementing class of "
+                        $"{nameof(IReferable)}: {referable.GetType()}");
+                    break;
+            }
+        }
 
         /// <summary>
         /// Verify <see cref="Identifier" />.
@@ -376,13 +420,35 @@ namespace AasCore.Aas3
                     break;
                 default:
                     throw new InvalidArgumentException(
-                        $"Unexpected implementing class of" 
+                        $"Unexpected implementing class of "
                         $"{nameof(IIdentifiable)}: {identifiable.GetType()}");
                     break;
             }
         }
 
+        /// <summary>
+        /// Dispatch dynamically to the corresponding concrete recursive verifier of 
+        /// the underlying implementing class of IIdentifiable.
+        /// </summary>
+        public void VerifyRecursivelyIIdentifiable(
+            IIdentifiable identifiable,
+            Errors errors)
+        {
+            if (errors.Full()) return;
 
+            switch (identifiable)
+            {
+                case AssetAdministrationShell assetAdministrationShell:
+                    VerifyRecursivelyAssetAdministrationShell(
+                        assetAdministrationShell, errors);
+                    break;
+                default:
+                    throw new InvalidArgumentException(
+                        $"Unexpected implementing class of "
+                        $"{nameof(IIdentifiable)}: {identifiable.GetType()}");
+                    break;
+            }
+        }
 
         public void VerifyIHasKind(
             IHasKind hasKind,
@@ -488,13 +554,35 @@ namespace AasCore.Aas3
                     break;
                 default:
                     throw new InvalidArgumentException(
-                        $"Unexpected implementing class of" 
+                        $"Unexpected implementing class of "
                         $"{nameof(IHasDataSpecification)}: {hasDataSpecification.GetType()}");
                     break;
             }
         }
 
+        /// <summary>
+        /// Dispatch dynamically to the corresponding concrete recursive verifier of 
+        /// the underlying implementing class of IHasDataSpecification.
+        /// </summary>
+        public void VerifyRecursivelyIHasDataSpecification(
+            IHasDataSpecification hasDataSpecification,
+            Errors errors)
+        {
+            if (errors.Full()) return;
 
+            switch (hasDataSpecification)
+            {
+                case AssetAdministrationShell assetAdministrationShell:
+                    VerifyRecursivelyAssetAdministrationShell(
+                        assetAdministrationShell, errors);
+                    break;
+                default:
+                    throw new InvalidArgumentException(
+                        $"Unexpected implementing class of "
+                        $"{nameof(IHasDataSpecification)}: {hasDataSpecification.GetType()}");
+                    break;
+            }
+        }
 
         /// <summary>
         /// Verify <see cref="AssetAdministrationShell" />.

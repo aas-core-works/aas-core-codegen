@@ -4,7 +4,7 @@ import textwrap
 import xml.sax.saxutils
 from typing import Tuple, Optional, List, Union
 
-from icontract import ensure
+from icontract import ensure, require
 
 import aas_core_csharp_codegen.csharp.common as csharp_common
 import aas_core_csharp_codegen.csharp.naming as csharp_naming
@@ -178,69 +178,85 @@ def _generate_verify_interface(
 
         return Stripped(code), None
 
-    # region Verify
+    @require(lambda function_prefix: function_prefix in ('Verify', 'VerifyRecursively'))
+    def generate_dispatch(function_prefix: str) -> Stripped:
+        """Generate the dispatch function with the ``function_prefix``."""
+        blocks = [
+            "if (errors.Full()) return;"
+        ]  # type: List[str]
 
-    verify_blocks = [
-        "if (errors.Full()) return;"
-    ]  # type: List[str]
+        switch_writer = io.StringIO()
+        switch_writer.write(f"switch ({arg_name})\n{{\n")
 
-    writer = io.StringIO()
-    writer.write(f"switch ({arg_name})\n{{\n")
+        for implementer in implementers:
+            cls_name = csharp_naming.class_name(implementer.name)
+            var_name = csharp_naming.variable_name(implementer.name)
 
-    for implementer in implementers:
-        cls_name = csharp_naming.class_name(implementer.name)
-        var_name = csharp_naming.variable_name(implementer.name)
+            switch_writer.write(
+                textwrap.indent(
+                    textwrap.dedent(f'''\
+                        case {cls_name} {var_name}:
+                        {csharp_common.INDENT}{function_prefix}{cls_name}(
+                        {csharp_common.INDENT2}{var_name}, errors);
+                        {csharp_common.INDENT}break;
+                        '''),
+                    csharp_common.INDENT))
 
-        writer.write(
+        switch_writer.write(
             textwrap.indent(
                 textwrap.dedent(f'''\
-                    case {cls_name} {var_name}:
-                    {csharp_common.INDENT}Verify{cls_name}(
-                    {csharp_common.INDENT2}{var_name}, errors);
+                    default:
+                    {csharp_common.INDENT}throw new InvalidArgumentException(
+                    {csharp_common.INDENT2}$"Unexpected implementing class of "
+                    {csharp_common.INDENT2}$"{{nameof({interface_name})}}: {{{arg_name}.GetType()}}");
                     {csharp_common.INDENT}break;
                     '''),
                 csharp_common.INDENT))
 
-    writer.write(
-        textwrap.indent(
-            textwrap.dedent(f'''\
-                default:
-                {csharp_common.INDENT}throw new InvalidArgumentException(
-                {csharp_common.INDENT2}$"Unexpected implementing class of" 
-                {csharp_common.INDENT2}$"{{nameof({interface_name})}}: {{{arg_name}.GetType()}}");
-                {csharp_common.INDENT}break;
-                '''),
-            csharp_common.INDENT))
+        switch_writer.write("}")
+        blocks.append(switch_writer.getvalue())
 
-    writer.write("}")
-    verify_blocks.append(writer.getvalue())
+        switch_writer = io.StringIO()
+        switch_writer.write(
+            textwrap.dedent(f'''\
+                public void {function_prefix}{interface_name}(
+                {csharp_common.INDENT}{interface_name} {arg_name},
+                {csharp_common.INDENT}Errors errors)
+                {{
+                '''))
+
+        for i, block in enumerate(blocks):
+            if i > 0:
+                switch_writer.write("\n\n")
+            switch_writer.write(textwrap.indent(block, csharp_common.INDENT))
+
+        switch_writer.write("\n}")
+
+        return Stripped(switch_writer.getvalue())
 
     writer = io.StringIO()
+
+    verify_dispatch = generate_dispatch(function_prefix="Verify")
+    verify_recursively_dispatch = generate_dispatch(function_prefix="VerifyRecursively")
+
     writer.write(
         textwrap.dedent(f'''\
             /// <summary>
             /// Dispatch dynamically to the corresponding concrete verifier of 
             /// the underlying implementing class of {interface_name}.
             /// </summary>
-            public void Verify{interface_name}(
-            {csharp_common.INDENT}{interface_name} {arg_name},
-            {csharp_common.INDENT}Errors errors)
-            {{
             '''))
+    writer.write(generate_dispatch(function_prefix="Verify"))
+    writer.write('\n\n')
 
-    for i, block in enumerate(verify_blocks):
-        if i > 0:
-            writer.write("\n\n")
-        writer.write(textwrap.indent(block, csharp_common.INDENT))
-
-    writer.write("\n}\n\n")
-
-    # endregion
-
-    # region VerifyRecursively
-    # TODO: VerifyRecursively{interface name} 🠒 dispatch to the corresponding class, use must_find_interface_descendants
-
-    # endregion
+    writer.write(
+        textwrap.dedent(f'''\
+            /// <summary>
+            /// Dispatch dynamically to the corresponding concrete recursive verifier of 
+            /// the underlying implementing class of {interface_name}.
+            /// </summary>
+            '''))
+    writer.write(generate_dispatch(function_prefix="VerifyRecursively"))
 
     return Stripped(writer.getvalue()), None
 
