@@ -1182,11 +1182,11 @@ def _classdef_to_symbol(
 
     if "Enum" in base_names and len(base_names) > 1:
         return (None, Error(
-                node=node,
-                message=f"Expected an enumeration to only inherit from ``Enum``, "
-                        f"but it inherits from: {base_names}",
-            ),
-        )
+            node=node,
+            message=f"Expected an enumeration to only inherit from ``Enum``, "
+                    f"but it inherits from: {base_names}",
+        ),
+                )
 
     if "Enum" in base_names:
         return _enum_to_symbol(node=node, atok=atok)
@@ -1416,6 +1416,36 @@ def _verify_symbol_table(
     """
     errors = []  # type: List[Error]
 
+    # region Check reserved names
+
+    reserved_symbol_names = {'entity', 'ientity', 'verification'}
+    reserved_method_names = {'descend', 'accept'}
+
+    for symbol in symbol_table.symbols:
+        if symbol.name.lower() in reserved_symbol_names:
+            errors.append(Error(
+                symbol.node,
+                f"The name of the symbol is reserved "
+                f"for the code generation: {symbol.name!r}"))
+
+        if isinstance(symbol, Entity):
+            for method in symbol.methods:
+                if method.name in reserved_method_names:
+                    errors.append(Error(
+                        method.node,
+                        f"The name of the method is reserved "
+                        f"for the code generation: {method.name!r}"))
+
+            for prop in symbol.properties:
+                if prop.name in reserved_method_names:
+                    errors.append(Error(
+                        prop.node,
+                        f"The name of the property is reserved "
+                        f"for the code generation: {prop.name!r}"))
+    # endregion
+
+    # region Check dangling inheritances
+
     for symbol in symbol_table.symbols:
         if not isinstance(symbol, Entity):
             continue
@@ -1428,9 +1458,7 @@ def _verify_symbol_table(
                     Error(
                         symbol.node,
                         f"The inheritance for entity {symbol.name} "
-                        f"is dangling: {inheritance}",
-                    )
-                )
+                        f"is dangling: {inheritance}"))
 
             elif not isinstance(parent_symbol, Entity):
                 errors.append(
@@ -1439,9 +1467,7 @@ def _verify_symbol_table(
                         f"Expected the entity {symbol.name} to inherit "
                         f"from an abstract entity, "
                         f"but it inherits from a symbol of type "
-                        f"{parent_symbol.__class__.__name__}: {parent_symbol.name}",
-                    )
-                )
+                        f"{parent_symbol.__class__.__name__}: {parent_symbol.name}"))
 
             elif not isinstance(parent_symbol, AbstractEntity):
                 errors.append(

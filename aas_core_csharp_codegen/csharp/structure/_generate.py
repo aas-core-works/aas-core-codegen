@@ -555,9 +555,10 @@ def _generate_interface(
 
     name = csharp_naming.interface_name(symbol.name)
 
-    if len(symbol.inheritances) == 0:
-        writer.write(f"public interface {name}\n{{\n")
-    elif len(symbol.inheritances) == 1:
+    inheritances = list(symbol.inheritances) + [Identifier('IEntity')]
+
+    assert len(inheritances) > 0
+    if len(symbol.inheritances) == 1:
         inheritance = csharp_naming.interface_name(symbol.inheritances[0])
         writer.write(f"public interface {name} : {inheritance}\n{{\n")
     else:
@@ -647,6 +648,39 @@ def _generate_interface(
 
     return Stripped(writer.getvalue()), None
 
+def _descendable(type_annotation: intermediate.Property)->bool:
+    """Check if the ``type_annotation`` describes an entity or subscribes an entity. """
+    # TODO: recursively iterate
+    raise NotImplementedError()
+
+def _generate_descend_method(
+        symbol: intermediate.Class
+) -> Stripped:
+    """Generate the ``Descend`` method of the class defined by the ``symbol``."""
+    blocks = []  # type: List[Stripped]
+
+    for prop in symbol.properties:
+        type_anno = prop.type_annotation
+
+
+
+        # TODO: continue here
+        raise NotImplementedError()
+
+    writer = io.StringIO()
+    writer.write(
+        textwrap.dedent('''\
+            /// <summary>
+            /// Iterate over all the entity instances contained in this instance.
+            /// </summary>
+            public IEnumerable<IEntity> Descend()
+            {
+            '''))
+    writer.write(textwrap.indent('\n\n'.join(blocks), csharp_common.INDENT))
+
+    writer.write('\n}')
+
+    return Stripped(writer.getvalue())
 
 @require(lambda symbol: symbol.implementation_key is None)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -667,9 +701,10 @@ def _generate_class(
 
     name = csharp_naming.class_name(symbol.name)
 
-    if len(symbol.interfaces) == 0:
-        writer.write(f"public class {name}\n{{\n")
-    elif len(symbol.interfaces) == 1:
+    interfaces = list(symbol.interfaces) + ['IEntity']
+
+    assert len(interfaces) > 0
+    if len(symbol.interfaces) == 1:
         interface_name = csharp_naming.interface_name(symbol.interfaces[0])
         writer.write(f"public class {name} : {interface_name}\n{{\n")
     else:
@@ -684,7 +719,7 @@ def _generate_class(
         writer.write("\n{{\n")
 
     # Code blocks separated by double newlines and indented once
-    codes = []  # type: List[Stripped]
+    blocks = []  # type: List[Stripped]
 
     # region Getters and setters
 
@@ -703,7 +738,7 @@ def _generate_class(
 
         prop_blocks.append(Stripped(f"{prop_type} {prop_name} {{ get; set; }}"))
 
-        codes.append(Stripped('\n'.join(prop_blocks)))
+        blocks.append(Stripped('\n'.join(prop_blocks)))
 
     # endregion
 
@@ -711,26 +746,38 @@ def _generate_class(
 
     for method in symbol.methods:
         if method.implementation_key is not None:
-            codes.append(spec_impls[method.implementation_key])
+            blocks.append(spec_impls[method.implementation_key])
         else:
             # NOTE (mristin, 2021-09-16):
             # At the moment, we do not transpile the method body and its contracts.
             # We want to finish the meta-model for the V3 and fix de/serialization
             # before taking on this rather hard task.
 
-            return (
-                None,
-                Error(
-                    symbol.parsed.node,
-                    "At the moment, we do not transpile the method body and "
-                    "its contracts."))
+            return (None, Error(
+                symbol.parsed.node,
+                "At the moment, we do not transpile the method body and "
+                "its contracts."))
+
+    # TODO: continue here, implement
+    blocks.append(_generate_descend_method(symbol=symbol))
+
+    blocks.append(
+        Stripped(
+            textwrap.dedent('''\
+                /// <summary>
+                /// Accept the visitor to visit this instance for double dispatch.
+                /// </summary>
+                public Accept<T>(IVisitor<T> visitor)
+                {
+                    visitor.visit(this);
+                }''')))
 
     # endregion
 
     # region Constructor
 
     if symbol.constructor.implementation_key is not None:
-        codes.append(spec_impls[symbol.constructor.implementation_key])
+        blocks.append(spec_impls[symbol.constructor.implementation_key])
     else:
         constructor_blocks = []  # type: List[str]
 
@@ -809,11 +856,11 @@ def _generate_class(
 
         constructor_blocks.append("}")
 
-        codes.append(Stripped("\n".join(constructor_blocks)))
+        blocks.append(Stripped("\n".join(constructor_blocks)))
 
     # endregion
 
-    for i, code in enumerate(codes):
+    for i, code in enumerate(blocks):
         if i > 0:
             writer.write("\n\n")
 
@@ -859,6 +906,25 @@ def generate(
         blocks.append(Stripped("\n".join(using_directives)))
 
     blocks.append(Stripped(f"namespace {namespace}\n{{"))
+
+    blocks.append(
+        Stripped(
+            textwrap.dedent('''\
+                /// <summary>
+                /// Represent a general entity of an AAS model.
+                /// </summary>
+                public interface IEntity
+                {
+                    /// <summary>
+                    /// Iterate over all the entity instances contained in this instance.
+                    /// </summary>
+                    public IEnumerable<IEntity> Descend();
+                    
+                    /// <summary>
+                    /// Accept the visitor to visit this instance for double dispatch.
+                    /// </summary>
+                    public Accept<T>(IVisitor<T> visitor);
+                }''')))
 
     errors = []  # type: List[Error]
 
