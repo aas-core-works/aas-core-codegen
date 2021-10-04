@@ -704,11 +704,8 @@ def _generate_descend_method(
                 if item_id == -1:
                     stmts.append(
                         f'yield return {prop_name};')
-                elif item_id == 0:
-                    stmts.append(f'yield return item;')
                 else:
-                    stmts.append(f'yield return item{item_id};')
-
+                    stmts.append(f'yield return {item_var(item_id)};')
             elif isinstance(type_anno, intermediate.SelfTypeAnnotation):
                 raise AssertionError("Unexpected self type annotation at this layer")
             elif isinstance(
@@ -729,15 +726,26 @@ def _generate_descend_method(
                     type_anno,
                     (intermediate.MappingTypeAnnotation,
                      intermediate.MutableMappingTypeAnnotation)):
-                # TODO: implement
-                raise NotImplementedError()
+                type_anno = type_anno.values
+
+                item_id += 1
+                if item_id == 0:
+                    stmts.append(
+                        f"foreach (var {item_var(item_id)} in {prop_name}.Values)")
+                else:
+                    stmts.append(
+                        f"foreach (var {item_var(item_id)} in "
+                        f"{item_var(item_id - 1)}.Values)")
+
             elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-                # TODO: implement
-                raise NotImplementedError()
+                if item_id == -1:
+                    stmts.append(f"if ({prop_name} != null)")
+                else:
+                    stmts.append(f"if ({item_var(item_id)} != null)")
             else:
                 assert_never(type_anno)
 
-        # TODO: continue here
+        # TODO: continue here 🠒 write stmts as chain
         raise NotImplementedError()
 
     if len(blocks) == 0:
