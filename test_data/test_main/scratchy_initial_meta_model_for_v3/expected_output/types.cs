@@ -9,7 +9,23 @@ using System.Collections.Generic;  // can't alias
 namespace AasCore.Aas3
 {
 
-    public interface IHasExtension
+    /// <summary>
+    /// Represent a general entity of an AAS model.
+    /// </summary>
+    public interface IEntity
+    {
+        /// <summary>
+        /// Iterate over all the entity instances contained in this instance.
+        /// </summary>
+        public IEnumerable<IEntity> DescendOnce();
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public Accept<T>(IVisitor<T> visitor);
+    }
+
+    public interface IHasExtension : IEntity
     {
 
     }
@@ -17,7 +33,7 @@ namespace AasCore.Aas3
     /// <summary>
     /// Give a text in a specific language.
     /// </summary>
-    public class LangString
+    public class LangString : IEntity
     {
         /// <summary>
         /// Language of the <see cref="text" />
@@ -28,6 +44,22 @@ namespace AasCore.Aas3
         /// Content of the string
         /// </summary>
         string Text { get; set; }
+
+        /// <summary>
+        /// Iterate over all the entity instances contained in this instance.
+        /// </summary>
+        public IEnumerable<IEntity> DescendOnce()
+        {
+            // No descendable properties
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public Accept<T>(IVisitor<T> visitor)
+        {
+            visitor.visit(this);
+        }
 
         LangString(
             string language,
@@ -49,7 +81,9 @@ namespace AasCore.Aas3
     /// This identifier is not globally unique.
     /// This identifier is unique within the name space of the element.
     /// </remarks>
-    public interface IReferable : IHasExtension
+    public interface IReferable :
+            IHasExtension,
+            IEntity
     {
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -123,11 +157,27 @@ namespace AasCore.Aas3
         Custom
     }
 
-    public class Identifier
+    public class Identifier : IEntity
     {
         string Id { get; set; }
 
         IdentifierType IdType { get; set; }
+
+        /// <summary>
+        /// Iterate over all the entity instances contained in this instance.
+        /// </summary>
+        public IEnumerable<IEntity> DescendOnce()
+        {
+            yield return IdType;
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public Accept<T>(IVisitor<T> visitor)
+        {
+            visitor.visit(this);
+        }
 
         Identifier(
             string id,
@@ -138,11 +188,27 @@ namespace AasCore.Aas3
         }
     }
 
-    public class AdministrativeInformation
+    public class AdministrativeInformation : IEntity
     {
         string? Version { get; set; }
 
         string? Revision { get; set; }
+
+        /// <summary>
+        /// Iterate over all the entity instances contained in this instance.
+        /// </summary>
+        public IEnumerable<IEntity> DescendOnce()
+        {
+            // No descendable properties
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public Accept<T>(IVisitor<T> visitor)
+        {
+            visitor.visit(this);
+        }
 
         AdministrativeInformation(
             string? version,
@@ -153,11 +219,13 @@ namespace AasCore.Aas3
         }
     }
 
-    public interface IIdentifiable : IReferable
+    public interface IIdentifiable :
+            IReferable,
+            IEntity
     {
-        Identifier Identifier { get; set; }
+        Identifier { get; set; }
 
-        AdministrativeInformation? AdministrativeInformation? { get; set; }
+        AdministrativeInformation? { get; set; }
     }
 
     public enum ModelingKind
@@ -169,9 +237,9 @@ namespace AasCore.Aas3
         Instance
     }
 
-    public interface IHasKind
+    public interface IHasKind : IEntity
     {
-        ModelingKind ModelingKind { get; set; }
+        ModelingKind { get; set; }
     }
 
     public enum LocalKeyType
@@ -366,13 +434,31 @@ namespace AasCore.Aas3
         View
     }
 
-    public class Key
+    public class Key : IEntity
     {
         KeyElements Type { get; set; }
 
         string Value { get; set; }
 
         KeyType IdType { get; set; }
+
+        /// <summary>
+        /// Iterate over all the entity instances contained in this instance.
+        /// </summary>
+        public IEnumerable<IEntity> DescendOnce()
+        {
+            yield return Type;
+
+            yield return IdType;
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public Accept<T>(IVisitor<T> visitor)
+        {
+            visitor.visit(this);
+        }
 
         Key(
             KeyElements type,
@@ -385,9 +471,28 @@ namespace AasCore.Aas3
         }
     }
 
-    public class Reference
+    public class Reference : IEntity
     {
         List<Key> Keys { get; set; }
+
+        /// <summary>
+        /// Iterate over all the entity instances contained in this instance.
+        /// </summary>
+        public IEnumerable<IEntity> DescendOnce()
+        {
+            foreach (var item in Keys)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public Accept<T>(IVisitor<T> visitor)
+        {
+            visitor.visit(this);
+        }
 
         Reference(List<Key> keys)
         {
@@ -395,19 +500,25 @@ namespace AasCore.Aas3
         }
     }
 
-    public interface IHasSemantics
+    public interface IHasSemantics : IEntity
     {
-        Reference? Reference? { get; set; }
+        Reference? { get; set; }
     }
 
-    public interface IHasDataSpecification
+    public interface IHasDataSpecification : IEntity
     {
-        List<Reference> List<Reference> { get; set; }
+        List<Reference> { get; set; }
     }
 
-    DataSpecifications = (dataSpecifications != null)
-        ? dataSpecifications
-        : new List<Reference>();    /// <summary>
+    /// <summary>
+    /// Structure a digital representation of an Asset.
+    /// </summary>
+    public class AssetAdministrationShell :
+            IIdentifiable,
+            IHasDataSpecification,
+            IEntity
+    {
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
         /// In case of referable this id is an identifying string of
         /// the element within its name space.
@@ -463,6 +574,47 @@ namespace AasCore.Aas3
         /// The reference to the AAS this AAS was derived from.
         /// </summary>
         AssetAdministrationShell? DerivedFrom { get; set; }
+
+        /// <summary>
+        /// Iterate over all the entity instances contained in this instance.
+        /// </summary>
+        public IEnumerable<IEntity> DescendOnce()
+        {
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+            }
+
+            yield return Identification;
+
+            if (Administration != null)
+            {
+                yield return Administration;
+            }
+
+            foreach (var item in DataSpecifications)
+            {
+                yield return item;
+            }
+
+            if (DerivedFrom != null)
+            {
+                yield return DerivedFrom;
+            }
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public Accept<T>(IVisitor<T> visitor)
+        {
+            visitor.visit(this);
+        }
 
         AssetAdministrationShell(
             Identifier identification,

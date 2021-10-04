@@ -1,5 +1,4 @@
 """Generate the C# data structures from the intermediate representation."""
-import ast
 import io
 import textwrap
 import xml.sax.saxutils
@@ -555,22 +554,22 @@ def _generate_interface(
 
     name = csharp_naming.interface_name(symbol.name)
 
-    inheritances = list(symbol.inheritances) + [Identifier('IEntity')]
+    inheritances = list(symbol.inheritances) + [Identifier('Entity')]
 
     assert len(inheritances) > 0
-    if len(symbol.inheritances) == 1:
-        inheritance = csharp_naming.interface_name(symbol.inheritances[0])
+    if len(inheritances) == 1:
+        inheritance = csharp_naming.interface_name(inheritances[0])
         writer.write(f"public interface {name} : {inheritance}\n{{\n")
     else:
-        writer.write(f"public class {name} :\n")
+        writer.write(f"public interface {name} :\n")
         for i, inheritance in enumerate(
-                map(csharp_naming.interface_name, symbol.inheritances)):
+                map(csharp_naming.interface_name, inheritances)):
             if i > 0:
                 writer.write(",\n")
 
-            writer.write(textwrap.indent(inheritance, csharp_common.INDENT * 2))
+            writer.write(textwrap.indent(inheritance, csharp_common.INDENT2))
 
-        writer.write("\n{{\n")
+        writer.write("\n{\n")
 
     # Code blocks separated by double newlines and indented once
     codes = []  # type: List[Stripped]
@@ -589,7 +588,7 @@ def _generate_interface(
             codes.append(
                 Stripped(f"{prop_comment}\n{prop_type} {prop_name} {{ get; set; }}"))
         else:
-            codes.append(Stripped(f"{prop_type} {prop_type} {{ get; set; }}"))
+            codes.append(Stripped(f"{prop_type} {{ get; set; }}"))
 
     # endregion
 
@@ -648,7 +647,8 @@ def _generate_interface(
 
     return Stripped(writer.getvalue()), None
 
-def _descendable(type_annotation: intermediate.TypeAnnotation)->bool:
+
+def _descendable(type_annotation: intermediate.TypeAnnotation) -> bool:
     """Check if the ``type_annotation`` describes an entity or subscribes an entity. """
     if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
         return False
@@ -672,17 +672,15 @@ def _descendable(type_annotation: intermediate.TypeAnnotation)->bool:
         assert_never(type_annotation)
 
 
-def _generate_descend_method(
+def _generate_descend_once_method(
         symbol: intermediate.Class
 ) -> Stripped:
-    """Generate the ``Descend`` method of the class defined by the ``symbol``."""
+    """Generate the ``DescendOnce`` method of the class defined by the ``symbol``."""
     blocks = []  # type: List[Stripped]
 
     for prop in symbol.properties:
-
-
         type_anno = prop.type_annotation
-        
+
         if not _descendable(type_annotation=type_anno):
             continue
 
@@ -692,29 +690,40 @@ def _generate_descend_method(
         stmts = []  # type: List[str]
         item_id = -1  # -1 means we are at the level of the property variable
 
-        item_var = lambda an_item_id: "item" if an_item_id == 0 else f"item{an_item_id}"
+        @require(lambda an_item_id: an_item_id >= 0)
+        def item_var(an_item_id: int) -> Identifier:
+            """Generate the item variable used in the loops."""
+            return (
+                Identifier("item")
+                if an_item_id == 0
+                else Identifier(f"item{an_item_id}"))
 
         while True:
+            old_type_anno = type_anno
+
             if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
                 raise AssertionError(
                     f"Unexpected BuiltinAtomicTypeAnnotation "
                     f"given the descendable property {prop.name!r} of class "
                     f"{symbol.name}")
+
             elif isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
                 if item_id == -1:
                     stmts.append(
                         f'yield return {prop_name};')
                 else:
                     stmts.append(f'yield return {item_var(item_id)};')
+
+                break
+
             elif isinstance(type_anno, intermediate.SelfTypeAnnotation):
                 raise AssertionError("Unexpected self type annotation at this layer")
+
             elif isinstance(
                     type_anno,
                     (intermediate.ListTypeAnnotation,
                      intermediate.SequenceTypeAnnotation,
                      intermediate.SetTypeAnnotation)):
-                type_anno = type_anno.items
-
                 item_id += 1
                 if item_id == 0:
                     stmts.append(
@@ -722,12 +731,14 @@ def _generate_descend_method(
                 else:
                     stmts.append(
                         f"foreach (var {item_var(item_id)} in {item_var(item_id - 1)})")
+
+                # noinspection PyUnresolvedReferences
+                type_anno = type_anno.items
+
             elif isinstance(
                     type_anno,
                     (intermediate.MappingTypeAnnotation,
                      intermediate.MutableMappingTypeAnnotation)):
-                type_anno = type_anno.values
-
                 item_id += 1
                 if item_id == 0:
                     stmts.append(
@@ -737,19 +748,39 @@ def _generate_descend_method(
                         f"foreach (var {item_var(item_id)} in "
                         f"{item_var(item_id - 1)}.Values)")
 
+                type_anno = type_anno.values
+
             elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
                 if item_id == -1:
                     stmts.append(f"if ({prop_name} != null)")
                 else:
                     stmts.append(f"if ({item_var(item_id)} != null)")
+
+                type_anno = type_anno.value
             else:
                 assert_never(type_anno)
 
-        # TODO: continue here 🠒 write stmts as chain
-        raise NotImplementedError()
+            assert type_anno != old_type_anno, "Loop invariant"
+
+        prefix = []  # type: List[str]
+        suffix = []  # type: List[str]
+
+        indent = ''
+        for i, stmt in enumerate(stmts):
+            if i != len(stmts) - 1:
+                prefix.append(f'{indent}{stmt}')
+                prefix.append(f'{indent}{{')
+
+                suffix.append(f'{indent}}}')
+            else:
+                prefix.append(f'{indent}{stmt}')
+
+            indent += csharp_common.INDENT
+
+        blocks.append(Stripped('\n'.join(prefix + suffix)))
 
     if len(blocks) == 0:
-        blocks.append('// No descendable properties')
+        blocks.append(Stripped('// No descendable properties'))
 
     writer = io.StringIO()
     writer.write(
@@ -757,7 +788,7 @@ def _generate_descend_method(
             /// <summary>
             /// Iterate over all the entity instances contained in this instance.
             /// </summary>
-            public IEnumerable<IEntity> Descend()
+            public IEnumerable<IEntity> DescendOnce()
             {
             '''))
     writer.write(textwrap.indent('\n\n'.join(blocks), csharp_common.INDENT))
@@ -765,6 +796,95 @@ def _generate_descend_method(
     writer.write('\n}')
 
     return Stripped(writer.getvalue())
+
+
+@require(lambda symbol: symbol.implementation_key is None)
+@require(lambda symbol: symbol.constructor.implementation_key is None)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_constructor(
+        symbol: intermediate.Class
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate the constructor function for the given symbol."""
+    cls_name = csharp_naming.class_name(symbol.name)
+
+    blocks = []  # type: List[str]
+
+    # TODO: handle default values
+    arg_codes = []  # type: List[str]
+    for arg in symbol.constructor.arguments:
+        if arg.name == "self":
+            continue
+
+        arg_type = csharp_common.generate_type(arg.type_annotation)
+        arg_name = csharp_naming.argument_name(arg.name)
+        arg_codes.append(Stripped(f'{arg_type} {arg_name}'))
+
+    if len(arg_codes) == 0:
+        return (None, Error(
+            symbol.parsed.node,
+            "An empty constructor is automatically generated, "
+            "which conflicts with the empty constructor "
+            "specified in the meta-model"))
+
+    elif len(arg_codes) == 1:
+        blocks.append(f"{cls_name}({arg_codes[0]})\n{{")
+    else:
+        arg_block = ",\n".join(arg_codes)
+        arg_block_indented = textwrap.indent(arg_block, csharp_common.INDENT)
+        blocks.append(
+            Stripped(f"{cls_name}(\n{arg_block_indented})\n{{"))
+
+    body = []  # type: List[str]
+    for stmt in symbol.constructor.statements:
+        if isinstance(stmt, understand_constructor.AssignArgument):
+            if stmt.default is None:
+                body.append(
+                    f'{csharp_naming.property_name(stmt.name)} = '
+                    f'{csharp_naming.argument_name(stmt.argument)};')
+            else:
+                if isinstance(stmt.default, understand_constructor.EmptyList):
+                    prop = symbol.property_map[stmt.name]
+                    prop_type = csharp_common.generate_type(prop.type_annotation)
+
+                    arg_name = csharp_naming.argument_name(stmt.argument)
+
+                    # Write the assignment as a ternary operator
+                    writer = io.StringIO()
+                    writer.write(f'{csharp_naming.property_name(stmt.name)} = ')
+                    writer.write(
+                        f'({arg_name} != null)\n')
+                    writer.write(
+                        textwrap.indent(f'? {arg_name}\n', csharp_common.INDENT))
+                    writer.write(
+                        textwrap.indent(
+                            f': new {prop_type}();', csharp_common.INDENT))
+
+                    body.append(writer.getvalue())
+                elif isinstance(
+                        stmt.default, understand_constructor.DefaultEnumLiteral):
+                    literal_code = ".".join([
+                        csharp_naming.enum_name(stmt.default.enum.name),
+                        csharp_naming.enum_literal_name(stmt.default.literal.name)
+                    ])
+
+                    body.append(
+                        f'{csharp_naming.property_name(stmt.name)} = '
+                        f'{literal_code};')
+                else:
+                    assert_never(stmt.default)
+
+        else:
+            assert_never(stmt)
+
+    blocks.append(
+        '\n'.join(
+            textwrap.indent(stmt_code, csharp_common.INDENT)
+            for stmt_code in body))
+
+    blocks.append("}")
+
+    return Stripped("\n".join(blocks)), None
+
 
 @require(lambda symbol: symbol.implementation_key is None)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -785,22 +905,22 @@ def _generate_class(
 
     name = csharp_naming.class_name(symbol.name)
 
-    interfaces = list(symbol.interfaces) + ['IEntity']
+    interfaces = list(symbol.interfaces) + [Identifier('Entity')]
 
     assert len(interfaces) > 0
-    if len(symbol.interfaces) == 1:
-        interface_name = csharp_naming.interface_name(symbol.interfaces[0])
+    if len(interfaces) == 1:
+        interface_name = csharp_naming.interface_name(interfaces[0])
         writer.write(f"public class {name} : {interface_name}\n{{\n")
     else:
         writer.write(f"public class {name} :\n")
         for i, interface_name in enumerate(
-                map(csharp_naming.interface_name, symbol.interfaces)):
+                map(csharp_naming.interface_name, interfaces)):
             if i > 0:
                 writer.write(",\n")
 
-            writer.write(textwrap.indent(interface_name, csharp_common.INDENT * 2))
+            writer.write(textwrap.indent(interface_name, csharp_common.INDENT2))
 
-        writer.write("\n{{\n")
+        writer.write("\n{\n")
 
     # Code blocks separated by double newlines and indented once
     blocks = []  # type: List[Stripped]
@@ -842,19 +962,18 @@ def _generate_class(
                 "At the moment, we do not transpile the method body and "
                 "its contracts."))
 
-    # TODO: continue here, implement
-    blocks.append(_generate_descend_method(symbol=symbol))
+    blocks.append(_generate_descend_once_method(symbol=symbol))
 
     blocks.append(
         Stripped(
-            textwrap.dedent('''\
+            textwrap.dedent(f'''\
                 /// <summary>
                 /// Accept the visitor to visit this instance for double dispatch.
                 /// </summary>
                 public Accept<T>(IVisitor<T> visitor)
-                {
-                    visitor.visit(this);
-                }''')))
+                {{
+                {csharp_common.INDENT}visitor.visit(this);
+                }}''')))
 
     # endregion
 
@@ -863,84 +982,11 @@ def _generate_class(
     if symbol.constructor.implementation_key is not None:
         blocks.append(spec_impls[symbol.constructor.implementation_key])
     else:
-        constructor_blocks = []  # type: List[str]
+        constructor_block, error = _generate_constructor(symbol=symbol)
+        if error is not None:
+            return None, error
 
-        # TODO: handle default values
-        arg_codes = []  # type: List[str]
-        for arg in symbol.constructor.arguments:
-            if arg.name == "self":
-                continue
-
-            arg_type = csharp_common.generate_type(arg.type_annotation)
-            arg_name = csharp_naming.argument_name(arg.name)
-            arg_codes.append(Stripped(f'{arg_type} {arg_name}'))
-
-        if len(arg_codes) == 0:
-            return (
-                None,
-                Error(
-                    symbol.parsed.node,
-                    "An empty constructor is automatically generated, "
-                    "which conflicts with the empty constructor "
-                    "specified in the meta-model"))
-        elif len(arg_codes) == 1:
-            constructor_blocks.append(f"{name}({arg_codes[0]})\n{{")
-        else:
-            arg_block = ",\n".join(arg_codes)
-            arg_block_indented = textwrap.indent(arg_block, csharp_common.INDENT)
-            constructor_blocks.append(
-                Stripped(f"{name}(\n{arg_block_indented})\n{{"))
-
-        body = []  # type: List[str]
-        for stmt in symbol.constructor.statements:
-            if isinstance(stmt, understand_constructor.AssignArgument):
-                if stmt.default is None:
-                    body.append(
-                        f'{csharp_naming.property_name(stmt.name)} = '
-                        f'{csharp_naming.argument_name(stmt.argument)};')
-                else:
-                    if isinstance(stmt.default, understand_constructor.EmptyList):
-                        prop = symbol.property_map[stmt.name]
-                        prop_type = csharp_common.generate_type(prop.type_annotation)
-
-                        arg_name = csharp_naming.argument_name(stmt.argument)
-
-                        # Write the assignment as a ternary operator
-                        writer = io.StringIO()
-                        writer.write(f'{csharp_naming.property_name(stmt.name)} = ')
-                        writer.write(
-                            f'({arg_name} != null)\n')
-                        writer.write(
-                            textwrap.indent(f'? {arg_name}\n', csharp_common.INDENT))
-                        writer.write(
-                            textwrap.indent(
-                                f': new {prop_type}();', csharp_common.INDENT))
-
-                        body.append(writer.getvalue())
-                    elif isinstance(
-                            stmt.default, understand_constructor.DefaultEnumLiteral):
-                        literal_code = ".".join([
-                            csharp_naming.enum_name(stmt.default.enum.name),
-                            csharp_naming.enum_literal_name(stmt.default.literal.name)
-                        ])
-
-                        body.append(
-                            f'{csharp_naming.property_name(stmt.name)} = '
-                            f'{literal_code};')
-                    else:
-                        assert_never(stmt.default)
-
-            else:
-                assert_never(stmt)
-
-        constructor_blocks.append(
-            '\n'.join(
-                textwrap.indent(stmt_code, csharp_common.INDENT)
-                for stmt_code in body))
-
-        constructor_blocks.append("}")
-
-        blocks.append(Stripped("\n".join(constructor_blocks)))
+        blocks.append(constructor_block)
 
     # endregion
 
@@ -953,6 +999,8 @@ def _generate_class(
     writer.write("\n}")
 
     return Stripped(writer.getvalue()), None
+
+# TODO: implement default constructor (setting all props to defaults)
 
 
 # fmt: off
@@ -973,13 +1021,7 @@ def generate(
 
     The ``namespace`` defines the C# namespace.
     """
-    warning = Stripped(textwrap.dedent("""\
-        /*
-         * This code has been automatically generated by aas-core-csharp-codegen.
-         * Do NOT edit or append.
-         */"""))
-
-    blocks = [warning]  # type: List[Rstripped]
+    blocks = [csharp_common.WARNING]  # type: List[Rstripped]
 
     using_directives = [
         "using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;",
@@ -992,23 +1034,25 @@ def generate(
     blocks.append(Stripped(f"namespace {namespace}\n{{"))
 
     blocks.append(
-        Stripped(
-            textwrap.dedent('''\
-                /// <summary>
-                /// Represent a general entity of an AAS model.
-                /// </summary>
-                public interface IEntity
-                {
+        Rstripped(
+            textwrap.indent(
+                textwrap.dedent('''\
                     /// <summary>
-                    /// Iterate over all the entity instances contained in this instance.
+                    /// Represent a general entity of an AAS model.
                     /// </summary>
-                    public IEnumerable<IEntity> Descend();
-                    
-                    /// <summary>
-                    /// Accept the visitor to visit this instance for double dispatch.
-                    /// </summary>
-                    public Accept<T>(IVisitor<T> visitor);
-                }''')))
+                    public interface IEntity
+                    {
+                        /// <summary>
+                        /// Iterate over all the entity instances contained in this instance.
+                        /// </summary>
+                        public IEnumerable<IEntity> DescendOnce();
+                        
+                        /// <summary>
+                        /// Accept the visitor to visit this instance for double dispatch.
+                        /// </summary>
+                        public Accept<T>(IVisitor<T> visitor);
+                    }'''),
+                csharp_common.INDENT)))
 
     errors = []  # type: List[Error]
 
@@ -1049,7 +1093,7 @@ def generate(
 
     blocks.append(Rstripped(f"}}  // namespace {namespace}"))
 
-    blocks.append(warning)
+    blocks.append(csharp_common.WARNING)
 
     out = io.StringIO()
     for i, block in enumerate(blocks):

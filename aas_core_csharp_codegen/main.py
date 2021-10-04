@@ -14,6 +14,7 @@ from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
     specific_implementations as csharp_specific_implementations,
     structure as csharp_structure,
+    visitation as csharp_visitation,
     verification as csharp_verification
 )
 from aas_core_csharp_codegen.understand import (
@@ -258,44 +259,72 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
             stderr=stderr)
         return 1
 
-    verification_spec_impl_errors = csharp_verification.verify(spec_impls=spec_impls)
-    if verification_spec_impl_errors is not None:
+    visitation_code, visitation_errors = csharp_visitation.generate(
+        symbol_table=ir_symbol_table,
+        namespace=namespace)
+
+    if visitation_errors is not None:
         write_error_report(
-            message=f"Failed to write the C# structures to {structure_pth}",
-            errors=verification_spec_impl_errors,
-            stderr=stderr)
-        return 1
-
-    interface_implementers = intermediate.map_interface_implementers(
-        symbol_table=ir_symbol_table)
-
-    verification_code, verification_errors = csharp_verification.generate(
-        symbol_table=verified_ir_table,
-        namespace=namespace,
-        spec_impls=spec_impls,
-        interface_implementers=interface_implementers)
-
-    if verification_errors is not None:
-        write_error_report(
-            message=f"Failed to generate the verification C# code "
+            message=f"Failed to generate the C# code for visitation "
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)
-                for error in verification_errors],
+                for error in visitation_errors],
             stderr=stderr)
         return 1
 
-    assert verification_code is not None
+    assert visitation_code is not None
 
-    verification_pth = params.output_dir / "verification.cs"
+    verification_pth = params.output_dir / "visitation.cs"
     try:
-        verification_pth.write_text(verification_code)
+        verification_pth.write_text(visitation_code)
     except Exception as exception:
         write_error_report(
-            message=f"Failed to write the verification C# code to {verification_pth}",
+            message=f"Failed to write the visitation C# code to {verification_pth}",
             errors=[str(exception)],
             stderr=stderr)
         return 1
+
+    # TODO: uncomment once refactored to use the visitor
+    # verification_spec_impl_errors = csharp_verification.verify(spec_impls=spec_impls)
+    # if verification_spec_impl_errors is not None:
+    #     write_error_report(
+    #         message=f"Failed to write the C# structures to {structure_pth}",
+    #         errors=verification_spec_impl_errors,
+    #         stderr=stderr)
+    #     return 1
+    #
+    # interface_implementers = intermediate.map_interface_implementers(
+    #     symbol_table=ir_symbol_table)
+    #
+    #
+    # verification_code, verification_errors = csharp_verification.generate(
+    #     symbol_table=verified_ir_table,
+    #     namespace=namespace,
+    #     spec_impls=spec_impls,
+    #     interface_implementers=interface_implementers)
+    #
+    # if verification_errors is not None:
+    #     write_error_report(
+    #         message=f"Failed to generate the verification C# code "
+    #                 f"based on {params.model_path}",
+    #         errors=[
+    #             lineno_columner.error_message(error)
+    #             for error in verification_errors],
+    #         stderr=stderr)
+    #     return 1
+    #
+    # assert verification_code is not None
+    #
+    # verification_pth = params.output_dir / "verification.cs"
+    # try:
+    #     verification_pth.write_text(verification_code)
+    # except Exception as exception:
+    #     write_error_report(
+    #         message=f"Failed to write the verification C# code to {verification_pth}",
+    #         errors=[str(exception)],
+    #         stderr=stderr)
+    #     return 1
 
     # TODO: implement further steps
 
