@@ -648,10 +648,29 @@ def _generate_interface(
 
     return Stripped(writer.getvalue()), None
 
-def _descendable(type_annotation: intermediate.Property)->bool:
+def _descendable(type_annotation: intermediate.TypeAnnotation)->bool:
     """Check if the ``type_annotation`` describes an entity or subscribes an entity. """
-    # TODO: recursively iterate
-    raise NotImplementedError()
+    if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
+        return False
+    elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
+        return True
+    elif isinstance(type_annotation, intermediate.SelfTypeAnnotation):
+        raise AssertionError("Unexpected self type annotation at this layer")
+    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
+        return _descendable(type_annotation=type_annotation.items)
+    elif isinstance(type_annotation, intermediate.SequenceTypeAnnotation):
+        return _descendable(type_annotation=type_annotation.items)
+    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
+        return _descendable(type_annotation=type_annotation.items)
+    elif isinstance(type_annotation, intermediate.MappingTypeAnnotation):
+        return _descendable(type_annotation=type_annotation.values)
+    elif isinstance(type_annotation, intermediate.MutableMappingTypeAnnotation):
+        return _descendable(type_annotation=type_annotation.values)
+    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
+        return _descendable(type_annotation=type_annotation.value)
+    else:
+        assert_never(type_annotation)
+
 
 def _generate_descend_method(
         symbol: intermediate.Class
@@ -660,12 +679,69 @@ def _generate_descend_method(
     blocks = []  # type: List[Stripped]
 
     for prop in symbol.properties:
+
+
         type_anno = prop.type_annotation
+        
+        if not _descendable(type_annotation=type_anno):
+            continue
 
+        prop_name = csharp_naming.property_name(prop.name)
 
+        # Unroll
+        stmts = []  # type: List[str]
+        item_id = -1  # -1 means we are at the level of the property variable
+
+        item_var = lambda an_item_id: "item" if an_item_id == 0 else f"item{an_item_id}"
+
+        while True:
+            if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
+                raise AssertionError(
+                    f"Unexpected BuiltinAtomicTypeAnnotation "
+                    f"given the descendable property {prop.name!r} of class "
+                    f"{symbol.name}")
+            elif isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
+                if item_id == -1:
+                    stmts.append(
+                        f'yield return {prop_name};')
+                elif item_id == 0:
+                    stmts.append(f'yield return item;')
+                else:
+                    stmts.append(f'yield return item{item_id};')
+
+            elif isinstance(type_anno, intermediate.SelfTypeAnnotation):
+                raise AssertionError("Unexpected self type annotation at this layer")
+            elif isinstance(
+                    type_anno,
+                    (intermediate.ListTypeAnnotation,
+                     intermediate.SequenceTypeAnnotation,
+                     intermediate.SetTypeAnnotation)):
+                type_anno = type_anno.items
+
+                item_id += 1
+                if item_id == 0:
+                    stmts.append(
+                        f"foreach (var {item_var(item_id)} in {prop_name})")
+                else:
+                    stmts.append(
+                        f"foreach (var {item_var(item_id)} in {item_var(item_id - 1)})")
+            elif isinstance(
+                    type_anno,
+                    (intermediate.MappingTypeAnnotation,
+                     intermediate.MutableMappingTypeAnnotation)):
+                # TODO: implement
+                raise NotImplementedError()
+            elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
+                # TODO: implement
+                raise NotImplementedError()
+            else:
+                assert_never(type_anno)
 
         # TODO: continue here
         raise NotImplementedError()
+
+    if len(blocks) == 0:
+        blocks.append('// No descendable properties')
 
     writer = io.StringIO()
     writer.write(
