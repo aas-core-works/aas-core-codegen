@@ -12,14 +12,14 @@ namespace AasCore.Aas3
         /// </summary>
         public interface IVisitor<T>
         {
-            public T visit(IEntity entity);
-            public T visit(LangString langString);
-            public T visit(LangStringSet langStringSet);
-            public T visit(Identifier identifier);
-            public T visit(AdministrativeInformation administrativeInformation);
-            public T visit(Key key);
-            public T visit(Reference reference);
-            public T visit(AssetAdministrationShell assetAdministrationShell);
+            public T Visit(IEntity entity);
+            public T Visit(LangString langString);
+            public T Visit(LangStringSet langStringSet);
+            public T Visit(Identifier identifier);
+            public T Visit(AdministrativeInformation administrativeInformation);
+            public T Visit(Key key);
+            public T Visit(Reference reference);
+            public T Visit(AssetAdministrationShell assetAdministrationShell);
         }  // public interface IVisitor
 
         /// <summary>
@@ -33,12 +33,13 @@ namespace AasCore.Aas3
         /// </remarks> 
         public interface VoidVisitor : IVisitor<void>
         {
-            public void visit(IEntity entity)
+            public void Visit(IEntity entity)
             {
                 // Dispatch
                 entity.Accept(this);
             }
-            public void visit(LangString langString)
+
+            public void Visit(LangString langString)
             {
                 // Do nothing, but descend
                 foreach (var something in langString.DescendOnce())
@@ -47,7 +48,7 @@ namespace AasCore.Aas3
                 }
             }
 
-            public void visit(LangStringSet langStringSet)
+            public void Visit(LangStringSet langStringSet)
             {
                 // Do nothing, but descend
                 foreach (var something in langStringSet.DescendOnce())
@@ -56,7 +57,7 @@ namespace AasCore.Aas3
                 }
             }
 
-            public void visit(Identifier identifier)
+            public void Visit(Identifier identifier)
             {
                 // Do nothing, but descend
                 foreach (var something in identifier.DescendOnce())
@@ -65,7 +66,7 @@ namespace AasCore.Aas3
                 }
             }
 
-            public void visit(AdministrativeInformation administrativeInformation)
+            public void Visit(AdministrativeInformation administrativeInformation)
             {
                 // Do nothing, but descend
                 foreach (var something in administrativeInformation.DescendOnce())
@@ -74,7 +75,7 @@ namespace AasCore.Aas3
                 }
             }
 
-            public void visit(Key key)
+            public void Visit(Key key)
             {
                 // Do nothing, but descend
                 foreach (var something in key.DescendOnce())
@@ -83,7 +84,7 @@ namespace AasCore.Aas3
                 }
             }
 
-            public void visit(Reference reference)
+            public void Visit(Reference reference)
             {
                 // Do nothing, but descend
                 foreach (var something in reference.DescendOnce())
@@ -92,7 +93,7 @@ namespace AasCore.Aas3
                 }
             }
 
-            public void visit(AssetAdministrationShell assetAdministrationShell)
+            public void Visit(AssetAdministrationShell assetAdministrationShell)
             {
                 // Do nothing, but descend
                 foreach (var something in assetAdministrationShell.DescendOnce())

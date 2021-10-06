@@ -34,6 +34,7 @@ class Lang_string(DBC):
         self.language = language
         self.text = text
 
+
 # fmt: off
 @invariant(lambda self: len(self.lang_strings) > 0)
 @invariant(

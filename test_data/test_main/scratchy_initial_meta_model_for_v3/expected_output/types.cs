@@ -15,9 +15,16 @@ namespace AasCore.Aas3
     public interface IEntity
     {
         /// <summary>
-        /// Iterate over all the entity instances contained in this instance.
+        /// Iterate over all the entity instances referenced from this instance 
+        /// without further recursion.
         /// </summary>
         public IEnumerable<IEntity> DescendOnce();
+
+        /// <summary>
+        /// Iterate recursively over all the entity instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IEntity> Descend();
+
 
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
@@ -46,9 +53,19 @@ namespace AasCore.Aas3
         string Text { get; set; }
 
         /// <summary>
-        /// Iterate over all the entity instances contained in this instance.
+        /// Iterate over all the entity instances referenced from this instance 
+        /// without further recursion.
         /// </summary>
         public IEnumerable<IEntity> DescendOnce()
+        {
+            // No descendable properties
+            yield return break;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the entity instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IEntity> Descend()
         {
             // No descendable properties
             yield return break;
@@ -165,11 +182,26 @@ namespace AasCore.Aas3
         IdentifierType IdType { get; set; }
 
         /// <summary>
-        /// Iterate over all the entity instances contained in this instance.
+        /// Iterate over all the entity instances referenced from this instance 
+        /// without further recursion.
         /// </summary>
         public IEnumerable<IEntity> DescendOnce()
         {
             yield return IdType;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the entity instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IEntity> Descend()
+        {
+            yield return IdType;
+
+            // Recurse
+            foreach (var anItem in IdType.Descend())
+            {
+                yield return anItem;
+            }
         }
 
         /// <summary>
@@ -196,9 +228,19 @@ namespace AasCore.Aas3
         string? Revision { get; set; }
 
         /// <summary>
-        /// Iterate over all the entity instances contained in this instance.
+        /// Iterate over all the entity instances referenced from this instance 
+        /// without further recursion.
         /// </summary>
         public IEnumerable<IEntity> DescendOnce()
+        {
+            // No descendable properties
+            yield return break;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the entity instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IEntity> Descend()
         {
             // No descendable properties
             yield return break;
@@ -445,13 +487,36 @@ namespace AasCore.Aas3
         KeyType IdType { get; set; }
 
         /// <summary>
-        /// Iterate over all the entity instances contained in this instance.
+        /// Iterate over all the entity instances referenced from this instance 
+        /// without further recursion.
         /// </summary>
         public IEnumerable<IEntity> DescendOnce()
         {
             yield return Type;
 
             yield return IdType;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the entity instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IEntity> Descend()
+        {
+            yield return Type;
+
+            // Recurse
+            foreach (var anItem in Type.Descend())
+            {
+                yield return anItem;
+            }
+
+            yield return IdType;
+
+            // Recurse
+            foreach (var anItem in IdType.Descend())
+            {
+                yield return anItem;
+            }
         }
 
         /// <summary>
@@ -478,13 +543,31 @@ namespace AasCore.Aas3
         List<Key> Keys { get; set; }
 
         /// <summary>
-        /// Iterate over all the entity instances contained in this instance.
+        /// Iterate over all the entity instances referenced from this instance 
+        /// without further recursion.
         /// </summary>
         public IEnumerable<IEntity> DescendOnce()
         {
             foreach (var anItem in Keys)
             {
                 yield return anItem;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the entity instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IEntity> Descend()
+        {
+            foreach (var anItem in Keys)
+            {
+                yield return anItem;
+
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
+                }
             }
         }
 
@@ -578,7 +661,8 @@ namespace AasCore.Aas3
         AssetAdministrationShell? DerivedFrom { get; set; }
 
         /// <summary>
-        /// Iterate over all the entity instances contained in this instance.
+        /// Iterate over all the entity instances referenced from this instance 
+        /// without further recursion.
         /// </summary>
         public IEnumerable<IEntity> DescendOnce()
         {
@@ -607,6 +691,75 @@ namespace AasCore.Aas3
             if (DerivedFrom != null)
             {
                 yield return DerivedFrom;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the entity instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IEntity> Descend()
+        {
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+
+                // Recurse
+                foreach (var anItem in DisplayName.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            yield return Identification;
+
+            // Recurse
+            foreach (var anItem in Identification.Descend())
+            {
+                yield return anItem;
+            }
+
+            if (Administration != null)
+            {
+                yield return Administration;
+
+                // Recurse
+                foreach (var anItem in Administration.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            foreach (var anItem in DataSpecifications)
+            {
+                yield return anItem;
+
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
+                }
+            }
+
+            if (DerivedFrom != null)
+            {
+                yield return DerivedFrom;
+
+                // Recurse
+                foreach (var anItem in DerivedFrom.Descend())
+                {
+                    yield return anItem;
+                }
             }
         }
 

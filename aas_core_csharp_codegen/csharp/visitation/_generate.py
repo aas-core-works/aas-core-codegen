@@ -35,7 +35,7 @@ def _generate_ivisitor(
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
             var_name = csharp_naming.argument_name(symbol.name)
-            blocks.append(Stripped(f'public T visit({cls_name} {var_name});'))
+            blocks.append(Stripped(f'public T Visit({cls_name} {var_name});'))
 
         else:
             assert_never(symbol)
@@ -48,7 +48,7 @@ def _generate_ivisitor(
             /// </summary>
             public interface IVisitor<T>
             {
-                public T visit(IEntity entity);
+                public T Visit(IEntity entity);
             '''))
 
     for i, block in enumerate(blocks):
@@ -67,6 +67,13 @@ def _generate_void_visitor(
     """Generate a visitor that does nothing and returns nothing."""
     blocks = []  # type: List[Stripped]
 
+    blocks.append(Stripped(textwrap.dedent('''\
+        public void Visit(IEntity entity)
+        {
+            // Dispatch
+            entity.Accept(this);
+        }''')))
+
     for symbol in symbol_table.symbols:
         if isinstance(symbol, intermediate.Enumeration):
             continue
@@ -78,7 +85,7 @@ def _generate_void_visitor(
             cls_name = csharp_naming.class_name(symbol.name)
             var_name = csharp_naming.argument_name(symbol.name)
             blocks.append(Stripped(textwrap.dedent(f'''\
-                public void visit({cls_name} {var_name})
+                public void Visit({cls_name} {var_name})
                 {{
                     // Do nothing, but descend
                     foreach (var something in {var_name}.DescendOnce())
@@ -104,11 +111,6 @@ def _generate_void_visitor(
             /// </remarks> 
             public interface VoidVisitor : IVisitor<void>
             {
-                public void visit(IEntity entity)
-                {
-                    // Dispatch
-                    entity.Accept(this);
-                }
             '''))
 
     for i, block in enumerate(blocks):

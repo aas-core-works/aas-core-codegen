@@ -673,17 +673,17 @@ def _descendable(type_annotation: intermediate.TypeAnnotation) -> bool:
         assert_never(type_annotation)
 
 
-# TODO: split: generate_descend_body(recurse: bool), generate_descend, generate_descend_once
-def _generate_descend_methods(
-        symbol: intermediate.Class
-) -> Stripped:
-    """Generate the ``DescendOnce`` and ``Descend`` methods based on the ``symbol``."""
-    # TODO: refactor into generate body (recurse: bool)
+def _generate_descend_body(
+        symbol: intermediate.Class,
+        recurse: bool
+)-> Stripped:
+    """
+    Generate the body of the ``Descend`` and ``DescendOnce`` methods.
 
-
+    With this function, we can unroll the recursion as a simple optimization
+    in the recursive case.
+    """
     blocks = []  # type: List[Stripped]
-
-
 
     for prop in symbol.properties:
         type_anno = prop.type_annotation
@@ -697,10 +697,12 @@ def _generate_descend_methods(
         stmts = []  # type: List[str]
         item_id = -1  # -1 means we are at the level of the property variable
 
-        @require(lambda an_item_id: an_item_id >= 0)
+        @require(lambda an_item_id: an_item_id >= -1)
         def item_var(an_item_id: int) -> Identifier:
             """Generate the item variable used in the loops."""
-            if an_item_id == 0:
+            if an_item_id == -1:
+                return prop_name
+            elif an_item_id == 0:
                 return Identifier("anItem")
             elif an_item_id == 1:
                 return Identifier("anotherItem")
@@ -717,12 +719,27 @@ def _generate_descend_methods(
                     f"{symbol.name}")
 
             elif isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
-                if item_id == -1:
-                    stmts.append(
-                        f'yield return {prop_name};')
-                else:
-                    stmts.append(f'yield return {item_var(item_id)};')
+                yield_var = item_var(item_id)
 
+                if not recurse:
+                    stmts.append(f'yield return {yield_var};')
+                else:
+                    if _descendable(prop.type_annotation):
+                        recurse_var = item_var(item_id + 1)
+                        stmts.append(textwrap.dedent(f'''\
+                            yield return {yield_var};
+
+                            // Recurse
+                            foreach (var {recurse_var} in {yield_var}.Descend())
+                            {{
+                                yield return {recurse_var};
+                            }}'''))
+                    else:
+                        stmts.append(textwrap.dedent(f'''\
+                            yield return {yield_var};
+                            
+                            // Recursive descent ends here.
+                            '''))
                 break
 
             elif isinstance(type_anno, intermediate.SelfTypeAnnotation):
@@ -734,12 +751,8 @@ def _generate_descend_methods(
                      intermediate.SequenceTypeAnnotation,
                      intermediate.SetTypeAnnotation)):
                 item_id += 1
-                if item_id == 0:
-                    stmts.append(
-                        f"foreach (var {item_var(item_id)} in {prop_name})")
-                else:
-                    stmts.append(
-                        f"foreach (var {item_var(item_id)} in {item_var(item_id - 1)})")
+                stmts.append(
+                    f"foreach (var {item_var(item_id)} in {item_var(item_id - 1)})")
 
                 # noinspection PyUnresolvedReferences
                 type_anno = type_anno.items
@@ -749,21 +762,16 @@ def _generate_descend_methods(
                     (intermediate.MappingTypeAnnotation,
                      intermediate.MutableMappingTypeAnnotation)):
                 item_id += 1
-                if item_id == 0:
-                    stmts.append(
-                        f"foreach (var {item_var(item_id)} in {prop_name}.Values)")
-                else:
-                    stmts.append(
-                        f"foreach (var {item_var(item_id)} in "
-                        f"{item_var(item_id - 1)}.Values)")
 
+                stmts.append(
+                    f"foreach (var {item_var(item_id)} in "
+                    f"{item_var(item_id - 1)}.Values)")
+
+                # noinspection PyUnresolvedReferences
                 type_anno = type_anno.values
 
             elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-                if item_id == -1:
-                    stmts.append(f"if ({prop_name} != null)")
-                else:
-                    stmts.append(f"if ({item_var(item_id)} != null)")
+                stmts.append(f"if ({item_var(item_id)} != null)")
 
                 type_anno = type_anno.value
             else:
@@ -782,7 +790,7 @@ def _generate_descend_methods(
 
                 suffix.append(f'{indent}}}')
             else:
-                prefix.append(f'{indent}{stmt}')
+                prefix.append(textwrap.indent(stmt, indent))
 
             indent += csharp_common.INDENT
 
@@ -791,20 +799,46 @@ def _generate_descend_methods(
     if len(blocks) == 0:
         blocks.append(Stripped('// No descendable properties\nyield return break;'))
 
-    writer = io.StringIO()
-    writer.write(
-        textwrap.dedent('''\
-            /// <summary>
-            /// Iterate over all the entity instances contained in this instance.
-            /// </summary>
-            public IEnumerable<IEntity> DescendOnce()
-            {
-            '''))
-    writer.write(textwrap.indent('\n\n'.join(blocks), csharp_common.INDENT))
+    return Stripped('\n\n'.join(blocks))
 
-    writer.write('\n}')
 
-    return Stripped(writer.getvalue())
+def _generate_descend_once_method(
+        symbol: intermediate.Class
+) -> Stripped:
+    """Generate the ``DescendOnce`` method for the class of the ``symbol``."""
+
+    body = _generate_descend_body(symbol=symbol, recurse=False)
+
+    indented_body = textwrap.indent(body, csharp_common.INDENT)
+
+    return Stripped(f'''\
+/// <summary>
+/// Iterate over all the entity instances referenced from this instance 
+/// without further recursion.
+/// </summary>
+public IEnumerable<IEntity> DescendOnce()
+{{
+{indented_body}
+}}''')
+
+
+def _generate_descend_method(
+        symbol: intermediate.Class
+) -> Stripped:
+    """Generate the recursive ``Descend`` method for the class of the ``symbol``."""
+
+    body = _generate_descend_body(symbol=symbol, recurse=True)
+
+    indented_body = textwrap.indent(body, csharp_common.INDENT)
+
+    return Stripped(f'''\
+/// <summary>
+/// Iterate recursively over all the entity instances referenced from this instance.
+/// </summary>
+public IEnumerable<IEntity> Descend()
+{{
+{indented_body}
+}}''')
 
 
 @require(lambda symbol: symbol.implementation_key is None)
@@ -971,7 +1005,8 @@ def _generate_class(
                 "At the moment, we do not transpile the method body and "
                 "its contracts."))
 
-    blocks.append(_generate_descend_methods(symbol=symbol))
+    blocks.append(_generate_descend_once_method(symbol=symbol))
+    blocks.append(_generate_descend_method(symbol=symbol))
 
     blocks.append(
         Stripped(
@@ -1042,8 +1077,7 @@ def generate(
 
     blocks.append(Stripped(f"namespace {namespace}\n{{"))
 
-    blocks.append(
-        Rstripped(
+    blocks.append(Rstripped(
             textwrap.indent(
                 textwrap.dedent('''\
                     /// <summary>
@@ -1052,9 +1086,16 @@ def generate(
                     public interface IEntity
                     {
                         /// <summary>
-                        /// Iterate over all the entity instances contained in this instance.
+                        /// Iterate over all the entity instances referenced from this instance 
+                        /// without further recursion.
                         /// </summary>
                         public IEnumerable<IEntity> DescendOnce();
+                        
+                        /// <summary>
+                        /// Iterate recursively over all the entity instances referenced from this instance.
+                        /// </summary>
+                        public IEnumerable<IEntity> Descend();
+
                         
                         /// <summary>
                         /// Accept the visitor to visit this instance for double dispatch.
