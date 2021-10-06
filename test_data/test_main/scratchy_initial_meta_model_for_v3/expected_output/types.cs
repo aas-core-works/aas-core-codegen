@@ -213,8 +213,8 @@ namespace AasCore.Aas3
         }
 
         Identifier(
-            string id,
-            IdentifierType idType)
+            string id = "hello",
+            IdentifierType idType = IdentifierType.Irdi)
         {
             Id = id;
             IdType = idType;

@@ -6,7 +6,7 @@ from typing import Sequence, Optional, Union, TypeVar, Mapping, MutableMapping, 
     Set
 
 import docutils.nodes
-from icontract import require
+from icontract import require, invariant
 
 import aas_core_csharp_codegen.understand.constructor as understand_constructor
 from aas_core_csharp_codegen import parse
@@ -195,9 +195,9 @@ class Property:
         )
 
 
-
 class DefaultConstant:
     """Represent a constant value as a default for an argument."""
+
     def __init__(
             self, value: Union[bool, int, float, str, None], parsed: parse.Default
     ) -> None:
@@ -209,7 +209,13 @@ class DefaultConstant:
 class DefaultEnumerationLiteral:
     """Represent an enumeration literal as a default for an argument."""
 
-    @require(lambda enumeration, literal: literal in enumeration)
+    # fmt: off
+    @require(
+        lambda enumeration, literal:
+        literal.name in enumeration.literal_map
+        and enumeration.literal_map[literal.name] == literal
+    )
+    # fmt: on
     def __init__(
             self,
             enumeration: 'Enumeration',
@@ -474,6 +480,21 @@ class EnumerationLiteral:
         self.parsed = parsed
 
 
+# fmt: off
+@invariant(
+    lambda self:
+    all(
+        literal == self.literal_map[literal.name]
+        for literal in self.literals
+    ),
+    "Literal map consistent on name"
+)
+@invariant(
+    lambda self:
+    sorted(map(id, self.literal_map.values())) == sorted(map(id, self.literals)),
+    "Literal map complete"
+)
+# fmt: on
 class Enumeration:
     """Represent an enumeration."""
 
@@ -488,6 +509,9 @@ class Enumeration:
         self.literals = literals
         self.description = description
         self.parsed = parsed
+
+        self.literal_map = {literal.name: literal for literal in self.literals}
+
 
 class Class:
     """
@@ -578,7 +602,6 @@ class SymbolTable:
             )
 
         return result
-
 
 
 InterfaceImplementers = MutableMapping[Interface, List[Class]]

@@ -852,7 +852,6 @@ def _generate_constructor(
 
     blocks = []  # type: List[str]
 
-    # TODO: handle default values
     arg_codes = []  # type: List[str]
     for arg in symbol.constructor.arguments:
         if arg.name == "self":
@@ -861,7 +860,33 @@ def _generate_constructor(
         arg_type = csharp_common.generate_type(arg.type_annotation)
         arg_name = csharp_naming.argument_name(arg.name)
 
-        arg_codes.append(Stripped(f'{arg_type} {arg_name}'))
+        default = None   # type: Optional[str]
+        if arg.default is not None:
+            if isinstance(arg.default, intermediate.DefaultConstant):
+                if arg.default.value is None:
+                    pass
+                elif isinstance(arg.default.value, bool):
+                    default = "true" if arg.default.value else "false"
+                elif isinstance(arg.default.value, str):
+                    default = csharp_common.string_literal(arg.default.value)
+                elif isinstance(arg.default.value, int):
+                    default = str(arg.default.value)
+                elif isinstance(arg.default, float):
+                    default = f"{arg.default}d"
+                else:
+                    assert_never(arg.default.value)
+            elif isinstance(arg.default, intermediate.DefaultEnumerationLiteral):
+                default = ".".join([
+                    csharp_naming.enum_name(arg.default.enumeration.name),
+                    csharp_naming.enum_literal_name(arg.default.literal.name)
+                ])
+            else:
+                assert_never(arg.default)
+
+        if default is None:
+            arg_codes.append(Stripped(f'{arg_type} {arg_name}'))
+        else:
+            arg_codes.append(Stripped(f'{arg_type} {arg_name} = {default}'))
 
     if len(arg_codes) == 0:
         return (None, Error(

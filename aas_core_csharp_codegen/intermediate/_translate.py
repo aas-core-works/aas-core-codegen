@@ -2,7 +2,7 @@
 import ast
 import itertools
 from typing import Sequence, List, Mapping, Optional, MutableMapping, Tuple, Union, \
-    Iterator
+    Iterator, Generator
 
 import asttokens
 import docutils.nodes
@@ -38,7 +38,7 @@ from aas_core_csharp_codegen.intermediate._types import (
     MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
     OurAtomicTypeAnnotation, STR_TO_BUILTIN_ATOMIC_TYPE, BuiltinAtomicTypeAnnotation,
     Description, PropertyReferenceInDoc, SymbolReferenceInDoc,
-    SubscriptedTypeAnnotation,
+    SubscriptedTypeAnnotation, DefaultEnumerationLiteral,
 )
 
 # noinspection PyUnusedLocal
@@ -270,9 +270,10 @@ class _DefaultPlaceholder:
     Therefore we insert a placeholder and resolve the default values in the second
     translation pass.
     """
-    def __init__(self, parsed: parse.Default)->None:
+
+    def __init__(self, parsed: parse.Default) -> None:
         """Initialize with the given values."""
-        Default.__init__(self, parsed=parsed)
+        self.parsed = parsed
 
 
 def _parsed_arguments_to_arguments(
@@ -753,6 +754,48 @@ def _over_symbol_reference_in_doc(
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _fill_in_default_placeholder(
+        default: _DefaultPlaceholder,
+        symbol_table: SymbolTable
+) -> Tuple[Optional[Default], Optional[Error]]:
+    """Resolve the default values to references using the constructed symbol table."""
+    # If we do not preemptively return, signal that we do not know how to handle
+    # the default
+
+    if isinstance(default.parsed.node, ast.Constant):
+        if (
+                isinstance(default.parsed.node.value, (bool, int, float, str))
+                or default.parsed.node.value is None
+        ):
+            return DefaultConstant(
+                value=default.parsed.node.value,
+                parsed=default.parsed), None
+
+    if (
+            isinstance(default.parsed.node, ast.Attribute)
+            and isinstance(default.parsed.node.ctx, ast.Load)
+            and isinstance(default.parsed.node.value, ast.Name)
+            and isinstance(default.parsed.node.value.ctx, ast.Load)
+    ):
+        symbol_name = Identifier(default.parsed.node.value.id)
+        attr_name = Identifier(default.parsed.node.attr)
+
+        symbol = symbol_table.find(name=symbol_name)
+        if isinstance(symbol, Enumeration):
+            literal = symbol.literal_map.get(attr_name, None)
+            if literal is not None:
+                return DefaultEnumerationLiteral(
+                    enumeration=symbol,
+                    literal=literal,
+                    parsed=default.parsed), None
+
+    return None, Error(
+        default.parsed.node,
+        f"The translation of the default value to the intermediate layer "
+        f"has not been implemented: {ast.dump(default.parsed.node)}")
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def translate(
         parsed_symbol_table: parse.SymbolTable,
         ontology: understand_hierarchy.Ontology,
@@ -878,8 +921,50 @@ def translate(
 
     # region Second pass to resolve the default argument values
 
-    # TODO: implement now, then implement the default constructor,
-    #  then continue with the verification!
+    for symbol in symbols:
+        if isinstance(symbol, Enumeration):
+            continue
+
+        elif isinstance(symbol, (Interface, Class)):
+            args_generator = None  # type: Optional[Generator[Argument]]
+
+            if isinstance(symbol, Interface):
+                args_generator = (
+                    arg
+                    for signature in symbol.signatures
+                    for arg in signature.arguments
+                )
+            elif isinstance(symbol, Class):
+                # noinspection PyTypeChecker
+                args_generator = itertools.chain(
+                    (
+                        arg
+                        for method in symbol.methods
+                        for arg in method.arguments
+                    ),
+                    iter(symbol.constructor.arguments))
+            else:
+                assert_never(symbol)
+
+            assert args_generator is not None
+
+            for arg in args_generator:
+                if arg.default is not None:
+                    assert isinstance(arg.default, _DefaultPlaceholder), (
+                        f"Expected the argument default value to be a placeholder "
+                        f"since we resolve it only in the second pass, "
+                        f"but got: {arg.default}")
+
+                    filled_default, error = _fill_in_default_placeholder(
+                        default=arg.default,
+                        symbol_table=symbol_table)
+
+                    if error:
+                        underlying_errors.append(error)
+                    else:
+                        arg.default = filled_default
+        else:
+            assert_never(symbol)
 
     # endregion
 
@@ -909,12 +994,10 @@ def translate(
     # endregion
 
     if len(underlying_errors) > 0:
-        return (
-            None,
-            Error(
-                atok.tree,
-                "Failed to translate the parsed symbol table "
-                "to an intermediate symbol table",
-                underlying=underlying_errors))
+        return (None, Error(
+            atok.tree,
+            "Failed to translate the parsed symbol table "
+            "to an intermediate symbol table",
+            underlying=underlying_errors))
 
     return symbol_table, None
