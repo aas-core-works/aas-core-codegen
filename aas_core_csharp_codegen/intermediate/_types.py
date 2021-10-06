@@ -72,13 +72,6 @@ class OurAtomicTypeAnnotation(AtomicTypeAnnotation):
         return self.symbol.name
 
 
-class SelfTypeAnnotation:
-    """Provide a placeholder for the special argument ``self`` in a method"""
-
-    def __str__(self) -> str:
-        return "SELF"
-
-
 class SubscriptedTypeAnnotation:
     """Represent a subscripted type annotation such as ``Mapping[..., ...]``."""
 
@@ -156,7 +149,7 @@ class OptionalTypeAnnotation(SubscriptedTypeAnnotation):
 
 
 TypeAnnotation = Union[
-    AtomicTypeAnnotation, SubscriptedTypeAnnotation, SelfTypeAnnotation
+    AtomicTypeAnnotation, SubscriptedTypeAnnotation
 ]
 
 
@@ -375,6 +368,14 @@ class Method:
         "Docstring is excluded from the body"
     )
     @require(
+        lambda arguments:
+        all(
+            arg.name != 'self'
+            for arg in arguments
+        ),
+        "No explicit ``self`` argument in the arguments"
+    )
+    @require(
         lambda arguments, contracts:
         (
                 arg_set := {arg.name for arg in arguments},
@@ -382,19 +383,22 @@ class Method:
                     arg in arg_set  # pylint: disable=used-before-assignment
                     for precondition in contracts.preconditions
                     for arg in precondition.args
+                    if arg.name != 'self'
                 )
                 and all(
                     arg in arg_set
                     for postcondition in contracts.postconditions
-                    for arg in postcondition.args if arg not in ('OLD', 'result')
+                    for arg in postcondition.args
+                    if arg not in ('OLD', 'result', 'self')
                 )
                 and all(
                     arg in arg_set
                     for snapshot in contracts.snapshots
                     for arg in snapshot.args
+                    if arg.name != 'self'
                 )
         )[1],
-        "All arguments of contracts defined in method arguments"
+        "All arguments of contracts defined in method arguments except ``self``"
     )
     @require(
         lambda arguments: (

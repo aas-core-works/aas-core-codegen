@@ -16,7 +16,6 @@ from aas_core_csharp_codegen.intermediate._types import (
     Interface,
     Method,
     Property,
-    SelfTypeAnnotation,
     Signature,
     Snapshot,
     SubscriptedTypeAnnotation,
@@ -146,14 +145,6 @@ def _stringify_subscripted_type_annotation(
         assert_never(type_annotation)
 
     assert result is not None
-    stringify.assert_compares_against_dict(result, type_annotation)
-    return result
-
-
-def _stringify_self_type_annotation(
-        type_annotation: SelfTypeAnnotation
-) -> stringify.Entity:
-    result = stringify.Entity(name=SelfTypeAnnotation.__name__, properties=[])
     stringify.assert_compares_against_dict(result, type_annotation)
     return result
 
@@ -473,7 +464,6 @@ Dumpable = Union[
     Invariant,
     Method,
     Property,
-    SelfTypeAnnotation,
     Signature,
     Snapshot,
     SubscriptedTypeAnnotation,
@@ -529,8 +519,6 @@ def _stringify(dumpable: Dumpable) -> stringify.Entity:
         stringified = _stringify_atomic_type_annotation(type_annotation=dumpable)
     elif isinstance(dumpable, SubscriptedTypeAnnotation):
         stringified = _stringify_subscripted_type_annotation(type_annotation=dumpable)
-    elif isinstance(dumpable, SelfTypeAnnotation):
-        stringified = _stringify_self_type_annotation(type_annotation=dumpable)
     else:
         assert_never(dumpable)
 

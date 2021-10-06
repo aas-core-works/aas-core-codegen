@@ -86,6 +86,13 @@ namespace AasCore.Aas3
             Language = language;
             Text = text;
         }
+
+        LangString() : this(
+            "",
+            "")
+        {
+            // Intentionally left empty.
+        }
     }
 
     public class LangStringSet {
@@ -213,11 +220,18 @@ namespace AasCore.Aas3
         }
 
         Identifier(
-            string id = "hello",
+            string id,
             IdentifierType idType = IdentifierType.Irdi)
         {
             Id = id;
             IdType = idType;
+        }
+
+        Identifier() : this(
+            "",
+            IdentifierType.Irdi)
+        {
+            // Intentionally left empty.
         }
     }
 
@@ -255,8 +269,8 @@ namespace AasCore.Aas3
         }
 
         AdministrativeInformation(
-            string? version,
-            string? revision)
+            string? version = null,
+            string? revision = null)
         {
             Version = version;
             Revision = revision;
@@ -536,6 +550,14 @@ namespace AasCore.Aas3
             Value = value;
             IdType = idType;
         }
+
+        Key() : this(
+            new KeyElements(),
+            "",
+            new KeyType())
+        {
+            // Intentionally left empty.
+        }
     }
 
     public class Reference : IEntity
@@ -583,6 +605,9 @@ namespace AasCore.Aas3
         {
             Keys = keys;
         }
+
+        Reference() : this(new List<Key>())
+
     }
 
     public interface IHasSemantics : IEntity
@@ -774,12 +799,12 @@ namespace AasCore.Aas3
         AssetAdministrationShell(
             Identifier identification,
             string idShort,
-            LangStringSet? displayName,
-            string? category,
-            LangStringSet? description,
-            AdministrativeInformation? administration,
-            List<Reference>? dataSpecifications,
-            AssetAdministrationShell? derivedFrom)
+            LangStringSet? displayName = null,
+            string? category = null,
+            LangStringSet? description = null,
+            AdministrativeInformation? administration = null,
+            List<Reference>? dataSpecifications = null,
+            AssetAdministrationShell? derivedFrom = null)
         {
             Identification = identification;
             Administration = administration;
@@ -791,6 +816,19 @@ namespace AasCore.Aas3
                 ? dataSpecifications
                 : new List<Reference>();
             DerivedFrom = derivedFrom;
+        }
+
+        AssetAdministrationShell() : this(
+            new Identifier(),
+            "",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null)
+        {
+            // Intentionally left empty.
         }
     }
 

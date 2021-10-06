@@ -9,7 +9,6 @@ AtomicTypeAnnotation = _types.AtomicTypeAnnotation
 BuiltinAtomicType = _types.BuiltinAtomicType
 BuiltinAtomicTypeAnnotation = _types.BuiltinAtomicTypeAnnotation
 OurAtomicTypeAnnotation = _types.OurAtomicTypeAnnotation
-SelfTypeAnnotation = _types.SelfTypeAnnotation
 SubscriptedTypeAnnotation = _types.SubscriptedTypeAnnotation
 ListTypeAnnotation = _types.ListTypeAnnotation
 SequenceTypeAnnotation = _types.SequenceTypeAnnotation

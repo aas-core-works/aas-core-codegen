@@ -20,7 +20,6 @@ from aas_core_csharp_codegen.intermediate._types import (
     Enumeration,
     EnumerationLiteral,
     TypeAnnotation,
-    SelfTypeAnnotation,
     Argument,
     Default,
     DefaultConstant,
@@ -253,7 +252,8 @@ def _parsed_type_annotation_to_type_annotation(
                 f"This should have been handled or caught before!")
 
     elif isinstance(parsed, parse.SelfTypeAnnotation):
-        return SelfTypeAnnotation()
+        raise AssertionError(
+            f"Unexpected self type annotation in the intermediate layer: {parsed}")
 
     else:
         assert_never(parsed)
@@ -291,6 +291,7 @@ def _parsed_arguments_to_arguments(
             parsed=parsed_arg,
         )
         for parsed_arg in parsed
+        if not isinstance(parsed_arg.type_annotation, parse.SelfTypeAnnotation)
     ]
 
 
@@ -617,7 +618,7 @@ def _over_our_atomic_type_annotations(
         something: Union[Class, Interface, TypeAnnotation]
 ) -> Iterator[OurAtomicTypeAnnotation]:
     """Iterate over all the atomic type annotations in the ``something``."""
-    if isinstance(something, (BuiltinAtomicTypeAnnotation, SelfTypeAnnotation)):
+    if isinstance(something, BuiltinAtomicTypeAnnotation):
         pass
     elif isinstance(something, OurAtomicTypeAnnotation):
         yield something

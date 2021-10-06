@@ -614,9 +614,6 @@ def _generate_interface(
 
         arg_codes = []  # type: List[Stripped]
         for arg in signature.arguments:
-            if arg.name == "self":
-                continue
-
             arg_type = csharp_common.generate_type(arg.type_annotation)
             arg_name = csharp_naming.argument_name(arg.name)
             arg_codes.append(Stripped(f'{arg_type} {arg_name}'))
@@ -655,8 +652,6 @@ def _descendable(type_annotation: intermediate.TypeAnnotation) -> bool:
         return False
     elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
         return True
-    elif isinstance(type_annotation, intermediate.SelfTypeAnnotation):
-        raise AssertionError("Unexpected self type annotation at this layer")
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         return _descendable(type_annotation=type_annotation.items)
     elif isinstance(type_annotation, intermediate.SequenceTypeAnnotation):
@@ -676,7 +671,7 @@ def _descendable(type_annotation: intermediate.TypeAnnotation) -> bool:
 def _generate_descend_body(
         symbol: intermediate.Class,
         recurse: bool
-)-> Stripped:
+) -> Stripped:
     """
     Generate the body of the ``Descend`` and ``DescendOnce`` methods.
 
@@ -741,9 +736,6 @@ def _generate_descend_body(
                             // Recursive descent ends here.
                             '''))
                 break
-
-            elif isinstance(type_anno, intermediate.SelfTypeAnnotation):
-                raise AssertionError("Unexpected self type annotation at this layer")
 
             elif isinstance(
                     type_anno,
@@ -841,6 +833,36 @@ public IEnumerable<IEntity> Descend()
 }}''')
 
 
+def _generate_default_value(default: intermediate.Default) -> Stripped:
+    """Generate the C# code representing the default value of an argument."""
+    code = None  # type: Optional[str]
+
+    if default is not None:
+        if isinstance(default, intermediate.DefaultConstant):
+            if default.value is None:
+                code = "null"
+            elif isinstance(default.value, bool):
+                code = "true" if default.value else "false"
+            elif isinstance(default.value, str):
+                code = csharp_common.string_literal(default.value)
+            elif isinstance(default.value, int):
+                code = str(default.value)
+            elif isinstance(default, float):
+                code = f"{default}d"
+            else:
+                assert_never(default.value)
+        elif isinstance(default, intermediate.DefaultEnumerationLiteral):
+            code = ".".join([
+                csharp_naming.enum_name(default.enumeration.name),
+                csharp_naming.enum_literal_name(default.literal.name)
+            ])
+        else:
+            assert_never(default)
+
+    assert code is not None
+    return Stripped(code)
+
+
 @require(lambda symbol: symbol.implementation_key is None)
 @require(lambda symbol: symbol.constructor.implementation_key is None)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -854,39 +876,14 @@ def _generate_constructor(
 
     arg_codes = []  # type: List[str]
     for arg in symbol.constructor.arguments:
-        if arg.name == "self":
-            continue
-
         arg_type = csharp_common.generate_type(arg.type_annotation)
         arg_name = csharp_naming.argument_name(arg.name)
 
-        default = None   # type: Optional[str]
-        if arg.default is not None:
-            if isinstance(arg.default, intermediate.DefaultConstant):
-                if arg.default.value is None:
-                    pass
-                elif isinstance(arg.default.value, bool):
-                    default = "true" if arg.default.value else "false"
-                elif isinstance(arg.default.value, str):
-                    default = csharp_common.string_literal(arg.default.value)
-                elif isinstance(arg.default.value, int):
-                    default = str(arg.default.value)
-                elif isinstance(arg.default, float):
-                    default = f"{arg.default}d"
-                else:
-                    assert_never(arg.default.value)
-            elif isinstance(arg.default, intermediate.DefaultEnumerationLiteral):
-                default = ".".join([
-                    csharp_naming.enum_name(arg.default.enumeration.name),
-                    csharp_naming.enum_literal_name(arg.default.literal.name)
-                ])
-            else:
-                assert_never(arg.default)
-
-        if default is None:
+        if arg.default is None:
             arg_codes.append(Stripped(f'{arg_type} {arg_name}'))
         else:
-            arg_codes.append(Stripped(f'{arg_type} {arg_name} = {default}'))
+            arg_codes.append(Stripped(
+                f'{arg_type} {arg_name} = {_generate_default_value(arg.default)}'))
 
     if len(arg_codes) == 0:
         return (None, Error(
@@ -953,6 +950,88 @@ def _generate_constructor(
     blocks.append("}")
 
     return Stripped("\n".join(blocks)), None
+
+
+def _generate_default_value_for_type_annotation(
+        type_annotation: intermediate.TypeAnnotation
+) -> Stripped:
+    """Generate the C# code representing the default value for the given type."""
+    code = None  # type: Optional[str]
+    if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
+        if type_annotation.a_type == intermediate.BuiltinAtomicType.BOOL:
+            code = "false"
+        elif type_annotation.a_type == intermediate.BuiltinAtomicType.INT:
+            code = "0"
+        elif type_annotation.a_type == intermediate.BuiltinAtomicType.FLOAT:
+            code = "0d"
+        elif type_annotation.a_type == intermediate.BuiltinAtomicType.STR:
+            code = '""'
+        else:
+            assert_never(type_annotation.a_type)
+    elif isinstance(type_annotation, (
+            intermediate.OurAtomicTypeAnnotation,
+            intermediate.ListTypeAnnotation,
+            intermediate.SequenceTypeAnnotation,
+            intermediate.SetTypeAnnotation,
+            intermediate.MappingTypeAnnotation,
+            intermediate.MutableMappingTypeAnnotation
+    )):
+        code = f"new {csharp_common.generate_type(type_annotation)}()"
+    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
+        code = "null"
+    else:
+        assert_never(type_annotation)
+
+    assert code is not None
+    return Stripped(code)
+
+
+@require(lambda symbol: symbol.implementation_key is None)
+@require(lambda symbol: symbol.constructor.implementation_key is None)
+def _generate_default_constructor(
+        symbol: intermediate.Class
+) -> Stripped:
+    """
+    Generate the default constructor for the given symbol.
+    
+    The constructor sets all the properties to their default values.
+    """
+    cls_name = csharp_naming.class_name(symbol.name)
+
+    default_values = []  # type: List[Stripped]
+
+    for arg in symbol.constructor.arguments:
+        if arg.default is None:
+            default_values.append(
+                _generate_default_value_for_type_annotation(
+                    type_annotation=arg.type_annotation))
+        else:
+            default_values.append(_generate_default_value(default=arg.default))
+
+    writer = io.StringIO()
+
+    assert len(default_values) >= 1, (
+        "We are constructing the default constructor "
+        "so we expected at least one default value, but got none.")
+
+    if len(default_values) == 1:
+        writer.write(f"{cls_name}() : this({default_values[0]})\n")
+    else:
+        writer.write(f"{cls_name}() : this(\n")
+        for i, default_value in enumerate(default_values):
+            writer.write(f"{csharp_common.INDENT}{default_value}")
+
+            if i < len(default_values) - 1:
+                writer.write(",\n")
+            else:
+                writer.write(")\n")
+
+        writer.write(
+            "{\n"
+            f"{csharp_common.INDENT}// Intentionally left empty.\n"
+            "}")
+
+    return Stripped(writer.getvalue())
 
 
 @require(lambda symbol: symbol.implementation_key is None)
@@ -1058,6 +1137,14 @@ def _generate_class(
 
         blocks.append(constructor_block)
 
+        if any(
+                arg.default is None
+                for arg in symbol.constructor.arguments
+        ):
+            # We generate the default constructor only if it has not been already
+            # defined by specifying the default values for all the arguments.
+            blocks.append(_generate_default_constructor(symbol=symbol))
+
     # endregion
 
     for i, code in enumerate(blocks):
@@ -1069,6 +1156,7 @@ def _generate_class(
     writer.write("\n}")
 
     return Stripped(writer.getvalue()), None
+
 
 # TODO: implement default constructor (setting all props to defaults)
 
@@ -1104,8 +1192,8 @@ def generate(
     blocks.append(Stripped(f"namespace {namespace}\n{{"))
 
     blocks.append(Rstripped(
-            textwrap.indent(
-                textwrap.dedent('''\
+        textwrap.indent(
+            textwrap.dedent('''\
                     /// <summary>
                     /// Represent a general entity of an AAS model.
                     /// </summary>
@@ -1128,7 +1216,7 @@ def generate(
                         /// </summary>
                         public Accept<T>(IVisitor<T> visitor);
                     }'''),
-                csharp_common.INDENT)))
+            csharp_common.INDENT)))
 
     errors = []  # type: List[Error]
 

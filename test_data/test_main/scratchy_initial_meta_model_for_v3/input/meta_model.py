@@ -190,7 +190,7 @@ class Identifier(DBC):
 
     def __init__(
             self,
-            id: str = "hello",
+            id: str,
             id_type: Identifier_type = Identifier_type.IRDI
     ) -> None:
         self.id = id
