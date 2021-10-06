@@ -12,8 +12,7 @@ from typing import (
     Union,
     Iterator,
     Sequence,
-    NoReturn, Mapping,
-)
+    NoReturn, )
 
 import asttokens
 from icontract import require, DBC
@@ -169,10 +168,6 @@ def assert_never(value: NoReturn) -> NoReturn:
     assert False, f"Unhandled value: {value} ({type(value).__name__})"
 
 
-LEADING_WHITESPACE_RE = re.compile(r'^\s+')
-TRAILING_WHITESPACE_RE = re.compile(r'\s+\Z')
-
-
 class Rstripped(str):
     """
     Represent a block of text without trailing whitespace.
@@ -180,7 +175,12 @@ class Rstripped(str):
     The block can be both single-line or multi-line.
     """
 
-    @require(lambda block: not TRAILING_WHITESPACE_RE.match(block))
+    @require(
+        lambda block:
+        not block.endswith('\n')
+        and not block.endswith(' ')
+        and not block.endswith('\t')
+    )
     def __new__(cls, block: str) -> 'Rstripped':
         return cast(Rstripped, block)
 
@@ -192,7 +192,19 @@ class Stripped(Rstripped):
     The block of text can be both single-line and multi-line.
     """
 
-    @require(lambda code: not LEADING_WHITESPACE_RE.match(code))
-    @require(lambda code: not TRAILING_WHITESPACE_RE.match(code))
-    def __new__(cls, code: str) -> 'Stripped':
-        return cast(Stripped, code)
+    # fmt: off
+    @require(
+        lambda block:
+        not block.startswith('\n')
+        and not block.startswith(' ')
+        and not block.startswith('\t')
+    )
+    @require(
+        lambda block:
+        not block.endswith('\n')
+        and not block.endswith(' ')
+        and not block.endswith('\t')
+    )
+    # fmt: on
+    def __new__(cls, block: str) -> 'Stripped':
+        return cast(Stripped, block)

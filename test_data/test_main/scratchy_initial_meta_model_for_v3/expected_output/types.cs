@@ -79,7 +79,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public T Accept<T>(IVisitor<T> visitor)
+        public T Accept<T>(Visitation.IVisitor<T> visitor)
         {
             return visitor.visit(this);
         }
@@ -87,7 +87,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+        public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
         {
             return visitor.visit(this, context);
         }
@@ -207,7 +207,8 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IEntity> DescendOnce()
         {
-            yield return IdType;
+            // No descendable properties
+            yield return break;
         }
 
         /// <summary>
@@ -215,19 +216,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IEntity> Descend()
         {
-            yield return IdType;
-
-            // Recurse
-            foreach (var anItem in IdType.Descend())
-            {
-                yield return anItem;
-            }
+            // No descendable properties
+            yield return break;
         }
 
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public T Accept<T>(IVisitor<T> visitor)
+        public T Accept<T>(Visitation.IVisitor<T> visitor)
         {
             return visitor.visit(this);
         }
@@ -235,7 +231,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+        public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
         {
             return visitor.visit(this, context);
         }
@@ -284,7 +280,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public T Accept<T>(IVisitor<T> visitor)
+        public T Accept<T>(Visitation.IVisitor<T> visitor)
         {
             return visitor.visit(this);
         }
@@ -292,7 +288,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+        public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
         {
             return visitor.visit(this, context);
         }
@@ -535,9 +531,8 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IEntity> DescendOnce()
         {
-            yield return Type;
-
-            yield return IdType;
+            // No descendable properties
+            yield return break;
         }
 
         /// <summary>
@@ -545,27 +540,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IEntity> Descend()
         {
-            yield return Type;
-
-            // Recurse
-            foreach (var anItem in Type.Descend())
-            {
-                yield return anItem;
-            }
-
-            yield return IdType;
-
-            // Recurse
-            foreach (var anItem in IdType.Descend())
-            {
-                yield return anItem;
-            }
+            // No descendable properties
+            yield return break;
         }
 
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public T Accept<T>(IVisitor<T> visitor)
+        public T Accept<T>(Visitation.IVisitor<T> visitor)
         {
             return visitor.visit(this);
         }
@@ -573,7 +555,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+        public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
         {
             return visitor.visit(this, context);
         }
@@ -633,7 +615,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public T Accept<T>(IVisitor<T> visitor)
+        public T Accept<T>(Visitation.IVisitor<T> visitor)
         {
             return visitor.visit(this);
         }
@@ -641,7 +623,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+        public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
         {
             return visitor.visit(this, context);
         }
@@ -652,7 +634,9 @@ namespace AasCore.Aas3
         }
 
         Reference() : this(new List<Key>())
-
+        {
+            // Intentionally left empty.
+        }
     }
 
     public interface IHasSemantics : IEntity
@@ -662,7 +646,7 @@ namespace AasCore.Aas3
 
     public interface IHasDataSpecification : IEntity
     {
-        List<Reference> { get; set; }
+        List<List<Reference>> { get; set; }
     }
 
     /// <summary>
@@ -723,7 +707,7 @@ namespace AasCore.Aas3
 
         AdministrativeInformation? Administration { get; set; }
 
-        List<Reference> DataSpecifications { get; set; }
+        List<List<Reference>> DataSpecifications { get; set; }
 
         /// <summary>
         /// The reference to the AAS this AAS was derived from.
@@ -736,29 +720,32 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IEntity> DescendOnce()
         {
-            if (DisplayName != null)
+            if (DisplayName != null
             {
                 yield return DisplayName;
             }
 
-            if (Description != null)
+            if (Description != null
             {
                 yield return Description;
             }
 
             yield return Identification;
 
-            if (Administration != null)
+            if (Administration != null
             {
                 yield return Administration;
             }
 
             foreach (var anItem in DataSpecifications)
             {
-                yield return anItem;
+                foreach (var anotherItem in anItem)
+                {
+                    yield return anotherItem;
+                }
             }
 
-            if (DerivedFrom != null)
+            if (DerivedFrom != null
             {
                 yield return DerivedFrom;
             }
@@ -769,7 +756,7 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IEntity> Descend()
         {
-            if (DisplayName != null)
+            if (DisplayName != null
             {
                 yield return DisplayName;
 
@@ -780,7 +767,7 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Description != null)
+            if (Description != null
             {
                 yield return Description;
 
@@ -799,7 +786,7 @@ namespace AasCore.Aas3
                 yield return anItem;
             }
 
-            if (Administration != null)
+            if (Administration != null
             {
                 yield return Administration;
 
@@ -812,16 +799,19 @@ namespace AasCore.Aas3
 
             foreach (var anItem in DataSpecifications)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anotherItem in anItem)
                 {
                     yield return anotherItem;
+
+                    // Recurse
+                    foreach (var yetYetanotherItem in anotherItem.Descend())
+                    {
+                        yield return yetYetanotherItem;
+                    }
                 }
             }
 
-            if (DerivedFrom != null)
+            if (DerivedFrom != null
             {
                 yield return DerivedFrom;
 
@@ -836,7 +826,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public T Accept<T>(IVisitor<T> visitor)
+        public T Accept<T>(Visitation.IVisitor<T> visitor)
         {
             return visitor.visit(this);
         }
@@ -844,7 +834,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+        public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
         {
             return visitor.visit(this, context);
         }
@@ -867,7 +857,7 @@ namespace AasCore.Aas3
             Description = description;
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<Reference>();
+                : new List<List<Reference>>();
             DerivedFrom = derivedFrom;
         }
 

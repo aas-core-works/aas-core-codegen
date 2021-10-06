@@ -9,12 +9,15 @@ import docutils.parsers.rst.roles
 import docutils.utils
 from icontract import ensure, require
 
-import aas_core_csharp_codegen.csharp.common as csharp_common
-import aas_core_csharp_codegen.csharp.naming as csharp_naming
 from aas_core_csharp_codegen import intermediate
 from aas_core_csharp_codegen import specific_implementations
-from aas_core_csharp_codegen.common import Error, Identifier, assert_never, \
-    Stripped, Rstripped
+from aas_core_csharp_codegen.common import (
+    Error, Identifier, assert_never,
+    Stripped, Rstripped)
+from aas_core_csharp_codegen.csharp import (
+    common as csharp_common,
+    naming as csharp_naming,
+    unrolling as csharp_unrolling)
 from aas_core_csharp_codegen.specific_implementations import (
     verify as specific_implementations_verify)
 from aas_core_csharp_codegen.understand import (
@@ -646,28 +649,6 @@ def _generate_interface(
     return Stripped(writer.getvalue()), None
 
 
-def _descendable(type_annotation: intermediate.TypeAnnotation) -> bool:
-    """Check if the ``type_annotation`` describes an entity or subscribes an entity. """
-    if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
-        return False
-    elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
-        return True
-    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-        return _descendable(type_annotation=type_annotation.items)
-    elif isinstance(type_annotation, intermediate.SequenceTypeAnnotation):
-        return _descendable(type_annotation=type_annotation.items)
-    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        return _descendable(type_annotation=type_annotation.items)
-    elif isinstance(type_annotation, intermediate.MappingTypeAnnotation):
-        return _descendable(type_annotation=type_annotation.values)
-    elif isinstance(type_annotation, intermediate.MutableMappingTypeAnnotation):
-        return _descendable(type_annotation=type_annotation.values)
-    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        return _descendable(type_annotation=type_annotation.value)
-    else:
-        assert_never(type_annotation)
-
-
 def _generate_descend_body(
         symbol: intermediate.Class,
         recurse: bool
@@ -681,112 +662,126 @@ def _generate_descend_body(
     blocks = []  # type: List[Stripped]
 
     for prop in symbol.properties:
-        type_anno = prop.type_annotation
+        descendability = intermediate.map_descendability(
+            type_annotation=prop.type_annotation)
 
-        if not _descendable(type_annotation=type_anno):
+        if not descendability[prop.type_annotation]:
             continue
 
-        prop_name = csharp_naming.property_name(prop.name)
+        # region Unroll
 
-        # Unroll
-        stmts = []  # type: List[str]
-        item_id = -1  # -1 means we are at the level of the property variable
-
-        @require(lambda an_item_id: an_item_id >= -1)
-        def item_var(an_item_id: int) -> Identifier:
-            """Generate the item variable used in the loops."""
-            if an_item_id == -1:
-                return prop_name
-            elif an_item_id == 0:
-                return Identifier("anItem")
-            elif an_item_id == 1:
-                return Identifier("anotherItem")
+        @require(lambda var_index: var_index >= 0)
+        def var_name(var_index: int) -> Identifier:
+            """Generate the name of the loop variable."""
+            if var_index == 0:
+                return Identifier(f"anItem")
+            elif var_index == 1:
+                return Identifier(f"anotherItem")
             else:
-                return Identifier("yet" + "Yet" * (an_item_id - 2) + "Item")
+                return Identifier("yet" + "Yet" * (var_index - 1) + f"anotherItem")
 
-        while True:
-            old_type_anno = type_anno
-
+        def unroll(
+                current_var_name: str,
+                item_count: int,
+                type_anno: intermediate.TypeAnnotation
+        ) -> List[csharp_unrolling.Node]:
+            """Generate the node corresponding to the ``type_anno`` and recurse."""
             if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
-                raise AssertionError(
-                    f"Unexpected BuiltinAtomicTypeAnnotation "
-                    f"given the descendable property {prop.name!r} of class "
-                    f"{symbol.name}")
+                return []
 
             elif isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
-                yield_var = item_var(item_id)
+                if isinstance(type_anno.symbol, intermediate.Enumeration):
+                    return []
 
-                if not recurse:
-                    stmts.append(f'yield return {yield_var};')
-                else:
-                    if _descendable(prop.type_annotation):
-                        recurse_var = item_var(item_id + 1)
-                        stmts.append(textwrap.dedent(f'''\
-                            yield return {yield_var};
+                assert isinstance(type_anno.symbol, (
+                    intermediate.Class, intermediate.Interface))
 
-                            // Recurse
-                            foreach (var {recurse_var} in {yield_var}.Descend())
-                            {{
-                                yield return {recurse_var};
-                            }}'''))
+                result = [csharp_unrolling.Node(
+                    f'yield return {current_var_name};', children=[])]
+
+                if recurse:
+                    if descendability[type_anno]:
+                        recurse_var = var_name(var_index=item_count)
+
+                        result.append(csharp_unrolling.Node(
+                            text=textwrap.dedent(f'''\
+                                // Recurse
+                                foreach (var {recurse_var} in {current_var_name}.Descend())
+                                {{
+                                    yield return {recurse_var};
+                                }}'''),
+                            children=[]))
                     else:
-                        stmts.append(textwrap.dedent(f'''\
-                            yield return {yield_var};
-                            
-                            // Recursive descent ends here.
-                            '''))
-                break
+                        result.append(csharp_unrolling.Node(
+                            text="// Recursive descent ends here.",
+                            children=[]))
 
-            elif isinstance(
-                    type_anno,
-                    (intermediate.ListTypeAnnotation,
-                     intermediate.SequenceTypeAnnotation,
-                     intermediate.SetTypeAnnotation)):
-                item_id += 1
-                stmts.append(
-                    f"foreach (var {item_var(item_id)} in {item_var(item_id - 1)})")
+                return result
 
-                # noinspection PyUnresolvedReferences
-                type_anno = type_anno.items
+            elif isinstance(type_anno, (
+                    intermediate.ListTypeAnnotation,
+                    intermediate.SequenceTypeAnnotation,
+                    intermediate.SetTypeAnnotation)):
+                item_var = var_name(item_count)
 
-            elif isinstance(
-                    type_anno,
-                    (intermediate.MappingTypeAnnotation,
-                     intermediate.MutableMappingTypeAnnotation)):
-                item_id += 1
+                children = unroll(
+                    current_var_name=var_name(item_count),
+                    item_count=item_count + 1,
+                    type_anno=type_anno.items)
 
-                stmts.append(
-                    f"foreach (var {item_var(item_id)} in "
-                    f"{item_var(item_id - 1)}.Values)")
+                if len(children) == 0:
+                    return []
 
-                # noinspection PyUnresolvedReferences
-                type_anno = type_anno.values
+                node = csharp_unrolling.Node(
+                    text=f"foreach (var {item_var} in {current_var_name})",
+                    children=children)
+
+                return [node]
+
+            elif isinstance(type_anno, (
+                    intermediate.MappingTypeAnnotation,
+                    intermediate.MutableMappingTypeAnnotation
+            )):
+                item_var = var_name(item_count)
+
+                children = unroll(
+                    current_var_name=var_name(item_count),
+                    item_count=item_count + 1,
+                    type_anno=type_anno.values)
+
+                if len(children) == 0:
+                    return []
+
+                return [csharp_unrolling.Node(
+                    text=f"foreach (var {item_var} in {current_var_name}.Values)",
+                    children=children)]
 
             elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-                stmts.append(f"if ({item_var(item_id)} != null)")
+                children = unroll(
+                    current_var_name=current_var_name,
+                    item_count=item_count,
+                    type_anno=type_anno.value)
 
-                type_anno = type_anno.value
+                if len(children) == 0:
+                    return []
+
+                return [csharp_unrolling.Node(
+                    text=f"if ({current_var_name} != null", children=children)]
             else:
                 assert_never(type_anno)
 
-            assert type_anno != old_type_anno, "Loop invariant"
+        roots = unroll(
+            current_var_name=csharp_naming.property_name(prop.name),
+            item_count=0,
+            type_anno=prop.type_annotation)
 
-        prefix = []  # type: List[str]
-        suffix = []  # type: List[str]
+        assert len(roots) > 0, (
+            "Since the type annotation was descendable, we must have obtained "
+            "at least one unrolling node")
 
-        indent = ''
-        for i, stmt in enumerate(stmts):
-            if i != len(stmts) - 1:
-                prefix.append(f'{indent}{stmt}')
-                prefix.append(f'{indent}{{')
+        blocks.extend(Stripped(csharp_unrolling.render(root)) for root in roots)
 
-                suffix.append(f'{indent}}}')
-            else:
-                prefix.append(textwrap.indent(stmt, indent))
-
-            indent += csharp_common.INDENT
-
-        blocks.append(Stripped('\n'.join(prefix + suffix)))
+        # endregion
 
     if len(blocks) == 0:
         blocks.append(Stripped('// No descendable properties\nyield return break;'))
@@ -1026,10 +1021,10 @@ def _generate_default_constructor(
             else:
                 writer.write(")\n")
 
-        writer.write(
-            "{\n"
-            f"{csharp_common.INDENT}// Intentionally left empty.\n"
-            "}")
+    writer.write(
+        "{\n"
+        f"{csharp_common.INDENT}// Intentionally left empty.\n"
+        "}")
 
     return Stripped(writer.getvalue())
 
@@ -1119,7 +1114,7 @@ def _generate_class(
                 /// <summary>
                 /// Accept the visitor to visit this instance for double dispatch.
                 /// </summary>
-                public T Accept<T>(IVisitor<T> visitor)
+                public T Accept<T>(Visitation.IVisitor<T> visitor)
                 {{
                 {csharp_common.INDENT}return visitor.visit(this);
                 }}''')))
@@ -1130,7 +1125,7 @@ def _generate_class(
                 /// <summary>
                 /// Accept the visitor to visit this instance for double dispatch.
                 /// </summary>
-                public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+                public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
                 {{
                 {csharp_common.INDENT}return visitor.visit(this, context);
                 }}''')))

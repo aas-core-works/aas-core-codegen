@@ -673,3 +673,66 @@ class PropertyReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
         self.property_name = property_name
         docutils.nodes.TextElement.__init__(
             self, rawsource, text, *children, **attributes)
+
+
+def map_descendability(
+        type_annotation: TypeAnnotation
+) -> MutableMapping[TypeAnnotation, bool]:
+    """
+    Map the type annotation recursively by the descendability.
+
+    The descendability means that the type annotation references an entity (an interface
+    or a class) *or* that it is a subscripted type annotation which subscribes one or
+    more entities of the meta-model.
+
+    The mapping is a form of caching. Otherwise, the time complexity would be quadratic
+    if we queried at each type annotation subscript.
+    """
+    mapping = dict()  # type: MutableMapping[TypeAnnotation, bool]
+
+    def recurse(a_type_annotation: TypeAnnotation) -> bool:
+        """Recursively iterate over subscripted type annotations."""
+        if isinstance(a_type_annotation, BuiltinAtomicTypeAnnotation):
+            mapping[a_type_annotation] = False
+            return False
+
+        elif isinstance(a_type_annotation, OurAtomicTypeAnnotation):
+            result = None  # type: Optional[bool]
+            if isinstance(a_type_annotation.symbol, Enumeration):
+                result = False
+            elif isinstance(a_type_annotation.symbol, (Interface, Class)):
+                result = True
+            else:
+                assert_never(a_type_annotation.symbol)
+
+            assert result is not None
+            mapping[a_type_annotation] = result
+            return result
+
+        elif isinstance(a_type_annotation, (
+                ListTypeAnnotation,
+                SequenceTypeAnnotation,
+                SetTypeAnnotation)):
+            result = recurse(a_type_annotation=a_type_annotation.items)
+            mapping[a_type_annotation] = result
+            return result
+
+        elif isinstance(a_type_annotation, (
+                MappingTypeAnnotation,
+                MutableMappingTypeAnnotation
+        )):
+            result = recurse(a_type_annotation=a_type_annotation.values)
+            mapping[a_type_annotation] = result
+            return result
+
+        elif isinstance(a_type_annotation, OptionalTypeAnnotation):
+            result = recurse(a_type_annotation=a_type_annotation.value)
+            mapping[a_type_annotation] = result
+            return result
+
+        else:
+            assert_never(a_type_annotation)
+
+    _ = recurse(a_type_annotation=type_annotation)
+
+    return mapping

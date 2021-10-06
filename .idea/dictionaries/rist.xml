@@ -8,6 +8,7 @@
       <w>columner</w>
       <w>csharp</w>
       <w>dedented</w>
+      <w>descendability</w>
       <w>descendable</w>
       <w>dumpable</w>
       <w>dunder</w>
@@ -19,6 +20,7 @@
       <w>irdi</w>
       <w>ivisitor</w>
       <w>lineno</w>
+      <w>linq</w>
       <w>mristin</w>
       <w>mypy</w>
       <w>nameof</w>
@@ -31,6 +33,7 @@
       <w>pylint</w>
       <w>rawsource</w>
       <w>rawtext</w>
+      <w>rstripped</w>
       <w>stmts</w>
       <w>stringifiable</w>
       <w>stringified</w>

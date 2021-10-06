@@ -6,8 +6,11 @@ from typing import Tuple, Optional, List, Sequence
 
 from icontract import ensure, require
 
-import aas_core_csharp_codegen.csharp.common as csharp_common
-import aas_core_csharp_codegen.csharp.naming as csharp_naming
+from aas_core_csharp_codegen.csharp import (
+    common as csharp_common,
+    naming as csharp_naming,
+    unrolling as csharp_unrolling
+)
 from aas_core_csharp_codegen import intermediate
 from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, assert_never, \
     Identifier
@@ -102,15 +105,6 @@ def _unroll_enumeration_check(
         prop: intermediate.Property) -> Stripped:
     """Generate the code for unrolling the enumeration checks for the given property."""
 
-    class Node:
-        """Represent a node in the tree of unrolled checks."""
-
-        def __init__(self, text: str, children: Sequence['Node']):
-            self.text = text
-            self.children = children
-
-    # TODO: adapt the var_name in Descend!
-
     @require(lambda var_index: var_index >= 0)
     @require(lambda suffix: suffix in ("Item", "KeyValue"))
     def var_name(var_index: int, suffix: str) -> Identifier:
@@ -135,7 +129,7 @@ def _unroll_enumeration_check(
             key_value_count: int,
             path: List[str],
             type_anno: intermediate.TypeAnnotation
-    ) -> List[Node]:
+    ) -> List[csharp_unrolling.Node]:
         """Generate the node corresponding to the ``type_anno`` and recurse."""
         if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
             return []
@@ -148,7 +142,7 @@ def _unroll_enumeration_check(
             joined_pth = '/'.join(path)
 
             return [
-                Node(
+                csharp_unrolling.Node(
                     text=textwrap.dedent(f'''\
                     if (!EnumValueSet.For{enum_name}.Contains({current_var_name}))
                     {{
@@ -174,8 +168,9 @@ def _unroll_enumeration_check(
             if len(children) == 0:
                 return []
 
-            node = Node(
-                text=f"for (var {item_var} in {current_var_name}", children=children)
+            node = csharp_unrolling.Node(
+                text=f"foreach (var {item_var} in {current_var_name}",
+                children=children)
 
             return [node]
 
@@ -202,7 +197,7 @@ def _unroll_enumeration_check(
             children = key_children + value_children
 
             if len(children) > 0:
-                return [Node(
+                return [csharp_unrolling.Node(
                     text=f'foreach (var {key_value_var} in {current_var_name})',
                     children=children)]
             else:
@@ -216,8 +211,8 @@ def _unroll_enumeration_check(
                 path=path,
                 type_anno=type_anno.value)
             if len(children) > 0:
-                return [Node(
-                    text=f"if ({current_var_name} != null", children=children)]
+                return [csharp_unrolling.Node(
+                    text=f"if ({current_var_name} != null)", children=children)]
             else:
                 return []
         else:
@@ -235,23 +230,7 @@ def _unroll_enumeration_check(
     if len(roots) == 0:
         return Stripped('')
 
-    def render(node: Node) -> str:
-        """Render the node recursively."""
-        if len(node.children) == 0:
-            return node.text
-
-        node_writer = io.StringIO()
-        node_writer.write(node.text)
-        node_writer.write('\n{')
-
-        for child in node.children:
-            node_writer.write(textwrap.indent(render(child), csharp_common.INDENT))
-
-        node_writer.write('\n}')
-
-        return node_writer.getvalue()
-
-    blocks = [render(root) for root in roots]
+    blocks = [csharp_unrolling.render(root) for root in roots]
     return Stripped('\n\n'.join(blocks))
 
 
@@ -284,8 +263,7 @@ def _generate_implementation_verify(
         /// Verify the given <paramref name={xml.sax.saxutils.quoteattr(arg_name)} /> and 
         /// append any errors to <paramref name="Errors" />.
         ///
-        /// The <paramref name="path" /> indicates the current path to the
-        /// <paramref name={xml.sax.saxutils.quoteattr(arg_name)} />.
+        /// The <paramref name="path" /> localized the <paramref name={xml.sax.saxutils.quoteattr(arg_name)} />.
         /// </summary>
         public void Verify{cls_name} (
         {csharp_common.INDENT}{cls_name} {arg_name},
@@ -320,17 +298,17 @@ def _generate_implementation(
             continue
 
         if symbol.implementation_key is not None:
-            visit_key = ImplementationKey(
+            verify_key = ImplementationKey(
                 f'Verification/Implementation/verify_{symbol.name}')
-            if visit_key not in spec_impls:
+            if verify_key not in spec_impls:
                 errors.append(
                     Error(
                         symbol.parsed.node,
                         f"The implementation snippet is missing for "
-                        f"the ``Verify`` method: {visit_key}"))
+                        f"the ``Verify`` method: {verify_key}"))
                 continue
 
-            blocks.append(spec_impls[visit_key])
+            blocks.append(spec_impls[verify_key])
         else:
             implementation_verify, error = _generate_implementation_verify(cls=symbol)
             if error is not None:
@@ -383,8 +361,7 @@ def _generate_non_recursive_verifier(
             NonRecursiveVerifier(Errors errors)
             {{
             {csharp_common.INDENT}Errors = errors;
-            }}
-            ''')),
+            }}''')),
         Stripped(textwrap.dedent(f'''\
             public void Visit(IEntity entity, string context)
             {{
@@ -403,9 +380,10 @@ def _generate_non_recursive_verifier(
 
         blocks.append(Stripped(textwrap.dedent(f'''\
             /// <summary>
-            /// Verify <paramref name={xml.sax.saxutils.quoteattr(arg_name)} />,
-            /// append any error to <see cref="Errors" /> where <paramref name="context" />
-            /// is used to localize the error.
+            /// Verify <paramref name={xml.sax.saxutils.quoteattr(arg_name)} /> and
+            /// append any error to <see cref="Errors" /> 
+            /// where <paramref name="context" /> is used to localize the error.
+            /// </summary>
             public void Visit(
             {csharp_common.INDENT}{cls_name} {arg_name},
             {csharp_common.INDENT}string context)
@@ -436,6 +414,196 @@ def _generate_non_recursive_verifier(
     return Stripped(writer.getvalue()), None
 
 
+@require(lambda cls, prop: prop in cls.properties)
+def _unroll_recursion_in_recursive_verify(
+        cls: intermediate.Class,
+        prop: intermediate.Property) -> Stripped:
+    """Generate the code for unrolling the recursive visits  for the given property."""
+    descendability = intermediate.map_descendability(prop.type_annotation)
+
+    @require(lambda var_index: var_index >= 0)
+    @require(lambda suffix: suffix in ("Item", "KeyValue"))
+    def var_name(var_index: int, suffix: str) -> Identifier:
+        """Generate the name of the loop variable."""
+        if var_index == 0:
+            if suffix == 'Item':
+                return Identifier(f"an{suffix}")
+            else:
+                return Identifier(f"a{suffix}")
+
+        elif var_index == 1:
+            return Identifier(f"another{suffix}")
+        else:
+            return Identifier("yet" + "Yet" * (var_index - 1) + f"another{suffix}")
+
+    def unroll(
+            current_var_name: str,
+            item_count: int,
+            key_value_count: int,
+            path: List[str],
+            type_anno: intermediate.TypeAnnotation
+    ) -> List[csharp_unrolling.Node]:
+        """Generate the node corresponding to the ``type_anno`` and recurse."""
+        if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
+            return []
+
+        elif isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
+            if isinstance(type_anno.symbol, intermediate.Enumeration):
+                return []
+
+            joined_pth = '/'.join(path)
+            return [csharp_unrolling.Node(
+                text=textwrap.dedent(f'''\
+                    Visit(
+                        {current_var_name},
+                        ${csharp_common.string_literal(joined_pth)});'''),
+                children=[])]
+
+        elif isinstance(type_anno, (
+                intermediate.ListTypeAnnotation, intermediate.SequenceTypeAnnotation,
+                intermediate.SetTypeAnnotation)):
+
+            if item_count > 15:
+                index_var = f'i{item_count}'
+            else:
+                index_var = chr(ord('i') + item_count)
+
+            children = unroll(
+                current_var_name=f'{current_var_name}[{index_var}]',
+                item_count=item_count + 1,
+                key_value_count=key_value_count,
+                path=path + [f'{{{index_var}}}'],
+                type_anno=type_anno.items)
+
+            if len(children) == 0:
+                return []
+
+            text = Stripped(
+                f'for(var {index_var} = 0; '
+                f'{index_var} < {current_var_name}.Count; '
+                f'{index_var}++)')
+
+            # Break into lines if too long.
+            # This is just a heuristics — we do not consider the actual indention.
+            if len(text) > 50:
+                text = Stripped(textwrap.dedent(f'''\
+                    for(
+                    {csharp_common.INDENT}var {index_var} = 0;
+                    {csharp_common.INDENT}{index_var} < {current_var_name}.Count;
+                    {csharp_common.INDENT}{index_var}++)'''))
+
+            return [csharp_unrolling.Node(text=text, children=children)]
+
+        elif isinstance(type_anno, (
+                intermediate.MappingTypeAnnotation,
+                intermediate.MutableMappingTypeAnnotation
+        )):
+            key_value_var = var_name(key_value_count + 1, "KeyValue")
+
+            children = unroll(
+                current_var_name=f'{key_value_var}.Value',
+                item_count=item_count,
+                key_value_count=key_value_count + 1,
+                path=path + [f'{{{key_value_var}.Key}}'],
+                type_anno=type_anno.values)
+
+            if len(children) > 0:
+                return [csharp_unrolling.Node(
+                    text=f'foreach (var {key_value_var} in {current_var_name})',
+                    children=children)]
+            else:
+                return []
+
+        elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
+            children = unroll(
+                current_var_name=current_var_name,
+                item_count=item_count,
+                key_value_count=key_value_count,
+                path=path,
+                type_anno=type_anno.value)
+            if len(children) > 0:
+                return [csharp_unrolling.Node(
+                    text=f"if ({current_var_name} != null)", children=children)]
+            else:
+                return []
+        else:
+            assert_never(type_anno)
+
+    arg_name = csharp_naming.argument_name(cls.name)
+    prop_name = csharp_naming.property_name(prop.name)
+
+    roots = unroll(
+        current_var_name=f'{arg_name}.{prop_name}',
+        item_count=0,
+        key_value_count=0,
+        path=['{context}', prop_name],
+        type_anno=prop.type_annotation)
+
+    if len(roots) == 0:
+        return Stripped('')
+
+    blocks = [csharp_unrolling.render(root) for root in roots]
+    return Stripped('\n\n'.join(blocks))
+
+
+# fmt: on
+@require(
+    lambda cls:
+    cls.implementation_key is None,
+    "Implementation-specific classes are handled elsewhere"
+)
+# fmt: off
+def _generate_recursive_verifier_visit(
+        cls: intermediate.Class
+) -> Stripped:
+    """Generate the ``Visit`` method of the ``RecursiveVerifier`` for the ``cls``."""
+    arg_name = csharp_naming.argument_name(cls.name)
+    cls_name = csharp_naming.class_name(cls.name)
+
+    assert arg_name != 'context', "Unexpected reserved argument name"
+
+    writer = io.StringIO()
+    writer.write(textwrap.dedent(f'''\
+        /// <summary>
+        /// Verify recursively <paramref name={xml.sax.saxutils.quoteattr(arg_name)} /> and
+        /// append any error to <see cref="Errors" /> 
+        /// where <paramref name="context" /> is used to localize the error.
+        /// </summary>
+        public void Visit(
+        {csharp_common.INDENT}{cls_name} {arg_name},
+        {csharp_common.INDENT}string context)
+        {{
+        '''))
+
+    blocks = [
+        Stripped(textwrap.dedent(f'''\
+        Implementation.Verify(
+        {csharp_common.INDENT}{arg_name},
+        {csharp_common.INDENT}context,
+        {csharp_common.INDENT}Errors);'''))
+    ]  # type: List[Stripped]
+
+    # region Unroll
+
+    for prop in cls.properties:
+        unrolled_prop_verification = _unroll_recursion_in_recursive_verify(
+            cls=cls,
+            prop=prop)
+
+        if unrolled_prop_verification != '':
+            blocks.append(unrolled_prop_verification)
+    # endregion
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write('\n\n')
+
+        writer.write(textwrap.indent(block, csharp_common.INDENT))
+
+    writer.write('\n}')
+    return Stripped(writer.getvalue())
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_recursive_verifier(
         symbol_table: intermediate.SymbolTable,
@@ -454,8 +622,7 @@ def _generate_recursive_verifier(
             RecursiveVerifier(Errors errors)
             {{
             {csharp_common.INDENT}Errors = errors;
-            }}
-            ''')),
+            }}''')),
         Stripped(textwrap.dedent(f'''\
             public void Visit(IEntity entity, string context)
             {{
@@ -469,29 +636,20 @@ def _generate_recursive_verifier(
         if not isinstance(symbol, intermediate.Class):
             continue
 
-        # TODO: include snippet, if symbol implementation-specific
+        if symbol.implementation_key is not None:
+            visit_key = ImplementationKey(
+                f'Verification/RecursiveVerifier/visit_{symbol.name}')
+            if visit_key not in spec_impls:
+                errors.append(
+                    Error(
+                        symbol.parsed.node,
+                        f"The implementation snippet is missing for "
+                        f"the ``Visit`` method: {visit_key}"))
+                continue
 
-        # TODO: implement and add recursion
-        #
-        # arg_name = csharp_naming.argument_name(symbol.name)
-        # cls_name = csharp_naming.class_name(symbol.name)
-        #
-        # assert arg_name != 'context', "Unexpected reserved argument name"
-        #
-        # blocks.append(Stripped(textwrap.dedent(f'''\
-        #     /// <summary>
-        #     /// Verify <paramref name={xml.sax.saxutils.quoteattr(arg_name)} />,
-        #     /// append any error to <see cref="Errors" /> where <paramref name="context" />
-        #     /// is used to localize the error.
-        #     public void Visit(
-        #     {csharp_common.INDENT}{cls_name} {arg_name},
-        #     {csharp_common.INDENT}string context)
-        #     {{
-        #     {csharp_common.INDENT}Implementation.Verify(
-        #     {csharp_common.INDENT2}{arg_name},
-        #     {csharp_common.INDENT2}context,
-        #     {csharp_common.INDENT2}Errors);
-        #     }}''')))
+            blocks.append(spec_impls[visit_key])
+        else:
+            blocks.append(_generate_recursive_verifier_visit(cls=symbol))
 
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
@@ -558,8 +716,7 @@ def generate(
         verification_blocks.append(implementation)
 
     non_recursive_verifier, error = _generate_non_recursive_verifier(
-        symbol_table=symbol_table,
-        spec_impls=spec_impls)
+        symbol_table=symbol_table)
 
     if error is not None:
         errors.append(error)
@@ -574,7 +731,6 @@ def generate(
         errors.append(error)
     else:
         verification_blocks.append(recursive_verifier)
-
 
     if len(errors) > 0:
         return None, errors
