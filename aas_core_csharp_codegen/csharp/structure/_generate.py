@@ -1158,9 +1158,6 @@ def _generate_class(
     return Stripped(writer.getvalue()), None
 
 
-# TODO: implement default constructor (setting all props to defaults)
-
-
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 @ensure(

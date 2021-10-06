@@ -109,8 +109,6 @@ docutils.parsers.rst.roles.register_local_role('class', _symbol_reference_role)
 docutils.parsers.rst.roles.register_local_role('py:attr', _property_reference_role)
 
 
-# TODO: add PropertyReferenceInDoc
-
 def _parsed_description_to_description(parsed: parse.Description) -> Description:
     """Translate the parsed description to an intermediate form."""
     # This function makes a simple copy at the moment, which might seem pointless.

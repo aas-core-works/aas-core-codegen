@@ -73,12 +73,24 @@ class Test_against_recorded(unittest.TestCase):
                     self.assertEqual(
                         normalized_stdout, stdout_pth.read_text(), stdout_pth)
 
-                self.assertEqual(
-                    (expected_output_dir / "types.cs").read_text(),
-                    (output_dir / "types.cs").read_text(),
-                    expected_output_dir)
-
                 # TODO: check the remainder of the generated files
+                for relevant_filename in [
+                    'types.cs', 'visitation.cs', 'verification.cs'
+                ]:
+                    expected_pth = expected_output_dir / relevant_filename
+                    output_pth = output_dir / relevant_filename
+
+                    if not output_pth.exists():
+                        raise FileNotFoundError(
+                            f"The output file is missing: {output_pth}")
+
+                    if Test_against_recorded.RERECORD:
+                        expected_pth.write_text(output_pth.read_text())
+                    else:
+                        self.assertEqual(
+                            expected_pth.read_text(),
+                            output_pth.read_text(),
+                            f"The files {expected_pth} and {output_pth} do not match.")
 
 
 if __name__ == "__main__":

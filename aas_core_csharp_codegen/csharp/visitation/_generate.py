@@ -145,7 +145,7 @@ def generate(
     writer = io.StringIO()
     writer.write(f"namespace {namespace}\n{{\n")
     writer.write(
-        f"{csharp_common.INDENT}static class Visitation\n"
+        f"{csharp_common.INDENT}public static class Visitation\n"
         f"{csharp_common.INDENT}{{\n")
 
     visitation_blocks = [
@@ -161,7 +161,7 @@ def generate(
             textwrap.indent(visitation_block, csharp_common.INDENT2))
 
     writer.write(
-        f"\n{csharp_common.INDENT}}}  // static class Visitation")
+        f"\n{csharp_common.INDENT}}}  // public static class Visitation")
     writer.write(f"\n}}  // namespace {namespace}")
 
     blocks.append(Stripped(writer.getvalue()))
