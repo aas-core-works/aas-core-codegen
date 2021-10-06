@@ -195,15 +195,34 @@ class Property:
         )
 
 
-class Default:
-    """Represent a default value for an argument."""
 
+class DefaultConstant:
+    """Represent a constant value as a default for an argument."""
     def __init__(
             self, value: Union[bool, int, float, str, None], parsed: parse.Default
     ) -> None:
         """Initialize with the given values."""
         self.value = value
         self.parsed = parsed
+
+
+class DefaultEnumerationLiteral:
+    """Represent an enumeration literal as a default for an argument."""
+
+    @require(lambda enumeration, literal: literal in enumeration)
+    def __init__(
+            self,
+            enumeration: 'Enumeration',
+            literal: 'EnumerationLiteral',
+            parsed: parse.Default
+    ) -> None:
+        """Initialize with the given values."""
+        self.parsed = parsed
+        self.enumeration = enumeration
+        self.literal = literal
+
+
+Default = Union[DefaultConstant, DefaultEnumerationLiteral]
 
 
 class Argument:
@@ -469,7 +488,6 @@ class Enumeration:
         self.literals = literals
         self.description = description
         self.parsed = parsed
-
 
 class Class:
     """

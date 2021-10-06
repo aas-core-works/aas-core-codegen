@@ -24,15 +24,32 @@ from aas_core_csharp_codegen.intermediate._types import (
     SymbolTable,
     TypeAnnotation, ListTypeAnnotation, SequenceTypeAnnotation, SetTypeAnnotation,
     MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
-    BuiltinAtomicTypeAnnotation, OurAtomicTypeAnnotation, Description, Invariant
+    BuiltinAtomicTypeAnnotation, OurAtomicTypeAnnotation, Description, Invariant,
+    DefaultConstant, DefaultEnumerationLiteral
 )
 
 
-def _stringify_default(default: Default) -> stringify.Entity:
+def _stringify_default_constant(default: DefaultConstant) -> stringify.Entity:
     result = stringify.Entity(
         name=Default.__name__,
         properties=[
             stringify.Property("value", default.value),
+            stringify.PropertyEllipsis("parsed", default.parsed),
+        ],
+    )
+
+    stringify.assert_compares_against_dict(result, default)
+    return result
+
+
+def _stringify_default_enumeration_literal(
+        default: DefaultEnumerationLiteral
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=Default.__name__,
+        properties=[
+            stringify.Property("enumeration", default.enumeration.name),
+            stringify.Property("literal", default.literal.name),
             stringify.PropertyEllipsis("parsed", default.parsed),
         ],
     )
@@ -78,7 +95,7 @@ def _stringify_subscripted_type_annotation(
             name=ListTypeAnnotation.__name__,
             properties=[
                 stringify.Property(
-                    "items", _stringify_type_annotation(type_annotation.items)),
+                    "items", _stringify(type_annotation.items)),
                 stringify.PropertyEllipsis("parsed", type_annotation.parsed),
             ])
     elif isinstance(type_annotation, SequenceTypeAnnotation):
@@ -86,7 +103,7 @@ def _stringify_subscripted_type_annotation(
             name=SequenceTypeAnnotation.__name__,
             properties=[
                 stringify.Property(
-                    "items", _stringify_type_annotation(type_annotation.items)),
+                    "items", _stringify(type_annotation.items)),
                 stringify.PropertyEllipsis("parsed", type_annotation.parsed),
             ])
     elif isinstance(type_annotation, SetTypeAnnotation):
@@ -94,7 +111,7 @@ def _stringify_subscripted_type_annotation(
             name=SetTypeAnnotation.__name__,
             properties=[
                 stringify.Property(
-                    "items", _stringify_type_annotation(type_annotation.items)),
+                    "items", _stringify(type_annotation.items)),
                 stringify.PropertyEllipsis("parsed", type_annotation.parsed),
             ])
     elif isinstance(type_annotation, MappingTypeAnnotation):
@@ -102,9 +119,9 @@ def _stringify_subscripted_type_annotation(
             name=MappingTypeAnnotation.__name__,
             properties=[
                 stringify.Property(
-                    "keys", _stringify_type_annotation(type_annotation.keys)),
+                    "keys", _stringify(type_annotation.keys)),
                 stringify.Property(
-                    "values", _stringify_type_annotation(type_annotation.values)),
+                    "values", _stringify(type_annotation.values)),
                 stringify.PropertyEllipsis("parsed", type_annotation.parsed),
             ])
     elif isinstance(type_annotation, MutableMappingTypeAnnotation):
@@ -112,9 +129,9 @@ def _stringify_subscripted_type_annotation(
             name=MutableMappingTypeAnnotation.__name__,
             properties=[
                 stringify.Property(
-                    "keys", _stringify_type_annotation(type_annotation.keys)),
+                    "keys", _stringify(type_annotation.keys)),
                 stringify.Property(
-                    "values", _stringify_type_annotation(type_annotation.values)),
+                    "values", _stringify(type_annotation.values)),
                 stringify.PropertyEllipsis("parsed", type_annotation.parsed),
             ])
     elif isinstance(type_annotation, OptionalTypeAnnotation):
@@ -122,7 +139,7 @@ def _stringify_subscripted_type_annotation(
             name=OptionalTypeAnnotation.__name__,
             properties=[
                 stringify.Property(
-                    "value", _stringify_type_annotation(type_annotation.value)),
+                    "value", _stringify(type_annotation.value)),
                 stringify.PropertyEllipsis("parsed", type_annotation.parsed),
             ])
     else:
@@ -133,21 +150,12 @@ def _stringify_subscripted_type_annotation(
     return result
 
 
-def _stringify_type_annotation(type_annotation: TypeAnnotation) -> stringify.Entity:
-    if isinstance(type_annotation, AtomicTypeAnnotation):
-        return _stringify_atomic_type_annotation(type_annotation)
-
-    elif isinstance(type_annotation, SubscriptedTypeAnnotation):
-        return _stringify_subscripted_type_annotation(type_annotation)
-
-    elif isinstance(type_annotation, SelfTypeAnnotation):
-        result = stringify.Entity(name=SelfTypeAnnotation.__name__, properties=[])
-        stringify.assert_compares_against_dict(result, type_annotation)
-        return result
-
-    else:
-        assert_never(type_annotation)
-        raise AssertionError(type_annotation)
+def _stringify_self_type_annotation(
+        type_annotation: SelfTypeAnnotation
+) -> stringify.Entity:
+    result = stringify.Entity(name=SelfTypeAnnotation.__name__, properties=[])
+    stringify.assert_compares_against_dict(result, type_annotation)
+    return result
 
 
 def _stringify_argument(argument: Argument) -> stringify.Entity:
@@ -156,13 +164,13 @@ def _stringify_argument(argument: Argument) -> stringify.Entity:
         properties=[
             stringify.Property("name", argument.name),
             stringify.Property(
-                "type_annotation", _stringify_type_annotation(argument.type_annotation)
+                "type_annotation", _stringify(argument.type_annotation)
             ),
             stringify.Property(
                 "default",
                 None
                 if argument.default is None
-                else _stringify_default(argument.default),
+                else _stringify(argument.default),
             ),
             stringify.PropertyEllipsis("parsed", argument.parsed),
         ],
@@ -194,7 +202,7 @@ def _stringify_signature(signature: Signature) -> stringify.Entity:
                 "returns",
                 None
                 if signature.returns is None
-                else _stringify_type_annotation(signature.returns),
+                else _stringify(signature.returns),
             ),
             stringify.Property(
                 "description", _stringify_description(signature.description)),
@@ -212,7 +220,7 @@ def _stringify_property(prop: Property) -> stringify.Entity:
         properties=[
             stringify.Property("name", prop.name),
             stringify.Property(
-                "type_annotation", _stringify_type_annotation(prop.type_annotation)
+                "type_annotation", _stringify(prop.type_annotation)
             ),
             stringify.Property("description", _stringify_description(prop.description)),
             stringify.Property("is_readonly", prop.is_readonly),
@@ -374,7 +382,7 @@ def _stringify_method(method: Method) -> stringify.Entity:
                 "returns",
                 None
                 if method.returns is None
-                else _stringify_type_annotation(method.returns),
+                else _stringify(method.returns),
             ),
             stringify.Property(
                 "description", _stringify_description(method.description)),
@@ -435,18 +443,6 @@ def _stringify_class(cls: Class) -> stringify.Entity:
     return result
 
 
-def _stringify_symbol(symbol: Symbol) -> stringify.Entity:
-    if isinstance(symbol, Interface):
-        return _stringify_interface(symbol)
-    elif isinstance(symbol, Enumeration):
-        return _stringify_enumeration(symbol)
-    elif isinstance(symbol, Class):
-        return _stringify_class(symbol)
-    else:
-        assert_never(symbol)
-        raise AssertionError(symbol)
-
-
 def _stringify_symbol_table(symbol_table: SymbolTable) -> stringify.Entity:
     """Represent the symbol table as a string for testing or debugging."""
     result = stringify.Entity(
@@ -454,7 +450,7 @@ def _stringify_symbol_table(symbol_table: SymbolTable) -> stringify.Entity:
         properties=[
             stringify.Property(
                 name="symbols",
-                value=[_stringify_symbol(symbol) for symbol in symbol_table.symbols],
+                value=[_stringify(symbol) for symbol in symbol_table.symbols],
             )
         ],
     )
@@ -487,8 +483,8 @@ Dumpable = Union[
 ]
 
 
-def dump(dumpable: Dumpable) -> str:
-    """Produce a string representation of the ``dumpable`` for testing or debugging."""
+def _stringify(dumpable: Dumpable) -> stringify.Entity:
+    """Translate the ``dumpable`` into a stringified entity."""
     stringified = None  # type: Optional[stringify.Entity]
 
     if isinstance(dumpable, Argument):
@@ -501,8 +497,10 @@ def dump(dumpable: Dumpable) -> str:
         stringified = _stringify_contract(dumpable)
     elif isinstance(dumpable, Contracts):
         stringified = _stringify_contracts(dumpable)
-    elif isinstance(dumpable, Default):
-        stringified = _stringify_default(dumpable)
+    elif isinstance(dumpable, DefaultConstant):
+        stringified = _stringify_default_constant(dumpable)
+    elif isinstance(dumpable, DefaultEnumerationLiteral):
+        stringified = _stringify_default_enumeration_literal(dumpable)
     elif isinstance(dumpable, Enumeration):
         stringified = _stringify_enumeration(dumpable)
     elif isinstance(dumpable, EnumerationLiteral):
@@ -519,19 +517,30 @@ def dump(dumpable: Dumpable) -> str:
         stringified = _stringify_signature(dumpable)
     elif isinstance(dumpable, Snapshot):
         stringified = _stringify_snapshot(dumpable)
-    elif isinstance(dumpable, (Interface, Enumeration, Class)):
-        stringified = _stringify_symbol(dumpable)
+    elif isinstance(dumpable, Interface):
+        stringified = _stringify_interface(interface=dumpable)
+    elif isinstance(dumpable, Enumeration):
+        stringified = _stringify_enumeration(enumeration=dumpable)
+    elif isinstance(dumpable, Class):
+        stringified = _stringify_class(cls=dumpable)
     elif isinstance(dumpable, SymbolTable):
         stringified = _stringify_symbol_table(dumpable)
-    elif isinstance(
-            dumpable,
-            (AtomicTypeAnnotation, SubscriptedTypeAnnotation, SelfTypeAnnotation)
-    ):
-        stringified = _stringify_type_annotation(dumpable)
+    elif isinstance(dumpable, AtomicTypeAnnotation):
+        stringified = _stringify_atomic_type_annotation(type_annotation=dumpable)
+    elif isinstance(dumpable, SubscriptedTypeAnnotation):
+        stringified = _stringify_subscripted_type_annotation(type_annotation=dumpable)
+    elif isinstance(dumpable, SelfTypeAnnotation):
+        stringified = _stringify_self_type_annotation(type_annotation=dumpable)
     else:
         assert_never(dumpable)
 
     assert stringified is not None
 
-    assert isinstance(stringified, stringify.Entity)
-    return stringify.dump(stringified)
+    assert isinstance(stringified, stringify.Entity)  # Prevent regressions
+
+    return stringified
+
+
+def dump(dumpable: Dumpable) -> str:
+    """Produce a string representation of the ``dumpable`` for testing or debugging."""
+    return stringify.dump(_stringify(dumpable=dumpable))

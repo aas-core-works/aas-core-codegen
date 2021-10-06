@@ -860,6 +860,7 @@ def _generate_constructor(
 
         arg_type = csharp_common.generate_type(arg.type_annotation)
         arg_name = csharp_naming.argument_name(arg.name)
+
         arg_codes.append(Stripped(f'{arg_type} {arg_name}'))
 
     if len(arg_codes) == 0:

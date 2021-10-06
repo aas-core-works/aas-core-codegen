@@ -1,4 +1,5 @@
 """Translate the parsed representation into the intermediate representation."""
+import ast
 import itertools
 from typing import Sequence, List, Mapping, Optional, MutableMapping, Tuple, Union, \
     Iterator
@@ -22,6 +23,7 @@ from aas_core_csharp_codegen.intermediate._types import (
     SelfTypeAnnotation,
     Argument,
     Default,
+    DefaultConstant,
     Interface,
     Signature,
     Property,
@@ -258,6 +260,21 @@ def _parsed_type_annotation_to_type_annotation(
         raise AssertionError(parsed)
 
 
+class _DefaultPlaceholder:
+    """Hold a place for postponed translation of the default values.
+
+    We can not translate the default argument values immediately while we are
+    constructing the symbol table as they might reference, *e.g.*, enumeration
+    literals which we still did not observe.
+
+    Therefore we insert a placeholder and resolve the default values in the second
+    translation pass.
+    """
+    def __init__(self, parsed: parse.Default)->None:
+        """Initialize with the given values."""
+        Default.__init__(self, parsed=parsed)
+
+
 def _parsed_arguments_to_arguments(
         parsed: Sequence[parse.Argument]
 ) -> List[Argument]:
@@ -267,7 +284,7 @@ def _parsed_arguments_to_arguments(
             name=parsed_arg.name,
             type_annotation=_parsed_type_annotation_to_type_annotation(
                 parsed_arg.type_annotation),
-            default=Default(value=parsed_arg.default.value, parsed=parsed_arg.default)
+            default=_DefaultPlaceholder(parsed=parsed_arg.default)  # type: ignore
             if parsed_arg.default is not None
             else None,
             parsed=parsed_arg,
@@ -856,6 +873,13 @@ def translate(
                     continue
 
                 symbol_ref_in_doc.symbol = symbol
+
+    # endregion
+
+    # region Second pass to resolve the default argument values
+
+    # TODO: implement now, then implement the default constructor,
+    #  then continue with the verification!
 
     # endregion
 

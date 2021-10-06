@@ -575,39 +575,7 @@ def _args_to_arguments(
         default = None  # type: Optional[Default]
         offset = len(node.args) - len(node.defaults)
         if i >= offset:
-            default_node = node.defaults[i - offset]
-            if not isinstance(default_node, ast.Constant):
-                return (
-                    None,
-                    Error(
-                        default_node,
-                        (
-                            f"Expected a constant as a default value, "
-                            f"but got: {atok.get_text(default_node)}"
-                        ),
-                    ),
-                )
-
-            if not (
-                    default_node.value is None
-                    or isinstance(default_node.value, (bool, int, float, str))
-            ):
-                return (
-                    None,
-                    Error(
-                        default_node,
-                        (
-                            f"Expected a constant of type int, float, bool, "
-                            f"or a None literal as a default value, "
-                            f"but got: {atok.get_text(default_node)}"
-                        ),
-                    ),
-                )
-
-            assert default_node.value is None or isinstance(
-                default_node.value, (bool, int, float, str)
-            )
-            default = Default(value=default_node.value)
+            default = Default(node=node.defaults[i - offset])
 
         # endregion
 

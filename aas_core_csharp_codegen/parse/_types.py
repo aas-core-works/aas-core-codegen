@@ -148,9 +148,9 @@ class Property:
 class Default:
     """Represent a default value for an argument."""
 
-    def __init__(self, value: Union[bool, int, float, str, None]) -> None:
+    def __init__(self, node: ast.AST) -> None:
         """Initialize with the given values."""
-        self.value = value
+        self.node = node
 
 
 class Argument:

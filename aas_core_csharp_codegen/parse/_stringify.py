@@ -105,7 +105,8 @@ def _stringify_property(prop: Property) -> stringify.Entity:
 
 def _stringify_default(default: Default) -> stringify.Entity:
     result = stringify.Entity(
-        name=Default.__name__, properties=[stringify.Property("value", default.value)]
+        name=Default.__name__, properties=[
+            stringify.PropertyEllipsis("node", default.node)]
     )
 
     stringify.assert_compares_against_dict(result, default)
