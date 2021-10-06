@@ -5,7 +5,7 @@
 
 namespace AasCore.Aas3
 {
-    static class Visitation
+    public static class Visitation
     {
         /// <summary>
         /// Define the interface for a visitor which visits the instances of the model.
@@ -102,7 +102,7 @@ namespace AasCore.Aas3
                 }
             }
         }  // public class VoidVisitor
-    }  // static class Visitation
+    }  // public static class Visitation
 }  // namespace AasCore.Aas3
 
 /*

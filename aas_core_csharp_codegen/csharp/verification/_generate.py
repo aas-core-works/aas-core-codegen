@@ -2,15 +2,15 @@
 import io
 import textwrap
 import xml.sax.saxutils
-from typing import Tuple, Optional, List, Union
+from typing import Tuple, Optional, List, Sequence
 
 from icontract import ensure, require
 
 import aas_core_csharp_codegen.csharp.common as csharp_common
 import aas_core_csharp_codegen.csharp.naming as csharp_naming
 from aas_core_csharp_codegen import intermediate
-from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, Identifier, \
-    assert_never
+from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, assert_never, \
+    Identifier
 from aas_core_csharp_codegen.csharp import specific_implementations
 from aas_core_csharp_codegen.specific_implementations import ImplementationKey
 
@@ -40,6 +40,7 @@ def verify(
 # endregion
 
 # region Generate
+
 
 def _generate_pattern_class(
         spec_impls: specific_implementations.SpecificImplementations
@@ -90,60 +91,186 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
 
         writer.write(textwrap.indent(block, csharp_common.INDENT))
 
+    writer.write('\n}  // private static class EnumValueSet')
+
     return Stripped(writer.getvalue())
 
 
-def _type_annotation_involves_enumeration(
-        type_annotation: intermediate.TypeAnnotation
-) -> bool:
-    """
-    Check whether the type annotation involves an enumeration.
-    
-    ``type_annotation`` can refer to an enumeration itself, but an enumeration can
-    also be contained in it (*e.g.*, as keys in a mapping).
-    """
-    if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
-        return False
-    elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
-        return isinstance(type_annotation.symbol, intermediate.Enumeration)
-    elif isinstance(type_annotation, (
-            intermediate.ListTypeAnnotation,
-            intermediate.SequenceTypeAnnotation,
-            intermediate.SetTypeAnnotation
-    )):
-        return _type_annotation_involves_enumeration(type_annotation.items)
-    elif isinstance(type_annotation, (
-            intermediate.MappingTypeAnnotation,
-            intermediate.MutableMappingTypeAnnotation
-    )):
-        return (
-                _type_annotation_involves_enumeration(type_annotation.keys)
-                or _type_annotation_involves_enumeration(type_annotation.values)
-        )
-    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        return _type_annotation_involves_enumeration(type_annotation.value)
-    else:
-        assert_never(type_annotation)
+@require(lambda cls, prop: prop in cls.properties)
+def _unroll_enumeration_check(
+        cls: intermediate.Class,
+        prop: intermediate.Property) -> Stripped:
+    """Generate the code for unrolling the enumeration checks for the given property."""
+
+    class Node:
+        """Represent a node in the tree of unrolled checks."""
+
+        def __init__(self, text: str, children: Sequence['Node']):
+            self.text = text
+            self.children = children
+
+    # TODO: adapt the var_name in Descend!
+
+    @require(lambda var_index: var_index >= 0)
+    @require(lambda suffix: suffix in ("Item", "KeyValue"))
+    def var_name(var_index: int, suffix: str) -> Identifier:
+        """Generate the name of the loop variable."""
+        if var_index == 0:
+            if suffix == 'Item':
+                return Identifier(f"an{suffix}")
+            else:
+                assert suffix == 'KeyValue'
+                return Identifier(f"a{suffix}")
+
+        elif var_index == 1:
+            return Identifier(f"another{suffix}")
+        else:
+            return Identifier("yet" + "Yet" * (var_index - 1) + f"another{suffix}")
+
+    prop_name = csharp_naming.property_name(prop.name)
+
+    def unroll(
+            current_var_name: str,
+            item_count: int,
+            key_value_count: int,
+            path: List[str],
+            type_anno: intermediate.TypeAnnotation
+    ) -> List[Node]:
+        """Generate the node corresponding to the ``type_anno`` and recurse."""
+        if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
+            return []
+
+        elif isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
+            if not isinstance(type_anno.symbol, intermediate.Enumeration):
+                return []
+
+            enum_name = csharp_naming.enum_name(type_anno.symbol.name)
+            joined_pth = '/'.join(path)
+
+            return [
+                Node(
+                    text=textwrap.dedent(f'''\
+                    if (!EnumValueSet.For{enum_name}.Contains({current_var_name}))
+                    {{
+                    {csharp_common.INDENT}errors.Add(
+                    {csharp_common.INDENT2}new Error(
+                    {csharp_common.INDENT3}$"{{path}}/{joined_pth}",
+                    {csharp_common.INDENT3}$"Invalid {{nameof({enum_name})}}: {{{current_var_name}}}"));
+                    }}'''),
+                    children=[])]
+
+        elif isinstance(type_anno, (
+                intermediate.ListTypeAnnotation, intermediate.SequenceTypeAnnotation,
+                intermediate.SetTypeAnnotation)):
+            item_var = var_name(item_count, "Item")
+
+            children = unroll(
+                current_var_name=item_var,
+                item_count=item_count + 1,
+                key_value_count=key_value_count,
+                path=path + [f'{{{item_var}}}'],
+                type_anno=type_anno.items)
+
+            if len(children) == 0:
+                return []
+
+            node = Node(
+                text=f"for (var {item_var} in {current_var_name}", children=children)
+
+            return [node]
+
+        elif isinstance(type_anno, (
+                intermediate.MappingTypeAnnotation,
+                intermediate.MutableMappingTypeAnnotation
+        )):
+            key_value_var = var_name(key_value_count + 1, "KeyValue")
+
+            key_children = unroll(
+                current_var_name=f'{key_value_var}.Key',
+                item_count=item_count,
+                key_value_count=key_value_count + 1,
+                path=path + [f'{{{key_value_var}.Key}}'],
+                type_anno=type_anno.keys)
+
+            value_children = unroll(
+                current_var_name=f'{key_value_var}.Value',
+                item_count=item_count,
+                key_value_count=key_value_count + 1,
+                path=path + [f'{{{key_value_var}.Key}}'],
+                type_anno=type_anno.values)
+
+            children = key_children + value_children
+
+            if len(children) > 0:
+                return [Node(
+                    text=f'foreach (var {key_value_var} in {current_var_name})',
+                    children=children)]
+            else:
+                return []
+
+        elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
+            children = unroll(
+                current_var_name=current_var_name,
+                item_count=item_count,
+                key_value_count=key_value_count,
+                path=path,
+                type_anno=type_anno.value)
+            if len(children) > 0:
+                return [Node(
+                    text=f"if ({current_var_name} != null", children=children)]
+            else:
+                return []
+        else:
+            assert_never(type_anno)
+
+    arg_name = csharp_naming.argument_name(cls.name)
+
+    roots = unroll(
+        current_var_name=f'{arg_name}.{prop_name}',
+        item_count=0,
+        key_value_count=0,
+        path=[prop_name],
+        type_anno=prop.type_annotation)
+
+    if len(roots) == 0:
+        return Stripped('')
+
+    def render(node: Node) -> str:
+        """Render the node recursively."""
+        if len(node.children) == 0:
+            return node.text
+
+        node_writer = io.StringIO()
+        node_writer.write(node.text)
+        node_writer.write('\n{')
+
+        for child in node.children:
+            node_writer.write(textwrap.indent(render(child), csharp_common.INDENT))
+
+        node_writer.write('\n}')
+
+        return node_writer.getvalue()
+
+    blocks = [render(root) for root in roots]
+    return Stripped('\n\n'.join(blocks))
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_implementation_verify(cls: intermediate.Class) -> Stripped:
+def _generate_implementation_verify(
+        cls: intermediate.Class
+) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verify function in the ``Implementation`` class."""
     blocks = []  # type: List[Stripped]
 
     # TODO: transpile the invariants into body_blocks
 
-    # for prop in cls.properties:
-    #
-    #
-    # TODO: check that all enumerations are in the valid range!
-    # TODO: this means, we need to unroll the subscripted types:
-    # TODO: if the current type is an enumeration 🠒 check it
-    # TODO: if the current type is a collection 🠒 unroll
-    # TODO: if the current type is a mapping/mutable mapping 🠒 if keys() 🠒 unroll, if values 🠒 unroll
+    for prop in cls.properties:
+        enum_check_block = _unroll_enumeration_check(cls=cls, prop=prop)
+        if enum_check_block != '':
+            blocks.append(enum_check_block)
 
     if len(blocks) == 0:
-        return Stripped("")
+        return Stripped(""), None
 
     cls_name = csharp_naming.class_name(cls.name)
     arg_name = csharp_naming.argument_name(cls.name)
@@ -153,13 +280,26 @@ def _generate_implementation_verify(cls: intermediate.Class) -> Stripped:
         /// <summary>
         /// Verify the given <paramref name={xml.sax.saxutils.quoteattr(arg_name)} /> and 
         /// append any errors to <paramref name="Errors" />.
+        ///
+        /// The <paramref name="path" /> indicates the current path to the
+        /// <paramref name={xml.sax.saxutils.quoteattr(arg_name)} />.
         /// </summary>
         public void Verify{cls_name} (
         {csharp_common.INDENT}{cls_name} {arg_name},
+        {csharp_common.INDENT}string path,
         {csharp_common.INDENT}Errors errors)
         {{
         '''))
-    # TODO: finish
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write('\n\n')
+        writer.write(textwrap.indent(block, csharp_common.INDENT))
+
+    writer.write('\n}')
+
+    return Stripped(writer.getvalue()), None
+
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_implementation(
@@ -189,13 +329,13 @@ def _generate_implementation(
 
             blocks.append(spec_impls[visit_key])
         else:
-            verify, error = _generate_implementation_verify(cls=symbol)
-
+            implementation_verify, error = _generate_implementation_verify(cls=symbol)
             if error is not None:
                 errors.append(error)
                 continue
 
-            blocks.append(verify)
+            if implementation_verify != '':
+                blocks.append(implementation_verify)
 
     if len(errors) > 0:
         return None, errors
@@ -240,9 +380,9 @@ def _generate_verifier(
             /// The errors observed during the visitation will be appended to
             /// the <paramref name="errors" />.
             /// </summary>
-            Verifier(Errors errors)
+            NonRecursiveVerifier(Errors errors)
             {{
-            {csharp_common.INDENT}_errors = errors;
+            {csharp_common.INDENT}Errors = errors;
             }}
             ''')),
         Stripped(textwrap.dedent(f'''\
@@ -254,12 +394,32 @@ def _generate_verifier(
 
     errors = []  # type: List[Error]
 
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, intermediate.Class):
+            continue
+
+        arg_name = csharp_naming.argument_name(symbol.name)
+        cls_name = csharp_naming.class_name(symbol.name)
+
+        blocks.append(Stripped(textwrap.dedent(f'''\
+            public void Visit(
+            {csharp_common.INDENT}{cls_name} {arg_name},
+            {csharp_common.INDENT}string path)
+            {{
+            {csharp_common.INDENT}Implementation.Verify(
+            {csharp_common.INDENT2}{arg_name},
+            {csharp_common.INDENT2}path,
+            {csharp_common.INDENT2}Errors);
+            }}''')))
+
+        # TODO: continue by implementing IPathedVisitor and adding Accept(IPathedVisitor<T>) to IEntity!
+
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         /// <summary>
         /// Verify the instances of the model entities non-recursively.
         /// </summary>
-        public static class NonRecursiveVerifier
+        public static class NonRecursiveVerifier : IPathedVisitor
         {{
         '''))
     for i, block in enumerate(blocks):
@@ -268,7 +428,7 @@ def _generate_verifier(
 
         writer.write(textwrap.indent(block, csharp_common.INDENT))
 
-    writer.write('\n}  // public static class NonRecursively')
+    writer.write('\n}  // public static class NonRecursiveVerifier')
 
     return Stripped(writer.getvalue()), None
 
@@ -535,7 +695,7 @@ def generate(
     using_directives = [
         "using ArgumentException = System.ArgumentException;\n"
         "using Regex = System.Text.RegularExpressions.Regex;\n"
-        "using System.Collections.Generic;  // can't alias"
+        "using System.Collections.Generic;  // can't alias\n"
         "using System.Linq;  // can't alias"
     ]  # type: List[str]
 

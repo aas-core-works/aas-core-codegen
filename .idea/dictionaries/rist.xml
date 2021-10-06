@@ -23,6 +23,7 @@
       <w>mypy</w>
       <w>nameof</w>
       <w>paramref</w>
+      <w>pathed</w>
       <w>posonlyargs</w>
       <w>postcondition</w>
       <w>postconditions</w>
