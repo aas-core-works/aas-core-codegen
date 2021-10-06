@@ -23,85 +23,21 @@ namespace AasCore.Aas3
         }  // public interface IVisitor
 
         /// <summary>
-        /// Provide a visitor that returns nothing and iterates over all the instances.
+        /// Define the interface for a visitor which visits the instances of the model.
         /// </summary>
-        /// <remarks>
-        /// The visitor is based on the double-dispatch using <see cref="IEntity.Accept"> method.
-        ///
-        /// While meaningless on its own, extending this visitor is helpful if you only want 
-        /// to implement a subset of visit methods, but still want to preserve deep iteration.
-        /// </remarks> 
-        public interface VoidVisitor : IVisitor<void>
+        /// <typeparam name="C">Context type</typeparam>
+        /// <typeparam name="T">Result type</typeparam>
+        public interface IVisitorWithContext<C, T>
         {
-            public void Visit(IEntity entity)
-            {
-                // Dispatch
-                entity.Accept(this);
-            }
-
-            public void Visit(LangString langString)
-            {
-                // Do nothing, but descend
-                foreach (var something in langString.DescendOnce())
-                {
-                    something.Accept(this);
-                }
-            }
-
-            public void Visit(LangStringSet langStringSet)
-            {
-                // Do nothing, but descend
-                foreach (var something in langStringSet.DescendOnce())
-                {
-                    something.Accept(this);
-                }
-            }
-
-            public void Visit(Identifier identifier)
-            {
-                // Do nothing, but descend
-                foreach (var something in identifier.DescendOnce())
-                {
-                    something.Accept(this);
-                }
-            }
-
-            public void Visit(AdministrativeInformation administrativeInformation)
-            {
-                // Do nothing, but descend
-                foreach (var something in administrativeInformation.DescendOnce())
-                {
-                    something.Accept(this);
-                }
-            }
-
-            public void Visit(Key key)
-            {
-                // Do nothing, but descend
-                foreach (var something in key.DescendOnce())
-                {
-                    something.Accept(this);
-                }
-            }
-
-            public void Visit(Reference reference)
-            {
-                // Do nothing, but descend
-                foreach (var something in reference.DescendOnce())
-                {
-                    something.Accept(this);
-                }
-            }
-
-            public void Visit(AssetAdministrationShell assetAdministrationShell)
-            {
-                // Do nothing, but descend
-                foreach (var something in assetAdministrationShell.DescendOnce())
-                {
-                    something.Accept(this);
-                }
-            }
-        }  // public class VoidVisitor
+            public T Visit(IEntity entity, C context);
+            public T Visit(LangString langString, C context);
+            public T Visit(LangStringSet langStringSet, C context);
+            public T Visit(Identifier identifier, C context);
+            public T Visit(AdministrativeInformation administrativeInformation, C context);
+            public T Visit(Key key, C context);
+            public T Visit(Reference reference, C context);
+            public T Visit(AssetAdministrationShell assetAdministrationShell, C context);
+        }  // public interface IVisitorWithContext
     }  // public static class Visitation
 }  // namespace AasCore.Aas3
 

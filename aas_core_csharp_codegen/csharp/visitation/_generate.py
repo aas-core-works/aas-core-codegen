@@ -61,18 +61,11 @@ def _generate_ivisitor(
     return Stripped(writer.getvalue())
 
 
-def _generate_void_visitor(
+def _generate_ivisitor_with_context(
         symbol_table: intermediate.SymbolTable
 ) -> Stripped:
-    """Generate a visitor that does nothing and returns nothing."""
+    """Generate the most general visitor pattern."""
     blocks = []  # type: List[Stripped]
-
-    blocks.append(Stripped(textwrap.dedent('''\
-        public void Visit(IEntity entity)
-        {
-            // Dispatch
-            entity.Accept(this);
-        }''')))
 
     for symbol in symbol_table.symbols:
         if isinstance(symbol, intermediate.Enumeration):
@@ -84,15 +77,8 @@ def _generate_void_visitor(
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
             var_name = csharp_naming.argument_name(symbol.name)
-            blocks.append(Stripped(textwrap.dedent(f'''\
-                public void Visit({cls_name} {var_name})
-                {{
-                    // Do nothing, but descend
-                    foreach (var something in {var_name}.DescendOnce())
-                    {{
-                        something.Accept(this);
-                    }}
-                }}''')))
+            blocks.append(Stripped(
+                f'public T Visit({cls_name} {var_name}, C context);'))
 
         else:
             assert_never(symbol)
@@ -101,24 +87,21 @@ def _generate_void_visitor(
     writer.write(
         textwrap.dedent('''\
             /// <summary>
-            /// Provide a visitor that returns nothing and iterates over all the instances.
+            /// Define the interface for a visitor which visits the instances of the model.
             /// </summary>
-            /// <remarks>
-            /// The visitor is based on the double-dispatch using <see cref="IEntity.Accept"> method.
-            ///
-            /// While meaningless on its own, extending this visitor is helpful if you only want 
-            /// to implement a subset of visit methods, but still want to preserve deep iteration.
-            /// </remarks> 
-            public interface VoidVisitor : IVisitor<void>
+            /// <typeparam name="C">Context type</typeparam>
+            /// <typeparam name="T">Result type</typeparam>
+            public interface IVisitorWithContext<C, T>
             {
+                public T Visit(IEntity entity, C context);
             '''))
 
     for i, block in enumerate(blocks):
         if i > 0:
-            writer.write('\n\n')
+            writer.write('\n')
         writer.write(textwrap.indent(block, csharp_common.INDENT))
 
-    writer.write(f'\n}}  // public class VoidVisitor')
+    writer.write(f'\n}}  // public interface IVisitorWithContext')
 
     return Stripped(writer.getvalue())
 
@@ -150,7 +133,7 @@ def generate(
 
     visitation_blocks = [
         _generate_ivisitor(symbol_table=symbol_table),
-        _generate_void_visitor(symbol_table=symbol_table)
+        _generate_ivisitor_with_context(symbol_table=symbol_table)
     ]
 
     for i, visitation_block in enumerate(visitation_blocks):

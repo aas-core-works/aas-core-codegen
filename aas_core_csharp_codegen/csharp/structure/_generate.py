@@ -1119,9 +1119,20 @@ def _generate_class(
                 /// <summary>
                 /// Accept the visitor to visit this instance for double dispatch.
                 /// </summary>
-                public Accept<T>(IVisitor<T> visitor)
+                public T Accept<T>(IVisitor<T> visitor)
                 {{
-                {csharp_common.INDENT}visitor.visit(this);
+                {csharp_common.INDENT}return visitor.visit(this);
+                }}''')))
+
+    blocks.append(
+        Stripped(
+            textwrap.dedent(f'''\
+                /// <summary>
+                /// Accept the visitor to visit this instance for double dispatch.
+                /// </summary>
+                public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+                {{
+                {csharp_common.INDENT}return visitor.visit(this, context);
                 }}''')))
 
     # endregion
@@ -1211,7 +1222,12 @@ def generate(
                         /// <summary>
                         /// Accept the visitor to visit this instance for double dispatch.
                         /// </summary>
-                        public Accept<T>(IVisitor<T> visitor);
+                        public T Accept<T>(IVisitor<T> visitor);
+                        
+                        /// <summary>
+                        /// Accept the visitor to visit this instance for double dispatch.
+                        /// </summary>
+                        public T Accept<C, T>(IVisitorWithContext<C, T> visitor)
                     }'''),
             csharp_common.INDENT)))
 

@@ -1386,7 +1386,15 @@ def _verify_symbol_table(
 
     # region Check reserved names
 
-    reserved_symbol_names = {'entity', 'ientity', 'verification'}
+    reserved_symbol_names = {
+        'context',
+        'entity',
+        'errors'
+        'ientity',
+        'path',
+        'verification',
+        'visitation',
+    }
     reserved_method_names = {'descend', 'accept'}
 
     for symbol in symbol_table.symbols:

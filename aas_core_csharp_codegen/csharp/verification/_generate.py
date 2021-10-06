@@ -275,6 +275,9 @@ def _generate_implementation_verify(
     cls_name = csharp_naming.class_name(cls.name)
     arg_name = csharp_naming.argument_name(cls.name)
 
+    assert arg_name != 'path', "Unexpected reserved argument name"
+    assert arg_name != 'errors', "Unexpected reserved argument name"
+
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         /// <summary>
@@ -364,13 +367,10 @@ def _generate_implementation(
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_verifier(
-        symbol_table: intermediate.SymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations
+def _generate_non_recursive_verifier(
+        symbol_table: intermediate.SymbolTable
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the ``Verifier`` class which visits the entities and verifies them."""
-    # TODO: rewrite this
-
+    """Generate the non-recursive verifier which visits the entities."""
     blocks = [
         Stripped("public readonly Errors Errors;"),
         Stripped(textwrap.dedent(f'''\
@@ -386,13 +386,11 @@ def _generate_verifier(
             }}
             ''')),
         Stripped(textwrap.dedent(f'''\
-            public void Visit(IEntity entity, string path)
+            public void Visit(IEntity entity, string context)
             {{
-            {csharp_common.INDENT}entity.Accept(this, path);
+            {csharp_common.INDENT}entity.Accept(this, context);
             }}'''))
     ]  # type: List[Stripped]
-
-    errors = []  # type: List[Error]
 
     for symbol in symbol_table.symbols:
         if not isinstance(symbol, intermediate.Class):
@@ -401,29 +399,30 @@ def _generate_verifier(
         arg_name = csharp_naming.argument_name(symbol.name)
         cls_name = csharp_naming.class_name(symbol.name)
 
+        assert arg_name != 'context', "Unexpected reserved argument name"
+
         blocks.append(Stripped(textwrap.dedent(f'''\
+            /// <summary>
+            /// Verify <paramref name={xml.sax.saxutils.quoteattr(arg_name)} />,
+            /// append any error to <see cref="Errors" /> where <paramref name="context" />
+            /// is used to localize the error.
             public void Visit(
             {csharp_common.INDENT}{cls_name} {arg_name},
-            {csharp_common.INDENT}string path)
+            {csharp_common.INDENT}string context)
             {{
             {csharp_common.INDENT}Implementation.Verify(
             {csharp_common.INDENT2}{arg_name},
-            {csharp_common.INDENT2}path,
+            {csharp_common.INDENT2}context,
             {csharp_common.INDENT2}Errors);
             }}''')))
-
-        # TODO: continue by:
-        #  * implementing IVisitorWithPath,
-        #  * VoidVisitorWithPath and
-        #  * adding Accept(IVisitorWithPath<T> visitor, string path) to IEntity!
-        #  🠒 match the implementation with unrolling in verification when we need to recurse further
 
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         /// <summary>
         /// Verify the instances of the model entities non-recursively.
         /// </summary>
-        public static class NonRecursiveVerifier : IPathedVisitor
+        public static class NonRecursiveVerifier : 
+        {csharp_common.INDENT}Visitation.IVisitorWithContext<string, void>
         {{
         '''))
     for i, block in enumerate(blocks):
@@ -437,242 +436,81 @@ def _generate_verifier(
     return Stripped(writer.getvalue()), None
 
 
-# TODO: remove below
-# def _generate_verify_class(
-#         cls: intermediate.Class,
-#         spec_impls: specific_implementations.SpecificImplementations
-# ) -> Tuple[Optional[Stripped], Optional[Error]]:
-#     """Generate the verify function for the given class."""
-#     # If a class is implementation-specific, check if there is a special verification
-#     # for it.
-#     if cls.implementation_key is not None:
-#         verification_implementation_key = f"Verification/{cls.name}"
-#         code = spec_impls.get(verification_implementation_key, None)
-#         if code is not None:
-#             return code, None
-#
-#     writer = io.StringIO()
-#
-#     verify_blocks = []  # type: List[str]
-#
-#     if len(cls.invariants) == 0:
-#         verify_blocks.append(
-#             f"// There were no invariants specified "
-#             f"for {csharp_naming.class_name(cls.name)}.\n"
-#             f"return;")
-#     else:
-#         verify_blocks.append("if (errors.Full()) return;")
-#         # TODO: transpile the invariants into body_blocks
-#
-#         # TODO: check that all enumerations are in the valid range!
-#         pass
-#
-#     cls_name = csharp_naming.class_name(cls.name)
-#     verify_name = Identifier(f"Verify{cls_name}")
-#     arg_name = Identifier(csharp_naming.argument_name(cls.name))
-#
-#     writer.write(
-#         textwrap.dedent(f'''\
-#             /// <summary>
-#             /// Verify <see cref={xml.sax.saxutils.quoteattr(cls_name)} />.
-#             /// </summary>
-#             /// <remarks>
-#             /// Do not recurse to verify the children entities.
-#             /// </remarks>
-#             public void {verify_name}(
-#                 {cls_name} {arg_name},
-#                 Errors errors)
-#             {{
-#             '''))
-#
-#     writer.write(
-#         textwrap.indent(
-#             Stripped('\n\n'.join(verify_blocks)), csharp_common.INDENT))
-#
-#     writer.write("\n}\n\n")
-#
-#     verify_recursively_blocks = [
-#         f"{verify_name}(errors);\n"
-#         "if (errors.Full()) return;"
-#     ]  # type: List[str]
-#
-#     for prop in cls.properties:
-#         if isinstance(prop.type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
-#             continue
-#         elif isinstance(prop.type_annotation, intermediate.OurAtomicTypeAnnotation):
-#             prop_symbol = prop.type_annotation.symbol
-#
-#             if isinstance(prop_symbol, intermediate.Enumeration):
-#                 continue
-#             elif isinstance(prop_symbol, intermediate.Class):
-#                 prop_cls_name = csharp_naming.class_name(prop_symbol.name)
-#                 prop_name = csharp_naming.property_name(prop.name)
-#
-#                 verify_recursively_blocks.append(
-#                     textwrap.dedent(f'''\
-#                         VerifyRecursively{prop_cls_name}(
-#                         {csharp_common.INDENT}{arg_name}.{prop_name},
-#                         {csharp_common.INDENT}errors);
-#                         if (errors.Full()) return;'''))
-#
-#             elif isinstance(prop_symbol, intermediate.Interface):
-#                 prop_interface_name = csharp_naming.interface_name(prop_symbol.name)
-#                 prop_name = csharp_naming.property_name(prop.name)
-#
-#                 verify_recursively_blocks.append(
-#                     textwrap.dedent(f'''\
-#                         VerifyRecursively{prop_interface_name}(
-#                         {csharp_common.INDENT}{arg_name}.{prop_name},
-#                         {csharp_common.INDENT}errors);
-#                         if (errors.Full()) return;'''))
-#             else:
-#                 assert_never(prop_symbol)
-#
-#         elif isinstance(prop.type_annotation, intermediate.SubscriptedTypeAnnotation):
-#             verify_recursively_blocks.append(
-#                 _generate_unrolling_for_recursive_verify(cls=cls, prop=prop))
-#
-#         elif isinstance(prop.type_annotation, intermediate.SelfTypeAnnotation):
-#             raise AssertionError(
-#                 f"Unexpected self type annotation for a property {prop.name!r} "
-#                 f"of class {cls.name}")
-#         else:
-#             assert_never(prop.type_annotation)
-#
-#     writer.write(
-#         textwrap.dedent(f'''\
-#             /// <summary>
-#             /// Verify <see cref={xml.sax.saxutils.quoteattr(cls_name)} /> and
-#             /// recurse into the contained children entities.
-#             /// </summary>
-#             public void VerifyRecursively{cls_name}(
-#                 {cls_name} {arg_name},
-#                 Errors errors)
-#             {{
-#             '''))
-#
-#     writer.write(
-#         textwrap.indent(
-#             Stripped('\n\n'.join(verify_recursively_blocks)), csharp_common.INDENT))
-#
-#     writer.write("\n}")
-#
-#     return Stripped(writer.getvalue()), None
-#
-#
-# def _generate_verify_interface(
-#         interface: intermediate.Interface,
-#         interface_implementers: intermediate.InterfaceImplementers
-# ) -> Tuple[Optional[Stripped], Optional[Error]]:
-#     """Generate the verify function for the given interface."""
-#     implementers = interface_implementers.get(interface, [])
-#
-#     interface_name = csharp_naming.interface_name(interface.name)
-#     arg_name = csharp_naming.argument_name(interface.name)
-#
-#     if len(implementers) == 0:
-#         code = textwrap.dedent(f'''\
-#             public void Verify{interface_name}(
-#             {csharp_common.INDENT}{interface_name} {arg_name},
-#             {csharp_common.INDENT}Errors errors)
-#             {{
-#             {csharp_common.INDENT}// There are no implementer classes for this interface,
-#             {csharp_common.INDENT}// so there is no verification function to dispatch to.
-#             {csharp_common.INDENT}return;
-#             }}
-#
-#             public void VerifyRecursively{interface_name}(
-#             {csharp_common.INDENT}{interface_name} {arg_name},
-#             {csharp_common.INDENT}Errors errors)
-#             {{
-#             {csharp_common.INDENT}// There are no implementer classes for this interface,
-#             {csharp_common.INDENT}// so there is no verification function to dispatch to.
-#             {csharp_common.INDENT}return;
-#             }}''')
-#
-#         return Stripped(code), None
-#
-#     @require(lambda function_prefix: function_prefix in ('Verify', 'VerifyRecursively'))
-#     def generate_dispatch(function_prefix: str) -> Stripped:
-#         """Generate the dispatch function with the ``function_prefix``."""
-#         blocks = [
-#             "if (errors.Full()) return;"
-#         ]  # type: List[str]
-#
-#         switch_writer = io.StringIO()
-#         switch_writer.write(f"switch ({arg_name})\n{{\n")
-#
-#         for implementer in implementers:
-#             cls_name = csharp_naming.class_name(implementer.name)
-#             var_name = csharp_naming.variable_name(implementer.name)
-#
-#             switch_writer.write(
-#                 textwrap.indent(
-#                     textwrap.dedent(f'''\
-#                         case {cls_name} {var_name}:
-#                         {csharp_common.INDENT}{function_prefix}{cls_name}(
-#                         {csharp_common.INDENT2}{var_name}, errors);
-#                         {csharp_common.INDENT}break;
-#                         '''),
-#                     csharp_common.INDENT))
-#
-#         switch_writer.write(
-#             textwrap.indent(
-#                 textwrap.dedent(f'''\
-#                     default:
-#                     {csharp_common.INDENT}throw new InvalidArgumentException(
-#                     {csharp_common.INDENT2}$"Unexpected implementing class of "
-#                     {csharp_common.INDENT2}$"{{nameof({interface_name})}}: {{{arg_name}.GetType()}}");
-#                     {csharp_common.INDENT}break;
-#                     '''),
-#                 csharp_common.INDENT))
-#
-#         switch_writer.write("}")
-#         blocks.append(switch_writer.getvalue())
-#
-#         switch_writer = io.StringIO()
-#         switch_writer.write(
-#             textwrap.dedent(f'''\
-#                 public void {function_prefix}{interface_name}(
-#                 {csharp_common.INDENT}{interface_name} {arg_name},
-#                 {csharp_common.INDENT}Errors errors)
-#                 {{
-#                 '''))
-#
-#         for i, block in enumerate(blocks):
-#             if i > 0:
-#                 switch_writer.write("\n\n")
-#             switch_writer.write(textwrap.indent(block, csharp_common.INDENT))
-#
-#         switch_writer.write("\n}")
-#
-#         return Stripped(switch_writer.getvalue())
-#
-#     writer = io.StringIO()
-#
-#     verify_dispatch = generate_dispatch(function_prefix="Verify")
-#     verify_recursively_dispatch = generate_dispatch(function_prefix="VerifyRecursively")
-#
-#     writer.write(
-#         textwrap.dedent(f'''\
-#             /// <summary>
-#             /// Dispatch dynamically to the corresponding concrete verifier of
-#             /// the underlying implementing class of {interface_name}.
-#             /// </summary>
-#             '''))
-#     writer.write(generate_dispatch(function_prefix="Verify"))
-#     writer.write('\n\n')
-#
-#     writer.write(
-#         textwrap.dedent(f'''\
-#             /// <summary>
-#             /// Dispatch dynamically to the corresponding concrete recursive verifier of
-#             /// the underlying implementing class of {interface_name}.
-#             /// </summary>
-#             '''))
-#     writer.write(generate_dispatch(function_prefix="VerifyRecursively"))
-#
-#     return Stripped(writer.getvalue()), None
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_recursive_verifier(
+        symbol_table: intermediate.SymbolTable,
+        spec_impls: specific_implementations.SpecificImplementations
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate the ``Verifier`` class which visits the entities and verifies them."""
+    blocks = [
+        Stripped("public readonly Errors Errors;"),
+        Stripped(textwrap.dedent(f'''\
+            /// <summary>
+            /// Initialize the visitor with the given <paramref name="errors" />.
+            ///
+            /// The errors observed during the visitation will be appended to
+            /// the <paramref name="errors" />.
+            /// </summary>
+            RecursiveVerifier(Errors errors)
+            {{
+            {csharp_common.INDENT}Errors = errors;
+            }}
+            ''')),
+        Stripped(textwrap.dedent(f'''\
+            public void Visit(IEntity entity, string context)
+            {{
+            {csharp_common.INDENT}entity.Accept(this, context);
+            }}'''))
+    ]  # type: List[Stripped]
+
+    errors = []  # type: List[Error]
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, intermediate.Class):
+            continue
+
+        # TODO: include snippet, if symbol implementation-specific
+
+        # TODO: implement and add recursion
+        #
+        # arg_name = csharp_naming.argument_name(symbol.name)
+        # cls_name = csharp_naming.class_name(symbol.name)
+        #
+        # assert arg_name != 'context', "Unexpected reserved argument name"
+        #
+        # blocks.append(Stripped(textwrap.dedent(f'''\
+        #     /// <summary>
+        #     /// Verify <paramref name={xml.sax.saxutils.quoteattr(arg_name)} />,
+        #     /// append any error to <see cref="Errors" /> where <paramref name="context" />
+        #     /// is used to localize the error.
+        #     public void Visit(
+        #     {csharp_common.INDENT}{cls_name} {arg_name},
+        #     {csharp_common.INDENT}string context)
+        #     {{
+        #     {csharp_common.INDENT}Implementation.Verify(
+        #     {csharp_common.INDENT2}{arg_name},
+        #     {csharp_common.INDENT2}context,
+        #     {csharp_common.INDENT2}Errors);
+        #     }}''')))
+
+    writer = io.StringIO()
+    writer.write(textwrap.dedent(f'''\
+        /// <summary>
+        /// Verify the instances of the model entities recursively.
+        /// </summary>
+        public static class RecursiveVerifier : 
+        {csharp_common.INDENT}Visitation.IVisitorWithContext<string, void>
+        {{
+        '''))
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write('\n\n')
+
+        writer.write(textwrap.indent(block, csharp_common.INDENT))
+
+    writer.write('\n}  // public static class RecursiveVerifier')
+
+    return Stripped(writer.getvalue()), None
 
 
 # fmt: off
@@ -686,8 +524,7 @@ def _generate_verifier(
 def generate(
         symbol_table: intermediate.SymbolTable,
         namespace: csharp_common.NamespaceIdentifier,
-        spec_impls: specific_implementations.SpecificImplementations,
-        interface_implementers: intermediate.InterfaceImplementers
+        spec_impls: specific_implementations.SpecificImplementations
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the C# code of the structures based on the symbol table.
@@ -720,16 +557,24 @@ def generate(
     else:
         verification_blocks.append(implementation)
 
-    verifier, error = _generate_verifier(
+    non_recursive_verifier, error = _generate_non_recursive_verifier(
         symbol_table=symbol_table,
         spec_impls=spec_impls)
-
-    # TODO: implement _generate_recursive_verifier
 
     if error is not None:
         errors.append(error)
     else:
-        verification_blocks.append(verifier)
+        verification_blocks.append(non_recursive_verifier)
+
+    recursive_verifier, error = _generate_recursive_verifier(
+        symbol_table=symbol_table,
+        spec_impls=spec_impls)
+
+    if error is not None:
+        errors.append(error)
+    else:
+        verification_blocks.append(recursive_verifier)
+
 
     if len(errors) > 0:
         return None, errors

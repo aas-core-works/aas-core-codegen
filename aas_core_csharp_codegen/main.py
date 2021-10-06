@@ -293,14 +293,10 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
             stderr=stderr)
         return 1
 
-    interface_implementers = intermediate.map_interface_implementers(
-        symbol_table=ir_symbol_table)
-
     verification_code, verification_errors = csharp_verification.generate(
         symbol_table=verified_ir_table,
         namespace=namespace,
-        spec_impls=spec_impls,
-        interface_implementers=interface_implementers)
+        spec_impls=spec_impls)
 
     if verification_errors is not None:
         write_error_report(

@@ -285,7 +285,8 @@ namespace AasCore.Aas3
         /// <summary>
         /// Verify the instances of the model entities non-recursively.
         /// </summary>
-        public static class NonRecursiveVerifier
+        public static class NonRecursiveVerifier : 
+            Visitation.IVisitorWithContext<string, void>
         {
             public readonly Errors Errors;
 
@@ -295,17 +296,115 @@ namespace AasCore.Aas3
             /// The errors observed during the visitation will be appended to
             /// the <paramref name="errors" />.
             /// </summary>
-            Verifier(Errors errors)
+            NonRecursiveVerifier(Errors errors)
             {
-                _errors = errors;
+                Errors = errors;
             }
 
 
-            public void Visit(IEntity entity)
+            public void Visit(IEntity entity, string path)
             {
-                entity.Accept(this);
+                entity.Accept(this, path);
             }
-        }  // public static class NonRecursively
+
+            /// <summary>
+            /// Verify <paramref name="langString" />,
+            /// append any error to <see cref="Errors" /> where <paramref name="context" />
+            /// is used to localize the error.
+            public void Visit(
+                LangString langString,
+                string context)
+            {
+                Implementation.Verify(
+                    langString,
+                    context,
+                    Errors);
+            }
+
+            /// <summary>
+            /// Verify <paramref name="langStringSet" />,
+            /// append any error to <see cref="Errors" /> where <paramref name="context" />
+            /// is used to localize the error.
+            public void Visit(
+                LangStringSet langStringSet,
+                string context)
+            {
+                Implementation.Verify(
+                    langStringSet,
+                    context,
+                    Errors);
+            }
+
+            /// <summary>
+            /// Verify <paramref name="identifier" />,
+            /// append any error to <see cref="Errors" /> where <paramref name="context" />
+            /// is used to localize the error.
+            public void Visit(
+                Identifier identifier,
+                string context)
+            {
+                Implementation.Verify(
+                    identifier,
+                    context,
+                    Errors);
+            }
+
+            /// <summary>
+            /// Verify <paramref name="administrativeInformation" />,
+            /// append any error to <see cref="Errors" /> where <paramref name="context" />
+            /// is used to localize the error.
+            public void Visit(
+                AdministrativeInformation administrativeInformation,
+                string context)
+            {
+                Implementation.Verify(
+                    administrativeInformation,
+                    context,
+                    Errors);
+            }
+
+            /// <summary>
+            /// Verify <paramref name="key" />,
+            /// append any error to <see cref="Errors" /> where <paramref name="context" />
+            /// is used to localize the error.
+            public void Visit(
+                Key key,
+                string context)
+            {
+                Implementation.Verify(
+                    key,
+                    context,
+                    Errors);
+            }
+
+            /// <summary>
+            /// Verify <paramref name="reference" />,
+            /// append any error to <see cref="Errors" /> where <paramref name="context" />
+            /// is used to localize the error.
+            public void Visit(
+                Reference reference,
+                string context)
+            {
+                Implementation.Verify(
+                    reference,
+                    context,
+                    Errors);
+            }
+
+            /// <summary>
+            /// Verify <paramref name="assetAdministrationShell" />,
+            /// append any error to <see cref="Errors" /> where <paramref name="context" />
+            /// is used to localize the error.
+            public void Visit(
+                AssetAdministrationShell assetAdministrationShell,
+                string context)
+            {
+                Implementation.Verify(
+                    assetAdministrationShell,
+                    context,
+                    Errors);
+            }
+        }  // public static class NonRecursiveVerifier
     }  // public static class Verification
 }  // namespace AasCore.Aas3
 

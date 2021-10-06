@@ -29,7 +29,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public Accept<T>(IVisitor<T> visitor);
+        public T Accept<T>(IVisitor<T> visitor);
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public T Accept<C, T>(IVisitorWithContext<C, T> visitor)
     }
 
     public interface IHasExtension : IEntity
@@ -74,9 +79,17 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public Accept<T>(IVisitor<T> visitor)
+        public T Accept<T>(IVisitor<T> visitor)
         {
-            visitor.visit(this);
+            return visitor.visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+        {
+            return visitor.visit(this, context);
         }
 
         LangString(
@@ -214,9 +227,17 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public Accept<T>(IVisitor<T> visitor)
+        public T Accept<T>(IVisitor<T> visitor)
         {
-            visitor.visit(this);
+            return visitor.visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+        {
+            return visitor.visit(this, context);
         }
 
         Identifier(
@@ -263,9 +284,17 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public Accept<T>(IVisitor<T> visitor)
+        public T Accept<T>(IVisitor<T> visitor)
         {
-            visitor.visit(this);
+            return visitor.visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+        {
+            return visitor.visit(this, context);
         }
 
         AdministrativeInformation(
@@ -536,9 +565,17 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public Accept<T>(IVisitor<T> visitor)
+        public T Accept<T>(IVisitor<T> visitor)
         {
-            visitor.visit(this);
+            return visitor.visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+        {
+            return visitor.visit(this, context);
         }
 
         Key(
@@ -596,9 +633,17 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public Accept<T>(IVisitor<T> visitor)
+        public T Accept<T>(IVisitor<T> visitor)
         {
-            visitor.visit(this);
+            return visitor.visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+        {
+            return visitor.visit(this, context);
         }
 
         Reference(List<Key> keys)
@@ -791,9 +836,17 @@ namespace AasCore.Aas3
         /// <summary>
         /// Accept the visitor to visit this instance for double dispatch.
         /// </summary>
-        public Accept<T>(IVisitor<T> visitor)
+        public T Accept<T>(IVisitor<T> visitor)
         {
-            visitor.visit(this);
+            return visitor.visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch.
+        /// </summary>
+        public T Accept<C, T>(IVisitorWithContext<C, T> visitor, C context)
+        {
+            return visitor.visit(this, context);
         }
 
         AssetAdministrationShell(
