@@ -30,9 +30,7 @@ def _generate_ivisitor(
             continue
 
         elif isinstance(symbol, intermediate.Interface):
-            interface_name = csharp_naming.interface_name(symbol.name)
-            var_name = csharp_naming.argument_name(symbol.name)
-            blocks.append(Stripped(f'public T visit({interface_name} {var_name});'))
+            continue
 
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
@@ -74,14 +72,7 @@ def _generate_void_visitor(
             continue
 
         elif isinstance(symbol, intermediate.Interface):
-            interface_name = csharp_naming.interface_name(symbol.name)
-            var_name = csharp_naming.argument_name(symbol.name)
-            blocks.append(Stripped(textwrap.dedent(f'''\
-                public void visit({interface_name} {var_name})
-                {{
-                    // Dispatch
-                    {var_name}.Accept(this);
-                }}''')))
+            continue
 
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)

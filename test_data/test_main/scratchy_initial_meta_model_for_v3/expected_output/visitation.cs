@@ -13,18 +13,12 @@ namespace AasCore.Aas3
         public interface IVisitor<T>
         {
             public T visit(IEntity entity);
-            public T visit(IHasExtension hasExtension);
             public T visit(LangString langString);
             public T visit(LangStringSet langStringSet);
-            public T visit(IReferable referable);
             public T visit(Identifier identifier);
             public T visit(AdministrativeInformation administrativeInformation);
-            public T visit(IIdentifiable identifiable);
-            public T visit(IHasKind hasKind);
             public T visit(Key key);
             public T visit(Reference reference);
-            public T visit(IHasSemantics hasSemantics);
-            public T visit(IHasDataSpecification hasDataSpecification);
             public T visit(AssetAdministrationShell assetAdministrationShell);
         }  // public interface IVisitor
 
@@ -44,12 +38,6 @@ namespace AasCore.Aas3
                 // Dispatch
                 entity.Accept(this);
             }
-            public void visit(IHasExtension hasExtension)
-            {
-                // Dispatch
-                hasExtension.Accept(this);
-            }
-
             public void visit(LangString langString)
             {
                 // Do nothing, but descend
@@ -66,12 +54,6 @@ namespace AasCore.Aas3
                 {
                     something.Accept(this);
                 }
-            }
-
-            public void visit(IReferable referable)
-            {
-                // Dispatch
-                referable.Accept(this);
             }
 
             public void visit(Identifier identifier)
@@ -92,18 +74,6 @@ namespace AasCore.Aas3
                 }
             }
 
-            public void visit(IIdentifiable identifiable)
-            {
-                // Dispatch
-                identifiable.Accept(this);
-            }
-
-            public void visit(IHasKind hasKind)
-            {
-                // Dispatch
-                hasKind.Accept(this);
-            }
-
             public void visit(Key key)
             {
                 // Do nothing, but descend
@@ -120,18 +90,6 @@ namespace AasCore.Aas3
                 {
                     something.Accept(this);
                 }
-            }
-
-            public void visit(IHasSemantics hasSemantics)
-            {
-                // Dispatch
-                hasSemantics.Accept(this);
-            }
-
-            public void visit(IHasDataSpecification hasDataSpecification)
-            {
-                // Dispatch
-                hasDataSpecification.Accept(this);
             }
 
             public void visit(AssetAdministrationShell assetAdministrationShell)

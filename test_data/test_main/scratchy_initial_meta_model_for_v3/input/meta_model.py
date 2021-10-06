@@ -173,6 +173,7 @@ class Identifier_type(Enum):
     CUSTOM = "Custom"
     """Custom identifiers like GUIDs (globally unique identifiers)"""
 
+
 @invariant(
     lambda self:
     not (self.id_type == Identifier_type.IRDI) or is_IRDI(self.id)

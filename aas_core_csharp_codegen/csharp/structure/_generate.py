@@ -240,7 +240,8 @@ def _render_description_element(
         assert name is not None
         return f'<see cref={xml.sax.saxutils.quoteattr(name)} />', None
     elif isinstance(element, intermediate.PropertyReferenceInDoc):
-        return f'<see cref={xml.sax.saxutils.quoteattr(element.property_name)} />', None
+        prop_name = csharp_naming.property_name(Identifier(element.property_name))
+        return f'<see cref={xml.sax.saxutils.quoteattr(prop_name)} />', None
 
     elif isinstance(element, docutils.nodes.literal):
         return f'<c>{xml.sax.saxutils.escape(element.astext())}</c>', None
@@ -672,11 +673,17 @@ def _descendable(type_annotation: intermediate.TypeAnnotation) -> bool:
         assert_never(type_annotation)
 
 
-def _generate_descend_once_method(
+# TODO: split: generate_descend_body(recurse: bool), generate_descend, generate_descend_once
+def _generate_descend_methods(
         symbol: intermediate.Class
 ) -> Stripped:
-    """Generate the ``DescendOnce`` method of the class defined by the ``symbol``."""
+    """Generate the ``DescendOnce`` and ``Descend`` methods based on the ``symbol``."""
+    # TODO: refactor into generate body (recurse: bool)
+
+
     blocks = []  # type: List[Stripped]
+
+
 
     for prop in symbol.properties:
         type_anno = prop.type_annotation
@@ -693,10 +700,12 @@ def _generate_descend_once_method(
         @require(lambda an_item_id: an_item_id >= 0)
         def item_var(an_item_id: int) -> Identifier:
             """Generate the item variable used in the loops."""
-            return (
-                Identifier("item")
-                if an_item_id == 0
-                else Identifier(f"item{an_item_id}"))
+            if an_item_id == 0:
+                return Identifier("anItem")
+            elif an_item_id == 1:
+                return Identifier("anotherItem")
+            else:
+                return Identifier("yet" + "Yet" * (an_item_id - 2) + "Item")
 
         while True:
             old_type_anno = type_anno
@@ -780,7 +789,7 @@ def _generate_descend_once_method(
         blocks.append(Stripped('\n'.join(prefix + suffix)))
 
     if len(blocks) == 0:
-        blocks.append(Stripped('// No descendable properties'))
+        blocks.append(Stripped('// No descendable properties\nyield return break;'))
 
     writer = io.StringIO()
     writer.write(
@@ -962,7 +971,7 @@ def _generate_class(
                 "At the moment, we do not transpile the method body and "
                 "its contracts."))
 
-    blocks.append(_generate_descend_once_method(symbol=symbol))
+    blocks.append(_generate_descend_methods(symbol=symbol))
 
     blocks.append(
         Stripped(

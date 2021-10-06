@@ -36,7 +36,7 @@ namespace AasCore.Aas3
     public class LangString : IEntity
     {
         /// <summary>
-        /// Language of the <see cref="text" />
+        /// Language of the <see cref="Text" />
         /// </summary>
         string Language { get; set; }
 
@@ -51,6 +51,7 @@ namespace AasCore.Aas3
         public IEnumerable<IEntity> DescendOnce()
         {
             // No descendable properties
+            yield return break;
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// An element that is referable by its <see cref="id_short" />.
+    /// An element that is referable by its <see cref="IdShort" />.
     /// </summary>
     /// <remarks>
     /// This identifier is not globally unique.
@@ -200,6 +201,7 @@ namespace AasCore.Aas3
         public IEnumerable<IEntity> DescendOnce()
         {
             // No descendable properties
+            yield return break;
         }
 
         /// <summary>
@@ -480,9 +482,9 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IEntity> DescendOnce()
         {
-            foreach (var item in Keys)
+            foreach (var anItem in Keys)
             {
-                yield return item;
+                yield return anItem;
             }
         }
 
@@ -597,9 +599,9 @@ namespace AasCore.Aas3
                 yield return Administration;
             }
 
-            foreach (var item in DataSpecifications)
+            foreach (var anItem in DataSpecifications)
             {
-                yield return item;
+                yield return anItem;
             }
 
             if (DerivedFrom != null)
