@@ -386,9 +386,9 @@ def _generate_verifier(
             }}
             ''')),
         Stripped(textwrap.dedent(f'''\
-            public void Visit(IEntity entity)
+            public void Visit(IEntity entity, string path)
             {{
-            {csharp_common.INDENT}entity.Accept(this);
+            {csharp_common.INDENT}entity.Accept(this, path);
             }}'''))
     ]  # type: List[Stripped]
 
@@ -412,7 +412,11 @@ def _generate_verifier(
             {csharp_common.INDENT2}Errors);
             }}''')))
 
-        # TODO: continue by implementing IPathedVisitor and adding Accept(IPathedVisitor<T>) to IEntity!
+        # TODO: continue by:
+        #  * implementing IVisitorWithPath,
+        #  * VoidVisitorWithPath and
+        #  * adding Accept(IVisitorWithPath<T> visitor, string path) to IEntity!
+        #  🠒 match the implementation with unrolling in verification when we need to recurse further
 
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
