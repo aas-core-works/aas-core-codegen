@@ -4,9 +4,9 @@ private static Regex _constructIrdiRegex()
     var safeChar = "[A-Za-z0-9:_.]";
 
     return new Regex(
-        $"^{numeric}{{4}}-{safeChar}{{1,35}}(-{safeChar}{{1,35}})?
-        $"#{safeChar}{{2}}-{safeChar}{{6}}
-        $"#{numeric}{{1,35}}$")
+        $"^{numeric}{{4}}-{safeChar}{{1,35}}(-{safeChar}{{1,35}})?" +
+        $"#{safeChar}{{2}}-{safeChar}{{6}}" +
+        $"#{numeric}{{1,35}}$"
     );
 }
 

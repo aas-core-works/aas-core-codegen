@@ -64,7 +64,7 @@ namespace AasCore.Aas3
         public IEnumerable<IEntity> DescendOnce()
         {
             // No descendable properties
-            yield return break;
+            yield break;
         }
 
         /// <summary>

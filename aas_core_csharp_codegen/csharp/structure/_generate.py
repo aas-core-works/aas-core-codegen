@@ -576,7 +576,7 @@ def _generate_interface(
         writer.write("\n{\n")
 
     # Code blocks separated by double newlines and indented once
-    codes = []  # type: List[Stripped]
+    blocks = []  # type: List[Stripped]
 
     # region Getters and setters
 
@@ -589,10 +589,11 @@ def _generate_interface(
             if error:
                 return None, error
 
-            codes.append(
-                Stripped(f"{prop_comment}\n{prop_type} {prop_name} {{ get; set; }}"))
+            blocks.append(
+                Stripped(
+                    f"{prop_comment}\npublic {prop_type} {prop_name} {{ get; set; }}"))
         else:
-            codes.append(Stripped(f"{prop_type} {{ get; set; }}"))
+            blocks.append(Stripped(f"public {prop_type} {prop_name} {{ get; set; }}"))
 
     # endregion
 
@@ -626,19 +627,19 @@ def _generate_interface(
             arg_block = ",\n".join(arg_codes)
             arg_block_indented = textwrap.indent(arg_block, csharp_common.INDENT)
             signature_blocks.append(
-                Stripped(f"{returns} {signature_name}(\n{arg_block_indented});"))
+                Stripped(f"public {returns} {signature_name}(\n{arg_block_indented});"))
         elif len(arg_codes) == 1:
             signature_blocks.append(
-                Stripped(f"{returns} {signature_name}({arg_codes[0]});"))
+                Stripped(f"public {returns} {signature_name}({arg_codes[0]});"))
         else:
             assert len(arg_codes) == 0
-            signature_blocks.append(Stripped(f"{returns} {signature_name}();"))
+            signature_blocks.append(Stripped(f"public {returns} {signature_name}();"))
 
-        codes.append(Stripped("\n".join(signature_blocks)))
+        blocks.append(Stripped("\n".join(signature_blocks)))
 
     # endregion
 
-    for i, code in enumerate(codes):
+    for i, code in enumerate(blocks):
         if i > 0:
             writer.write("\n\n")
 
@@ -766,7 +767,7 @@ def _generate_descend_body(
                     return []
 
                 return [csharp_unrolling.Node(
-                    text=f"if ({current_var_name} != null", children=children)]
+                    text=f"if ({current_var_name} != null)", children=children)]
             else:
                 assert_never(type_anno)
 
@@ -784,7 +785,7 @@ def _generate_descend_body(
         # endregion
 
     if len(blocks) == 0:
-        blocks.append(Stripped('// No descendable properties\nyield return break;'))
+        blocks.append(Stripped('// No descendable properties\nyield break;'))
 
     return Stripped('\n\n'.join(blocks))
 
@@ -1083,7 +1084,7 @@ def _generate_class(
 
             prop_blocks.append(prop_comment)
 
-        prop_blocks.append(Stripped(f"{prop_type} {prop_name} {{ get; set; }}"))
+        prop_blocks.append(Stripped(f"public {prop_type} {prop_name} {{ get; set; }}"))
 
         blocks.append(Stripped('\n'.join(prop_blocks)))
 
@@ -1222,7 +1223,7 @@ def generate(
                         /// <summary>
                         /// Accept the visitor to visit this instance for double dispatch.
                         /// </summary>
-                        public T Accept<C, T>(IVisitorWithContext<C, T> visitor)
+                        public T Accept<C, T>(IVisitorWithContext<C, T> visitor);
                     }'''),
             csharp_common.INDENT)))
 

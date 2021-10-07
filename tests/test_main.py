@@ -5,7 +5,7 @@ import pathlib
 import tempfile
 import unittest
 
-from aas_core_csharp_codegen import main
+import aas_core_csharp_codegen.main
 
 
 class Test_against_recorded(unittest.TestCase):
@@ -46,7 +46,7 @@ class Test_against_recorded(unittest.TestCase):
                     exit_stack.push(tmp_dir)
                     output_dir = pathlib.Path(tmp_dir.name)
 
-                params = main.Parameters(
+                params = aas_core_csharp_codegen.main.Parameters(
                     model_path=model_pth,
                     snippets_dir=snippets_dir,
                     namespace=namespace,
@@ -55,7 +55,8 @@ class Test_against_recorded(unittest.TestCase):
                 stdout = io.StringIO()
                 stderr = io.StringIO()
 
-                return_code = main.run(params=params, stdout=stdout, stderr=stderr)
+                return_code = aas_core_csharp_codegen.main.run(
+                    params=params, stdout=stdout, stderr=stderr)
 
                 self.assertEqual(
                     "", stderr.getvalue(), "Expected no stderr on valid models")
