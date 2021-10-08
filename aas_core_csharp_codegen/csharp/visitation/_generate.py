@@ -22,7 +22,7 @@ from aas_core_csharp_codegen.specific_implementations import ImplementationKey
 def _generate_ivisitor(
         symbol_table: intermediate.SymbolTable
 ) -> Stripped:
-    """Generate the most general visitor pattern."""
+    """Generate the visitor interface."""
     blocks = []  # type: List[Stripped]
 
     for symbol in symbol_table.symbols:
@@ -35,7 +35,7 @@ def _generate_ivisitor(
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
             var_name = csharp_naming.argument_name(symbol.name)
-            blocks.append(Stripped(f'public T Visit({cls_name} {var_name});'))
+            blocks.append(Stripped(f'public void Visit({cls_name} {var_name});'))
 
         else:
             assert_never(symbol)
@@ -46,9 +46,9 @@ def _generate_ivisitor(
             /// <summary>
             /// Define the interface for a visitor which visits the instances of the model.
             /// </summary>
-            public interface IVisitor<T>
+            public interface IVisitor
             {
-                public T Visit(IEntity entity);
+                public void Visit(IEntity entity);
             '''))
 
     for i, block in enumerate(blocks):
@@ -61,10 +61,69 @@ def _generate_ivisitor(
     return Stripped(writer.getvalue())
 
 
+def _generate_visitor_through(
+        symbol_table: intermediate.SymbolTable
+) -> Stripped:
+    """Generate the visitor that simply iterates over the instances."""
+    blocks = []  # type: List[Stripped]
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, intermediate.Enumeration):
+            continue
+
+        elif isinstance(symbol, intermediate.Interface):
+            continue
+
+        elif isinstance(symbol, intermediate.Class):
+            cls_name = csharp_naming.class_name(symbol.name)
+            var_name = csharp_naming.argument_name(symbol.name)
+            blocks.append(Stripped(textwrap.dedent(f'''\
+                public void Visit({cls_name} {var_name})
+                {{
+                    // Just descend through, do nothing with the {var_name}
+                    foreach (var something in {var_name}.DescendOnce())
+                    {{
+                        Visit(something);
+                    }}
+                }}
+                ''')))
+
+        else:
+            assert_never(symbol)
+
+    writer = io.StringIO()
+    writer.write(
+        textwrap.dedent('''\
+            /// <summary>
+            /// Just descend through the instances without any action.
+            /// </summary>
+            /// <remarks>
+            /// This class is meaningless for itself. However, it is a good base if you
+            /// want to descend through instances and apply actions only on a subset of
+            /// entities.
+            /// </remarks> 
+            public class VisitorThrough
+            {
+                public void Visit(IEntity entity)
+                {{
+                    entity.Accept(this);
+                }}
+            '''))
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write('\n')
+        writer.write(textwrap.indent(block, csharp_common.INDENT))
+
+    writer.write(f'\n}}  // public class VisitorThrough')
+
+    return Stripped(writer.getvalue())
+
+
 def _generate_ivisitor_with_context(
         symbol_table: intermediate.SymbolTable
 ) -> Stripped:
-    """Generate the most general visitor pattern."""
+    """Generate the interface for the visitor with context."""
     blocks = []  # type: List[Stripped]
 
     for symbol in symbol_table.symbols:
@@ -78,7 +137,7 @@ def _generate_ivisitor_with_context(
             cls_name = csharp_naming.class_name(symbol.name)
             var_name = csharp_naming.argument_name(symbol.name)
             blocks.append(Stripped(
-                f'public T Visit({cls_name} {var_name}, C context);'))
+                f'public void Visit({cls_name} {var_name}, C context);'))
 
         else:
             assert_never(symbol)
@@ -90,10 +149,9 @@ def _generate_ivisitor_with_context(
             /// Define the interface for a visitor which visits the instances of the model.
             /// </summary>
             /// <typeparam name="C">Context type</typeparam>
-            /// <typeparam name="T">Result type</typeparam>
-            public interface IVisitorWithContext<C, T>
+            public interface IVisitorWithContext<C>
             {
-                public T Visit(IEntity entity, C context);
+                public void Visit(IEntity entity, C context);
             '''))
 
     for i, block in enumerate(blocks):
@@ -102,6 +160,96 @@ def _generate_ivisitor_with_context(
         writer.write(textwrap.indent(block, csharp_common.INDENT))
 
     writer.write(f'\n}}  // public interface IVisitorWithContext')
+
+    return Stripped(writer.getvalue())
+
+
+def _generate_itransformer(
+        symbol_table: intermediate.SymbolTable
+) -> Stripped:
+    """Generate the transformer interface."""
+    blocks = []  # type: List[Stripped]
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, intermediate.Enumeration):
+            continue
+
+        elif isinstance(symbol, intermediate.Interface):
+            continue
+
+        elif isinstance(symbol, intermediate.Class):
+            cls_name = csharp_naming.class_name(symbol.name)
+            var_name = csharp_naming.argument_name(symbol.name)
+            blocks.append(Stripped(f'public T Transform({cls_name} {var_name});'))
+
+        else:
+            assert_never(symbol)
+
+    writer = io.StringIO()
+    writer.write(
+        textwrap.dedent('''\
+            /// <summary>
+            /// Define the interface for a transformer which transforms recursively 
+            /// the instances into something else.
+            /// </summary>
+            /// <typeparam name="T">The type of the transformation result</typeparam>
+            public interface ITransformer<T>
+            {
+                public T Transform(IEntity entity);
+            '''))
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write('\n')
+        writer.write(textwrap.indent(block, csharp_common.INDENT))
+
+    writer.write(f'\n}}  // public interface ITransformer')
+
+    return Stripped(writer.getvalue())
+
+
+def _generate_itransformer_with_context(
+        symbol_table: intermediate.SymbolTable
+) -> Stripped:
+    """Generate the interface for the transformer with context."""
+    blocks = []  # type: List[Stripped]
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, intermediate.Enumeration):
+            continue
+
+        elif isinstance(symbol, intermediate.Interface):
+            continue
+
+        elif isinstance(symbol, intermediate.Class):
+            cls_name = csharp_naming.class_name(symbol.name)
+            var_name = csharp_naming.argument_name(symbol.name)
+            blocks.append(Stripped(
+                f'public T Transform({cls_name} {var_name}, C context);'))
+
+        else:
+            assert_never(symbol)
+
+    writer = io.StringIO()
+    writer.write(
+        textwrap.dedent('''\
+            /// <summary>
+            /// Define the interface for a transformer which recursively transforms
+            /// the instances into something else while the context is passed along.
+            /// </summary>
+            /// <typeparam name="T">The type of the transformation result</typeparam>
+            /// <typeparam name="C">Context type</typeparam>
+            public interface ITransformerWithContext<C, T>
+            {
+                public T Transform(IEntity entity, C context);
+            '''))
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write('\n')
+        writer.write(textwrap.indent(block, csharp_common.INDENT))
+
+    writer.write(f'\n}}  // public interface ITransformerWithContext')
 
     return Stripped(writer.getvalue())
 
@@ -133,7 +281,9 @@ def generate(
 
     visitation_blocks = [
         _generate_ivisitor(symbol_table=symbol_table),
-        _generate_ivisitor_with_context(symbol_table=symbol_table)
+        _generate_ivisitor_with_context(symbol_table=symbol_table),
+        _generate_itransformer(symbol_table=symbol_table),
+        _generate_itransformer_with_context(symbol_table=symbol_table)
     ]
 
     for i, visitation_block in enumerate(visitation_blocks):

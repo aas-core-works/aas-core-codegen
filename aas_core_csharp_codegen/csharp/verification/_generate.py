@@ -77,20 +77,20 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
 
         enum_name = csharp_naming.enum_name(symbol.name)
         blocks.append(Stripped(
-            f"public static HashSet<int> For{enum_name} = "
-            f"System.Enum.GetValues({enum_name});"))
+            f"public static HashSet<int> For{enum_name} = new HashSet<int>(\n"
+            f"{csharp_common.INDENT}System.Enum.GetValues(typeof({enum_name})).Cast<int>());"))
 
     writer = io.StringIO()
     writer.write(textwrap.dedent('''\
         /// <summary>
-        /// Hash allowed enum values to allow for efficient validation of enums.
+        /// Hash allowed enum values for efficient validation of enums.
         /// </summary> 
         private static class EnumValueSet
         {
         '''))
     for i, block in enumerate(blocks):
         if i > 0:
-            writer.write('\n')
+            writer.write('\n\n')
 
         writer.write(textwrap.indent(block, csharp_common.INDENT))
 
@@ -144,7 +144,8 @@ def _unroll_enumeration_check(
             return [
                 csharp_unrolling.Node(
                     text=textwrap.dedent(f'''\
-                    if (!EnumValueSet.For{enum_name}.Contains({current_var_name}))
+                    if (!EnumValueSet.For{enum_name}.Contains(
+                    {csharp_common.INDENT2}(int){current_var_name}))
                     {{
                     {csharp_common.INDENT}errors.Add(
                     {csharp_common.INDENT2}new Error(
@@ -241,7 +242,13 @@ def _generate_implementation_verify(
     """Generate the verify function in the ``Implementation`` class."""
     blocks = []  # type: List[Stripped]
 
-    # TODO: transpile the invariants into body_blocks
+    cls_name = csharp_naming.class_name(cls.name)
+
+    if len(cls.invariants) == 0:
+        blocks.append(Stripped(f'// There are no invariants defined for {cls_name}.'))
+    else:
+        pass
+        # TODO: transpile the invariants into body_blocks
 
     for prop in cls.properties:
         enum_check_block = _unroll_enumeration_check(cls=cls, prop=prop)
@@ -249,9 +256,9 @@ def _generate_implementation_verify(
             blocks.append(enum_check_block)
 
     if len(blocks) == 0:
-        return Stripped(""), None
+        blocks.append(Stripped(
+            f'// There is no verification specified for {cls_name}.'))
 
-    cls_name = csharp_naming.class_name(cls.name)
     arg_name = csharp_naming.argument_name(cls.name)
 
     assert arg_name != 'path', "Unexpected reserved argument name"
@@ -263,9 +270,9 @@ def _generate_implementation_verify(
         /// Verify the given <paramref name={xml.sax.saxutils.quoteattr(arg_name)} /> and 
         /// append any errors to <paramref name="Errors" />.
         ///
-        /// The <paramref name="path" /> localized the <paramref name={xml.sax.saxutils.quoteattr(arg_name)} />.
+        /// The <paramref name="path" /> localizes the <paramref name={xml.sax.saxutils.quoteattr(arg_name)} />.
         /// </summary>
-        public void Verify{cls_name} (
+        public static void Verify{cls_name} (
         {csharp_common.INDENT}{cls_name} {arg_name},
         {csharp_common.INDENT}string path,
         {csharp_common.INDENT}Errors errors)
@@ -305,7 +312,8 @@ def _generate_implementation(
                     Error(
                         symbol.parsed.node,
                         f"The implementation snippet is missing for "
-                        f"the ``Verify`` method: {verify_key}"))
+                        f"the ``Verify`` method "
+                        f"of the ``Verification.Implementation`` class: {verify_key}"))
                 continue
 
             blocks.append(spec_impls[verify_key])
@@ -347,7 +355,7 @@ def _generate_implementation(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_non_recursive_verifier(
         symbol_table: intermediate.SymbolTable
-) -> Tuple[Optional[Stripped], Optional[Error]]:
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the non-recursive verifier which visits the entities."""
     blocks = [
         Stripped("public readonly Errors Errors;"),
@@ -388,7 +396,7 @@ def _generate_non_recursive_verifier(
             {csharp_common.INDENT}{cls_name} {arg_name},
             {csharp_common.INDENT}string context)
             {{
-            {csharp_common.INDENT}Implementation.Verify(
+            {csharp_common.INDENT}Implementation.Verify{cls_name}(
             {csharp_common.INDENT2}{arg_name},
             {csharp_common.INDENT2}context,
             {csharp_common.INDENT2}Errors);
@@ -399,8 +407,8 @@ def _generate_non_recursive_verifier(
         /// <summary>
         /// Verify the instances of the model entities non-recursively.
         /// </summary>
-        public static class NonRecursiveVerifier : 
-        {csharp_common.INDENT}Visitation.IVisitorWithContext<string, void>
+        public class NonRecursiveVerifier : 
+        {csharp_common.INDENT}Visitation.IVisitorWithContext<string>
         {{
         '''))
     for i, block in enumerate(blocks):
@@ -409,7 +417,7 @@ def _generate_non_recursive_verifier(
 
         writer.write(textwrap.indent(block, csharp_common.INDENT))
 
-    writer.write('\n}  // public static class NonRecursiveVerifier')
+    writer.write('\n}  // public class NonRecursiveVerifier')
 
     return Stripped(writer.getvalue()), None
 
@@ -577,7 +585,7 @@ def _generate_recursive_verifier_visit(
 
     blocks = [
         Stripped(textwrap.dedent(f'''\
-        Implementation.Verify(
+        Implementation.Verify{cls_name}(
         {csharp_common.INDENT}{arg_name},
         {csharp_common.INDENT}context,
         {csharp_common.INDENT}Errors);'''))
@@ -585,6 +593,7 @@ def _generate_recursive_verifier_visit(
 
     # region Unroll
 
+    recursion_ends_here = True
     for prop in cls.properties:
         unrolled_prop_verification = _unroll_recursion_in_recursive_verify(
             cls=cls,
@@ -592,6 +601,10 @@ def _generate_recursive_verifier_visit(
 
         if unrolled_prop_verification != '':
             blocks.append(unrolled_prop_verification)
+            recursion_ends_here = False
+
+    if recursion_ends_here:
+        blocks.append(Stripped("// The recursion ends here."))
     # endregion
 
     for i, block in enumerate(blocks):
@@ -608,7 +621,7 @@ def _generate_recursive_verifier_visit(
 def _generate_recursive_verifier(
         symbol_table: intermediate.SymbolTable,
         spec_impls: specific_implementations.SpecificImplementations
-) -> Tuple[Optional[Stripped], Optional[Error]]:
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the ``Verifier`` class which visits the entities and verifies them."""
     blocks = [
         Stripped("public readonly Errors Errors;"),
@@ -644,20 +657,25 @@ def _generate_recursive_verifier(
                     Error(
                         symbol.parsed.node,
                         f"The implementation snippet is missing for "
-                        f"the ``Visit`` method: {visit_key}"))
+                        f"the ``Visit`` method "
+                        f"of the ``Verification.RecursiveVerifier`` class: "
+                        f"{visit_key}"))
                 continue
 
             blocks.append(spec_impls[visit_key])
         else:
             blocks.append(_generate_recursive_verifier_visit(cls=symbol))
 
+    if len(errors) > 0:
+        return None, errors
+
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         /// <summary>
         /// Verify the instances of the model entities recursively.
         /// </summary>
-        public static class RecursiveVerifier : 
-        {csharp_common.INDENT}Visitation.IVisitorWithContext<string, void>
+        public class RecursiveVerifier : 
+        {csharp_common.INDENT}Visitation.IVisitorWithContext<string>
         {{
         '''))
     for i, block in enumerate(blocks):
@@ -666,7 +684,7 @@ def _generate_recursive_verifier(
 
         writer.write(textwrap.indent(block, csharp_common.INDENT))
 
-    writer.write('\n}  // public static class RecursiveVerifier')
+    writer.write('\n}  // public class RecursiveVerifier')
 
     return Stripped(writer.getvalue()), None
 
@@ -693,8 +711,11 @@ def generate(
 
     using_directives = [
         "using ArgumentException = System.ArgumentException;\n"
+        "using InvalidOperationException = System.InvalidOperationException;\n"
+        "using NotImplementedException = System.NotImplementedException;\n"
         "using Regex = System.Text.RegularExpressions.Regex;\n"
         "using System.Collections.Generic;  // can't alias\n"
+        "using System.Collections.ObjectModel;  // can't alias\n"
         "using System.Linq;  // can't alias"
     ]  # type: List[str]
 
@@ -715,22 +736,22 @@ def generate(
     else:
         verification_blocks.append(implementation)
 
-    non_recursive_verifier, error = _generate_non_recursive_verifier(
+    non_recursive, non_recursive_errors = _generate_non_recursive_verifier(
         symbol_table=symbol_table)
 
-    if error is not None:
-        errors.append(error)
+    if non_recursive_errors is not None:
+        errors.extend(non_recursive_errors)
     else:
-        verification_blocks.append(non_recursive_verifier)
+        verification_blocks.append(non_recursive)
 
-    recursive_verifier, error = _generate_recursive_verifier(
+    recursive, recursive_errors = _generate_recursive_verifier(
         symbol_table=symbol_table,
         spec_impls=spec_impls)
 
-    if error is not None:
-        errors.append(error)
+    if recursive_errors is not None:
+        errors.extend(recursive_errors)
     else:
-        verification_blocks.append(recursive_verifier)
+        verification_blocks.append(recursive)
 
     if len(errors) > 0:
         return None, errors

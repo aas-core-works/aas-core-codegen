@@ -889,7 +889,7 @@ def _generate_constructor(
             "specified in the meta-model"))
 
     elif len(arg_codes) == 1:
-        blocks.append(f"{cls_name}({arg_codes[0]})\n{{")
+        blocks.append(f"public {cls_name}({arg_codes[0]})\n{{")
     else:
         arg_block = ",\n".join(arg_codes)
         arg_block_indented = textwrap.indent(arg_block, csharp_common.INDENT)
@@ -1011,9 +1011,9 @@ def _generate_default_constructor(
         "so we expected at least one default value, but got none.")
 
     if len(default_values) == 1:
-        writer.write(f"{cls_name}() : this({default_values[0]})\n")
+        writer.write(f"public {cls_name}() : this({default_values[0]})\n")
     else:
-        writer.write(f"{cls_name}() : this(\n")
+        writer.write(f"public {cls_name}() : this(\n")
         for i, default_value in enumerate(default_values):
             writer.write(f"{csharp_common.INDENT}{default_value}")
 
@@ -1109,27 +1109,46 @@ def _generate_class(
     blocks.append(_generate_descend_once_method(symbol=symbol))
     blocks.append(_generate_descend_method(symbol=symbol))
 
-    blocks.append(
-        Stripped(
-            textwrap.dedent(f'''\
-                /// <summary>
-                /// Accept the visitor to visit this instance for double dispatch.
-                /// </summary>
-                public T Accept<T>(Visitation.IVisitor<T> visitor)
-                {{
-                {csharp_common.INDENT}return visitor.visit(this);
-                }}''')))
+    blocks.append(Stripped(textwrap.dedent(f'''\
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {{
+        {csharp_common.INDENT}visitor.Visit(this);
+        }}''')))
 
-    blocks.append(
-        Stripped(
-            textwrap.dedent(f'''\
-                /// <summary>
-                /// Accept the visitor to visit this instance for double dispatch.
-                /// </summary>
-                public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
-                {{
-                {csharp_common.INDENT}return visitor.visit(this, context);
-                }}''')))
+    blocks.append(Stripped(textwrap.dedent(f'''\
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch 
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        {{
+        {csharp_common.INDENT}visitor.Visit(this, context);
+        }}''')))
+
+    blocks.append(Stripped(textwrap.dedent(f'''\
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {{
+        {csharp_common.INDENT}return transformer.Transform(this);
+        }}''')))
+
+    blocks.append(Stripped(textwrap.dedent(f'''\
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+        {csharp_common.INDENT}Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {{
+        {csharp_common.INDENT}return transformer.Transform(this, context);
+        }}''')))
 
     # endregion
 
@@ -1187,6 +1206,7 @@ def generate(
 
     using_directives = [
         "using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;",
+        "using NotImplementedException = System.NotImplementedException;",
         "using System.Collections.Generic;  // can't alias"
     ]  # type: List[str]
 
@@ -1195,37 +1215,49 @@ def generate(
 
     blocks.append(Stripped(f"namespace {namespace}\n{{"))
 
-    blocks.append(Rstripped(
-        textwrap.indent(
-            textwrap.dedent('''\
-                    /// <summary>
-                    /// Represent a general entity of an AAS model.
-                    /// </summary>
-                    public interface IEntity
-                    {
-                        /// <summary>
-                        /// Iterate over all the entity instances referenced from this instance 
-                        /// without further recursion.
-                        /// </summary>
-                        public IEnumerable<IEntity> DescendOnce();
-                        
-                        /// <summary>
-                        /// Iterate recursively over all the entity instances referenced from this instance.
-                        /// </summary>
-                        public IEnumerable<IEntity> Descend();
+    blocks.append(Rstripped(textwrap.indent(textwrap.dedent(f'''\
+        /// <summary>
+        /// Represent a general entity of an AAS model.
+        /// </summary>
+        public interface IEntity
+        {{
+            /// <summary>
+            /// Iterate over all the entity instances referenced from this instance 
+            /// without further recursion.
+            /// </summary>
+            public IEnumerable<IEntity> DescendOnce();
+            
+            /// <summary>
+            /// Iterate recursively over all the entity instances referenced from this instance.
+            /// </summary>
+            public IEnumerable<IEntity> Descend();
 
-                        
-                        /// <summary>
-                        /// Accept the visitor to visit this instance for double dispatch.
-                        /// </summary>
-                        public T Accept<T>(IVisitor<T> visitor);
-                        
-                        /// <summary>
-                        /// Accept the visitor to visit this instance for double dispatch.
-                        /// </summary>
-                        public T Accept<C, T>(IVisitorWithContext<C, T> visitor);
-                    }'''),
-            csharp_common.INDENT)))
+            /// <summary>
+            /// Accept the <paramref name="visitor" /> to visit this instance 
+            /// for double dispatch.
+            /// </summary>
+            public void Accept(Visitation.IVisitor visitor);
+            
+            /// <summary>
+            /// Accept the visitor to visit this instance for double dispatch 
+            /// with the <paramref name="context" />.
+            /// </summary>
+            public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context);
+            
+            /// <summary>
+            /// Accept the <paramref name="transformer" /> to transform this instance 
+            /// for double dispatch.
+            /// </summary>
+            public T Transform<T>(Visitation.ITransformer<T> transformer);
+            
+            /// <summary>
+            /// Accept the <paramref name="transformer" /> to visit this instance 
+            /// for double dispatch with the <paramref name="context" />.
+            /// </summary>
+            public T Transform<C, T>(
+            {csharp_common.INDENT}Visitation.ITransformerWithContext<C, T> transformer, C context);                        
+        }}'''),
+                                            csharp_common.INDENT)))
 
     errors = []  # type: List[Error]
 

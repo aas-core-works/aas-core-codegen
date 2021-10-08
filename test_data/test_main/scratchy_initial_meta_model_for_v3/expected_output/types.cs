@@ -4,6 +4,7 @@
  */
 
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
+using NotImplementedException = System.NotImplementedException;
 using System.Collections.Generic;  // can't alias
 
 namespace AasCore.Aas3
@@ -25,16 +26,30 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IEntity> Descend();
 
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor);
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the visitor to visit this instance for double dispatch 
+        /// with the <paramref name="context" />.
         /// </summary>
-        public T Accept<T>(IVisitor<T> visitor);
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context);
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// for double dispatch.
         /// </summary>
-        public T Accept<C, T>(IVisitorWithContext<C, T> visitor)
+        public T Transform<T>(Visitation.ITransformer<T> transformer);
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+            Visitation.ITransformerWithContext<C, T> transformer, C context);                        
     }
 
     public interface IHasExtension : IEntity
@@ -50,12 +65,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Language of the <see cref="Text" />
         /// </summary>
-        string Language { get; set; }
+        public string Language { get; set; }
 
         /// <summary>
         /// Content of the string
         /// </summary>
-        string Text { get; set; }
+        public string Text { get; set; }
 
         /// <summary>
         /// Iterate over all the entity instances referenced from this instance 
@@ -73,23 +88,44 @@ namespace AasCore.Aas3
         public IEnumerable<IEntity> Descend()
         {
             // No descendable properties
-            yield return break;
+            yield break;
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// for double dispatch.
         /// </summary>
-        public T Accept<T>(Visitation.IVisitor<T> visitor)
+        public void Accept(Visitation.IVisitor visitor)
         {
-            return visitor.visit(this);
+            visitor.Visit(this);
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the visitor to visit this instance for double dispatch 
+        /// with the <paramref name="context" />.
         /// </summary>
-        public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
         {
-            return visitor.visit(this, context);
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            return transformer.Transform(this, context);
         }
 
         LangString(
@@ -100,7 +136,7 @@ namespace AasCore.Aas3
             Text = text;
         }
 
-        LangString() : this(
+        public LangString() : this(
             "",
             "")
         {
@@ -108,8 +144,36 @@ namespace AasCore.Aas3
         }
     }
 
-    public class LangStringSet {
-        // This is just a dummy snippet.
+    public class LangStringSet : IEntity {
+        public IEnumerable<IEntity> DescendOnce()
+        {
+            throw new NotImplementedException("TODO");
+        }
+
+        public IEnumerable<IEntity> Descend()
+        {
+            throw new NotImplementedException("TODO");
+        }
+
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            throw new NotImplementedException("TODO");
+        }
+
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        {
+            throw new NotImplementedException("TODO");
+        }
+
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            throw new NotImplementedException("TODO");
+        }
+
+        public T Transform<C, T>(Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            throw new NotImplementedException("TODO");
+        }
     }
 
     /// <summary>
@@ -128,7 +192,7 @@ namespace AasCore.Aas3
         /// In case of referable this id is an identifying string of
         /// the element within its name space.
         /// </summary>
-        string IdShort { get; set; }
+        public string IdShort { get; set; }
 
         /// <summary>
         /// Display name. Can be provided in several languages.
@@ -147,7 +211,7 @@ namespace AasCore.Aas3
         /// <li>the short name of the concept description-the idShort of the element</li>
         /// </ul></para>
         /// </remarks>
-        LangStringSet? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -155,7 +219,7 @@ namespace AasCore.Aas3
         /// It affects the expected existence of attributes and the applicability of
         /// constraints.
         /// </summary>
-        string? Category { get; set; }
+        public string? Category { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -167,7 +231,7 @@ namespace AasCore.Aas3
         /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
         /// in which context or which additional data specification templates are provided.
         /// </remarks>
-        LangStringSet? Description { get; set; }
+        public LangStringSet? Description { get; set; }
     }
 
     /// <summary>
@@ -197,9 +261,9 @@ namespace AasCore.Aas3
 
     public class Identifier : IEntity
     {
-        string Id { get; set; }
+        public string Id { get; set; }
 
-        IdentifierType IdType { get; set; }
+        public IdentifierType IdType { get; set; }
 
         /// <summary>
         /// Iterate over all the entity instances referenced from this instance 
@@ -208,7 +272,7 @@ namespace AasCore.Aas3
         public IEnumerable<IEntity> DescendOnce()
         {
             // No descendable properties
-            yield return break;
+            yield break;
         }
 
         /// <summary>
@@ -217,23 +281,44 @@ namespace AasCore.Aas3
         public IEnumerable<IEntity> Descend()
         {
             // No descendable properties
-            yield return break;
+            yield break;
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// for double dispatch.
         /// </summary>
-        public T Accept<T>(Visitation.IVisitor<T> visitor)
+        public void Accept(Visitation.IVisitor visitor)
         {
-            return visitor.visit(this);
+            visitor.Visit(this);
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the visitor to visit this instance for double dispatch 
+        /// with the <paramref name="context" />.
         /// </summary>
-        public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
         {
-            return visitor.visit(this, context);
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            return transformer.Transform(this, context);
         }
 
         Identifier(
@@ -244,7 +329,7 @@ namespace AasCore.Aas3
             IdType = idType;
         }
 
-        Identifier() : this(
+        public Identifier() : this(
             "",
             IdentifierType.Irdi)
         {
@@ -254,9 +339,9 @@ namespace AasCore.Aas3
 
     public class AdministrativeInformation : IEntity
     {
-        string? Version { get; set; }
+        public string? Version { get; set; }
 
-        string? Revision { get; set; }
+        public string? Revision { get; set; }
 
         /// <summary>
         /// Iterate over all the entity instances referenced from this instance 
@@ -265,7 +350,7 @@ namespace AasCore.Aas3
         public IEnumerable<IEntity> DescendOnce()
         {
             // No descendable properties
-            yield return break;
+            yield break;
         }
 
         /// <summary>
@@ -274,23 +359,44 @@ namespace AasCore.Aas3
         public IEnumerable<IEntity> Descend()
         {
             // No descendable properties
-            yield return break;
+            yield break;
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// for double dispatch.
         /// </summary>
-        public T Accept<T>(Visitation.IVisitor<T> visitor)
+        public void Accept(Visitation.IVisitor visitor)
         {
-            return visitor.visit(this);
+            visitor.Visit(this);
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the visitor to visit this instance for double dispatch 
+        /// with the <paramref name="context" />.
         /// </summary>
-        public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
         {
-            return visitor.visit(this, context);
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            return transformer.Transform(this, context);
         }
 
         AdministrativeInformation(
@@ -306,9 +412,9 @@ namespace AasCore.Aas3
             IReferable,
             IEntity
     {
-        Identifier { get; set; }
+        public Identifier Identification { get; set; }
 
-        AdministrativeInformation? { get; set; }
+        public AdministrativeInformation? Administration { get; set; }
     }
 
     public enum ModelingKind
@@ -322,7 +428,7 @@ namespace AasCore.Aas3
 
     public interface IHasKind : IEntity
     {
-        ModelingKind { get; set; }
+        public ModelingKind Kind { get; set; }
     }
 
     public enum LocalKeyType
@@ -519,11 +625,11 @@ namespace AasCore.Aas3
 
     public class Key : IEntity
     {
-        KeyElements Type { get; set; }
+        public KeyElements Type { get; set; }
 
-        string Value { get; set; }
+        public string Value { get; set; }
 
-        KeyType IdType { get; set; }
+        public KeyType IdType { get; set; }
 
         /// <summary>
         /// Iterate over all the entity instances referenced from this instance 
@@ -532,7 +638,7 @@ namespace AasCore.Aas3
         public IEnumerable<IEntity> DescendOnce()
         {
             // No descendable properties
-            yield return break;
+            yield break;
         }
 
         /// <summary>
@@ -541,23 +647,44 @@ namespace AasCore.Aas3
         public IEnumerable<IEntity> Descend()
         {
             // No descendable properties
-            yield return break;
+            yield break;
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// for double dispatch.
         /// </summary>
-        public T Accept<T>(Visitation.IVisitor<T> visitor)
+        public void Accept(Visitation.IVisitor visitor)
         {
-            return visitor.visit(this);
+            visitor.Visit(this);
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the visitor to visit this instance for double dispatch 
+        /// with the <paramref name="context" />.
         /// </summary>
-        public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
         {
-            return visitor.visit(this, context);
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            return transformer.Transform(this, context);
         }
 
         Key(
@@ -570,7 +697,7 @@ namespace AasCore.Aas3
             IdType = idType;
         }
 
-        Key() : this(
+        public Key() : this(
             new KeyElements(),
             "",
             new KeyType())
@@ -581,7 +708,7 @@ namespace AasCore.Aas3
 
     public class Reference : IEntity
     {
-        List<Key> Keys { get; set; }
+        public List<Key> Keys { get; set; }
 
         /// <summary>
         /// Iterate over all the entity instances referenced from this instance 
@@ -613,27 +740,48 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// for double dispatch.
         /// </summary>
-        public T Accept<T>(Visitation.IVisitor<T> visitor)
+        public void Accept(Visitation.IVisitor visitor)
         {
-            return visitor.visit(this);
+            visitor.Visit(this);
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the visitor to visit this instance for double dispatch 
+        /// with the <paramref name="context" />.
         /// </summary>
-        public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
         {
-            return visitor.visit(this, context);
+            visitor.Visit(this, context);
         }
 
-        Reference(List<Key> keys)
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public Reference(List<Key> keys)
         {
             Keys = keys;
         }
 
-        Reference() : this(new List<Key>())
+        public Reference() : this(new List<Key>())
         {
             // Intentionally left empty.
         }
@@ -641,12 +789,12 @@ namespace AasCore.Aas3
 
     public interface IHasSemantics : IEntity
     {
-        Reference? { get; set; }
+        public Reference? SemanticId { get; set; }
     }
 
     public interface IHasDataSpecification : IEntity
     {
-        List<List<Reference>> { get; set; }
+        public List<Reference> DataSpecifications { get; set; }
     }
 
     /// <summary>
@@ -662,7 +810,7 @@ namespace AasCore.Aas3
         /// In case of referable this id is an identifying string of
         /// the element within its name space.
         /// </summary>
-        string IdShort { get; set; }
+        public string IdShort { get; set; }
 
         /// <summary>
         /// Display name. Can be provided in several languages.
@@ -681,7 +829,7 @@ namespace AasCore.Aas3
         /// <li>the short name of the concept description-the idShort of the element</li>
         /// </ul></para>
         /// </remarks>
-        LangStringSet? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -689,7 +837,7 @@ namespace AasCore.Aas3
         /// It affects the expected existence of attributes and the applicability of
         /// constraints.
         /// </summary>
-        string? Category { get; set; }
+        public string? Category { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -701,18 +849,18 @@ namespace AasCore.Aas3
         /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
         /// in which context or which additional data specification templates are provided.
         /// </remarks>
-        LangStringSet? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
-        Identifier Identification { get; set; }
+        public Identifier Identification { get; set; }
 
-        AdministrativeInformation? Administration { get; set; }
+        public AdministrativeInformation? Administration { get; set; }
 
-        List<List<Reference>> DataSpecifications { get; set; }
+        public List<Reference> DataSpecifications { get; set; }
 
         /// <summary>
         /// The reference to the AAS this AAS was derived from.
         /// </summary>
-        AssetAdministrationShell? DerivedFrom { get; set; }
+        public AssetAdministrationShell? DerivedFrom { get; set; }
 
         /// <summary>
         /// Iterate over all the entity instances referenced from this instance 
@@ -720,32 +868,29 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IEntity> DescendOnce()
         {
-            if (DisplayName != null
+            if (DisplayName != null)
             {
                 yield return DisplayName;
             }
 
-            if (Description != null
+            if (Description != null)
             {
                 yield return Description;
             }
 
             yield return Identification;
 
-            if (Administration != null
+            if (Administration != null)
             {
                 yield return Administration;
             }
 
             foreach (var anItem in DataSpecifications)
             {
-                foreach (var anotherItem in anItem)
-                {
-                    yield return anotherItem;
-                }
+                yield return anItem;
             }
 
-            if (DerivedFrom != null
+            if (DerivedFrom != null)
             {
                 yield return DerivedFrom;
             }
@@ -756,7 +901,7 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IEntity> Descend()
         {
-            if (DisplayName != null
+            if (DisplayName != null)
             {
                 yield return DisplayName;
 
@@ -767,7 +912,7 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Description != null
+            if (Description != null)
             {
                 yield return Description;
 
@@ -786,7 +931,7 @@ namespace AasCore.Aas3
                 yield return anItem;
             }
 
-            if (Administration != null
+            if (Administration != null)
             {
                 yield return Administration;
 
@@ -799,19 +944,16 @@ namespace AasCore.Aas3
 
             foreach (var anItem in DataSpecifications)
             {
-                foreach (var anotherItem in anItem)
+                yield return anItem;
+
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
                 {
                     yield return anotherItem;
-
-                    // Recurse
-                    foreach (var yetYetanotherItem in anotherItem.Descend())
-                    {
-                        yield return yetYetanotherItem;
-                    }
                 }
             }
 
-            if (DerivedFrom != null
+            if (DerivedFrom != null)
             {
                 yield return DerivedFrom;
 
@@ -824,19 +966,40 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// for double dispatch.
         /// </summary>
-        public T Accept<T>(Visitation.IVisitor<T> visitor)
+        public void Accept(Visitation.IVisitor visitor)
         {
-            return visitor.visit(this);
+            visitor.Visit(this);
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch.
+        /// Accept the visitor to visit this instance for double dispatch 
+        /// with the <paramref name="context" />.
         /// </summary>
-        public T Accept<C, T>(Visitation.IVisitorWithContext<C, T> visitor, C context)
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
         {
-            return visitor.visit(this, context);
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            return transformer.Transform(this, context);
         }
 
         AssetAdministrationShell(
@@ -857,11 +1020,11 @@ namespace AasCore.Aas3
             Description = description;
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<List<Reference>>();
+                : new List<Reference>();
             DerivedFrom = derivedFrom;
         }
 
-        AssetAdministrationShell() : this(
+        public AssetAdministrationShell() : this(
             new Identifier(),
             "",
             null,

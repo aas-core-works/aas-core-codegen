@@ -4,8 +4,11 @@
  */
 
 using ArgumentException = System.ArgumentException;
+using InvalidOperationException = System.InvalidOperationException;
+using NotImplementedException = System.NotImplementedException;
 using Regex = System.Text.RegularExpressions.Regex;
 using System.Collections.Generic;  // can't alias
+using System.Collections.ObjectModel;  // can't alias
 using System.Linq;  // can't alias
 
 namespace AasCore.Aas3
@@ -18,11 +21,11 @@ namespace AasCore.Aas3
             {
                 var scheme = "[a-zA-Z][a-zA-Z0-9+\\-.]*";
                 var ucschar = (
-                    "[\\xa0-\\ud7ff\\uf900-\\ufdcf\\ufdf0-\\uffef\\u10000-\\u1fffd"
-                    "\\u20000-\\u2fffd\\u30000-\\u3fffd\\u40000-\\u4fffd"
-                    "\\u50000-\\u5fffd\\u60000-\\u6fffd\\u70000-\\u7fffd"
-                    "\\u80000-\\u8fffd\\u90000-\\u9fffd\\ua0000-\\uafffd"
-                    "\\ub0000-\\ubfffd\\uc0000-\\ucfffd\\ud0000-\\udfffd"
+                    "[\\xa0-\\ud7ff\\uf900-\\ufdcf\\ufdf0-\\uffef\\u10000-\\u1fffd" +
+                    "\\u20000-\\u2fffd\\u30000-\\u3fffd\\u40000-\\u4fffd" +
+                    "\\u50000-\\u5fffd\\u60000-\\u6fffd\\u70000-\\u7fffd" +
+                    "\\u80000-\\u8fffd\\u90000-\\u9fffd\\ua0000-\\uafffd" +
+                    "\\ub0000-\\ubfffd\\uc0000-\\ucfffd\\ud0000-\\udfffd" +
                     "\\ue1000-\\uefffd]"
                 );
                 var iunreserved = $"([a-zA-Z0-9\\-._~]|{ucschar})";
@@ -34,11 +37,11 @@ namespace AasCore.Aas3
                 var ipv4address = $"{dec_octet}\\.{dec_octet}\\.{dec_octet}\\.{dec_octet}";
                 var ls32 = $"({h16}:{h16}|{ipv4address})";
                 var ipv6address = (
-                    f"(({h16}:){{6,6}}{ls32}|::({h16}:){{5,5}}{ls32}|({h16})?::({h16}"
-                    f":){{4,4}}{ls32}|(({h16}:)?{h16})?::({h16}:){{3,3}}{ls32}|(({h16}"
-                    f":){{2}}{h16})?::({h16}:){{2,2}}{ls32}|(({h16}:){{3}}{h16})?::{h16}:"
-                    f"{ls32}|(({h16}:){{4}}{h16})?::{ls32}|(({h16}:){{5}}{h16})?::{h16}|"
-                    f"(({h16}:){{6}}{h16})?::)"
+                    $"(({h16}:){{6,6}}{ls32}|::({h16}:){{5,5}}{ls32}|({h16})?::({h16}" +
+                    $":){{4,4}}{ls32}|(({h16}:)?{h16})?::({h16}:){{3,3}}{ls32}|(({h16}" +
+                    $":){{2}}{h16})?::({h16}:){{2,2}}{ls32}|(({h16}:){{3}}{h16})?::{h16}:" +
+                    $"{ls32}|(({h16}:){{4}}{h16})?::{ls32}|(({h16}:){{5}}{h16})?::{h16}|" +
+                    $"(({h16}:){{6}}{h16})?::)"
                 );
                 var unreserved = "[a-zA-Z0-9\\-._~]";
                 var ipvfuture = $"[vV][0-9A-Fa-f]{{1,}}\\.({unreserved}|{subDelims}|:){{1,}}";
@@ -55,23 +58,22 @@ namespace AasCore.Aas3
                 var ipathRootless = $"{isegment_nz}(/{isegment})*";
                 var ipathEmpty = $"({ipchar}){{0,0}}";
                 var ihierPart = (
-                    f"(//{iauthority}{ipath_abempty}|{ipath_absolute}|"
-                    f"{ipathRootless}|{ipathEmpty})"
+                    $"(//{iauthority}{ipath_abempty}|{ipath_absolute}|" +
+                    $"{ipathRootless}|{ipathEmpty})"
                 );
                 var iprivate = "[\\ue000-\\uf8ff\\uf0000-\\uffffd\\u100000-\\u10fffd]";
                 var iquery = $"({ipchar}|{iprivate}|[/?])*";
                 var absoluteIri = $"{scheme}:{ihierPart}(\\?{iquery})?";
-                var genDelims = "[:/?#\\[\\]@]";
                 var ifragment = $"({ipchar}|[/?])*";
                 var isegmentNzNc = $"({iunreserved}|{pctEncoded}|{subDelims}|@){{1,}}";
                 var ipathNoscheme = $"{isegmentNzNc}(/{isegment})*";
                 var ipath = (
-                    f"({ipath_abempty}|{ipath_absolute}|{ipathNoscheme}|"
-                    f"{ipathRootless}|{ipathEmpty})"
+                    $"({ipath_abempty}|{ipath_absolute}|{ipathNoscheme}|" +
+                    $"{ipathRootless}|{ipathEmpty})"
                 );
                 var irelativePart = (
-                    f"(//{iauthority}{ipath_abempty}|{ipath_absolute}|"
-                    f"{ipathNoscheme}|{ipathEmpty})"
+                    $"(//{iauthority}{ipath_abempty}|{ipath_absolute}|" +
+                    $"{ipathNoscheme}|{ipathEmpty})"
                 );
                 var irelativeRef = $"{irelativePart}(\\?{iquery})?(\\#{ifragment})?";
                 var iri = $"{scheme}:{ihierPart}(\\?{iquery})?(\\#{ifragment})?";
@@ -99,9 +101,9 @@ namespace AasCore.Aas3
                 var safeChar = "[A-Za-z0-9:_.]";
 
                 return new Regex(
-                    $"^{numeric}{{4}}-{safeChar}{{1,35}}(-{safeChar}{{1,35}})?
-                    $"#{safeChar}{{2}}-{safeChar}{{6}}
-                    $"#{numeric}{{1,35}}$")
+                    $"^{numeric}{{4}}-{safeChar}{{1,35}}(-{safeChar}{{1,35}})?" +
+                    $"#{safeChar}{{2}}-{safeChar}{{6}}" +
+                    $"#{numeric}{{1,35}}$"
                 );
             }
 
@@ -113,7 +115,7 @@ namespace AasCore.Aas3
             /// <remarks>
             /// Related ISO standard: https://www.iso.org/standard/50773.html
             /// </remarks>
-            public static bool IsIri(string text)
+            public static bool IsIrdi(string text)
             {
                 return _IrdiRegex.IsMatch(text);
             }
@@ -128,7 +130,7 @@ namespace AasCore.Aas3
             /// <remarks>
             /// Related: Constraint AASd-002
             /// </remarks>
-            public static bool IsIri(string text)
+            public static bool IsIdShort(string text)
             {
                 return _idShortRe.IsMatch(text);
             }
@@ -169,7 +171,7 @@ namespace AasCore.Aas3
             /// <summary>
             /// Contained error items
             /// </summary>
-            public readonly List<Error> Errors;
+            private readonly List<Error> _entries;
 
             /// <summary>
             /// Initialize the container with the given <paramref name="capacity" />.
@@ -183,7 +185,7 @@ namespace AasCore.Aas3
                 }
 
                 Capacity = capacity;
-                Errors = new List<Error>(Capacity);
+                _entries = new List<Error>(Capacity);
             }
 
             /// <summary>
@@ -191,18 +193,36 @@ namespace AasCore.Aas3
             /// </summary>
             public void Add(Error error)
             {
-                if(Errors.Count <= Capacity)
+                if(_entries.Count <= Capacity)
                 {
-                    Errors.Add(error);
+                    _entries.Add(error);
                 }
             }
 
             /// <summary>
             /// True if the capacity has been reached.
             /// </summary>
-            public boolean Full()
+            public bool Full()
             {
-                return Errors.Count == Capacity;
+                return _entries.Count == Capacity;
+            }
+
+            /// <summary>
+            /// Retrieve the contained error entries.
+            /// </summary>
+            /// <remarks>
+            /// If you want to add a new error, use <see cref="Add" />.
+            /// </remarks>
+            public ReadOnlyCollection<Error> Entries()
+            {
+                var result = this._entries.AsReadOnly();
+                if (result.Count > Capacity)
+                {
+                    throw new InvalidOperationException(
+                        $"Post-condition violated: " +
+                        $"result.Count (== {result.Count}) > Capacity (== {Capacity})");
+                }
+                return result;
             }
         }
 
@@ -216,33 +236,73 @@ namespace AasCore.Aas3
         private static class Implementation
         {
             /// <summary>
-            /// Hash allowed enum values to allow for efficient validation of enums.
+            /// Hash allowed enum values for efficient validation of enums.
             /// </summary> 
             private static class EnumValueSet
             {
-                public static HashSet<int> ForIdentifierType = System.Enum.GetValues(IdentifierType);
-                public static HashSet<int> ForModelingKind = System.Enum.GetValues(ModelingKind);
-                public static HashSet<int> ForLocalKeyType = System.Enum.GetValues(LocalKeyType);
-                public static HashSet<int> ForKeyType = System.Enum.GetValues(KeyType);
-                public static HashSet<int> ForIdentifiableElements = System.Enum.GetValues(IdentifiableElements);
-                public static HashSet<int> ForReferableElements = System.Enum.GetValues(ReferableElements);
-                public static HashSet<int> ForKeyElements = System.Enum.GetValues(KeyElements);
+                public static HashSet<int> ForIdentifierType = new HashSet<int>(
+                    System.Enum.GetValues(typeof(IdentifierType)).Cast<int>());
+
+                public static HashSet<int> ForModelingKind = new HashSet<int>(
+                    System.Enum.GetValues(typeof(ModelingKind)).Cast<int>());
+
+                public static HashSet<int> ForLocalKeyType = new HashSet<int>(
+                    System.Enum.GetValues(typeof(LocalKeyType)).Cast<int>());
+
+                public static HashSet<int> ForKeyType = new HashSet<int>(
+                    System.Enum.GetValues(typeof(KeyType)).Cast<int>());
+
+                public static HashSet<int> ForIdentifiableElements = new HashSet<int>(
+                    System.Enum.GetValues(typeof(IdentifiableElements)).Cast<int>());
+
+                public static HashSet<int> ForReferableElements = new HashSet<int>(
+                    System.Enum.GetValues(typeof(ReferableElements)).Cast<int>());
+
+                public static HashSet<int> ForKeyElements = new HashSet<int>(
+                    System.Enum.GetValues(typeof(KeyElements)).Cast<int>());
             }  // private static class EnumValueSet
 
-            // TODO: needs to implement VerifyLangStringSet
+            /// <summary>
+            /// Verify the given <paramref name="langString" /> and 
+            /// append any errors to <paramref name="Errors" />.
+            ///
+            /// The <paramref name="path" /> localizes the <paramref name="langString" />.
+            /// </summary>
+            public static void VerifyLangString (
+                LangString langString,
+                string path,
+                Errors errors)
+            {
+                // There are no invariants defined for LangString.
+            }
+
+            /// <summary>
+            /// Verify the given <paramref name="langStringSet" /> and
+            /// append any errors to <paramref name="Errors" />.
+            ///
+            /// The <paramref name="path" /> localizes the <paramref name="langString" />.
+            /// </summary>
+            public static void VerifyLangStringSet (
+                LangStringSet langStringSet,
+                string path,
+                Errors errors)
+            {
+                throw new NotImplementedException("TODO");
+            }
 
             /// <summary>
             /// Verify the given <paramref name="identifier" /> and 
             /// append any errors to <paramref name="Errors" />.
             ///
-            /// The <paramref name="path" /> localized the <paramref name="identifier" />.
+            /// The <paramref name="path" /> localizes the <paramref name="identifier" />.
             /// </summary>
-            public void VerifyIdentifier (
+            public static void VerifyIdentifier (
                 Identifier identifier,
                 string path,
                 Errors errors)
             {
-                if (!EnumValueSet.ForIdentifierType.Contains(identifier.IdType))
+                if (!EnumValueSet.ForIdentifierType.Contains(
+                        (int)identifier.IdType))
                 {
                     errors.Add(
                         new Error(
@@ -252,17 +312,32 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
+            /// Verify the given <paramref name="administrativeInformation" /> and 
+            /// append any errors to <paramref name="Errors" />.
+            ///
+            /// The <paramref name="path" /> localizes the <paramref name="administrativeInformation" />.
+            /// </summary>
+            public static void VerifyAdministrativeInformation (
+                AdministrativeInformation administrativeInformation,
+                string path,
+                Errors errors)
+            {
+                // There is no verification specified for AdministrativeInformation.
+            }
+
+            /// <summary>
             /// Verify the given <paramref name="key" /> and 
             /// append any errors to <paramref name="Errors" />.
             ///
-            /// The <paramref name="path" /> localized the <paramref name="key" />.
+            /// The <paramref name="path" /> localizes the <paramref name="key" />.
             /// </summary>
-            public void VerifyKey (
+            public static void VerifyKey (
                 Key key,
                 string path,
                 Errors errors)
             {
-                if (!EnumValueSet.ForKeyElements.Contains(key.Type))
+                if (!EnumValueSet.ForKeyElements.Contains(
+                        (int)key.Type))
                 {
                     errors.Add(
                         new Error(
@@ -270,7 +345,8 @@ namespace AasCore.Aas3
                             $"Invalid {nameof(KeyElements)}: {key.Type}"));
                 }
 
-                if (!EnumValueSet.ForKeyType.Contains(key.IdType))
+                if (!EnumValueSet.ForKeyType.Contains(
+                        (int)key.IdType))
                 {
                     errors.Add(
                         new Error(
@@ -278,13 +354,41 @@ namespace AasCore.Aas3
                             $"Invalid {nameof(KeyType)}: {key.IdType}"));
                 }
             }
+
+            /// <summary>
+            /// Verify the given <paramref name="reference" /> and 
+            /// append any errors to <paramref name="Errors" />.
+            ///
+            /// The <paramref name="path" /> localizes the <paramref name="reference" />.
+            /// </summary>
+            public static void VerifyReference (
+                Reference reference,
+                string path,
+                Errors errors)
+            {
+                // There is no verification specified for Reference.
+            }
+
+            /// <summary>
+            /// Verify the given <paramref name="assetAdministrationShell" /> and 
+            /// append any errors to <paramref name="Errors" />.
+            ///
+            /// The <paramref name="path" /> localizes the <paramref name="assetAdministrationShell" />.
+            /// </summary>
+            public static void VerifyAssetAdministrationShell (
+                AssetAdministrationShell assetAdministrationShell,
+                string path,
+                Errors errors)
+            {
+                // There is no verification specified for AssetAdministrationShell.
+            }
         }  // private static class Implementation
 
         /// <summary>
         /// Verify the instances of the model entities non-recursively.
         /// </summary>
-        public static class NonRecursiveVerifier : 
-            Visitation.IVisitorWithContext<string, void>
+        public class NonRecursiveVerifier : 
+            Visitation.IVisitorWithContext<string>
         {
             public readonly Errors Errors;
 
@@ -313,7 +417,7 @@ namespace AasCore.Aas3
                 LangString langString,
                 string context)
             {
-                Implementation.Verify(
+                Implementation.VerifyLangString(
                     langString,
                     context,
                     Errors);
@@ -328,7 +432,7 @@ namespace AasCore.Aas3
                 LangStringSet langStringSet,
                 string context)
             {
-                Implementation.Verify(
+                Implementation.VerifyLangStringSet(
                     langStringSet,
                     context,
                     Errors);
@@ -343,7 +447,7 @@ namespace AasCore.Aas3
                 Identifier identifier,
                 string context)
             {
-                Implementation.Verify(
+                Implementation.VerifyIdentifier(
                     identifier,
                     context,
                     Errors);
@@ -358,7 +462,7 @@ namespace AasCore.Aas3
                 AdministrativeInformation administrativeInformation,
                 string context)
             {
-                Implementation.Verify(
+                Implementation.VerifyAdministrativeInformation(
                     administrativeInformation,
                     context,
                     Errors);
@@ -373,7 +477,7 @@ namespace AasCore.Aas3
                 Key key,
                 string context)
             {
-                Implementation.Verify(
+                Implementation.VerifyKey(
                     key,
                     context,
                     Errors);
@@ -388,7 +492,7 @@ namespace AasCore.Aas3
                 Reference reference,
                 string context)
             {
-                Implementation.Verify(
+                Implementation.VerifyReference(
                     reference,
                     context,
                     Errors);
@@ -403,18 +507,18 @@ namespace AasCore.Aas3
                 AssetAdministrationShell assetAdministrationShell,
                 string context)
             {
-                Implementation.Verify(
+                Implementation.VerifyAssetAdministrationShell(
                     assetAdministrationShell,
                     context,
                     Errors);
             }
-        }  // public static class NonRecursiveVerifier
+        }  // public class NonRecursiveVerifier
 
         /// <summary>
         /// Verify the instances of the model entities recursively.
         /// </summary>
-        public static class RecursiveVerifier : 
-            Visitation.IVisitorWithContext<string, void>
+        public class RecursiveVerifier : 
+            Visitation.IVisitorWithContext<string>
         {
             public readonly Errors Errors;
 
@@ -443,10 +547,24 @@ namespace AasCore.Aas3
                 LangString langString,
                 string context)
             {
-                Implementation.Verify(
+                Implementation.VerifyLangString(
                     langString,
                     context,
                     Errors);
+
+                // The recursion ends here.
+            }
+
+            /// <summary>
+            /// Verify recursively <paramref name="langStringSet" /> and
+            /// append any error to <see cref="Errors" />
+            /// where <paramref name="context" /> is used to localize the error.
+            /// </summary>
+            public void Visit(
+                LangStringSet langStringSet,
+                string context)
+            {
+                throw new NotImplementedException("TODO");
             }
 
             /// <summary>
@@ -458,10 +576,12 @@ namespace AasCore.Aas3
                 Identifier identifier,
                 string context)
             {
-                Implementation.Verify(
+                Implementation.VerifyIdentifier(
                     identifier,
                     context,
                     Errors);
+
+                // The recursion ends here.
             }
 
             /// <summary>
@@ -473,10 +593,12 @@ namespace AasCore.Aas3
                 AdministrativeInformation administrativeInformation,
                 string context)
             {
-                Implementation.Verify(
+                Implementation.VerifyAdministrativeInformation(
                     administrativeInformation,
                     context,
                     Errors);
+
+                // The recursion ends here.
             }
 
             /// <summary>
@@ -488,10 +610,12 @@ namespace AasCore.Aas3
                 Key key,
                 string context)
             {
-                Implementation.Verify(
+                Implementation.VerifyKey(
                     key,
                     context,
                     Errors);
+
+                // The recursion ends here.
             }
 
             /// <summary>
@@ -503,7 +627,7 @@ namespace AasCore.Aas3
                 Reference reference,
                 string context)
             {
-                Implementation.Verify(
+                Implementation.VerifyReference(
                     reference,
                     context,
                     Errors);
@@ -525,7 +649,7 @@ namespace AasCore.Aas3
                 AssetAdministrationShell assetAdministrationShell,
                 string context)
             {
-                Implementation.Verify(
+                Implementation.VerifyAssetAdministrationShell(
                     assetAdministrationShell,
                     context,
                     Errors);
@@ -560,15 +684,9 @@ namespace AasCore.Aas3
                     i < assetAdministrationShell.DataSpecifications.Count;
                     i++)
                 {
-                    for(
-                        var j = 0;
-                        j < assetAdministrationShell.DataSpecifications[i].Count;
-                        j++)
-                    {
-                        Visit(
-                            assetAdministrationShell.DataSpecifications[i][j],
-                            $"{context}/DataSpecifications/{i}/{j}");
-                    }
+                    Visit(
+                        assetAdministrationShell.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
                 if (assetAdministrationShell.DerivedFrom != null)
@@ -578,7 +696,7 @@ namespace AasCore.Aas3
                         $"{context}/DerivedFrom");
                 }
             }
-        }  // public static class RecursiveVerifier
+        }  // public class RecursiveVerifier
     }  // public static class Verification
 }  // namespace AasCore.Aas3
 

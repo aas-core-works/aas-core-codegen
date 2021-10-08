@@ -18,7 +18,7 @@ private static readonly Regex _IrdiRegex = _constructIrdiRegex();
 /// <remarks>
 /// Related ISO standard: https://www.iso.org/standard/50773.html
 /// </remarks>
-public static bool IsIri(string text)
+public static bool IsIrdi(string text)
 {
     return _IrdiRegex.IsMatch(text);
 }

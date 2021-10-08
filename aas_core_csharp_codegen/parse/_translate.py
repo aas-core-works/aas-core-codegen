@@ -1387,15 +1387,25 @@ def _verify_symbol_table(
     # region Check reserved names
 
     reserved_symbol_names = {
+        'accept',
+        'visit'
         'context',
         'entity',
         'errors'
         'ientity',
+        'itransformer_with_context'
+        'ivisitor',
+        'ivisitor_with_context',
         'path',
+        'transform',
+        'transformer',
+        'transformer_with_context'
         'verification',
         'visitation',
+        'visitor',
+        'visitor_with_context',
     }
-    reserved_method_names = {'descend', 'accept'}
+    reserved_method_names = {'descend', 'descend_once', 'accept', 'transform'}
 
     for symbol in symbol_table.symbols:
         if symbol.name.lower() in reserved_symbol_names:

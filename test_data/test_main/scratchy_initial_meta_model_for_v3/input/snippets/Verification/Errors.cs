@@ -11,7 +11,7 @@ public class Errors
     /// <summary>
     /// Contained error items
     /// </summary>
-    public readonly List<Error> Errors;
+    private readonly List<Error> _entries;
 
     /// <summary>
     /// Initialize the container with the given <paramref name="capacity" />.
@@ -25,7 +25,7 @@ public class Errors
         }
 
         Capacity = capacity;
-        Errors = new List<Error>(Capacity);
+        _entries = new List<Error>(Capacity);
     }
 
     /// <summary>
@@ -33,17 +33,35 @@ public class Errors
     /// </summary>
     public void Add(Error error)
     {
-        if(Errors.Count <= Capacity)
+        if(_entries.Count <= Capacity)
         {
-            Errors.Add(error);
+            _entries.Add(error);
         }
     }
 
     /// <summary>
     /// True if the capacity has been reached.
     /// </summary>
-    public boolean Full()
+    public bool Full()
     {
-        return Errors.Count == Capacity;
+        return _entries.Count == Capacity;
+    }
+
+    /// <summary>
+    /// Retrieve the contained error entries.
+    /// </summary>
+    /// <remarks>
+    /// If you want to add a new error, use <see cref="Add" />.
+    /// </remarks>
+    public ReadOnlyCollection<Error> Entries()
+    {
+        var result = this._entries.AsReadOnly();
+        if (result.Count > Capacity)
+        {
+            throw new InvalidOperationException(
+                $"Post-condition violated: " +
+                $"result.Count (== {result.Count}) > Capacity (== {Capacity})");
+        }
+        return result;
     }
 }

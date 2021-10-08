@@ -45,7 +45,6 @@ private static Regex _constructIriRe()
     var iprivate = "[\\ue000-\\uf8ff\\uf0000-\\uffffd\\u100000-\\u10fffd]";
     var iquery = $"({ipchar}|{iprivate}|[/?])*";
     var absoluteIri = $"{scheme}:{ihierPart}(\\?{iquery})?";
-    var genDelims = "[:/?#\\[\\]@]";
     var ifragment = $"({ipchar}|[/?])*";
     var isegmentNzNc = $"({iunreserved}|{pctEncoded}|{subDelims}|@){{1,}}";
     var ipathNoscheme = $"{isegmentNzNc}(/{isegment})*";

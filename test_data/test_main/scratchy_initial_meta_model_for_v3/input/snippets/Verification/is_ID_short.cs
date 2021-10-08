@@ -8,7 +8,7 @@ private static readonly Regex _idShortRe = new Regex(
 /// <remarks>
 /// Related: Constraint AASd-002
 /// </remarks>
-public static bool IsIri(string text)
+public static bool IsIdShort(string text)
 {
     return _idShortRe.IsMatch(text);
 }
