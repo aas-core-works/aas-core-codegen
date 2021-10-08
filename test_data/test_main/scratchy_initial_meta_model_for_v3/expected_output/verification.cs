@@ -301,6 +301,8 @@ namespace AasCore.Aas3
                 string path,
                 Errors errors)
             {
+                if (errors.Full()) return;
+
                 if (!EnumValueSet.ForIdentifierType.Contains(
                         (int)identifier.IdType))
                 {
@@ -336,6 +338,8 @@ namespace AasCore.Aas3
                 string path,
                 Errors errors)
             {
+                if (errors.Full()) return;
+
                 if (!EnumValueSet.ForKeyElements.Contains(
                         (int)key.Type))
                 {
@@ -344,6 +348,8 @@ namespace AasCore.Aas3
                             $"{path}/Type",
                             $"Invalid {nameof(KeyElements)}: {key.Type}"));
                 }
+
+                if (errors.Full()) return;
 
                 if (!EnumValueSet.ForKeyType.Contains(
                         (int)key.IdType))
@@ -632,6 +638,8 @@ namespace AasCore.Aas3
                     context,
                     Errors);
 
+                if (Errors.Full()) return;
+
                 for(var i = 0; i < reference.Keys.Count; i++)
                 {
                     Visit(
@@ -654,12 +662,16 @@ namespace AasCore.Aas3
                     context,
                     Errors);
 
+                if (Errors.Full()) return;
+
                 if (assetAdministrationShell.DisplayName != null)
                 {
                     Visit(
                         assetAdministrationShell.DisplayName,
                         $"{context}/DisplayName");
                 }
+
+                if (Errors.Full()) return;
 
                 if (assetAdministrationShell.Description != null)
                 {
@@ -668,9 +680,13 @@ namespace AasCore.Aas3
                         $"{context}/Description");
                 }
 
+                if (Errors.Full()) return;
+
                 Visit(
                     assetAdministrationShell.Identification,
                     $"{context}/Identification");
+
+                if (Errors.Full()) return;
 
                 if (assetAdministrationShell.Administration != null)
                 {
@@ -678,6 +694,8 @@ namespace AasCore.Aas3
                         assetAdministrationShell.Administration,
                         $"{context}/Administration");
                 }
+
+                if (Errors.Full()) return;
 
                 for(
                     var i = 0;
@@ -688,6 +706,8 @@ namespace AasCore.Aas3
                         assetAdministrationShell.DataSpecifications[i],
                         $"{context}/DataSpecifications/{i}");
                 }
+
+                if (Errors.Full()) return;
 
                 if (assetAdministrationShell.DerivedFrom != null)
                 {

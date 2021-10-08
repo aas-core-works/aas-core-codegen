@@ -33,7 +33,6 @@ def main() -> int:
         (repo_dir/"deleteme").mkdir(exist_ok=True,parents=True)
         tmp_dir = str(repo_dir / "deleteme/expected_output")
 
-
         parent_case_dir = repo_dir / "test_data" / "test_main"
         assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
 
