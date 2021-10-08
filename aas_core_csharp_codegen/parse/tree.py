@@ -14,12 +14,16 @@ class Expression:
         return dump(self)
 
 
-class Property(Expression):
-    """Represent a loading of a property value."""
+class Member(Expression):
+    """
+    Represent a member of an instance.
 
-    def __init__(self, source: 'Expression', name: Identifier) -> None:
+    A member is either a property or a method.
+    """
+
+    def __init__(self, instance: 'Expression', name: Identifier) -> None:
         """Initialize with the given values."""
-        self.source = source
+        self.instance = instance
         self.name = name
 
 
@@ -68,12 +72,12 @@ class MethodCall(Expression):
 
     def __init__(
             self,
-            reference: 'Expression',
+            member: Member,
             args: Sequence['Expression'],
             kwargs: Sequence['KeywordArgument']
     ) -> None:
         """Initialize with the given values."""
-        self.reference = reference
+        self.member = member
         self.args = args
         self.kwargs = kwargs
 
@@ -100,21 +104,21 @@ class Constant(Expression):
         """Initialize with the given values."""
         self.value = value
 
-    def __str__(self) -> str:
-        """Provide a human-readable representation of the instance."""
-        return dump(self)
-
 
 class IsNone(Expression):
-    """Represent a check whether something is None."""
+    """Represent a check whether something ``is None``."""
 
     def __init__(self, value: Expression) -> None:
         """Initialize with the given values."""
         self.value = value
 
-    def __str__(self) -> str:
-        """Provide a human-readable representation of the instance."""
-        return dump(self)
+
+class IsNotNone(Expression):
+    """Represent a check whether something ``is not None``."""
+
+    def __init__(self, value: Expression) -> None:
+        """Initialize with the given values."""
+        self.value = value
 
 
 class Name(Expression):
@@ -123,6 +127,20 @@ class Name(Expression):
     def __init__(self, identifier: Identifier) -> None:
         """Initialize with the given values."""
         self.identifier = identifier
+
+
+class And(Expression):
+    """Represent a conjunction."""
+
+    def __init__(self, values: Sequence[Expression]) -> None:
+        self.values = values
+
+
+class Or(Expression):
+    """Represent a disjunction."""
+
+    def __init__(self, values: Sequence[Expression]) -> None:
+        self.values = values
 
 
 # TODO: add statements once we get there.
@@ -135,11 +153,11 @@ def dump(dumpable: Dumpable) -> str:
     """Produce a string representation of the tree."""
     stringified = None  # type: Optional[stringify.Entity]
 
-    if isinstance(dumpable, Property):
+    if isinstance(dumpable, Member):
         stringified = stringify.Entity(
-            name=Property.__name__,
+            name=Member.__name__,
             properties=[
-                stringify.Property("source", dump(dumpable.source)),
+                stringify.Property("source", dump(dumpable.instance)),
                 stringify.Property("name", dumpable.name)
             ])
 
@@ -175,7 +193,7 @@ def dump(dumpable: Dumpable) -> str:
         stringified = stringify.Entity(
             name=MethodCall.__name__,
             properties=[
-                stringify.Property("reference", dump(dumpable.reference)),
+                stringify.Property("member", dump(dumpable.member)),
                 stringify.Property("args", [dump(arg) for arg in dumpable.args]),
                 stringify.Property(
                     "kwargs", [dump(kwarg) for kwarg in dumpable.kwargs])
@@ -200,6 +218,25 @@ def dump(dumpable: Dumpable) -> str:
         stringified = stringify.Entity(
             name=IsNone.__name__,
             properties=[stringify.Property("value", dump(dumpable.value))])
+
+    elif isinstance(dumpable, Name):
+        stringified = stringify.Entity(
+            name=Name.__name__,
+            properties=[stringify.Property("identifier", dumpable.identifier)])
+
+    elif isinstance(dumpable, And):
+        stringified = stringify.Entity(
+            name=And.__name__,
+            properties=[
+                stringify.Property("values", [dump(value) for value in dumpable.values])
+            ])
+
+    elif isinstance(dumpable, Or):
+        stringified = stringify.Entity(
+            name=Or.__name__,
+            properties=[
+                stringify.Property("values", [dump(value) for value in dumpable.values])
+            ])
 
     else:
         assert_never(dumpable)

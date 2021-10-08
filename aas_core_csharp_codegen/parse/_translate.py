@@ -703,6 +703,54 @@ def _ast_node_to_our_node(
 
         return tree.Implication(antecedent=antecedent, consequent=consequent), None
 
+    elif isinstance(node, ast.Attribute):
+        instance, error = _ast_node_to_our_node(node.value)
+        if error is not None:
+            return None, error
+
+        return tree.Member(instance=instance, name=Identifier(node.attr)), None
+
+    elif isinstance(node, ast.Name):
+        return tree.Name(identifier=Identifier(node.id)), None
+
+    elif (
+            isinstance(node, ast.Compare)
+            and len(node.ops) == 1
+            and isinstance(node.ops[0], (ast.Is, ast.IsNot))
+            and len(node.comparators) == 1
+            and isinstance(node.comparators[0], ast.Constant)
+            and node.comparators[0].value is None
+    ):
+        value, error = _ast_node_to_our_node(node.left)
+        if error is not None:
+            return None, error
+
+        if isinstance(node.ops[0], ast.Is):
+            return tree.IsNone(value=value), None
+        elif isinstance(node.ops[0], ast.IsNot):
+            return tree.IsNotNone(value=value), None
+        else:
+            raise AssertionError("Unexpected: {node.ops[0]=}")
+
+    elif (
+            isinstance(node, ast.BoolOp)
+            and isinstance(node.op, (ast.And, ast.Or))
+    ):
+        values = []  # type: List[tree.Expression]
+        for value_node in node.values:
+            value, error = _ast_node_to_our_node(value_node)
+            if error is not None:
+                return None, error
+
+            values.append(value)
+
+        if isinstance(node.op, ast.And):
+            return tree.And(values=values), None
+        elif isinstance(node.op, ast.Or):
+            return tree.Or(values=values), None
+        else:
+            raise AssertionError(f"Unexpected: {node.op=}")
+
     else:
         return None, Error(
             node, f"The code matched no pattern for transpilation: {ast.dump(node)}")
