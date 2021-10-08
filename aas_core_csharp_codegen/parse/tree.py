@@ -6,12 +6,20 @@ from aas_core_csharp_codegen import stringify
 from aas_core_csharp_codegen.common import Identifier, assert_never
 
 
-class Expression:
-    """Represent an expression in our abstract syntax tree."""
+class Dumpable:
+    """Provide a human-readable string representation."""
 
     def __str__(self) -> str:
         """Provide a human-readable representation of the instance."""
         return dump(self)
+
+
+class Statement(Dumpable):
+    """Represent a statement in a program."""
+
+
+class Expression(Dumpable):
+    """Represent an expression in our abstract syntax tree."""
 
 
 class Member(Expression):
@@ -58,7 +66,7 @@ class Implication(Expression):
         self.consequent = consequent
 
 
-class KeywordArgument:
+class KeywordArgument(Dumpable):
     """Represent a keyword argument as it is passed to a method or a function call."""
 
     def __init__(self, arg: Identifier, value: 'Expression') -> None:
@@ -143,10 +151,32 @@ class Or(Expression):
         self.values = values
 
 
-# TODO: add statements once we get there.
-Node = Union[Expression]
+class Declaration(Statement):
+    """Declare a variable."""
 
-Dumpable = Union[Expression, KeywordArgument]
+    def __init__(self, identifier: Identifier, value: Expression) -> None:
+        """Initialize with the given values."""
+        self.identifier = identifier
+        self.value = value
+
+
+class ExpressionWithDeclarations(Expression):
+    """
+    Represent a declaration of a local variable followed by the expression.
+
+    This abstract the code patterns such as ``(x := ..., len(x) > 0)[1]``, similar to,
+    *e.g.*, short ``If`` statements in Golang.
+    """
+
+    def __init__(
+            self, declarations: Sequence[Declaration], expression: Expression
+    ) -> None:
+        """Initialize with the given values."""
+        self.declarations = declarations
+        self.expression = expression
+
+
+Node = Union[Statement, Expression]
 
 
 def dump(dumpable: Dumpable) -> str:
@@ -236,6 +266,26 @@ def dump(dumpable: Dumpable) -> str:
             name=Or.__name__,
             properties=[
                 stringify.Property("values", [dump(value) for value in dumpable.values])
+            ])
+
+    elif isinstance(dumpable, Declaration):
+        stringified = stringify.Entity(
+            name=Declaration.__name__,
+            properties=[
+                stringify.Property("identifier", dumpable.identifier),
+                stringify.Property("value", dump(dumpable.value)),
+            ])
+
+    elif isinstance(dumpable, ExpressionWithDeclarations):
+        stringified = stringify.Entity(
+            name=Declaration.__name__,
+            properties=[
+                stringify.Property(
+                    "declarations", [
+                        dump(declaration)
+                        for declaration in dumpable.declarations
+                    ]),
+                stringify.Property("expression", dump(dumpable.expression))
             ])
 
     else:

@@ -1,5 +1,5 @@
 """Translate the abstract syntax tree of the meta-model into parsed structures."""
-
+import abc
 import ast
 import collections
 import enum
@@ -18,7 +18,7 @@ from aas_core_csharp_codegen.common import (
     LinenoColumner,
     assert_never,
 )
-from aas_core_csharp_codegen.parse import tree
+from aas_core_csharp_codegen.parse import tree, _rules
 from aas_core_csharp_codegen.parse._types import (
     AbstractEntity,
     Argument,
@@ -594,166 +594,8 @@ def _args_to_arguments(
     return arguments, None
 
 
-_AST_COMPARATOR_TO_OURS = {
-    ast.Lt: tree.Comparator.LT,
-    ast.LtE: tree.Comparator.LE,
-    ast.Gt: tree.Comparator.GT,
-    ast.GtE: tree.Comparator.GE,
-    ast.Eq: tree.Comparator.EQ,
-    ast.NotEq: tree.Comparator.NE
-}  # type: Mapping[Type[ast.cmpop], tree.Comparator]
 
 
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _ast_node_to_our_node(
-        node: ast.AST
-) -> Tuple[Optional[tree.Node], Optional[Error]]:
-    """
-    Parse the Python AST node into our custom AST.
-
-    For example, this function is used to parse contract conditions into
-    our representation which is later easier for processing.
-    """
-    if (
-            isinstance(node, ast.Compare)
-            and len(node.ops) == 1
-            and type(node.ops[0]) in _AST_COMPARATOR_TO_OURS
-            and len(node.comparators) == 1
-    ):
-        left, error = _ast_node_to_our_node(node.left)
-        if error is not None:
-            return None, error
-
-        op = _AST_COMPARATOR_TO_OURS[type(node.ops[0])]
-
-        right, error = _ast_node_to_our_node(node.comparators[0])
-        if error is not None:
-            return None, error
-
-        return tree.Comparison(left=left, op=op, right=right), None
-
-    elif isinstance(node, ast.Call):
-        print(f"ast.dump(node) is {ast.dump(node)!r}")  # TODO: debug
-
-        args = []  # type: List[tree.Expression]
-        for arg_node in node.args:
-            arg, error = _ast_node_to_our_node(arg_node)
-            if error is not None:
-                return None, error
-
-            if not isinstance(arg, tree.Expression):
-                return None, Error(
-                    arg_node,
-                    f"Expected the argument to a call to be an expression, "
-                    f"but got: {arg}")
-
-            args.append(arg)
-
-        kwargs = []  # type: List[tree.KeywordArgument]
-        for kw_node in node.keywords:
-            kw_value, error = _ast_node_to_our_node(kw_node.value)
-            if error is not None:
-                return None, error
-
-            if not isinstance(kw_value, tree.Expression):
-                return None, Error(
-                    kw_node,
-                    f"Expected the keyword argument to a call to be an expression, "
-                    f"but got: {kw_value}")
-
-            kwargs.append(tree.KeywordArgument(arg=kw_node.arg, value=kw_value))
-
-        if isinstance(node.func, ast.Name):
-            return tree.FunctionCall(
-                name=Identifier(node.func.id), args=args, kwargs=kwargs), None
-        else:
-            reference, error = _ast_node_to_our_node(node.func)
-            if error is not None:
-                return None, error
-
-            return tree.MethodCall(reference=reference, args=args, kwargs=kwargs), None
-
-    elif (
-            isinstance(node, ast.Attribute)
-            and isinstance(node.value, ast.Name)
-            and node.value.id == 'self'
-    ):
-        return tree.Self(), None
-
-    elif (
-            isinstance(node, ast.Constant)
-            and isinstance(node.value, (bool, int, float, str))
-    ):
-        return tree.Constant(value=node.value), None
-
-    elif (
-            isinstance(node, ast.BoolOp)
-            and isinstance(node.op, ast.Or)
-            and len(node.values) == 2
-            and isinstance(node.values[0], ast.UnaryOp)
-            and isinstance(node.values[0].op, ast.Not)
-    ):
-        antecedent, error = _ast_node_to_our_node(node.values[0].operand)
-        if error is not None:
-            return None, error
-
-        consequent, error = _ast_node_to_our_node(node.values[1])
-        if error is not None:
-            return None, error
-
-        return tree.Implication(antecedent=antecedent, consequent=consequent), None
-
-    elif isinstance(node, ast.Attribute):
-        instance, error = _ast_node_to_our_node(node.value)
-        if error is not None:
-            return None, error
-
-        return tree.Member(instance=instance, name=Identifier(node.attr)), None
-
-    elif isinstance(node, ast.Name):
-        return tree.Name(identifier=Identifier(node.id)), None
-
-    elif (
-            isinstance(node, ast.Compare)
-            and len(node.ops) == 1
-            and isinstance(node.ops[0], (ast.Is, ast.IsNot))
-            and len(node.comparators) == 1
-            and isinstance(node.comparators[0], ast.Constant)
-            and node.comparators[0].value is None
-    ):
-        value, error = _ast_node_to_our_node(node.left)
-        if error is not None:
-            return None, error
-
-        if isinstance(node.ops[0], ast.Is):
-            return tree.IsNone(value=value), None
-        elif isinstance(node.ops[0], ast.IsNot):
-            return tree.IsNotNone(value=value), None
-        else:
-            raise AssertionError("Unexpected: {node.ops[0]=}")
-
-    elif (
-            isinstance(node, ast.BoolOp)
-            and isinstance(node.op, (ast.And, ast.Or))
-    ):
-        values = []  # type: List[tree.Expression]
-        for value_node in node.values:
-            value, error = _ast_node_to_our_node(value_node)
-            if error is not None:
-                return None, error
-
-            values.append(value)
-
-        if isinstance(node.op, ast.And):
-            return tree.And(values=values), None
-        elif isinstance(node.op, ast.Or):
-            return tree.Or(values=values), None
-        else:
-            raise AssertionError(f"Unexpected: {node.op=}")
-
-    else:
-        return None, Error(
-            node, f"The code matched no pattern for transpilation: {ast.dump(node)}")
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -1274,7 +1116,7 @@ def _entity_decorator_to_invariant(
             decorator,
             "Expected the invariant to have a single argument, ``self``"))
 
-    body, error = _ast_node_to_our_node(node=condition_node.body)
+    body, error = _rules.ast_node_to_our_node(node=condition_node.body)
     if error is not None:
         return None, Error(
             condition_node.body, "Failed to parse the invariant", [error])
