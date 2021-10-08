@@ -463,6 +463,7 @@ def _unroll_recursion_in_recursive_verify(
             joined_pth = '/'.join(path)
             return [csharp_unrolling.Node(
                 text=textwrap.dedent(f'''\
+                    if (Errors.Full()) return;
                     Visit(
                         {current_var_name},
                         ${csharp_common.string_literal(joined_pth)});'''),
@@ -601,7 +602,6 @@ def _generate_recursive_verifier_visit(
             prop=prop)
 
         if unrolled_prop_verification != '':
-            blocks.append(Stripped("if (Errors.Full()) return;"))
             blocks.append(unrolled_prop_verification)
             recursion_ends_here = False
 
