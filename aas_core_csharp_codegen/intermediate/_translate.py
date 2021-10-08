@@ -348,7 +348,23 @@ def _parsed_property_to_property(parsed: parse.Property) -> Property:
     )
 
 
-def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
+# TODO: uncomment and adapt once we know how to translate the invariant
+# def _translate_invariant(
+#         body: ast.AST
+# ) -> Tuple[Optional[tree.Expression], Optional[Error]]:
+#     """
+#     Translate the body of the invariant to our AST.
+#
+#     Since we parse the invariants *while* the symbol table is constructed, we add
+#     placeholders which are resolved in the second pass.
+#     """
+#     # TODO: implement
+#     raise NotImplementedError()
+
+
+def _parsed_contracts_to_contracts(
+        parsed: parse.Contracts
+) -> Contracts:
     """Translate the parsed contracts into intermediate ones."""
     return Contracts(
         preconditions=[
@@ -480,12 +496,13 @@ def _stack_contracts(contracts: Contracts, other: Contracts) -> Contracts:
     )
 
 
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parsed_entity_to_class(
         parsed: parse.ConcreteEntity,
         ontology: understand_hierarchy.Ontology,
         in_lined_constructors: Mapping[
             parse.Entity, Sequence[understand_constructor.AssignArgument]]
-) -> Class:
+) -> Tuple[Optional[Class], Optional[Error]]:
     """Translate a concrete entity to an intermediate class."""
     antecedents = ontology.list_antecedents(entity=parsed)
 
@@ -581,17 +598,31 @@ def _parsed_entity_to_class(
             invariants.append(
                 Invariant(
                     description=parsed_invariant.description,
-                    body=parsed_invariant.condition.body,
                     parsed=parsed_invariant))
 
+    errors = []  # type: List[Error]
+
     for parsed_invariant in parsed.invariants:
+        # TODO: adapt once we know how to translate the invariant from the parsed one
+        # invariant_body, error = _translate_invariant(
+        #     body=parsed_invariant.condition.body)
+        # if error is not None:
+        #     errors.append(error)
+        #     continue
+
         invariants.append(
             Invariant(
                 description=parsed_invariant.description,
-                body=parsed_invariant.condition.body,
                 parsed=parsed_invariant))
 
     # endregion
+
+    if len(errors) > 0:
+        return None, Error(
+            node=parsed.node,
+            message=f"Failed to translate the class {parsed.name} "
+                    f"to the intermediate representation",
+            underlying=errors)
 
     return Class(
         name=parsed.name,
@@ -609,7 +640,7 @@ def _parsed_entity_to_class(
             if parsed.description is not None
             else None),
         parsed=parsed,
-    )
+    ), None
 
 
 def _over_our_atomic_type_annotations(
@@ -804,6 +835,14 @@ def translate(
     """Translate the parsed symbols into intermediate symbols."""
     underlying_errors = []  # type: List[Error]
 
+    def bundle_underlying_errors() -> Error:
+        """Bundle underlying errors to the main error."""
+        return Error(
+            atok.tree,
+            "Failed to translate the parsed symbol table "
+            "to an intermediate symbol table",
+            underlying=underlying_errors)
+
     # region First pass of translation; type annotations reference placeholder symbols
 
     in_lined_constructors = _in_line_constructors(
@@ -823,16 +862,23 @@ def translate(
             symbol = _parsed_abstract_entity_to_interface(parsed=parsed_symbol)
 
         elif isinstance(parsed_symbol, parse.ConcreteEntity):
-            symbol = _parsed_entity_to_class(
+            symbol, error = _parsed_entity_to_class(
                 parsed=parsed_symbol,
                 ontology=ontology,
                 in_lined_constructors=in_lined_constructors)
+
+            if error is not None:
+                underlying_errors.append(error)
+                continue
 
         else:
             assert_never(parsed_symbol)
 
         assert symbol is not None
         symbols.append(symbol)
+
+    if len(underlying_errors) > 0:
+        return None, bundle_underlying_errors()
 
     symbol_table = SymbolTable(symbols=symbols)
 
@@ -993,10 +1039,6 @@ def translate(
     # endregion
 
     if len(underlying_errors) > 0:
-        return (None, Error(
-            atok.tree,
-            "Failed to translate the parsed symbol table "
-            "to an intermediate symbol table",
-            underlying=underlying_errors))
+        return None, bundle_underlying_errors()
 
     return symbol_table, None

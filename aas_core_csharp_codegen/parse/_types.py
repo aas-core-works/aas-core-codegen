@@ -7,6 +7,7 @@ import docutils.nodes
 from icontract import require, DBC, ensure
 
 from aas_core_csharp_codegen.common import Identifier, assert_never
+from aas_core_csharp_codegen.parse import tree
 
 _MODULE_NAME = pathlib.Path(__file__).parent.name
 
@@ -180,11 +181,11 @@ class Invariant:
     def __init__(
             self,
             description: Optional[Description],
-            condition: ast.Lambda,
+            body: tree.Expression,
             node: ast.AST
     ) -> None:
         self.description = description
-        self.condition = condition
+        self.body = body
         self.node = node
 
 

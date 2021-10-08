@@ -905,7 +905,7 @@ def _generate_constructor(
                     f'{csharp_naming.argument_name(stmt.argument)};')
             else:
                 if isinstance(stmt.default, understand_constructor.EmptyList):
-                    prop = symbol.property_map[stmt.name]
+                    prop = symbol.name_to_property[stmt.name]
                     prop_type = csharp_common.generate_type(prop.type_annotation)
 
                     arg_name = csharp_naming.argument_name(stmt.argument)

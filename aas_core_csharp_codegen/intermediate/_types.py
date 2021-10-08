@@ -2,8 +2,8 @@
 import ast
 import enum
 import pathlib
-from typing import Sequence, Optional, Union, TypeVar, Mapping, MutableMapping, List, \
-    Set
+from typing import (
+    Sequence, Optional, Union, TypeVar, Mapping, MutableMapping, List)
 
 import docutils.nodes
 from icontract import require, invariant
@@ -205,8 +205,8 @@ class DefaultEnumerationLiteral:
     # fmt: off
     @require(
         lambda enumeration, literal:
-        literal.name in enumeration.literal_map
-        and enumeration.literal_map[literal.name] == literal
+        literal.name in enumeration.literals_by_name
+        and enumeration.literals_by_name[literal.name] == literal
     )
     # fmt: on
     def __init__(
@@ -292,11 +292,10 @@ class Invariant:
     def __init__(
             self,
             description: Optional[Description],
-            body: ast.AST,
             parsed: parse.Invariant
     ) -> None:
         self.description = description
-        self.body = body
+        # TODO: add body once we can translate it
         self.parsed = parsed
 
 
@@ -488,14 +487,14 @@ class EnumerationLiteral:
 @invariant(
     lambda self:
     all(
-        literal == self.literal_map[literal.name]
+        literal == self.literals_by_name[literal.name]
         for literal in self.literals
     ),
     "Literal map consistent on name"
 )
 @invariant(
     lambda self:
-    sorted(map(id, self.literal_map.values())) == sorted(map(id, self.literals)),
+    sorted(map(id, self.literals_by_name.values())) == sorted(map(id, self.literals)),
     "Literal map complete"
 )
 # fmt: on
@@ -514,7 +513,10 @@ class Enumeration:
         self.description = description
         self.parsed = parsed
 
-        self.literal_map = {literal.name: literal for literal in self.literals}
+        self.literals_by_name: Mapping[str, EnumerationLiteral] = {
+            literal.name: literal
+            for literal in self.literals
+        }
 
 
 class Class:
@@ -565,7 +567,12 @@ class Class:
         self.description = description
         self.parsed = parsed
 
-        self.property_map = {prop.name: prop for prop in self.properties}
+        self.properties_by_name: Mapping[str, Property] = {
+            prop.name: prop for prop in self.properties
+        }
+
+        self.property_id_set = frozenset(id(prop) for prop in self.properties)
+        self.invariant_id_set = frozenset(id(inv) for inv in self.invariants)
 
 
 Symbol = Union[Interface, Enumeration, Class]

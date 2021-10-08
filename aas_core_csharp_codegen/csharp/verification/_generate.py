@@ -1,19 +1,20 @@
 """Generate the invariant verifiers from the intermediate representation."""
+import ast
 import io
 import textwrap
 import xml.sax.saxutils
-from typing import Tuple, Optional, List, Sequence
+from typing import Tuple, Optional, List
 
 from icontract import ensure, require
 
+from aas_core_csharp_codegen import intermediate
+from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, assert_never, \
+    Identifier
 from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming,
     unrolling as csharp_unrolling
 )
-from aas_core_csharp_codegen import intermediate
-from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, assert_never, \
-    Identifier
 from aas_core_csharp_codegen.csharp import specific_implementations
 from aas_core_csharp_codegen.specific_implementations import ImplementationKey
 
@@ -99,7 +100,7 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
     return Stripped(writer.getvalue())
 
 
-@require(lambda cls, prop: prop in cls.properties)
+@require(lambda cls, prop: id(prop) in cls.property_id_set)
 def _unroll_enumeration_check(
         cls: intermediate.Class,
         prop: intermediate.Property) -> Stripped:
@@ -235,11 +236,24 @@ def _unroll_enumeration_check(
     return Stripped('\n\n'.join(blocks))
 
 
+@require(lambda cls, invariant: id(invariant) in cls.invariant_id_set)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _transpile_invariant(
+        cls: intermediate.Class,
+        invariant: intermediate.Invariant
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Translate the invariant from the meta-model into C# snippet."""
+    print(f"ast.dump(invariant.body) is {ast.dump(invariant.body)!r}")  # TODO: debug
+
+
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_implementation_verify(
         cls: intermediate.Class
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verify function in the ``Implementation`` class."""
+    errors = []  # type: List[Error]
     blocks = []  # type: List[Stripped]
 
     cls_name = csharp_naming.class_name(cls.name)
@@ -247,8 +261,16 @@ def _generate_implementation_verify(
     if len(cls.invariants) == 0:
         blocks.append(Stripped(f'// There are no invariants defined for {cls_name}.'))
     else:
-        pass
-        # TODO: transpile the invariants into body_blocks
+        for invariant in cls.invariants:
+            invariant_code, error = _transpile_invariant(cls=cls, invariant=invariant)
+            if error is not None:
+                errors.append(error)
+
+    if len(errors) > 0:
+        return None, Error(
+            cls.parsed.node,
+            f"Failed to parse one or more invariants of the class {cls}",
+            underlying=errors)
 
     for prop in cls.properties:
         enum_check_block = _unroll_enumeration_check(cls=cls, prop=prop)
@@ -287,6 +309,7 @@ def _generate_implementation_verify(
 
     writer.write('\n}')
 
+    assert len(errors) == 0
     return Stripped(writer.getvalue()), None
 
 
@@ -423,13 +446,11 @@ def _generate_non_recursive_verifier(
     return Stripped(writer.getvalue()), None
 
 
-@require(lambda cls, prop: prop in cls.properties)
+@require(lambda cls, prop: id(prop) in cls.property_id_set)
 def _unroll_recursion_in_recursive_verify(
         cls: intermediate.Class,
         prop: intermediate.Property) -> Stripped:
     """Generate the code for unrolling the recursive visits  for the given property."""
-    descendability = intermediate.map_descendability(prop.type_annotation)
-
     @require(lambda var_index: var_index >= 0)
     @require(lambda suffix: suffix in ("Item", "KeyValue"))
     def var_name(var_index: int, suffix: str) -> Identifier:
