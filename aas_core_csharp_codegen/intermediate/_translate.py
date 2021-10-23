@@ -348,18 +348,18 @@ def _parsed_property_to_property(parsed: parse.Property) -> Property:
     )
 
 
-# TODO: uncomment and adapt once we know how to translate the invariant
-# def _translate_invariant(
-#         body: ast.AST
-# ) -> Tuple[Optional[tree.Expression], Optional[Error]]:
-#     """
-#     Translate the body of the invariant to our AST.
-#
-#     Since we parse the invariants *while* the symbol table is constructed, we add
-#     placeholders which are resolved in the second pass.
-#     """
-#     # TODO: implement
-#     raise NotImplementedError()
+def _translate_invariant(
+        body: ast.AST
+) -> Tuple[Optional[tree.Expression], Optional[Error]]:
+    """
+    Translate the body of the invariant and analyze its semantics.
+
+    Since we parse the invariants *while* the symbol table is constructed, we add
+    placeholders which are resolved in the second pass.
+    """
+    # TODO: continue here, implement
+    # TODO: think hard about the environments and symbol resolution
+    raise NotImplementedError()
 
 
 def _parsed_contracts_to_contracts(
@@ -812,7 +812,7 @@ def _fill_in_default_placeholder(
 
         symbol = symbol_table.find(name=symbol_name)
         if isinstance(symbol, Enumeration):
-            literal = symbol.literal_map.get(attr_name, None)
+            literal = symbol.literals_by_name.get(attr_name, None)
             if literal is not None:
                 return DefaultEnumerationLiteral(
                     enumeration=symbol,

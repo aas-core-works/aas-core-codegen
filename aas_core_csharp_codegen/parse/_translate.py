@@ -1121,13 +1121,13 @@ def _entity_decorator_to_invariant(
         return None, Error(
             condition_node.body, "Failed to parse the invariant", [error])
 
-    return (Invariant(
+    return Invariant(
         description=(
             description_node.value
             if description_node is not None
             else None),
         body=body,
-        node=decorator), None)
+        node=decorator), None
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))

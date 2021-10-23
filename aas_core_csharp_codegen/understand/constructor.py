@@ -20,6 +20,8 @@ from aas_core_csharp_codegen import parse
 from aas_core_csharp_codegen.common import Identifier, Error
 from aas_core_csharp_codegen.parse import Method
 
+# TODO: integrate this module into the intermediate module,
+#  and use parse.tree for analysis
 
 class CallSuperConstructor:
     """

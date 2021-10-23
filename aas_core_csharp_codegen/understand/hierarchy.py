@@ -17,6 +17,7 @@ from icontract import require, ensure
 from aas_core_csharp_codegen import parse
 from aas_core_csharp_codegen.common import Error, Identifier
 
+# TODO: integrate this module into intermediate stage
 
 def first_not_in_topological_order(
     entities: Sequence[parse.Entity], symbol_table: parse.SymbolTable

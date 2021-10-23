@@ -1,4 +1,13 @@
-"""Define the parse rules for transforming Python AST to our custom AST."""
+"""
+Define the parse rules for transforming Python AST to our custom AST.
+
+This module provides translation from a very general Python AST to our more specific,
+domain-related syntax.
+
+For comparison, :py:mod:`aas_core_csharp_codegen.intermediate` is responsible for
+semantic analysis, simplifications and resolution to environments and actual symbols.
+"""
+
 import abc
 import ast
 import os
@@ -269,7 +278,8 @@ class _ParseDeclaration(_Parse):
         return (
             tree.Declaration(identifier=Identifier(node.target.id), value=value), None)
 
-# TODO: continue here, implement list comprehension
+# TODO: continue here, implement generators and other constructs
+
 
 _CHAIN_OF_RULES = [
     _ParseComparison(),
@@ -285,14 +295,16 @@ _CHAIN_OF_RULES = [
     _ParseDeclaration()
 ]  # type: Sequence[_Parse]
 
+# TODO: implement _Simplify(node) -> node
 
-def _assert_chain_of_command_follows_file_structure() -> None:
+
+def _assert_chains_follow_file_structure() -> None:
     """
-    Make sure that the chain of command follows exactly this module.
+    Make sure that the chains of command follow the structure of the module.
 
     This check is necessary so that the rules can be directly followed in the source
-    code. Otherwise, it is very hard to follow the chain if it differs from how
-    the classes are defined.
+    code. Otherwise, it is very hard to follow the chain if it differs from the order
+    in which the classes are defined.
     """
     this_file = pathlib.Path(os.path.realpath(__file__))
     root = ast.parse(source=this_file.read_text(), filename=str(this_file))
@@ -314,7 +326,7 @@ def _assert_chain_of_command_follows_file_structure() -> None:
         f"{expected_parse_names=} != {parse_names_in_chain=}")
 
 
-_assert_chain_of_command_follows_file_structure()
+_assert_chains_follow_file_structure()
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -329,7 +341,8 @@ def ast_node_to_our_node(
     """
     for parse_rule in _CHAIN_OF_RULES:
         # NOTE(mristin, 2021-10-08):
-        # Please leave the variables as they are to facilitate the eventual debugging.
+        # Please leave the variables as they are to facilitate the eventual debugging
+        # even though a more succinct code structure lures you.
 
         matches = parse_rule.matches(node)
         if matches:
@@ -341,4 +354,6 @@ def ast_node_to_our_node(
             return result, None
 
     return None, Error(
-        node, f"The code matched no pattern for transpilation: {ast.dump(node)}")
+        node,
+        f"The code matched no pattern for transpilation "
+        f"at the parse stage: {ast.dump(node)}")

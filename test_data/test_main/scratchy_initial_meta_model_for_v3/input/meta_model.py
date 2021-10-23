@@ -35,17 +35,7 @@ class Lang_string(DBC):
         self.text = text
 
 
-# fmt: off
 @invariant(lambda self: len(self.lang_strings) > 0)
-@invariant(
-    lambda self:
-    (
-            languages := [lang_string.language for lang_string in self.lang_strings],
-            len(languages) == len(set(languages))
-    )[1],
-    "No duplicate languages allowed"
-)
-# fmt: on
 @implementation_specific
 class Lang_string_set(DBC):
     """
