@@ -1,13 +1,12 @@
 """Generate the invariant verifiers from the intermediate representation."""
-import ast
 import io
 import textwrap
-import xml.sax.saxutils
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Mapping
 
 from icontract import ensure, require
 
 from aas_core_csharp_codegen import intermediate
+from aas_core_csharp_codegen.parse import (tree as parse_tree)
 from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, assert_never, \
     Identifier
 from aas_core_csharp_codegen.csharp import (
@@ -231,13 +230,48 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
     return Stripped('\n\n'.join(blocks))
 
 
-@require(lambda cls, invariant: id(invariant) in cls.invariant_id_set)
+def _transpile_expression(
+        expr: parse_tree.Expression,
+        environment: Mapping[str, Stripped]
+) -> Stripped:
+    """
+    Transpile the given expression ``expr``.
+
+    The ``environment`` defines how names should be mapped to outer scope
+    in the C# code.
+    """
+    # TODO: refactor this into a visitor once finished
+
+    # TODO: watch out! This is only a minimal implementation for our presentation in
+    #  November 2021. The real implementation needs to go to a separate module!
+    if isinstance(expr, parse_tree.Name):
+        environment_var = environment.get(expr.identifier, None)
+        if environment_var is not None:
+            return environment_var
+
+        return Stripped(expr.identifier)
+
+    elif isinstance(expr, parse_tree.Member):
+        instance = _transpile_expression(expr=expr.instance, environment=environment)
+        member_name = csharp_naming.property_name(expr.name)
+
+        if isinstance(expr.instance, (parse_tree.Member, parse_tree.Name)):
+            return Stripped(f"{instance}.{member_name}")
+        else:
+            return Stripped(f"({instance}).{member_name}")
+
+
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _transpile_invariant(
-        invariant: intermediate.Invariant
+        invariant: intermediate.Invariant,
+        symbol_table: intermediate.SymbolTable
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Translate the invariant from the meta-model into C# snippet."""
-    print(f"ast.dump(invariant.body) is {ast.dump(invariant.body)!r}")  # TODO: debug
+    # TODO: replace Name with the corresponding symbol (enumeration, class, interface, enumeration literal, argument)
+    print(f"invariant.parsed.body is {parse_tree.dump(invariant.parsed.body)}")  # TODO: debug
+    raise NotImplementedError()
 
 
 
@@ -255,12 +289,10 @@ def _generate_implementation_verify(
     if len(cls.invariants) == 0:
         blocks.append(Stripped(f'// There are no invariants defined for {cls_name}.'))
     else:
-        # TODO: uncomment once implemented
-        pass
-        # for invariant in cls.invariants:
-        #     invariant_code, error = _transpile_invariant(cls=cls, invariant=invariant)
-        #     if error is not None:
-        #         errors.append(error)
+        for invariant in cls.invariants:
+            invariant_code, error = _transpile_invariant(invariant=invariant)
+            if error is not None:
+                errors.append(error)
 
     if len(errors) > 0:
         return None, Error(

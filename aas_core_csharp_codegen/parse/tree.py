@@ -35,9 +35,6 @@ class Member(Expression):
         self.name = name
 
 
-class Self(Expression):
-    """Represent a ``self`` instance."""
-
 
 class Comparator(enum.Enum):
     LT = "LT"
@@ -179,36 +176,33 @@ class ExpressionWithDeclarations(Expression):
 Node = Union[Statement, Expression]
 
 
-def dump(dumpable: Dumpable) -> str:
-    """Produce a string representation of the tree."""
+def _stringify(dumpable: Dumpable) -> stringify.Entity:
+    """Transform the ``dumpable`` into a stringifiable representation."""
     stringified = None  # type: Optional[stringify.Entity]
 
     if isinstance(dumpable, Member):
         stringified = stringify.Entity(
             name=Member.__name__,
             properties=[
-                stringify.Property("source", dump(dumpable.instance)),
+                stringify.Property("instance", _stringify(dumpable.instance)),
                 stringify.Property("name", dumpable.name)
             ])
-
-    elif isinstance(dumpable, Self):
-        stringified = stringify.Entity(name=Self.__name__, properties=[])
 
     elif isinstance(dumpable, Comparison):
         stringified = stringify.Entity(
             name=Comparison.__name__,
             properties=[
-                stringify.Property("left", dump(dumpable.left)),
+                stringify.Property("left", _stringify(dumpable.left)),
                 stringify.Property("op", str(dumpable.op.value)),
-                stringify.Property("right", dump(dumpable.right)),
+                stringify.Property("right", _stringify(dumpable.right)),
             ])
 
     elif isinstance(dumpable, Implication):
         stringified = stringify.Entity(
             name=Implication.__name__,
             properties=[
-                stringify.Property("antecedent", dump(dumpable.antecedent)),
-                stringify.Property("consequent", dump(dumpable.consequent)),
+                stringify.Property("antecedent", _stringify(dumpable.antecedent)),
+                stringify.Property("consequent", _stringify(dumpable.consequent)),
             ])
 
     elif isinstance(dumpable, KeywordArgument):
@@ -216,17 +210,17 @@ def dump(dumpable: Dumpable) -> str:
             name=KeywordArgument.__name__,
             properties=[
                 stringify.Property("arg", dumpable.arg),
-                stringify.Property("value", dump(dumpable.value))
+                stringify.Property("value", _stringify(dumpable.value))
             ])
 
     elif isinstance(dumpable, MethodCall):
         stringified = stringify.Entity(
             name=MethodCall.__name__,
             properties=[
-                stringify.Property("member", dump(dumpable.member)),
-                stringify.Property("args", [dump(arg) for arg in dumpable.args]),
+                stringify.Property("member", _stringify(dumpable.member)),
+                stringify.Property("args", [_stringify(arg) for arg in dumpable.args]),
                 stringify.Property(
-                    "kwargs", [dump(kwarg) for kwarg in dumpable.kwargs])
+                    "kwargs", [_stringify(kwarg) for kwarg in dumpable.kwargs])
             ])
 
     elif isinstance(dumpable, FunctionCall):
@@ -234,9 +228,9 @@ def dump(dumpable: Dumpable) -> str:
             name=FunctionCall.__name__,
             properties=[
                 stringify.Property("name", dumpable.name),
-                stringify.Property("args", [dump(arg) for arg in dumpable.args]),
+                stringify.Property("args", [_stringify(arg) for arg in dumpable.args]),
                 stringify.Property(
-                    "kwargs", [dump(kwarg) for kwarg in dumpable.kwargs])
+                    "kwargs", [_stringify(kwarg) for kwarg in dumpable.kwargs])
             ])
 
     elif isinstance(dumpable, Constant):
@@ -247,7 +241,7 @@ def dump(dumpable: Dumpable) -> str:
     elif isinstance(dumpable, IsNone):
         stringified = stringify.Entity(
             name=IsNone.__name__,
-            properties=[stringify.Property("value", dump(dumpable.value))])
+            properties=[stringify.Property("value", _stringify(dumpable.value))])
 
     elif isinstance(dumpable, Name):
         stringified = stringify.Entity(
@@ -258,14 +252,16 @@ def dump(dumpable: Dumpable) -> str:
         stringified = stringify.Entity(
             name=And.__name__,
             properties=[
-                stringify.Property("values", [dump(value) for value in dumpable.values])
+                stringify.Property("values",
+                                   [_stringify(value) for value in dumpable.values])
             ])
 
     elif isinstance(dumpable, Or):
         stringified = stringify.Entity(
             name=Or.__name__,
             properties=[
-                stringify.Property("values", [dump(value) for value in dumpable.values])
+                stringify.Property("values",
+                                   [_stringify(value) for value in dumpable.values])
             ])
 
     elif isinstance(dumpable, Declaration):
@@ -273,7 +269,7 @@ def dump(dumpable: Dumpable) -> str:
             name=Declaration.__name__,
             properties=[
                 stringify.Property("identifier", dumpable.identifier),
-                stringify.Property("value", dump(dumpable.value)),
+                stringify.Property("value", _stringify(dumpable.value)),
             ])
 
     elif isinstance(dumpable, ExpressionWithDeclarations):
@@ -282,10 +278,10 @@ def dump(dumpable: Dumpable) -> str:
             properties=[
                 stringify.Property(
                     "declarations", [
-                        dump(declaration)
+                        _stringify(declaration)
                         for declaration in dumpable.declarations
                     ]),
-                stringify.Property("expression", dump(dumpable.expression))
+                stringify.Property("expression", _stringify(dumpable.expression))
             ])
 
     else:
@@ -293,7 +289,12 @@ def dump(dumpable: Dumpable) -> str:
 
     assert stringified is not None
     assert isinstance(stringified, stringify.Entity)
-    assert stringified.name == dumpable.__name__
+    assert stringified.name == dumpable.__class__.__name__
     stringify.assert_compares_against_dict(entity=stringified, obj=dumpable)
 
-    return stringify.dump(stringified)
+    return stringified
+
+
+def dump(dumpable: Dumpable) -> str:
+    """Produce a string representation of the tree."""
+    return stringify.dump(_stringify(dumpable=dumpable))

@@ -169,13 +169,6 @@ class _ParseMember(_Parse):
         return tree.Member(instance=instance, name=Identifier(node.attr)), None
 
 
-class _ParseSelf(_Parse):
-    def matches(self, node: ast.AST) -> bool:
-        return isinstance(node, ast.Name) and node.id == 'self'
-
-    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
-        return tree.Self(), None
-
 
 class _ParseName(_Parse):
     def matches(self, node: ast.AST) -> bool:
@@ -287,7 +280,6 @@ _CHAIN_OF_RULES = [
     _ParseConstant(),
     _ParseImplication(),
     _ParseMember(),
-    _ParseSelf(),
     _ParseName(),
     _ParseIsNoneOrIsNotNone(),
     _ParseAndOrOr(),

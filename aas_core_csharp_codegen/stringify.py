@@ -134,6 +134,7 @@ def assert_compares_against_dict(entity: Entity, obj: object) -> None:
         raise AssertionError(
             "Expected the stringified properties to match the object properties, "
             "but they do not.\n\n"
+            f"{type(obj)=}\n"
             f"{first_diff_in_entity=}\n"
             f"{first_diff_in_obj=}\n\n"
             f"{sorted(entity_property_set)=}\n"
