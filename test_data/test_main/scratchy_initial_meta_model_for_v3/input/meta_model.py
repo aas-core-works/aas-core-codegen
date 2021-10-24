@@ -205,7 +205,6 @@ class Administrative_information(DBC):
 
 
 @abstract
-@invariant(lambda self: is_ID_short(self.id_short))
 class Identifiable(Referable):
     identification: Identifier
     administration: Optional[Administrative_information]

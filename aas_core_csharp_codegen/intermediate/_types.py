@@ -291,7 +291,7 @@ class Invariant:
 
     def __init__(
             self,
-            description: Optional[Description],
+            description: Optional[str],
             parsed: parse.Invariant
     ) -> None:
         self.description = description
@@ -305,7 +305,7 @@ class Contract:
     def __init__(
             self,
             args: Sequence[Identifier],
-            description: Optional[Description],
+            description: Optional[str],
             body: ast.AST,
             parsed: parse.Contract,
     ) -> None:

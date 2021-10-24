@@ -6,7 +6,6 @@ from typing import Tuple, Optional, List, Mapping
 from icontract import ensure, require
 
 from aas_core_csharp_codegen import intermediate
-from aas_core_csharp_codegen.parse import (tree as parse_tree)
 from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, assert_never, \
     Identifier
 from aas_core_csharp_codegen.csharp import (
@@ -15,6 +14,7 @@ from aas_core_csharp_codegen.csharp import (
     unrolling as csharp_unrolling
 )
 from aas_core_csharp_codegen.csharp import specific_implementations
+from aas_core_csharp_codegen.parse import (tree as parse_tree)
 from aas_core_csharp_codegen.specific_implementations import ImplementationKey
 
 
@@ -261,6 +261,364 @@ def _transpile_expression(
             return Stripped(f"({instance}).{member_name}")
 
 
+class _InvariantTranspiler(
+    parse_tree.Transformer[Tuple[Optional[Stripped], Optional[Error]]]):
+    """Transpile an invariant expression into a code, or an error."""
+
+    def __init__(self, symbol_table: intermediate.SymbolTable) -> None:
+        """Initialize with the given values."""
+        self.symbol_table = symbol_table
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform(
+            self,
+            node: parse_tree.Node
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """Dispatch to the appropriate transformation method."""
+        return node.transform(self)
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_member(
+            self,
+            node: parse_tree.Member
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        instance, error = self.transform(node.instance)
+        if error is not None:
+            return None, error
+
+        # Special case: enumeration literal
+        if isinstance(node.instance, parse_tree.Name):
+            symbol = self.symbol_table.find(name=node.instance.identifier)
+            if symbol is not None and isinstance(symbol, intermediate.Enumeration):
+                enumeration_name = csharp_naming.enum_name(symbol.name)
+                enum_literal_name = csharp_naming.enum_literal_name(node.name)
+
+                return Stripped(f"{enumeration_name}.{enum_literal_name}"), None
+
+        prop_name = csharp_naming.property_name(node.name)
+
+        if isinstance(node.instance, (parse_tree.Name, parse_tree.Member)):
+            return Stripped(f"{instance}.{prop_name}"), None
+
+        return Stripped(f"({instance}).{prop_name}"), None
+
+    _CSHARP_COMPARISON_MAP = {
+        parse_tree.Comparator.LT: "<",
+        parse_tree.Comparator.LE: "<=",
+        parse_tree.Comparator.GT: ">",
+        parse_tree.Comparator.GE: ">=",
+        parse_tree.Comparator.EQ: "==",
+        parse_tree.Comparator.NE: "!="
+    }
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_comparison(
+            self,
+            node: parse_tree.Comparison
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        comparator = _InvariantTranspiler._CSHARP_COMPARISON_MAP[node.op]
+
+        errors = []
+
+        left, error = self.transform(node.left)
+        if error is not None:
+            errors.append(error)
+
+        right, error = self.transform(node.right)
+        if error is not None:
+            errors.append(error)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the comparison", errors)
+
+        no_parentheses_types = (
+            parse_tree.Member,
+            parse_tree.FunctionCall,
+            parse_tree.MethodCall,
+            parse_tree.Name,
+            parse_tree.Constant
+        )
+
+        if (
+                isinstance(node.left, no_parentheses_types)
+                and isinstance(node.right, no_parentheses_types)
+        ):
+            return Stripped(f"{left} {comparator} {right}"), None
+
+        return Stripped(f"({left}) {comparator} ({right})"), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_implication(
+            self, node: parse_tree.Implication
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []
+
+        antecedent, error = self.transform(node.antecedent)
+        if error is not None:
+            errors.append(error)
+
+        consequent, error = self.transform(node.consequent)
+        if error is not None:
+            errors.append(error)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the implication", errors)
+
+        assert antecedent is not None
+        assert consequent is not None
+
+        no_parentheses_types = (
+            parse_tree.Member,
+            parse_tree.FunctionCall,
+            parse_tree.MethodCall,
+            parse_tree.Name
+        )
+
+        if isinstance(node.antecedent, no_parentheses_types):
+            not_antecedent = f"!{antecedent}"
+        else:
+            not_antecedent = f"!({antecedent})"
+
+        if not isinstance(node.consequent, no_parentheses_types):
+            consequent = f"({consequent})"
+
+        return Stripped(
+                f"{not_antecedent}\n"
+                f"|| {consequent}"), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_method_call(
+            self, node: parse_tree.MethodCall
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        instance, error = self.transform(node.member.instance)
+        if error is not None:
+            errors.append(error)
+
+        args = []  # type: List[Stripped]
+        for arg_node in node.args:
+            arg, error = self.transform(arg_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            args.append(arg)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the method call", errors)
+
+        assert instance is not None
+
+        if not isinstance(node.member.instance, (parse_tree.Name, parse_tree.Member)):
+            instance = f"({instance})"
+
+        method_name = csharp_naming.method_name(node.member.name)
+
+        # TODO: add heuristic for breaking the lines
+        joined_args = ", ".join(args)
+
+        return Stripped(f"{instance}.{method_name}({joined_args})"), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_function_call(
+            self,
+            node: parse_tree.FunctionCall
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        args = []  # type: List[Stripped]
+        for arg_node in node.args:
+            arg, error = self.transform(arg_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            args.append(arg)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the function call", errors)
+
+        # TODO: add heuristic for breaking the lines
+        joined_args = ", ".join(args)
+
+        if node.name == "is_IRDI":
+            if len(args) != 1:
+                return None, Error(node.original_node, "Expected exactly one argument")
+
+            return Stripped(f"Pattern.IsIrdi({joined_args})"), None
+        elif node.name == "is_IRI":
+            if len(args) != 1:
+                return None, Error(node.original_node, "Expected exactly one argument")
+
+            return Stripped(f"Pattern.IsIri({joined_args})"), None
+        elif node.name == "is_ID_short":
+            if len(args) != 1:
+                return None, Error(node.original_node, "Expected exactly one argument")
+
+            return Stripped(f"Pattern.IsIdShort({joined_args})"), None
+        elif node.name == "len":
+            if len(args) != 1:
+                return None, Error(node.original_node, "Expected exactly one argument")
+
+            collection_node = node.args[0]
+            if not isinstance(
+                    collection_node,
+                    (parse_tree.Name, parse_tree.Member, parse_tree.MethodCall)
+            ):
+                collection = f"({args[0]})"
+            else:
+                collection = args[0]
+
+            return Stripped(f"{collection}.Count"), None
+        else:
+            return None, Error(
+                node.original_node,
+                f"The handling of the function is not implemented: {node.name}")
+
+    def transform_constant(
+            self,
+            node: parse_tree.Constant
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if isinstance(node.value, bool):
+            return Stripped("true" if node.value else "false"), None
+        elif isinstance(node.value, (int, float)):
+            return Stripped(str(node.value)), None
+        elif isinstance(node.value, str):
+            return Stripped(repr(node.value)), None
+        else:
+            assert_never(node.value)
+
+    def transform_is_none(
+            self, node: parse_tree.IsNone
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        value, error = self.transform(node.value)
+        if error is not None:
+            return None, error
+
+        no_parentheses_types = (
+            parse_tree.Name,
+            parse_tree.Member,
+            parse_tree.MethodCall,
+            parse_tree.FunctionCall
+        )
+        if isinstance(node.value, no_parentheses_types):
+            return Stripped(f"{value} == null"), None
+        else:
+            return Stripped(f"({value}) == null"), None
+
+    def transform_is_not_none(
+            self,
+            node: parse_tree.IsNotNone
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        value, error = self.transform(node.value)
+        if error is not None:
+            return None, error
+
+        no_parentheses_types = (
+            parse_tree.Name,
+            parse_tree.Member,
+            parse_tree.MethodCall,
+            parse_tree.FunctionCall
+        )
+        if isinstance(node.value, no_parentheses_types):
+            return Stripped(f"{value} != null"), None
+        else:
+            return Stripped(f"({value}) != null"), None
+
+    def transform_name(
+            self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if node.identifier == 'self':
+            # The ``that`` refers to the argument of the verification function.
+            return Stripped("that"), None
+
+        return Stripped(csharp_naming.variable_name(node.identifier)), None
+
+    def transform_and(
+            self,
+            node: parse_tree.And) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+        values = []  # type: List[Stripped]
+
+        for value_node in node.values:
+            value, error = self.transform(value_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            if not isinstance(value_node, (
+                    parse_tree.Member,
+                    parse_tree.MethodCall,
+                    parse_tree.FunctionCall,
+                    parse_tree.Comparison,
+                    parse_tree.Name
+            )):
+                value = f"({value})"
+
+            values.append(value)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the conjunction", errors)
+
+        # TODO: add heuristic for breaking the lines
+        return Stripped(" && ".join(values)), None
+
+    def transform_or(
+            self, node: parse_tree.Or
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+        values = []  # type: List[Stripped]
+
+        for value_node in node.values:
+            value, error = self.transform(value_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            if not isinstance(value_node, (
+                    parse_tree.Member,
+                    parse_tree.MethodCall,
+                    parse_tree.FunctionCall,
+                    parse_tree.Comparison,
+                    parse_tree.Name
+            )):
+                value = f"({value})"
+
+            values.append(value)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the conjunction", errors)
+
+        # TODO: add heuristic for breaking the lines
+        return Stripped(" || ".join(values)), None
+
+    def transform_declaration(
+            self,
+            node: parse_tree.Declaration
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        # TODO: implement once we got to end-to-end with serialization
+        raise NotImplementedError()
+
+    def transform_expression_with_declarations(
+            self,
+            node: parse_tree.ExpressionWithDeclarations
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        # TODO: implement once we got to end-to-end with serialization
+        raise NotImplementedError()
+
+
+# noinspection PyProtectedMember,PyProtectedMember
+assert all(
+    op in _InvariantTranspiler._CSHARP_COMPARISON_MAP
+    for op in parse_tree.Comparator
+)
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -268,17 +626,66 @@ def _transpile_invariant(
         invariant: intermediate.Invariant,
         symbol_table: intermediate.SymbolTable
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Translate the invariant from the meta-model into C# snippet."""
-    # TODO: replace Name with the corresponding symbol (enumeration, class, interface, enumeration literal, argument)
-    print(f"invariant.parsed.body is {parse_tree.dump(invariant.parsed.body)}")  # TODO: debug
-    raise NotImplementedError()
+    """Translate the invariant from the meta-model into C# code."""
+    # NOTE (mristin, 2021-10-24):
+    # We manually transpile the invariant from our custom syntax without additional
+    # semantic analysis in the :py:mod:`aas_core_csharp_codegen.intermediate` layer.
+    #
+    # While this might seem repetitive ("unDRY"), we are still not sure about 
+    # the appropriate abstraction. After we implement the code generation for a couple
+    # of languages, we hope to have a much better understanding about the necessary
+    # abstractions.
 
+    transformer = _InvariantTranspiler(symbol_table=symbol_table)
+    expr, error = transformer.transform(invariant.parsed.body)
+    if error is not None:
+        return None, error
 
+    writer = io.StringIO()
+    if len(expr) > 50 or '\n' in expr:
+        writer.write("if (!(\n")
+        writer.write(textwrap.indent(expr, csharp_common.INDENT))
+        writer.write("))\n{\n")
+    else:
+        if isinstance(
+                invariant.parsed.body,
+                (parse_tree.Name, parse_tree.Member, parse_tree.MethodCall,
+                 parse_tree.FunctionCall)
+        ):
+            not_expr = f"!{expr}"
+        else:
+            not_expr = f"!({expr})"
+
+        writer.write(f"if ({not_expr})\n{{\n")
+
+    writer.write(
+        f'{csharp_common.INDENT}errors.Add(\n'
+        f'{csharp_common.INDENT2}"Invariant violated:\\n" +\n')
+
+    lines = []  # type: List[str]
+    if invariant.description is not None:
+        lines = invariant.description.splitlines()
+
+    lines = lines + expr.splitlines()
+
+    for i, line in enumerate(lines):
+        if i < len(lines) - 1:
+            line_literal = csharp_common.string_literal(line + "\n")
+            writer.write(
+                f'{csharp_common.INDENT2}{line_literal} +\n')
+        else:
+            writer.write(
+                f'{csharp_common.INDENT2}{csharp_common.string_literal(line)});')
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_implementation_verify(
-        cls: intermediate.Class
+        cls: intermediate.Class,
+        symbol_table: intermediate.SymbolTable
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verify function in the ``Implementation`` class."""
     errors = []  # type: List[Error]
@@ -290,9 +697,13 @@ def _generate_implementation_verify(
         blocks.append(Stripped(f'// There are no invariants defined for {cls_name}.'))
     else:
         for invariant in cls.invariants:
-            invariant_code, error = _transpile_invariant(invariant=invariant)
+            invariant_code, error = _transpile_invariant(
+                invariant=invariant, symbol_table=symbol_table)
             if error is not None:
                 errors.append(error)
+                continue
+
+            blocks.append(invariant_code)
 
     if len(errors) > 0:
         return None, Error(
@@ -365,7 +776,8 @@ def _generate_implementation(
 
             blocks.append(spec_impls[verify_key])
         else:
-            implementation_verify, error = _generate_implementation_verify(cls=symbol)
+            implementation_verify, error = _generate_implementation_verify(
+                cls=symbol, symbol_table=symbol_table)
             if error is not None:
                 errors.append(error)
                 continue
@@ -465,6 +877,7 @@ def _generate_non_recursive_verifier(
 def _unroll_recursion_in_recursive_verify(
         prop: intermediate.Property) -> Stripped:
     """Generate the code for unrolling the recursive visits  for the given property."""
+
     @require(lambda var_index: var_index >= 0)
     @require(lambda suffix: suffix in ("Item", "KeyValue"))
     def var_name(var_index: int, suffix: str) -> Identifier:

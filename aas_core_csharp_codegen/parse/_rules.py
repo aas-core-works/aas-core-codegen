@@ -68,7 +68,7 @@ class _ParseComparison(_Parse):
 
         assert isinstance(right, tree.Expression), f"{right=}"
 
-        return tree.Comparison(left=left, op=op, right=right), None
+        return tree.Comparison(left=left, op=op, right=right, original_node=node), None
 
 
 class _ParseCall(_Parse):
@@ -90,23 +90,17 @@ class _ParseCall(_Parse):
 
             args.append(arg)
 
-        kwargs = []  # type: List[tree.KeywordArgument]
-        for kw_node in node.keywords:
-            kw_value, error = ast_node_to_our_node(kw_node.value)
-            if error is not None:
-                return None, error
-
-            if not isinstance(kw_value, tree.Expression):
-                return None, Error(
-                    kw_node,
-                    f"Expected the keyword argument to a call to be an expression, "
-                    f"but got: {kw_value}")
-
-            kwargs.append(tree.KeywordArgument(arg=kw_node.arg, value=kw_value))
+        if len(node.keywords) > 0:
+            return None, Error(
+                    node,
+                    "Keyword arguments are not supported since "
+                    "many implementation languages do not support them")
 
         if isinstance(node.func, ast.Name):
             return tree.FunctionCall(
-                name=Identifier(node.func.id), args=args, kwargs=kwargs), None
+                name=Identifier(node.func.id),
+                args=args,
+                original_node=node), None
         else:
             member, error = ast_node_to_our_node(node.func)
             if error is not None:
@@ -115,7 +109,8 @@ class _ParseCall(_Parse):
             assert isinstance(member, tree.Member), (
                 f"Expected a member for {ast.dump(node.func)=}, but got: {member=}")
 
-            return tree.MethodCall(member=member, args=args, kwargs=kwargs), None
+            return tree.MethodCall(
+                member=member, args=args, original_node=node), None
 
 
 class _ParseConstant(_Parse):
@@ -126,7 +121,7 @@ class _ParseConstant(_Parse):
         )
 
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
-        return tree.Constant(value=node.value), None
+        return tree.Constant(value=node.value, original_node=node), None
 
 
 class _ParseImplication(_Parse):
@@ -152,7 +147,8 @@ class _ParseImplication(_Parse):
 
         assert isinstance(consequent, tree.Expression), f"{consequent=}"
 
-        return tree.Implication(antecedent=antecedent, consequent=consequent), None
+        return tree.Implication(
+            antecedent=antecedent, consequent=consequent, original_node=node), None
 
 
 class _ParseMember(_Parse):
@@ -166,8 +162,8 @@ class _ParseMember(_Parse):
 
         assert isinstance(instance, tree.Expression), f"{instance=}"
 
-        return tree.Member(instance=instance, name=Identifier(node.attr)), None
-
+        return tree.Member(
+            instance=instance, name=Identifier(node.attr), original_node=node), None
 
 
 class _ParseName(_Parse):
@@ -175,7 +171,7 @@ class _ParseName(_Parse):
         return isinstance(node, ast.Name)
 
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
-        return tree.Name(identifier=Identifier(node.id)), None
+        return tree.Name(identifier=Identifier(node.id), original_node=node), None
 
 
 class _ParseIsNoneOrIsNotNone(_Parse):
@@ -194,10 +190,13 @@ class _ParseIsNoneOrIsNotNone(_Parse):
         if error is not None:
             return None, error
 
+        assert value is not None
+        assert isinstance(value, tree.Expression), f"{value=}"
+
         if isinstance(node.ops[0], ast.Is):
-            return tree.IsNone(value=value), None
+            return tree.IsNone(value=value, original_node=node), None
         elif isinstance(node.ops[0], ast.IsNot):
-            return tree.IsNotNone(value=value), None
+            return tree.IsNotNone(value=value, original_node=node), None
         else:
             raise AssertionError(f"Unexpected: {node.ops[0]=}")
 
@@ -216,12 +215,15 @@ class _ParseAndOrOr(_Parse):
             if error is not None:
                 return None, error
 
+            assert value is not None
+            assert isinstance(value, tree.Expression), f"{value=}"
+
             values.append(value)
 
         if isinstance(node.op, ast.And):
-            return tree.And(values=values), None
+            return tree.And(values=values, original_node=node), None
         elif isinstance(node.op, ast.Or):
-            return tree.Or(values=values), None
+            return tree.Or(values=values, original_node=node), None
         else:
             raise AssertionError(f"Unexpected: {node.op=}")
 
@@ -253,7 +255,8 @@ class _ParseExpressionWithDeclaration(_Parse):
 
         return tree.ExpressionWithDeclarations(
             declarations=[declaration],
-            expression=expression), None
+            expression=expression,
+            original_node=node), None
 
 
 class _ParseDeclaration(_Parse):
@@ -268,8 +271,15 @@ class _ParseDeclaration(_Parse):
         if error is not None:
             return None, error
 
+        assert value is not None
+        assert isinstance(value, tree.Expression), f"{value=}"
+
         return (
-            tree.Declaration(identifier=Identifier(node.target.id), value=value), None)
+            tree.Declaration(
+                identifier=Identifier(node.target.id),
+                value=value,
+                original_node=node), None)
+
 
 # TODO: continue here, implement generators and other constructs
 
@@ -286,6 +296,7 @@ _CHAIN_OF_RULES = [
     _ParseExpressionWithDeclaration(),
     _ParseDeclaration()
 ]  # type: Sequence[_Parse]
+
 
 # TODO: implement _Simplify(node) -> node
 

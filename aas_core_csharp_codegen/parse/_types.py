@@ -180,7 +180,7 @@ class Invariant:
 
     def __init__(
             self,
-            description: Optional[Description],
+            description: Optional[str],
             body: tree.Expression,
             node: ast.AST
     ) -> None:
@@ -195,7 +195,7 @@ class Contract:
     def __init__(
             self,
             args: Sequence[Identifier],
-            description: Optional[Description],
+            description: Optional[str],
             condition: ast.Lambda,
             node: ast.AST
     ) -> None:

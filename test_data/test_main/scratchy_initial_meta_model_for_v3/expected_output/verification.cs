@@ -301,6 +301,26 @@ namespace AasCore.Aas3
                 string path,
                 Errors errors)
             {
+                if (!(
+                    !(that.IdType == IdentifierType.Irdi)
+                    || Pattern.IsIrdi(that.Id)))
+                {
+                    errors.Add(
+                        "Invariant violated:\n" +
+                        "!(that.IdType == IdentifierType.Irdi)\n" +
+                        "|| Pattern.IsIrdi(that.Id)");
+                }
+
+                if (!(
+                    !(that.IdType == IdentifierType.Iri)
+                    || Pattern.IsIri(that.Id)))
+                {
+                    errors.Add(
+                        "Invariant violated:\n" +
+                        "!(that.IdType == IdentifierType.Iri)\n" +
+                        "|| Pattern.IsIri(that.Id)");
+                }
+
                 if (errors.Full()) return;
 
                 if (!EnumValueSet.ForIdentifierType.Contains(
@@ -324,7 +344,15 @@ namespace AasCore.Aas3
                 string path,
                 Errors errors)
             {
-                // There is no verification specified for AdministrativeInformation.
+                if (!(
+                    !(that.Revision != null)
+                    || (that.Version != null)))
+                {
+                    errors.Add(
+                        "Invariant violated:\n" +
+                        "!(that.Revision != null)\n" +
+                        "|| (that.Version != null)");
+                }
             }
 
             /// <summary>
@@ -338,6 +366,49 @@ namespace AasCore.Aas3
                 string path,
                 Errors errors)
             {
+                if (!(
+                    !(that.IdType == KeyType.Iri)
+                    || Pattern.IsIri(that.Value)))
+                {
+                    errors.Add(
+                        "Invariant violated:\n" +
+                        "If ID type is IRI, it must be an IRI\n" +
+                        "!(that.IdType == KeyType.Iri)\n" +
+                        "|| Pattern.IsIri(that.Value)");
+                }
+
+                if (!(
+                    !(that.IdType == KeyType.Irdi)
+                    || Pattern.IsIrdi(that.Value)))
+                {
+                    errors.Add(
+                        "Invariant violated:\n" +
+                        "!(that.IdType == KeyType.Irdi)\n" +
+                        "|| Pattern.IsIrdi(that.Value)");
+                }
+
+                if (!(
+                    !(that.Type == KeyElements.GlobalReference)
+                    || (that.IdType != KeyType.IdShort && that.IdType != KeyType.FragmentId)))
+                {
+                    errors.Add(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-080\n" +
+                        "!(that.Type == KeyElements.GlobalReference)\n" +
+                        "|| (that.IdType != KeyType.IdShort && that.IdType != KeyType.FragmentId)");
+                }
+
+                if (!(
+                    !(that.Type == KeyElements.AssetAdministrationShell)
+                    || (that.IdType != KeyType.IdShort && that.IdType != KeyType.FragmentId)))
+                {
+                    errors.Add(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-081\n" +
+                        "!(that.Type == KeyElements.AssetAdministrationShell)\n" +
+                        "|| (that.IdType != KeyType.IdShort && that.IdType != KeyType.FragmentId)");
+                }
+
                 if (errors.Full()) return;
 
                 if (!EnumValueSet.ForKeyElements.Contains(
@@ -372,7 +443,12 @@ namespace AasCore.Aas3
                 string path,
                 Errors errors)
             {
-                // There is no verification specified for Reference.
+                if (!(that.Keys.Count >= 1))
+                {
+                    errors.Add(
+                        "Invariant violated:\n" +
+                        "that.Keys.Count >= 1");
+                }
             }
 
             /// <summary>
@@ -386,7 +462,13 @@ namespace AasCore.Aas3
                 string path,
                 Errors errors)
             {
-                // There is no verification specified for AssetAdministrationShell.
+                if (!Pattern.IsIdShort(that.IdShort))
+                {
+                    errors.Add(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-002\n" +
+                        "Pattern.IsIdShort(that.IdShort)");
+                }
             }
         }  // private static class Implementation
 
