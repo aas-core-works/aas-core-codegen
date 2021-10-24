@@ -13,7 +13,7 @@ from icontract import require, ensure
 from aas_core_csharp_codegen import parse
 from aas_core_csharp_codegen.common import Error, Identifier, assert_never, \
     IDENTIFIER_RE
-from aas_core_csharp_codegen.intermediate import _hierarchy, _constructor
+from aas_core_csharp_codegen.intermediate import _hierarchy, construction
 from aas_core_csharp_codegen.intermediate._types import (
     SymbolTable,
     Enumeration,
@@ -420,12 +420,12 @@ def _parsed_method_to_method(
 def _in_line_constructors(
         parsed_symbol_table: parse.SymbolTable,
         ontology: _hierarchy.Ontology,
-        constructor_table: _constructor.ConstructorTable,
-) -> Mapping[parse.Entity, Sequence[_constructor.AssignArgument]]:
+        constructor_table: construction.ConstructorTable,
+) -> Mapping[parse.Entity, Sequence[construction.AssignArgument]]:
     """In-line recursively all the constructor bodies."""
     result = (
         dict()
-    )  # type: MutableMapping[parse.Entity, List[_constructor.AssignArgument]]
+    )  # type: MutableMapping[parse.Entity, List[construction.AssignArgument]]
 
     for entity in ontology.entities:
         # We explicitly check at the stage of
@@ -433,9 +433,9 @@ def _in_line_constructors(
         # are calls to constructors of a super class or property assignments.
 
         constructor_body = constructor_table.must_find(entity)
-        in_lined = []  # type: List[_constructor.AssignArgument]
+        in_lined = []  # type: List[construction.AssignArgument]
         for statement in constructor_body:
-            if isinstance(statement, _constructor.CallSuperConstructor):
+            if isinstance(statement, construction.CallSuperConstructor):
                 antecedent = parsed_symbol_table.must_find_entity(statement.super_name)
 
                 in_lined_of_antecedent = result.get(antecedent, None)
@@ -481,7 +481,7 @@ def _parsed_entity_to_class(
         parsed: parse.ConcreteEntity,
         ontology: _hierarchy.Ontology,
         in_lined_constructors: Mapping[
-            parse.Entity, Sequence[_constructor.AssignArgument]]
+            parse.Entity, Sequence[construction.AssignArgument]]
 ) -> Tuple[Optional[Class], Optional[Error]]:
     """Translate a concrete entity to an intermediate class."""
     antecedents = ontology.list_antecedents(entity=parsed)
@@ -836,7 +836,7 @@ def translate(
 
     # region Understand constructor stacks
 
-    constructor_table, error = _constructor.understand_all(
+    constructor_table, error = construction.understand_all(
         parsed_symbol_table=parsed_symbol_table, atok=atok)
 
     if error is not None:

@@ -11,7 +11,7 @@ from icontract import ensure, require
 
 from aas_core_csharp_codegen import intermediate
 from aas_core_csharp_codegen.intermediate import (
-    _constructor as intermediate_constructor
+    construction as intermediate_construction
 )
 
 from aas_core_csharp_codegen import specific_implementations
@@ -899,13 +899,13 @@ def _generate_constructor(
 
     body = []  # type: List[str]
     for stmt in symbol.constructor.statements:
-        if isinstance(stmt, intermediate_constructor.AssignArgument):
+        if isinstance(stmt, intermediate_construction.AssignArgument):
             if stmt.default is None:
                 body.append(
                     f'{csharp_naming.property_name(stmt.name)} = '
                     f'{csharp_naming.argument_name(stmt.argument)};')
             else:
-                if isinstance(stmt.default, intermediate_constructor.EmptyList):
+                if isinstance(stmt.default, intermediate_construction.EmptyList):
                     prop = symbol.properties_by_name[stmt.name]
                     prop_type = csharp_common.generate_type(prop.type_annotation)
 
@@ -924,7 +924,7 @@ def _generate_constructor(
 
                     body.append(writer.getvalue())
                 elif isinstance(
-                        stmt.default, intermediate_constructor.DefaultEnumLiteral):
+                        stmt.default, intermediate_construction.DefaultEnumLiteral):
                     literal_code = ".".join([
                         csharp_naming.enum_name(stmt.default.enum.name),
                         csharp_naming.enum_literal_name(stmt.default.literal.name)
