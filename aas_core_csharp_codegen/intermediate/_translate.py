@@ -348,20 +348,6 @@ def _parsed_property_to_property(parsed: parse.Property) -> Property:
     )
 
 
-def _translate_invariant(
-        body: ast.AST
-) -> Tuple[Optional[tree.Expression], Optional[Error]]:
-    """
-    Translate the body of the invariant and analyze its semantics.
-
-    Since we parse the invariants *while* the symbol table is constructed, we add
-    placeholders which are resolved in the second pass.
-    """
-    # TODO: continue here, implement
-    # TODO: think hard about the environments and symbol resolution
-    raise NotImplementedError()
-
-
 def _parsed_contracts_to_contracts(
         parsed: parse.Contracts
 ) -> Contracts:

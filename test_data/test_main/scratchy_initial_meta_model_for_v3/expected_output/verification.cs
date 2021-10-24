@@ -263,13 +263,13 @@ namespace AasCore.Aas3
             }  // private static class EnumValueSet
 
             /// <summary>
-            /// Verify the given <paramref name="langString" /> and 
+            /// Verify <paramref name="that" /> instance and 
             /// append any errors to <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes the <paramref name="langString" />.
+            /// 
+            /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
             /// </summary>
             public static void VerifyLangString (
-                LangString langString,
+                LangString that,
                 string path,
                 Errors errors)
             {
@@ -283,7 +283,7 @@ namespace AasCore.Aas3
             /// The <paramref name="path" /> localizes the <paramref name="langString" />.
             /// </summary>
             public static void VerifyLangStringSet (
-                LangStringSet langStringSet,
+                LangStringSet that,
                 string path,
                 Errors errors)
             {
@@ -291,36 +291,36 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify the given <paramref name="identifier" /> and 
+            /// Verify <paramref name="that" /> instance and 
             /// append any errors to <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes the <paramref name="identifier" />.
+            /// 
+            /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
             /// </summary>
             public static void VerifyIdentifier (
-                Identifier identifier,
+                Identifier that,
                 string path,
                 Errors errors)
             {
                 if (errors.Full()) return;
 
                 if (!EnumValueSet.ForIdentifierType.Contains(
-                        (int)identifier.IdType))
+                        (int)that.IdType))
                 {
                     errors.Add(
                         new Error(
                             $"{path}/IdType",
-                            $"Invalid {nameof(IdentifierType)}: {identifier.IdType}"));
+                            $"Invalid {nameof(IdentifierType)}: {that.IdType}"));
                 }
             }
 
             /// <summary>
-            /// Verify the given <paramref name="administrativeInformation" /> and 
+            /// Verify <paramref name="that" /> instance and 
             /// append any errors to <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes the <paramref name="administrativeInformation" />.
+            /// 
+            /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
             /// </summary>
             public static void VerifyAdministrativeInformation (
-                AdministrativeInformation administrativeInformation,
+                AdministrativeInformation that,
                 string path,
                 Errors errors)
             {
@@ -328,47 +328,47 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify the given <paramref name="key" /> and 
+            /// Verify <paramref name="that" /> instance and 
             /// append any errors to <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes the <paramref name="key" />.
+            /// 
+            /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
             /// </summary>
             public static void VerifyKey (
-                Key key,
+                Key that,
                 string path,
                 Errors errors)
             {
                 if (errors.Full()) return;
 
                 if (!EnumValueSet.ForKeyElements.Contains(
-                        (int)key.Type))
+                        (int)that.Type))
                 {
                     errors.Add(
                         new Error(
                             $"{path}/Type",
-                            $"Invalid {nameof(KeyElements)}: {key.Type}"));
+                            $"Invalid {nameof(KeyElements)}: {that.Type}"));
                 }
 
                 if (errors.Full()) return;
 
                 if (!EnumValueSet.ForKeyType.Contains(
-                        (int)key.IdType))
+                        (int)that.IdType))
                 {
                     errors.Add(
                         new Error(
                             $"{path}/IdType",
-                            $"Invalid {nameof(KeyType)}: {key.IdType}"));
+                            $"Invalid {nameof(KeyType)}: {that.IdType}"));
                 }
             }
 
             /// <summary>
-            /// Verify the given <paramref name="reference" /> and 
+            /// Verify <paramref name="that" /> instance and 
             /// append any errors to <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes the <paramref name="reference" />.
+            /// 
+            /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
             /// </summary>
             public static void VerifyReference (
-                Reference reference,
+                Reference that,
                 string path,
                 Errors errors)
             {
@@ -376,13 +376,13 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify the given <paramref name="assetAdministrationShell" /> and 
+            /// Verify <paramref name="that" /> instance and 
             /// append any errors to <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes the <paramref name="assetAdministrationShell" />.
+            /// 
+            /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
             /// </summary>
             public static void VerifyAssetAdministrationShell (
-                AssetAdministrationShell assetAdministrationShell,
+                AssetAdministrationShell that,
                 string path,
                 Errors errors)
             {
@@ -409,114 +409,86 @@ namespace AasCore.Aas3
                 Errors = errors;
             }
 
-            public void Visit(IEntity entity, string context)
+            public void Visit(IEntity that, string context)
             {
-                entity.Accept(this, context);
+                that.Accept(this, context);
             }
 
             /// <summary>
-            /// Verify <paramref name="langString" /> and
+            /// Verify <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                LangString langString,
-                string context)
+            public void Visit(LangString that, string context)
             {
                 Implementation.VerifyLangString(
-                    langString,
-                    context,
-                    Errors);
+                    that, context, Errors);
             }
 
             /// <summary>
-            /// Verify <paramref name="langStringSet" /> and
+            /// Verify <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                LangStringSet langStringSet,
-                string context)
+            public void Visit(LangStringSet that, string context)
             {
                 Implementation.VerifyLangStringSet(
-                    langStringSet,
-                    context,
-                    Errors);
+                    that, context, Errors);
             }
 
             /// <summary>
-            /// Verify <paramref name="identifier" /> and
+            /// Verify <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                Identifier identifier,
-                string context)
+            public void Visit(Identifier that, string context)
             {
                 Implementation.VerifyIdentifier(
-                    identifier,
-                    context,
-                    Errors);
+                    that, context, Errors);
             }
 
             /// <summary>
-            /// Verify <paramref name="administrativeInformation" /> and
+            /// Verify <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                AdministrativeInformation administrativeInformation,
-                string context)
+            public void Visit(AdministrativeInformation that, string context)
             {
                 Implementation.VerifyAdministrativeInformation(
-                    administrativeInformation,
-                    context,
-                    Errors);
+                    that, context, Errors);
             }
 
             /// <summary>
-            /// Verify <paramref name="key" /> and
+            /// Verify <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                Key key,
-                string context)
+            public void Visit(Key that, string context)
             {
                 Implementation.VerifyKey(
-                    key,
-                    context,
-                    Errors);
+                    that, context, Errors);
             }
 
             /// <summary>
-            /// Verify <paramref name="reference" /> and
+            /// Verify <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                Reference reference,
-                string context)
+            public void Visit(Reference that, string context)
             {
                 Implementation.VerifyReference(
-                    reference,
-                    context,
-                    Errors);
+                    that, context, Errors);
             }
 
             /// <summary>
-            /// Verify <paramref name="assetAdministrationShell" /> and
+            /// Verify <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                AssetAdministrationShell assetAdministrationShell,
-                string context)
+            public void Visit(AssetAdministrationShell that, string context)
             {
                 Implementation.VerifyAssetAdministrationShell(
-                    assetAdministrationShell,
-                    context,
-                    Errors);
+                    that, context, Errors);
             }
         }  // public class NonRecursiveVerifier
 
@@ -539,24 +511,20 @@ namespace AasCore.Aas3
                 Errors = errors;
             }
 
-            public void Visit(IEntity entity, string context)
+            public void Visit(IEntity that, string context)
             {
-                entity.Accept(this, context);
+                that.Accept(this, context);
             }
 
             /// <summary>
-            /// Verify recursively <paramref name="langString" /> and
+            /// Verify recursively <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                LangString langString,
-                string context)
+            public void Visit(LangString that, string context) 
             {
                 Implementation.VerifyLangString(
-                    langString,
-                    context,
-                    Errors);
+                    that, context, Errors);
 
                 // The recursion ends here.
             }
@@ -566,153 +534,124 @@ namespace AasCore.Aas3
             /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                LangStringSet langStringSet,
-                string context)
+            public void Visit(LangStringSet that, string context)
             {
                 throw new NotImplementedException("TODO");
             }
 
             /// <summary>
-            /// Verify recursively <paramref name="identifier" /> and
+            /// Verify recursively <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                Identifier identifier,
-                string context)
+            public void Visit(Identifier that, string context) 
             {
                 Implementation.VerifyIdentifier(
-                    identifier,
-                    context,
-                    Errors);
+                    that, context, Errors);
 
                 // The recursion ends here.
             }
 
             /// <summary>
-            /// Verify recursively <paramref name="administrativeInformation" /> and
+            /// Verify recursively <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                AdministrativeInformation administrativeInformation,
-                string context)
+            public void Visit(AdministrativeInformation that, string context) 
             {
                 Implementation.VerifyAdministrativeInformation(
-                    administrativeInformation,
-                    context,
-                    Errors);
+                    that, context, Errors);
 
                 // The recursion ends here.
             }
 
             /// <summary>
-            /// Verify recursively <paramref name="key" /> and
+            /// Verify recursively <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                Key key,
-                string context)
+            public void Visit(Key that, string context) 
             {
                 Implementation.VerifyKey(
-                    key,
-                    context,
-                    Errors);
+                    that, context, Errors);
 
                 // The recursion ends here.
             }
 
             /// <summary>
-            /// Verify recursively <paramref name="reference" /> and
+            /// Verify recursively <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                Reference reference,
-                string context)
+            public void Visit(Reference that, string context) 
             {
                 Implementation.VerifyReference(
-                    reference,
-                    context,
-                    Errors);
+                    that, context, Errors);
 
-                if (Errors.Full()) return;
-
-                for(var i = 0; i < reference.Keys.Count; i++)
+                for(var i = 0; i < that.Keys.Count; i++)
                 {
+                    if (Errors.Full()) return;
                     Visit(
-                        reference.Keys[i],
+                        that.Keys[i],
                         $"{context}/Keys/{i}");
                 }
             }
 
             /// <summary>
-            /// Verify recursively <paramref name="assetAdministrationShell" /> and
+            /// Verify recursively <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-                AssetAdministrationShell assetAdministrationShell,
-                string context)
+            public void Visit(AssetAdministrationShell that, string context) 
             {
                 Implementation.VerifyAssetAdministrationShell(
-                    assetAdministrationShell,
-                    context,
-                    Errors);
+                    that, context, Errors);
 
-                if (Errors.Full()) return;
-
-                if (assetAdministrationShell.DisplayName != null)
+                if (that.DisplayName != null)
                 {
+                    if (Errors.Full()) return;
                     Visit(
-                        assetAdministrationShell.DisplayName,
+                        that.DisplayName,
                         $"{context}/DisplayName");
                 }
 
-                if (Errors.Full()) return;
-
-                if (assetAdministrationShell.Description != null)
+                if (that.Description != null)
                 {
+                    if (Errors.Full()) return;
                     Visit(
-                        assetAdministrationShell.Description,
+                        that.Description,
                         $"{context}/Description");
                 }
 
                 if (Errors.Full()) return;
-
                 Visit(
-                    assetAdministrationShell.Identification,
+                    that.Identification,
                     $"{context}/Identification");
 
-                if (Errors.Full()) return;
-
-                if (assetAdministrationShell.Administration != null)
+                if (that.Administration != null)
                 {
+                    if (Errors.Full()) return;
                     Visit(
-                        assetAdministrationShell.Administration,
+                        that.Administration,
                         $"{context}/Administration");
                 }
 
-                if (Errors.Full()) return;
-
                 for(
                     var i = 0;
-                    i < assetAdministrationShell.DataSpecifications.Count;
+                    i < that.DataSpecifications.Count;
                     i++)
                 {
+                    if (Errors.Full()) return;
                     Visit(
-                        assetAdministrationShell.DataSpecifications[i],
+                        that.DataSpecifications[i],
                         $"{context}/DataSpecifications/{i}");
                 }
 
-                if (Errors.Full()) return;
-
-                if (assetAdministrationShell.DerivedFrom != null)
+                if (that.DerivedFrom != null)
                 {
+                    if (Errors.Full()) return;
                     Visit(
-                        assetAdministrationShell.DerivedFrom,
+                        that.DerivedFrom,
                         $"{context}/DerivedFrom");
                 }
             }

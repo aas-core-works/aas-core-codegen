@@ -3,9 +3,7 @@
 /// append any error to <see cref="Errors" />
 /// where <paramref name="context" /> is used to localize the error.
 /// </summary>
-public void Visit(
-    LangStringSet langStringSet,
-    string context)
+public void Visit(LangStringSet that, string context)
 {
     throw new NotImplementedException("TODO");
 }

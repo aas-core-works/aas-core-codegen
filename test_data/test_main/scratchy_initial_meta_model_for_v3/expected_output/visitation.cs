@@ -12,14 +12,14 @@ namespace AasCore.Aas3
         /// </summary>
         public interface IVisitor
         {
-            public void Visit(IEntity entity);
-            public void Visit(LangString langString);
-            public void Visit(LangStringSet langStringSet);
-            public void Visit(Identifier identifier);
-            public void Visit(AdministrativeInformation administrativeInformation);
-            public void Visit(Key key);
-            public void Visit(Reference reference);
-            public void Visit(AssetAdministrationShell assetAdministrationShell);
+            public void Visit(IEntity that);
+            public void Visit(LangString that);
+            public void Visit(LangStringSet that);
+            public void Visit(Identifier that);
+            public void Visit(AdministrativeInformation that);
+            public void Visit(Key that);
+            public void Visit(Reference that);
+            public void Visit(AssetAdministrationShell that);
         }  // public interface IVisitor
 
         /// <summary>
@@ -28,14 +28,14 @@ namespace AasCore.Aas3
         /// <typeparam name="C">Context type</typeparam>
         public interface IVisitorWithContext<C>
         {
-            public void Visit(IEntity entity, C context);
-            public void Visit(LangString langString, C context);
-            public void Visit(LangStringSet langStringSet, C context);
-            public void Visit(Identifier identifier, C context);
-            public void Visit(AdministrativeInformation administrativeInformation, C context);
-            public void Visit(Key key, C context);
-            public void Visit(Reference reference, C context);
-            public void Visit(AssetAdministrationShell assetAdministrationShell, C context);
+            public void Visit(IEntity that, C context);
+            public void Visit(LangString that, C context);
+            public void Visit(LangStringSet that, C context);
+            public void Visit(Identifier that, C context);
+            public void Visit(AdministrativeInformation that, C context);
+            public void Visit(Key that, C context);
+            public void Visit(Reference that, C context);
+            public void Visit(AssetAdministrationShell that, C context);
         }  // public interface IVisitorWithContext
 
         /// <summary>
@@ -45,14 +45,14 @@ namespace AasCore.Aas3
         /// <typeparam name="T">The type of the transformation result</typeparam>
         public interface ITransformer<T>
         {
-            public T Transform(IEntity entity);
-            public T Transform(LangString langString);
-            public T Transform(LangStringSet langStringSet);
-            public T Transform(Identifier identifier);
-            public T Transform(AdministrativeInformation administrativeInformation);
-            public T Transform(Key key);
-            public T Transform(Reference reference);
-            public T Transform(AssetAdministrationShell assetAdministrationShell);
+            public T Transform(IEntity that);
+            public T Transform(LangString that);
+            public T Transform(LangStringSet that);
+            public T Transform(Identifier that);
+            public T Transform(AdministrativeInformation that);
+            public T Transform(Key that);
+            public T Transform(Reference that);
+            public T Transform(AssetAdministrationShell that);
         }  // public interface ITransformer
 
         /// <summary>
@@ -63,14 +63,14 @@ namespace AasCore.Aas3
         /// <typeparam name="C">Context type</typeparam>
         public interface ITransformerWithContext<C, T>
         {
-            public T Transform(IEntity entity, C context);
-            public T Transform(LangString langString, C context);
-            public T Transform(LangStringSet langStringSet, C context);
-            public T Transform(Identifier identifier, C context);
-            public T Transform(AdministrativeInformation administrativeInformation, C context);
-            public T Transform(Key key, C context);
-            public T Transform(Reference reference, C context);
-            public T Transform(AssetAdministrationShell assetAdministrationShell, C context);
+            public T Transform(IEntity that, C context);
+            public T Transform(LangString that, C context);
+            public T Transform(LangStringSet that, C context);
+            public T Transform(Identifier that, C context);
+            public T Transform(AdministrativeInformation that, C context);
+            public T Transform(Key that, C context);
+            public T Transform(Reference that, C context);
+            public T Transform(AssetAdministrationShell that, C context);
         }  // public interface ITransformerWithContext
     }  // public static class Visitation
 }  // namespace AasCore.Aas3

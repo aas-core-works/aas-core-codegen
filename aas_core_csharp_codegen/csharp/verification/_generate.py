@@ -100,10 +100,7 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
     return Stripped(writer.getvalue())
 
 
-@require(lambda cls, prop: id(prop) in cls.property_id_set)
-def _unroll_enumeration_check(
-        cls: intermediate.Class,
-        prop: intermediate.Property) -> Stripped:
+def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
     """Generate the code for unrolling the enumeration checks for the given property."""
 
     @require(lambda var_index: var_index >= 0)
@@ -220,10 +217,8 @@ def _unroll_enumeration_check(
         else:
             assert_never(type_anno)
 
-    arg_name = csharp_naming.argument_name(cls.name)
-
     roots = unroll(
-        current_var_name=f'{arg_name}.{prop_name}',
+        current_var_name=f'that.{prop_name}',
         item_count=0,
         key_value_count=0,
         path=[prop_name],
@@ -239,7 +234,6 @@ def _unroll_enumeration_check(
 @require(lambda cls, invariant: id(invariant) in cls.invariant_id_set)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _transpile_invariant(
-        cls: intermediate.Class,
         invariant: intermediate.Invariant
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Translate the invariant from the meta-model into C# snippet."""
@@ -261,10 +255,12 @@ def _generate_implementation_verify(
     if len(cls.invariants) == 0:
         blocks.append(Stripped(f'// There are no invariants defined for {cls_name}.'))
     else:
-        for invariant in cls.invariants:
-            invariant_code, error = _transpile_invariant(cls=cls, invariant=invariant)
-            if error is not None:
-                errors.append(error)
+        # TODO: uncomment once implemented
+        pass
+        # for invariant in cls.invariants:
+        #     invariant_code, error = _transpile_invariant(cls=cls, invariant=invariant)
+        #     if error is not None:
+        #         errors.append(error)
 
     if len(errors) > 0:
         return None, Error(
@@ -273,7 +269,7 @@ def _generate_implementation_verify(
             underlying=errors)
 
     for prop in cls.properties:
-        enum_check_block = _unroll_enumeration_check(cls=cls, prop=prop)
+        enum_check_block = _unroll_enumeration_check(prop=prop)
         if enum_check_block != '':
             blocks.append(Stripped("if (errors.Full()) return;"))
             blocks.append(enum_check_block)
@@ -282,21 +278,16 @@ def _generate_implementation_verify(
         blocks.append(Stripped(
             f'// There is no verification specified for {cls_name}.'))
 
-    arg_name = csharp_naming.argument_name(cls.name)
-
-    assert arg_name != 'path', "Unexpected reserved argument name"
-    assert arg_name != 'errors', "Unexpected reserved argument name"
-
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         /// <summary>
-        /// Verify the given <paramref name={xml.sax.saxutils.quoteattr(arg_name)} /> and 
+        /// Verify <paramref name="that" /> instance and 
         /// append any errors to <paramref name="Errors" />.
-        ///
-        /// The <paramref name="path" /> localizes the <paramref name={xml.sax.saxutils.quoteattr(arg_name)} />.
+        /// 
+        /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
         /// </summary>
         public static void Verify{cls_name} (
-        {csharp_common.INDENT}{cls_name} {arg_name},
+        {csharp_common.INDENT}{cls_name} that,
         {csharp_common.INDENT}string path,
         {csharp_common.INDENT}Errors errors)
         {{
@@ -395,9 +386,9 @@ def _generate_non_recursive_verifier(
             {csharp_common.INDENT}Errors = errors;
             }}''')),
         Stripped(textwrap.dedent(f'''\
-            public void Visit(IEntity entity, string context)
+            public void Visit(IEntity that, string context)
             {{
-            {csharp_common.INDENT}entity.Accept(this, context);
+            {csharp_common.INDENT}that.Accept(this, context);
             }}'''))
     ]  # type: List[Stripped]
 
@@ -405,25 +396,18 @@ def _generate_non_recursive_verifier(
         if not isinstance(symbol, intermediate.Class):
             continue
 
-        arg_name = csharp_naming.argument_name(symbol.name)
         cls_name = csharp_naming.class_name(symbol.name)
-
-        assert arg_name != 'context', "Unexpected reserved argument name"
 
         blocks.append(Stripped(textwrap.dedent(f'''\
             /// <summary>
-            /// Verify <paramref name={xml.sax.saxutils.quoteattr(arg_name)} /> and
+            /// Verify <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(
-            {csharp_common.INDENT}{cls_name} {arg_name},
-            {csharp_common.INDENT}string context)
+            public void Visit({cls_name} that, string context)
             {{
             {csharp_common.INDENT}Implementation.Verify{cls_name}(
-            {csharp_common.INDENT2}{arg_name},
-            {csharp_common.INDENT2}context,
-            {csharp_common.INDENT2}Errors);
+            {csharp_common.INDENT2}that, context, Errors);
             }}''')))
 
     writer = io.StringIO()
@@ -446,9 +430,7 @@ def _generate_non_recursive_verifier(
     return Stripped(writer.getvalue()), None
 
 
-@require(lambda cls, prop: id(prop) in cls.property_id_set)
 def _unroll_recursion_in_recursive_verify(
-        cls: intermediate.Class,
         prop: intermediate.Property) -> Stripped:
     """Generate the code for unrolling the recursive visits  for the given property."""
     @require(lambda var_index: var_index >= 0)
@@ -560,11 +542,10 @@ def _unroll_recursion_in_recursive_verify(
         else:
             assert_never(type_anno)
 
-    arg_name = csharp_naming.argument_name(cls.name)
     prop_name = csharp_naming.property_name(prop.name)
 
     roots = unroll(
-        current_var_name=f'{arg_name}.{prop_name}',
+        current_var_name=f'that.{prop_name}',
         item_count=0,
         key_value_count=0,
         path=['{context}', prop_name],
@@ -588,39 +569,30 @@ def _generate_recursive_verifier_visit(
         cls: intermediate.Class
 ) -> Stripped:
     """Generate the ``Visit`` method of the ``RecursiveVerifier`` for the ``cls``."""
-    arg_name = csharp_naming.argument_name(cls.name)
     cls_name = csharp_naming.class_name(cls.name)
-
-    assert arg_name != 'context', "Unexpected reserved argument name"
 
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         /// <summary>
-        /// Verify recursively <paramref name={xml.sax.saxutils.quoteattr(arg_name)} /> and
+        /// Verify recursively <paramref name="that" /> instance and
         /// append any error to <see cref="Errors" /> 
         /// where <paramref name="context" /> is used to localize the error.
         /// </summary>
-        public void Visit(
-        {csharp_common.INDENT}{cls_name} {arg_name},
-        {csharp_common.INDENT}string context)
+        public void Visit({cls_name} that, string context) 
         {{
         '''))
 
     blocks = [
         Stripped(textwrap.dedent(f'''\
         Implementation.Verify{cls_name}(
-        {csharp_common.INDENT}{arg_name},
-        {csharp_common.INDENT}context,
-        {csharp_common.INDENT}Errors);'''))
+        {csharp_common.INDENT}that, context, Errors);'''))
     ]  # type: List[Stripped]
 
     # region Unroll
 
     recursion_ends_here = True
     for prop in cls.properties:
-        unrolled_prop_verification = _unroll_recursion_in_recursive_verify(
-            cls=cls,
-            prop=prop)
+        unrolled_prop_verification = _unroll_recursion_in_recursive_verify(prop=prop)
 
         if unrolled_prop_verification != '':
             blocks.append(unrolled_prop_verification)
@@ -660,9 +632,9 @@ def _generate_recursive_verifier(
             {csharp_common.INDENT}Errors = errors;
             }}''')),
         Stripped(textwrap.dedent(f'''\
-            public void Visit(IEntity entity, string context)
+            public void Visit(IEntity that, string context)
             {{
-            {csharp_common.INDENT}entity.Accept(this, context);
+            {csharp_common.INDENT}that.Accept(this, context);
             }}'''))
     ]  # type: List[Stripped]
 

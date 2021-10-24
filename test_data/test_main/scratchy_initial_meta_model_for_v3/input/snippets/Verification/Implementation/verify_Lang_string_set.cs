@@ -5,7 +5,7 @@
 /// The <paramref name="path" /> localizes the <paramref name="langString" />.
 /// </summary>
 public static void VerifyLangStringSet (
-    LangStringSet langStringSet,
+    LangStringSet that,
     string path,
     Errors errors)
 {

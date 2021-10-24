@@ -3,18 +3,14 @@
 """Generate the invariant verifiers from the intermediate representation."""
 import io
 import textwrap
-import xml.sax.saxutils
-from typing import Tuple, Optional, List, Union
+from typing import Tuple, Optional, List
 
-from icontract import ensure, require
+from icontract import ensure
 
 import aas_core_csharp_codegen.csharp.common as csharp_common
 import aas_core_csharp_codegen.csharp.naming as csharp_naming
 from aas_core_csharp_codegen import intermediate
-from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, Identifier, \
-    assert_never
-from aas_core_csharp_codegen.csharp import specific_implementations
-from aas_core_csharp_codegen.specific_implementations import ImplementationKey
+from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, assert_never
 
 
 # region Generate
@@ -34,8 +30,7 @@ def _generate_ivisitor(
 
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
-            var_name = csharp_naming.argument_name(symbol.name)
-            blocks.append(Stripped(f'public void Visit({cls_name} {var_name});'))
+            blocks.append(Stripped(f'public void Visit({cls_name} that);'))
 
         else:
             assert_never(symbol)
@@ -48,7 +43,7 @@ def _generate_ivisitor(
             /// </summary>
             public interface IVisitor
             {
-                public void Visit(IEntity entity);
+                public void Visit(IEntity that);
             '''))
 
     for i, block in enumerate(blocks):
@@ -76,12 +71,11 @@ def _generate_visitor_through(
 
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
-            var_name = csharp_naming.argument_name(symbol.name)
             blocks.append(Stripped(textwrap.dedent(f'''\
-                public void Visit({cls_name} {var_name})
+                public void Visit({cls_name} that)
                 {{
-                    // Just descend through, do nothing with the {var_name}
-                    foreach (var something in {var_name}.DescendOnce())
+                    // Just descend through, do nothing with the <c>that</c>
+                    foreach (var something in that.DescendOnce())
                     {{
                         Visit(something);
                     }}
@@ -104,9 +98,9 @@ def _generate_visitor_through(
             /// </remarks> 
             public class VisitorThrough
             {
-                public void Visit(IEntity entity)
+                public void Visit(IEntity that)
                 {{
-                    entity.Accept(this);
+                    that.Accept(this);
                 }}
             '''))
 
@@ -135,9 +129,8 @@ def _generate_ivisitor_with_context(
 
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
-            var_name = csharp_naming.argument_name(symbol.name)
             blocks.append(Stripped(
-                f'public void Visit({cls_name} {var_name}, C context);'))
+                f'public void Visit({cls_name} that, C context);'))
 
         else:
             assert_never(symbol)
@@ -151,7 +144,7 @@ def _generate_ivisitor_with_context(
             /// <typeparam name="C">Context type</typeparam>
             public interface IVisitorWithContext<C>
             {
-                public void Visit(IEntity entity, C context);
+                public void Visit(IEntity that, C context);
             '''))
 
     for i, block in enumerate(blocks):
@@ -180,7 +173,7 @@ def _generate_itransformer(
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
             var_name = csharp_naming.argument_name(symbol.name)
-            blocks.append(Stripped(f'public T Transform({cls_name} {var_name});'))
+            blocks.append(Stripped(f'public T Transform({cls_name} that);'))
 
         else:
             assert_never(symbol)
@@ -195,7 +188,7 @@ def _generate_itransformer(
             /// <typeparam name="T">The type of the transformation result</typeparam>
             public interface ITransformer<T>
             {
-                public T Transform(IEntity entity);
+                public T Transform(IEntity that);
             '''))
 
     for i, block in enumerate(blocks):
@@ -223,9 +216,8 @@ def _generate_itransformer_with_context(
 
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
-            var_name = csharp_naming.argument_name(symbol.name)
             blocks.append(Stripped(
-                f'public T Transform({cls_name} {var_name}, C context);'))
+                f'public T Transform({cls_name} that, C context);'))
 
         else:
             assert_never(symbol)
@@ -241,7 +233,7 @@ def _generate_itransformer_with_context(
             /// <typeparam name="C">Context type</typeparam>
             public interface ITransformerWithContext<C, T>
             {
-                public T Transform(IEntity entity, C context);
+                public T Transform(IEntity that, C context);
             '''))
 
     for i, block in enumerate(blocks):
