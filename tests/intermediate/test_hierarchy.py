@@ -1,7 +1,7 @@
 import textwrap
 import unittest
 
-import aas_core_csharp_codegen.understand.hierarchy as understand_hierarchy
+import aas_core_csharp_codegen.intermediate._hierarchy as _hierarchy
 import tests.common
 from aas_core_csharp_codegen.common import Identifier
 
@@ -18,7 +18,7 @@ class Test_ontology_ok(unittest.TestCase):
         assert error is None, f"{error=}"
         assert symbol_table is not None
 
-        ontology, errors = understand_hierarchy.symbol_table_to_ontology(symbol_table)
+        ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
         assert errors is None, f"{errors=}"
         assert ontology is not None
 
@@ -54,7 +54,7 @@ class Test_ontology_ok(unittest.TestCase):
 
         assert symbol_table is not None
 
-        ontology, errors = understand_hierarchy.symbol_table_to_ontology(symbol_table)
+        ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
         assert errors is None, f"{errors=}"
         assert ontology is not None
 
@@ -85,7 +85,7 @@ class Test_ontology_fail(unittest.TestCase):
         assert error is None, f"{error=}"
         assert symbol_table is not None
 
-        ontology, errors = understand_hierarchy.symbol_table_to_ontology(symbol_table)
+        ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
         assert errors is not None and len(errors) == 1
 
         self.assertEqual(
@@ -110,7 +110,7 @@ class Test_ontology_fail(unittest.TestCase):
         assert error is None, f"{error=}"
         assert symbol_table is not None
 
-        ontology, errors = understand_hierarchy.symbol_table_to_ontology(symbol_table)
+        ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
         assert errors is not None and len(errors) == 1
 
         self.assertEqual(
@@ -133,7 +133,7 @@ class Test_ontology_fail(unittest.TestCase):
         assert error is None, f"{error=}"
         assert symbol_table is not None
 
-        ontology, errors = understand_hierarchy.symbol_table_to_ontology(symbol_table)
+        ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
         assert errors is not None and len(errors) == 1
 
         self.assertEqual(
@@ -157,7 +157,7 @@ class Test_ontology_fail(unittest.TestCase):
         assert error is None, f"{error=}"
         assert symbol_table is not None
 
-        ontology, errors = understand_hierarchy.symbol_table_to_ontology(symbol_table)
+        ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
         assert errors is not None and len(errors) == 1
 
         self.assertEqual(
@@ -175,7 +175,7 @@ class Test_against_real_meta_models(unittest.TestCase):
             assert error is None, f"{meta_model_pth=}, {error=}"
             assert symbol_table is not None
 
-            _, errors = understand_hierarchy.symbol_table_to_ontology(
+            _, errors = _hierarchy.map_symbol_table_to_ontology(
                 symbol_table)
 
             assert errors is None, f"{meta_model_pth=}, {errors=}"

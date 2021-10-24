@@ -17,10 +17,9 @@ from icontract import require, ensure
 from aas_core_csharp_codegen import parse
 from aas_core_csharp_codegen.common import Error, Identifier
 
-# TODO: integrate this module into intermediate stage
 
 def first_not_in_topological_order(
-    entities: Sequence[parse.Entity], symbol_table: parse.SymbolTable
+    entities: Sequence[parse.Entity], parsed_symbol_table: parse.SymbolTable
 ) -> Optional[parse.Entity]:
     """
     Verify that ``entities`` are topologically sorted.
@@ -30,7 +29,7 @@ def first_not_in_topological_order(
     observed = set()  # type: Set[parse.Entity]
     for entity in entities:
         for parent_name in entity.inheritances:
-            parent = symbol_table.must_find_entity(parent_name)
+            parent = parsed_symbol_table.must_find_entity(parent_name)
             if parent not in observed:
                 return entity
 
@@ -54,11 +53,10 @@ class _UnverifiedOntology:
     #: Map entity 🠒 topologically sorted antecedents
     _antecedents_of: Final[Mapping[parse.Entity, Sequence[parse.AbstractEntity]]]
 
+    # fmt: off
     @require(
-        lambda entities, symbol_table: first_not_in_topological_order(
-            entities, symbol_table
-        )
-        is None
+        lambda entities, parsed_symbol_table:
+        first_not_in_topological_order(entities, parsed_symbol_table) is None
     )
     @require(
         lambda entities: len(entities) == 0 or len(entities[0].inheritances) == 0,
@@ -69,13 +67,15 @@ class _UnverifiedOntology:
         "Unique entities in the topological sort",
     )
     @ensure(
-        lambda self, symbol_table: all(
-            first_not_in_topological_order(entity_antecedents, symbol_table) is None
+        lambda self, parsed_symbol_table: all(
+            first_not_in_topological_order(
+                entity_antecedents, parsed_symbol_table) is None
             for entity_antecedents in self._antecedents_of.values()
         )
     )
+    # fmt: on
     def __init__(
-        self, entities: Sequence[parse.Entity], symbol_table: parse.SymbolTable
+        self, entities: Sequence[parse.Entity], parsed_symbol_table: parse.SymbolTable
     ) -> None:
         """Initialize with the given values and pre-compute the antecedents."""
         self.entities = entities
@@ -88,7 +88,7 @@ class _UnverifiedOntology:
 
         for entity in entities:
             parents = [
-                symbol_table.must_find_entity(parent_name)
+                parsed_symbol_table.must_find_entity(parent_name)
                 for parent_name in entity.inheritances
             ]
 
@@ -130,10 +130,10 @@ class _UnverifiedOntology:
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _topologically_sort(
-    symbol_table: parse.SymbolTable,
+    parsed_symbol_table: parse.SymbolTable,
 ) -> Tuple[Optional[_UnverifiedOntology], Optional[parse.Entity]]:
     """
-    Sort topologically all the entities in the ``symbol_table``.
+    Sort topologically all the entities in the ``parsed_symbol_table``.
 
     :return: topologically sorted entities, or an entity in a cycle
     """
@@ -146,7 +146,7 @@ def _topologically_sort(
         key=lambda an_entity: an_entity.name
     )  # type: sortedcontainers.SortedSet[parse.Entity]
 
-    for symbol in symbol_table.symbols:
+    for symbol in parsed_symbol_table.symbols:
         if not isinstance(symbol, parse.Entity):
             continue
 
@@ -179,7 +179,7 @@ def _topologically_sort(
         temporary_marks.add(entity)
 
         for an_identifier in entity.inheritances:
-            a_symbol = symbol_table.must_find(an_identifier)
+            a_symbol = parsed_symbol_table.must_find(an_identifier)
             assert isinstance(a_symbol, parse.AbstractEntity)
 
             visit(entity=a_symbol)
@@ -198,27 +198,25 @@ def _topologically_sort(
     if visited_more_than_once:
         return None, visited_more_than_once
 
-    return _UnverifiedOntology(entities=result, symbol_table=symbol_table), None
+    return _UnverifiedOntology(
+        entities=result, parsed_symbol_table=parsed_symbol_table), None
 
 
 class Ontology(_UnverifiedOntology):
     """
     Provide an ontology computed from a symbol table.
 
-    The ontology has been verified through :py:function`symbol_table_to_ontology`.
+    The ontology has been verified through :py:function`map_symbol_table_to_ontology`.
     """
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def symbol_table_to_ontology(
-    symbol_table: parse.SymbolTable,
+def map_symbol_table_to_ontology(
+    parsed_symbol_table: parse.SymbolTable,
 ) -> Tuple[Optional[Ontology], Optional[List[Error]]]:
-    """
-    Check that ``symbol_table`` is consistent as an ontology.
-
-    For example, check that there are no inheritance cycles.
-    """
-    ontology, visited_more_than_once = _topologically_sort(symbol_table=symbol_table)
+    """Infer the ontology of the entities from the ``parsed_symbol_table``."""
+    ontology, visited_more_than_once = _topologically_sort(
+        parsed_symbol_table=parsed_symbol_table)
     if visited_more_than_once is not None:
         return (
             None,
@@ -238,7 +236,7 @@ def symbol_table_to_ontology(
 
     # region Check that properties and methods do not conflict among antecedents
 
-    for symbol in symbol_table.symbols:
+    for symbol in parsed_symbol_table.symbols:
         if not isinstance(symbol, parse.Entity):
             continue
 
@@ -283,7 +281,7 @@ def symbol_table_to_ontology(
 
     # region Check that antecedents do not have constructors if the entity lacks one
 
-    for symbol in symbol_table.symbols:
+    for symbol in parsed_symbol_table.symbols:
         if not isinstance(symbol, parse.Entity):
             continue
 

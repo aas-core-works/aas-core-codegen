@@ -20,8 +20,6 @@ from aas_core_csharp_codegen import parse
 from aas_core_csharp_codegen.common import Identifier, Error
 from aas_core_csharp_codegen.parse import Method
 
-# TODO: integrate this module into the intermediate module,
-#  and use parse.tree for analysis
 
 class CallSuperConstructor:
     """
@@ -90,7 +88,7 @@ Statement = Union[CallSuperConstructor, AssignArgument]
 def _call_as_call_to_super_init(
         call: ast.Call,
         entity: parse.Entity,
-        symbol_table: parse.SymbolTable,
+        parsed_symbol_table: parse.SymbolTable,
         atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[CallSuperConstructor], Optional[Error]]:
     """Understand a call as a call to the constructor of a super-class."""
@@ -141,7 +139,7 @@ def _call_as_call_to_super_init(
             ),
         )
 
-    super_entity = symbol_table.must_find_entity(name=identifier)
+    super_entity = parsed_symbol_table.must_find_entity(name=identifier)
 
     if "__init__" not in super_entity.method_map:
         return (
@@ -300,7 +298,6 @@ def _understand_assignment(
         assign: ast.Assign,
         init: Method,
         entity: parse.Entity,
-        symbol_table: parse.SymbolTable,
         atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Statement], Optional[Error]]:
     if len(assign.targets) > 1:
@@ -398,7 +395,9 @@ def _understand_assignment(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _understand_body(
-        entity: parse.Entity, symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
+        entity: parse.Entity,
+        parsed_symbol_table: parse.SymbolTable,
+        atok: asttokens.ASTTokens
 ) -> Tuple[Optional[List[Statement]], Optional[Error]]:
     """Try to understand the body of the constructor for the given ``entity``."""
     init = None  # type: Optional[parse.Method]
@@ -418,7 +417,7 @@ def _understand_body(
             continue
         elif isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
             call_super_init, error = _call_as_call_to_super_init(
-                call=stmt.value, entity=entity, symbol_table=symbol_table, atok=atok
+                call=stmt.value, entity=entity, parsed_symbol_table=parsed_symbol_table, atok=atok
             )
 
             if error is not None:
@@ -429,7 +428,9 @@ def _understand_body(
 
         elif isinstance(stmt, ast.Assign):
             prop_assignment, error = _understand_assignment(
-                assign=stmt, init=init, entity=entity, symbol_table=symbol_table,
+                assign=stmt,
+                init=init,
+                entity=entity,
                 atok=atok)
 
             if error is not None:
@@ -491,11 +492,11 @@ class ConstructorTable:
 
 # fmt: off
 @ensure(
-    lambda symbol_table, result:
+    lambda parsed_symbol_table, result:
     result[0] is None
     or all(
         result[0].has(symbol)
-        for symbol in symbol_table.symbols
+        for symbol in parsed_symbol_table.symbols
         if isinstance(symbol, parse.Entity)
     ),
     "Constructor understood for each entity"
@@ -503,7 +504,7 @@ class ConstructorTable:
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def understand_all(
-        symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
+        parsed_symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[ConstructorTable], Optional[Error]]:
     """Understand the constructors of all the entities in the symbol table."""
     errors = []  # type: List[Error]
@@ -511,12 +512,12 @@ def understand_all(
         collections.OrderedDict()
     )  # type: MutableMapping[parse.Entity, List[Statement]]
 
-    for symbol in symbol_table.symbols:
+    for symbol in parsed_symbol_table.symbols:
         if not isinstance(symbol, parse.Entity):
             continue
 
         statements, error = _understand_body(
-            entity=symbol, symbol_table=symbol_table, atok=atok
+            entity=symbol, parsed_symbol_table=parsed_symbol_table, atok=atok
         )
 
         if error is not None:

@@ -7,13 +7,13 @@ from icontract import ensure
 import tests.common
 from aas_core_csharp_codegen import parse
 from aas_core_csharp_codegen.common import Error
-from aas_core_csharp_codegen.understand import constructor
+from aas_core_csharp_codegen.intermediate import _constructor
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def understand_constructor_table(
         source: str
-) -> Tuple[Optional[constructor.ConstructorTable], Optional[Error]]:
+) -> Tuple[Optional[_constructor.ConstructorTable], Optional[Error]]:
     """Parse the source and try to understand all the constructors."""
     atok, parse_exception = parse.source_to_atok(source=source)
     assert atok is not None
@@ -26,7 +26,7 @@ def understand_constructor_table(
     assert error is None, f"{error=}"
     assert symbol_table is not None
 
-    either = constructor.understand_all(
+    either = _constructor.understand_all(
         symbol_table=symbol_table,
         atok=atok)
 
@@ -34,9 +34,9 @@ def understand_constructor_table(
 
 
 def must_find_item_for(
-        constructor_table: constructor.ConstructorTable,
+        constructor_table: _constructor.ConstructorTable,
         name: str
-) -> Tuple[parse.Entity, Sequence[constructor.Statement]]:
+) -> Tuple[parse.Entity, Sequence[_constructor.Statement]]:
     """
     Find the constructor statements for the entity given with ``identifier``.
 
@@ -116,7 +116,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
         self.assertEqual(1, len(statements))
 
         statement = statements[0]
-        assert isinstance(statement, constructor.CallSuperConstructor)
+        assert isinstance(statement, _constructor.CallSuperConstructor)
         self.assertEqual("Parent", statement.super_name)
 
     def test_with_arguments(self) -> None:
@@ -146,7 +146,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
         self.assertEqual(1, len(statements))
 
         statement = statements[0]
-        assert isinstance(statement, constructor.CallSuperConstructor)
+        assert isinstance(statement, _constructor.CallSuperConstructor)
         self.assertEqual("Parent", statement.super_name)
 
 
@@ -169,7 +169,7 @@ class Test_assign_property_ok(unittest.TestCase):
         self.assertEqual(1, len(statements))
 
         statement = statements[0]
-        assert isinstance(statement, constructor.AssignArgument)
+        assert isinstance(statement, _constructor.AssignArgument)
         self.assertEqual("x", statement.name)
 
 

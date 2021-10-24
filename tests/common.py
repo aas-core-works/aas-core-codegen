@@ -113,7 +113,7 @@ def translate_source_to_intermediate(
     assert error is None, f"{error=}"
     assert parsed_symbol_table is not None
 
-    ontology, errors = understand_hierarchy.symbol_table_to_ontology(
+    ontology, errors = understand_hierarchy.map_symbol_table_to_ontology(
         symbol_table=parsed_symbol_table)
     assert errors is None, f"{errors=}"
     assert ontology is not None

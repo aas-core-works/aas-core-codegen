@@ -10,11 +10,10 @@ import docutils.parsers.rst
 import docutils.utils
 from icontract import require, ensure
 
-import aas_core_csharp_codegen.understand.constructor as understand_constructor
-import aas_core_csharp_codegen.understand.hierarchy as understand_hierarchy
 from aas_core_csharp_codegen import parse
 from aas_core_csharp_codegen.common import Error, Identifier, assert_never, \
     IDENTIFIER_RE
+from aas_core_csharp_codegen.intermediate import _hierarchy, _constructor
 from aas_core_csharp_codegen.intermediate._types import (
     SymbolTable,
     Enumeration,
@@ -356,10 +355,7 @@ def _parsed_contracts_to_contracts(
         preconditions=[
             Contract(
                 args=parsed_pre.args,
-                description=(
-                    _parsed_description_to_description(parsed_pre.description)
-                    if parsed_pre.description is not None
-                    else None),
+                description=parsed_pre.description,
                 body=parsed_pre.condition.body,
                 parsed=parsed_pre,
             )
@@ -377,10 +373,7 @@ def _parsed_contracts_to_contracts(
         postconditions=[
             Contract(
                 args=parsed_post.args,
-                description=(
-                    _parsed_description_to_description(parsed_post.description)
-                    if parsed_post.description is not None
-                    else None),
+                description=parsed_post.description,
                 body=parsed_post.condition.body,
                 parsed=parsed_post,
             )
@@ -426,22 +419,23 @@ def _parsed_method_to_method(
 
 def _in_line_constructors(
         parsed_symbol_table: parse.SymbolTable,
-        ontology: understand_hierarchy.Ontology,
-        constructor_table: understand_constructor.ConstructorTable,
-) -> Mapping[parse.Entity, Sequence[understand_constructor.AssignArgument]]:
+        ontology: _hierarchy.Ontology,
+        constructor_table: _constructor.ConstructorTable,
+) -> Mapping[parse.Entity, Sequence[_constructor.AssignArgument]]:
     """In-line recursively all the constructor bodies."""
     result = (
         dict()
-    )  # type: MutableMapping[parse.Entity, List[understand_constructor.AssignArgument]]
+    )  # type: MutableMapping[parse.Entity, List[_constructor.AssignArgument]]
 
     for entity in ontology.entities:
-        # We explicitly check at the stage of understand.constructor that all the calls
+        # We explicitly check at the stage of
+        # :py:mod:`aas_core_csharp_codegen.intermediate.constructor` that all the calls
         # are calls to constructors of a super class or property assignments.
 
         constructor_body = constructor_table.must_find(entity)
-        in_lined = []  # type: List[understand_constructor.AssignArgument]
+        in_lined = []  # type: List[_constructor.AssignArgument]
         for statement in constructor_body:
-            if isinstance(statement, understand_constructor.CallSuperConstructor):
+            if isinstance(statement, _constructor.CallSuperConstructor):
                 antecedent = parsed_symbol_table.must_find_entity(statement.super_name)
 
                 in_lined_of_antecedent = result.get(antecedent, None)
@@ -485,9 +479,9 @@ def _stack_contracts(contracts: Contracts, other: Contracts) -> Contracts:
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parsed_entity_to_class(
         parsed: parse.ConcreteEntity,
-        ontology: understand_hierarchy.Ontology,
+        ontology: _hierarchy.Ontology,
         in_lined_constructors: Mapping[
-            parse.Entity, Sequence[understand_constructor.AssignArgument]]
+            parse.Entity, Sequence[_constructor.AssignArgument]]
 ) -> Tuple[Optional[Class], Optional[Error]]:
     """Translate a concrete entity to an intermediate class."""
     antecedents = ontology.list_antecedents(entity=parsed)
@@ -541,7 +535,7 @@ def _parsed_entity_to_class(
     if init_is_implementation_specific:
         init_implementation_key = ImplementationKey(f"{parsed.name}/__init__")
 
-    constructor = Constructor(
+    ctor = Constructor(
         arguments=arguments,
         contracts=contracts,
         implementation_key=init_implementation_key,
@@ -619,7 +613,7 @@ def _parsed_entity_to_class(
             else None),
         properties=properties,
         methods=methods,
-        constructor=constructor,
+        constructor=ctor,
         invariants=invariants,
         description=(
             _parsed_description_to_description(parsed.description)
@@ -814,8 +808,6 @@ def _fill_in_default_placeholder(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def translate(
         parsed_symbol_table: parse.SymbolTable,
-        ontology: understand_hierarchy.Ontology,
-        constructor_table: understand_constructor.ConstructorTable,
         atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[SymbolTable], Optional[Error]]:
     """Translate the parsed symbols into intermediate symbols."""
@@ -829,13 +821,39 @@ def translate(
             "to an intermediate symbol table",
             underlying=underlying_errors)
 
-    # region First pass of translation; type annotations reference placeholder symbols
+    # region Infer hierarchy as ontology
+
+    ontology, errors = _hierarchy.map_symbol_table_to_ontology(
+        parsed_symbol_table=parsed_symbol_table
+    )
+    if errors is not None:
+        underlying_errors = errors
+        return None, bundle_underlying_errors()
+
+    assert ontology is not None
+
+    # endregion
+
+    # region Understand constructor stacks
+
+    constructor_table, error = _constructor.understand_all(
+        parsed_symbol_table=parsed_symbol_table, atok=atok)
+
+    if error is not None:
+        underlying_errors = [error]
+        return None, bundle_underlying_errors()
+
+    assert constructor_table is not None
 
     in_lined_constructors = _in_line_constructors(
         parsed_symbol_table=parsed_symbol_table,
         ontology=ontology,
         constructor_table=constructor_table,
     )
+
+    # endregion
+
+    # region First pass of translation; type annotations reference placeholder symbols
 
     symbols = []  # type: List[Symbol]
     for parsed_symbol in parsed_symbol_table.symbols:

@@ -10,6 +10,10 @@ import docutils.utils
 from icontract import ensure, require
 
 from aas_core_csharp_codegen import intermediate
+from aas_core_csharp_codegen.intermediate import (
+    _constructor as intermediate_constructor
+)
+
 from aas_core_csharp_codegen import specific_implementations
 from aas_core_csharp_codegen.common import (
     Error, Identifier, assert_never,
@@ -20,9 +24,6 @@ from aas_core_csharp_codegen.csharp import (
     unrolling as csharp_unrolling)
 from aas_core_csharp_codegen.specific_implementations import (
     verify as specific_implementations_verify)
-from aas_core_csharp_codegen.understand import (
-    constructor as understand_constructor
-)
 
 
 # region Checks
@@ -898,13 +899,13 @@ def _generate_constructor(
 
     body = []  # type: List[str]
     for stmt in symbol.constructor.statements:
-        if isinstance(stmt, understand_constructor.AssignArgument):
+        if isinstance(stmt, intermediate_constructor.AssignArgument):
             if stmt.default is None:
                 body.append(
                     f'{csharp_naming.property_name(stmt.name)} = '
                     f'{csharp_naming.argument_name(stmt.argument)};')
             else:
-                if isinstance(stmt.default, understand_constructor.EmptyList):
+                if isinstance(stmt.default, intermediate_constructor.EmptyList):
                     prop = symbol.properties_by_name[stmt.name]
                     prop_type = csharp_common.generate_type(prop.type_annotation)
 
@@ -923,7 +924,7 @@ def _generate_constructor(
 
                     body.append(writer.getvalue())
                 elif isinstance(
-                        stmt.default, understand_constructor.DefaultEnumLiteral):
+                        stmt.default, intermediate_constructor.DefaultEnumLiteral):
                     literal_code = ".".join([
                         csharp_naming.enum_name(stmt.default.enum.name),
                         csharp_naming.enum_literal_name(stmt.default.literal.name)

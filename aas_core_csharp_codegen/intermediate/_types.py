@@ -8,9 +8,9 @@ from typing import (
 import docutils.nodes
 from icontract import require, invariant
 
-import aas_core_csharp_codegen.understand.constructor as understand_constructor
 from aas_core_csharp_codegen import parse
 from aas_core_csharp_codegen.common import Identifier, assert_never
+from aas_core_csharp_codegen.intermediate import _constructor
 from aas_core_csharp_codegen.parse import BUILTIN_ATOMIC_TYPES
 from aas_core_csharp_codegen.specific_implementations import ImplementationKey
 
@@ -453,7 +453,7 @@ class Constructor:
             arguments: Sequence[Argument],
             contracts: Contracts,
             implementation_key: Optional[ImplementationKey],
-            statements: Sequence[understand_constructor.AssignArgument],
+            statements: Sequence[_constructor.AssignArgument],
     ) -> None:
         self.arguments = arguments
         self.contracts = contracts

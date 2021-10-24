@@ -17,10 +17,6 @@ from aas_core_csharp_codegen.csharp import (
     visitation as csharp_visitation,
     verification as csharp_verification
 )
-from aas_core_csharp_codegen.understand import (
-    constructor as understand_constructor,
-    hierarchy as understand_hierarchy,
-)
 
 assert aas_core_csharp_codegen.__doc__ == __doc__
 
@@ -170,39 +166,8 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     assert parsed_symbol_table is not None
 
-    ontology, ontology_errors = understand_hierarchy.symbol_table_to_ontology(
-        symbol_table=parsed_symbol_table
-    )
-    if ontology_errors:
-        write_error_report(
-            message=f"Failed to construct the ontology based on the symbol table "
-                    f"parsed from {params.model_path}",
-            errors=[lineno_columner.error_message(error) for error in ontology_errors],
-            stderr=stderr,
-        )
-
-        return 1
-
-    constructor_table, constructor_error = understand_constructor.understand_all(
-        symbol_table=parsed_symbol_table, atok=atok
-    )
-    if constructor_error is not None:
-        write_error_report(
-            message=f"Failed to understand the constructors "
-                    f"based on the symbol table parsed from {params.model_path}",
-            errors=[lineno_columner.error_message(constructor_error)],
-            stderr=stderr,
-        )
-
-        return 1
-
-    assert ontology is not None
-    assert constructor_table is not None
-
     ir_symbol_table, ir_error = intermediate.translate(
         parsed_symbol_table=parsed_symbol_table,
-        ontology=ontology,
-        constructor_table=constructor_table,
         atok=atok,
     )
     if ir_error is not None:
