@@ -348,6 +348,14 @@ class Contracts:
         self.postconditions = postconditions
 
 
+class JsonSerialization:
+    """Specify the settings for JSON serialization of a concrete class."""
+
+    def __init__(self, with_model_type: bool) -> None:
+        """Initialize with the given values."""
+        self.with_model_type = with_model_type
+
+
 class Method:
     """
     Represent a method of a class.
@@ -553,6 +561,7 @@ class Class:
             methods: Sequence[Method],
             constructor: Constructor,
             invariants: Sequence[Invariant],
+            json_serialization: JsonSerialization,
             description: Optional[Description],
             parsed: parse.Entity,
     ) -> None:
@@ -564,6 +573,7 @@ class Class:
         self.methods = methods
         self.constructor = constructor
         self.invariants = invariants
+        self.json_serialization = json_serialization
         self.description = description
         self.parsed = parsed
 

@@ -31,6 +31,7 @@ Snapshot = _types.Snapshot
 Contracts = _types.Contracts
 Method = _types.Method
 Constructor = _types.Constructor
+JsonSerialization = _types.JsonSerialization
 EnumerationLiteral = _types.EnumerationLiteral
 Enumeration = _types.Enumeration
 Class = _types.Class

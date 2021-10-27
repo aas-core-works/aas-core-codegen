@@ -2,7 +2,7 @@
 import ast
 import itertools
 from typing import Sequence, List, Mapping, Optional, MutableMapping, Tuple, Union, \
-    Iterator, Generator
+    Iterator, Generator, TypeVar, Generic
 
 import asttokens
 import docutils.nodes
@@ -29,6 +29,7 @@ from aas_core_csharp_codegen.intermediate._types import (
     Contracts,
     Contract,
     Snapshot,
+    JsonSerialization,
     Method,
     Class,
     Constructor,
@@ -476,6 +477,89 @@ def _stack_contracts(contracts: Contracts, other: Contracts) -> Contracts:
     )
 
 
+T = TypeVar('T')
+
+
+class _SettingWithSource(Generic[T]):
+    """
+    Represent a setting from an inheritance chain.
+
+    For example, a setting for JSON serialization.
+    """
+
+    def __init__(self, value: T, source: parse.Entity):
+        """Initialize with the given values."""
+        self.value = value
+        self.source = source
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _resolve_inheritance_chain_of_a_setting(
+        chain: Sequence[_SettingWithSource[T]],
+        default: T
+) -> Tuple[Optional[T], Optional[str]]:
+    """
+    Resolve the inheritance chain for a setting.
+
+    Return either the resolved value, or an error.
+    """
+    if len(chain) == 0:
+        return default, None
+
+    last_setting = None  # type: Optional[_SettingWithSource]
+
+    for setting in chain:
+        if last_setting is not None and setting.value != last_setting.value:
+            return None, (
+                f"The setting for the entity {setting.source.name} "
+                f"says {setting.value!r}, "
+                f"but the entity {last_setting.source.name} "
+                f"says {last_setting.value!r}")
+
+        last_setting = setting
+
+    return last_setting.value, None
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _stack_json_serializations(
+        entity: parse.Entity,
+        antecedents: Sequence[parse.Entity]
+) -> Tuple[Optional[JsonSerialization], Optional[Error]]:
+    """Effectuate inheritance of json serialization settings through antecedents."""
+    # TODO: test this function
+    # TODO: test also the failure cases
+
+    # NOTE (mristin, 2021-10-27):
+    # We decided to encapsulate the chain resolution to a separate function.
+    # The original implementation, where the chain has been locally resolved, was
+    # quite unreadable and can not scale for XML and other settings.
+
+    chain = list(antecedents) + [entity]
+
+    with_model_type_chain = [
+        _SettingWithSource(
+            value=an_entity_in_chain.json_serialization.with_model_type,
+            source=an_entity_in_chain)
+        for an_entity_in_chain in chain
+        if (
+                an_entity_in_chain.json_serialization is not None
+                and an_entity_in_chain.json_serialization.with_model_type is not None
+        )
+    ]  # type: List[_SettingWithSource[bool]]
+
+    with_model_type, error_message = _resolve_inheritance_chain_of_a_setting(
+        chain=with_model_type_chain, default=False)
+
+    if error_message:
+        return None, Error(
+            entity.node,
+            f"Failed to resolve the chain for setting ``with_model_type`` "
+            f"for JSON serialization: {error_message}")
+
+    return JsonSerialization(with_model_type=with_model_type), None
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parsed_entity_to_class(
         parsed: parse.ConcreteEntity,
@@ -583,17 +667,20 @@ def _parsed_entity_to_class(
     errors = []  # type: List[Error]
 
     for parsed_invariant in parsed.invariants:
-        # TODO: adapt once we know how to translate the invariant from the parsed one
-        # invariant_body, error = _translate_invariant(
-        #     body=parsed_invariant.condition.body)
-        # if error is not None:
-        #     errors.append(error)
-        #     continue
-
         invariants.append(
             Invariant(
                 description=parsed_invariant.description,
                 parsed=parsed_invariant))
+
+    # endregion
+
+    # region Stack settings for JSON serialization
+
+    json_serialization, error = _stack_json_serializations(
+        entity=parsed, antecedents=antecedents)
+
+    if error is not None:
+        errors.append(error)
 
     # endregion
 
@@ -603,6 +690,8 @@ def _parsed_entity_to_class(
             message=f"Failed to translate the class {parsed.name} "
                     f"to the intermediate representation",
             underlying=errors)
+
+    assert json_serialization is not None
 
     return Class(
         name=parsed.name,
@@ -615,6 +704,7 @@ def _parsed_entity_to_class(
         methods=methods,
         constructor=ctor,
         invariants=invariants,
+        json_serialization=json_serialization,
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
