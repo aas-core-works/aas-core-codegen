@@ -327,6 +327,18 @@ class Method:
         )
 
 
+class JsonSerialization:
+    """Define settings for JSON de/serialization of a specific entity."""
+
+    def __init__(self, with_model_type: Optional[bool]) -> None:
+        """
+        Initialize with the given values.
+
+        :param with_model_type: The parsed ``with_model_type`` argument
+        """
+        self.with_model_type = with_model_type
+
+
 class Entity:
     """Represent an entity of the meta-model."""
 
@@ -356,6 +368,7 @@ class Entity:
             properties: Sequence[Property],
             methods: Sequence[Method],
             invariants: Sequence[Invariant],
+            json_serialization: Optional[JsonSerialization],
             description: Optional[Description],
             node: ast.ClassDef,
     ) -> None:
@@ -365,6 +378,7 @@ class Entity:
         self.properties = properties
         self.methods = methods
         self.invariants = invariants
+        self.json_serialization = json_serialization
         self.description = description
         self.node = node
 

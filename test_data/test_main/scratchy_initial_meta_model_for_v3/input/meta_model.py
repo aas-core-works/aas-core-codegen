@@ -7,7 +7,8 @@ from icontract import invariant, DBC
 from aas_core3_meta.marker import (
     abstract,
     implementation_specific,
-    comment
+    comment,
+    json_serialization
 )
 from aas_core3_meta.pattern import is_IRI, is_IRDI, is_ID_short
 
@@ -84,6 +85,7 @@ class Lang_string_set(DBC):
 
 
 @abstract
+@json_serialization(with_model_type=True)
 @invariant(lambda self: is_ID_short(self.id_short), "Constraint AASd-002")
 class Referable(Has_extension):
     """
@@ -416,3 +418,18 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
         Has_data_specification.__init__(self, data_specifications=data_specifications)
 
         self.derived_from = derived_from
+
+
+# TODO: uncomment once we finished the JSON serialization for everything else
+# @implementation_specific
+# class Environment:
+#     """Model the environment as the entry point for referencing and serialization."""
+#     # The environment needs to provide many efficient de-referencing and
+#     # iteration mechanisms, so we make it implementation specific. Alternatively,
+#     # we could automatically generate it (by querying which concrete classes are
+#     # identifiable), but then the generated implementations might be quite inefficient
+#     # (both in terms of run-time and memory usage).
+#     #
+#     # Therefore, we accept the trade-off to manually write this class, which is more
+#     # work for the developer, but where the final result is more ergonomic
+#     # for the end user.

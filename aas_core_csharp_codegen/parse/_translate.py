@@ -33,6 +33,7 @@ from aas_core_csharp_codegen.parse._types import (
     EnumerationLiteral,
     final_in_type_annotation,
     is_string_expr,
+    JsonSerialization,
     Method,
     Property,
     SelfTypeAnnotation,
@@ -71,12 +72,11 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
         self.errors = []  # type: List[Error]
 
     def visit_Import(self, node: ast.Import) -> Any:
-        self.errors.append(
-            Error(
-                node=node,
-                message=f"Unexpected ``import ...``. "
-                        f"Only ``from ... import...`` statements are expected.",
-            )
+        self.errors.append(Error(
+            node,
+            f"Unexpected ``import ...``. "
+            f"Only ``from ... import...`` statements are expected.",
+        )
         )
 
     _EXPECTED_NAME_FROM_MODULE = collections.OrderedDict(
@@ -91,6 +91,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("require", "icontract"),
             ("abstract", "aas_core3_meta.marker"),
             ("implementation_specific", "aas_core3_meta.marker"),
+            ("json_serialization", "aas_core3_meta.marker"),
             ("comment", "aas_core3_meta.marker"),
             ("is_IRI", "aas_core3_meta.pattern"),
             ("is_IRDI", "aas_core3_meta.pattern"),
@@ -102,33 +103,24 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
         for name in node.names:
             assert isinstance(name, ast.alias)
             if name.asname is not None:
-                self.errors.append(
-                    Error(
-                        node=name,
-                        message=f"Unexpected ``from ... import ... as ...``. "
-                                f"Only ``from ... import...`` statements are expected.",
-                    )
-                )
+                self.errors.append(Error(
+                    name,
+                    f"Unexpected ``from ... import ... as ...``. "
+                    f"Only ``from ... import...`` statements are expected."))
             else:
                 if name.name not in self._EXPECTED_NAME_FROM_MODULE:
-                    self.errors.append(
-                        Error(
-                            node=name,
-                            message=f"Unexpected import of a name {name.name!r}.",
-                        )
-                    )
+                    self.errors.append(Error(
+                        name,
+                        f"Unexpected import of a name {name.name!r}."))
 
                 else:
                     expected_module = self._EXPECTED_NAME_FROM_MODULE[name.name]
                     if expected_module != node.module:
-                        self.errors.append(
-                            Error(
-                                node=name,
-                                message=f"Expected to import {name.name!r} "
-                                        f"from the module {expected_module}, "
-                                        f"but it is imported from {node.module}.",
-                            )
-                        )
+                        self.errors.append(Error(
+                            name,
+                            f"Expected to import {name.name!r} "
+                            f"from the module {expected_module}, "
+                            f"but it is imported from {node.module}."))
 
 
 def check_expected_imports(atok: asttokens.ASTTokens) -> List[str]:
@@ -187,44 +179,28 @@ def _enum_to_symbol(
             assign = body_node
 
             if len(assign.targets) != 1:
-                return (
-                    None,
-                    Error(
-                        node=assign,
-                        message=f"Expected a single target in the assignment, "
-                                f"but got: {len(assign.targets)}",
-                    ),
-                )
+                return (None, Error(
+                    assign,
+                    f"Expected a single target in the assignment, "
+                    f"but got: {len(assign.targets)}"))
 
             if not isinstance(assign.targets[0], ast.Name):
-                return (
-                    None,
-                    Error(
-                        node=assign.targets[0],
-                        message=f"Expected a name as a target of the assignment, "
-                                f"but got: {assign.targets[0]}",
-                    ),
-                )
+                return (None, Error(
+                    assign.targets[0],
+                    f"Expected a name as a target of the assignment, "
+                    f"but got: {assign.targets[0]}"))
 
             if not isinstance(assign.value, ast.Constant):
-                return (
-                    None,
-                    Error(
-                        node=assign.value,
-                        message=f"Expected a constant in the enumeration assignment, "
-                                f"but got: {atok.get_text(assign.value)}",
-                    ),
-                )
+                return (None, Error(
+                    assign.value,
+                    f"Expected a constant in the enumeration assignment, "
+                    f"but got: {atok.get_text(assign.value)}"))
 
             if not isinstance(assign.value.value, str):
-                return (
-                    None,
-                    Error(
-                        node=assign.value,
-                        message=f"Expected a string literal in the enumeration, "
-                                f"but got: {assign.value.value}",
-                    ),
-                )
+                return (None, Error(
+                    assign.value,
+                    f"Expected a string literal in the enumeration, "
+                    f"but got: {assign.value.value}"))
 
             literal_name = Identifier(assign.targets[0].id)
             literal_value = assign.value.value
@@ -254,15 +230,11 @@ def _enum_to_symbol(
             cursor += 1
 
         else:
-            return (
-                None,
-                Error(
-                    node=node.body[cursor],
-                    message=f"Expected either a docstring or an assignment "
-                            f"in an enumeration, "
-                            f"but got: {atok.get_text(node.body[cursor])}",
-                ),
-            )
+            return (None, Error(
+                node.body[cursor],
+                f"Expected either a docstring or an assignment "
+                f"in an enumeration, "
+                f"but got: {atok.get_text(node.body[cursor])}"))
 
         assert cursor > old_cursor, f"Loop invariant: {cursor=}, {old_cursor=}"
 
@@ -297,30 +269,22 @@ def _type_annotation(
 
     elif isinstance(node, ast.Constant):
         if not isinstance(node.value, str):
-            return (
-                None,
-                Error(
-                    node=node.value,
-                    message=f"Expected a string literal "
-                            f"if the type annotation is given as a constant, "
-                            f"but got: "
-                            f"{node.value!r} (as {type(node.value)})",
-                ),
-            )
+            return (None, Error(
+                node.value,
+                f"Expected a string literal "
+                f"if the type annotation is given as a constant, "
+                f"but got: "
+                f"{node.value!r} (as {type(node.value)})"))
 
         return AtomicTypeAnnotation(identifier=Identifier(node.value), node=node), None
 
     elif isinstance(node, ast.Subscript):
         if not isinstance(node.value, ast.Name):
-            return (
-                None,
-                Error(
-                    node=node.value,
-                    message=f"Expected a name to define "
-                            f"a subscripted type annotation,"
-                            f"but got: {atok.get_text(node.value)}",
-                ),
-            )
+            return (None, Error(
+                node.value,
+                f"Expected a name to define "
+                f"a subscripted type annotation,"
+                f"but got: {atok.get_text(node.value)}"))
 
         if isinstance(node.slice, ast.Index):
             subscripts = []  # type: List[TypeAnnotation]
@@ -366,15 +330,11 @@ def _type_annotation(
             )
 
         else:
-            return (
-                None,
-                Error(
-                    node=node.slice,
-                    message=f"Expected an index to define "
-                            f"a subscripted type annotation, "
-                            f"but got: {atok.get_text(node.slice)}",
-                ),
-            )
+            return (None, Error(
+                node.slice,
+                f"Expected an index to define "
+                f"a subscripted type annotation, "
+                f"but got: {atok.get_text(node.slice)}"))
     else:
         return (
             None,
@@ -592,10 +552,6 @@ def _args_to_arguments(
     # endregion
 
     return arguments, None
-
-
-
-
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -1034,7 +990,13 @@ def _string_constant_to_description(
 
 class _EntityMarker(enum.Enum):
     ABSTRACT = "abstract"
-    IS_IMPLEMENTATION_SPECIFIC = "is_implementation_specific"
+    IMPLEMENTATION_SPECIFIC = "implementation_specific"
+
+
+_ENTITY_MARKER_FROM_STRING: Mapping[str, _EntityMarker] = {
+    marker.value: marker
+    for marker in _EntityMarker
+}
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -1042,17 +1004,62 @@ def _entity_decorator_to_marker(
         decorator: ast.Name
 ) -> Tuple[Optional[_EntityMarker], Optional[Error]]:
     """Parse a simple decorator as an entity marker."""
-    if decorator.id == "abstract":
-        return _EntityMarker.ABSTRACT, None
+    entity_marker = _ENTITY_MARKER_FROM_STRING.get(decorator.id, None)
 
-    elif decorator.id == "implementation_specific":
-        return _EntityMarker.IS_IMPLEMENTATION_SPECIFIC, None
-
-    else:
+    if entity_marker is None:
         return (None, Error(
             decorator,
             f"The handling of the marker has not been implemented: {decorator.id!r}"
         ))
+
+    return entity_marker, None
+
+
+# fmt: off
+@require(
+    lambda decorator:
+    isinstance(decorator.func, ast.Name)
+    and isinstance(decorator.func.ctx, ast.Load)
+    and decorator.func.id == 'json_serialization'
+)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+# fmt: on
+def _entity_decorator_to_json_serialization(
+        decorator: ast.Call
+) -> Tuple[Optional[JsonSerialization], Optional[Error]]:
+    """Translate a decorator to settings of the JSON serialization."""
+    with_model_type_node = None  # type: Optional[ast.AST]
+
+    if len(decorator.args) >= 1:
+        with_model_type_node = decorator.args[0]
+
+    if len(decorator.keywords) > 0:
+        for kwarg in decorator.keywords:
+            if kwarg.arg == 'with_model_type':
+                with_model_type_node = kwarg.value
+            else:
+                return (None, Error(
+                    decorator,
+                    f"Handling of the keyword argument {kwarg.arg!r} "
+                    f"for the json_serialization has not been implemented"))
+
+    with_model_type = None  # type: Optional[bool]
+    if with_model_type_node is not None:
+        if not isinstance(with_model_type_node, ast.Constant):
+            return (None, Error(
+                with_model_type_node,
+                f"Expected the value for ``with_model_type`` parameter "
+                f"to be a constant, but got: {ast.dump(with_model_type_node)}"))
+
+        if not isinstance(with_model_type_node.value, bool):
+            return (None, Error(
+                with_model_type_node,
+                f"Expected the value for ``with_model_type`` parameter "
+                f"to be a boolean, but got: {with_model_type_node.value}"))
+
+        with_model_type = with_model_type_node.value
+
+    return JsonSerialization(with_model_type=with_model_type), None
 
 
 # fmt: off
@@ -1121,6 +1128,11 @@ def _entity_decorator_to_invariant(
         return None, Error(
             condition_node.body, "Failed to parse the invariant", [error])
 
+    if not isinstance(body, tree.Expression):
+        return None, Error(
+            condition_node.body,
+            f"Expected an expression, but got: {tree.dump(body)}")
+
     return Invariant(
         description=(
             description_node.value
@@ -1160,11 +1172,9 @@ def _classdef_to_symbol(
 
     if "Enum" in base_names and len(base_names) > 1:
         return (None, Error(
-            node=node,
-            message=f"Expected an enumeration to only inherit from ``Enum``, "
-                    f"but it inherits from: {base_names}",
-        ),
-                )
+            node,
+            f"Expected an enumeration to only inherit from ``Enum``, "
+            f"but it inherits from: {base_names}"))
 
     if "Enum" in base_names:
         return _enum_to_symbol(node=node, atok=atok)
@@ -1185,6 +1195,9 @@ def _classdef_to_symbol(
 
     is_abstract = False
     is_implementation_specific = False
+
+    json_serialization = None  # type: Optional[JsonSerialization]
+
     for decorator in node.decorator_list:
         if isinstance(decorator, ast.Name):
             entity_marker, error = _entity_decorator_to_marker(decorator=decorator)
@@ -1194,7 +1207,7 @@ def _classdef_to_symbol(
 
             if entity_marker == _EntityMarker.ABSTRACT:
                 is_abstract = True
-            elif entity_marker == _EntityMarker.IS_IMPLEMENTATION_SPECIFIC:
+            elif entity_marker == _EntityMarker.IMPLEMENTATION_SPECIFIC:
                 is_implementation_specific = True
             else:
                 raise AssertionError(f"Unhandled enum: {entity_marker}")
@@ -1203,20 +1216,33 @@ def _classdef_to_symbol(
                 isinstance(decorator, ast.Call)
                 and isinstance(decorator.func, ast.Name)
                 and isinstance(decorator.func.ctx, ast.Load)
-                and decorator.func.id == 'invariant'
         ):
-            invariant, error = _entity_decorator_to_invariant(
-                decorator=decorator, atok=atok)
+            if decorator.func.id == 'invariant':
+                invariant, error = _entity_decorator_to_invariant(
+                    decorator=decorator, atok=atok)
 
-            if error is not None:
-                underlying_errors.append(error)
-                continue
+                if error is not None:
+                    underlying_errors.append(error)
+                    continue
 
-            invariants.append(invariant)
+                invariants.append(invariant)
+            elif decorator.func.id == 'json_serialization':
+                json_serialization, error = _entity_decorator_to_json_serialization(
+                    decorator=decorator)
+
+                if error is not None:
+                    underlying_errors.append(error)
+                    continue
+
+            else:
+                underlying_errors.append(Error(
+                    decorator,
+                    f"Handling of a decorator has not been "
+                    f"implemented: {decorator.id!r}"))
         else:
             underlying_errors.append(
                 Error(
-                    node=decorator,
+                    decorator,
                     message=f"Handling of a decorator has not been "
                             f"implemented: {decorator.id!r}"))
 
@@ -1232,7 +1258,7 @@ def _classdef_to_symbol(
         return (
             None,
             Error(
-                node=node,
+                node,
                 message=f"Abstract entities can not be implementation-specific "
                         f"at the same time "
                         f"(otherwise we can not convert them to interfaces etc.)"))
@@ -1308,15 +1334,12 @@ def _classdef_to_symbol(
             cursor += 1
 
         else:
-            return (
-                None,
-                Error(
-                    node=expr,
-                    message=f"Expected only either "
-                            f"properties explicitly annotated with types or "
-                            f"instance methods, but got: {atok.get_text(expr)}",
-                ),
-            )
+            return (None, Error(
+                expr,
+                f"Expected only either "
+                f"properties explicitly annotated with types or "
+                f"instance methods, but got: {atok.get_text(expr)}",
+            ))
 
         assert old_cursor < cursor, f"Loop invariant: {old_cursor=}, {cursor=}"
 
@@ -1335,6 +1358,7 @@ def _classdef_to_symbol(
             properties=properties,
             methods=methods,
             invariants=invariants,
+            json_serialization=json_serialization,
             description=description,
             node=node,
         ),
