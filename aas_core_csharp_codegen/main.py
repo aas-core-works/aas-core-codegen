@@ -17,6 +17,9 @@ from aas_core_csharp_codegen.csharp import (
     visitation as csharp_visitation,
     verification as csharp_verification
 )
+from aas_core_csharp_codegen.csharp.serialization import (
+    stringification as csharp_serialization_stringification
+)
 
 assert aas_core_csharp_codegen.__doc__ == __doc__
 
@@ -154,11 +157,11 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     lineno_columner = LinenoColumner(atok=atok)
 
-    parsed_symbol_table, parse_error = parse.atok_to_symbol_table(atok=atok)
-    if parse_error is not None:
+    parsed_symbol_table, error = parse.atok_to_symbol_table(atok=atok)
+    if error is not None:
         write_error_report(
             message=f"Failed to construct the symbol table from {params.model_path}",
-            errors=[lineno_columner.error_message(parse_error)],
+            errors=[lineno_columner.error_message(error)],
             stderr=stderr,
         )
 
@@ -166,126 +169,167 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     assert parsed_symbol_table is not None
 
-    ir_symbol_table, ir_error = intermediate.translate(
+    ir_symbol_table, error = intermediate.translate(
         parsed_symbol_table=parsed_symbol_table,
         atok=atok,
     )
-    if ir_error is not None:
+    if error is not None:
         write_error_report(
             message=f"Failed to translate the parsed symbol table "
                     f"to intermediate symbol table "
                     f"based on {params.model_path}",
-            errors=[lineno_columner.error_message(ir_error)],
+            errors=[lineno_columner.error_message(error)],
             stderr=stderr,
         )
 
         return 1
 
-    verified_ir_table, ir_for_csharp_errors = csharp_structure.verify(
+    verified_ir_table, errors = csharp_structure.verify(
         symbol_table=ir_symbol_table,
         spec_impls=spec_impls)
 
-    if ir_for_csharp_errors is not None:
+    if errors is not None:
         write_error_report(
             message=f"Failed to verify the intermediate symbol table "
                     f"for generation of C# code"
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)
-                for error in ir_for_csharp_errors
+                for error in errors
             ],
             stderr=stderr)
         return 1
 
     namespace = csharp_common.NamespaceIdentifier(params.namespace)
 
-    structure_code, structure_errors = csharp_structure.generate(
+    # region Structure
+
+    code, errors = csharp_structure.generate(
         symbol_table=verified_ir_table,
         namespace=namespace,
         spec_impls=spec_impls)
 
-    if structure_errors is not None:
+    if errors is not None:
         write_error_report(
             message=f"Failed to generate the structures in the C# code "
                     f"based on {params.model_path}",
-            errors=[lineno_columner.error_message(error) for error in structure_errors],
+            errors=[lineno_columner.error_message(error) for error in errors],
             stderr=stderr)
         return 1
 
-    assert structure_code is not None
+    assert code is not None
 
-    structure_pth = params.output_dir / "types.cs"
+    pth = params.output_dir / "types.cs"
     try:
-        structure_pth.write_text(structure_code)
+        pth.write_text(code)
     except Exception as exception:
         write_error_report(
-            message=f"Failed to write the C# structures to {structure_pth}",
+            message=f"Failed to write the C# structures to {pth}",
             errors=[str(exception)],
             stderr=stderr)
         return 1
 
-    visitation_code, visitation_errors = csharp_visitation.generate(
+    # endregion
+
+    # region Visitation
+
+    code, errors = csharp_visitation.generate(
         symbol_table=ir_symbol_table,
         namespace=namespace)
 
-    if visitation_errors is not None:
+    if errors is not None:
         write_error_report(
             message=f"Failed to generate the C# code for visitation "
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)
-                for error in visitation_errors],
+                for error in errors],
             stderr=stderr)
         return 1
 
-    assert visitation_code is not None
+    assert code is not None
 
-    verification_pth = params.output_dir / "visitation.cs"
+    pth = params.output_dir / "visitation.cs"
     try:
-        verification_pth.write_text(visitation_code)
+        pth.write_text(code)
     except Exception as exception:
         write_error_report(
-            message=f"Failed to write the visitation C# code to {verification_pth}",
+            message=f"Failed to write the visitation C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr)
         return 1
 
-    verification_spec_impl_errors = csharp_verification.verify(spec_impls=spec_impls)
-    if verification_spec_impl_errors is not None:
+    # endregion
+
+    # region Verification
+
+    errors = csharp_verification.verify(spec_impls=spec_impls)
+    if errors is not None:
         write_error_report(
-            message=f"Failed to write the C# structures to {structure_pth}",
-            errors=verification_spec_impl_errors,
+            message=f"Failed to write the C# structures to {pth}",
+            errors=errors,
             stderr=stderr)
         return 1
 
-    verification_code, verification_errors = csharp_verification.generate(
+    code, errors = csharp_verification.generate(
         symbol_table=verified_ir_table,
         namespace=namespace,
         spec_impls=spec_impls)
 
-    if verification_errors is not None:
+    if errors is not None:
         write_error_report(
             message=f"Failed to generate the verification C# code "
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)
-                for error in verification_errors],
+                for error in errors],
             stderr=stderr)
         return 1
 
-    assert verification_code is not None
+    assert code is not None
 
-    verification_pth = params.output_dir / "verification.cs"
+    pth = params.output_dir / "verification.cs"
     try:
-        verification_pth.write_text(verification_code)
+        pth.write_text(code)
     except Exception as exception:
         write_error_report(
-            message=f"Failed to write the verification C# code to {verification_pth}",
+            message=f"Failed to write the verification C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr)
         return 1
 
-    # TODO: implement further steps
+    # endregion
+
+    # region Verification
+
+    code, errors = csharp_serialization_stringification.generate(
+        symbol_table=ir_symbol_table, namespace=namespace)
+
+    if errors is not None:
+        write_error_report(
+            message=f"Failed to generate the stringification C# code "
+                    f"based on {params.model_path}",
+            errors=[
+                lineno_columner.error_message(error)
+                for error in errors],
+            stderr=stderr)
+        return 1
+
+    assert code is not None
+
+    pth = params.output_dir / "serialization" / "stringification.cs"
+    pth.parent.mkdir(exist_ok=True)
+
+    try:
+        pth.write_text(code)
+    except Exception as exception:
+        write_error_report(
+            message=f"Failed to write the stringification C# code to {pth}",
+            errors=[str(exception)],
+            stderr=stderr)
+        return 1
+
+    # endregion
 
     stdout.write(f"Code generated to: {params.output_dir}\n")
     return 0

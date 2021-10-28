@@ -1201,7 +1201,7 @@ def generate(
     """
     Generate the C# code of the structures based on the symbol table.
 
-    The ``namespace`` defines the C# namespace.
+    The ``namespace`` defines the AAS C# namespace.
     """
     blocks = [csharp_common.WARNING]  # type: List[Rstripped]
 

@@ -261,7 +261,7 @@ def generate(
     """
     Generate the C# code of the visitors based on the intermediate representation
 
-    The ``namespace`` defines the C# namespace.
+    The ``namespace`` defines the AAS C# namespace.
     """
     blocks = [csharp_common.WARNING]  # type: List[Rstripped]
 

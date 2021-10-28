@@ -1422,19 +1422,26 @@ def _verify_symbol_table(
 
     reserved_symbol_names = {
         'accept',
-        'visit'
         'context',
         'entity',
-        'errors'
+        'environment',
+        'error',
+        'errors',
+        'from_json',
+        'from_xml',
         'ientity',
-        'itransformer_with_context'
+        'itransformer_with_context',
         'ivisitor',
         'ivisitor_with_context',
         'path',
+        'serialization',
+        'to_json',
+        'to_xml',
         'transform',
         'transformer',
         'transformer_with_context'
         'verification',
+        'visit',
         'visitation',
         'visitor',
         'visitor_with_context',

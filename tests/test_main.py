@@ -75,11 +75,14 @@ class Test_against_recorded(unittest.TestCase):
                         normalized_stdout, stdout_pth.read_text(), stdout_pth)
 
                 # TODO: check the remainder of the generated files
-                for relevant_filename in [
-                    'types.cs', 'visitation.cs', 'verification.cs'
+                for relevant_rel_pth in [
+                    pathlib.Path('types.cs'),
+                    pathlib.Path('visitation.cs'),
+                    pathlib.Path('verification.cs'),
+                    pathlib.Path('serialization') / 'stringification.cs'
                 ]:
-                    expected_pth = expected_output_dir / relevant_filename
-                    output_pth = output_dir / relevant_filename
+                    expected_pth = expected_output_dir / relevant_rel_pth
+                    output_pth = output_dir / relevant_rel_pth
 
                     if not output_pth.exists():
                         raise FileNotFoundError(

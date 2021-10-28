@@ -84,6 +84,27 @@ def property_name(identifier: Identifier) -> Identifier:
             ''.join(part.capitalize() for part in parts[1:])))
 
 
+def private_property_name(identifier: Identifier) -> Identifier:
+    """
+    Generate a C# name for a private property based on the ``identifier``.
+
+    >>> private_property_name(Identifier("something"))
+    '_something'
+
+    >>> private_property_name(Identifier("something_to_URL"))
+    '_somethingToUrl'
+    """
+    parts = identifier.split('_')
+
+    if len(parts) == 1:
+        return Identifier(f"_{Identifier(parts[0].lower())}")
+
+    return Identifier(
+        "_{}{}".format(
+            parts[0].lower(),
+            ''.join(part.capitalize() for part in parts[1:])))
+
+
 def method_name(identifier: Identifier) -> Identifier:
     """
     Generate a C# name for a member method based on its meta-model ``identifier``.
