@@ -1427,16 +1427,13 @@ def _verify_symbol_table(
         'environment',
         'error',
         'errors',
-        'from_json',
-        'from_xml',
         'ientity',
         'itransformer_with_context',
         'ivisitor',
         'ivisitor_with_context',
+        'jsonization',
         'path',
-        'serialization',
-        'to_json',
-        'to_xml',
+        'stringification',
         'transform',
         'transformer',
         'transformer_with_context'
@@ -1446,7 +1443,9 @@ def _verify_symbol_table(
         'visitor',
         'visitor_with_context',
     }
-    reserved_method_names = {'descend', 'descend_once', 'accept', 'transform'}
+    reserved_member_names = {
+        'descend', 'descend_once', 'accept', 'transform', 'model_type'
+    }
 
     for symbol in symbol_table.symbols:
         if symbol.name.lower() in reserved_symbol_names:
@@ -1457,14 +1456,14 @@ def _verify_symbol_table(
 
         if isinstance(symbol, Entity):
             for method in symbol.methods:
-                if method.name in reserved_method_names:
+                if method.name in reserved_member_names:
                     errors.append(Error(
                         method.node,
                         f"The name of the method is reserved "
                         f"for the code generation: {method.name!r}"))
 
             for prop in symbol.properties:
-                if prop.name in reserved_method_names:
+                if prop.name in reserved_member_names:
                     errors.append(Error(
                         prop.node,
                         f"The name of the property is reserved "

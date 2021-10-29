@@ -15,10 +15,9 @@ from aas_core_csharp_codegen.csharp import (
     specific_implementations as csharp_specific_implementations,
     structure as csharp_structure,
     visitation as csharp_visitation,
-    verification as csharp_verification
-)
-from aas_core_csharp_codegen.csharp.serialization import (
-    stringification as csharp_serialization_stringification
+    verification as csharp_verification,
+    stringification as csharp_stringification,
+    jsonization as csharp_jsonization
 )
 
 assert aas_core_csharp_codegen.__doc__ == __doc__
@@ -300,9 +299,9 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     # endregion
 
-    # region Verification
+    # region Stringification
 
-    code, errors = csharp_serialization_stringification.generate(
+    code, errors = csharp_stringification.generate(
         symbol_table=ir_symbol_table, namespace=namespace)
 
     if errors is not None:
@@ -317,7 +316,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     assert code is not None
 
-    pth = params.output_dir / "serialization" / "stringification.cs"
+    pth = params.output_dir / "stringification.cs"
     pth.parent.mkdir(exist_ok=True)
 
     try:
@@ -325,6 +324,37 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     except Exception as exception:
         write_error_report(
             message=f"Failed to write the stringification C# code to {pth}",
+            errors=[str(exception)],
+            stderr=stderr)
+        return 1
+
+    # endregion
+
+    # region Jsonization
+
+    code, errors = csharp_jsonization.generate(
+        symbol_table=ir_symbol_table, namespace=namespace)
+
+    if errors is not None:
+        write_error_report(
+            message=f"Failed to generate the jsonization C# code "
+                    f"based on {params.model_path}",
+            errors=[
+                lineno_columner.error_message(error)
+                for error in errors],
+            stderr=stderr)
+        return 1
+
+    assert code is not None
+
+    pth = params.output_dir / "jsonization.cs"
+    pth.parent.mkdir(exist_ok=True)
+
+    try:
+        pth.write_text(code)
+    except Exception as exception:
+        write_error_report(
+            message=f"Failed to write the jsonization C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr)
         return 1

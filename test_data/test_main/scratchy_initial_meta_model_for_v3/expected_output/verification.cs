@@ -9,7 +9,10 @@ using NotImplementedException = System.NotImplementedException;
 using Regex = System.Text.RegularExpressions.Regex;
 using System.Collections.Generic;  // can't alias
 using System.Collections.ObjectModel;  // can't alias
-using System.Linq;  // can't alias
+using System.Linq;  // can't alias"
+
+using Aas = AasCore.Aas3;
+using Visitation = AasCore.Aas3.Visitation;
 
 namespace AasCore.Aas3
 {
@@ -171,7 +174,7 @@ namespace AasCore.Aas3
             /// <summary>
             /// Contained error items
             /// </summary>
-            private readonly List<Error> _entries;
+            private readonly List<Verification.Error> _entries;
 
             /// <summary>
             /// Initialize the container with the given <paramref name="capacity" />.
@@ -185,13 +188,13 @@ namespace AasCore.Aas3
                 }
 
                 Capacity = capacity;
-                _entries = new List<Error>(Capacity);
+                _entries = new List<Verification.Error>(Capacity);
             }
 
             /// <summary>
             /// Add the error to the container if the capacity has not been reached.
             /// </summary>
-            public void Add(Error error)
+            public void Add(Verification.Error error)
             {
                 if(_entries.Count <= Capacity)
                 {
@@ -213,7 +216,7 @@ namespace AasCore.Aas3
             /// <remarks>
             /// If you want to add a new error, use <see cref="Add" />.
             /// </remarks>
-            public ReadOnlyCollection<Error> Entries()
+            public ReadOnlyCollection<Verification.Error> Entries()
             {
                 var result = this._entries.AsReadOnly();
                 if (result.Count > Capacity)
@@ -241,25 +244,25 @@ namespace AasCore.Aas3
             private static class EnumValueSet
             {
                 public static HashSet<int> ForIdentifierType = new HashSet<int>(
-                    System.Enum.GetValues(typeof(IdentifierType)).Cast<int>());
+                    System.Enum.GetValues(typeof(Aas.IdentifierType)).Cast<int>());
 
                 public static HashSet<int> ForModelingKind = new HashSet<int>(
-                    System.Enum.GetValues(typeof(ModelingKind)).Cast<int>());
+                    System.Enum.GetValues(typeof(Aas.ModelingKind)).Cast<int>());
 
                 public static HashSet<int> ForLocalKeyType = new HashSet<int>(
-                    System.Enum.GetValues(typeof(LocalKeyType)).Cast<int>());
+                    System.Enum.GetValues(typeof(Aas.LocalKeyType)).Cast<int>());
 
                 public static HashSet<int> ForKeyType = new HashSet<int>(
-                    System.Enum.GetValues(typeof(KeyType)).Cast<int>());
+                    System.Enum.GetValues(typeof(Aas.KeyType)).Cast<int>());
 
                 public static HashSet<int> ForIdentifiableElements = new HashSet<int>(
-                    System.Enum.GetValues(typeof(IdentifiableElements)).Cast<int>());
+                    System.Enum.GetValues(typeof(Aas.IdentifiableElements)).Cast<int>());
 
                 public static HashSet<int> ForReferableElements = new HashSet<int>(
-                    System.Enum.GetValues(typeof(ReferableElements)).Cast<int>());
+                    System.Enum.GetValues(typeof(Aas.ReferableElements)).Cast<int>());
 
                 public static HashSet<int> ForKeyElements = new HashSet<int>(
-                    System.Enum.GetValues(typeof(KeyElements)).Cast<int>());
+                    System.Enum.GetValues(typeof(Aas.KeyElements)).Cast<int>());
             }  // private static class EnumValueSet
 
             /// <summary>
@@ -269,9 +272,9 @@ namespace AasCore.Aas3
             /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
             /// </summary>
             public static void VerifyLangString (
-                LangString that,
+                Aas.LangString that,
                 string path,
-                Errors errors)
+                Verification.Errors errors)
             {
                 // There are no invariants defined for LangString.
             }
@@ -297,18 +300,20 @@ namespace AasCore.Aas3
             /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
             /// </summary>
             public static void VerifyIdentifier (
-                Identifier that,
+                Aas.Identifier that,
                 string path,
-                Errors errors)
+                Verification.Errors errors)
             {
                 if (!(
                     !(that.IdType == IdentifierType.Irdi)
                     || Pattern.IsIrdi(that.Id)))
                 {
                     errors.Add(
-                        "Invariant violated:\n" +
-                        "!(that.IdType == IdentifierType.Irdi)\n" +
-                        "|| Pattern.IsIrdi(that.Id)");
+                        new Verification.Error(
+                            path,
+                            "Invariant violated:\n" +
+                            "!(that.IdType == IdentifierType.Irdi)\n" +
+                            "|| Pattern.IsIrdi(that.Id)"));
                 }
 
                 if (!(
@@ -316,20 +321,22 @@ namespace AasCore.Aas3
                     || Pattern.IsIri(that.Id)))
                 {
                     errors.Add(
-                        "Invariant violated:\n" +
-                        "!(that.IdType == IdentifierType.Iri)\n" +
-                        "|| Pattern.IsIri(that.Id)");
+                        new Verification.Error(
+                            path,
+                            "Invariant violated:\n" +
+                            "!(that.IdType == IdentifierType.Iri)\n" +
+                            "|| Pattern.IsIri(that.Id)"));
                 }
 
                 if (errors.Full()) return;
 
-                if (!EnumValueSet.ForIdentifierType.Contains(
+                if (!Verification.Implementation.EnumValueSet.ForIdentifierType.Contains(
                         (int)that.IdType))
                 {
                     errors.Add(
-                        new Error(
+                        new Verification.Error(
                             $"{path}/IdType",
-                            $"Invalid {nameof(IdentifierType)}: {that.IdType}"));
+                            $"Invalid {nameof(Aas.IdentifierType)}: {that.IdType}"));
                 }
             }
 
@@ -340,18 +347,20 @@ namespace AasCore.Aas3
             /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
             /// </summary>
             public static void VerifyAdministrativeInformation (
-                AdministrativeInformation that,
+                Aas.AdministrativeInformation that,
                 string path,
-                Errors errors)
+                Verification.Errors errors)
             {
                 if (!(
                     !(that.Revision != null)
                     || (that.Version != null)))
                 {
                     errors.Add(
-                        "Invariant violated:\n" +
-                        "!(that.Revision != null)\n" +
-                        "|| (that.Version != null)");
+                        new Verification.Error(
+                            path,
+                            "Invariant violated:\n" +
+                            "!(that.Revision != null)\n" +
+                            "|| (that.Version != null)"));
                 }
             }
 
@@ -362,19 +371,21 @@ namespace AasCore.Aas3
             /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
             /// </summary>
             public static void VerifyKey (
-                Key that,
+                Aas.Key that,
                 string path,
-                Errors errors)
+                Verification.Errors errors)
             {
                 if (!(
                     !(that.IdType == KeyType.Iri)
                     || Pattern.IsIri(that.Value)))
                 {
                     errors.Add(
-                        "Invariant violated:\n" +
-                        "If ID type is IRI, it must be an IRI\n" +
-                        "!(that.IdType == KeyType.Iri)\n" +
-                        "|| Pattern.IsIri(that.Value)");
+                        new Verification.Error(
+                            path,
+                            "Invariant violated:\n" +
+                            "If ID type is IRI, it must be an IRI\n" +
+                            "!(that.IdType == KeyType.Iri)\n" +
+                            "|| Pattern.IsIri(that.Value)"));
                 }
 
                 if (!(
@@ -382,9 +393,11 @@ namespace AasCore.Aas3
                     || Pattern.IsIrdi(that.Value)))
                 {
                     errors.Add(
-                        "Invariant violated:\n" +
-                        "!(that.IdType == KeyType.Irdi)\n" +
-                        "|| Pattern.IsIrdi(that.Value)");
+                        new Verification.Error(
+                            path,
+                            "Invariant violated:\n" +
+                            "!(that.IdType == KeyType.Irdi)\n" +
+                            "|| Pattern.IsIrdi(that.Value)"));
                 }
 
                 if (!(
@@ -392,10 +405,12 @@ namespace AasCore.Aas3
                     || (that.IdType != KeyType.IdShort && that.IdType != KeyType.FragmentId)))
                 {
                     errors.Add(
-                        "Invariant violated:\n" +
-                        "Constraint AASd-080\n" +
-                        "!(that.Type == KeyElements.GlobalReference)\n" +
-                        "|| (that.IdType != KeyType.IdShort && that.IdType != KeyType.FragmentId)");
+                        new Verification.Error(
+                            path,
+                            "Invariant violated:\n" +
+                            "Constraint AASd-080\n" +
+                            "!(that.Type == KeyElements.GlobalReference)\n" +
+                            "|| (that.IdType != KeyType.IdShort && that.IdType != KeyType.FragmentId)"));
                 }
 
                 if (!(
@@ -403,32 +418,34 @@ namespace AasCore.Aas3
                     || (that.IdType != KeyType.IdShort && that.IdType != KeyType.FragmentId)))
                 {
                     errors.Add(
-                        "Invariant violated:\n" +
-                        "Constraint AASd-081\n" +
-                        "!(that.Type == KeyElements.AssetAdministrationShell)\n" +
-                        "|| (that.IdType != KeyType.IdShort && that.IdType != KeyType.FragmentId)");
+                        new Verification.Error(
+                            path,
+                            "Invariant violated:\n" +
+                            "Constraint AASd-081\n" +
+                            "!(that.Type == KeyElements.AssetAdministrationShell)\n" +
+                            "|| (that.IdType != KeyType.IdShort && that.IdType != KeyType.FragmentId)"));
                 }
 
                 if (errors.Full()) return;
 
-                if (!EnumValueSet.ForKeyElements.Contains(
+                if (!Verification.Implementation.EnumValueSet.ForKeyElements.Contains(
                         (int)that.Type))
                 {
                     errors.Add(
-                        new Error(
+                        new Verification.Error(
                             $"{path}/Type",
-                            $"Invalid {nameof(KeyElements)}: {that.Type}"));
+                            $"Invalid {nameof(Aas.KeyElements)}: {that.Type}"));
                 }
 
                 if (errors.Full()) return;
 
-                if (!EnumValueSet.ForKeyType.Contains(
+                if (!Verification.Implementation.EnumValueSet.ForKeyType.Contains(
                         (int)that.IdType))
                 {
                     errors.Add(
-                        new Error(
+                        new Verification.Error(
                             $"{path}/IdType",
-                            $"Invalid {nameof(KeyType)}: {that.IdType}"));
+                            $"Invalid {nameof(Aas.KeyType)}: {that.IdType}"));
                 }
             }
 
@@ -439,15 +456,17 @@ namespace AasCore.Aas3
             /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
             /// </summary>
             public static void VerifyReference (
-                Reference that,
+                Aas.Reference that,
                 string path,
-                Errors errors)
+                Verification.Errors errors)
             {
                 if (!(that.Keys.Count >= 1))
                 {
                     errors.Add(
-                        "Invariant violated:\n" +
-                        "that.Keys.Count >= 1");
+                        new Verification.Error(
+                            path,
+                            "Invariant violated:\n" +
+                            "that.Keys.Count >= 1"));
                 }
             }
 
@@ -458,16 +477,18 @@ namespace AasCore.Aas3
             /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
             /// </summary>
             public static void VerifyAssetAdministrationShell (
-                AssetAdministrationShell that,
+                Aas.AssetAdministrationShell that,
                 string path,
-                Errors errors)
+                Verification.Errors errors)
             {
                 if (!Pattern.IsIdShort(that.IdShort))
                 {
                     errors.Add(
-                        "Invariant violated:\n" +
-                        "Constraint AASd-002\n" +
-                        "Pattern.IsIdShort(that.IdShort)");
+                        new Verification.Error(
+                            path,
+                            "Invariant violated:\n" +
+                            "Constraint AASd-002\n" +
+                            "Pattern.IsIdShort(that.IdShort)"));
                 }
             }
         }  // private static class Implementation
@@ -478,7 +499,7 @@ namespace AasCore.Aas3
         public class NonRecursiveVerifier : 
             Visitation.IVisitorWithContext<string>
         {
-            public readonly Errors Errors;
+            public readonly Verification.Errors Errors;
 
             /// <summary>
             /// Initialize the visitor with the given <paramref name="errors" />.
@@ -486,12 +507,12 @@ namespace AasCore.Aas3
             /// The errors observed during the visitation will be appended to
             /// the <paramref name="errors" />.
             /// </summary>
-            NonRecursiveVerifier(Errors errors)
+            NonRecursiveVerifier(Verification.Errors errors)
             {
                 Errors = errors;
             }
 
-            public void Visit(IEntity that, string context)
+            public void Visit(Aas.IEntity that, string context)
             {
                 that.Accept(this, context);
             }
@@ -501,7 +522,7 @@ namespace AasCore.Aas3
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(LangString that, string context)
+            public void Visit(Aas.LangString that, string context)
             {
                 Implementation.VerifyLangString(
                     that, context, Errors);
@@ -512,7 +533,7 @@ namespace AasCore.Aas3
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(LangStringSet that, string context)
+            public void Visit(Aas.LangStringSet that, string context)
             {
                 Implementation.VerifyLangStringSet(
                     that, context, Errors);
@@ -523,7 +544,7 @@ namespace AasCore.Aas3
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Identifier that, string context)
+            public void Visit(Aas.Identifier that, string context)
             {
                 Implementation.VerifyIdentifier(
                     that, context, Errors);
@@ -534,7 +555,7 @@ namespace AasCore.Aas3
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(AdministrativeInformation that, string context)
+            public void Visit(Aas.AdministrativeInformation that, string context)
             {
                 Implementation.VerifyAdministrativeInformation(
                     that, context, Errors);
@@ -545,7 +566,7 @@ namespace AasCore.Aas3
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Key that, string context)
+            public void Visit(Aas.Key that, string context)
             {
                 Implementation.VerifyKey(
                     that, context, Errors);
@@ -556,7 +577,7 @@ namespace AasCore.Aas3
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Reference that, string context)
+            public void Visit(Aas.Reference that, string context)
             {
                 Implementation.VerifyReference(
                     that, context, Errors);
@@ -567,7 +588,7 @@ namespace AasCore.Aas3
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(AssetAdministrationShell that, string context)
+            public void Visit(Aas.AssetAdministrationShell that, string context)
             {
                 Implementation.VerifyAssetAdministrationShell(
                     that, context, Errors);

@@ -39,3 +39,10 @@ check_expected_imports = _translate.check_expected_imports
 atok_to_symbol_table = _translate.atok_to_symbol_table
 
 dump = _stringify.dump
+
+# TODO: integrate __book_version__ and __book_url__ into parsed and intermediate types,
+#  and add them to comments in the generated code
+
+# TODO: parse markers reference_in_the_book and integrate them in the generated code
+
+# TODO: handle type aliases — this needs to be an additional symbol

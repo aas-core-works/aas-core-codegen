@@ -8,10 +8,14 @@ from typing import Tuple, Optional, List
 from icontract import ensure
 
 from aas_core_csharp_codegen import intermediate
-from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, Identifier
+from aas_core_csharp_codegen.common import Error, Stripped, Identifier
 from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming
+)
+from aas_core_csharp_codegen.csharp.common import (
+    INDENT as I,
+    INDENT2 as II
 )
 
 
@@ -31,13 +35,13 @@ def _generate_enum_to_and_from_string(
     to_str_map_writer = io.StringIO()
     to_str_map_writer.write(
         f'private static readonly Dictionary<Aas.{name}, string> {to_str_map_name} = (\n'
-        f'{csharp_common.INDENT}new Dictionary<Aas.{name}, string>()\n'
-        f'{csharp_common.INDENT}{{\n')
+        f'{I}new Dictionary<Aas.{name}, string>()\n'
+        f'{I}{{\n')
 
     for i, literal in enumerate(enumeration.literals):
         literal_name = csharp_naming.enum_literal_name(literal.name)
         to_str_map_writer.write(
-            f"{csharp_common.INDENT2}{{ Aas.{name}.{literal_name}, "
+            f"{II}{{ Aas.{name}.{literal_name}, "
             f"{csharp_common.string_literal(literal.value)} }}")
 
         if i < len(enumeration.literals) - 1:
@@ -45,7 +49,7 @@ def _generate_enum_to_and_from_string(
 
         to_str_map_writer.write("\n")
 
-    to_str_map_writer.write(f'{csharp_common.INDENT}}});')
+    to_str_map_writer.write(f'{I}}});')
 
     blocks.append(Stripped(to_str_map_writer.getvalue()))
 
@@ -65,14 +69,14 @@ def _generate_enum_to_and_from_string(
         /// </remarks>
         public static string? {to_str_name}(Aas.{name} that)
         {{
-        {csharp_common.INDENT}if ({to_str_map_name}.TryGetValue(that, out string? value))
-        {csharp_common.INDENT}{{
-        {csharp_common.INDENT2}return value;
-        {csharp_common.INDENT}}}
-        {csharp_common.INDENT}else
-        {csharp_common.INDENT}{{
-        {csharp_common.INDENT2}return null;
-        {csharp_common.INDENT}}}
+        {I}if ({to_str_map_name}.TryGetValue(that, out string? value))
+        {I}{{
+        {II}return value;
+        {I}}}
+        {I}else
+        {I}{{
+        {II}return null;
+        {I}}}
         }}'''))
 
     blocks.append(Stripped(to_str_writer.getvalue()))
@@ -87,13 +91,13 @@ def _generate_enum_to_and_from_string(
     from_str_map_writer = io.StringIO()
     from_str_map_writer.write(
         f'private static readonly Dictionary<string, Aas.{name}> {from_str_map_name} = (\n'
-        f'{csharp_common.INDENT}new Dictionary<string, Aas.{name}>()\n'
-        f'{csharp_common.INDENT}{{\n')
+        f'{I}new Dictionary<string, Aas.{name}>()\n'
+        f'{I}{{\n')
 
     for i, literal in enumerate(enumeration.literals):
         literal_name = csharp_naming.enum_literal_name(literal.name)
         from_str_map_writer.write(
-            f"{csharp_common.INDENT2}{{ {csharp_common.string_literal(literal.value)}, "
+            f"{II}{{ {csharp_common.string_literal(literal.value)}, "
             f"Aas.{name}.{literal_name} }}")
 
         if i < len(enumeration.literals) - 1:
@@ -101,7 +105,7 @@ def _generate_enum_to_and_from_string(
 
         from_str_map_writer.write("\n")
 
-    from_str_map_writer.write(f'{csharp_common.INDENT}}});')
+    from_str_map_writer.write(f'{I}}});')
 
     blocks.append(Stripped(from_str_map_writer.getvalue()))
 
@@ -124,14 +128,14 @@ def _generate_enum_to_and_from_string(
         /// </remarks>
         public static Aas.{name}? {from_str_name}(string text)
         {{
-        {csharp_common.INDENT}if ({from_str_map_name}.TryGetValue(text, out {name} value))
-        {csharp_common.INDENT}{{
-        {csharp_common.INDENT2}return value;
-        {csharp_common.INDENT}}}
-        {csharp_common.INDENT}else
-        {csharp_common.INDENT}{{
-        {csharp_common.INDENT2}return null;
-        {csharp_common.INDENT}}}
+        {I}if ({from_str_map_name}.TryGetValue(text, out {name} value))
+        {I}{{
+        {II}return value;
+        {I}}}
+        {I}else
+        {I}{{
+        {II}return null;
+        {I}}}
         }}'''))
 
     blocks.append(Stripped(from_str_writer.getvalue()))
@@ -177,22 +181,22 @@ def generate(
 
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
-        namespace {namespace}.Serialization
+        namespace {namespace}
         {{
-        \tpublic static class Stringification
-        \t{{
-        ''').replace('\t', csharp_common.INDENT))
+        {I}public static class Stringification
+        {I}{{
+        '''))
 
     for i, stringification_block in enumerate(stringification_blocks):
         if i > 0:
             writer.write('\n\n')
 
         writer.write(
-            textwrap.indent(stringification_block, 2 * csharp_common.INDENT))
+            textwrap.indent(stringification_block, csharp_common.INDENT2))
 
     writer.write(
-        f"\n{csharp_common.INDENT}}}  // public static class Stringification")
-    writer.write(f"\n}}  // namespace {namespace}.Serialization")
+        f"\n{I}}}  // public static class Stringification")
+    writer.write(f"\n}}  // namespace {namespace}")
 
     blocks.append(Stripped(writer.getvalue()))
 

@@ -1,14 +1,14 @@
 from aas_core_csharp_codegen.common import Identifier
 
 
-def json_name(identifier: Identifier) -> Identifier:
+def json_property(identifier: Identifier) -> Identifier:
     """
     Generate a JSON name of a property based on its meta-model ``identifier``.
 
-    >>> json_name(Identifier("something"))
+    >>> json_property(Identifier("something"))
     'something'
 
-    >>> json_name(Identifier("something_to_URL"))
+    >>> json_property(Identifier("something_to_URL"))
     'somethingToUrl'
     """
     parts = identifier.split('_')
