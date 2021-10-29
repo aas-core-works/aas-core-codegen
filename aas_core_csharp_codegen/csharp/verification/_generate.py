@@ -627,12 +627,12 @@ def _transpile_invariant(
 
         writer.write(f"if ({not_expr})\n{{\n")
 
-    writer.write(textwrap.dedent(f'''\
-        {csharp_common.INDENT}errors.Add(
-        {csharp_common.INDENT2}new Verification.Error(
-        {csharp_common.INDENT3}path,
-        {csharp_common.INDENT3}"Invariant violated:\\n" +
-        '''))
+    writer.write(textwrap.indent(textwrap.dedent(f'''\
+        errors.Add(
+        {csharp_common.INDENT}new Verification.Error(
+        {csharp_common.INDENT2}path,
+        {csharp_common.INDENT2}"Invariant violated:\\n" +
+        '''), csharp_common.INDENT))
 
     lines = []  # type: List[str]
     if invariant.description is not None:
