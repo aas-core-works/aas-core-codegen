@@ -11,7 +11,7 @@ public class Errors
     /// <summary>
     /// Contained error items
     /// </summary>
-    private readonly List<Error> _entries;
+    private readonly List<Verification.Error> _entries;
 
     /// <summary>
     /// Initialize the container with the given <paramref name="capacity" />.
@@ -25,13 +25,13 @@ public class Errors
         }
 
         Capacity = capacity;
-        _entries = new List<Error>(Capacity);
+        _entries = new List<Verification.Error>(Capacity);
     }
 
     /// <summary>
     /// Add the error to the container if the capacity has not been reached.
     /// </summary>
-    public void Add(Error error)
+    public void Add(Verification.Error error)
     {
         if(_entries.Count <= Capacity)
         {
@@ -53,7 +53,7 @@ public class Errors
     /// <remarks>
     /// If you want to add a new error, use <see cref="Add" />.
     /// </remarks>
-    public ReadOnlyCollection<Error> Entries()
+    public ReadOnlyCollection<Verification.Error> Entries()
     {
         var result = this._entries.AsReadOnly();
         if (result.Count > Capacity)

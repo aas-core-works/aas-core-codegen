@@ -1,7 +1,7 @@
 """Generate the invariant verifiers from the intermediate representation."""
 import io
 import textwrap
-from typing import Tuple, Optional, List, Mapping
+from typing import Tuple, Optional, List
 
 from icontract import ensure, require
 
@@ -78,7 +78,7 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
         enum_name = csharp_naming.enum_name(symbol.name)
         blocks.append(Stripped(
             f"public static HashSet<int> For{enum_name} = new HashSet<int>(\n"
-            f"{csharp_common.INDENT}System.Enum.GetValues(typeof({enum_name})).Cast<int>());"))
+            f"{csharp_common.INDENT}System.Enum.GetValues(typeof(Aas.{enum_name})).Cast<int>());"))
 
     writer = io.StringIO()
     writer.write(textwrap.dedent('''\
@@ -141,13 +141,13 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
             return [
                 csharp_unrolling.Node(
                     text=textwrap.dedent(f'''\
-                    if (!EnumValueSet.For{enum_name}.Contains(
+                    if (!Verification.Implementation.EnumValueSet.For{enum_name}.Contains(
                     {csharp_common.INDENT2}(int){current_var_name}))
                     {{
                     {csharp_common.INDENT}errors.Add(
-                    {csharp_common.INDENT2}new Error(
+                    {csharp_common.INDENT2}new Verification.Error(
                     {csharp_common.INDENT3}$"{{path}}/{joined_pth}",
-                    {csharp_common.INDENT3}$"Invalid {{nameof({enum_name})}}: {{{current_var_name}}}"));
+                    {csharp_common.INDENT3}$"Invalid {{nameof(Aas.{enum_name})}}: {{{current_var_name}}}"));
                     }}'''),
                     children=[])]
 
@@ -228,37 +228,6 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
 
     blocks = [csharp_unrolling.render(root) for root in roots]
     return Stripped('\n\n'.join(blocks))
-
-
-def _transpile_expression(
-        expr: parse_tree.Expression,
-        environment: Mapping[str, Stripped]
-) -> Stripped:
-    """
-    Transpile the given expression ``expr``.
-
-    The ``environment`` defines how names should be mapped to outer scope
-    in the C# code.
-    """
-    # TODO: refactor this into a visitor once finished
-
-    # TODO: watch out! This is only a minimal implementation for our presentation in
-    #  November 2021. The real implementation needs to go to a separate module!
-    if isinstance(expr, parse_tree.Name):
-        environment_var = environment.get(expr.identifier, None)
-        if environment_var is not None:
-            return environment_var
-
-        return Stripped(expr.identifier)
-
-    elif isinstance(expr, parse_tree.Member):
-        instance = _transpile_expression(expr=expr.instance, environment=environment)
-        member_name = csharp_naming.property_name(expr.name)
-
-        if isinstance(expr.instance, (parse_tree.Member, parse_tree.Name)):
-            return Stripped(f"{instance}.{member_name}")
-        else:
-            return Stripped(f"({instance}).{member_name}")
 
 
 class _InvariantTranspiler(
@@ -385,8 +354,8 @@ class _InvariantTranspiler(
             consequent = f"({consequent})"
 
         return Stripped(
-                f"{not_antecedent}\n"
-                f"|| {consequent}"), None
+            f"{not_antecedent}\n"
+            f"|| {consequent}"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_method_call(
@@ -660,7 +629,7 @@ def _transpile_invariant(
 
     writer.write(textwrap.dedent(f'''\
         {csharp_common.INDENT}errors.Add(
-        {csharp_common.INDENT2}new Error(
+        {csharp_common.INDENT2}new Verification.Error(
         {csharp_common.INDENT3}path,
         {csharp_common.INDENT3}"Invariant violated:\\n" +
         '''))
@@ -733,9 +702,9 @@ def _generate_implementation_verify(
         /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
         /// </summary>
         public static void Verify{cls_name} (
-        {csharp_common.INDENT}{cls_name} that,
+        {csharp_common.INDENT}Aas.{cls_name} that,
         {csharp_common.INDENT}string path,
-        {csharp_common.INDENT}Errors errors)
+        {csharp_common.INDENT}Verification.Errors errors)
         {{
         '''))
 
@@ -820,7 +789,7 @@ def _generate_non_recursive_verifier(
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the non-recursive verifier which visits the entities."""
     blocks = [
-        Stripped("public readonly Errors Errors;"),
+        Stripped("public readonly Verification.Errors Errors;"),
         Stripped(textwrap.dedent(f'''\
             /// <summary>
             /// Initialize the visitor with the given <paramref name="errors" />.
@@ -828,12 +797,12 @@ def _generate_non_recursive_verifier(
             /// The errors observed during the visitation will be appended to
             /// the <paramref name="errors" />.
             /// </summary>
-            NonRecursiveVerifier(Errors errors)
+            NonRecursiveVerifier(Verification.Errors errors)
             {{
             {csharp_common.INDENT}Errors = errors;
             }}''')),
         Stripped(textwrap.dedent(f'''\
-            public void Visit(IEntity that, string context)
+            public void Visit(Aas.IEntity that, string context)
             {{
             {csharp_common.INDENT}that.Accept(this, context);
             }}'''))
@@ -851,7 +820,7 @@ def _generate_non_recursive_verifier(
             /// append any error to <see cref="Errors" /> 
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit({cls_name} that, string context)
+            public void Visit(Aas.{cls_name} that, string context)
             {{
             {csharp_common.INDENT}Implementation.Verify{cls_name}(
             {csharp_common.INDENT2}that, context, Errors);
@@ -1150,19 +1119,20 @@ def generate(
 
     The ``namespace`` defines the AAS C# namespace.
     """
-    blocks = [csharp_common.WARNING]  # type: List[Rstripped]
-
-    using_directives = [
-        "using ArgumentException = System.ArgumentException;\n"
-        "using InvalidOperationException = System.InvalidOperationException;\n"
-        "using NotImplementedException = System.NotImplementedException;\n"
-        "using Regex = System.Text.RegularExpressions.Regex;\n"
-        "using System.Collections.Generic;  // can't alias\n"
-        "using System.Collections.ObjectModel;  // can't alias\n"
-        "using System.Linq;  // can't alias"
-    ]  # type: List[str]
-
-    blocks.append(Stripped("\n".join(using_directives)))
+    blocks = [
+        csharp_common.WARNING,
+        Stripped(textwrap.dedent(f"""\
+            using ArgumentException = System.ArgumentException;
+            using InvalidOperationException = System.InvalidOperationException;
+            using NotImplementedException = System.NotImplementedException;
+            using Regex = System.Text.RegularExpressions.Regex;
+            using System.Collections.Generic;  // can't alias
+            using System.Collections.ObjectModel;  // can't alias
+            using System.Linq;  // can't alias"
+    
+            using Aas = {namespace};
+            using Visitation = {namespace}.Visitation;"""))
+    ]  # type: List[Stripped]
 
     verification_blocks = [
         _generate_pattern_class(spec_impls=spec_impls),

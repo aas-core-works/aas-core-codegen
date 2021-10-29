@@ -13,7 +13,6 @@ from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming
 )
-from aas_core_csharp_codegen.csharp import specific_implementations
 
 
 def _generate_enum_to_and_from_string(
@@ -31,14 +30,14 @@ def _generate_enum_to_and_from_string(
 
     to_str_map_writer = io.StringIO()
     to_str_map_writer.write(
-        f'private static readonly Dictionary<{name}, string> {to_str_map_name} = (\n'
-        f'{csharp_common.INDENT}new Dictionary<{name}, string>()\n'
+        f'private static readonly Dictionary<Aas.{name}, string> {to_str_map_name} = (\n'
+        f'{csharp_common.INDENT}new Dictionary<Aas.{name}, string>()\n'
         f'{csharp_common.INDENT}{{\n')
 
     for i, literal in enumerate(enumeration.literals):
         literal_name = csharp_naming.enum_literal_name(literal.name)
         to_str_map_writer.write(
-            f"{csharp_common.INDENT2}{{ {name}.{literal_name}, "
+            f"{csharp_common.INDENT2}{{ Aas.{name}.{literal_name}, "
             f"{csharp_common.string_literal(literal.value)} }}")
 
         if i < len(enumeration.literals) - 1:
@@ -64,7 +63,7 @@ def _generate_enum_to_and_from_string(
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? {to_str_name}({name} that)
+        public static string? {to_str_name}(Aas.{name} that)
         {{
         {csharp_common.INDENT}if ({to_str_map_name}.TryGetValue(that, out string? value))
         {csharp_common.INDENT}{{
@@ -87,15 +86,15 @@ def _generate_enum_to_and_from_string(
 
     from_str_map_writer = io.StringIO()
     from_str_map_writer.write(
-        f'private static readonly Dictionary<string, {name}> {from_str_map_name} = (\n'
-        f'{csharp_common.INDENT}new Dictionary<string, {name}>()\n'
+        f'private static readonly Dictionary<string, Aas.{name}> {from_str_map_name} = (\n'
+        f'{csharp_common.INDENT}new Dictionary<string, Aas.{name}>()\n'
         f'{csharp_common.INDENT}{{\n')
 
     for i, literal in enumerate(enumeration.literals):
         literal_name = csharp_naming.enum_literal_name(literal.name)
         from_str_map_writer.write(
             f"{csharp_common.INDENT2}{{ {csharp_common.string_literal(literal.value)}, "
-            f"{name}.{literal_name} }}")
+            f"Aas.{name}.{literal_name} }}")
 
         if i < len(enumeration.literals) - 1:
             from_str_map_writer.write(',')
@@ -123,7 +122,7 @@ def _generate_enum_to_and_from_string(
         /// of a literal of <see cref={xml.sax.saxutils.quoteattr(name)} />, 
         /// return <c>null</c>.
         /// </remarks>
-        public static {name}? {from_str_name}(string text)
+        public static Aas.{name}? {from_str_name}(string text)
         {{
         {csharp_common.INDENT}if ({from_str_map_name}.TryGetValue(text, out {name} value))
         {csharp_common.INDENT}{{
@@ -159,13 +158,13 @@ def generate(
 
     The ``namespace`` defines the AAS C# namespace.
     """
-    blocks = [csharp_common.WARNING]  # type: List[Rstripped]
-
-    using_directives = [
-        "using System.Collections.Generic;  // can't alias"
-    ]  # type: List[str]
-
-    blocks.append(Stripped("\n".join(using_directives)))
+    blocks = [
+        csharp_common.WARNING,
+        Stripped(textwrap.dedent(f"""\
+            using System.Collections.Generic;  // can't alias
+    
+            using Aas = {namespace};"""))
+    ]
 
     stringification_blocks = []  # type: List[Stripped]
 
