@@ -57,22 +57,24 @@ def _generate_enum_to_and_from_string(
     to_str_name = csharp_naming.method_name(Identifier(f"to_string"))
 
     to_str_writer = io.StringIO()
-    to_str_writer.write(
-        textwrap.dedent(f'''\
-            /// <summary>
-            /// Retrieve the string representation of <paramref name="that" />.
-            /// </summary>
-            /// <remarks>
-            /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
-            /// </remarks>
-            public string? {to_str_name}({name} that)
-            {{
-            \tstring value;
-            \treturn {to_str_map_name}.TryGetValue(that, out value)
-            \t\t? value
-            \t\t: null;
-            \t}}
-            }}''').replace('\t', csharp_common.INDENT))
+    to_str_writer.write(textwrap.dedent(f'''\
+        /// <summary>
+        /// Retrieve the string representation of <paramref name="that" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
+        /// </remarks>
+        public static string? {to_str_name}({name} that)
+        {{
+        {csharp_common.INDENT}if ({to_str_map_name}.TryGetValue(that, out string? value))
+        {csharp_common.INDENT}{{
+        {csharp_common.INDENT2}return value;
+        {csharp_common.INDENT}}}
+        {csharp_common.INDENT}else
+        {csharp_common.INDENT}{{
+        {csharp_common.INDENT2}return null;
+        {csharp_common.INDENT}}}
+        }}'''))
 
     blocks.append(Stripped(to_str_writer.getvalue()))
 
@@ -112,24 +114,26 @@ def _generate_enum_to_and_from_string(
         Identifier(f"{enumeration.name}_from_string"))
 
     from_str_writer = io.StringIO()
-    from_str_writer.write(
-        textwrap.dedent(f'''\
-            /// <summary>
-            /// Parse the string representation of <see cref={xml.sax.saxutils.quoteattr(name)} />.
-            /// </summary>
-            /// <remarks>
-            /// If <paramref name="text" /> is not a valid string representation 
-            /// of a literal of <see cref={xml.sax.saxutils.quoteattr(name)} />, 
-            /// return <c>null</c>.
-            /// </remarks>
-            public string? {from_str_name}(string text)
-            {{
-            \t{name} value;
-            \treturn {from_str_map_name}.TryGetValue(text, out value)
-            \t\t? value
-            \t\t: null;
-            \t}}
-            }}''').replace('\t', csharp_common.INDENT))
+    from_str_writer.write(textwrap.dedent(f'''\
+        /// <summary>
+        /// Parse the string representation of <see cref={xml.sax.saxutils.quoteattr(name)} />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="text" /> is not a valid string representation 
+        /// of a literal of <see cref={xml.sax.saxutils.quoteattr(name)} />, 
+        /// return <c>null</c>.
+        /// </remarks>
+        public static {name}? {from_str_name}(string text)
+        {{
+        {csharp_common.INDENT}if ({from_str_map_name}.TryGetValue(text, out {name} value))
+        {csharp_common.INDENT}{{
+        {csharp_common.INDENT2}return value;
+        {csharp_common.INDENT}}}
+        {csharp_common.INDENT}else
+        {csharp_common.INDENT}{{
+        {csharp_common.INDENT2}return null;
+        {csharp_common.INDENT}}}
+        }}'''))
 
     blocks.append(Stripped(from_str_writer.getvalue()))
 

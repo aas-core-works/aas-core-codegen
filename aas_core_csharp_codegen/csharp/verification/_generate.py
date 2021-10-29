@@ -658,9 +658,12 @@ def _transpile_invariant(
 
         writer.write(f"if ({not_expr})\n{{\n")
 
-    writer.write(
-        f'{csharp_common.INDENT}errors.Add(\n'
-        f'{csharp_common.INDENT2}"Invariant violated:\\n" +\n')
+    writer.write(textwrap.dedent(f'''\
+        {csharp_common.INDENT}errors.Add(
+        {csharp_common.INDENT2}new Error(
+        {csharp_common.INDENT3}path,
+        {csharp_common.INDENT3}"Invariant violated:\\n" +
+        '''))
 
     lines = []  # type: List[str]
     if invariant.description is not None:
@@ -672,10 +675,10 @@ def _transpile_invariant(
         if i < len(lines) - 1:
             line_literal = csharp_common.string_literal(line + "\n")
             writer.write(
-                f'{csharp_common.INDENT2}{line_literal} +\n')
+                f'{csharp_common.INDENT3}{line_literal} +\n')
         else:
             writer.write(
-                f'{csharp_common.INDENT2}{csharp_common.string_literal(line)});')
+                f'{csharp_common.INDENT3}{csharp_common.string_literal(line)}));')
 
     writer.write("\n}")
 
