@@ -208,3 +208,15 @@ class Stripped(Rstripped):
     # fmt: on
     def __new__(cls, block: str) -> 'Stripped':
         return cast(Stripped, block)
+
+
+def indent_but_first_line(text: str, indention: str) -> str:
+    """
+    Indent all but the first of the given ``text`` by ``indention``.
+
+    For example, this helps you insert indented blocks into formatted string literals.
+    """
+    return "\n".join(
+        indention + line if i > 0 else line
+        for i, line in enumerate(text.splitlines())
+    )

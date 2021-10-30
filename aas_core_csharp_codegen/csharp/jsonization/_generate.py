@@ -8,7 +8,8 @@ from typing import Tuple, Optional, List
 from icontract import ensure
 
 from aas_core_csharp_codegen import intermediate, naming
-from aas_core_csharp_codegen.common import Error, Stripped, Identifier, assert_never
+from aas_core_csharp_codegen.common import Error, Stripped, Identifier, assert_never, \
+    indent_but_first_line
 from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming
@@ -91,51 +92,161 @@ def _generate_read_for_class(
     """Generate the body of the ``Read`` method for deserializing a class ``cls``."""
     cls_name = csharp_naming.class_name(cls.name)
 
-    blocks = []  # type: List[Stripped]
-
-    # TODO: continue here
-    #  * initialize all the variables to null
-    #  * map property names to lambda setters
-    #  * switch on property names 🠒 execute the setters, throw if the property is not known.
-    #  * check for missing required fields
-    #  * construct
-    for prop in cls.properties:
-        var_name = csharp_naming.variable_name(prop.name)
-        prop_type = csharp_common.generate_type(prop.type_annotation)
-        prop_name = naming.json_property(prop.name)
-
-        blocks.append(Stripped(textwrap.dedent(f'''\
+    blocks = [
+        Stripped(textwrap.dedent(f'''\
             if (reader.TokenType != System.Text.Json.JsonTokenType.StartObject)
             {{
-            {I}throw new JsonException();
-            }}''')))
-        #
-        #     // Don't pass in options when recursively calling Deserialize.
-        #     {prop_type} {var_name} = (
-        #     {I}System.Text.Json.JsonSerializer.Deserialize<{prop_type}>(
-        #     {II}ref reader));''')))
-        #
-        # if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        #     blocks.append(Stripped(textwrap.dedent(f'''\
-        #         if ({var_name} == null)
-        #         {{
-        #         {I}throw new System.Text.Json.JsonException(
-        #         {II}"Required property is missing: {prop_name}");
-        #         }}''')))
+            {I}throw new System.Text.Json.JsonException();
+            }}'''))
+    ]
 
-    constructor_call_writer = io.StringIO()
-    constructor_call_writer.write(f'return new Aas.{cls_name}(\n')
+    # region Initializations
 
-    for i, prop in enumerate(cls.properties):
-        var_name = csharp_naming.variable_name(prop.name)
-        constructor_call_writer.write(f'{I}{var_name}')
+    if len(cls.properties) > 0:
 
-        if i < len(cls.properties) - 1:
-            constructor_call_writer.write(',\n')
-        else:
-            constructor_call_writer.write(');')
+        initialization_lines = [
+            Stripped('// Prefix the property variables with "the" to avoid conflicts')
+        ]  # type: List[Stripped]
 
-    blocks.append(Stripped(constructor_call_writer.getvalue()))
+        for prop in cls.properties:
+            var_name = csharp_naming.variable_name(Identifier(f'the_{prop.name}'))
+            prop_type = csharp_common.generate_type(prop.type_annotation)
+
+            if prop_type.endswith('?'):
+                initialization_lines.append(Stripped(f'{prop_type} {var_name};'))
+            else:
+                initialization_lines.append(Stripped(f'{prop_type}? {var_name};'))
+
+        blocks.append('\n'.join(initialization_lines))
+
+    # endregion
+
+    # region Final successful case
+
+    return_writer = io.StringIO()
+    if len(cls.properties) > 0:
+        # Check the mandatory properties first
+        required_properties = [
+            prop
+            for prop in cls.properties
+            if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
+        ]
+
+        for i, prop in enumerate(required_properties):
+            if i > 0:
+                return_writer.write('\n\n')
+
+            var_name = csharp_naming.variable_name(Identifier(f'the_{prop.name}'))
+            prop_name = naming.json_property(prop.name)
+
+            return_writer.write(textwrap.dedent(f'''\
+                    if ({var_name} == null)
+                    {{
+                    {I}throw new System.Text.Json.JsonException(
+                    {II}"Required property is missing: {prop_name}");
+                    }}'''))
+
+        if len(required_properties) > 0:
+            return_writer.write('\n\n')
+
+        return_writer.write(f'return new Aas.{cls_name}(\n')
+
+        for i, prop in enumerate(cls.properties):
+            var_name = csharp_naming.variable_name(Identifier(f'the_{prop.name}'))
+            return_writer.write(f'{I}{var_name}')
+
+            if i < len(cls.properties) - 1:
+                return_writer.write(',\n')
+            else:
+                return_writer.write(');')
+
+    else:
+        return_writer.write(f'{I}return new Aas.{cls_name}();')
+
+    # endregion
+
+    # region Loop and switch
+
+    token_case_blocks = [
+        Stripped(f'''\
+case System.Text.Json.JsonTokenType.EndObject:
+{I}{indent_but_first_line(return_writer.getvalue(), I)}
+{I}break;''')]
+
+    if len(cls.properties) > 0 or cls.json_serialization.with_model_type:
+        property_switch_writer = io.StringIO()
+        property_switch_writer.write(textwrap.dedent(f'''\
+            string propertyName = reader.GetString()
+            switch (propertyName)
+            {{
+            '''))
+
+        for prop in cls.properties:
+            var_name = csharp_naming.variable_name(Identifier(f'the_{prop.name}'))
+
+            if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+                prop_type = csharp_common.generate_type(prop.type_annotation.value)
+            else:
+                prop_type = csharp_common.generate_type(prop.type_annotation)
+
+            prop_name = naming.json_property(prop.name)
+
+            property_switch_writer.write(textwrap.indent(textwrap.dedent(f'''\
+                case {csharp_common.string_literal(prop_name)}: 
+                {I}{var_name} =  (
+                {II}System.Text.Json.JsonSerializer.Deserialize<{prop_type}>(
+                {III}ref reader));
+                {I}break;
+                '''), csharp_common.INDENT))
+
+        if cls.json_serialization.with_model_type:
+            property_switch_writer.write(textwrap.indent(textwrap.dedent(f'''\
+                case "modelType": 
+                    {I}// Ignore the property modelType as we already know the exact type
+                    {I}break;
+                    '''), csharp_common.INDENT))
+
+        property_switch_writer.write(textwrap.dedent(f'''\
+            {I}default:
+            {II}throw new System.Text.Json.JsonException(
+            {III}$"Unexpected property in {cls_name}: {{propertyName}}");
+            {II}break;
+            }}  // switch on propertyName'''))
+
+        token_case_blocks.append(Stripped(f'''\
+case JsonTokenType.PropertyName:
+{I}{indent_but_first_line(property_switch_writer.getvalue(), I)}
+{I}break;'''))
+
+    token_case_blocks.append(Stripped(textwrap.dedent(f'''\
+        default:
+        {I}throw new JsonException();
+        {I}break;''')))
+
+    while_writer = io.StringIO()
+    while_writer.write(textwrap.dedent(f'''\
+        while (reader.Read())
+        {{
+        {I}switch (reader.TokenType)
+        {I}{{
+        '''))
+
+    for i, token_case_block in enumerate(token_case_blocks):
+        if i > 0:
+            while_writer.write('\n\n')
+
+        while_writer.write(textwrap.indent(token_case_block, csharp_common.INDENT2))
+
+    while_writer.write(
+        f'\n'
+        f'{I}}}  // switch on token type\n'
+        f'}}  // while reader.Read')
+
+    blocks.append(Stripped(while_writer.getvalue()))
+
+    # endregion
+
+    # region Bundle it all together
 
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
@@ -152,7 +263,11 @@ def _generate_read_for_class(
         writer.write(textwrap.indent(block, csharp_common.INDENT))
 
     writer.write('\n}')
+
+    # endregion
+
     return Stripped(writer.getvalue())
+
 
 
 def _generate_json_converter_for_class(
@@ -174,9 +289,9 @@ def _generate_json_converter_for_class(
             _generate_read_for_class(cls=cls),
             csharp_common.INDENT))
 
-    # TODO: implement Write
+    # TODO: continue here: implement Write
 
-    writer.write('\n}')
+    writer.write(f'\n}}  // {cls_name}JsonConverter')
 
     return Stripped(writer.getvalue())
 

@@ -1444,7 +1444,7 @@ def _verify_symbol_table(
         'visitor_with_context',
     }
     reserved_member_names = {
-        'descend', 'descend_once', 'accept', 'transform', 'model_type'
+        'descend', 'descend_once', 'accept', 'transform', 'model_type', 'property_name'
     }
 
     for symbol in symbol_table.symbols:

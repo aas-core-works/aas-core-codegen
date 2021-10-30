@@ -7,7 +7,7 @@ from typing import Sequence, Union, Any
 
 from icontract import require
 
-from aas_core_csharp_codegen.common import assert_never
+from aas_core_csharp_codegen.common import assert_never, indent_but_first_line
 
 # We have to separate Stringifiable and Sequence[Stringifiable] since recursive types
 # are not supported in mypy, see https://github.com/python/mypy/issues/731.
@@ -51,15 +51,6 @@ class Entity:
         self.properties = properties
 
 
-@require(lambda spaces: spaces >= 0)
-def _indent_but_first_line(text: str, spaces: int) -> str:
-    """Indent all but the first of the given ``text`` by ``spaces``."""
-    return "\n".join(
-        " " * spaces + line if i > 0 else line
-        for i, line in enumerate(text.splitlines())
-    )
-
-
 def dump(stringifiable: Stringifiable) -> str:
     """Produce a string representation of ``stringifiable`` for debugging or testing."""
     if isinstance(stringifiable, (bool, int, float, str)):
@@ -75,7 +66,9 @@ def dump(stringifiable: Stringifiable) -> str:
         for i, prop in enumerate(stringifiable.properties):
             if isinstance(prop, Property):
                 value_str = dump(prop.value)
-                writer.write(f"  {prop.name}={_indent_but_first_line(value_str, 2)}")
+                indention = '  '
+                writer.write(
+                    f"  {prop.name}={indent_but_first_line(value_str, indention)}")
             elif isinstance(prop, PropertyEllipsis):
                 value_str = "None" if prop.ignored_value is None else "..."
                 writer.write(f"  {prop.name}={value_str}")
