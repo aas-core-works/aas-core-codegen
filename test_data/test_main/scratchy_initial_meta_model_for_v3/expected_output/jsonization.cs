@@ -86,6 +86,24 @@ namespace AasCore.Aas3
                     }  // switch on token type
                 }  // while reader.Read
             }
+
+            public override void Write(
+                System.Text.Json.Utf8JsonWriter writer,
+                Aas.LangString that,
+                System.Text.Json.JsonSerializerOptions options)
+            {
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("language");
+                System.Text.Json.JsonSerializer.Serialize(
+                    writer, that.Language);
+
+                writer.WritePropertyName("text");
+                System.Text.Json.JsonSerializer.Serialize(
+                    writer, that.Text);
+
+                writer.WriteEndObject();
+            }
         }  // LangStringJsonConverter
 
         public class LangStringSetJsonConverter :
@@ -140,6 +158,20 @@ namespace AasCore.Aas3
                             break;
                     }  // switch on token type
                 }  // while reader.Read
+            }
+
+            public override void Write(
+                System.Text.Json.Utf8JsonWriter writer,
+                Aas.LangStringSet that,
+                System.Text.Json.JsonSerializerOptions options)
+            {
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("langStrings");
+                System.Text.Json.JsonSerializer.Serialize(
+                    writer, that.LangStrings);
+
+                writer.WriteEndObject();
             }
         }  // LangStringSetJsonConverter
 
@@ -255,6 +287,24 @@ namespace AasCore.Aas3
                     }  // switch on token type
                 }  // while reader.Read
             }
+
+            public override void Write(
+                System.Text.Json.Utf8JsonWriter writer,
+                Aas.Identifier that,
+                System.Text.Json.JsonSerializerOptions options)
+            {
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("id");
+                System.Text.Json.JsonSerializer.Serialize(
+                    writer, that.Id);
+
+                writer.WritePropertyName("idType");
+                System.Text.Json.JsonSerializer.Serialize(
+                    writer, that.IdType);
+
+                writer.WriteEndObject();
+            }
         }  // IdentifierJsonConverter
 
         public class AdministrativeInformationJsonConverter :
@@ -310,6 +360,30 @@ namespace AasCore.Aas3
                             break;
                     }  // switch on token type
                 }  // while reader.Read
+            }
+
+            public override void Write(
+                System.Text.Json.Utf8JsonWriter writer,
+                Aas.AdministrativeInformation that,
+                System.Text.Json.JsonSerializerOptions options)
+            {
+                writer.WriteStartObject();
+
+                if (that.Version != null)
+                {
+                    writer.WritePropertyName("version");
+                    System.Text.Json.JsonSerializer.Serialize(
+                        writer, that.Version);
+                }
+
+                if (that.Revision != null)
+                {
+                    writer.WritePropertyName("revision");
+                    System.Text.Json.JsonSerializer.Serialize(
+                        writer, that.Revision);
+                }
+
+                writer.WriteEndObject();
             }
         }  // AdministrativeInformationJsonConverter
 
@@ -668,6 +742,28 @@ namespace AasCore.Aas3
                     }  // switch on token type
                 }  // while reader.Read
             }
+
+            public override void Write(
+                System.Text.Json.Utf8JsonWriter writer,
+                Aas.Key that,
+                System.Text.Json.JsonSerializerOptions options)
+            {
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("type");
+                System.Text.Json.JsonSerializer.Serialize(
+                    writer, that.Type);
+
+                writer.WritePropertyName("value");
+                System.Text.Json.JsonSerializer.Serialize(
+                    writer, that.Value);
+
+                writer.WritePropertyName("idType");
+                System.Text.Json.JsonSerializer.Serialize(
+                    writer, that.IdType);
+
+                writer.WriteEndObject();
+            }
         }  // KeyJsonConverter
 
         public class ReferenceJsonConverter :
@@ -723,6 +819,20 @@ namespace AasCore.Aas3
                     }  // switch on token type
                 }  // while reader.Read
             }
+
+            public override void Write(
+                System.Text.Json.Utf8JsonWriter writer,
+                Aas.Reference that,
+                System.Text.Json.JsonSerializerOptions options)
+            {
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("keys");
+                System.Text.Json.JsonSerializer.Serialize(
+                    writer, that.Keys);
+
+                writer.WriteEndObject();
+            }
         }  // ReferenceJsonConverter
 
         public class AssetAdministrationShellJsonConverter :
@@ -772,11 +882,11 @@ namespace AasCore.Aas3
                             }
     
                             return new Aas.AssetAdministrationShell(
+                                theIdentification,
                                 theIdShort,
                                 theDisplayName,
                                 theCategory,
                                 theDescription,
-                                theIdentification,
                                 theAdministration,
                                 theDataSpecifications,
                                 theDerivedFrom);
@@ -841,6 +951,63 @@ namespace AasCore.Aas3
                             break;
                     }  // switch on token type
                 }  // while reader.Read
+            }
+
+            public override void Write(
+                System.Text.Json.Utf8JsonWriter writer,
+                Aas.AssetAdministrationShell that,
+                System.Text.Json.JsonSerializerOptions options)
+            {
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("idShort");
+                System.Text.Json.JsonSerializer.Serialize(
+                    writer, that.IdShort);
+
+                if (that.DisplayName != null)
+                {
+                    writer.WritePropertyName("displayName");
+                    System.Text.Json.JsonSerializer.Serialize(
+                        writer, that.DisplayName);
+                }
+
+                if (that.Category != null)
+                {
+                    writer.WritePropertyName("category");
+                    System.Text.Json.JsonSerializer.Serialize(
+                        writer, that.Category);
+                }
+
+                if (that.Description != null)
+                {
+                    writer.WritePropertyName("description");
+                    System.Text.Json.JsonSerializer.Serialize(
+                        writer, that.Description);
+                }
+
+                writer.WritePropertyName("identification");
+                System.Text.Json.JsonSerializer.Serialize(
+                    writer, that.Identification);
+
+                if (that.Administration != null)
+                {
+                    writer.WritePropertyName("administration");
+                    System.Text.Json.JsonSerializer.Serialize(
+                        writer, that.Administration);
+                }
+
+                writer.WritePropertyName("dataSpecifications");
+                System.Text.Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
+
+                if (that.DerivedFrom != null)
+                {
+                    writer.WritePropertyName("derivedFrom");
+                    System.Text.Json.JsonSerializer.Serialize(
+                        writer, that.DerivedFrom);
+                }
+
+                writer.WriteEndObject();
             }
         }  // AssetAdministrationShellJsonConverter
     }  // public static class Jsonization
