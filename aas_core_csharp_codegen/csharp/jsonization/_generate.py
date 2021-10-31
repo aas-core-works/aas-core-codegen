@@ -7,7 +7,7 @@ from typing import Tuple, Optional, List
 
 from icontract import ensure
 
-from aas_core_csharp_codegen import intermediate, naming
+from aas_core_csharp_codegen import intermediate, naming, specific_implementations
 from aas_core_csharp_codegen.common import Error, Stripped, Identifier, assert_never, \
     indent_but_first_line
 from aas_core_csharp_codegen.csharp import (
@@ -52,24 +52,19 @@ def _generate_json_converter_for_enumeration(
         
         {II}Aas.{enum_name}? value = Stringification.{enum_name}FromString(
         {III}text);
-        {II}if (value == null)
-        {II}{{
-        {III}throw new System.Text.Json.JsonException(
-        {IIII}$"Invalid {enum_name}: {{text}}");
-        {II}}}
-        {II}return value;
+        {II}return value ?? throw new System.Text.Json.JsonException(
+        {III}$"Invalid {enum_name}: {{text}}");
         {I}}}
         
         {I}public override void Write(
-        {II}Utf8JsonWriter writer,
+        {II}System.Text.Json.Utf8JsonWriter writer,
         {II}Aas.{enum_name} value,
         {II}System.Text.Json.JsonSerializerOptions options)
         {I}{{
-        {II}string? text = Stringification.{enum_name}ToString(
-        {III}value);
+        {II}string? text = Stringification.ToString(value);
         {II}if (text == null)
         {II}{{
-        {III}throw new InvalidArgumentException(
+        {III}throw new System.ArgumentException(
         {IIII}$"Invalid {enum_name}: {{value}}");
         {II}}}
         
@@ -113,9 +108,11 @@ def _generate_read_for_class(
             prop_type = csharp_common.generate_type(prop.type_annotation)
 
             if prop_type.endswith('?'):
-                initialization_lines.append(Stripped(f'{prop_type} {var_name};'))
+                initialization_lines.append(Stripped(
+                    f'{prop_type} {var_name} = null;'))
             else:
-                initialization_lines.append(Stripped(f'{prop_type}? {var_name};'))
+                initialization_lines.append(Stripped(
+                    f'{prop_type}? {var_name} = null;'))
 
         blocks.append('\n'.join(initialization_lines))
 
@@ -125,30 +122,6 @@ def _generate_read_for_class(
 
     return_writer = io.StringIO()
     if len(cls.properties) > 0:
-        # Check the mandatory properties first
-        required_properties = [
-            prop
-            for prop in cls.properties
-            if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-        ]
-
-        for i, prop in enumerate(required_properties):
-            if i > 0:
-                return_writer.write('\n\n')
-
-            var_name = csharp_naming.variable_name(Identifier(f'the_{prop.name}'))
-            json_prop_name = naming.json_property(prop.name)
-
-            return_writer.write(textwrap.dedent(f'''\
-                    if ({var_name} == null)
-                    {{
-                    {I}throw new System.Text.Json.JsonException(
-                    {II}"Required property is missing: {json_prop_name}");
-                    }}'''))
-
-        if len(required_properties) > 0:
-            return_writer.write('\n\n')
-
         return_writer.write(f'return new Aas.{cls_name}(\n')
 
         constructor_arg_names = [arg.name for arg in cls.constructor.arguments]
@@ -158,10 +131,27 @@ def _generate_read_for_class(
         ), "Expected the properties to match the constructor arguments"
 
         for i, constructor_arg_name in enumerate(constructor_arg_names):
-            var_name = csharp_naming.variable_name(
-                Identifier(f'the_{constructor_arg_name}'))
+            prop = cls.properties_by_name[constructor_arg_name]
 
-            return_writer.write(f'{I}{var_name}')
+            var_name = csharp_naming.variable_name(
+                Identifier(f'the_{prop.name}'))
+
+            if not isinstance(
+                    prop.type_annotation, intermediate.OptionalTypeAnnotation):
+                json_prop_name = naming.json_property(
+                    Identifier(f'the_{prop.name}'))
+
+                error_msg = csharp_common.string_literal(
+                    f'Required property is missing: {json_prop_name}')
+
+                return_writer.write(
+                    textwrap.indent(
+                        textwrap.dedent(f'''\
+                            {var_name} ?? throw new System.Text.Json.JsonException(
+                            {I}{error_msg})'''),
+                        csharp_common.INDENT))
+            else:
+                return_writer.write(f'{I}{var_name}')
 
             if i < len(constructor_arg_names) - 1:
                 return_writer.write(',\n')
@@ -178,13 +168,15 @@ def _generate_read_for_class(
     token_case_blocks = [
         Stripped(f'''\
 case System.Text.Json.JsonTokenType.EndObject:
-{I}{indent_but_first_line(return_writer.getvalue(), I)}
-{I}break;''')]
+{I}{indent_but_first_line(return_writer.getvalue(), I)}''')]
 
     if len(cls.properties) > 0 or cls.json_serialization.with_model_type:
         property_switch_writer = io.StringIO()
         property_switch_writer.write(textwrap.dedent(f'''\
             string propertyName = reader.GetString()
+            {I}?? throw new System.InvalidOperationException(
+            {II}"Unexpected property name null");
+
             switch (propertyName)
             {{
             '''))
@@ -218,18 +210,16 @@ case System.Text.Json.JsonTokenType.EndObject:
             {I}default:
             {II}throw new System.Text.Json.JsonException(
             {III}$"Unexpected property in {cls_name}: {{propertyName}}");
-            {II}break;
             }}  // switch on propertyName'''))
 
         token_case_blocks.append(Stripped(f'''\
-case JsonTokenType.PropertyName:
+case System.Text.Json.JsonTokenType.PropertyName:
 {I}{indent_but_first_line(property_switch_writer.getvalue(), I)}
 {I}break;'''))
 
     token_case_blocks.append(Stripped(textwrap.dedent(f'''\
         default:
-        {I}throw new JsonException();
-        {I}break;''')))
+        {I}throw new System.Text.Json.JsonException();''')))
 
     while_writer = io.StringIO()
     while_writer.write(textwrap.dedent(f'''\
@@ -251,6 +241,8 @@ case JsonTokenType.PropertyName:
         f'}}  // while reader.Read')
 
     blocks.append(Stripped(while_writer.getvalue()))
+
+    blocks.append(Stripped('throw new System.Text.Json.JsonException();'))
 
     # endregion
 
@@ -371,13 +363,16 @@ def _generate_json_converter_for_class(
 # fmt: on
 def generate(
         symbol_table: intermediate.SymbolTable,
-        namespace: csharp_common.NamespaceIdentifier
+        namespace: csharp_common.NamespaceIdentifier,
+        spec_impls: specific_implementations.SpecificImplementations
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the C# code for the general serialization.
 
     The ``namespace`` defines the AAS C# namespace.
     """
+    errors = []  # type: List[Error]
+
     blocks = [
         csharp_common.WARNING,
         Stripped(textwrap.dedent(f"""\
@@ -389,7 +384,6 @@ def generate(
              * </ul>
              */""")),
         Stripped(textwrap.dedent(f"""\
-            using InvalidArgumentException = System.InvalidArgumentException;
             using System.Collections.Generic;  // can't alias
 
             using Aas = {namespace};"""))
@@ -422,8 +416,22 @@ def generate(
         #     jsonization_block = _generate_json_converter_for_interface(
         #         interface=symbol)
         elif isinstance(symbol, intermediate.Class):
-            jsonization_block = _generate_json_converter_for_class(
-                cls=symbol)
+            if symbol.implementation_key is not None:
+                jsonization_key = specific_implementations.ImplementationKey(
+                    f'Jsonization/{symbol.name}_json_converter')
+                if jsonization_key not in spec_impls:
+                    errors.append(
+                        Error(
+                            symbol.parsed.node,
+                            f"The jsonization snippet is missing "
+                            f"for the implementation-specific "
+                            f"class {symbol.name}: {jsonization_key}"))
+                    continue
+
+                jsonization_block = spec_impls[jsonization_key]
+            else:
+                jsonization_block = _generate_json_converter_for_class(cls=symbol)
+        # TODO: uncomment once implemented
         # else:
         #     assert_never(symbol)
         #
@@ -433,6 +441,9 @@ def generate(
         # TODO: remove after debug
         if jsonization_block is not None:
             jsonization_blocks.append(jsonization_block)
+
+    if len(errors) > 0:
+        return None, errors
 
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\

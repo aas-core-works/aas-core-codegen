@@ -895,7 +895,7 @@ def _generate_constructor(
         arg_block = ",\n".join(arg_codes)
         arg_block_indented = textwrap.indent(arg_block, csharp_common.INDENT)
         blocks.append(
-            Stripped(f"{cls_name}(\n{arg_block_indented})\n{{"))
+            Stripped(f"public {cls_name}(\n{arg_block_indented})\n{{"))
 
     body = []  # type: List[str]
     for stmt in symbol.constructor.statements:
@@ -1207,7 +1207,6 @@ def generate(
 
     using_directives = [
         "using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;",
-        "using NotImplementedException = System.NotImplementedException;",
         "using System.Collections.Generic;  // can't alias"
     ]  # type: List[str]
 
@@ -1313,5 +1312,3 @@ def generate(
     return out.getvalue(), None
 
 # endregion
-
-# TODO: implement live_test 🠒 use C# compiler to actually create and compile the code!

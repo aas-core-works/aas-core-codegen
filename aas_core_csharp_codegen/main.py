@@ -333,7 +333,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     # region Jsonization
 
     code, errors = csharp_jsonization.generate(
-        symbol_table=ir_symbol_table, namespace=namespace)
+        symbol_table=ir_symbol_table, namespace=namespace, spec_impls=spec_impls)
 
     if errors is not None:
         write_error_report(

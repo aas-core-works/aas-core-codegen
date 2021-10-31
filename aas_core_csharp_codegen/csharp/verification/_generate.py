@@ -6,7 +6,7 @@ from typing import Tuple, Optional, List
 from icontract import ensure, require
 
 from aas_core_csharp_codegen import intermediate
-from aas_core_csharp_codegen.common import Error, Stripped, Rstripped, assert_never, \
+from aas_core_csharp_codegen.common import Error, Stripped, assert_never, \
     Identifier
 from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
@@ -15,7 +15,6 @@ from aas_core_csharp_codegen.csharp import (
 )
 from aas_core_csharp_codegen.csharp import specific_implementations
 from aas_core_csharp_codegen.parse import (tree as parse_tree)
-from aas_core_csharp_codegen.specific_implementations import ImplementationKey
 
 
 # region Verify
@@ -31,7 +30,7 @@ def verify(
         'Verification/Error', 'Verification/Errors'
     ]
     for key in expected_keys:
-        if ImplementationKey(key) not in spec_impls:
+        if specific_implementations.ImplementationKey(key) not in spec_impls:
             errors.append(f"The implementation snippet is missing for: {key}")
 
     if len(errors) == 0:
@@ -50,9 +49,9 @@ def _generate_pattern_class(
 ) -> Stripped:
     """Generate the Pattern class used for verifying different patterns."""
     blocks = [
-        spec_impls[ImplementationKey('Verification/is_IRI')],
-        spec_impls[ImplementationKey('Verification/is_IRDI')],
-        spec_impls[ImplementationKey('Verification/is_ID_short')]
+        spec_impls[specific_implementations.ImplementationKey('Verification/is_IRI')],
+        spec_impls[specific_implementations.ImplementationKey('Verification/is_IRDI')],
+        spec_impls[specific_implementations.ImplementationKey('Verification/is_ID_short')]
     ]  # type: List[str]
 
     writer = io.StringIO()
@@ -231,7 +230,7 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
 
 
 class _InvariantTranspiler(
-    parse_tree.Transformer[Tuple[Optional[Stripped], Optional[Error]]]):
+        parse_tree.Transformer[Tuple[Optional[Stripped], Optional[Error]]]):
     """Transpile an invariant expression into a code, or an error."""
 
     def __init__(self, symbol_table: intermediate.SymbolTable) -> None:
@@ -735,7 +734,7 @@ def _generate_implementation(
             continue
 
         if symbol.implementation_key is not None:
-            verify_key = ImplementationKey(
+            verify_key = specific_implementations.ImplementationKey(
                 f'Verification/Implementation/verify_{symbol.name}')
             if verify_key not in spec_impls:
                 errors.append(
@@ -1062,7 +1061,7 @@ def _generate_recursive_verifier(
             continue
 
         if symbol.implementation_key is not None:
-            visit_key = ImplementationKey(
+            visit_key = specific_implementations.ImplementationKey(
                 f'Verification/RecursiveVerifier/visit_{symbol.name}')
             if visit_key not in spec_impls:
                 errors.append(
@@ -1122,9 +1121,6 @@ def generate(
     blocks = [
         csharp_common.WARNING,
         Stripped(textwrap.dedent(f"""\
-            using ArgumentException = System.ArgumentException;
-            using InvalidOperationException = System.InvalidOperationException;
-            using NotImplementedException = System.NotImplementedException;
             using Regex = System.Text.RegularExpressions.Regex;
             using System.Collections.Generic;  // can't alias
             using System.Collections.ObjectModel;  // can't alias
@@ -1136,8 +1132,8 @@ def generate(
 
     verification_blocks = [
         _generate_pattern_class(spec_impls=spec_impls),
-        spec_impls[ImplementationKey('Verification/Error')],
-        spec_impls[ImplementationKey('Verification/Errors')]
+        spec_impls[specific_implementations.ImplementationKey('Verification/Error')],
+        spec_impls[specific_implementations.ImplementationKey('Verification/Errors')]
     ]  # type: List[Stripped]
 
     errors = []  # type: List[Error]

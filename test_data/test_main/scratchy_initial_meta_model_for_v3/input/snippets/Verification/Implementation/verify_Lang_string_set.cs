@@ -9,5 +9,5 @@ public static void VerifyLangStringSet (
     string path,
     Errors errors)
 {
-    throw new NotImplementedException("TODO");
+    throw new System.NotImplementedException("TODO");
 }

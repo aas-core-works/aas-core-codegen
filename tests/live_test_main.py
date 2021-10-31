@@ -85,6 +85,15 @@ def main() -> int:
                         <Platforms>AnyCPU</Platforms>
                         <LangVersion>8</LangVersion>
                     </PropertyGroup>
+                    
+                    <ItemGroup>
+                        <!-- 
+                            You can exclude this dependency if you are compiling 
+                            for net5.0 or netcore3.1. 
+                        -->
+                        <PackageReference Include="System.Text.Json" Version="5.*" />
+                    </ItemGroup>
+
                 </Project>
                 '''))
 

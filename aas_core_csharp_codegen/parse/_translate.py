@@ -1421,6 +1421,7 @@ def _verify_symbol_table(
     # region Check reserved names
 
     reserved_symbol_names = {
+        'aas',
         'accept',
         'context',
         'entity',

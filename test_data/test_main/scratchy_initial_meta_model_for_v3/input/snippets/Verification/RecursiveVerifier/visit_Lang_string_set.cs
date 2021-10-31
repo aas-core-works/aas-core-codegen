@@ -5,5 +5,5 @@
 /// </summary>
 public void Visit(LangStringSet that, string context)
 {
-    throw new NotImplementedException("TODO");
+    throw new System.NotImplementedException("TODO");
 }

@@ -20,7 +20,7 @@ public class Errors
     {
         if (capacity <= 0)
         {
-            throw new ArgumentException(
+            throw new System.ArgumentException(
                 $"Expected a strictly positive capacity, but got: {capacity}");
         }
 
@@ -58,7 +58,7 @@ public class Errors
         var result = this._entries.AsReadOnly();
         if (result.Count > Capacity)
         {
-            throw new InvalidOperationException(
+            throw new System.InvalidOperationException(
                 $"Post-condition violated: " +
                 $"result.Count (== {result.Count}) > Capacity (== {Capacity})");
         }
