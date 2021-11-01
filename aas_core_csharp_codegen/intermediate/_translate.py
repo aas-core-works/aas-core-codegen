@@ -503,6 +503,9 @@ def _resolve_inheritance_chain_of_a_setting(
 
     Return either the resolved value, or an error.
     """
+    # TODO: consider removing this function as well once we implemented O(N) json serialization
+    #  resolution.
+
     if len(chain) == 0:
         return default, None
 
@@ -521,12 +524,50 @@ def _resolve_inheritance_chain_of_a_setting(
     return last_setting.value, None
 
 
+# fmt: off
+@ensure(
+    lambda parsed_symbol_table, result:
+    all(
+        symbol.name in result
+        for symbol in parsed_symbol_table
+        if not isinstance(symbol, parse.Enumeration)
+    ),
+    "JSON resolution performed for all the non-enumeration symbols"
+)
+# fmt: on
+def _resolve_json_serializations(
+        parsed_symbol_table: parse.SymbolTable,
+        ontology: _hierarchy.Ontology
+) -> Tuple[
+    Optional[MutableMapping[parse.Entity, JsonSerialization]],
+    Optional[List[Error]]]:
+    """Resolve how JSON serialization settings stack through the ontology."""
+    mapping = dict()  # type: MutableMapping[Identifier, JsonSerialization]
+    errors = []  # type: List[Error]
+
+    for entity in ontology.entities:
+        assert entity.name not in mapping, (
+                f"Expected the ontology to be a correctly linearized DAG, "
+                f"but the entity {entity.name!r} has been already visited before")
+
+        for inheritance in entity.inheritances:
+            assert inheritance in mapping, (
+                f"Expected the ontology to be a correctly linearized DAG, "
+                f"but the inheritance {inheritance!r} of the entity {entity.name!r} "
+                f"has not been visited before."
+            )
+
+            # TODO: continue here, think how the resolution should happen
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _stack_json_serializations(
         entity: parse.Entity,
         antecedents: Sequence[parse.Entity]
 ) -> Tuple[Optional[JsonSerialization], Optional[Error]]:
     """Effectuate inheritance of json serialization settings through antecedents."""
+    # TODO: remove the following function once we implemented O(N) resolution
+
     # TODO: test this function
     # TODO: test also the failure cases
 

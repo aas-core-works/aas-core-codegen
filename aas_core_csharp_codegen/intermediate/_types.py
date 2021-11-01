@@ -260,6 +260,14 @@ class Signature:
         self.parsed = parsed
 
 
+class JsonSerialization:
+    """Specify the settings for JSON serialization of a concrete class."""
+
+    def __init__(self, with_model_type: bool) -> None:
+        """Initialize with the given values."""
+        self.with_model_type = with_model_type
+
+
 class Interface:
     """
     Represent an interface with methods mapped to signatures.
@@ -274,6 +282,7 @@ class Interface:
             inheritances: Sequence[Identifier],
             signatures: Sequence[Signature],
             properties: Sequence[Property],
+            json_serialization: JsonSerialization,
             description: Optional[Description],
             parsed: parse.Entity,
     ) -> None:
@@ -282,6 +291,7 @@ class Interface:
         self.inheritances = inheritances
         self.signatures = signatures
         self.properties = properties
+        self.json_serialization = json_serialization
         self.description = description
         self.parsed = parsed
 
@@ -346,14 +356,6 @@ class Contracts:
         self.preconditions = preconditions
         self.snapshots = snapshots
         self.postconditions = postconditions
-
-
-class JsonSerialization:
-    """Specify the settings for JSON serialization of a concrete class."""
-
-    def __init__(self, with_model_type: bool) -> None:
-        """Initialize with the given values."""
-        self.with_model_type = with_model_type
 
 
 class Method:

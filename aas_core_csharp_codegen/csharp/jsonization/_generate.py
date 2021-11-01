@@ -275,8 +275,6 @@ def _generate_write_for_class(
     """Generate the body of the ``Write`` method for serializing the class ``cls``."""
     blocks = [Stripped('writer.WriteStartObject();')]
 
-    # TODO: continue here: implement
-
     for prop in cls.properties:
         prop_name = csharp_naming.property_name(prop.name)
         json_prop_name = naming.json_property(prop.name)
@@ -391,28 +389,23 @@ def generate(
 
     jsonization_blocks = []  # type: List[Stripped]
 
-    # TODO: idea how to avoid modelType:
-    #  * for each interface, collect all the implementer classes
-    #  * these classes have model_typed = True, others have False
-    #  * when serializing, add modelType property
-
     # TODO: for interface
-    #  * collect all the implementers
-    #  * collect the union of their properties
+    #  * allow converters only for interfaces with with_model_type
+    #  * collect the union of the properties of the implementers
     #  🠒 make sure no duplicates!
     #  🠒 make sure all the type annotations are equal!
-    #  * if more than one implementer: include modelType
     #  * initialize all the properties (including modelType) to null
-    #  * deserialize by switching 🠒 similar as for the classes
-    #  * switch on modelType 🠒 check for required fields! return the constructor
+    #  * once endobject:
+    #    * switch on modelType 🠒 return the constructor
 
     for symbol in symbol_table.symbols:
         jsonization_block = None  # type: Optional[Stripped]
         if isinstance(symbol, intermediate.Enumeration):
             jsonization_block = _generate_json_converter_for_enumeration(
                 enumeration=symbol)
-        # TODO: uncomment once implemented
-        # elif isinstance(symbol, intermediate.Interface):
+        elif (
+                isinstance(symbol, intermediate.Interface)
+                and symbol.:
         #     jsonization_block = _generate_json_converter_for_interface(
         #         interface=symbol)
         elif isinstance(symbol, intermediate.Class):
