@@ -2,7 +2,7 @@
 
 import io
 import textwrap
-from typing import Tuple, Optional, List, Sequence
+from typing import Tuple, Optional, List, Sequence, MutableMapping
 
 from icontract import ensure, require
 
@@ -94,6 +94,28 @@ def _generate_read_for_interface(
     #  * once endobject:
     #    * switch on modelType 🠒 return the constructor
 
+    # region Set up the property union
+
+    property_union = dict(
+    )  # type: MutableMapping[Identifier, intermediate.TypeAnnotation]
+
+    for implementer in implementers:
+        for prop in implementer.properties:
+            type_anno = property_union.get(prop.name, None)
+            if type_anno is None:
+
+
+    # endregion
+
+    # region Initializations
+
+
+
+    union_of_properties = []  # type: List[intermediate.Property]
+
+    # endregion
+
+
     raise NotImplementedError()
 
 
@@ -117,13 +139,14 @@ def _generate_json_converter_for_interface(
                 interface=interface, implementers=implementers),
             csharp_common.INDENT))
 
-    writer.write('\n\n')
-
-    writer.write(
-        textwrap.indent(
-            _generate_write_for_interface(
-                interface=interface, implementers=implementers),
-            csharp_common.INDENT))
+    # TODO: uncomment once implemented
+    # writer.write('\n\n')
+    #
+    # writer.write(
+    #     textwrap.indent(
+    #         _generate_write_for_interface(
+    #             interface=interface, implementers=implementers),
+    #         csharp_common.INDENT))
 
     writer.write(f'\n}}  // {interface_name}JsonConverter')
 
@@ -134,8 +157,6 @@ def _generate_read_for_class(
         cls: intermediate.Class
 ) -> Stripped:
     """Generate the body of the ``Read`` method for de-serializing the class ``cls``."""
-    cls_name = csharp_naming.class_name(cls.name)
-
     blocks = [
         Stripped(textwrap.dedent(f'''\
             if (reader.TokenType != System.Text.Json.JsonTokenType.StartObject)
@@ -166,6 +187,8 @@ def _generate_read_for_class(
         blocks.append('\n'.join(initialization_lines))
 
     # endregion
+
+    cls_name = csharp_naming.class_name(cls.name)
 
     # region Final successful case
 

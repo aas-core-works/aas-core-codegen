@@ -37,7 +37,8 @@ from aas_core_csharp_codegen.intermediate._types import (
     MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
     OurAtomicTypeAnnotation, STR_TO_BUILTIN_ATOMIC_TYPE, BuiltinAtomicTypeAnnotation,
     Description, PropertyReferenceInDoc, SymbolReferenceInDoc,
-    SubscriptedTypeAnnotation, DefaultEnumerationLiteral,
+    SubscriptedTypeAnnotation, DefaultEnumerationLiteral, map_interface_implementers,
+    type_annotations_equal,
 )
 
 # noinspection PyUnusedLocal
@@ -526,8 +527,8 @@ def _resolve_json_serializations(
 
     for entity in ontology.entities:
         assert entity.name not in with_model_type_map, (
-                f"Expected the ontology to be a correctly linearized DAG, "
-                f"but the entity {entity.name!r} has been already visited before")
+            f"Expected the ontology to be a correctly linearized DAG, "
+            f"but the entity {entity.name!r} has been already visited before")
 
         settings = []  # type: List[_SettingWithSource]
 
@@ -918,6 +919,15 @@ def _fill_in_default_placeholder(
         f"has not been implemented: {ast.dump(default.parsed.node)}")
 
 
+class _PropertyOfClass:
+    """Represent the property with its corresponding class."""
+
+    def __init__(self, prop: Property, cls: Class):
+        """Initialize with the given values."""
+        self.prop = prop
+        self.cls = cls
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def translate(
         parsed_symbol_table: parse.SymbolTable,
@@ -940,7 +950,11 @@ def translate(
         parsed_symbol_table=parsed_symbol_table
     )
     if errors is not None:
-        underlying_errors = errors
+        underlying_errors.extend(errors)
+
+    if len(underlying_errors) > 0:
+        # If the ontology could not be inferred, we can not perform any error recovery
+        # as any further analysis will be invalidated.
         return None, bundle_underlying_errors()
 
     assert ontology is not None
@@ -953,16 +967,7 @@ def translate(
         parsed_symbol_table=parsed_symbol_table, atok=atok)
 
     if error is not None:
-        underlying_errors = [error]
-        return None, bundle_underlying_errors()
-
-    assert constructor_table is not None
-
-    in_lined_constructors = _in_line_constructors(
-        parsed_symbol_table=parsed_symbol_table,
-        ontology=ontology,
-        constructor_table=constructor_table,
-    )
+        underlying_errors.append(error)
 
     # endregion
 
@@ -972,12 +977,26 @@ def translate(
         ontology=ontology, parsed_symbol_table=parsed_symbol_table)
 
     if error is not None:
-        underlying_errors = [error]
-        return None, bundle_underlying_errors()
+        underlying_errors.append(error)
 
     # endregion
 
+    if len(underlying_errors) > 0:
+        # We can not proceed and recover from these errors as they concern critical
+        # dependencies of the further analysis.
+        return None, bundle_underlying_errors()
+
     # region First pass of translation
+
+    assert constructor_table is not None
+
+    in_lined_constructors = _in_line_constructors(
+        parsed_symbol_table=parsed_symbol_table,
+        ontology=ontology,
+        constructor_table=constructor_table,
+    )
+
+    assert json_serializations is not None
 
     # Type annotations reference placeholder symbols at this point.
 
@@ -1168,6 +1187,51 @@ def translate(
                             f"Invalid identifier of a property: "
                             f"{prop_ref_in_doc.property_name}"))
                     continue
+
+    # endregion
+
+    # region Verify that the properties match in type for all implementer classes
+
+    # NOTE (mristin, 2021-11-03):
+    # This check is necessary for an efficient JSON de-serialization. Otherwise
+    # we would first have to find the discriminating property (``modelType``), and only
+    # then de-serialize the object. The problem is that *finding* the discriminating
+    # property implies de-serializing the whole object in the first place as JSON does
+    # not impose the order of the properties in an object.
+
+    interface_implementers = map_interface_implementers(symbol_table=symbol_table)
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Interface):
+            continue
+
+        implementers = interface_implementers[symbol]
+
+        property_union = dict()  # type: MutableMapping[Identifier, _PropertyOfClass]
+        for implementer in implementers:
+            for prop in implementer.properties:
+                another_prop = property_union.get(prop.name, None)
+
+                if another_prop is None:
+                    property_union[prop.name] = _PropertyOfClass(
+                        cls=implementer, prop=prop)
+                elif not type_annotations_equal(
+                        prop.type_annotation,
+                        another_prop.prop.type_annotation):
+                    underlying_errors.append(Error(
+                        implementer.parsed.node,
+                        f"The property {prop.name} of the class {implementer.name} "
+                        f"has inconsistent type ({prop.type_annotation}) "
+                        f"with the property {another_prop.prop.name} "
+                        f"of the class {another_prop.cls.name} "
+                        f"({another_prop.prop.type_annotation}. "
+                        f"This is a blocker for generating efficient code for "
+                        f"JSON de-serialization of the interface {symbol.name} "
+                        f"(which both {implementer.name} and "
+                        f"{another_prop.cls.name} implement)."))
+                else:
+                    # Everything is OK, the properties share the same type.
+                    pass
 
     # endregion
 

@@ -3,7 +3,7 @@ import ast
 import enum
 import pathlib
 from typing import (
-    Sequence, Optional, Union, TypeVar, Mapping, MutableMapping, List)
+    Sequence, Optional, Union, TypeVar, Mapping, MutableMapping, List, Tuple)
 
 import docutils.nodes
 from icontract import require, invariant
@@ -151,6 +151,47 @@ class OptionalTypeAnnotation(SubscriptedTypeAnnotation):
 TypeAnnotation = Union[
     AtomicTypeAnnotation, SubscriptedTypeAnnotation
 ]
+
+
+def type_annotations_equal(that: TypeAnnotation, other: TypeAnnotation) -> bool:
+    """
+    Compare two type annotations for equality.
+
+    Two type annotations are equal if they describe the same type.
+    """
+    if type(that) is not type(other):
+        return False
+
+    if isinstance(that, BuiltinAtomicTypeAnnotation):
+        assert isinstance(other, BuiltinAtomicTypeAnnotation)
+        return that.a_type == other.a_type
+    elif isinstance(that, OurAtomicTypeAnnotation):
+        assert isinstance(other, OurAtomicTypeAnnotation)
+        return that.symbol == other.symbol
+    elif isinstance(that, ListTypeAnnotation):
+        assert isinstance(other, ListTypeAnnotation)
+        return type_annotations_equal(that.items, other.items)
+    elif isinstance(that, SequenceTypeAnnotation):
+        assert isinstance(other, SequenceTypeAnnotation)
+        return type_annotations_equal(that.items, other.items)
+    elif isinstance(that, SetTypeAnnotation):
+        assert isinstance(other, SetTypeAnnotation)
+        return type_annotations_equal(that.items, other.items)
+    elif isinstance(that, MappingTypeAnnotation):
+        assert isinstance(other, MappingTypeAnnotation)
+        return (
+                type_annotations_equal(that.keys, other.keys)
+                and type_annotations_equal(that.values, other.values))
+    elif isinstance(that, MutableMappingTypeAnnotation):
+        assert isinstance(other, MutableMappingTypeAnnotation)
+        return (
+                type_annotations_equal(that.keys, other.keys)
+                and type_annotations_equal(that.values, other.values))
+    elif isinstance(that, OptionalTypeAnnotation):
+        assert isinstance(other, OptionalTypeAnnotation)
+        return type_annotations_equal(that.value, other.value)
+    else:
+        assert_never(that)
 
 
 class Description:
@@ -755,3 +796,12 @@ def map_descendability(
     _ = recurse(a_type_annotation=type_annotation)
 
     return mapping
+
+def make_union_of_properties(interface: Interface, implementers: Sequence[Class])->Tuple[MutableMapping[Identifier, TypeAnnotation], Optional[Error]]:
+    """Make a union of all the properties over all the implementer classes.
+
+    This union is necessary, for example, when you need to de-serialize an object, but
+    you are not yet sure which concrete type it has. Hence you need to be prepared to
+    de-serialize an unknown *subset* of the properties of *this* union.
+    """
+    # TODO: implement

@@ -419,6 +419,7 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
 
         self.derived_from = derived_from
 
+# TODO: include ManagedEnvironment as a separate, by-convention, snippet
 
 # TODO: uncomment once we finished the JSON serialization for everything else
 # @implementation_specific
@@ -433,3 +434,5 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
 #     # Therefore, we accept the trade-off to manually write this class, which is more
 #     # work for the developer, but where the final result is more ergonomic
 #     # for the end user.
+
+# TODO: assert All identifiables have an aggregation on root level.

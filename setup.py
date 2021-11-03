@@ -45,6 +45,7 @@ setup(
             "coverage>=4.5.1,<5",
             "docutils>=0.14,<1",
             "pygments>=2,<3",
+            "docutils-stubs==0.0.21"
         ],
     },
     # fmt: on
