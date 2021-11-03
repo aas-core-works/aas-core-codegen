@@ -52,10 +52,10 @@ def class_name(identifier: Identifier) -> Identifier:
     """
     Generate a C# name for a class based on its meta-model ``identifier``.
 
-    >>> enum_name(Identifier("something"))
+    >>> class_name(Identifier("something"))
     'Something'
 
-    >>> enum_name(Identifier("URL_to_something"))
+    >>> class_name(Identifier("URL_to_something"))
     'UrlToSomething'
     """
     parts = identifier.split('_')

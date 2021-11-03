@@ -499,9 +499,10 @@ class _SettingWithSource(Generic[T]):
 # fmt: off
 @ensure(
     lambda parsed_symbol_table, result:
-    all(
-        symbol.name in result
-        for symbol in parsed_symbol_table
+    not (result[0] is not None)
+    or all(
+        symbol in result[0]
+        for symbol in parsed_symbol_table.symbols
         if not isinstance(symbol, parse.Enumeration)
     ),
     "Resolution of JSON settings performed for all non-enumeration symbols"
@@ -1187,51 +1188,6 @@ def translate(
                             f"Invalid identifier of a property: "
                             f"{prop_ref_in_doc.property_name}"))
                     continue
-
-    # endregion
-
-    # region Verify that the properties match in type for all implementer classes
-
-    # NOTE (mristin, 2021-11-03):
-    # This check is necessary for an efficient JSON de-serialization. Otherwise
-    # we would first have to find the discriminating property (``modelType``), and only
-    # then de-serialize the object. The problem is that *finding* the discriminating
-    # property implies de-serializing the whole object in the first place as JSON does
-    # not impose the order of the properties in an object.
-
-    interface_implementers = map_interface_implementers(symbol_table=symbol_table)
-
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, Interface):
-            continue
-
-        implementers = interface_implementers[symbol]
-
-        property_union = dict()  # type: MutableMapping[Identifier, _PropertyOfClass]
-        for implementer in implementers:
-            for prop in implementer.properties:
-                another_prop = property_union.get(prop.name, None)
-
-                if another_prop is None:
-                    property_union[prop.name] = _PropertyOfClass(
-                        cls=implementer, prop=prop)
-                elif not type_annotations_equal(
-                        prop.type_annotation,
-                        another_prop.prop.type_annotation):
-                    underlying_errors.append(Error(
-                        implementer.parsed.node,
-                        f"The property {prop.name} of the class {implementer.name} "
-                        f"has inconsistent type ({prop.type_annotation}) "
-                        f"with the property {another_prop.prop.name} "
-                        f"of the class {another_prop.cls.name} "
-                        f"({another_prop.prop.type_annotation}. "
-                        f"This is a blocker for generating efficient code for "
-                        f"JSON de-serialization of the interface {symbol.name} "
-                        f"(which both {implementer.name} and "
-                        f"{another_prop.cls.name} implement)."))
-                else:
-                    # Everything is OK, the properties share the same type.
-                    pass
 
     # endregion
 

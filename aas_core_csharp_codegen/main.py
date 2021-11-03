@@ -330,10 +330,14 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     # endregion
 
+    interface_implementers = intermediate.map_interface_implementers(
+        symbol_table=ir_symbol_table)
+
     # region Jsonization
 
     code, errors = csharp_jsonization.generate(
-        symbol_table=ir_symbol_table, namespace=namespace, spec_impls=spec_impls)
+        symbol_table=ir_symbol_table, namespace=namespace, spec_impls=spec_impls,
+        interface_implementers=interface_implementers)
 
     if errors is not None:
         write_error_report(

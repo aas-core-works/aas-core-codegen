@@ -9,7 +9,7 @@ import docutils.nodes
 from icontract import require, invariant
 
 from aas_core_csharp_codegen import parse
-from aas_core_csharp_codegen.common import Identifier, assert_never
+from aas_core_csharp_codegen.common import Identifier, assert_never, Error
 from aas_core_csharp_codegen.intermediate import construction
 from aas_core_csharp_codegen.parse import BUILTIN_ATOMIC_TYPES
 from aas_core_csharp_codegen.specific_implementations import ImplementationKey
@@ -336,6 +336,12 @@ class Interface:
         self.description = description
         self.parsed = parsed
 
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
 
 class Invariant:
     """Represent an invariant of a class."""
@@ -627,6 +633,11 @@ class Class:
         self.property_id_set = frozenset(id(prop) for prop in self.properties)
         self.invariant_id_set = frozenset(id(inv) for inv in self.invariants)
 
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
 
 Symbol = Union[Interface, Enumeration, Class]
 
@@ -797,11 +808,63 @@ def map_descendability(
 
     return mapping
 
-def make_union_of_properties(interface: Interface, implementers: Sequence[Class])->Tuple[MutableMapping[Identifier, TypeAnnotation], Optional[Error]]:
+
+class _PropertyOfClass:
+    """Represent the property with its corresponding class."""
+
+    def __init__(self, prop: Property, cls: Class):
+        """Initialize with the given values."""
+        self.prop = prop
+        self.cls = cls
+
+
+def make_union_of_properties(
+        interface: Interface,
+        implementers: Sequence[Class]
+) -> Tuple[Optional[MutableMapping[Identifier, TypeAnnotation]], Optional[Error]]:
     """Make a union of all the properties over all the implementer classes.
 
     This union is necessary, for example, when you need to de-serialize an object, but
     you are not yet sure which concrete type it has. Hence you need to be prepared to
-    de-serialize an unknown *subset* of the properties of *this* union.
+    de-serialize a yet-unknown *subset* of the properties of *this* union when you start
+    de-serializing an object of type ``interface``.
     """
-    # TODO: implement
+    errors = []  # type: List[Error]
+
+    property_union = dict()  # type: MutableMapping[Identifier, _PropertyOfClass]
+    for implementer in implementers:
+        for prop in implementer.properties:
+            another_prop = property_union.get(prop.name, None)
+
+            if another_prop is None:
+                property_union[prop.name] = _PropertyOfClass(
+                    cls=implementer, prop=prop)
+            elif not type_annotations_equal(
+                    prop.type_annotation,
+                    another_prop.prop.type_annotation):
+                errors.append(Error(
+                    implementer.parsed.node,
+                    f"The property {prop.name} of the class {implementer.name} "
+                    f"has inconsistent type ({prop.type_annotation}) "
+                    f"with the property {another_prop.prop.name} "
+                    f"of the class {another_prop.cls.name} "
+                    f"({another_prop.prop.type_annotation}. "
+                    f"This is a blocker for generating efficient code for "
+                    f"JSON de-serialization of the interface {interface.name} "
+                    f"(which both {implementer.name} and "
+                    f"{another_prop.cls.name} implement)."))
+            else:
+                # Everything is OK, the properties share the same type.
+                pass
+
+    if len(errors) > 0:
+        return None, Error(
+            interface.parsed.node,
+            f"Failed to make a union of properties over all implementer classes of "
+            f"interface {interface.name}",
+            errors)
+
+    return {
+               prop_of_cls.prop.name: prop_of_cls.prop.type_annotation
+               for prop_of_cls in property_union.values()
+           }, None
