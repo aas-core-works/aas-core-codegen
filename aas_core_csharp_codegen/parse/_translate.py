@@ -1425,7 +1425,6 @@ def _verify_symbol_table(
         'accept',
         'context',
         'entity',
-        'environment',
         'error',
         'errors',
         'ientity',

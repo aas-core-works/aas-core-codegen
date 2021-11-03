@@ -419,20 +419,18 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
 
         self.derived_from = derived_from
 
-# TODO: include ManagedEnvironment as a separate, by-convention, snippet
 
-# TODO: uncomment once we finished the JSON serialization for everything else
-# @implementation_specific
-# class Environment:
-#     """Model the environment as the entry point for referencing and serialization."""
-#     # The environment needs to provide many efficient de-referencing and
-#     # iteration mechanisms, so we make it implementation specific. Alternatively,
-#     # we could automatically generate it (by querying which concrete classes are
-#     # identifiable), but then the generated implementations might be quite inefficient
-#     # (both in terms of run-time and memory usage).
-#     #
-#     # Therefore, we accept the trade-off to manually write this class, which is more
-#     # work for the developer, but where the final result is more ergonomic
-#     # for the end user.
+class Environment:
+    """Model the environment as the entry point for referencing and serialization."""
+    asset_administration_shells: List[Asset_administration_shell]
 
-# TODO: assert All identifiables have an aggregation on root level.
+    def __init__(
+            self,
+            asset_administration_shells: Optional[
+                List[Asset_administration_shell]] = None
+    ) -> None:
+        self.asset_administration_shells = (
+            asset_administration_shells
+            if asset_administration_shells is not None
+            else []
+        )

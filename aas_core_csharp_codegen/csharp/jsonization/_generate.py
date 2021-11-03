@@ -8,7 +8,7 @@ from icontract import ensure, require
 
 from aas_core_csharp_codegen import intermediate, naming, specific_implementations
 from aas_core_csharp_codegen.common import Error, Stripped, Identifier, \
-    indent_but_first_line
+    indent_but_first_line, assert_never
 from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming
@@ -30,34 +30,34 @@ def _generate_json_converter_for_enumeration(
 
     return Stripped(textwrap.dedent(f'''\
         public class {enum_name}JsonConverter :
-        {I}System.Text.Json.Serialization.JsonConverter<Aas.{enum_name}>
+        {I}Json.Serialization.JsonConverter<Aas.{enum_name}>
         {{
         {I}public override Aas.{enum_name} Read(
-        {II}ref System.Text.Json.Utf8JsonReader reader,
+        {II}ref Json.Utf8JsonReader reader,
         {II}System.Type typeToConvert,
-        {II}System.Text.Json.JsonSerializerOptions options)
+        {II}Json.JsonSerializerOptions options)
         {I}{{
-        {II}if (reader.TokenType != System.Text.Json.JsonTokenType.String)
+        {II}if (reader.TokenType != Json.JsonTokenType.String)
         {II}{{
-        {III}throw new System.Text.Json.JsonException();
+        {III}throw new Json.JsonException();
         {II}}}
         
         {II}string? text = reader.GetString();
         {II}if (text == null)
         {II}{{
-        {III}throw new System.Text.Json.JsonException();
+        {III}throw new Json.JsonException();
         {II}}}
         
         {II}Aas.{enum_name}? value = Stringification.{enum_name}FromString(
         {III}text);
-        {II}return value ?? throw new System.Text.Json.JsonException(
+        {II}return value ?? throw new Json.JsonException(
         {III}$"Invalid {enum_name}: {{text}}");
         {I}}}
         
         {I}public override void Write(
-        {II}System.Text.Json.Utf8JsonWriter writer,
+        {II}Json.Utf8JsonWriter writer,
         {II}Aas.{enum_name} value,
-        {II}System.Text.Json.JsonSerializerOptions options)
+        {II}Json.JsonSerializerOptions options)
         {I}{{
         {II}string? text = Stringification.ToString(value);
         {II}if (text == null)
@@ -92,9 +92,9 @@ def _generate_read_for_interface(
 
     blocks = [
         Stripped(textwrap.dedent(f'''\
-            if (reader.TokenType != System.Text.Json.JsonTokenType.StartObject)
+            if (reader.TokenType != Json.JsonTokenType.StartObject)
             {{
-            {I}throw new System.Text.Json.JsonException();
+            {I}throw new Json.JsonException();
             }}''')),
         Stripped('string? modelType = null;')
     ]
@@ -161,10 +161,10 @@ def _generate_read_for_interface(
                         f'Required property is missing: {json_prop_name}')
 
                     return_writer.write(textwrap.indent(textwrap.dedent(f'''\
-                        {var_name} ?? throw new System.Text.Json.JsonException(
-                        {I}{error_msg})'''), II))
+                        {var_name} ?? throw new Json.JsonException(
+                        {I}{error_msg})'''), III))
                 else:
-                    return_writer.write(f'{I}{var_name}')
+                    return_writer.write(f'{III}{var_name}')
 
                 if i < len(constructor_arg_names) - 1:
                     return_writer.write(',\n')
@@ -173,11 +173,11 @@ def _generate_read_for_interface(
 
     return_writer.write(textwrap.indent(textwrap.dedent(f'''\
         default:
-        {I}throw new System.Text.Json.JsonException(
+        {I}throw new Json.JsonException(
         {II}$"Unknown model type: {{modelType}}");
         '''), I))
 
-    return_writer.write('\n}')
+    return_writer.write('\n}  // switch on modelType')
 
     # endregion
 
@@ -185,7 +185,7 @@ def _generate_read_for_interface(
 
     token_case_blocks = [
         Stripped(f'''\
-case System.Text.Json.JsonTokenType.EndObject:
+case Json.JsonTokenType.EndObject:
 {I}{indent_but_first_line(return_writer.getvalue(), I)}''')]
 
     property_switch_writer = io.StringIO()
@@ -213,14 +213,14 @@ case System.Text.Json.JsonTokenType.EndObject:
         property_switch_writer.write(textwrap.indent(textwrap.dedent(f'''\
             case {csharp_common.string_literal(json_prop_name)}: 
             {I}{var_name} =  (
-            {II}System.Text.Json.JsonSerializer.Deserialize<{prop_type}>(
+            {II}Json.JsonSerializer.Deserialize<{prop_type}>(
             {III}ref reader));
             {I}break;
             '''), I))
 
     property_switch_writer.write(textwrap.indent(textwrap.dedent(f'''\
         case "modelType":
-        {I}modelType = System.Text.Json.JsonSerializer.Deserialize<string>(
+        {I}modelType = Json.JsonSerializer.Deserialize<string>(
         {II}ref reader);
         {I}break;
         '''), I))
@@ -229,19 +229,19 @@ case System.Text.Json.JsonTokenType.EndObject:
 
     property_switch_writer.write(textwrap.dedent(f'''\
         {I}default:
-        {II}throw new System.Text.Json.JsonException(
-        {III}$"Unexpected property in an implementer class of {interface_name}: " +
-        {III}propertyName);
+        {II}throw new Json.JsonException(
+        {III}$"Unexpected property in an implementer class " + 
+        {III}$"of {interface_name}: {{propertyName}}");
         }}  // switch on propertyName'''))
 
     token_case_blocks.append(Stripped(f'''\
-case System.Text.Json.JsonTokenType.PropertyName:
+case Json.JsonTokenType.PropertyName:
 {I}{indent_but_first_line(property_switch_writer.getvalue(), I)}
 {I}break;'''))
 
     token_case_blocks.append(Stripped(textwrap.dedent(f'''\
         default:
-        {I}throw new System.Text.Json.JsonException();''')))
+        {I}throw new Json.JsonException();''')))
 
     while_writer = io.StringIO()
     while_writer.write(textwrap.dedent(f'''\
@@ -264,7 +264,7 @@ case System.Text.Json.JsonTokenType.PropertyName:
 
     blocks.append(Stripped(while_writer.getvalue()))
 
-    blocks.append(Stripped('throw new System.Text.Json.JsonException();'))
+    blocks.append(Stripped('throw new Json.JsonException();'))
 
     # endregion
 
@@ -273,9 +273,9 @@ case System.Text.Json.JsonTokenType.PropertyName:
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         public override Aas.{interface_name} Read(
-        {I}ref System.Text.Json.Utf8JsonReader reader,
+        {I}ref Json.Utf8JsonReader reader,
         {I}System.Type typeToConvert,
-        {I}System.Text.Json.JsonSerializerOptions options)
+        {I}Json.JsonSerializerOptions options)
         {{
         '''))
 
@@ -312,7 +312,7 @@ def _generate_write_for_interface(
 
         switch_writer.write(textwrap.indent(textwrap.dedent(f'''\
             case {cls_name} {var_name}:
-            {I}System.Text.Json.JsonSerializer.Serialize(
+            {I}Json.JsonSerializer.Serialize(
             {II}writer, {var_name});
             {I}break;
             '''), I))
@@ -332,9 +332,9 @@ def _generate_write_for_interface(
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         public override void Write(
-        {I}System.Text.Json.Utf8JsonWriter writer,
+        {I}Json.Utf8JsonWriter writer,
         {I}Aas.{interface_name} that,
-        {I}System.Text.Json.JsonSerializerOptions options)
+        {I}Json.JsonSerializerOptions options)
         {{
         '''))
 
@@ -367,7 +367,7 @@ def _generate_json_converter_for_interface(
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         public class {interface_name}JsonConverter :
-        {I}System.Text.Json.Serialization.JsonConverter<Aas.{interface_name}>
+        {I}Json.Serialization.JsonConverter<Aas.{interface_name}>
         {{
         {I}public override bool CanConvert(System.Type typeToConvert)
         {I}{{
@@ -393,9 +393,9 @@ def _generate_read_for_class(
     """Generate the ``Read`` method for de-serializing the class ``cls``."""
     blocks = [
         Stripped(textwrap.dedent(f'''\
-            if (reader.TokenType != System.Text.Json.JsonTokenType.StartObject)
+            if (reader.TokenType != Json.JsonTokenType.StartObject)
             {{
-            {I}throw new System.Text.Json.JsonException();
+            {I}throw new Json.JsonException();
             }}'''))
     ]
 
@@ -450,7 +450,7 @@ def _generate_read_for_class(
                     f'Required property is missing: {json_prop_name}')
 
                 return_writer.write(textwrap.indent(textwrap.dedent(f'''\
-                    {var_name} ?? throw new System.Text.Json.JsonException(
+                    {var_name} ?? throw new Json.JsonException(
                     {I}{error_msg})'''), I))
             else:
                 return_writer.write(f'{I}{var_name}')
@@ -469,7 +469,7 @@ def _generate_read_for_class(
 
     token_case_blocks = [
         Stripped(f'''\
-case System.Text.Json.JsonTokenType.EndObject:
+case Json.JsonTokenType.EndObject:
 {I}{indent_but_first_line(return_writer.getvalue(), I)}''')]
 
     if len(cls.properties) > 0 or cls.json_serialization.with_model_type:
@@ -496,7 +496,7 @@ case System.Text.Json.JsonTokenType.EndObject:
             property_switch_writer.write(textwrap.indent(textwrap.dedent(f'''\
                 case {csharp_common.string_literal(json_prop_name)}: 
                 {I}{var_name} =  (
-                {II}System.Text.Json.JsonSerializer.Deserialize<{prop_type}>(
+                {II}Json.JsonSerializer.Deserialize<{prop_type}>(
                 {III}ref reader));
                 {I}break;
                 '''), I))
@@ -504,24 +504,24 @@ case System.Text.Json.JsonTokenType.EndObject:
         if cls.json_serialization.with_model_type:
             property_switch_writer.write(textwrap.indent(textwrap.dedent(f'''\
                 case "modelType": 
-                    {I}// Ignore the property modelType as we already know the exact type
-                    {I}break;
-                    '''), I))
+                {I}// Ignore the property modelType as we already know the exact type
+                {I}break;
+                '''), I))
 
         property_switch_writer.write(textwrap.dedent(f'''\
             {I}default:
-            {II}throw new System.Text.Json.JsonException(
+            {II}throw new Json.JsonException(
             {III}$"Unexpected property in {cls_name}: {{propertyName}}");
             }}  // switch on propertyName'''))
 
         token_case_blocks.append(Stripped(f'''\
-case System.Text.Json.JsonTokenType.PropertyName:
+case Json.JsonTokenType.PropertyName:
 {I}{indent_but_first_line(property_switch_writer.getvalue(), I)}
 {I}break;'''))
 
     token_case_blocks.append(Stripped(textwrap.dedent(f'''\
         default:
-        {I}throw new System.Text.Json.JsonException();''')))
+        {I}throw new Json.JsonException();''')))
 
     while_writer = io.StringIO()
     while_writer.write(textwrap.dedent(f'''\
@@ -544,7 +544,7 @@ case System.Text.Json.JsonTokenType.PropertyName:
 
     blocks.append(Stripped(while_writer.getvalue()))
 
-    blocks.append(Stripped('throw new System.Text.Json.JsonException();'))
+    blocks.append(Stripped('throw new Json.JsonException();'))
 
     # endregion
 
@@ -553,9 +553,9 @@ case System.Text.Json.JsonTokenType.PropertyName:
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         public override Aas.{cls_name} Read(
-        {I}ref System.Text.Json.Utf8JsonReader reader,
+        {I}ref Json.Utf8JsonReader reader,
         {I}System.Type typeToConvert,
-        {I}System.Text.Json.JsonSerializerOptions options)
+        {I}Json.JsonSerializerOptions options)
         {{
         '''))
 
@@ -581,7 +581,7 @@ def _generate_write_for_class(
         json_model_type = naming.json_model_type(cls.name)
         blocks.append(Stripped(textwrap.dedent(f'''\
             writer.WritePropertyName("modelType");
-            System.Text.Json.JsonSerializer.Serialize(
+            Json.JsonSerializer.Serialize(
             {I}writer, {csharp_common.string_literal(json_model_type)});''')))
 
     for prop in cls.properties:
@@ -591,14 +591,14 @@ def _generate_write_for_class(
         if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             blocks.append(Stripped(textwrap.dedent(f'''\
                 writer.WritePropertyName({csharp_common.string_literal(json_prop_name)});
-                System.Text.Json.JsonSerializer.Serialize(
+                Json.JsonSerializer.Serialize(
                 {I}writer, that.{prop_name});''')))
         else:
             blocks.append(Stripped(textwrap.dedent(f'''\
                 if (that.{prop_name} != null)
                 {{
                 {I}writer.WritePropertyName({csharp_common.string_literal(json_prop_name)});
-                {I}System.Text.Json.JsonSerializer.Serialize(
+                {I}Json.JsonSerializer.Serialize(
                 {II}writer, that.{prop_name});
                 }}''')))
 
@@ -611,9 +611,9 @@ def _generate_write_for_class(
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         public override void Write(
-        {I}System.Text.Json.Utf8JsonWriter writer,
+        {I}Json.Utf8JsonWriter writer,
         {I}Aas.{cls_name} that,
-        {I}System.Text.Json.JsonSerializerOptions options)
+        {I}Json.JsonSerializerOptions options)
         {{
         '''))
 
@@ -639,7 +639,7 @@ def _generate_json_converter_for_class(
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         public class {cls_name}JsonConverter :
-        {I}System.Text.Json.Serialization.JsonConverter<Aas.{cls_name}>
+        {I}Json.Serialization.JsonConverter<Aas.{cls_name}>
         {{
         '''))
 
@@ -686,24 +686,29 @@ def generate(
              * </ul>
              */""")),
         Stripped(textwrap.dedent(f"""\
+            using Json = System.Text.Json;
             using System.Collections.Generic;  // can't alias
 
             using Aas = {namespace};"""))
     ]
 
     jsonization_blocks = []  # type: List[Stripped]
+    converters = []  # type: List[Identifier]
 
     for symbol in symbol_table.symbols:
         jsonization_block = None  # type: Optional[Stripped]
         if isinstance(symbol, intermediate.Enumeration):
             jsonization_block = _generate_json_converter_for_enumeration(
                 enumeration=symbol)
-        elif (
-                isinstance(symbol, intermediate.Interface)
-                and symbol.json_serialization.with_model_type
-        ):
+
+            converters.append(Identifier(
+                f'{csharp_naming.enum_name(symbol.name)}JsonConverter'))
+        elif isinstance(symbol, intermediate.Interface):
             # Only interfaces with ``modelType`` property can be deserialized as
             # otherwise we would lack the discriminating property.
+            if not symbol.json_serialization.with_model_type:
+                continue
+
             implementers = interface_implementers[symbol]
             jsonization_block, error = _generate_json_converter_for_interface(
                 interface=symbol,
@@ -712,6 +717,9 @@ def generate(
             if error is not None:
                 errors.append(error)
                 continue
+
+            converters.append(Identifier(
+                f'{csharp_naming.interface_name(symbol.name)}JsonConverter'))
 
         elif isinstance(symbol, intermediate.Class):
             if symbol.implementation_key is not None:
@@ -729,16 +737,43 @@ def generate(
                 jsonization_block = spec_impls[jsonization_key]
             else:
                 jsonization_block = _generate_json_converter_for_class(cls=symbol)
-        # TODO: uncomment once implemented
-        # else:
-        #     assert_never(symbol)
-        #
-        # assert jsonization_block is not None
-        # jsonization_blocks.append(jsonization_block)
 
-        # TODO: remove after debug
-        if jsonization_block is not None:
-            jsonization_blocks.append(jsonization_block)
+            converters.append(Identifier(
+                f'{csharp_naming.class_name(symbol.name)}JsonConverter'))
+        else:
+            assert_never(symbol)
+
+        assert jsonization_block is not None
+        jsonization_blocks.append(jsonization_block)
+
+    if len(converters) == 0:
+        jsonization_blocks.append(Stripped(textwrap.dedent(f'''\
+            public static List<Json.JsonConverter> JsonConverters()
+            {{
+            {I}return new List<Json.JsonConverter>();
+            }}''')))
+    else:
+        converters_writer = io.StringIO()
+        converters_writer.write(textwrap.dedent(f'''\
+            /// <summary>
+            /// Create and populate a list of our custom-tailored JSON converters.
+            /// </summary>
+            public static List<Json.Serialization.JsonConverter> CreateJsonConverters()
+            {{
+            {I}return new List<Json.Serialization.JsonConverter>()
+            {I}{{
+            '''))
+
+        for i, converter in enumerate(converters):
+            converters_writer.write(f'{II}new {converter}()')
+
+            if i < len(converters) - 1:
+                converters_writer.write(',')
+
+            converters_writer.write('\n')
+
+        converters_writer.write(f'{I}}};\n}}')
+        jsonization_blocks.append(Stripped(converters_writer.getvalue()))
 
     if len(errors) > 0:
         return None, errors
