@@ -2,19 +2,17 @@
 
 import io
 import textwrap
-import xml.sax.saxutils
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Sequence
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_csharp_codegen import intermediate, naming, specific_implementations
-from aas_core_csharp_codegen.common import Error, Stripped, Identifier, assert_never, \
+from aas_core_csharp_codegen.common import Error, Stripped, Identifier, \
     indent_but_first_line
 from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming
 )
-
 # TODO: apply this trick to everything
 from aas_core_csharp_codegen.csharp.common import (
     INDENT as I,
@@ -73,12 +71,63 @@ def _generate_json_converter_for_enumeration(
         }}'''))
 
 
+# fmt: off
+@require(
+    lambda interface, implementers:
+    all(
+        interface.name in implementer.interfaces
+        for implementer in implementers
+    )
+)
+# fmt: on
+def _generate_read_for_interface(
+        interface: intermediate.Interface,
+        implementers: Sequence[intermediate.Class]
+) -> Stripped:
+    """Generate the body of the ``Read`` method for de-serializing the ``interface``."""
+    # TODO: for interface
+    #  * allow converters only for interfaces with with_model_type
+    #  * collect the union of the properties of the implementers
+    #  🠒 make sure no duplicates!
+    #  🠒 make sure all the type annotations are equal!
+    #  * initialize all the properties (including modelType) to null
+    #  * once endobject:
+    #    * switch on modelType 🠒 return the constructor
+
+    raise NotImplementedError()
+
+
 def _generate_json_converter_for_interface(
-        interface: intermediate.Interface
+        interface: intermediate.Interface,
+        implementers: Sequence[intermediate.Class]
 ) -> Stripped:
     """Generate the custom JSON converter based on the intermediate ``interface``."""
-    # TODO: implement
-    raise NotImplementedError()
+    interface_name = csharp_naming.interface_name(interface.name)
+
+    writer = io.StringIO()
+    writer.write(textwrap.dedent(f'''\
+            public class {interface_name}JsonConverter :
+            {I}System.Text.Json.Serialization.JsonConverter<Aas.{interface_name}>
+            {{
+            '''))
+
+    writer.write(
+        textwrap.indent(
+            _generate_read_for_interface(
+                interface=interface, implementers=implementers),
+            csharp_common.INDENT))
+
+    writer.write('\n\n')
+
+    writer.write(
+        textwrap.indent(
+            _generate_write_for_interface(
+                interface=interface, implementers=implementers),
+            csharp_common.INDENT))
+
+    writer.write(f'\n}}  // {interface_name}JsonConverter')
+
+    return Stripped(writer.getvalue())
 
 
 def _generate_read_for_class(
@@ -362,6 +411,7 @@ def _generate_json_converter_for_class(
 def generate(
         symbol_table: intermediate.SymbolTable,
         namespace: csharp_common.NamespaceIdentifier,
+        interface_implementers: intermediate.InterfaceImplementers,
         spec_impls: specific_implementations.SpecificImplementations
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
@@ -389,15 +439,6 @@ def generate(
 
     jsonization_blocks = []  # type: List[Stripped]
 
-    # TODO: for interface
-    #  * allow converters only for interfaces with with_model_type
-    #  * collect the union of the properties of the implementers
-    #  🠒 make sure no duplicates!
-    #  🠒 make sure all the type annotations are equal!
-    #  * initialize all the properties (including modelType) to null
-    #  * once endobject:
-    #    * switch on modelType 🠒 return the constructor
-
     for symbol in symbol_table.symbols:
         jsonization_block = None  # type: Optional[Stripped]
         if isinstance(symbol, intermediate.Enumeration):
@@ -405,9 +446,15 @@ def generate(
                 enumeration=symbol)
         elif (
                 isinstance(symbol, intermediate.Interface)
-                and symbol.:
-        #     jsonization_block = _generate_json_converter_for_interface(
-        #         interface=symbol)
+                and symbol.json_serialization.with_model_type
+        ):
+            # Only interfaces with ``modelType`` property can be deserialized as
+            # otherwise we would lack the discriminating property.
+            implementers = interface_implementers[symbol]
+            jsonization_block = _generate_json_converter_for_interface(
+                interface=symbol,
+                implementers=implementers)
+
         elif isinstance(symbol, intermediate.Class):
             if symbol.implementation_key is not None:
                 jsonization_key = specific_implementations.ImplementationKey(

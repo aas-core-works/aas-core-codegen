@@ -294,7 +294,8 @@ def _parsed_arguments_to_arguments(
 
 
 def _parsed_abstract_entity_to_interface(
-        parsed: parse.AbstractEntity
+        parsed: parse.AbstractEntity,
+        json_serializations: Mapping[parse.Entity, JsonSerialization]
 ) -> Interface:
     """Translate an abstract entity of a meta-model to an intermediate interface."""
     # noinspection PyTypeChecker
@@ -325,6 +326,7 @@ def _parsed_abstract_entity_to_interface(
             _parsed_property_to_property(parsed=parsed_prop)
             for parsed_prop in parsed.properties
         ],
+        json_serialization=json_serializations[parsed],
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
@@ -493,37 +495,6 @@ class _SettingWithSource(Generic[T]):
         self.source = source
 
 
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _resolve_inheritance_chain_of_a_setting(
-        chain: Sequence[_SettingWithSource[T]],
-        default: T
-) -> Tuple[Optional[T], Optional[str]]:
-    """
-    Resolve the inheritance chain for a setting.
-
-    Return either the resolved value, or an error.
-    """
-    # TODO: consider removing this function as well once we implemented O(N) json serialization
-    #  resolution.
-
-    if len(chain) == 0:
-        return default, None
-
-    last_setting = None  # type: Optional[_SettingWithSource]
-
-    for setting in chain:
-        if last_setting is not None and setting.value != last_setting.value:
-            return None, (
-                f"The setting for the entity {setting.source.name} "
-                f"says {setting.value!r}, "
-                f"but the entity {last_setting.source.name} "
-                f"says {last_setting.value!r}")
-
-        last_setting = setting
-
-    return last_setting.value, None
-
-
 # fmt: off
 @ensure(
     lambda parsed_symbol_table, result:
@@ -537,19 +508,24 @@ def _resolve_inheritance_chain_of_a_setting(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def _resolve_json_serializations(
-        parsed_symbol_table: parse.SymbolTable,
-        ontology: _hierarchy.Ontology
-) -> Tuple[
-    Optional[MutableMapping[Identifier, JsonSerialization]],
-    Optional[Error]]:
+        ontology: _hierarchy.Ontology,
+        parsed_symbol_table: parse.SymbolTable
+) -> Tuple[Optional[MutableMapping[parse.Entity, JsonSerialization]], Optional[Error]]:
     """Resolve how JSON serialization settings stack through the ontology."""
-    settings_map = dict(
+    # NOTE (mristin, 2021-11-03):
+    # We do not abstract away different settings of the JSON serialization at this point
+    # as there is only a single one, ``with_model_type``. In the future, if there are
+    # more settings, this function needs to be split into multiple ones (one function
+    # for a setting each), or maybe we can even think of a more general approach to
+    # inheritance of serialization settings.
+
+    # region ``with_model_type``
+
+    with_model_type_map = dict(
     )  # type: MutableMapping[Identifier, Optional[_SettingWithSource]]
 
-    errors = []  # type: List[Error]
-
     for entity in ontology.entities:
-        assert entity.name not in settings_map, (
+        assert entity.name not in with_model_type_map, (
                 f"Expected the ontology to be a correctly linearized DAG, "
                 f"but the entity {entity.name!r} has been already visited before")
 
@@ -565,13 +541,13 @@ def _resolve_json_serializations(
                     source=entity))
 
         for inheritance in entity.inheritances:
-            assert inheritance in settings_map, (
+            assert inheritance in with_model_type_map, (
                 f"Expected the ontology to be a correctly linearized DAG, "
                 f"but the inheritance {inheritance!r} of the entity {entity.name!r} "
                 f"has not been visited before."
             )
 
-            setting = settings_map[inheritance]
+            setting = with_model_type_map[inheritance]
             if setting is None:
                 continue
 
@@ -582,6 +558,12 @@ def _resolve_json_serializations(
             # settings are consistent.
             for setting in settings[1:]:
                 if setting.value != settings[0].value:
+                    # NOTE (mristin, 2021-11-03):
+                    # We have to return immediately at the first error and can not
+                    # continue to interpret the remainder of the hierarchy since
+                    # a single inconsistency impedes us to make synchronization
+                    # points for a viable error recovery.
+
                     return None, Error(
                         entity.node,
                         f"The setting ``with_model_type`` "
@@ -590,61 +572,33 @@ def _resolve_json_serializations(
                         f"and {settings[0].source} is "
                         f"inconsistent")
 
-        settings_map[entity.name] = (
+        with_model_type_map[entity.name] = (
             None
             if len(settings) == 0
             else settings[0])
 
-    # TODO: resolve the settings to the actual values 🠒 where it's None, it must be False
+    # endregion
 
+    mapping = dict(
+    )  # type: MutableMapping[parse.Entity, JsonSerialization]
 
+    for identifier, setting in with_model_type_map.items():
+        entity = parsed_symbol_table.must_find_entity(name=identifier)
+        if setting is None:
+            # Neither the current entity nor its antecedents specified the setting
+            # so we assume the default value.
+            mapping[entity] = JsonSerialization(with_model_type=False)
+        else:
+            mapping[entity] = JsonSerialization(with_model_type=setting.value)
 
-
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _stack_json_serializations(
-        entity: parse.Entity,
-        antecedents: Sequence[parse.Entity]
-) -> Tuple[Optional[JsonSerialization], Optional[Error]]:
-    """Effectuate inheritance of json serialization settings through antecedents."""
-    # TODO: remove the following function once we implemented O(N) resolution
-
-    # TODO: test this function
-    # TODO: test also the failure cases
-
-    # NOTE (mristin, 2021-10-27):
-    # We decided to encapsulate the chain resolution to a separate function.
-    # The original implementation, where the chain has been locally resolved, was
-    # quite unreadable and can not scale for XML and other settings.
-
-    chain = list(antecedents) + [entity]
-
-    with_model_type_chain = [
-        _SettingWithSource(
-            value=an_entity_in_chain.json_serialization.with_model_type,
-            source=an_entity_in_chain)
-        for an_entity_in_chain in chain
-        if (
-                an_entity_in_chain.json_serialization is not None
-                and an_entity_in_chain.json_serialization.with_model_type is not None
-        )
-    ]  # type: List[_SettingWithSource[bool]]
-
-    with_model_type, error_message = _resolve_inheritance_chain_of_a_setting(
-        chain=with_model_type_chain, default=False)
-
-    if error_message:
-        return None, Error(
-            entity.node,
-            f"Failed to resolve the chain for setting ``with_model_type`` "
-            f"for JSON serialization: {error_message}")
-
-    return JsonSerialization(with_model_type=with_model_type), None
+    return mapping, None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parsed_entity_to_class(
         parsed: parse.ConcreteEntity,
         ontology: _hierarchy.Ontology,
+        json_serializations: Mapping[parse.Entity, JsonSerialization],
         in_lined_constructors: Mapping[
             parse.Entity, Sequence[construction.AssignArgument]]
 ) -> Tuple[Optional[Class], Optional[Error]]:
@@ -755,24 +709,12 @@ def _parsed_entity_to_class(
 
     # endregion
 
-    # region Stack settings for JSON serialization
-
-    json_serialization, error = _stack_json_serializations(
-        entity=parsed, antecedents=antecedents)
-
-    if error is not None:
-        errors.append(error)
-
-    # endregion
-
     if len(errors) > 0:
         return None, Error(
             node=parsed.node,
             message=f"Failed to translate the class {parsed.name} "
                     f"to the intermediate representation",
             underlying=errors)
-
-    assert json_serialization is not None
 
     return Class(
         name=parsed.name,
@@ -785,7 +727,7 @@ def _parsed_entity_to_class(
         methods=methods,
         constructor=ctor,
         invariants=invariants,
-        json_serialization=json_serialization,
+        json_serialization=json_serializations[parsed],
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
@@ -1024,7 +966,20 @@ def translate(
 
     # endregion
 
-    # region First pass of translation; type annotations reference placeholder symbols
+    # region Resolve settings for the JSON serialization
+
+    json_serializations, error = _resolve_json_serializations(
+        ontology=ontology, parsed_symbol_table=parsed_symbol_table)
+
+    if error is not None:
+        underlying_errors = [error]
+        return None, bundle_underlying_errors()
+
+    # endregion
+
+    # region First pass of translation
+
+    # Type annotations reference placeholder symbols at this point.
 
     symbols = []  # type: List[Symbol]
     for parsed_symbol in parsed_symbol_table.symbols:
@@ -1034,12 +989,15 @@ def translate(
             symbol = _parsed_enumeration_to_enumeration(parsed=parsed_symbol)
 
         elif isinstance(parsed_symbol, parse.AbstractEntity):
-            symbol = _parsed_abstract_entity_to_interface(parsed=parsed_symbol)
+            symbol = _parsed_abstract_entity_to_interface(
+                parsed=parsed_symbol,
+                json_serializations=json_serializations)
 
         elif isinstance(parsed_symbol, parse.ConcreteEntity):
             symbol, error = _parsed_entity_to_class(
                 parsed=parsed_symbol,
                 ontology=ontology,
+                json_serializations=json_serializations,
                 in_lined_constructors=in_lined_constructors)
 
             if error is not None:
