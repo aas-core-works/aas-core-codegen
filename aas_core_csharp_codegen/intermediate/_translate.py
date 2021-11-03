@@ -532,32 +532,72 @@ def _resolve_inheritance_chain_of_a_setting(
         for symbol in parsed_symbol_table
         if not isinstance(symbol, parse.Enumeration)
     ),
-    "JSON resolution performed for all the non-enumeration symbols"
+    "Resolution of JSON settings performed for all non-enumeration symbols"
 )
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def _resolve_json_serializations(
         parsed_symbol_table: parse.SymbolTable,
         ontology: _hierarchy.Ontology
 ) -> Tuple[
-    Optional[MutableMapping[parse.Entity, JsonSerialization]],
-    Optional[List[Error]]]:
+    Optional[MutableMapping[Identifier, JsonSerialization]],
+    Optional[Error]]:
     """Resolve how JSON serialization settings stack through the ontology."""
-    mapping = dict()  # type: MutableMapping[Identifier, JsonSerialization]
+    settings_map = dict(
+    )  # type: MutableMapping[Identifier, Optional[_SettingWithSource]]
+
     errors = []  # type: List[Error]
 
     for entity in ontology.entities:
-        assert entity.name not in mapping, (
+        assert entity.name not in settings_map, (
                 f"Expected the ontology to be a correctly linearized DAG, "
                 f"but the entity {entity.name!r} has been already visited before")
 
+        settings = []  # type: List[_SettingWithSource]
+
+        if (
+                entity.json_serialization is not None
+                and entity.json_serialization.with_model_type
+        ):
+            settings.append(
+                _SettingWithSource(
+                    value=entity.json_serialization.with_model_type,
+                    source=entity))
+
         for inheritance in entity.inheritances:
-            assert inheritance in mapping, (
+            assert inheritance in settings_map, (
                 f"Expected the ontology to be a correctly linearized DAG, "
                 f"but the inheritance {inheritance!r} of the entity {entity.name!r} "
                 f"has not been visited before."
             )
 
-            # TODO: continue here, think how the resolution should happen
+            setting = settings_map[inheritance]
+            if setting is None:
+                continue
+
+            settings.append(setting)
+
+        if len(settings) > 1:
+            # Verify that the setting for the entity as well as all the inherited
+            # settings are consistent.
+            for setting in settings[1:]:
+                if setting.value != settings[0].value:
+                    return None, Error(
+                        entity.node,
+                        f"The setting ``with_model_type`` "
+                        f"for JSON serialization "
+                        f"between the entity {setting.source} "
+                        f"and {settings[0].source} is "
+                        f"inconsistent")
+
+        settings_map[entity.name] = (
+            None
+            if len(settings) == 0
+            else settings[0])
+
+    # TODO: resolve the settings to the actual values 🠒 where it's None, it must be False
+
+
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
