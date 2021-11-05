@@ -1,4 +1,4 @@
-"""Generate C# code for JSON-ization based on the intermediate representation."""
+"""Generate C# code for XML-ization based on the intermediate representation."""
 
 import io
 import textwrap
@@ -510,18 +510,8 @@ case Json.JsonTokenType.EndObject:
 
         property_switch_writer.write(textwrap.dedent(f'''\
             {I}default:
-            {II}// Ignore an unknown property
-            {II}if (!reader.Read())
-            {II}{{
-            {III}throw new Json.JsonException(
-            {IIII}$"Unexpected end-of-stream after the property: {{propertyName}}");
-            {II}}}
-            {II}if (!reader.TrySkip())
-            {II}{{
-            {III}throw new Json.JsonException(
-            {IIII}"Unexpected end-of-stream when skipping " + 
-            {IIII}$"the value of the unknown property: {{propertyName}}");
-            {II}}}
+            {II}throw new Json.JsonException(
+            {III}$"Unexpected property in {cls_name}: {{propertyName}}");
             }}  // switch on propertyName'''))
 
         token_case_blocks.append(Stripped(f'''\
@@ -689,10 +679,14 @@ def generate(
         csharp_common.WARNING,
         Stripped(textwrap.dedent(f"""\
             /*
-             * For more information about customizing JSON serialization in C#, please see:
+             * We implement a streaming-based XML de/serialization with 
+             * <see cref="System.Xml.XmlReader" /> and <see cref="System.Xml.XmlWriter" /> 
+             * due to performance reasons.
+             * For more information, see:
              * <ul>
-             * <li>https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-converters-how-to</li>
-             * <li>https://docs.microsoft.com/en-gb/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to</li>
+             * <li>https://bertwagner.com/posts/xmlreader-vs-xmldocument-performance/</li>
+             * <li>https://www.erikthecoder.net/2019/08/02/xml-parsing-performance-csharp-versus-go/</li>
+             * <li>https://docs.microsoft.com/en-us/dotnet/standard/serialization/xml-serializer-generator-tool-sgen-exe</li>
              * </ul>
              */""")),
         Stripped(textwrap.dedent(f"""\
@@ -702,109 +696,44 @@ def generate(
             using Aas = {namespace};"""))
     ]
 
-    jsonization_blocks = []  # type: List[Stripped]
+    xmlization_blocks = []  # type: List[Stripped]
     converters = []  # type: List[Identifier]
 
     for symbol in symbol_table.symbols:
-        jsonization_block = None  # type: Optional[Stripped]
+        xmlization_block = None  # type: Optional[Stripped]
         if isinstance(symbol, intermediate.Enumeration):
-            jsonization_block = _generate_json_converter_for_enumeration(
-                enumeration=symbol)
-
-            converters.append(Identifier(
-                f'{csharp_naming.enum_name(symbol.name)}JsonConverter'))
+            raise NotImplementedError()
         elif isinstance(symbol, intermediate.Interface):
-            # Only interfaces with ``modelType`` property can be deserialized as
-            # otherwise we would lack the discriminating property.
-            if not symbol.json_serialization.with_model_type:
-                continue
-
-            implementers = interface_implementers[symbol]
-            jsonization_block, error = _generate_json_converter_for_interface(
-                interface=symbol,
-                implementers=implementers)
-
-            if error is not None:
-                errors.append(error)
-                continue
-
-            converters.append(Identifier(
-                f'{csharp_naming.interface_name(symbol.name)}JsonConverter'))
+            raise NotImplementedError()
 
         elif isinstance(symbol, intermediate.Class):
-            if symbol.implementation_key is not None:
-                jsonization_key = specific_implementations.ImplementationKey(
-                    f'Jsonization/{symbol.name}_json_converter')
-                if jsonization_key not in spec_impls:
-                    errors.append(
-                        Error(
-                            symbol.parsed.node,
-                            f"The jsonization snippet is missing "
-                            f"for the implementation-specific "
-                            f"class {symbol.name}: {jsonization_key}"))
-                    continue
-
-                jsonization_block = spec_impls[jsonization_key]
-            else:
-                jsonization_block = _generate_json_converter_for_class(cls=symbol)
-
-            converters.append(Identifier(
-                f'{csharp_naming.class_name(symbol.name)}JsonConverter'))
+            raise NotImplementedError()
         else:
             assert_never(symbol)
 
-        assert jsonization_block is not None
-        jsonization_blocks.append(jsonization_block)
-
-    if len(converters) == 0:
-        jsonization_blocks.append(Stripped(textwrap.dedent(f'''\
-            public static List<Json.JsonConverter> JsonConverters()
-            {{
-            {I}return new List<Json.JsonConverter>();
-            }}''')))
-    else:
-        converters_writer = io.StringIO()
-        converters_writer.write(textwrap.dedent(f'''\
-            /// <summary>
-            /// Create and populate a list of our custom-tailored JSON converters.
-            /// </summary>
-            public static List<Json.Serialization.JsonConverter> CreateJsonConverters()
-            {{
-            {I}return new List<Json.Serialization.JsonConverter>()
-            {I}{{
-            '''))
-
-        for i, converter in enumerate(converters):
-            converters_writer.write(f'{II}new {converter}()')
-
-            if i < len(converters) - 1:
-                converters_writer.write(',')
-
-            converters_writer.write('\n')
-
-        converters_writer.write(f'{I}}};\n}}')
-        jsonization_blocks.append(Stripped(converters_writer.getvalue()))
+        assert xmlization_block is not None
+        xmlization_blocks.append(xmlization_block)
 
     if len(errors) > 0:
         return None, errors
 
     writer = io.StringIO()
-    # TODO: continue here: add better documentation!
+    # TODO: add better documentation!
     writer.write(textwrap.dedent(f'''\
         namespace {namespace}
         {{
-        \tpublic static class Jsonization
+        \tpublic static class Xmlization
         \t{{
         ''').replace('\t', I))
 
-    for i, jsonization_block in enumerate(jsonization_blocks):
+    for i, xmlization_block in enumerate(xmlization_blocks):
         if i > 0:
             writer.write('\n\n')
 
-        writer.write(textwrap.indent(jsonization_block, II))
+        writer.write(textwrap.indent(xmlization_block, II))
 
     writer.write(
-        f"\n{I}}}  // public static class Jsonization")
+        f"\n{I}}}  // public static class Xmlization")
     writer.write(f"\n}}  // namespace {namespace}")
 
     blocks.append(Stripped(writer.getvalue()))

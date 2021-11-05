@@ -8,7 +8,8 @@ from aas_core3_meta.marker import (
     abstract,
     implementation_specific,
     comment,
-    json_serialization
+    json_serialization,
+    xml_serialization
 )
 from aas_core3_meta.pattern import is_IRI, is_IRDI, is_ID_short
 
@@ -21,6 +22,7 @@ class Has_extension(DBC):
     pass
 
 
+@xml_serialization(property_as_text="text")
 class Lang_string(DBC):
     """Give a text in a specific language."""
 
@@ -167,6 +169,7 @@ class Identifier_type(Enum):
     """Custom identifiers like GUIDs (globally unique identifiers)"""
 
 
+# fmt: off
 @invariant(
     lambda self:
     not (self.id_type == Identifier_type.IRDI) or is_IRDI(self.id)
@@ -175,6 +178,7 @@ class Identifier_type(Enum):
     lambda self:
     not (self.id_type == Identifier_type.IRI) or is_IRI(self.id)
 )
+@xml_serialization(property_as_text="id")
 # fmt: on
 class Identifier(DBC):
     id: str
@@ -350,6 +354,7 @@ class Key_elements(Enum):
     or (self.id_type != Key_type.ID_SHORT and self.id_type != Key_type.FRAGMENT_ID),
     "Constraint AASd-081"
 )
+@xml_serialization(property_as_text="value")
 # fmt: on
 class Key(DBC):
     type: Key_elements
@@ -420,6 +425,9 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
         self.derived_from = derived_from
 
 
+# TODO: make this environment implementation-specific in the final implementation.
+#  + Sketch what methods it should implement.
+#  + Sketch what invariants it should implement.
 class Environment:
     """Model the environment as the entry point for referencing and serialization."""
     asset_administration_shells: List[Asset_administration_shell]
