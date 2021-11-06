@@ -790,7 +790,7 @@ def generate(
         return None, errors
 
     writer = io.StringIO()
-    # TODO: continue here: add better documentation!
+    # TODO (mristin, 2021-11-06): add a good docstring 🠒 add examples!
     writer.write(textwrap.dedent(f'''\
         namespace {namespace}
         {{
