@@ -1309,6 +1309,41 @@ def translate(
 
     # endregion
 
+    # region Verify that XML serialization is possible
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Class):
+            continue
+
+        property_exists = True
+        if symbol.xml_serialization.property_as_text is not None:
+            if (
+                    symbol.xml_serialization.property_as_text not in
+                    symbol.properties_by_name
+            ):
+                underlying_errors.append(Error(
+                    symbol.parsed.xml_serialization.node,
+                    f"The property {symbol.xml_serialization.property_as_text} "
+                    f"given in ``property_as_text`` setting for XML serialization "
+                    f"is not available in the entity {symbol.parsed.name}"))
+                property_exists = False
+
+            if property_exists:
+                for prop in symbol.properties:
+                    if prop.name == symbol.xml_serialization.property_as_text:
+                        continue
+
+                    if not isinstance(prop.type_annotation,
+                                      BuiltinAtomicTypeAnnotation):
+                        underlying_errors.append(Error(
+                            prop.parsed.node,
+                            f"The ``property_as_text`` setting for XML serialization "
+                            f"has been defined, but the property {prop.name} is not "
+                            f"a built-in type, so we do not know how to "
+                            f"de/serialize it from/to an XML attribute"))
+
+    # endregion
+
     if len(underlying_errors) > 0:
         return None, bundle_underlying_errors()
 

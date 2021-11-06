@@ -341,13 +341,14 @@ class JsonSerialization:
 
 class XmlSerialization:
     """Define settings for XML de/serialization of a specific entity."""
-    def __init__(self, property_as_text: Optional[Identifier]) -> None:
+    def __init__(self, property_as_text: Optional[Identifier], node: ast.AST) -> None:
         """
         Initialize with the given values.
 
         :param property_as_text: The parsed ``property_as_text`` argument
         """
         self.property_as_text = property_as_text
+        self.node = node
 
 
 class Entity:

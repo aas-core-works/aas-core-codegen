@@ -34,6 +34,8 @@ def _generate_serializer(
     # TODO: continue here
     # TODO: consider inheriting from Visitor and accepting the XmlWriter
     # TODO: unroll collections and dictionaries 🠒 we need to know how to serialize those anyhow...
+    # TODO: serialization of primitives: <Value>...</Value>
+    # TODO: serialization of dictionaries: <Key>...</Key><Value>...</Value>
 
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\

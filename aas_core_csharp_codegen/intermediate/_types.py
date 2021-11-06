@@ -636,7 +636,7 @@ class Class:
         self.description = description
         self.parsed = parsed
 
-        self.properties_by_name: Mapping[str, Property] = {
+        self.properties_by_name: Mapping[Identifier, Property] = {
             prop.name: prop for prop in self.properties
         }
 

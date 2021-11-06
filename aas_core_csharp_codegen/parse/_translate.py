@@ -1114,7 +1114,9 @@ def _entity_decorator_to_xml_serialization(
 
         property_as_text = Identifier(property_as_text_node.value)
 
-    return XmlSerialization(property_as_text=property_as_text), None
+    return XmlSerialization(
+        property_as_text=property_as_text,
+        node=decorator), None
 
 
 # fmt: off
