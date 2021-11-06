@@ -24,6 +24,7 @@ is_string_expr = _types.is_string_expr
 Method = _types.Method
 Symbol = _types.Symbol
 JsonSerialization = _types.JsonSerialization
+XmlSerialization = _types.XmlSerialization
 Entity = _types.Entity
 AbstractEntity = _types.AbstractEntity
 ConcreteEntity = _types.ConcreteEntity

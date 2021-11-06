@@ -522,6 +522,7 @@ case Json.JsonTokenType.EndObject:
             {IIII}"Unexpected end-of-stream when skipping " + 
             {IIII}$"the value of the unknown property: {{propertyName}}");
             {II}}}
+            {II}break;
             }}  // switch on propertyName'''))
 
         token_case_blocks.append(Stripped(f'''\

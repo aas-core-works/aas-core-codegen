@@ -37,10 +37,8 @@ from aas_core_csharp_codegen.intermediate._types import (
     MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
     OurAtomicTypeAnnotation, STR_TO_BUILTIN_ATOMIC_TYPE, BuiltinAtomicTypeAnnotation,
     Description, PropertyReferenceInDoc, SymbolReferenceInDoc,
-    SubscriptedTypeAnnotation, DefaultEnumerationLiteral, map_interface_implementers,
-    type_annotations_equal,
+    SubscriptedTypeAnnotation, DefaultEnumerationLiteral, XmlSerialization,
 )
-
 # noinspection PyUnusedLocal
 from aas_core_csharp_codegen.specific_implementations import ImplementationKey
 
@@ -531,7 +529,7 @@ def _resolve_json_serializations(
             f"Expected the ontology to be a correctly linearized DAG, "
             f"but the entity {entity.name!r} has been already visited before")
 
-        settings = []  # type: List[_SettingWithSource]
+        settings = []  # type: List[_SettingWithSource[bool]]
 
         if (
                 entity.json_serialization is not None
@@ -596,11 +594,119 @@ def _resolve_json_serializations(
     return mapping, None
 
 
+# fmt: off
+@ensure(
+    lambda parsed_symbol_table, result:
+    not (result[0] is not None)
+    or all(
+        symbol in result[0]
+        for symbol in parsed_symbol_table.symbols
+        if not isinstance(symbol, parse.Enumeration)
+    ),
+    "Resolution of XML settings performed for all non-enumeration symbols"
+)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+# fmt: on
+def _resolve_xml_serializations(
+        ontology: _hierarchy.Ontology,
+        parsed_symbol_table: parse.SymbolTable
+) -> Tuple[Optional[MutableMapping[parse.Entity, XmlSerialization]], Optional[Error]]:
+    """Resolve how JSON serialization settings stack through the ontology."""
+    # NOTE (mristin, 2021-11-03):
+    # We do not abstract away different settings of the XML serialization at this point
+    # as there is only a single one, ``property_as_text``. In the future, if there are
+    # more settings, this function needs to be split into multiple ones (one function
+    # for a setting each), or maybe we can even think of a more general approach to
+    # inheritance of serialization settings.
+
+    # Logic behind the inheritance (the entities refer to abstract and concrete entities
+    # in the ontology):
+    #
+    # * If there is the setting ``property_as_text`` specified for an entity, 
+    #   that setting overrides any "inherited" setting.
+    # * If an entity lacks the setting ``property_as_text``, but 
+    #   inherits from one or more entities, and some entities specify
+    #   a ``property_as_text`` setting, these settings must agree, and the current 
+    #   entity inherits the setting.
+
+    property_as_text_map = dict(
+    )  # type: MutableMapping[Identifier, Optional[_SettingWithSource[Identifier]]]
+
+    for entity in ontology.entities:
+        assert entity.name not in property_as_text_map, (
+            f"Expected the ontology to be a correctly linearized DAG, "
+            f"but the entity {entity.name!r} has been already visited before")
+
+        if (
+                entity.xml_serialization is not None
+                and entity.xml_serialization.property_as_text
+        ):
+            # The setting at the entity overrides any inherited settings. 
+            property_as_text_map[entity.name] = _SettingWithSource(
+                value=entity.xml_serialization.property_as_text,
+                source=entity)
+
+        else:
+            settings = []  # type: List[_SettingWithSource[Identifier]]
+            for inheritance in entity.inheritances:
+                assert inheritance in property_as_text_map, (
+                    f"Expected the ontology to be a correctly linearized DAG, "
+                    f"but the inheritance {inheritance!r} of the entity {entity.name!r} "
+                    f"has not been visited before."
+                )
+    
+                setting = property_as_text_map[inheritance]
+                if setting is None:
+                    continue
+    
+                settings.append(setting)
+
+            if len(settings) >= 2:
+                # Verify that the inherited settings are consistent.
+                for setting in settings:
+                    if setting.value != settings[0].value:
+                        # NOTE (mristin, 2021-11-03):
+                        # We have to return immediately at the first error and can not
+                        # continue to interpret the remainder of the hierarchy since
+                        # a single inconsistency impedes us to make synchronization
+                        # points for a viable error recovery.
+    
+                        return None, Error(
+                            entity.node,
+                            f"The setting ``property_as_text`` "
+                            f"for XML serialization "
+                            f"between the entity {setting.source} "
+                            f"and {settings[0].source} is "
+                            f"inconsistent")
+    
+            property_as_text_map[entity.name] = (
+                None
+                if len(settings) == 0
+                else settings[0])
+
+    # endregion
+
+    mapping = dict(
+    )  # type: MutableMapping[parse.Entity, XmlSerialization]
+
+    for identifier, setting in property_as_text_map.items():
+        entity = parsed_symbol_table.must_find_entity(name=identifier)
+        if setting is None:
+            # Neither the current entity nor its antecedents specified the setting
+            # so we assume the default value.
+            mapping[entity] = XmlSerialization(property_as_text=None)
+        else:
+            mapping[entity] = XmlSerialization(property_as_text=setting.value)
+
+    return mapping, None
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parsed_entity_to_class(
         parsed: parse.ConcreteEntity,
         ontology: _hierarchy.Ontology,
         json_serializations: Mapping[parse.Entity, JsonSerialization],
+        xml_serializations: Mapping[parse.Entity, XmlSerialization],
         in_lined_constructors: Mapping[
             parse.Entity, Sequence[construction.AssignArgument]]
 ) -> Tuple[Optional[Class], Optional[Error]]:
@@ -730,6 +836,7 @@ def _parsed_entity_to_class(
         constructor=ctor,
         invariants=invariants,
         json_serialization=json_serializations[parsed],
+        xml_serialization=xml_serializations[parsed],
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
@@ -981,6 +1088,16 @@ def translate(
         underlying_errors.append(error)
 
     # endregion
+    
+    # region Resolve settings for the XML serialization
+
+    xml_serializations, error = _resolve_xml_serializations(
+        ontology=ontology, parsed_symbol_table=parsed_symbol_table)
+
+    if error is not None:
+        underlying_errors.append(error)
+    
+    # endregion
 
     if len(underlying_errors) > 0:
         # We can not proceed and recover from these errors as they concern critical
@@ -1018,6 +1135,7 @@ def translate(
                 parsed=parsed_symbol,
                 ontology=ontology,
                 json_serializations=json_serializations,
+                xml_serializations=xml_serializations,
                 in_lined_constructors=in_lined_constructors)
 
             if error is not None:

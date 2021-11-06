@@ -339,6 +339,17 @@ class JsonSerialization:
         self.with_model_type = with_model_type
 
 
+class XmlSerialization:
+    """Define settings for XML de/serialization of a specific entity."""
+    def __init__(self, property_as_text: Optional[Identifier]) -> None:
+        """
+        Initialize with the given values.
+
+        :param property_as_text: The parsed ``property_as_text`` argument
+        """
+        self.property_as_text = property_as_text
+
+
 class Entity:
     """Represent an entity of the meta-model."""
 
@@ -369,6 +380,7 @@ class Entity:
             methods: Sequence[Method],
             invariants: Sequence[Invariant],
             json_serialization: Optional[JsonSerialization],
+            xml_serialization: Optional[XmlSerialization],
             description: Optional[Description],
             node: ast.ClassDef,
     ) -> None:
@@ -379,6 +391,7 @@ class Entity:
         self.methods = methods
         self.invariants = invariants
         self.json_serialization = json_serialization
+        self.xml_serialization = xml_serialization
         self.description = description
         self.node = node
 

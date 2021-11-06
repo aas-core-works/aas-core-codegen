@@ -302,11 +302,19 @@ class Signature:
 
 
 class JsonSerialization:
-    """Specify the settings for JSON serialization of a concrete class."""
+    """Specify the settings for JSON serialization of an interface or a class."""
 
     def __init__(self, with_model_type: bool) -> None:
         """Initialize with the given values."""
         self.with_model_type = with_model_type
+
+
+class XmlSerialization:
+    """Specify the settings for XML serialization of an interface or a class."""
+
+    def __init__(self, property_as_text: Optional[Identifier]) -> None:
+        """Initialize with the given values."""
+        self.property_as_text = property_as_text
 
 
 class Interface:
@@ -611,6 +619,7 @@ class Class:
             constructor: Constructor,
             invariants: Sequence[Invariant],
             json_serialization: JsonSerialization,
+            xml_serialization: XmlSerialization,
             description: Optional[Description],
             parsed: parse.Entity,
     ) -> None:
@@ -623,6 +632,7 @@ class Class:
         self.constructor = constructor
         self.invariants = invariants
         self.json_serialization = json_serialization
+        self.xml_serialization = xml_serialization
         self.description = description
         self.parsed = parsed
 
