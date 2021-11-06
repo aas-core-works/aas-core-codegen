@@ -794,9 +794,9 @@ def generate(
     writer.write(textwrap.dedent(f'''\
         namespace {namespace}
         {{
-        \tpublic static class Jsonization
-        \t{{
-        ''').replace('\t', I))
+        {I}public static class Jsonization
+        {I}{{
+        '''))
 
     for i, jsonization_block in enumerate(jsonization_blocks):
         if i > 0:
