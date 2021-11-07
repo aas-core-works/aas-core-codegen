@@ -22,6 +22,16 @@ from aas_core_csharp_codegen.csharp.common import (
 )
 
 
+def _generate_serializer_visit(
+        cls: intermediate.Class
+)->Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate the serialization method for the intermediate class ``cls``."""
+    # TODO: continue here, implement
+    # TODO: unroll collections and dictionaries 🠒 we need to know how to serialize those anyhow...
+    # TODO: serialization of primitives: <Value>...</Value>
+    # TODO: serialization of dictionaries: <Key>...</Key><Value>...</Value>
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_serializer(
         symbol_table: intermediate.SymbolTable,
@@ -43,10 +53,32 @@ def _generate_serializer(
             }}'''))
     ]  # type: List[Stripped]
 
-    # TODO: consider inheriting from Visitor and accepting the XmlWriter
-    # TODO: unroll collections and dictionaries 🠒 we need to know how to serialize those anyhow...
-    # TODO: serialization of primitives: <Value>...</Value>
-    # TODO: serialization of dictionaries: <Key>...</Key><Value>...</Value>
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, intermediate.Class):
+            continue
+
+        block = None  # type: Optional[Stripped]
+        if symbol.implementation_key is not None:
+            implementation_key = specific_implementations.ImplementationKey(
+                f'Xmlization/Serializer/visit_{symbol.name}')
+            if implementation_key not in spec_impls:
+                errors.append(
+                    Error(
+                        symbol.parsed.node,
+                        f"The xmlization serializer snippet is missing "
+                        f"for the implementation-specific "
+                        f"class {symbol.name}: {implementation_key}"))
+                continue
+
+            block = spec_impls[implementation_key]
+        else:
+            block, error = _generate_serializer_visit(cls=symbol)
+            if error is not None:
+                errors.append(error)
+                continue
+
+        assert block is not None
+        blocks.append(block)
 
     writer = io.StringIO()
     writer.write(textwrap.dedent('''\
@@ -61,6 +93,7 @@ def _generate_serializer(
 
     writer.write('\n}  // public class Serializer')
 
+    return Stripped(writer.getvalue()), None
 
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
