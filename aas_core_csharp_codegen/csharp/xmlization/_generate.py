@@ -29,19 +29,29 @@ def _generate_serializer(
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     errors = []  # type: List[Error]
 
-    blocks = []  # type: List[Stripped]
+    blocks = [
+        Stripped('private readonly Xml.XmlWriter _writer;'),
+        Stripped(textwrap.dedent(f'''\
+            Serializer(Xml.XmlWriter writer)
+            {{
+            {I}_writer = writer;
+            }}''')),
+        Stripped(textwrap.dedent(f'''\
+            public void Visit(IEntity that)
+            {{
+            {I}that.Accept(this);
+            }}'''))
+    ]  # type: List[Stripped]
 
-    # TODO: continue here
     # TODO: consider inheriting from Visitor and accepting the XmlWriter
     # TODO: unroll collections and dictionaries 🠒 we need to know how to serialize those anyhow...
     # TODO: serialization of primitives: <Value>...</Value>
     # TODO: serialization of dictionaries: <Key>...</Key><Value>...</Value>
 
     writer = io.StringIO()
-    writer.write(textwrap.dedent(f'''\
-        public class Serializer
-        {{
-        '''))
+    writer.write(textwrap.dedent('''\
+        public class Serializer : Visitation.Visitor 
+        {'''))
 
     for i, block in enumerate(blocks):
         if i > 0:
@@ -91,7 +101,8 @@ def generate(
             using Xml = System.Xml;
             using System.Collections.Generic;  // can't alias
 
-            using Aas = {namespace};"""))
+            using Aas = {namespace};
+            using Visitation = {namespace}.Visitation;"""))
     ]
 
     xmlization_blocks = []  # type: List[Stripped]
