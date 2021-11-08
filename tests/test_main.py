@@ -80,7 +80,8 @@ class Test_against_recorded(unittest.TestCase):
                     pathlib.Path('visitation.cs'),
                     pathlib.Path('verification.cs'),
                     pathlib.Path('stringification.cs'),
-                    pathlib.Path('jsonization.cs')
+                    pathlib.Path('jsonization.cs'),
+                    pathlib.Path('xmlization.cs')
                 ]:
                     expected_pth = expected_output_dir / relevant_rel_pth
                     output_pth = output_dir / relevant_rel_pth

@@ -11,7 +11,7 @@
  * </ul>
  */
 
-using InvalidArgumentException = System.InvalidArgumentException;
+using Json = System.Text.Json;
 using System.Collections.Generic;  // can't alias
 
 using Aas = AasCore.Aas3;
@@ -21,85 +21,88 @@ namespace AasCore.Aas3
     public static class Jsonization
     {
         public class LangStringJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.LangString>
+            Json.Serialization.JsonConverter<Aas.LangString>
         {
             public override Aas.LangString Read(
-                ref System.Text.Json.Utf8JsonReader reader,
+                ref Json.Utf8JsonReader reader,
                 System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.StartObject)
+                if (reader.TokenType != Json.JsonTokenType.StartObject)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                string? theLanguage;
-                string? theText;
+                string? theLanguage = null;
+                string? theText = null;
 
                 while (reader.Read())
                 {
                     switch (reader.TokenType)
                     {
-                        case System.Text.Json.JsonTokenType.EndObject:
-                            if (theLanguage == null)
-                            {
-                                throw new System.Text.Json.JsonException(
-                                    "Required property is missing: language");
-                            }
-    
-                            if (theText == null)
-                            {
-                                throw new System.Text.Json.JsonException(
-                                    "Required property is missing: text");
-                            }
-    
+                        case Json.JsonTokenType.EndObject:
                             return new Aas.LangString(
-                                theLanguage,
-                                theText);
-                            break;
+                                theLanguage ?? throw new Json.JsonException(
+                                    "Required property is missing: language"),
+                                theText ?? throw new Json.JsonException(
+                                    "Required property is missing: text"));
 
-                        case JsonTokenType.PropertyName:
+                        case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected property name null");
+    
                             switch (propertyName)
                             {
                                 case "language": 
                                     theLanguage =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<string>(
+                                        Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
                                 case "text": 
                                     theText =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<string>(
+                                        Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
                                 default:
-                                    throw new System.Text.Json.JsonException(
-                                        $"Unexpected property in LangString: {propertyName}");
+                                    // Ignore an unknown property
+                                    if (!reader.Read())
+                                    {
+                                        throw new Json.JsonException(
+                                            $"Unexpected end-of-stream after the property: {propertyName}");
+                                    }
+                                    if (!reader.TrySkip())
+                                    {
+                                        throw new Json.JsonException(
+                                            "Unexpected end-of-stream when skipping " + 
+                                            $"the value of the unknown property: {propertyName}");
+                                    }
                                     break;
                             }  // switch on propertyName
                             break;
 
                         default:
-                            throw new JsonException();
-                            break;
+                            throw new Json.JsonException();
                     }  // switch on token type
                 }  // while reader.Read
+
+                throw new Json.JsonException();
             }
 
             public override void Write(
-                System.Text.Json.Utf8JsonWriter writer,
+                Json.Utf8JsonWriter writer,
                 Aas.LangString that,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("language");
-                System.Text.Json.JsonSerializer.Serialize(
+                Json.JsonSerializer.Serialize(
                     writer, that.Language);
 
                 writer.WritePropertyName("text");
-                System.Text.Json.JsonSerializer.Serialize(
+                Json.JsonSerializer.Serialize(
                     writer, that.Text);
 
                 writer.WriteEndObject();
@@ -114,106 +117,193 @@ namespace AasCore.Aas3
                 System.Type typeToConvert,
                 System.Text.Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.StartObject)
+                throw new System.NotImplementedException("TODO");
+            }
+
+            public override void Write(
+                System.Text.Json.Utf8JsonWriter writer,
+                Aas.LangStringSet value,
+                System.Text.Json.JsonSerializerOptions options)
+            {
+                throw new System.NotImplementedException("TODO");
+            }
+        }
+
+        public class IReferableJsonConverter :
+            Json.Serialization.JsonConverter<Aas.IReferable>
+        {
+            public override bool CanConvert(System.Type typeToConvert)
+            {
+                return typeof(Aas.IReferable).IsAssignableFrom(typeToConvert);
+            }
+
+            public override Aas.IReferable Read(
+                ref Json.Utf8JsonReader reader,
+                System.Type typeToConvert,
+                Json.JsonSerializerOptions options)
+            {
+                if (reader.TokenType != Json.JsonTokenType.StartObject)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
+                string? modelType = null;
+
                 // Prefix the property variables with "the" to avoid conflicts
-                List<LangString>? theLangStrings;
+                AdministrativeInformation? theAdministration = null;
+                string? theCategory = null;
+                List<Reference>? theDataSpecifications = null;
+                AssetAdministrationShell? theDerivedFrom = null;
+                LangStringSet? theDescription = null;
+                LangStringSet? theDisplayName = null;
+                string? theIdShort = null;
+                Identifier? theIdentification = null;
 
                 while (reader.Read())
                 {
                     switch (reader.TokenType)
                     {
-                        case System.Text.Json.JsonTokenType.EndObject:
-                            if (theLangStrings == null)
+                        case Json.JsonTokenType.EndObject:
+                            switch (modelType)
                             {
-                                throw new System.Text.Json.JsonException(
-                                    "Required property is missing: langStrings");
-                            }
+                                case "AssetAdministrationShell":
+                                    return new Aas.AssetAdministrationShell(
+                                        theIdentification ?? throw new Json.JsonException(
+                                            "Required property is missing: identification"),
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
+                                        theDisplayName,
+                                        theCategory,
+                                        theDescription,
+                                        theAdministration,
+                                        theDataSpecifications ?? throw new Json.JsonException(
+                                            "Required property is missing: dataSpecifications"),
+                                        theDerivedFrom);
+                                default:
+                                    throw new Json.JsonException(
+                                        $"Unknown model type: {modelType}");
     
-                            return new Aas.LangStringSet(
-                                theLangStrings);
-                            break;
+                            }  // switch on modelType
 
-                        case JsonTokenType.PropertyName:
+                        case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected property name null");
+    
                             switch (propertyName)
                             {
-                                case "langStrings": 
-                                    theLangStrings =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<List<LangString>>(
+                                case "administration": 
+                                    theAdministration =  (
+                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
                                             ref reader));
                                     break;
-                                default:
-                                    throw new System.Text.Json.JsonException(
-                                        $"Unexpected property in LangStringSet: {propertyName}");
+                                case "category": 
+                                    theCategory =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
                                     break;
+                                case "dataSpecifications": 
+                                    theDataSpecifications =  (
+                                        Json.JsonSerializer.Deserialize<List<Reference>>(
+                                            ref reader));
+                                    break;
+                                case "derivedFrom": 
+                                    theDerivedFrom =  (
+                                        Json.JsonSerializer.Deserialize<AssetAdministrationShell>(
+                                            ref reader));
+                                    break;
+                                case "description": 
+                                    theDescription =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "displayName": 
+                                    theDisplayName =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "idShort": 
+                                    theIdShort =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "identification": 
+                                    theIdentification =  (
+                                        Json.JsonSerializer.Deserialize<Identifier>(
+                                            ref reader));
+                                    break;
+                                case "modelType":
+                                    modelType = Json.JsonSerializer.Deserialize<string>(
+                                        ref reader);
+                                    break;
+                                default:
+                                    throw new Json.JsonException(
+                                        $"Unexpected property in an implementer class " + 
+                                        $"of IReferable: {propertyName}");
                             }  // switch on propertyName
                             break;
 
                         default:
-                            throw new JsonException();
-                            break;
+                            throw new Json.JsonException();
                     }  // switch on token type
                 }  // while reader.Read
+
+                throw new Json.JsonException();
             }
 
             public override void Write(
-                System.Text.Json.Utf8JsonWriter writer,
-                Aas.LangStringSet that,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.Utf8JsonWriter writer,
+                Aas.IReferable that,
+                Json.JsonSerializerOptions options)
             {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("langStrings");
-                System.Text.Json.JsonSerializer.Serialize(
-                    writer, that.LangStrings);
-
-                writer.WriteEndObject();
+            switch (that)
+            {
+                case AssetAdministrationShell theAssetAdministrationShell:
+                    Json.JsonSerializer.Serialize(
+                        writer, theAssetAdministrationShell);
+                    break;
+                default:
+                    throw new System.ArgumentException(
+                    $"Instance `that` of type {that.GetType()} is " + 
+                    $"not an implementer class of IReferable: {that}");
             }
-        }  // LangStringSetJsonConverter
+            }
+        }  // IReferableJsonConverter
 
         public class IdentifierTypeJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.IdentifierType>
+            Json.Serialization.JsonConverter<Aas.IdentifierType>
         {
             public override Aas.IdentifierType Read(
-                ref System.Text.Json.Utf8JsonReader reader,
+                ref Json.Utf8JsonReader reader,
                 System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.String)
+                if (reader.TokenType != Json.JsonTokenType.String)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 string? text = reader.GetString();
                 if (text == null)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 Aas.IdentifierType? value = Stringification.IdentifierTypeFromString(
                     text);
-                if (value == null)
-                {
-                    throw new System.Text.Json.JsonException(
-                        $"Invalid IdentifierType: {text}");
-                }
-                return value;
+                return value ?? throw new Json.JsonException(
+                    $"Invalid IdentifierType: {text}");
             }
 
             public override void Write(
-                Utf8JsonWriter writer,
+                Json.Utf8JsonWriter writer,
                 Aas.IdentifierType value,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                string? text = Stringification.IdentifierTypeToString(
-                    value);
+                string? text = Stringification.ToString(value);
                 if (text == null)
                 {
-                    throw new InvalidArgumentException(
+                    throw new System.ArgumentException(
                         $"Invalid IdentifierType: {value}");
                 }
 
@@ -222,85 +312,88 @@ namespace AasCore.Aas3
         }
 
         public class IdentifierJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.Identifier>
+            Json.Serialization.JsonConverter<Aas.Identifier>
         {
             public override Aas.Identifier Read(
-                ref System.Text.Json.Utf8JsonReader reader,
+                ref Json.Utf8JsonReader reader,
                 System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.StartObject)
+                if (reader.TokenType != Json.JsonTokenType.StartObject)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                string? theId;
-                IdentifierType? theIdType;
+                string? theId = null;
+                IdentifierType? theIdType = null;
 
                 while (reader.Read())
                 {
                     switch (reader.TokenType)
                     {
-                        case System.Text.Json.JsonTokenType.EndObject:
-                            if (theId == null)
-                            {
-                                throw new System.Text.Json.JsonException(
-                                    "Required property is missing: id");
-                            }
-    
-                            if (theIdType == null)
-                            {
-                                throw new System.Text.Json.JsonException(
-                                    "Required property is missing: idType");
-                            }
-    
+                        case Json.JsonTokenType.EndObject:
                             return new Aas.Identifier(
-                                theId,
-                                theIdType);
-                            break;
+                                theId ?? throw new Json.JsonException(
+                                    "Required property is missing: id"),
+                                theIdType ?? throw new Json.JsonException(
+                                    "Required property is missing: idType"));
 
-                        case JsonTokenType.PropertyName:
+                        case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected property name null");
+    
                             switch (propertyName)
                             {
                                 case "id": 
                                     theId =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<string>(
+                                        Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
                                 case "idType": 
                                     theIdType =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<IdentifierType>(
+                                        Json.JsonSerializer.Deserialize<IdentifierType>(
                                             ref reader));
                                     break;
                                 default:
-                                    throw new System.Text.Json.JsonException(
-                                        $"Unexpected property in Identifier: {propertyName}");
+                                    // Ignore an unknown property
+                                    if (!reader.Read())
+                                    {
+                                        throw new Json.JsonException(
+                                            $"Unexpected end-of-stream after the property: {propertyName}");
+                                    }
+                                    if (!reader.TrySkip())
+                                    {
+                                        throw new Json.JsonException(
+                                            "Unexpected end-of-stream when skipping " + 
+                                            $"the value of the unknown property: {propertyName}");
+                                    }
                                     break;
                             }  // switch on propertyName
                             break;
 
                         default:
-                            throw new JsonException();
-                            break;
+                            throw new Json.JsonException();
                     }  // switch on token type
                 }  // while reader.Read
+
+                throw new Json.JsonException();
             }
 
             public override void Write(
-                System.Text.Json.Utf8JsonWriter writer,
+                Json.Utf8JsonWriter writer,
                 Aas.Identifier that,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("id");
-                System.Text.Json.JsonSerializer.Serialize(
+                Json.JsonSerializer.Serialize(
                     writer, that.Id);
 
                 writer.WritePropertyName("idType");
-                System.Text.Json.JsonSerializer.Serialize(
+                Json.JsonSerializer.Serialize(
                     writer, that.IdType);
 
                 writer.WriteEndObject();
@@ -308,78 +401,91 @@ namespace AasCore.Aas3
         }  // IdentifierJsonConverter
 
         public class AdministrativeInformationJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.AdministrativeInformation>
+            Json.Serialization.JsonConverter<Aas.AdministrativeInformation>
         {
             public override Aas.AdministrativeInformation Read(
-                ref System.Text.Json.Utf8JsonReader reader,
+                ref Json.Utf8JsonReader reader,
                 System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.StartObject)
+                if (reader.TokenType != Json.JsonTokenType.StartObject)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                string? theVersion;
-                string? theRevision;
+                string? theVersion = null;
+                string? theRevision = null;
 
                 while (reader.Read())
                 {
                     switch (reader.TokenType)
                     {
-                        case System.Text.Json.JsonTokenType.EndObject:
+                        case Json.JsonTokenType.EndObject:
                             return new Aas.AdministrativeInformation(
                                 theVersion,
                                 theRevision);
-                            break;
 
-                        case JsonTokenType.PropertyName:
+                        case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected property name null");
+    
                             switch (propertyName)
                             {
                                 case "version": 
                                     theVersion =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<string>(
+                                        Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
                                 case "revision": 
                                     theRevision =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<string>(
+                                        Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
                                 default:
-                                    throw new System.Text.Json.JsonException(
-                                        $"Unexpected property in AdministrativeInformation: {propertyName}");
+                                    // Ignore an unknown property
+                                    if (!reader.Read())
+                                    {
+                                        throw new Json.JsonException(
+                                            $"Unexpected end-of-stream after the property: {propertyName}");
+                                    }
+                                    if (!reader.TrySkip())
+                                    {
+                                        throw new Json.JsonException(
+                                            "Unexpected end-of-stream when skipping " + 
+                                            $"the value of the unknown property: {propertyName}");
+                                    }
                                     break;
                             }  // switch on propertyName
                             break;
 
                         default:
-                            throw new JsonException();
-                            break;
+                            throw new Json.JsonException();
                     }  // switch on token type
                 }  // while reader.Read
+
+                throw new Json.JsonException();
             }
 
             public override void Write(
-                System.Text.Json.Utf8JsonWriter writer,
+                Json.Utf8JsonWriter writer,
                 Aas.AdministrativeInformation that,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
                 writer.WriteStartObject();
 
                 if (that.Version != null)
                 {
                     writer.WritePropertyName("version");
-                    System.Text.Json.JsonSerializer.Serialize(
+                    Json.JsonSerializer.Serialize(
                         writer, that.Version);
                 }
 
                 if (that.Revision != null)
                 {
                     writer.WritePropertyName("revision");
-                    System.Text.Json.JsonSerializer.Serialize(
+                    Json.JsonSerializer.Serialize(
                         writer, that.Revision);
                 }
 
@@ -387,45 +493,181 @@ namespace AasCore.Aas3
             }
         }  // AdministrativeInformationJsonConverter
 
+        public class IIdentifiableJsonConverter :
+            Json.Serialization.JsonConverter<Aas.IIdentifiable>
+        {
+            public override bool CanConvert(System.Type typeToConvert)
+            {
+                return typeof(Aas.IIdentifiable).IsAssignableFrom(typeToConvert);
+            }
+
+            public override Aas.IIdentifiable Read(
+                ref Json.Utf8JsonReader reader,
+                System.Type typeToConvert,
+                Json.JsonSerializerOptions options)
+            {
+                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                {
+                    throw new Json.JsonException();
+                }
+
+                string? modelType = null;
+
+                // Prefix the property variables with "the" to avoid conflicts
+                AdministrativeInformation? theAdministration = null;
+                string? theCategory = null;
+                List<Reference>? theDataSpecifications = null;
+                AssetAdministrationShell? theDerivedFrom = null;
+                LangStringSet? theDescription = null;
+                LangStringSet? theDisplayName = null;
+                string? theIdShort = null;
+                Identifier? theIdentification = null;
+
+                while (reader.Read())
+                {
+                    switch (reader.TokenType)
+                    {
+                        case Json.JsonTokenType.EndObject:
+                            switch (modelType)
+                            {
+                                case "AssetAdministrationShell":
+                                    return new Aas.AssetAdministrationShell(
+                                        theIdentification ?? throw new Json.JsonException(
+                                            "Required property is missing: identification"),
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
+                                        theDisplayName,
+                                        theCategory,
+                                        theDescription,
+                                        theAdministration,
+                                        theDataSpecifications ?? throw new Json.JsonException(
+                                            "Required property is missing: dataSpecifications"),
+                                        theDerivedFrom);
+                                default:
+                                    throw new Json.JsonException(
+                                        $"Unknown model type: {modelType}");
+    
+                            }  // switch on modelType
+
+                        case Json.JsonTokenType.PropertyName:
+                            string propertyName = reader.GetString()
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected property name null");
+    
+                            switch (propertyName)
+                            {
+                                case "administration": 
+                                    theAdministration =  (
+                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
+                                            ref reader));
+                                    break;
+                                case "category": 
+                                    theCategory =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "dataSpecifications": 
+                                    theDataSpecifications =  (
+                                        Json.JsonSerializer.Deserialize<List<Reference>>(
+                                            ref reader));
+                                    break;
+                                case "derivedFrom": 
+                                    theDerivedFrom =  (
+                                        Json.JsonSerializer.Deserialize<AssetAdministrationShell>(
+                                            ref reader));
+                                    break;
+                                case "description": 
+                                    theDescription =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "displayName": 
+                                    theDisplayName =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "idShort": 
+                                    theIdShort =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "identification": 
+                                    theIdentification =  (
+                                        Json.JsonSerializer.Deserialize<Identifier>(
+                                            ref reader));
+                                    break;
+                                case "modelType":
+                                    modelType = Json.JsonSerializer.Deserialize<string>(
+                                        ref reader);
+                                    break;
+                                default:
+                                    throw new Json.JsonException(
+                                        $"Unexpected property in an implementer class " + 
+                                        $"of IIdentifiable: {propertyName}");
+                            }  // switch on propertyName
+                            break;
+
+                        default:
+                            throw new Json.JsonException();
+                    }  // switch on token type
+                }  // while reader.Read
+
+                throw new Json.JsonException();
+            }
+
+            public override void Write(
+                Json.Utf8JsonWriter writer,
+                Aas.IIdentifiable that,
+                Json.JsonSerializerOptions options)
+            {
+            switch (that)
+            {
+                case AssetAdministrationShell theAssetAdministrationShell:
+                    Json.JsonSerializer.Serialize(
+                        writer, theAssetAdministrationShell);
+                    break;
+                default:
+                    throw new System.ArgumentException(
+                    $"Instance `that` of type {that.GetType()} is " + 
+                    $"not an implementer class of IIdentifiable: {that}");
+            }
+            }
+        }  // IIdentifiableJsonConverter
+
         public class ModelingKindJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.ModelingKind>
+            Json.Serialization.JsonConverter<Aas.ModelingKind>
         {
             public override Aas.ModelingKind Read(
-                ref System.Text.Json.Utf8JsonReader reader,
+                ref Json.Utf8JsonReader reader,
                 System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.String)
+                if (reader.TokenType != Json.JsonTokenType.String)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 string? text = reader.GetString();
                 if (text == null)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 Aas.ModelingKind? value = Stringification.ModelingKindFromString(
                     text);
-                if (value == null)
-                {
-                    throw new System.Text.Json.JsonException(
-                        $"Invalid ModelingKind: {text}");
-                }
-                return value;
+                return value ?? throw new Json.JsonException(
+                    $"Invalid ModelingKind: {text}");
             }
 
             public override void Write(
-                Utf8JsonWriter writer,
+                Json.Utf8JsonWriter writer,
                 Aas.ModelingKind value,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                string? text = Stringification.ModelingKindToString(
-                    value);
+                string? text = Stringification.ToString(value);
                 if (text == null)
                 {
-                    throw new InvalidArgumentException(
+                    throw new System.ArgumentException(
                         $"Invalid ModelingKind: {value}");
                 }
 
@@ -434,44 +676,39 @@ namespace AasCore.Aas3
         }
 
         public class LocalKeyTypeJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.LocalKeyType>
+            Json.Serialization.JsonConverter<Aas.LocalKeyType>
         {
             public override Aas.LocalKeyType Read(
-                ref System.Text.Json.Utf8JsonReader reader,
+                ref Json.Utf8JsonReader reader,
                 System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.String)
+                if (reader.TokenType != Json.JsonTokenType.String)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 string? text = reader.GetString();
                 if (text == null)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 Aas.LocalKeyType? value = Stringification.LocalKeyTypeFromString(
                     text);
-                if (value == null)
-                {
-                    throw new System.Text.Json.JsonException(
-                        $"Invalid LocalKeyType: {text}");
-                }
-                return value;
+                return value ?? throw new Json.JsonException(
+                    $"Invalid LocalKeyType: {text}");
             }
 
             public override void Write(
-                Utf8JsonWriter writer,
+                Json.Utf8JsonWriter writer,
                 Aas.LocalKeyType value,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                string? text = Stringification.LocalKeyTypeToString(
-                    value);
+                string? text = Stringification.ToString(value);
                 if (text == null)
                 {
-                    throw new InvalidArgumentException(
+                    throw new System.ArgumentException(
                         $"Invalid LocalKeyType: {value}");
                 }
 
@@ -480,44 +717,39 @@ namespace AasCore.Aas3
         }
 
         public class KeyTypeJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.KeyType>
+            Json.Serialization.JsonConverter<Aas.KeyType>
         {
             public override Aas.KeyType Read(
-                ref System.Text.Json.Utf8JsonReader reader,
+                ref Json.Utf8JsonReader reader,
                 System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.String)
+                if (reader.TokenType != Json.JsonTokenType.String)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 string? text = reader.GetString();
                 if (text == null)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 Aas.KeyType? value = Stringification.KeyTypeFromString(
                     text);
-                if (value == null)
-                {
-                    throw new System.Text.Json.JsonException(
-                        $"Invalid KeyType: {text}");
-                }
-                return value;
+                return value ?? throw new Json.JsonException(
+                    $"Invalid KeyType: {text}");
             }
 
             public override void Write(
-                Utf8JsonWriter writer,
+                Json.Utf8JsonWriter writer,
                 Aas.KeyType value,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                string? text = Stringification.KeyTypeToString(
-                    value);
+                string? text = Stringification.ToString(value);
                 if (text == null)
                 {
-                    throw new InvalidArgumentException(
+                    throw new System.ArgumentException(
                         $"Invalid KeyType: {value}");
                 }
 
@@ -526,44 +758,39 @@ namespace AasCore.Aas3
         }
 
         public class IdentifiableElementsJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.IdentifiableElements>
+            Json.Serialization.JsonConverter<Aas.IdentifiableElements>
         {
             public override Aas.IdentifiableElements Read(
-                ref System.Text.Json.Utf8JsonReader reader,
+                ref Json.Utf8JsonReader reader,
                 System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.String)
+                if (reader.TokenType != Json.JsonTokenType.String)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 string? text = reader.GetString();
                 if (text == null)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 Aas.IdentifiableElements? value = Stringification.IdentifiableElementsFromString(
                     text);
-                if (value == null)
-                {
-                    throw new System.Text.Json.JsonException(
-                        $"Invalid IdentifiableElements: {text}");
-                }
-                return value;
+                return value ?? throw new Json.JsonException(
+                    $"Invalid IdentifiableElements: {text}");
             }
 
             public override void Write(
-                Utf8JsonWriter writer,
+                Json.Utf8JsonWriter writer,
                 Aas.IdentifiableElements value,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                string? text = Stringification.IdentifiableElementsToString(
-                    value);
+                string? text = Stringification.ToString(value);
                 if (text == null)
                 {
-                    throw new InvalidArgumentException(
+                    throw new System.ArgumentException(
                         $"Invalid IdentifiableElements: {value}");
                 }
 
@@ -572,44 +799,39 @@ namespace AasCore.Aas3
         }
 
         public class ReferableElementsJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.ReferableElements>
+            Json.Serialization.JsonConverter<Aas.ReferableElements>
         {
             public override Aas.ReferableElements Read(
-                ref System.Text.Json.Utf8JsonReader reader,
+                ref Json.Utf8JsonReader reader,
                 System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.String)
+                if (reader.TokenType != Json.JsonTokenType.String)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 string? text = reader.GetString();
                 if (text == null)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 Aas.ReferableElements? value = Stringification.ReferableElementsFromString(
                     text);
-                if (value == null)
-                {
-                    throw new System.Text.Json.JsonException(
-                        $"Invalid ReferableElements: {text}");
-                }
-                return value;
+                return value ?? throw new Json.JsonException(
+                    $"Invalid ReferableElements: {text}");
             }
 
             public override void Write(
-                Utf8JsonWriter writer,
+                Json.Utf8JsonWriter writer,
                 Aas.ReferableElements value,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                string? text = Stringification.ReferableElementsToString(
-                    value);
+                string? text = Stringification.ToString(value);
                 if (text == null)
                 {
-                    throw new InvalidArgumentException(
+                    throw new System.ArgumentException(
                         $"Invalid ReferableElements: {value}");
                 }
 
@@ -618,44 +840,39 @@ namespace AasCore.Aas3
         }
 
         public class KeyElementsJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.KeyElements>
+            Json.Serialization.JsonConverter<Aas.KeyElements>
         {
             public override Aas.KeyElements Read(
-                ref System.Text.Json.Utf8JsonReader reader,
+                ref Json.Utf8JsonReader reader,
                 System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.String)
+                if (reader.TokenType != Json.JsonTokenType.String)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 string? text = reader.GetString();
                 if (text == null)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 Aas.KeyElements? value = Stringification.KeyElementsFromString(
                     text);
-                if (value == null)
-                {
-                    throw new System.Text.Json.JsonException(
-                        $"Invalid KeyElements: {text}");
-                }
-                return value;
+                return value ?? throw new Json.JsonException(
+                    $"Invalid KeyElements: {text}");
             }
 
             public override void Write(
-                Utf8JsonWriter writer,
+                Json.Utf8JsonWriter writer,
                 Aas.KeyElements value,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                string? text = Stringification.KeyElementsToString(
-                    value);
+                string? text = Stringification.ToString(value);
                 if (text == null)
                 {
-                    throw new InvalidArgumentException(
+                    throw new System.ArgumentException(
                         $"Invalid KeyElements: {value}");
                 }
 
@@ -664,102 +881,100 @@ namespace AasCore.Aas3
         }
 
         public class KeyJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.Key>
+            Json.Serialization.JsonConverter<Aas.Key>
         {
             public override Aas.Key Read(
-                ref System.Text.Json.Utf8JsonReader reader,
+                ref Json.Utf8JsonReader reader,
                 System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.StartObject)
+                if (reader.TokenType != Json.JsonTokenType.StartObject)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                KeyElements? theType;
-                string? theValue;
-                KeyType? theIdType;
+                KeyElements? theType = null;
+                string? theValue = null;
+                KeyType? theIdType = null;
 
                 while (reader.Read())
                 {
                     switch (reader.TokenType)
                     {
-                        case System.Text.Json.JsonTokenType.EndObject:
-                            if (theType == null)
-                            {
-                                throw new System.Text.Json.JsonException(
-                                    "Required property is missing: type");
-                            }
-    
-                            if (theValue == null)
-                            {
-                                throw new System.Text.Json.JsonException(
-                                    "Required property is missing: value");
-                            }
-    
-                            if (theIdType == null)
-                            {
-                                throw new System.Text.Json.JsonException(
-                                    "Required property is missing: idType");
-                            }
-    
+                        case Json.JsonTokenType.EndObject:
                             return new Aas.Key(
-                                theType,
-                                theValue,
-                                theIdType);
-                            break;
+                                theType ?? throw new Json.JsonException(
+                                    "Required property is missing: type"),
+                                theValue ?? throw new Json.JsonException(
+                                    "Required property is missing: value"),
+                                theIdType ?? throw new Json.JsonException(
+                                    "Required property is missing: idType"));
 
-                        case JsonTokenType.PropertyName:
+                        case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected property name null");
+    
                             switch (propertyName)
                             {
                                 case "type": 
                                     theType =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<KeyElements>(
+                                        Json.JsonSerializer.Deserialize<KeyElements>(
                                             ref reader));
                                     break;
                                 case "value": 
                                     theValue =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<string>(
+                                        Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
                                 case "idType": 
                                     theIdType =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<KeyType>(
+                                        Json.JsonSerializer.Deserialize<KeyType>(
                                             ref reader));
                                     break;
                                 default:
-                                    throw new System.Text.Json.JsonException(
-                                        $"Unexpected property in Key: {propertyName}");
+                                    // Ignore an unknown property
+                                    if (!reader.Read())
+                                    {
+                                        throw new Json.JsonException(
+                                            $"Unexpected end-of-stream after the property: {propertyName}");
+                                    }
+                                    if (!reader.TrySkip())
+                                    {
+                                        throw new Json.JsonException(
+                                            "Unexpected end-of-stream when skipping " + 
+                                            $"the value of the unknown property: {propertyName}");
+                                    }
                                     break;
                             }  // switch on propertyName
                             break;
 
                         default:
-                            throw new JsonException();
-                            break;
+                            throw new Json.JsonException();
                     }  // switch on token type
                 }  // while reader.Read
+
+                throw new Json.JsonException();
             }
 
             public override void Write(
-                System.Text.Json.Utf8JsonWriter writer,
+                Json.Utf8JsonWriter writer,
                 Aas.Key that,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("type");
-                System.Text.Json.JsonSerializer.Serialize(
+                Json.JsonSerializer.Serialize(
                     writer, that.Type);
 
                 writer.WritePropertyName("value");
-                System.Text.Json.JsonSerializer.Serialize(
+                Json.JsonSerializer.Serialize(
                     writer, that.Value);
 
                 writer.WritePropertyName("idType");
-                System.Text.Json.JsonSerializer.Serialize(
+                Json.JsonSerializer.Serialize(
                     writer, that.IdType);
 
                 writer.WriteEndObject();
@@ -767,68 +982,76 @@ namespace AasCore.Aas3
         }  // KeyJsonConverter
 
         public class ReferenceJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.Reference>
+            Json.Serialization.JsonConverter<Aas.Reference>
         {
             public override Aas.Reference Read(
-                ref System.Text.Json.Utf8JsonReader reader,
+                ref Json.Utf8JsonReader reader,
                 System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.StartObject)
+                if (reader.TokenType != Json.JsonTokenType.StartObject)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<Key>? theKeys;
+                List<Key>? theKeys = null;
 
                 while (reader.Read())
                 {
                     switch (reader.TokenType)
                     {
-                        case System.Text.Json.JsonTokenType.EndObject:
-                            if (theKeys == null)
-                            {
-                                throw new System.Text.Json.JsonException(
-                                    "Required property is missing: keys");
-                            }
-    
+                        case Json.JsonTokenType.EndObject:
                             return new Aas.Reference(
-                                theKeys);
-                            break;
+                                theKeys ?? throw new Json.JsonException(
+                                    "Required property is missing: keys"));
 
-                        case JsonTokenType.PropertyName:
+                        case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected property name null");
+    
                             switch (propertyName)
                             {
                                 case "keys": 
                                     theKeys =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<List<Key>>(
+                                        Json.JsonSerializer.Deserialize<List<Key>>(
                                             ref reader));
                                     break;
                                 default:
-                                    throw new System.Text.Json.JsonException(
-                                        $"Unexpected property in Reference: {propertyName}");
+                                    // Ignore an unknown property
+                                    if (!reader.Read())
+                                    {
+                                        throw new Json.JsonException(
+                                            $"Unexpected end-of-stream after the property: {propertyName}");
+                                    }
+                                    if (!reader.TrySkip())
+                                    {
+                                        throw new Json.JsonException(
+                                            "Unexpected end-of-stream when skipping " + 
+                                            $"the value of the unknown property: {propertyName}");
+                                    }
                                     break;
                             }  // switch on propertyName
                             break;
 
                         default:
-                            throw new JsonException();
-                            break;
+                            throw new Json.JsonException();
                     }  // switch on token type
                 }  // while reader.Read
+
+                throw new Json.JsonException();
             }
 
             public override void Write(
-                System.Text.Json.Utf8JsonWriter writer,
+                Json.Utf8JsonWriter writer,
                 Aas.Reference that,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("keys");
-                System.Text.Json.JsonSerializer.Serialize(
+                Json.JsonSerializer.Serialize(
                     writer, that.Keys);
 
                 writer.WriteEndObject();
@@ -836,180 +1059,286 @@ namespace AasCore.Aas3
         }  // ReferenceJsonConverter
 
         public class AssetAdministrationShellJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.AssetAdministrationShell>
+            Json.Serialization.JsonConverter<Aas.AssetAdministrationShell>
         {
             public override Aas.AssetAdministrationShell Read(
-                ref System.Text.Json.Utf8JsonReader reader,
+                ref Json.Utf8JsonReader reader,
                 System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
-                if (reader.TokenType != System.Text.Json.JsonTokenType.StartObject)
+                if (reader.TokenType != Json.JsonTokenType.StartObject)
                 {
-                    throw new System.Text.Json.JsonException();
+                    throw new Json.JsonException();
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                string? theIdShort;
-                LangStringSet? theDisplayName;
-                string? theCategory;
-                LangStringSet? theDescription;
-                Identifier? theIdentification;
-                AdministrativeInformation? theAdministration;
-                List<Reference>? theDataSpecifications;
-                AssetAdministrationShell? theDerivedFrom;
+                string? theIdShort = null;
+                LangStringSet? theDisplayName = null;
+                string? theCategory = null;
+                LangStringSet? theDescription = null;
+                Identifier? theIdentification = null;
+                AdministrativeInformation? theAdministration = null;
+                List<Reference>? theDataSpecifications = null;
+                AssetAdministrationShell? theDerivedFrom = null;
 
                 while (reader.Read())
                 {
                     switch (reader.TokenType)
                     {
-                        case System.Text.Json.JsonTokenType.EndObject:
-                            if (theIdShort == null)
-                            {
-                                throw new System.Text.Json.JsonException(
-                                    "Required property is missing: idShort");
-                            }
-    
-                            if (theIdentification == null)
-                            {
-                                throw new System.Text.Json.JsonException(
-                                    "Required property is missing: identification");
-                            }
-    
-                            if (theDataSpecifications == null)
-                            {
-                                throw new System.Text.Json.JsonException(
-                                    "Required property is missing: dataSpecifications");
-                            }
-    
+                        case Json.JsonTokenType.EndObject:
                             return new Aas.AssetAdministrationShell(
-                                theIdentification,
-                                theIdShort,
+                                theIdentification ?? throw new Json.JsonException(
+                                    "Required property is missing: identification"),
+                                theIdShort ?? throw new Json.JsonException(
+                                    "Required property is missing: idShort"),
                                 theDisplayName,
                                 theCategory,
                                 theDescription,
                                 theAdministration,
-                                theDataSpecifications,
+                                theDataSpecifications ?? throw new Json.JsonException(
+                                    "Required property is missing: dataSpecifications"),
                                 theDerivedFrom);
-                            break;
 
-                        case JsonTokenType.PropertyName:
+                        case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected property name null");
+    
                             switch (propertyName)
                             {
                                 case "idShort": 
                                     theIdShort =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<string>(
+                                        Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
                                 case "displayName": 
                                     theDisplayName =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<LangStringSet>(
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
                                             ref reader));
                                     break;
                                 case "category": 
                                     theCategory =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<string>(
+                                        Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
                                 case "description": 
                                     theDescription =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<LangStringSet>(
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
                                             ref reader));
                                     break;
                                 case "identification": 
                                     theIdentification =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<Identifier>(
+                                        Json.JsonSerializer.Deserialize<Identifier>(
                                             ref reader));
                                     break;
                                 case "administration": 
                                     theAdministration =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<AdministrativeInformation>(
+                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
                                             ref reader));
                                     break;
                                 case "dataSpecifications": 
                                     theDataSpecifications =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<List<Reference>>(
+                                        Json.JsonSerializer.Deserialize<List<Reference>>(
                                             ref reader));
                                     break;
                                 case "derivedFrom": 
                                     theDerivedFrom =  (
-                                        System.Text.Json.JsonSerializer.Deserialize<AssetAdministrationShell>(
+                                        Json.JsonSerializer.Deserialize<AssetAdministrationShell>(
                                             ref reader));
                                     break;
                                 case "modelType": 
-                                        // Ignore the property modelType as we already know the exact type
-                                        break;
+                                    // Ignore the property modelType as we already know the exact type
+                                    break;
                                 default:
-                                    throw new System.Text.Json.JsonException(
-                                        $"Unexpected property in AssetAdministrationShell: {propertyName}");
+                                    // Ignore an unknown property
+                                    if (!reader.Read())
+                                    {
+                                        throw new Json.JsonException(
+                                            $"Unexpected end-of-stream after the property: {propertyName}");
+                                    }
+                                    if (!reader.TrySkip())
+                                    {
+                                        throw new Json.JsonException(
+                                            "Unexpected end-of-stream when skipping " + 
+                                            $"the value of the unknown property: {propertyName}");
+                                    }
                                     break;
                             }  // switch on propertyName
                             break;
 
                         default:
-                            throw new JsonException();
-                            break;
+                            throw new Json.JsonException();
                     }  // switch on token type
                 }  // while reader.Read
+
+                throw new Json.JsonException();
             }
 
             public override void Write(
-                System.Text.Json.Utf8JsonWriter writer,
+                Json.Utf8JsonWriter writer,
                 Aas.AssetAdministrationShell that,
-                System.Text.Json.JsonSerializerOptions options)
+                Json.JsonSerializerOptions options)
             {
                 writer.WriteStartObject();
 
+                writer.WritePropertyName("modelType");
+                Json.JsonSerializer.Serialize(
+                    writer, "AssetAdministrationShell");
+
                 writer.WritePropertyName("idShort");
-                System.Text.Json.JsonSerializer.Serialize(
+                Json.JsonSerializer.Serialize(
                     writer, that.IdShort);
 
                 if (that.DisplayName != null)
                 {
                     writer.WritePropertyName("displayName");
-                    System.Text.Json.JsonSerializer.Serialize(
+                    Json.JsonSerializer.Serialize(
                         writer, that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
                     writer.WritePropertyName("category");
-                    System.Text.Json.JsonSerializer.Serialize(
+                    Json.JsonSerializer.Serialize(
                         writer, that.Category);
                 }
 
                 if (that.Description != null)
                 {
                     writer.WritePropertyName("description");
-                    System.Text.Json.JsonSerializer.Serialize(
+                    Json.JsonSerializer.Serialize(
                         writer, that.Description);
                 }
 
                 writer.WritePropertyName("identification");
-                System.Text.Json.JsonSerializer.Serialize(
+                Json.JsonSerializer.Serialize(
                     writer, that.Identification);
 
                 if (that.Administration != null)
                 {
                     writer.WritePropertyName("administration");
-                    System.Text.Json.JsonSerializer.Serialize(
+                    Json.JsonSerializer.Serialize(
                         writer, that.Administration);
                 }
 
                 writer.WritePropertyName("dataSpecifications");
-                System.Text.Json.JsonSerializer.Serialize(
+                Json.JsonSerializer.Serialize(
                     writer, that.DataSpecifications);
 
                 if (that.DerivedFrom != null)
                 {
                     writer.WritePropertyName("derivedFrom");
-                    System.Text.Json.JsonSerializer.Serialize(
+                    Json.JsonSerializer.Serialize(
                         writer, that.DerivedFrom);
                 }
 
                 writer.WriteEndObject();
             }
         }  // AssetAdministrationShellJsonConverter
+
+        public class EnvironmentJsonConverter :
+            Json.Serialization.JsonConverter<Aas.Environment>
+        {
+            public override Aas.Environment Read(
+                ref Json.Utf8JsonReader reader,
+                System.Type typeToConvert,
+                Json.JsonSerializerOptions options)
+            {
+                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                {
+                    throw new Json.JsonException();
+                }
+
+                // Prefix the property variables with "the" to avoid conflicts
+                List<AssetAdministrationShell>? theAssetAdministrationShells = null;
+
+                while (reader.Read())
+                {
+                    switch (reader.TokenType)
+                    {
+                        case Json.JsonTokenType.EndObject:
+                            return new Aas.Environment(
+                                theAssetAdministrationShells ?? throw new Json.JsonException(
+                                    "Required property is missing: assetAdministrationShells"));
+
+                        case Json.JsonTokenType.PropertyName:
+                            string propertyName = reader.GetString()
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected property name null");
+    
+                            switch (propertyName)
+                            {
+                                case "assetAdministrationShells": 
+                                    theAssetAdministrationShells =  (
+                                        Json.JsonSerializer.Deserialize<List<AssetAdministrationShell>>(
+                                            ref reader));
+                                    break;
+                                default:
+                                    // Ignore an unknown property
+                                    if (!reader.Read())
+                                    {
+                                        throw new Json.JsonException(
+                                            $"Unexpected end-of-stream after the property: {propertyName}");
+                                    }
+                                    if (!reader.TrySkip())
+                                    {
+                                        throw new Json.JsonException(
+                                            "Unexpected end-of-stream when skipping " + 
+                                            $"the value of the unknown property: {propertyName}");
+                                    }
+                                    break;
+                            }  // switch on propertyName
+                            break;
+
+                        default:
+                            throw new Json.JsonException();
+                    }  // switch on token type
+                }  // while reader.Read
+
+                throw new Json.JsonException();
+            }
+
+            public override void Write(
+                Json.Utf8JsonWriter writer,
+                Aas.Environment that,
+                Json.JsonSerializerOptions options)
+            {
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("assetAdministrationShells");
+                Json.JsonSerializer.Serialize(
+                    writer, that.AssetAdministrationShells);
+
+                writer.WriteEndObject();
+            }
+        }  // EnvironmentJsonConverter
+
+        /// <summary>
+        /// Create and populate a list of our custom-tailored JSON converters.
+        /// </summary>
+        public static List<Json.Serialization.JsonConverter> CreateJsonConverters()
+        {
+            return new List<Json.Serialization.JsonConverter>()
+            {
+                new LangStringJsonConverter(),
+                new LangStringSetJsonConverter(),
+                new IReferableJsonConverter(),
+                new IdentifierTypeJsonConverter(),
+                new IdentifierJsonConverter(),
+                new AdministrativeInformationJsonConverter(),
+                new IIdentifiableJsonConverter(),
+                new ModelingKindJsonConverter(),
+                new LocalKeyTypeJsonConverter(),
+                new KeyTypeJsonConverter(),
+                new IdentifiableElementsJsonConverter(),
+                new ReferableElementsJsonConverter(),
+                new KeyElementsJsonConverter(),
+                new KeyJsonConverter(),
+                new ReferenceJsonConverter(),
+                new AssetAdministrationShellJsonConverter(),
+                new EnvironmentJsonConverter()
+            };
+        }
     }  // public static class Jsonization
 }  // namespace AasCore.Aas3
 

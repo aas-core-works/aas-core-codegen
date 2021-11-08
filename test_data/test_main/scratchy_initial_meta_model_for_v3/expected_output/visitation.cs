@@ -20,6 +20,7 @@ namespace AasCore.Aas3
             public void Visit(Key that);
             public void Visit(Reference that);
             public void Visit(AssetAdministrationShell that);
+            public void Visit(Environment that);
         }  // public interface IVisitor
 
         /// <summary>
@@ -36,6 +37,7 @@ namespace AasCore.Aas3
             public void Visit(Key that, C context);
             public void Visit(Reference that, C context);
             public void Visit(AssetAdministrationShell that, C context);
+            public void Visit(Environment that, C context);
         }  // public interface IVisitorWithContext
 
         /// <summary>
@@ -53,6 +55,7 @@ namespace AasCore.Aas3
             public T Transform(Key that);
             public T Transform(Reference that);
             public T Transform(AssetAdministrationShell that);
+            public T Transform(Environment that);
         }  // public interface ITransformer
 
         /// <summary>
@@ -71,6 +74,7 @@ namespace AasCore.Aas3
             public T Transform(Key that, C context);
             public T Transform(Reference that, C context);
             public T Transform(AssetAdministrationShell that, C context);
+            public T Transform(Environment that, C context);
         }  // public interface ITransformerWithContext
     }  // public static class Visitation
 }  // namespace AasCore.Aas3

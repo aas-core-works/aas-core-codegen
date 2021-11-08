@@ -17,7 +17,8 @@ from aas_core_csharp_codegen.csharp import (
     visitation as csharp_visitation,
     verification as csharp_verification,
     stringification as csharp_stringification,
-    jsonization as csharp_jsonization
+    jsonization as csharp_jsonization,
+    xmlization as csharp_xmlization
 )
 
 assert aas_core_csharp_codegen.__doc__ == __doc__
@@ -336,8 +337,10 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     # region Jsonization
 
     code, errors = csharp_jsonization.generate(
-        symbol_table=ir_symbol_table, namespace=namespace, spec_impls=spec_impls,
-        interface_implementers=interface_implementers)
+        symbol_table=ir_symbol_table,
+        namespace=namespace,
+        interface_implementers=interface_implementers,
+        spec_impls=spec_impls)
 
     if errors is not None:
         write_error_report(
@@ -359,6 +362,40 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     except Exception as exception:
         write_error_report(
             message=f"Failed to write the jsonization C# code to {pth}",
+            errors=[str(exception)],
+            stderr=stderr)
+        return 1
+
+    # endregion
+
+    # region Xmlization
+
+    code, errors = csharp_xmlization.generate(
+        symbol_table=ir_symbol_table,
+        namespace=namespace,
+        interface_implementers=interface_implementers,
+        spec_impls=spec_impls)
+
+    if errors is not None:
+        write_error_report(
+            message=f"Failed to generate the xmlization C# code "
+                    f"based on {params.model_path}",
+            errors=[
+                lineno_columner.error_message(error)
+                for error in errors],
+            stderr=stderr)
+        return 1
+
+    assert code is not None
+
+    pth = params.output_dir / "xmlization.cs"
+    pth.parent.mkdir(exist_ok=True)
+
+    try:
+        pth.write_text(code)
+    except Exception as exception:
+        write_error_report(
+            message=f"Failed to write the xmlization C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr)
         return 1

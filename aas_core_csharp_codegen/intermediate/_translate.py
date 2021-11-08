@@ -654,11 +654,11 @@ def _resolve_xml_serializations(
                     f"but the inheritance {inheritance!r} of the entity {entity.name!r} "
                     f"has not been visited before."
                 )
-    
+
                 setting = property_as_text_map[inheritance]
                 if setting is None:
                     continue
-    
+
                 settings.append(setting)
 
             if len(settings) >= 2:
@@ -670,7 +670,7 @@ def _resolve_xml_serializations(
                         # continue to interpret the remainder of the hierarchy since
                         # a single inconsistency impedes us to make synchronization
                         # points for a viable error recovery.
-    
+
                         return None, Error(
                             entity.node,
                             f"The setting ``property_as_text`` "
@@ -678,7 +678,7 @@ def _resolve_xml_serializations(
                             f"between the entity {setting.source} "
                             f"and {settings[0].source} is "
                             f"inconsistent")
-    
+
             property_as_text_map[entity.name] = (
                 None
                 if len(settings) == 0
@@ -1088,7 +1088,7 @@ def translate(
         underlying_errors.append(error)
 
     # endregion
-    
+
     # region Resolve settings for the XML serialization
 
     xml_serializations, error = _resolve_xml_serializations(
@@ -1096,7 +1096,7 @@ def translate(
 
     if error is not None:
         underlying_errors.append(error)
-    
+
     # endregion
 
     if len(underlying_errors) > 0:
@@ -1333,14 +1333,24 @@ def translate(
                     if prop.name == symbol.xml_serialization.property_as_text:
                         continue
 
-                    if not isinstance(prop.type_annotation,
-                                      BuiltinAtomicTypeAnnotation):
+                    xmlizable = isinstance(
+                        prop.type_annotation, BuiltinAtomicTypeAnnotation)
+
+                    xmlizable = (
+                            xmlizable
+                            or (
+                                    isinstance(prop.type_annotation,
+                                               OurAtomicTypeAnnotation)
+                                    and isinstance(prop.type_annotation.symbol,
+                                                   Enumeration)))
+                    if not xmlizable:
                         underlying_errors.append(Error(
                             prop.parsed.node,
                             f"The ``property_as_text`` setting for XML serialization "
-                            f"has been defined, but the property {prop.name} is not "
-                            f"a built-in type, so we do not know how to "
-                            f"de/serialize it from/to an XML attribute"))
+                            f"has been defined, but the property {prop.name} has the "
+                            f"type annotation {prop.type_annotation} which is neither "
+                            f"a built-in type nor an enumeration, so we do not know "
+                            f"how to de/serialize it from/to an XML attribute"))
 
     # endregion
 

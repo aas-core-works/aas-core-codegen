@@ -4,7 +4,6 @@
  */
 
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
-using NotImplementedException = System.NotImplementedException;
 using System.Collections.Generic;  // can't alias
 
 namespace AasCore.Aas3
@@ -128,7 +127,7 @@ namespace AasCore.Aas3
             return transformer.Transform(this, context);
         }
 
-        LangString(
+        public LangString(
             string language,
             string text)
         {
@@ -147,33 +146,35 @@ namespace AasCore.Aas3
     public class LangStringSet : IEntity {
         public IEnumerable<IEntity> DescendOnce()
         {
-            throw new NotImplementedException("TODO");
+            throw new System.NotImplementedException("TODO");
         }
 
         public IEnumerable<IEntity> Descend()
         {
-            throw new NotImplementedException("TODO");
+            throw new System.NotImplementedException("TODO");
         }
 
         public void Accept(Visitation.IVisitor visitor)
         {
-            throw new NotImplementedException("TODO");
+            throw new System.NotImplementedException("TODO");
         }
 
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
         {
-            throw new NotImplementedException("TODO");
+            throw new System.NotImplementedException("TODO");
         }
 
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            throw new NotImplementedException("TODO");
+            throw new System.NotImplementedException("TODO");
         }
 
         public T Transform<C, T>(Visitation.ITransformerWithContext<C, T> transformer, C context)
         {
-            throw new NotImplementedException("TODO");
+            throw new System.NotImplementedException("TODO");
         }
+
+
     }
 
     /// <summary>
@@ -321,7 +322,7 @@ namespace AasCore.Aas3
             return transformer.Transform(this, context);
         }
 
-        Identifier(
+        public Identifier(
             string id,
             IdentifierType idType = IdentifierType.Irdi)
         {
@@ -399,7 +400,7 @@ namespace AasCore.Aas3
             return transformer.Transform(this, context);
         }
 
-        AdministrativeInformation(
+        public AdministrativeInformation(
             string? version = null,
             string? revision = null)
         {
@@ -687,7 +688,7 @@ namespace AasCore.Aas3
             return transformer.Transform(this, context);
         }
 
-        Key(
+        public Key(
             KeyElements type,
             string value,
             KeyType idType)
@@ -1002,7 +1003,7 @@ namespace AasCore.Aas3
             return transformer.Transform(this, context);
         }
 
-        AssetAdministrationShell(
+        public AssetAdministrationShell(
             Identifier identification,
             string idShort,
             LangStringSet? displayName = null,
@@ -1035,6 +1036,87 @@ namespace AasCore.Aas3
             null)
         {
             // Intentionally left empty.
+        }
+    }
+
+    /// <summary>
+    /// Model the environment as the entry point for referencing and serialization.
+    /// </summary>
+    public class Environment : IEntity
+    {
+        public List<AssetAdministrationShell> AssetAdministrationShells { get; set; }
+
+        /// <summary>
+        /// Iterate over all the entity instances referenced from this instance 
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IEntity> DescendOnce()
+        {
+            foreach (var anItem in AssetAdministrationShells)
+            {
+                yield return anItem;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the entity instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IEntity> Descend()
+        {
+            foreach (var anItem in AssetAdministrationShells)
+            {
+                yield return anItem;
+
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch 
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public Environment(List<AssetAdministrationShell>? assetAdministrationShells = null)
+        {
+            AssetAdministrationShells = (assetAdministrationShells != null)
+                ? assetAdministrationShells
+                : new List<AssetAdministrationShell>();
         }
     }
 

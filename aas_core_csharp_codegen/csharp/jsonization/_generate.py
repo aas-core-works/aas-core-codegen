@@ -2,9 +2,9 @@
 
 import io
 import textwrap
-from typing import Tuple, Optional, List, Sequence, MutableMapping
+from typing import Tuple, Optional, List, Sequence
 
-from icontract import ensure, require
+from icontract import ensure
 
 from aas_core_csharp_codegen import intermediate, naming, specific_implementations
 from aas_core_csharp_codegen.common import Error, Stripped, Identifier, \

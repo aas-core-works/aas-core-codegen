@@ -3,9 +3,6 @@
  * Do NOT edit or append.
  */
 
-using ArgumentException = System.ArgumentException;
-using InvalidOperationException = System.InvalidOperationException;
-using NotImplementedException = System.NotImplementedException;
 using Regex = System.Text.RegularExpressions.Regex;
 using System.Collections.Generic;  // can't alias
 using System.Collections.ObjectModel;  // can't alias
@@ -183,7 +180,7 @@ namespace AasCore.Aas3
             {
                 if (capacity <= 0)
                 {
-                    throw new ArgumentException(
+                    throw new System.ArgumentException(
                         $"Expected a strictly positive capacity, but got: {capacity}");
                 }
 
@@ -221,7 +218,7 @@ namespace AasCore.Aas3
                 var result = this._entries.AsReadOnly();
                 if (result.Count > Capacity)
                 {
-                    throw new InvalidOperationException(
+                    throw new System.InvalidOperationException(
                         $"Post-condition violated: " +
                         $"result.Count (== {result.Count}) > Capacity (== {Capacity})");
                 }
@@ -290,7 +287,7 @@ namespace AasCore.Aas3
                 string path,
                 Errors errors)
             {
-                throw new NotImplementedException("TODO");
+                throw new System.NotImplementedException("TODO");
             }
 
             /// <summary>
@@ -491,6 +488,20 @@ namespace AasCore.Aas3
                             "Pattern.IsIdShort(that.IdShort)"));
                 }
             }
+
+            /// <summary>
+            /// Verify <paramref name="that" /> instance and 
+            /// append any errors to <paramref name="Errors" />.
+            /// 
+            /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
+            /// </summary>
+            public static void VerifyEnvironment (
+                Aas.Environment that,
+                string path,
+                Verification.Errors errors)
+            {
+                // There are no invariants defined for Environment.
+            }
         }  // private static class Implementation
 
         /// <summary>
@@ -593,6 +604,17 @@ namespace AasCore.Aas3
                 Implementation.VerifyAssetAdministrationShell(
                     that, context, Errors);
             }
+
+            /// <summary>
+            /// Verify <paramref name="that" /> instance and
+            /// append any error to <see cref="Errors" /> 
+            /// where <paramref name="context" /> is used to localize the error.
+            /// </summary>
+            public void Visit(Aas.Environment that, string context)
+            {
+                Implementation.VerifyEnvironment(
+                    that, context, Errors);
+            }
         }  // public class NonRecursiveVerifier
 
         /// <summary>
@@ -639,7 +661,7 @@ namespace AasCore.Aas3
             /// </summary>
             public void Visit(LangStringSet that, string context)
             {
-                throw new NotImplementedException("TODO");
+                throw new System.NotImplementedException("TODO");
             }
 
             /// <summary>
@@ -756,6 +778,28 @@ namespace AasCore.Aas3
                     Visit(
                         that.DerivedFrom,
                         $"{context}/DerivedFrom");
+                }
+            }
+
+            /// <summary>
+            /// Verify recursively <paramref name="that" /> instance and
+            /// append any error to <see cref="Errors" /> 
+            /// where <paramref name="context" /> is used to localize the error.
+            /// </summary>
+            public void Visit(Environment that, string context) 
+            {
+                Implementation.VerifyEnvironment(
+                    that, context, Errors);
+
+                for(
+                    var i = 0;
+                    i < that.AssetAdministrationShells.Count;
+                    i++)
+                {
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.AssetAdministrationShells[i],
+                        $"{context}/AssetAdministrationShells/{i}");
                 }
             }
         }  // public class RecursiveVerifier
