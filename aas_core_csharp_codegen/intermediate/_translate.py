@@ -300,7 +300,10 @@ def _parsed_abstract_entity_to_interface(
     # noinspection PyTypeChecker
     return Interface(
         name=parsed.name,
-        inheritances=parsed.inheritances,
+        inheritances=[
+            _PlaceholderSymbol(inheritance)
+            for inheritance in parsed.inheritances
+        ],
         signatures=[
             Signature(
                 name=parsed_method.name,
@@ -322,7 +325,7 @@ def _parsed_abstract_entity_to_interface(
             if parsed_method.name != "__init__"
         ],
         properties=[
-            _parsed_property_to_property(parsed=parsed_prop)
+            _parsed_property_to_property(parsed=parsed_prop, entity=parsed)
             for parsed_prop in parsed.properties
         ],
         json_serialization=json_serializations[parsed],
@@ -334,8 +337,12 @@ def _parsed_abstract_entity_to_interface(
     )
 
 
-def _parsed_property_to_property(parsed: parse.Property) -> Property:
-    """Translate a parsed property of a class to an intermediate one."""
+def _parsed_property_to_property(
+        parsed: parse.Property,
+        entity: parse.Entity
+) -> Property:
+    """Translate a parsed property of an entity to an intermediate one."""
+    # noinspection PyTypeChecker
     return Property(
         name=parsed.name,
         type_annotation=_parsed_type_annotation_to_type_annotation(
@@ -345,6 +352,7 @@ def _parsed_property_to_property(parsed: parse.Property) -> Property:
             if parsed.description is not None
             else None),
         is_readonly=parsed.is_readonly,
+        implemented_for=_PlaceholderSymbol(entity.name),
         parsed=parsed,
     )
 
@@ -722,13 +730,13 @@ def _parsed_entity_to_class(
 
     for antecedent in antecedents:
         properties.extend(
-            _parsed_property_to_property(parsed=parsed_prop)
+            _parsed_property_to_property(parsed=parsed_prop, entity=antecedent)
             for parsed_prop in antecedent.properties
         )
 
     for parsed_prop in parsed.properties:
         properties.append(
-            _parsed_property_to_property(parsed=parsed_prop))
+            _parsed_property_to_property(parsed=parsed_prop, entity=parsed))
 
     # endregion
 
@@ -824,9 +832,13 @@ def _parsed_entity_to_class(
                     f"to the intermediate representation",
             underlying=errors)
 
+    # noinspection PyTypeChecker
     return Class(
         name=parsed.name,
-        interfaces=parsed.inheritances,
+        interfaces=[
+            _PlaceholderSymbol(inheritance)
+            for inheritance in parsed.inheritances
+        ],
         implementation_key=(
             ImplementationKey(parsed.name)
             if parsed.is_implementation_specific
@@ -1281,6 +1293,59 @@ def translate(
                         arg.default = filled_default
         else:
             assert_never(symbol)
+
+    # endregion
+
+    # region Second pass to resolve the interfaces and inheritances
+
+    for symbol in symbols:
+        if isinstance(symbol, Enumeration):
+            continue
+        elif isinstance(symbol, Interface):
+            resolved_inheritances = []  # type: List[Interface]
+            for inheritance in symbol.inheritances:
+                assert isinstance(inheritance, _PlaceholderSymbol)
+
+                inheritance_symbol = symbol_table.must_find(
+                    Identifier(inheritance.identifier))
+
+                assert isinstance(inheritance_symbol, Interface)
+
+                resolved_inheritances.append(inheritance_symbol)
+
+            symbol.inheritances = resolved_inheritances
+
+        elif isinstance(symbol, Class):
+            resolved_interfaces = []  # type: List[Interface]
+            for interface in symbol.interfaces:
+                assert isinstance(interface, _PlaceholderSymbol)
+
+                interface_symbol = symbol_table.must_find(
+                    Identifier(interface.identifier))
+
+                assert isinstance(interface_symbol, Interface)
+
+                resolved_interfaces.append(interface_symbol)
+
+            symbol.interfaces = resolved_interfaces
+        else:
+            assert_never(symbol)
+
+    # endregion
+
+    # region Second pass to resolve the resulting entity of the ``implemented_for``
+
+    for symbol in symbols:
+        if isinstance(symbol, Enumeration):
+            continue
+
+        for prop in symbol.properties:
+            assert isinstance(prop.implemented_for, _PlaceholderSymbol), (
+                f"Expected the placeholder symbol for ``implemented_for`` in "
+                f"the property {prop} of {symbol}, but got: {prop.implemented_for}")
+
+            prop.implemented_for = symbol_table.must_find(
+                Identifier(prop.implemented_for.identifier))
 
     # endregion
 

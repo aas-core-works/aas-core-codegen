@@ -559,7 +559,10 @@ def _generate_interface(
 
     name = csharp_naming.interface_name(symbol.name)
 
-    inheritances = list(symbol.inheritances) + [Identifier('Entity')]
+    inheritances = (
+            [
+                inheritance.name for inheritance in symbol.inheritances
+            ] + [Identifier('Entity')])
 
     assert len(inheritances) > 0
     if len(inheritances) == 1:
@@ -1050,7 +1053,11 @@ def _generate_class(
 
     name = csharp_naming.class_name(symbol.name)
 
-    interfaces = list(symbol.interfaces) + [Identifier('Entity')]
+    interfaces = (
+            [
+                interface.name
+                for interface in symbol.interfaces
+            ] + [Identifier('Entity')])
 
     assert len(interfaces) > 0
     if len(interfaces) == 1:

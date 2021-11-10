@@ -213,6 +213,7 @@ class Property:
             type_annotation: TypeAnnotation,
             description: Optional[Description],
             is_readonly: bool,
+            implemented_for: Optional['Symbol'],
             parsed: parse.Property,
     ) -> None:
         """Initialize with the given values."""
@@ -220,6 +221,7 @@ class Property:
         self.type_annotation = type_annotation
         self.description = description
         self.is_readonly = is_readonly
+        self.implemented_for = implemented_for
         self.parsed = parsed
 
     def __repr__(self) -> str:
@@ -328,7 +330,7 @@ class Interface:
     def __init__(
             self,
             name: Identifier,
-            inheritances: Sequence[Identifier],
+            inheritances: Sequence['Interface'],
             signatures: Sequence[Signature],
             properties: Sequence[Property],
             json_serialization: JsonSerialization,
@@ -612,7 +614,7 @@ class Class:
     def __init__(
             self,
             name: Identifier,
-            interfaces: Sequence[Identifier],
+            interfaces: Sequence['Interface'],
             implementation_key: Optional[ImplementationKey],
             properties: Sequence[Property],
             methods: Sequence[Method],
@@ -709,15 +711,12 @@ def map_interface_implementers(
 
         assert isinstance(symbol, Class)
 
-        stack = []  # type: List[Identifier]
-        for interface_id in symbol.interfaces:
-            stack.append(interface_id)
+        stack = []  # type: List[Interface]
+        for interface in symbol.interfaces:
+            stack.append(interface)
 
         while len(stack) > 0:
-            interface_id = stack.pop()
-            interface = symbol_table.must_find(name=interface_id)
-            assert isinstance(interface, Interface), (
-                f"Expected an interface given its identifier: {interface_id}")
+            interface = stack.pop()
 
             lst = mapping.get(interface, None)
             if lst is None:

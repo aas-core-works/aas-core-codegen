@@ -4,7 +4,7 @@ import collections
 import json
 import pathlib
 import sys
-from typing import TextIO, Any, MutableMapping, Optional, Tuple, List
+from typing import TextIO, Any, MutableMapping, Optional, Tuple, List, Union
 
 import asttokens
 from icontract import ensure
@@ -12,7 +12,8 @@ from icontract import ensure
 import aas_core_csharp_codegen
 from aas_core_csharp_codegen import cli, parse, naming, specific_implementations, \
     intermediate
-from aas_core_csharp_codegen.common import LinenoColumner, Stripped, Error, assert_never
+from aas_core_csharp_codegen.common import LinenoColumner, Stripped, Error, \
+    assert_never, Identifier
 from aas_core_csharp_codegen.jsonschema import (
     specific_implementations as jsonschema_specific_implementations
 )
@@ -58,80 +59,112 @@ def _define_for_enumeration(
     return result
 
 
-def _define_for_interface(
-        interface: intermediate.Interface,
-        symbol_table: intermediate.SymbolTable
+_BUILTIN_MAP = {
+    intermediate.BuiltinAtomicType.BOOL: "boolean",
+    intermediate.BuiltinAtomicType.INT: "integer",
+    intermediate.BuiltinAtomicType.FLOAT: "number",
+    intermediate.BuiltinAtomicType.STR: "string"
+}
+assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType)
+
+
+def _define_type(
+        type_annotation: intermediate.TypeAnnotation) -> MutableMapping[str, Any]:
+    """Generate the type definition for ``type_annotation``."""
+    result = collections.OrderedDict()  # type: MutableMapping[str, Any]
+
+    if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
+        return collections.OrderedDict(
+            [('type', _BUILTIN_MAP[type_annotation.a_type])]
+        )
+    elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
+        return collections.OrderedDict(
+            [('$ref',
+              f"#/definitions/{naming.json_model_type(type_annotation.symbol.name)}")])
+    elif isinstance(
+            type_annotation, (
+                    intermediate.ListTypeAnnotation,
+                    intermediate.SequenceTypeAnnotation,
+                    intermediate.SetTypeAnnotation)):
+        return collections.OrderedDict(
+            [('type', 'array'), ('items', _define_type(type_annotation.items))])
+    elif isinstance(
+            type_annotation, (
+                    intermediate.MutableMappingTypeAnnotation,
+                    intermediate.MappingTypeAnnotation)
+    ):
+        return collections.OrderedDict([
+            ('type', 'object'),
+            ('additionalProperties', _define_type(type_annotation.values))
+        ])
+    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
+        raise NotImplementedError(
+            f'(mristin, 2021-11-10):\n'
+            f'Nested optional values are unexpected in the JSON schema. '
+            f'We did not implement them at the moment since we need more information '
+            f'about the context.\n\n'
+            f'This feature needs yet to be implemented.\n\n'
+            f'{type_annotation.value=}')
+
+
+def _define_for_class_or_interface(
+        symbol: Union[intermediate.Interface, intermediate.Class]
 ) -> MutableMapping[str, Any]:
     """Generate the definition for an ``interface``."""
-    all_of = None  # type: Optional[List[MutableMapping[str, Any]]]
-    if len(interface.inheritances) > 0:
-        for inheritance in interface.inheritances:
+    all_of = []  # type: List[MutableMapping[str, Any]]
+
+    if isinstance(symbol, intermediate.Interface):
+        for inheritance in symbol.inheritances:
             all_of.append(
                 {
-                    "$ref": f"#/definitions/{naming.json_model_type(inheritance)}"
+                    "$ref": f"#/definitions/{naming.json_model_type(inheritance.name)}"
                 })
+    elif isinstance(symbol, intermediate.Class):
+        for interface in symbol.interfaces:
+            all_of.append(
+                {
+                    "$ref": f"#/definitions/{naming.json_model_type(interface.name)}"
+                })
+    else:
+        assert_never(symbol)
+
+    properties = collections.OrderedDict()
+    required = []  # type: List[Identifier]
+
+    for prop in symbol.properties:
+        if prop.implemented_for is not symbol:
+            continue
+
+        prop_name = naming.json_property(prop.name)
+
+        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            type_definition = _define_type(
+                type_annotation=prop.type_annotation.value)
+        else:
+            type_definition = _define_type(
+                type_annotation=prop.type_annotation)
+            required.append(prop_name)
+
+        properties[prop_name] = type_definition
 
     definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
     definition["type"] = "object"
+    definition['properties'] = properties
+    definition['required'] = required
 
-    inherited_properties = {
-        for prop in inheritance.properties
-        for inheritance
-    }
+    if len(all_of) == 0 and len(properties) == 0:
+        return collections.OrderedDict([('type', 'object')])
 
-    properties = collections.OrderedDict()
-    for prop in interface.properties:
-        properties[naming.json_property(prop.name)] = _define_type(
-            type_annotation=prop.type_annotation)
+    elif len(all_of) > 0 and len(properties) == 0:
+        return collections.OrderedDict([('allOf', all_of)])
 
-    definition["properties"] = properties
-
-    if all_of is None:
+    elif len(all_of) == 0 and len(properties) > 0:
         return definition
-    else:
-        result = collections.OrderedDict()  # type: MutableMapping[str, Any]
-        all_of.append(definition)
 
-        return result
-
-
-
-# TODO: uncomment once implemented
-# def _define_type(type_annotation: parse.TypeAnnotation)->MutableMapping[str, Any]:
-#     """Generate the type definition for ``type_annotation``."""
-#     if isinstance(type_annotation, parse.AtomicTypeAnnotation)
-#
-#
-# def _define_for_abstract_entity(
-#         entity: parse.AbstractEntity
-# ) -> MutableMapping[str, Any]:
-#     """Generate the definition for the abstract ``entity``."""
-#     all_of = None  # type: Optional[List[MutableMapping[str, Any]]]
-#     if len(entity.inheritances) > 0:
-#         all_of = []
-#         for inheritance in entity.inheritances:
-#             all_of.append(
-#                 {
-#                     "$ref": f"#/definitions/{naming.json_model_type(inheritance)}"
-#                 })
-#
-#     definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
-#     definition["type"] = "object"
-#
-#     properties = collections.OrderedDict()
-#     for prop in entity.properties:
-#         properties[naming.json_property(prop.name)] = _define_type(
-#             type_annotation=prop.type_annotation)
-#
-#     definition["properties"] = properties
-#
-#     if all_of is None:
-#         return definition
-#     else:
-#         result = collections.OrderedDict()  # type: MutableMapping[str, Any]
-#         all_of.append(definition)
-#
-#         return result
+    elif len(all_of) > 0 and len(properties) > 0:
+        return collections.OrderedDict([
+            ('allOf', all_of + [definition])
+        ])
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -163,18 +196,12 @@ def _generate(
 
         if isinstance(symbol, intermediate.Enumeration):
             definition = _define_for_enumeration(enumeration=symbol)
-        elif isinstance(symbol, intermediate.Interface):
-            definition = _define_for_interface(
-                interface=symbol, symbol_table=symbol_table)
-        # elif isinstance(symbol, intermediate.Class):
-        #     definition = _define_for_class(
-        #         cls=symbol, symbol_table=symbol_table)
-        # else:
-        #     assert_never(symbol)
+        elif isinstance(symbol, (intermediate.Interface, intermediate.Class)):
+            definition = _define_for_class_or_interface(symbol=symbol)
+        else:
+            assert_never(symbol)
 
-        # assert definition is not None
-        if definition is not None:  # TODO: remove if once implemented
-            definitions[naming.json_model_type(symbol.name)] = definition
+        definitions[naming.json_model_type(symbol.name)] = definition
 
     schema["definitions"] = definitions
 

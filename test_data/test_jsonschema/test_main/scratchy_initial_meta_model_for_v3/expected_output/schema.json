@@ -36,6 +36,65 @@
     }
   },
   "definitions": {
+    "HasExtension": {
+      "type": "object"
+    },
+    "LangString": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "language",
+        "text"
+      ]
+    },
+    "LangStringSet": {
+      "type": "object",
+      "properties": {
+        "langStrings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LangString"
+          }
+        }
+      },
+      "required": [
+        "langStrings"
+      ]
+    },
+    "Referable": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/HasExtension"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "idShort": {
+              "type": "string"
+            },
+            "displayName": {
+              "$ref": "#/definitions/LangStringSet"
+            },
+            "category": {
+              "type": "string"
+            },
+            "description": {
+              "$ref": "#/definitions/LangStringSet"
+            }
+          },
+          "required": [
+            "idShort"
+          ]
+        }
+      ]
+    },
     "IdentifierType": {
       "type": "string",
       "enum": [
@@ -44,11 +103,70 @@
         "Custom"
       ]
     },
+    "Identifier": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "idType": {
+          "$ref": "#/definitions/IdentifierType"
+        }
+      },
+      "required": [
+        "id",
+        "idType"
+      ]
+    },
+    "AdministrativeInformation": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "Identifiable": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Referable"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "identification": {
+              "$ref": "#/definitions/Identifier"
+            },
+            "administration": {
+              "$ref": "#/definitions/AdministrativeInformation"
+            }
+          },
+          "required": [
+            "identification"
+          ]
+        }
+      ]
+    },
     "ModelingKind": {
       "type": "string",
       "enum": [
         "Template",
         "Instance"
+      ]
+    },
+    "HasKind": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "$ref": "#/definitions/ModelingKind"
+        }
+      },
+      "required": [
+        "kind"
       ]
     },
     "LocalKeyType": {
@@ -133,6 +251,95 @@
         "SubmodelElement",
         "SubmodelElementCollection",
         "View"
+      ]
+    },
+    "Key": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/KeyElements"
+        },
+        "value": {
+          "type": "string"
+        },
+        "idType": {
+          "$ref": "#/definitions/KeyType"
+        }
+      },
+      "required": [
+        "type",
+        "value",
+        "idType"
+      ]
+    },
+    "Reference": {
+      "type": "object",
+      "properties": {
+        "keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Key"
+          }
+        }
+      },
+      "required": [
+        "keys"
+      ]
+    },
+    "HasSemantics": {
+      "type": "object",
+      "properties": {
+        "semanticId": {
+          "$ref": "#/definitions/Reference"
+        }
+      },
+      "required": []
+    },
+    "HasDataSpecification": {
+      "type": "object",
+      "properties": {
+        "dataSpecifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Reference"
+          }
+        }
+      },
+      "required": [
+        "dataSpecifications"
+      ]
+    },
+    "AssetAdministrationShell": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Identifiable"
+        },
+        {
+          "$ref": "#/definitions/HasDataSpecification"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "derivedFrom": {
+              "$ref": "#/definitions/AssetAdministrationShell"
+            }
+          },
+          "required": []
+        }
+      ]
+    },
+    "Environment": {
+      "type": "object",
+      "properties": {
+        "assetAdministrationShells": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AssetAdministrationShell"
+          }
+        }
+      },
+      "required": [
+        "assetAdministrationShells"
       ]
     }
   }
