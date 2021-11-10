@@ -14,35 +14,11 @@ from aas_core_csharp_codegen import cli, parse, naming, specific_implementations
     intermediate
 from aas_core_csharp_codegen.common import LinenoColumner, Stripped, Error, \
     assert_never, Identifier
-from aas_core_csharp_codegen.jsonschema import (
-    specific_implementations as jsonschema_specific_implementations
-)
 
 # TODO: this needs to be moved to a separate package once we are done with
 #  the development.
 
 assert aas_core_csharp_codegen.jsonschema.__doc__ == __doc__
-
-_SCHEMA_BASE_KEY = specific_implementations.ImplementationKey("schema_base")
-
-
-def _verify_spec_impls(
-        spec_impls: specific_implementations.SpecificImplementations
-) -> Optional[List[str]]:
-    """Verify all the implementation snippets related to JSON schema."""
-    errors = []  # type: List[str]
-
-    expected_keys = [
-        _SCHEMA_BASE_KEY
-    ]
-    for key in expected_keys:
-        if key not in spec_impls:
-            errors.append(f"The implementation snippet is missing for: {key}")
-
-    if len(errors) == 0:
-        return None
-
-    return errors
 
 
 def _define_for_enumeration(
@@ -71,8 +47,6 @@ assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType
 def _define_type(
         type_annotation: intermediate.TypeAnnotation) -> MutableMapping[str, Any]:
     """Generate the type definition for ``type_annotation``."""
-    result = collections.OrderedDict()  # type: MutableMapping[str, Any]
-
     if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
         return collections.OrderedDict(
             [('type', _BUILTIN_MAP[type_annotation.a_type])]
@@ -183,9 +157,21 @@ def _generate(
         atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the JSON schema based on the ``symbol_table."""
+    schema_base_key = specific_implementations.ImplementationKey(
+        "schema_base.json"
+    )
+
+    schema_base_json = spec_impls.get(schema_base_key, None)
+    if schema_base_json is None:
+        return None, [
+            Error(
+                None,
+                f"The implementation snippet for the base schema "
+                f"is missing: {schema_base_key}")]
+
     # noinspection PyTypeChecker
     schema = json.loads(
-        spec_impls[_SCHEMA_BASE_KEY],
+        schema_base_json,
         object_pairs_hook=collections.OrderedDict)
 
     errors = []  # type: List[Error]
@@ -212,7 +198,7 @@ def _generate(
 
         definitions[naming.json_model_type(symbol.name)] = definition
 
-    model_type = definitions.get('ModelType', None)
+    model_type = definitions.get(Identifier('ModelType'), None)
     if model_type is not None:
         errors.append(Error(
             atok.tree,
@@ -283,7 +269,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     # region Parse
 
     spec_impls, spec_impls_errors = (
-        jsonschema_specific_implementations.read_from_directory(
+        specific_implementations.read_from_directory(
             snippets_dir=params.snippets_dir))
 
     if spec_impls_errors:
@@ -355,16 +341,6 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Schema
 
-    spec_impls_errors = _verify_spec_impls(spec_impls=spec_impls)
-    if spec_impls_errors is not None:
-        errors = _verify_spec_impls(spec_impls=spec_impls)
-        if errors is not None:
-            cli.write_error_report(
-                message=f"Failed to verify the C#-specific C# structures",
-                errors=spec_impls_errors,
-                stderr=stderr)
-            return 1
-
     code, errors = _generate(
         symbol_table=ir_symbol_table,
         spec_impls=spec_impls,
@@ -372,7 +348,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     if errors is not None:
         cli.write_error_report(
-            message=f"Failed to _generate the JSON Schema "
+            message=f"Failed to generate the JSON Schema "
                     f"based on {params.model_path}",
             errors=[lineno_columner.error_message(error) for error in errors],
             stderr=stderr)

@@ -404,13 +404,9 @@ def _parsed_method_to_method(
         original_entity: parse.Entity
 ) -> Method:
     """Translate the parsed method into an intermediate representation."""
-    implementation_key = None  # type: Optional[ImplementationKey]
-    if parsed.is_implementation_specific:
-        implementation_key = ImplementationKey(f"{original_entity.name}/{parsed.name}")
-
     return Method(
         name=parsed.name,
-        implementation_key=implementation_key,
+        is_implementation_specific=parsed.is_implementation_specific,
         arguments=_parsed_arguments_to_arguments(parsed=parsed.arguments),
         returns=(
             None
@@ -766,14 +762,10 @@ def _parsed_entity_to_class(
             contracts, _parsed_contracts_to_contracts(parsed_entity_init.contracts)
         )
 
-    init_implementation_key = None  # type: Optional[ImplementationKey]
-    if init_is_implementation_specific:
-        init_implementation_key = ImplementationKey(f"{parsed.name}/__init__")
-
     ctor = Constructor(
         arguments=arguments,
         contracts=contracts,
-        implementation_key=init_implementation_key,
+        is_implementation_specific=init_is_implementation_specific,
         statements=in_lined_constructors[parsed],
     )
 
@@ -839,10 +831,7 @@ def _parsed_entity_to_class(
             _PlaceholderSymbol(inheritance)
             for inheritance in parsed.inheritances
         ],
-        implementation_key=(
-            ImplementationKey(parsed.name)
-            if parsed.is_implementation_specific
-            else None),
+        is_implementation_specific=parsed.is_implementation_specific,
         properties=properties,
         methods=methods,
         constructor=ctor,

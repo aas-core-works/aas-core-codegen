@@ -28,8 +28,6 @@ class Test_against_recorded(unittest.TestCase):
             snippets_dir = case_dir / "input/snippets"
             assert snippets_dir.exists() and snippets_dir.is_dir(), snippets_dir
 
-            namespace = (case_dir / "input/namespace.txt").read_text()
-
             expected_output_dir = case_dir / "expected_output"
 
             with contextlib.ExitStack() as exit_stack:
@@ -49,7 +47,6 @@ class Test_against_recorded(unittest.TestCase):
                 params = aas_core_csharp_codegen.csharp.main.Parameters(
                     model_path=model_pth,
                     snippets_dir=snippets_dir,
-                    namespace=namespace,
                     output_dir=output_dir)
 
                 stdout = io.StringIO()

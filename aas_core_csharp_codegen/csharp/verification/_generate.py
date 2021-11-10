@@ -5,7 +5,7 @@ from typing import Tuple, Optional, List
 
 from icontract import ensure, require
 
-from aas_core_csharp_codegen import intermediate
+from aas_core_csharp_codegen import intermediate, specific_implementations
 from aas_core_csharp_codegen.common import Error, Stripped, assert_never, \
     Identifier
 from aas_core_csharp_codegen.csharp import (
@@ -13,7 +13,6 @@ from aas_core_csharp_codegen.csharp import (
     naming as csharp_naming,
     unrolling as csharp_unrolling
 )
-from aas_core_csharp_codegen.csharp import specific_implementations
 from aas_core_csharp_codegen.parse import (tree as parse_tree)
 
 
@@ -26,11 +25,14 @@ def verify(
     errors = []  # type: List[str]
 
     expected_keys = [
-        'Verification/is_IRI', 'Verification/is_IRDI', 'Verification/is_ID_short',
-        'Verification/Error', 'Verification/Errors'
+        specific_implementations.ImplementationKey('Verification/is_IRI.cs'),
+        specific_implementations.ImplementationKey('Verification/is_IRDI.cs'),
+        specific_implementations.ImplementationKey('Verification/is_ID_short.cs'),
+        specific_implementations.ImplementationKey('Verification/Error.cs'),
+        specific_implementations.ImplementationKey('Verification/Errors.cs')
     ]
     for key in expected_keys:
-        if specific_implementations.ImplementationKey(key) not in spec_impls:
+        if key not in spec_impls:
             errors.append(f"The implementation snippet is missing for: {key}")
 
     if len(errors) == 0:
@@ -43,16 +45,34 @@ def verify(
 
 # region Generate
 
-
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_pattern_class(
         spec_impls: specific_implementations.SpecificImplementations
-) -> Stripped:
-    """Generate the Pattern class used for verifying different patterns."""
-    blocks = [
-        spec_impls[specific_implementations.ImplementationKey('Verification/is_IRI')],
-        spec_impls[specific_implementations.ImplementationKey('Verification/is_IRDI')],
-        spec_impls[specific_implementations.ImplementationKey('Verification/is_ID_short')]
-    ]  # type: List[str]
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the Pattern class used for verifying different patterns.
+
+    Return the code or errors, if any.
+    """
+    blocks = []  # type: List[Stripped]
+    errors = []  # type: List[Error]
+
+    implementation_keys = [
+        specific_implementations.ImplementationKey('Verification/is_IRI.cs'),
+        specific_implementations.ImplementationKey('Verification/is_IRDI.cs'),
+        specific_implementations.ImplementationKey('Verification/is_ID_short.cs')
+    ]
+
+    for implementation_key in implementation_keys:
+        implementation = spec_impls.get(implementation_key, None)
+        if implementation is None:
+            errors.append(Error(
+                None,
+                f"The implementation of the pattern is missing: {implementation_key}"))
+        else:
+            blocks.append(implementation)
+
+    if len(errors) > 0:
+        return None, errors
 
     writer = io.StringIO()
     writer.write('public static class Pattern\n{\n')
@@ -63,7 +83,7 @@ def _generate_pattern_class(
         writer.write(textwrap.indent(block.strip(), csharp_common.INDENT))
 
     writer.write('\n}')
-    return Stripped(writer.getvalue())
+    return Stripped(writer.getvalue()), None
 
 
 def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Stripped:
@@ -719,7 +739,7 @@ def _generate_implementation_verify(
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_implementation(
+def _generate_implementation_class(
         symbol_table: intermediate.SymbolTable,
         spec_impls: specific_implementations.SpecificImplementations
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
@@ -733,9 +753,9 @@ def _generate_implementation(
         if isinstance(symbol, (intermediate.Enumeration, intermediate.Interface)):
             continue
 
-        if symbol.implementation_key is not None:
+        if symbol.is_implementation_specific:
             verify_key = specific_implementations.ImplementationKey(
-                f'Verification/Implementation/verify_{symbol.name}')
+                f'Verification/Implementation/verify_{symbol.name}.cs')
             if verify_key not in spec_impls:
                 errors.append(
                     Error(
@@ -977,7 +997,7 @@ def _unroll_recursion_in_recursive_verify(
 # fmt: on
 @require(
     lambda cls:
-    cls.implementation_key is None,
+    not cls.is_implementation_specific,
     "Implementation-specific classes are handled elsewhere"
 )
 # fmt: off
@@ -1060,10 +1080,12 @@ def _generate_recursive_verifier(
         if not isinstance(symbol, intermediate.Class):
             continue
 
-        if symbol.implementation_key is not None:
+        if symbol.is_implementation_specific:
             visit_key = specific_implementations.ImplementationKey(
-                f'Verification/RecursiveVerifier/visit_{symbol.name}')
-            if visit_key not in spec_impls:
+                f'Verification/RecursiveVerifier/visit_{symbol.name}.cs')
+
+            implementation = spec_impls.get(visit_key, None)
+            if implementation is None:
                 errors.append(
                     Error(
                         symbol.parsed.node,
@@ -1073,7 +1095,7 @@ def _generate_recursive_verifier(
                         f"{visit_key}"))
                 continue
 
-            blocks.append(spec_impls[visit_key])
+            blocks.append(implementation)
         else:
             blocks.append(_generate_recursive_verifier_visit(cls=symbol))
 
@@ -1130,20 +1152,31 @@ def generate(
             using Visitation = {namespace}.Visitation;"""))
     ]  # type: List[Stripped]
 
-    verification_blocks = [
-        _generate_pattern_class(spec_impls=spec_impls),
-        spec_impls[specific_implementations.ImplementationKey('Verification/Error')],
-        spec_impls[specific_implementations.ImplementationKey('Verification/Errors')]
-    ]  # type: List[Stripped]
-
+    verification_blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]
 
-    implementation, implementation_errors = _generate_implementation(
-        symbol_table=symbol_table, spec_impls=spec_impls)
-    if implementation_errors:
-        errors.extend(implementation_errors)
+    pattern_class, pattern_class_errors = _generate_pattern_class(spec_impls=spec_impls)
+    if pattern_class_errors is not None:
+        errors.extend(pattern_class_errors)
     else:
-        verification_blocks.append(implementation)
+        verification_blocks.append(pattern_class)
+
+    for implementation_key in [
+        specific_implementations.ImplementationKey('Verification/Error.cs'),
+        specific_implementations.ImplementationKey('Verification/Errors.cs')
+    ]:
+        implementation = spec_impls.get(implementation_key, None)
+        if implementation is None:
+            errors.append(Error(None, f"The snippet is missing: {implementation_key}"))
+        else:
+            verification_blocks.append(implementation)
+
+    implementation_class, implementation_class_errors = _generate_implementation_class(
+        symbol_table=symbol_table, spec_impls=spec_impls)
+    if implementation_class_errors:
+        errors.extend(implementation_class_errors)
+    else:
+        verification_blocks.append(implementation_class)
 
     non_recursive, non_recursive_errors = _generate_non_recursive_verifier(
         symbol_table=symbol_table)

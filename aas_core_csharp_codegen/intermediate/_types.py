@@ -12,7 +12,6 @@ from aas_core_csharp_codegen import parse
 from aas_core_csharp_codegen.common import Identifier, assert_never, Error
 from aas_core_csharp_codegen.intermediate import construction
 from aas_core_csharp_codegen.parse import BUILTIN_ATOMIC_TYPES
-from aas_core_csharp_codegen.specific_implementations import ImplementationKey
 
 _MODULE_NAME = pathlib.Path(__file__).parent.name
 
@@ -362,7 +361,6 @@ class Invariant:
             parsed: parse.Invariant
     ) -> None:
         self.description = description
-        # TODO: add body once we can translate it
         self.parsed = parsed
 
 
@@ -416,12 +414,7 @@ class Contracts:
 
 
 class Method:
-    """
-    Represent a method of a class.
-
-    If :py:attr:`implementation_key` is specified, the method is considered
-    implementation-specific.
-    """
+    """Represent a method of a class."""
 
     # fmt: off
     @require(
@@ -477,7 +470,7 @@ class Method:
     def __init__(
             self,
             name: Identifier,
-            implementation_key: Optional[ImplementationKey],
+            is_implementation_specific: bool,
             arguments: Sequence[Argument],
             returns: Optional[TypeAnnotation],
             description: Optional[Description],
@@ -487,7 +480,7 @@ class Method:
     ) -> None:
         """Initialize with the given values."""
         self.name = name
-        self.implementation_key = implementation_key
+        self.is_implementation_specific = is_implementation_specific
         self.arguments = arguments
         self.returns = returns
         self.description = description
@@ -507,9 +500,6 @@ class Constructor:
     Represent an understood constructor of a class stacked.
 
     The constructor is expected to be stacked from the entity and all the antecedents.
-
-    If :py:attr:`implementation_key` is specified, the constructor is considered
-    implementation-specific.
     """
 
     @require(
@@ -519,12 +509,12 @@ class Constructor:
             self,
             arguments: Sequence[Argument],
             contracts: Contracts,
-            implementation_key: Optional[ImplementationKey],
+            is_implementation_specific: bool,
             statements: Sequence[construction.AssignArgument],
     ) -> None:
         self.arguments = arguments
         self.contracts = contracts
-        self.implementation_key = implementation_key
+        self.is_implementation_specific = is_implementation_specific
 
         # The calls to the super constructors must be in-lined before.
         self.statements = statements
@@ -587,12 +577,7 @@ class Enumeration:
 
 
 class Class:
-    """
-    Represent a class implementing zero, one or more interfaces.
-
-    If :py:attr:`implementation_key` is specified, the constructor is considered
-    implementation-specific.
-    """
+    """Represent a class implementing zero, one or more interfaces."""
 
     # fmt: off
     @require(
@@ -615,7 +600,7 @@ class Class:
             self,
             name: Identifier,
             interfaces: Sequence['Interface'],
-            implementation_key: Optional[ImplementationKey],
+            is_implementation_specific: bool,
             properties: Sequence[Property],
             methods: Sequence[Method],
             constructor: Constructor,
@@ -628,7 +613,7 @@ class Class:
         """Initialize with the given values."""
         self.name = name
         self.interfaces = interfaces
-        self.implementation_key = implementation_key
+        self.is_implementation_specific = is_implementation_specific
         self.properties = properties
         self.methods = methods
         self.constructor = constructor

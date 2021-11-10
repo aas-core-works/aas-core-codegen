@@ -228,7 +228,12 @@ def _stringify_interface(interface: Interface) -> stringify.Entity:
         name=Interface.__name__,
         properties=[
             stringify.Property("name", interface.name),
-            stringify.Property("inheritances", interface.inheritances),
+            stringify.Property(
+                "inheritances",
+                [
+                    f"reference to {inheritance}"
+                    for inheritance in interface.inheritances
+                ]),
             stringify.Property(
                 "signatures",
                 [_stringify_signature(signature) for signature in interface.signatures],
@@ -290,8 +295,7 @@ def _stringify_invariant(invariant: Invariant) -> stringify.Entity:
         name=Invariant.__name__,
         properties=[
             stringify.Property(
-                "description", _stringify_description(invariant.description)),
-            stringify.PropertyEllipsis("body", invariant.body),
+                "description", invariant.description),
             stringify.PropertyEllipsis("parsed", invariant.parsed),
         ],
     )
@@ -306,7 +310,7 @@ def _stringify_contract(contract: Contract) -> stringify.Entity:
         properties=[
             stringify.Property("args", contract.args),
             stringify.Property(
-                "description", _stringify_description(contract.description)),
+                "description", contract.description),
             stringify.PropertyEllipsis("body", contract.body),
             stringify.PropertyEllipsis("parsed", contract.parsed),
         ],
@@ -363,7 +367,7 @@ def _stringify_method(method: Method) -> stringify.Entity:
         properties=[
             stringify.Property("name", method.name),
             stringify.Property(
-                "implementation_key", method.implementation_key
+                "is_implementation_specific", method.is_implementation_specific
             ),
             stringify.Property(
                 "arguments",
@@ -399,7 +403,7 @@ def _stringify_constructor(constructor: Constructor) -> stringify.Entity:
                 "contracts", _stringify_contracts(constructor.contracts)
             ),
             stringify.Property(
-                "implementation_key", constructor.implementation_key
+                "is_implementation_specific", constructor.is_implementation_specific
             ),
             stringify.PropertyEllipsis("statements", constructor.statements),
         ],
@@ -414,9 +418,11 @@ def _stringify_class(cls: Class) -> stringify.Entity:
         name=Class.__name__,
         properties=[
             stringify.Property("name", cls.name),
-            stringify.Property("interfaces", cls.interfaces),
             stringify.Property(
-                "implementation_key", cls.implementation_key
+                "interfaces",
+                [f"reference to {interface.name}" for interface in cls.interfaces]),
+            stringify.Property(
+                "is_implementation_specific", cls.is_implementation_specific
             ),
             stringify.Property(
                 "properties", [_stringify_property(prop) for prop in cls.properties]

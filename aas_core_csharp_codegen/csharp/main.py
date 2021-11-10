@@ -5,11 +5,10 @@ import sys
 from typing import TextIO
 
 import aas_core_csharp_codegen
-from aas_core_csharp_codegen import cli, parse, intermediate
+from aas_core_csharp_codegen import cli, parse, intermediate, specific_implementations
 from aas_core_csharp_codegen.common import LinenoColumner
 from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
-    specific_implementations as csharp_specific_implementations,
     structure as csharp_structure,
     visitation as csharp_visitation,
     verification as csharp_verification,
@@ -28,13 +27,11 @@ class Parameters:
             self,
             model_path: pathlib.Path,
             snippets_dir: pathlib.Path,
-            namespace: str,
             output_dir: pathlib.Path
     ) -> None:
         """Initialize with the given values."""
         self.model_path = model_path
         self.snippets_dir = snippets_dir
-        self.namespace = namespace
         self.output_dir = output_dir
 
 
@@ -75,14 +72,9 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
                 f"{params.output_dir}\n")
             return 1
 
-    if not csharp_common.NAMESPACE_IDENTIFIER_RE.match(params.namespace):
-        stderr.write(
-            f"The --namespace is not a valid identifier: {params.namespace!r}\n")
-        return 1
-
     # endregion
 
-    spec_impls, spec_impls_errors = csharp_specific_implementations.read_from_directory(
+    spec_impls, spec_impls_errors = specific_implementations.read_from_directory(
         snippets_dir=params.snippets_dir)
     if spec_impls_errors:
         cli.write_error_report(
@@ -164,7 +156,22 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
             stderr=stderr)
         return 1
 
-    namespace = csharp_common.NamespaceIdentifier(params.namespace)
+    namespace_key = specific_implementations.ImplementationKey("namespace.txt")
+    namespace_text = spec_impls.get(namespace_key, None)
+    if namespace_text is None:
+        stderr.write(
+            f"The namespace snippet is missing: {namespace_key}\n"
+        )
+        return 1
+
+    if not csharp_common.NAMESPACE_IDENTIFIER_RE.fullmatch(namespace_text):
+        stderr.write(
+            f"The text from the snippet {namespace_key} "
+            f"is not a valid namespace identifier: {namespace_text!r}\n"
+        )
+        return 1
+
+    namespace = csharp_common.NamespaceIdentifier(namespace_text)
 
     # region Structure
 
@@ -384,11 +391,6 @@ def main(prog: str) -> int:
         help="path to the directory containing implementation-specific code snippets",
         required=True)
     parser.add_argument(
-        "--namespace",
-        help="namespace of the generated code",
-        required=True
-    )
-    parser.add_argument(
         "--output_dir", help="path to the generated code", required=True
     )
     args = parser.parse_args()
@@ -396,7 +398,6 @@ def main(prog: str) -> int:
     params = Parameters(
         model_path=pathlib.Path(args.model_path),
         snippets_dir=pathlib.Path(args.snippets_dir),
-        namespace=str(args.namespace),
         output_dir=pathlib.Path(args.output_dir),
     )
 

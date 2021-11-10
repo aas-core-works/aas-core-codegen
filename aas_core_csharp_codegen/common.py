@@ -37,7 +37,7 @@ class Error:
     """
 
     def __init__(
-            self, node: ast.AST, message: str,
+            self, node: Optional[ast.AST], message: str,
             underlying: Optional[List["Error"]] = None
     ) -> None:
         self.node = node

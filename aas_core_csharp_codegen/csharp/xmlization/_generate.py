@@ -354,10 +354,12 @@ def _generate_serializer(
             continue
 
         block = None  # type: Optional[Stripped]
-        if symbol.implementation_key is not None:
+        if symbol.is_implementation_specific:
             implementation_key = specific_implementations.ImplementationKey(
                 f'Xmlization/Serializer/visit_{symbol.name}')
-            if implementation_key not in spec_impls:
+
+            implementation = spec_impls.get(implementation_key, None)
+            if implementation is None:
                 errors.append(
                     Error(
                         symbol.parsed.node,
@@ -366,7 +368,7 @@ def _generate_serializer(
                         f"class {symbol.name}: {implementation_key}"))
                 continue
 
-            block = spec_impls[implementation_key]
+            block = implementation
         else:
             block, error = _generate_serializer_visit(
                 cls=symbol)

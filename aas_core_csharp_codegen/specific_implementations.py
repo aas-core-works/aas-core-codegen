@@ -1,13 +1,25 @@
-"""Handle specific implementations for JSON schemas."""
+"""Handle implementation snippets regardless for all implementation languages."""
 
 import pathlib
-from typing import Optional, List, Tuple
+import re
+from typing import cast, Mapping, Tuple, Optional, List
 
-from icontract import ensure
+from icontract import require, ensure
 
 from aas_core_csharp_codegen.common import Stripped
-from aas_core_csharp_codegen.specific_implementations import SpecificImplementations, \
-    ImplementationKey, IMPLEMENTATION_KEY_RE
+
+IMPLEMENTATION_KEY_RE = re.compile('[a-zA-Z_][a-zA-Z_0-9.]*(/[a-zA-Z_][a-zA-Z_0-9.]*)*')
+
+
+class ImplementationKey(str):
+    """Represent a key in the map of specific implementations."""
+
+    @require(lambda key: IMPLEMENTATION_KEY_RE.fullmatch(key))
+    def __new__(cls, key: str) -> 'ImplementationKey':
+        return cast(ImplementationKey, key)
+
+
+SpecificImplementations = Mapping[ImplementationKey, Stripped]
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -16,8 +28,6 @@ def read_from_directory(
 ) -> Tuple[Optional[SpecificImplementations], Optional[List[str]]]:
     """
     Read all the implementation-specific code snippets from the ``snippets_dir``.
-
-    All the snippet files are expected to have the extension ``.schema.json``.
 
     :return: either the map of the implementations, or the errors
     """
@@ -28,15 +38,7 @@ def read_from_directory(
         if pth.is_dir():
             continue
 
-        if not pth.name.endswith(".schema.json"):
-            errors.append(
-                f"Expected only *.schema.json files in the implementations, "
-                f"but got: {pth}")
-            continue
-
-        stem = pth.name[:-len(".schema.json")]
-
-        maybe_key = (pth.relative_to(snippets_dir).parent / stem).as_posix()
+        maybe_key = (pth.relative_to(snippets_dir).parent / pth.name).as_posix()
         if not IMPLEMENTATION_KEY_RE.match(maybe_key):
             errors.append(
                 f"The snippet key is not valid "

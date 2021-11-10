@@ -22,8 +22,6 @@ from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming,
     unrolling as csharp_unrolling)
-from aas_core_csharp_codegen.specific_implementations import (
-    verify as specific_implementations_verify)
 
 
 # region Checks
@@ -202,11 +200,6 @@ def verify(
         error = _verify_intra_structure_collisions(intermediate_symbol=symbol)
         if error is not None:
             errors.append(error)
-
-    errors.extend(
-        specific_implementations_verify.that_available_for_all_symbols(
-            symbol_table=symbol_table,
-            spec_impls=spec_impls))
 
     if len(errors) > 0:
         return None, errors
@@ -863,8 +856,8 @@ def _generate_default_value(default: intermediate.Default) -> Stripped:
     return Stripped(code)
 
 
-@require(lambda symbol: symbol.implementation_key is None)
-@require(lambda symbol: symbol.constructor.implementation_key is None)
+@require(lambda symbol: not symbol.is_implementation_specific)
+@require(lambda symbol: not symbol.constructor.is_implementation_specific)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_constructor(
         symbol: intermediate.Class
@@ -986,8 +979,8 @@ def _generate_default_value_for_type_annotation(
     return Stripped(code)
 
 
-@require(lambda symbol: symbol.implementation_key is None)
-@require(lambda symbol: symbol.constructor.implementation_key is None)
+@require(lambda symbol: not symbol.is_implementation_specific)
+@require(lambda symbol: not symbol.constructor.is_implementation_specific)
 def _generate_default_constructor(
         symbol: intermediate.Class
 ) -> Stripped:
@@ -1034,7 +1027,7 @@ def _generate_default_constructor(
     return Stripped(writer.getvalue())
 
 
-@require(lambda symbol: symbol.implementation_key is None)
+@require(lambda symbol: not symbol.is_implementation_specific)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
         symbol: intermediate.Class,
@@ -1100,16 +1093,31 @@ def _generate_class(
 
     # region Methods
 
+    errors = []  # type: List[Error]
+
     for method in symbol.methods:
-        if method.implementation_key is not None:
-            blocks.append(spec_impls[method.implementation_key])
+        if method.is_implementation_specific:
+            implementation_key = specific_implementations.ImplementationKey(
+                f"{symbol.name}/{method.name}.cs")
+
+            implementation = spec_impls.get(implementation_key, None)
+
+            if implementation is None:
+                errors.append(Error(
+                    method.parsed.node,
+                    f"The implementation is missing for the implementation-specific "
+                    f"method: {implementation_key}"
+                ))
+                continue
+
+            blocks.append(implementation)
         else:
             # NOTE (mristin, 2021-09-16):
             # At the moment, we do not transpile the method body and its contracts.
             # We want to finish the meta-model for the V3 and fix de/serialization
             # before taking on this rather hard task.
 
-            return (None, Error(
+            errors.append(Error(
                 symbol.parsed.node,
                 "At the moment, we do not transpile the method body and "
                 "its contracts."))
@@ -1162,24 +1170,41 @@ def _generate_class(
 
     # region Constructor
 
-    if symbol.constructor.implementation_key is not None:
-        blocks.append(spec_impls[symbol.constructor.implementation_key])
+    if symbol.constructor.is_implementation_specific:
+        implementation_key = specific_implementations.ImplementationKey(
+            f"{symbol.name}/{symbol.name}.cs"
+        )
+        implementation = spec_impls.get(implementation_key, None)
+
+        if implementation is None:
+            errors.append(Error(
+                symbol.parsed.node,
+                f"The implementation of the implementation-specific constructor "
+                f"is missing: {implementation_key}"))
+        else:
+            blocks.append(implementation)
     else:
         constructor_block, error = _generate_constructor(symbol=symbol)
         if error is not None:
-            return None, error
+            errors.append(error)
+        else:
+            blocks.append(constructor_block)
 
-        blocks.append(constructor_block)
-
-        if any(
-                arg.default is None
-                for arg in symbol.constructor.arguments
-        ):
-            # We _generate the default constructor only if it has not been already
-            # defined by specifying the default values for all the arguments.
-            blocks.append(_generate_default_constructor(symbol=symbol))
+            if any(
+                    arg.default is None
+                    for arg in symbol.constructor.arguments
+            ):
+                # We _generate the default constructor only if it has not been already
+                # defined by specifying the default values for all the arguments.
+                blocks.append(_generate_default_constructor(symbol=symbol))
 
     # endregion
+
+    if len(errors) > 0:
+        return None, Error(
+            symbol.parsed.node,
+            f"Failed to generate the code for the class {symbol.name}",
+            errors)
 
     for i, code in enumerate(blocks):
         if i > 0:
@@ -1274,9 +1299,17 @@ def generate(
 
         if (
                 isinstance(intermediate_symbol, intermediate.Class)
-                and intermediate_symbol.implementation_key is not None
+                and intermediate_symbol.is_implementation_specific
         ):
-            code = spec_impls[intermediate_symbol.implementation_key]
+            implementation_key = specific_implementations.ImplementationKey(
+                f"{intermediate_symbol.name}.cs")
+
+            code = spec_impls.get(implementation_key, None)
+            if code is None:
+                error = Error(
+                    intermediate_symbol.parsed.node,
+                    f"The implementation is missing "
+                    f"for the implementation-specific class: {implementation_key}")
         else:
             if isinstance(intermediate_symbol, intermediate.Enumeration):
                 # TODO: test

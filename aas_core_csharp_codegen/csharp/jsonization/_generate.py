@@ -733,10 +733,12 @@ def generate(
                 f'{csharp_naming.interface_name(symbol.name)}JsonConverter'))
 
         elif isinstance(symbol, intermediate.Class):
-            if symbol.implementation_key is not None:
+            if symbol.is_implementation_specific:
                 jsonization_key = specific_implementations.ImplementationKey(
-                    f'Jsonization/{symbol.name}_json_converter')
-                if jsonization_key not in spec_impls:
+                    f'Jsonization/{symbol.name}_json_converter.cs')
+
+                implementation = spec_impls.get(jsonization_key, None)
+                if implementation is None:
                     errors.append(
                         Error(
                             symbol.parsed.node,
