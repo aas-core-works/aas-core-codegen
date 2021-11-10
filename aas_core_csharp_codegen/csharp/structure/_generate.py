@@ -1168,7 +1168,7 @@ def _generate_class(
                 arg.default is None
                 for arg in symbol.constructor.arguments
         ):
-            # We generate the default constructor only if it has not been already
+            # We _generate the default constructor only if it has not been already
             # defined by specifying the default values for all the arguments.
             blocks.append(_generate_default_constructor(symbol=symbol))
 

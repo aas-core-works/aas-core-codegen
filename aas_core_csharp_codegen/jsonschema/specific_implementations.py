@@ -1,4 +1,4 @@
-"""Manage specific implementations for C#."""
+"""Handle specific implementations for JSON schemas."""
 
 import pathlib
 from typing import Optional, List, Tuple
@@ -17,7 +17,7 @@ def read_from_directory(
     """
     Read all the implementation-specific code snippets from the ``snippets_dir``.
 
-    All the snippet files are expected to have the extension ``.cs``.
+    All the snippet files are expected to have the extension ``.schema.json``.
 
     :return: either the map of the implementations, or the errors
     """
@@ -28,12 +28,15 @@ def read_from_directory(
         if pth.is_dir():
             continue
 
-        if not pth.name.endswith(".cs"):
+        if not pth.name.endswith(".schema.json"):
             errors.append(
-                f"Expected only *.cs files in the implementations, but got: {pth}")
+                f"Expected only *.schema.json files in the implementations, "
+                f"but got: {pth}")
             continue
 
-        maybe_key = (pth.relative_to(snippets_dir).parent / pth.stem).as_posix()
+        stem = pth.name[:-len(".schema.json")]
+
+        maybe_key = (pth.relative_to(snippets_dir).parent / stem).as_posix()
         if not IMPLEMENTATION_KEY_RE.match(maybe_key):
             errors.append(
                 f"The snippet key is not valid "

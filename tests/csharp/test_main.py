@@ -5,7 +5,7 @@ import pathlib
 import tempfile
 import unittest
 
-import aas_core_csharp_codegen.main
+import aas_core_csharp_codegen.csharp.main
 
 
 class Test_against_recorded(unittest.TestCase):
@@ -14,9 +14,9 @@ class Test_against_recorded(unittest.TestCase):
     RERECORD = True  # TODO: undo
 
     def test_cases(self) -> None:
-        repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent
+        repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
-        parent_case_dir = repo_dir / "test_data" / "test_main"
+        parent_case_dir = repo_dir / "test_data" / "test_csharp" / "test_main"
         assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
 
         for case_dir in parent_case_dir.iterdir():
@@ -46,7 +46,7 @@ class Test_against_recorded(unittest.TestCase):
                     exit_stack.push(tmp_dir)
                     output_dir = pathlib.Path(tmp_dir.name)
 
-                params = aas_core_csharp_codegen.main.Parameters(
+                params = aas_core_csharp_codegen.csharp.main.Parameters(
                     model_path=model_pth,
                     snippets_dir=snippets_dir,
                     namespace=namespace,
@@ -55,7 +55,7 @@ class Test_against_recorded(unittest.TestCase):
                 stdout = io.StringIO()
                 stderr = io.StringIO()
 
-                return_code = aas_core_csharp_codegen.main.run(
+                return_code = aas_core_csharp_codegen.csharp.main.run(
                     params=params, stdout=stdout, stderr=stderr)
 
                 self.assertEqual(

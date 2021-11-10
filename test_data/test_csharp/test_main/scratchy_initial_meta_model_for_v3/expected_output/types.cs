@@ -173,8 +173,6 @@ namespace AasCore.Aas3
         {
             throw new System.NotImplementedException("TODO");
         }
-
-
     }
 
     /// <summary>

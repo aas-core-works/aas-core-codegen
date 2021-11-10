@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "AssetAdministrationShellEnvironment",
+  "$id": "http://www.admin-shell.io/schema/json/V3.0RC01",
+  "type": "object",
+  "required": [
+    "assetAdministrationShells",
+    "submodels",
+    "assets",
+    "conceptDescriptions"
+  ],
+  "properties": {
+    "assetAdministrationShells": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AssetAdministrationShell"
+      }
+    },
+    "submodels": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Submodel"
+      }
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Asset"
+      }
+    },
+    "conceptDescriptions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ConceptDescription"
+      }
+    }
+  }
+}

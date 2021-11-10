@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "AssetAdministrationShellEnvironment",
+  "$id": "http://www.admin-shell.io/schema/json/V3.0RC01",
+  "type": "object",
+  "required": [
+    "assetAdministrationShells",
+    "submodels",
+    "assets",
+    "conceptDescriptions"
+  ],
+  "properties": {
+    "assetAdministrationShells": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AssetAdministrationShell"
+      }
+    },
+    "submodels": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Submodel"
+      }
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Asset"
+      }
+    },
+    "conceptDescriptions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ConceptDescription"
+      }
+    }
+  },
+  "definitions": {
+    "IdentifierType": {
+      "type": "string",
+      "enum": [
+        "IRDI",
+        "IRI",
+        "Custom"
+      ]
+    },
+    "ModelingKind": {
+      "type": "string",
+      "enum": [
+        "Template",
+        "Instance"
+      ]
+    },
+    "LocalKeyType": {
+      "type": "string",
+      "enum": [
+        "IdShort",
+        "FragmentId"
+      ]
+    },
+    "KeyType": {
+      "type": "string",
+      "enum": [
+        "IdShort",
+        "FragmentId",
+        "Custom",
+        "IRDI",
+        "IRI"
+      ]
+    },
+    "IdentifiableElements": {
+      "type": "string",
+      "enum": [
+        "Asset",
+        "AssetAdministrationShell",
+        "ConceptDescription",
+        "Submodel"
+      ]
+    },
+    "ReferableElements": {
+      "type": "string",
+      "enum": [
+        "AccessPermissionRule",
+        "AnnotatedRelationshipElement",
+        "Asset",
+        "AssetAdministrationShell",
+        "BasicEvent",
+        "Blob",
+        "Capability",
+        "ConceptDescription",
+        "ConceptDictionary",
+        "DataElement",
+        "Entity",
+        "Event",
+        "File",
+        "MultiLanguageProperty",
+        "Operation",
+        "Property",
+        "Range",
+        "ReferenceElement",
+        "RelationshipElement",
+        "Submodel",
+        "SubmodelElement",
+        "SubmodelElementCollection",
+        "View"
+      ]
+    },
+    "KeyElements": {
+      "type": "string",
+      "enum": [
+        "GlobalReference",
+        "FragmentReference",
+        "AccessPermissionRule",
+        "AnnotatedRelationshipElement",
+        "Asset",
+        "AssetAdministrationShell",
+        "BasicEvent",
+        "Blob",
+        "Capability",
+        "ConceptDescription",
+        "ConceptDictionary",
+        "DataElement",
+        "Entity",
+        "Event",
+        "File",
+        "MultiLanguageProperty",
+        "Operation",
+        "Property",
+        "Range",
+        "ReferenceElement",
+        "RelationshipElement",
+        "Submodel",
+        "SubmodelElement",
+        "SubmodelElementCollection",
+        "View"
+      ]
+    }
+  }
+}

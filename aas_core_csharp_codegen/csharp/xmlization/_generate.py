@@ -11,20 +11,22 @@ from aas_core_csharp_codegen.common import Error, Stripped, Identifier, \
     assert_never
 from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
-    naming as csharp_naming
+    naming as csharp_naming,
+    unrolling as csharp_unrolling
 )
 # TODO: apply this trick to everything
 from aas_core_csharp_codegen.csharp.common import (
     INDENT as I,
-    INDENT2 as II
+    INDENT2 as II,
+    INDENT3 as III
 )
 
 
 @require(lambda cls: cls.xml_serialization.property_as_text is not None)
 def _generate_serialization_with_property_as_text(
         cls: intermediate.Class
-)->Stripped:
-    """Generate the serialization for ``cls`` with ``property_as_text``."""
+) -> Stripped:
+    """Generate the serialization body for ``cls`` with ``property_as_text``."""
     xml_name = naming.xml_name(cls.name)
 
     prop_as_text = None  # type: Optional[intermediate.Property]
@@ -38,8 +40,9 @@ def _generate_serialization_with_property_as_text(
 
     assert prop_as_text is not None
 
-    stmts = [
+    blocks = [
         Stripped(textwrap.dedent(f'''\
+            // Main tag
             _writer.WriteStartElement({csharp_common.string_literal(xml_name)});'''))
     ]
 
@@ -48,20 +51,24 @@ def _generate_serialization_with_property_as_text(
         prop_name = csharp_naming.property_name(prop.name)
 
         if isinstance(prop.type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
-            stmts.append(Stripped(textwrap.dedent(f'''\
-                _writer.WriteAttributeString(
-                {I}null, {csharp_common.string_literal(xml_attr)}, null, that.{prop_name});''')))
+            blocks.append(Stripped(textwrap.dedent(f'''\
+                // Serialize {prop_name}
+                _writer.WriteStartAttribute({csharp_common.string_literal(xml_attr)});
+                _writer.WriteValue(that.{prop_name});
+                _writer.WriteEndAttribute();''')))
+
         elif isinstance(prop.type_annotation, intermediate.OurAtomicTypeAnnotation):
             if isinstance(prop.type_annotation.symbol, intermediate.Enumeration):
                 enum_name = csharp_naming.enum_name(prop.type_annotation.symbol.name)
 
-                var_name = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
-                stmts.append(Stripped(textwrap.dedent(f'''\
-                    string {var_name} = Stringification.ToString(that.{prop_name})
-                    {I}?? throw new System.ArgumentException(
-                    {II}$"Invalid {enum_name}: {{that.{prop_name}}}");
-                    _writer.WriteAttributeString(
-                    {I}null, {csharp_common.string_literal(xml_attr)}, null, {var_name});''')))
+                blocks.append(Stripped(textwrap.dedent(f'''\
+                    // Serialize {prop_name}
+                    _writer.WriteStartAttribute({csharp_common.string_literal(xml_attr)});
+                    _writer.WriteValue(
+                    {I}Stringification.ToString(that.{prop_name})
+                    {II}?? throw new System.ArgumentException(
+                    {III}$"Invalid {enum_name}: {{that.{prop_name}}}");
+                    _writer.WriteEndAttribute();''')))
             else:
                 raise AssertionError(prop.type_annotation.symbol)
         else:
@@ -71,7 +78,7 @@ def _generate_serialization_with_property_as_text(
 
     if isinstance(
             prop_as_text.type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
-        stmts.append(Stripped(textwrap.dedent(f'''\
+        blocks.append(Stripped(textwrap.dedent(f'''\
                 _writer.WriteValue(that.{prop_as_text_name});''')))
     elif isinstance(
             prop_as_text.type_annotation, intermediate.OurAtomicTypeAnnotation):
@@ -82,7 +89,7 @@ def _generate_serialization_with_property_as_text(
             var_name = csharp_naming.variable_name(
                 Identifier(f"the_{prop_as_text.name}"))
 
-            stmts.append(Stripped(textwrap.dedent(f'''\
+            blocks.append(Stripped(textwrap.dedent(f'''\
                 string {var_name} = Stringification.ToString(that.{prop_as_text_name})
                 {I}?? throw new System.ArgumentException(
                 {II}$"Invalid {enum_name}: {{that.{prop_as_text_name}}}");
@@ -92,9 +99,203 @@ def _generate_serialization_with_property_as_text(
     else:
         raise AssertionError(prop_as_text.type_annotation)
 
-    stmts.append(Stripped('_writer.WriteEndElement();'))
+    blocks.append(Stripped(textwrap.dedent('''\
+        // Main tag
+        _writer.WriteEndElement();''')))
 
-    return Stripped('\n'.join(stmts))
+    return Stripped('\n\n'.join(blocks))
+
+
+@require(lambda cls: cls.xml_serialization.property_as_text is None)
+def _generate_serialization(
+        cls: intermediate.Class
+) -> Stripped:
+    """Generate the serialization body for ``cls`` with default settings."""
+    xml_name = naming.xml_name(cls.name)
+
+    blocks = [
+        Stripped(textwrap.dedent(f'''\
+            // Main tag
+            _writer.WriteStartElement({csharp_common.string_literal(xml_name)});'''))
+    ]  # type: List[Stripped]
+
+    for prop in cls.properties:
+        prop_name = csharp_naming.property_name(prop.name)
+        xml_attr = naming.xml_attribute(prop.name)
+
+        stmts = [
+            Stripped(f"// Serialize {prop_name}")
+        ]
+
+        # region Unroll
+
+        @require(lambda var_index: var_index >= 0)
+        def var_name(var_index: int) -> Identifier:
+            """Generate the name of the loop variable."""
+            if var_index == 0:
+                return Identifier(f"anItem")
+            elif var_index == 1:
+                return Identifier(f"anotherItem")
+            else:
+                return Identifier("yet" + "Yet" * (var_index - 1) + f"anotherItem")
+
+        def unroll(
+                current_var_name: str,
+                item_count: int,
+                type_anno: intermediate.TypeAnnotation
+        ) -> List[csharp_unrolling.Node]:
+            """Generate the serialization for the ``type_anno`` and recurse."""
+            if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
+                if item_count == 0:
+                    # We are at the root level of the property.
+                    assert current_var_name == f'that.{prop_name}'
+
+                    return [csharp_unrolling.Node(
+                        text=Stripped(textwrap.dedent(f'''\
+                            _writer.WriteStartElement({csharp_common.string_literal(xml_attr)});
+                            _writer.WriteValue({current_var_name});
+                            _writer.WriteEndElement();''')),
+                        children=[]
+                    )]
+                else:
+                    raise NotImplementedError(
+                        f"(mristin, 2021-11-10):\n"
+                        f"We did not implement an XML serialization "
+                        f"of atomic built-in values in a descendable property. "
+                        f"The property was {prop.name} of entity {cls.parsed.name}. "
+                        f"Please have a closer look and implement this feature "
+                        f"once the context is more clear.\n\n"
+                        f"{type_anno=}, {item_count=}, {current_var_name=}")
+
+            elif isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
+                if isinstance(type_anno.symbol, intermediate.Enumeration):
+                    if item_count == 0:
+                        # We are at the root level of the property.
+                        assert current_var_name == f'that.{prop_name}'
+
+                        enum_name = csharp_naming.enum_name(type_anno.symbol.name)
+
+                        return [csharp_unrolling.Node(
+                            text=Stripped(textwrap.dedent(f'''\
+                                _writer.WriteStartElement({csharp_common.string_literal(xml_attr)});
+                                _writer.WriteValue(
+                                {I}Stringification.ToString({current_var_name})
+                                {II}?? throw new System.ArgumentException(
+                                {III}$"Invalid {enum_name}: {{{current_var_name}}}"));
+                                _writer.WriteEndElement();''')),
+                            children=[]
+                        )]
+                    else:
+                        raise NotImplementedError(
+                            f"(mristin, 2021-11-10):\n"
+                            f"We did not implement an XML serialization "
+                            f"of enumerations in a descendable property. "
+                            f"The property was {prop.name} of "
+                            f"entity {cls.parsed.name}. Please have a closer look "
+                            f"and implement this feature once the context is "
+                            f"more clear.\n\n"
+                            f"{type_anno=}, {item_count=}, {current_var_name=}")
+
+                elif isinstance(
+                        type_anno.symbol,
+                        (intermediate.Interface, intermediate.Class)):
+                    if item_count == 0:
+                        # We are at the root level of the property.
+                        return [csharp_unrolling.Node(
+                            text=Stripped(textwrap.dedent(f'''\
+                                _writer.WriteStartElement({csharp_common.string_literal(xml_attr)});
+                                Visit({current_var_name});
+                                _writer.WriteEndElement();''')),
+                            children=[])]
+                    else:
+                        return [csharp_unrolling.Node(
+                            f'Visit({current_var_name});', children=[])]
+
+            elif isinstance(type_anno, (
+                    intermediate.ListTypeAnnotation,
+                    intermediate.SequenceTypeAnnotation,
+                    intermediate.SetTypeAnnotation)):
+                item_var = var_name(item_count)
+
+                children = unroll(
+                    current_var_name=var_name(item_count),
+                    item_count=item_count + 1,
+                    type_anno=type_anno.items)
+
+                assert len(children) > 0, (
+                    f"Expected children when unrolling: "
+                    f"{prop=}, {cls=}, {item_count=}, {type_anno=}")
+
+                node = csharp_unrolling.Node(
+                    text=f"foreach (var {item_var} in {current_var_name})",
+                    children=children)
+
+                if item_count == 0:
+                    return [
+                        csharp_unrolling.Node(
+                            text=f"_writer.WriteStartElement("
+                                 f"{csharp_common.string_literal(xml_attr)});",
+                            children=[]),
+                        node,
+                        csharp_unrolling.Node(
+                            text=f"_writer.WriteEndElement();",
+                            children=[]),
+                    ]
+                else:
+                    return [node]
+
+            elif isinstance(type_anno, (
+                    intermediate.MappingTypeAnnotation,
+                    intermediate.MutableMappingTypeAnnotation
+            )):
+                raise NotImplementedError(
+                    f"(mristin, 2021-11-10):\n"
+                    f"We did not implement an XML serialization "
+                    f"of dictionaries in a descendable property. "
+                    f"The property was {prop.name} of "
+                    f"entity {cls.parsed.name}. Please have a closer look "
+                    f"and implement this feature once the context is "
+                    f"more clear.\n\n"
+                    f"{type_anno=}, {item_count=}, {current_var_name=}")
+
+            elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
+                children = unroll(
+                    current_var_name=current_var_name,
+                    item_count=item_count,
+                    type_anno=type_anno.value)
+
+                assert len(children) > 0, (
+                    f"Expected children when unrolling: "
+                    f"{prop=}, {cls=}, {item_count=}, {type_anno=}")
+
+                return [csharp_unrolling.Node(
+                    text=f"if ({current_var_name} != null)", children=children)]
+            else:
+                assert_never(type_anno)
+
+        roots = unroll(
+            current_var_name=f"that.{prop_name}",
+            item_count=0,
+            type_anno=prop.type_annotation)
+
+        assert len(roots) > 0, (
+            f"Expected at least one unrolling root since "
+            f"the property of the class {cls.name} "
+            f"was descendable: {prop.name}")
+
+        stmts.extend(Stripped(csharp_unrolling.render(root)) for root in roots)
+
+        stmts.append(Stripped(f'// Serialized {prop_name}.'))
+
+        # endregion
+
+        blocks.append(Stripped('\n'.join(stmts)))
+
+    blocks.append(Stripped(textwrap.dedent('''\
+        // Main tag
+        _writer.WriteEndElement();''')))
+
+    return Stripped('\n\n'.join(blocks))
 
 
 def _generate_serializer_visit(
@@ -102,17 +303,13 @@ def _generate_serializer_visit(
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the serialization method for the intermediate class ``cls``."""
     blocks = []  # type: List[Stripped]
-    cls_name = csharp_naming.class_name(cls.name)
 
     if cls.xml_serialization.property_as_text is not None:
         blocks.append(_generate_serialization_with_property_as_text(cls=cls))
     else:
-        # TODO: continue here, implement
-        # TODO: unroll collections and dictionaries 🠒 we need to know how to serialize those anyhow...
-        # TODO: serialization of primitives: <Value>...</Value>
-        # TODO: serialization of dictionaries: <Key>...</Key><Value>...</Value>
+        blocks.append(_generate_serialization(cls=cls))
 
-        pass
+    cls_name = csharp_naming.class_name(cls.name)
 
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\

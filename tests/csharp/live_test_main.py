@@ -11,7 +11,7 @@ import sys
 import tempfile
 import textwrap
 
-import aas_core_csharp_codegen.main
+import aas_core_csharp_codegen.csharp.main
 
 
 def main() -> int:
@@ -27,13 +27,13 @@ def main() -> int:
         return 1
 
     with tempfile.TemporaryDirectory() as tmp_dir:
-        repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent
+        repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
         # TODO: remove
         (repo_dir/"deleteme").mkdir(exist_ok=True,parents=True)
         tmp_dir = str(repo_dir / "deleteme/expected_output")
 
-        parent_case_dir = repo_dir / "test_data" / "test_main"
+        parent_case_dir = repo_dir / "test_data" / "test_csharp" / "test_main"
         assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
 
         for case_dir in parent_case_dir.iterdir():
@@ -56,7 +56,7 @@ def main() -> int:
                 f"to: {output_dir} ...")
 
             output_dir.mkdir(exist_ok=True, parents=True)
-            params = aas_core_csharp_codegen.main.Parameters(
+            params = aas_core_csharp_codegen.csharp.main.Parameters(
                 model_path=model_pth,
                 snippets_dir=snippets_dir,
                 namespace=namespace,
@@ -65,7 +65,7 @@ def main() -> int:
             stdout = io.StringIO()
             stderr = io.StringIO()
 
-            return_code = aas_core_csharp_codegen.main.run(
+            return_code = aas_core_csharp_codegen.csharp.main.run(
                 params=params, stdout=stdout, stderr=stderr)
 
             assert stderr.getvalue() == "", (

@@ -28,6 +28,4 @@ public class LangStringSet : IEntity {
     {
         throw new System.NotImplementedException("TODO");
     }
-
-
 }

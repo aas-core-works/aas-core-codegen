@@ -54,7 +54,7 @@ setup(
     data_files=[(".", ["LICENSE", "README.rst", "requirements.txt"])],
     entry_points={
         "console_scripts": [
-            "aas-core-csharp-codegen = aas_core_csharp_codegen.main:entry_point"
+            "aas-core-csharp-codegen = aas_core_csharp_codegen.csharp.main:entry_point"
         ]
     },
 )

@@ -2,13 +2,10 @@
 import argparse
 import pathlib
 import sys
-import textwrap
-from typing import TextIO, Sequence
-
-from icontract import require
+from typing import TextIO
 
 import aas_core_csharp_codegen
-from aas_core_csharp_codegen import parse, intermediate
+from aas_core_csharp_codegen import cli, parse, intermediate
 from aas_core_csharp_codegen.common import LinenoColumner
 from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
@@ -39,39 +36,6 @@ class Parameters:
         self.snippets_dir = snippets_dir
         self.namespace = namespace
         self.output_dir = output_dir
-
-
-# fmt: off
-@require(
-    lambda errors:
-    all(
-        len(error) > 0
-        and not error.startswith('\n')
-        # This is necessary so that we do not have double bullet point.
-        and not error.startswith('*')
-        and not error.endswith('\n')
-        for error in errors
-    )
-)
-@require(lambda message: not message.endswith(':'))
-@require(lambda message: not message.endswith('\n'))
-@require(
-    lambda message:
-    not message.startswith('\n')
-    and not message.startswith('*')
-)
-# fmt: on
-def write_error_report(message: str, errors: Sequence[str], stderr: TextIO) -> None:
-    """
-    Write the report (main ``message`` and details as ``errors``) to ``stderr``.
-
-    This method helps us to have a unified way of showing errors.
-    """
-    stderr.write(f"{message}:\n")
-    for error in errors:
-        indented = textwrap.indent(error, "  ")
-        indented = "* " + indented[2:]
-        stderr.write(f"{indented}\n")
 
 
 def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
@@ -121,7 +85,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     spec_impls, spec_impls_errors = csharp_specific_implementations.read_from_directory(
         snippets_dir=params.snippets_dir)
     if spec_impls_errors:
-        write_error_report(
+        cli.write_error_report(
             message="Failed to resolve the implementation-specific code snippets",
             errors=spec_impls_errors,
             stderr=stderr)
@@ -147,7 +111,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     import_errors = parse.check_expected_imports(atok=atok)
     if import_errors:
-        write_error_report(
+        cli.write_error_report(
             message="One or more unexpected imports in the meta-model",
             errors=import_errors,
             stderr=stderr,
@@ -159,7 +123,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     parsed_symbol_table, error = parse.atok_to_symbol_table(atok=atok)
     if error is not None:
-        write_error_report(
+        cli.write_error_report(
             message=f"Failed to construct the symbol table from {params.model_path}",
             errors=[lineno_columner.error_message(error)],
             stderr=stderr,
@@ -174,7 +138,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         atok=atok,
     )
     if error is not None:
-        write_error_report(
+        cli.write_error_report(
             message=f"Failed to translate the parsed symbol table "
                     f"to intermediate symbol table "
                     f"based on {params.model_path}",
@@ -189,7 +153,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         spec_impls=spec_impls)
 
     if errors is not None:
-        write_error_report(
+        cli.write_error_report(
             message=f"Failed to verify the intermediate symbol table "
                     f"for generation of C# code"
                     f"based on {params.model_path}",
@@ -210,8 +174,8 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         spec_impls=spec_impls)
 
     if errors is not None:
-        write_error_report(
-            message=f"Failed to generate the structures in the C# code "
+        cli.write_error_report(
+            message=f"Failed to _generate the structures in the C# code "
                     f"based on {params.model_path}",
             errors=[lineno_columner.error_message(error) for error in errors],
             stderr=stderr)
@@ -223,7 +187,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     try:
         pth.write_text(code)
     except Exception as exception:
-        write_error_report(
+        cli.write_error_report(
             message=f"Failed to write the C# structures to {pth}",
             errors=[str(exception)],
             stderr=stderr)
@@ -238,8 +202,8 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         namespace=namespace)
 
     if errors is not None:
-        write_error_report(
-            message=f"Failed to generate the C# code for visitation "
+        cli.write_error_report(
+            message=f"Failed to _generate the C# code for visitation "
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)
@@ -253,7 +217,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     try:
         pth.write_text(code)
     except Exception as exception:
-        write_error_report(
+        cli.write_error_report(
             message=f"Failed to write the visitation C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr)
@@ -265,8 +229,8 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     errors = csharp_verification.verify(spec_impls=spec_impls)
     if errors is not None:
-        write_error_report(
-            message=f"Failed to write the C# structures to {pth}",
+        cli.write_error_report(
+            message=f"Failed to verify the C#-specific C# structures",
             errors=errors,
             stderr=stderr)
         return 1
@@ -277,8 +241,8 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         spec_impls=spec_impls)
 
     if errors is not None:
-        write_error_report(
-            message=f"Failed to generate the verification C# code "
+        cli.write_error_report(
+            message=f"Failed to _generate the verification C# code "
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)
@@ -292,7 +256,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     try:
         pth.write_text(code)
     except Exception as exception:
-        write_error_report(
+        cli.write_error_report(
             message=f"Failed to write the verification C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr)
@@ -306,8 +270,8 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         symbol_table=ir_symbol_table, namespace=namespace)
 
     if errors is not None:
-        write_error_report(
-            message=f"Failed to generate the stringification C# code "
+        cli.write_error_report(
+            message=f"Failed to _generate the stringification C# code "
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)
@@ -323,7 +287,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     try:
         pth.write_text(code)
     except Exception as exception:
-        write_error_report(
+        cli.write_error_report(
             message=f"Failed to write the stringification C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr)
@@ -343,8 +307,8 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         spec_impls=spec_impls)
 
     if errors is not None:
-        write_error_report(
-            message=f"Failed to generate the jsonization C# code "
+        cli.write_error_report(
+            message=f"Failed to _generate the jsonization C# code "
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)
@@ -360,7 +324,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     try:
         pth.write_text(code)
     except Exception as exception:
-        write_error_report(
+        cli.write_error_report(
             message=f"Failed to write the jsonization C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr)
@@ -377,8 +341,8 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         spec_impls=spec_impls)
 
     if errors is not None:
-        write_error_report(
-            message=f"Failed to generate the xmlization C# code "
+        cli.write_error_report(
+            message=f"Failed to _generate the xmlization C# code "
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)
@@ -394,7 +358,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     try:
         pth.write_text(code)
     except Exception as exception:
-        write_error_report(
+        cli.write_error_report(
             message=f"Failed to write the xmlization C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr)
