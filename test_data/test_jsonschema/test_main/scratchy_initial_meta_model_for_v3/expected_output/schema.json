@@ -3,37 +3,8 @@
   "title": "AssetAdministrationShellEnvironment",
   "$id": "http://www.admin-shell.io/schema/json/V3.0RC01",
   "type": "object",
-  "required": [
-    "assetAdministrationShells",
-    "submodels",
-    "assets",
-    "conceptDescriptions"
-  ],
-  "properties": {
-    "assetAdministrationShells": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/AssetAdministrationShell"
-      }
-    },
-    "submodels": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Submodel"
-      }
-    },
-    "assets": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Asset"
-      }
-    },
-    "conceptDescriptions": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/ConceptDescription"
-      }
-    }
+  "allOf": {
+    "$ref": "#/definitions/Environment"
   },
   "definitions": {
     "HasExtension": {
@@ -87,6 +58,9 @@
             },
             "description": {
               "$ref": "#/definitions/LangStringSet"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
@@ -127,8 +101,7 @@
         "revision": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     },
     "Identifiable": {
       "allOf": [
@@ -143,6 +116,9 @@
             },
             "administration": {
               "$ref": "#/definitions/AdministrativeInformation"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
@@ -292,8 +268,7 @@
         "semanticId": {
           "$ref": "#/definitions/Reference"
         }
-      },
-      "required": []
+      }
     },
     "HasDataSpecification": {
       "type": "object",
@@ -322,9 +297,11 @@
           "properties": {
             "derivedFrom": {
               "$ref": "#/definitions/AssetAdministrationShell"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
             }
-          },
-          "required": []
+          }
         }
       ]
     },

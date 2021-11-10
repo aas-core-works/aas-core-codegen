@@ -147,10 +147,19 @@ def _define_for_class_or_interface(
 
         properties[prop_name] = type_definition
 
+    if (
+            symbol.json_serialization is not None
+            and symbol.json_serialization.with_model_type
+    ):
+        properties['modelType'] = collections.OrderedDict(
+            [('$ref', '#/definitions/ModelType')])
+
     definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
     definition["type"] = "object"
     definition['properties'] = properties
-    definition['required'] = required
+
+    if len(required) > 0:
+        definition['required'] = required
 
     if len(all_of) == 0 and len(properties) == 0:
         return collections.OrderedDict([('type', 'object')])
@@ -202,6 +211,12 @@ def _generate(
             assert_never(symbol)
 
         definitions[naming.json_model_type(symbol.name)] = definition
+
+    model_type = definitions.get('ModelType', None)
+    if model_type is not None:
+        errors.append(Error(
+            atok.tree,
+            f"Unexpected definition of ``modelType``: {json.dumps(model_type)}"))
 
     schema["definitions"] = definitions
 
