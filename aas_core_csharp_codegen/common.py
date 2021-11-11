@@ -74,14 +74,18 @@ class LinenoColumner:
 
     def error_message(self, error: Error) -> str:
         """Generate the error message based on the unexpected observation."""
-        start, _ = self.atok.get_text_range(node=error.node)
-        lineno, column = self.positions[start]
+        prefix = ""
+        if error.node is not None:
+            start, _ = self.atok.get_text_range(node=error.node)
+            lineno, column = self.positions[start]
 
-        if error.underlying is None:
-            return f"At line {lineno} and column {column}: {error.message}"
+            prefix = f"At line {lineno} and column {column}: "
+
+        if error.underlying is None or len(error.underlying) == 0:
+            return f"{prefix}{error.message}"
         else:
             writer = io.StringIO()
-            writer.write(f"At line {lineno} and column {column}: {error.message}\n")
+            writer.write(f"{prefix}{error.message}\n")
             for i, underlying_error in enumerate(error.underlying):
                 if i > 0:
                     writer.write("\n")

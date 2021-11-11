@@ -182,7 +182,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     if errors is not None:
         cli.write_error_report(
-            message=f"Failed to _generate the structures in the C# code "
+            message=f"Failed to _generate_rdf the structures in the C# code "
                     f"based on {params.model_path}",
             errors=[lineno_columner.error_message(error) for error in errors],
             stderr=stderr)
@@ -210,7 +210,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     if errors is not None:
         cli.write_error_report(
-            message=f"Failed to _generate the C# code for visitation "
+            message=f"Failed to _generate_rdf the C# code for visitation "
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)
@@ -249,7 +249,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     if errors is not None:
         cli.write_error_report(
-            message=f"Failed to _generate the verification C# code "
+            message=f"Failed to _generate_rdf the verification C# code "
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)
@@ -278,7 +278,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     if errors is not None:
         cli.write_error_report(
-            message=f"Failed to _generate the stringification C# code "
+            message=f"Failed to _generate_rdf the stringification C# code "
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)
@@ -315,7 +315,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     if errors is not None:
         cli.write_error_report(
-            message=f"Failed to _generate the jsonization C# code "
+            message=f"Failed to _generate_rdf the jsonization C# code "
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)
@@ -349,7 +349,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     if errors is not None:
         cli.write_error_report(
-            message=f"Failed to _generate the xmlization C# code "
+            message=f"Failed to _generate_rdf the xmlization C# code "
                     f"based on {params.model_path}",
             errors=[
                 lineno_columner.error_message(error)

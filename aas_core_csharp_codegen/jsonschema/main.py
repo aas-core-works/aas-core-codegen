@@ -84,7 +84,7 @@ def _define_type(
 def _define_for_class_or_interface(
         symbol: Union[intermediate.Interface, intermediate.Class]
 ) -> MutableMapping[str, Any]:
-    """Generate the definition for an ``interface``."""
+    """Generate the definition for the intermediate ``symbol``."""
     all_of = []  # type: List[MutableMapping[str, Any]]
 
     if isinstance(symbol, intermediate.Interface):
@@ -153,8 +153,7 @@ def _define_for_class_or_interface(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate(
         symbol_table: intermediate.SymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations,
-        atok: asttokens.ASTTokens
+        spec_impls: specific_implementations.SpecificImplementations
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the JSON schema based on the ``symbol_table."""
     schema_base_key = specific_implementations.ImplementationKey(
@@ -178,7 +177,7 @@ def _generate(
 
     if 'definitions' in schema:
         errors.append(Error(
-            atok.tree,
+            None,
             "The property ``definitions`` unexpected in the base JSON schema"))
 
     if len(errors) > 0:
@@ -201,8 +200,9 @@ def _generate(
     model_type = definitions.get(Identifier('ModelType'), None)
     if model_type is not None:
         errors.append(Error(
-            atok.tree,
-            f"Unexpected definition of ``modelType``: {json.dumps(model_type)}"))
+            None,
+            f"Unexpected definition of ``modelType`` "
+            f"in the definitions: {json.dumps(model_type)}"))
 
     schema["definitions"] = definitions
 
@@ -343,8 +343,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     code, errors = _generate(
         symbol_table=ir_symbol_table,
-        spec_impls=spec_impls,
-        atok=atok)
+        spec_impls=spec_impls)
 
     if errors is not None:
         cli.write_error_report(
