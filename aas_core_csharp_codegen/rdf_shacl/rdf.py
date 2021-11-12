@@ -81,13 +81,29 @@ def _define_for_enumeration(
         else:
             assert comment is not None
             writer.write(
-                f'{I}rdfs:comment {rdf_shacl_common.string_literal(comment)}@en ;\n')
+                f'\n{I}rdfs:comment {rdf_shacl_common.string_literal(comment)}@en ;')
 
     if len(enumeration.literals) > 0:
-        writer.write(f"{I}owl:oneOf (\n")
+        writer.write(f"\n{I}owl:oneOf (\n")
         for literal in enumeration.literals:
-            writer.write(f"{II}<{url_prefix}/{cls_name}/")
+            literal_name = rdf_shacl_naming.enumeration_literal(literal.name)
+            writer.write(f"{II}<{url_prefix}/{cls_name}/{literal_name}>\n")
 
+        writer.write(f"{I}) ;")
+
+    writer.write("\n.")
+
+    if len(enumeration.literals) > 0:
+        for literal in enumeration.literals:
+            literal_name = rdf_shacl_naming.enumeration_literal(literal.name)
+            literal_label = rdf_shacl_naming.enumeration_literal_label(literal.name)
+
+            writer.write('\n\n')
+            writer.write(textwrap.dedent(f'''\
+                ### {url_prefix}/{cls_name}/{literal_name}
+                <{url_prefix}/{cls_name}/{literal_name}> rdf:type aas:{cls_name} ;
+                {I}rdfs:label {rdf_shacl_common.string_literal(literal_label)}^^xsd:string ;
+                .'''))
 
     if len(errors) > 0:
         return None, Error(
@@ -186,6 +202,7 @@ def _define_property(
     rdfs_domain = f"aas:{cls_name}"
 
     prop_name = None  # type: Optional[Identifier]
+    prop_label = None  # type: Optional[Stripped]
     rdf_type = None  # type: Optional[str]
     rdfs_range = None  # type: Optional[str]
 
@@ -193,11 +210,13 @@ def _define_property(
 
     if isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
         prop_name = rdf_shacl_naming.property_name(prop.name)
+        prop_label = rdf_shacl_naming.property_label(prop.name)
         rdf_type = "owl:ObjectProperty"
         rdfs_range = symbol_to_rdfs_range[type_anno.symbol]
 
     elif isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
         prop_name = rdf_shacl_naming.property_name(prop.name)
+        prop_label = rdf_shacl_naming.property_label(prop.name)
         rdf_type = "owl:DatatypeProperty"
         rdfs_range = _BUILTIN_MAP[type_anno.a_type]
 
@@ -208,6 +227,7 @@ def _define_property(
              intermediate.SetTypeAnnotation)
     ):
         prop_name = rdf_shacl_naming.property_name(plural_to_singular(prop.name))
+        prop_label = rdf_shacl_naming.property_label(plural_to_singular(prop.name))
 
         if isinstance(type_anno.items, intermediate.OurAtomicTypeAnnotation):
             rdf_type = "owl:ObjectProperty"
@@ -231,10 +251,9 @@ def _define_property(
             f"this missing functionality.")
 
     assert prop_name is not None
+    assert prop_label is not None
     assert rdf_type is not None
     assert rdfs_range is not None
-
-    prop_label = rdf_shacl_naming.property_label(prop_name)
 
     url = f'{url_prefix}/{cls_name}/{prop_name}'
     writer = io.StringIO()
@@ -358,7 +377,14 @@ def generate(
         block = None  # type: Optional[Stripped]
 
         if isinstance(symbol, intermediate.Enumeration):
-            block = _define_for_enumeration(enumeration=symbol)
+            block, error = _define_for_enumeration(
+                enumeration=symbol, url_prefix=url_prefix)
+
+            if error is not None:
+                errors.append(error)
+            else:
+                assert block is not None
+                blocks.append(block)
         if isinstance(symbol, (intermediate.Interface, intermediate.Class)):
             if (
                     isinstance(symbol, intermediate.Class)

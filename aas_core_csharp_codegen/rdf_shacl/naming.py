@@ -102,10 +102,39 @@ def property_label(identifier: Identifier) -> Stripped:
 
     return Stripped(" ".join(cased))
 
+
 def enumeration_literal(identifier: Identifier) -> Stripped:
     """
     Generate the enumeration literal for its intermediate ``identifier``.
 
-    >>> enumeration_literal(Identifier())
+    >>> enumeration_literal(Identifier('something'))
+    'SOMETHING'
+
+    >>> enumeration_literal(Identifier("something_to_URL"))
+    'SOMETHING_TO_URL'
     """
-    # TODO: continue here, implement the doctests and then go back to rdf
+    parts = identifier.split('_')
+    return Stripped('_'.join(part.upper() for part in parts))
+
+def enumeration_literal_label(identifier: Identifier) -> Stripped:
+    """
+    Generate the label for an enumeration literal with intermediate ``identifier``.
+
+    >>> enumeration_literal_label(Identifier("something"))
+    'Something'
+
+    >>> enumeration_literal_label(Identifier("something_good_to_URL"))
+    'Something Good to URL'
+    """
+    parts = identifier.split('_')
+
+    cased = []  # type: List[str]
+    for part in parts:
+        if part in _UPPERCASE_ABBREVIATION_SET:
+            cased.append(part.upper())
+        elif part in _LOWERCASE_WORDS_IN_LABEL:
+            cased.append(part.lower())
+        else:
+            cased.append(part.capitalize())
+
+    return Stripped(" ".join(cased))

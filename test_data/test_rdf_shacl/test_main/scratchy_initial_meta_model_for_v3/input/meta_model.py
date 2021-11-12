@@ -238,9 +238,8 @@ class Identifiable(Referable):
 
 
 class Modeling_kind(Enum):
-    # TODO (mristin, 2021-05-28): how to document the enums?
-    TEMPLATE = "Template"
-    INSTANCE = "Instance"
+    Template = "Template"
+    Instance = "Instance"
 
 
 @abstract
@@ -256,16 +255,9 @@ class Local_key_type(Enum):
     FRAGMENT_ID = "FragmentId"
 
 
-class Key_type(Enum):
-    ID_SHORT = "IdShort"
-    FRAGMENT_ID = "FragmentId"
-    CUSTOM = "Custom"
-    IRDI = "IRDI"
-    IRI = "IRI"
+class Key_type(Local_key_type, Identifier_type):
+    pass
 
-
-# TODO (mristin, 2021-05-28): add assertion that KeyType is union of
-#  LocalKeyType and IdentifierType
 
 class Identifiable_elements(Enum):
     ASSET = "Asset"
@@ -300,35 +292,9 @@ class Referable_elements(Enum):
     VIEW = "View"
 
 
-# TODO (mristin, 2021-05-28): add assertion that ReferableElements also contains
-#  all IdentifiableElements
-
-class Key_elements(Enum):
+class Key_elements(Referable_elements):
     GLOBAL_REFERENCE = "GlobalReference"
     FRAGMENT_REFERENCE = "FragmentReference"
-    ACCESS_PERMISSION_RULE = "AccessPermissionRule"
-    ANNOTATED_RELATIONSHIP_ELEMENT = "AnnotatedRelationshipElement"
-    ASSET = "Asset"
-    ASSET_ADMINISTRATION_SHELL = "AssetAdministrationShell"
-    BASIC_EVENT = "BasicEvent"
-    BLOB = "Blob"
-    CAPABILITY = "Capability"
-    CONCEPT_DESCRIPTION = "ConceptDescription"
-    CONCEPT_DICTIONARY = "ConceptDictionary"
-    DATA_ELEMENT = "DataElement"
-    ENTITY = "Entity"
-    EVENT = "Event"
-    FILE = "File"
-    MULTI_LANGUAGE_PROPERTY = "MultiLanguageProperty"
-    OPERATION = "Operation"
-    PROPERTY = "Property"
-    RANGE = "Range"
-    REFERENCE_ELEMENT = "ReferenceElement"
-    RELATIONSHIP_ELEMENT = "RelationshipElement"
-    SUBMODEL = "Submodel"
-    SUBMODEL_ELEMENT = "SubmodelElement"
-    SUBMODEL_ELEMENT_COLLECTION = "SubmodelElementCollection"
-    VIEW = "View"
 
 
 # TODO (mristin, 2021-05-28): add assertion that KeyElements also contains
