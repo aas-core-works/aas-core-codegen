@@ -41,6 +41,7 @@
       <w>pylint</w>
       <w>rawsource</w>
       <w>rawtext</w>
+      <w>rdfs</w>
       <w>rstripped</w>
       <w>shacl</w>
       <w>stmts</w>
@@ -59,6 +60,7 @@
       <w>vistitor</w>
       <w>xmlizable</w>
       <w>xmlization</w>
+      <w>yagni</w>
     </words>
   </dictionary>
 </component>

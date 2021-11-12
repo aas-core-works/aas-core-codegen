@@ -7,8 +7,9 @@ from typing import Tuple, Optional, List, Sequence
 from icontract import ensure
 
 from aas_core_csharp_codegen import intermediate, naming, specific_implementations
+from aas_core_csharp_codegen.rendering import indent_but_first_line
 from aas_core_csharp_codegen.common import Error, Stripped, Identifier, \
-    indent_but_first_line, assert_never
+    assert_never
 from aas_core_csharp_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming

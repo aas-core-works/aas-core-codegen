@@ -11,7 +11,6 @@ import docutils.nodes
 
 import tests.common
 from aas_core_csharp_codegen import parse
-import aas_core_csharp_codegen.parse._translate as parse_translate
 from aas_core_csharp_codegen.common import Error, LinenoColumner, Identifier
 
 

@@ -7,7 +7,8 @@ from typing import Sequence, Union, Any
 
 from icontract import require
 
-from aas_core_csharp_codegen.common import assert_never, indent_but_first_line
+from aas_core_csharp_codegen.common import assert_never
+from aas_core_csharp_codegen.rendering import indent_but_first_line
 
 # We have to separate Stringifiable and Sequence[Stringifiable] since recursive types
 # are not supported in mypy, see https://github.com/python/mypy/issues/731.

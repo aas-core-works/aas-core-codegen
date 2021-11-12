@@ -12,10 +12,11 @@ from typing import (
     Union,
     Iterator,
     Sequence,
-    NoReturn, )
+    NoReturn, TypeVar, Generic, )
 
+import docutils.nodes
 import asttokens
-from icontract import require, DBC
+from icontract import require, DBC, ensure
 
 IDENTIFIER_RE = re.compile(r"[a-zA-Z_][a-zA-Z_0-9]*")
 
@@ -214,13 +215,3 @@ class Stripped(Rstripped):
         return cast(Stripped, block)
 
 
-def indent_but_first_line(text: str, indention: str) -> str:
-    """
-    Indent all but the first of the given ``text`` by ``indention``.
-
-    For example, this helps you insert indented blocks into formatted string literals.
-    """
-    return "\n".join(
-        indention + line if i > 0 else line
-        for i, line in enumerate(text.splitlines())
-    )
