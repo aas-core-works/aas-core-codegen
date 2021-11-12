@@ -8,6 +8,9 @@ from typing import TextIO
 import aas_core_csharp_codegen
 import aas_core_csharp_codegen.rdf_shacl.rdf
 import aas_core_csharp_codegen.rdf_shacl.shacl
+from aas_core_csharp_codegen.rdf_shacl import (
+    common as rdf_shacl_common
+)
 from aas_core_csharp_codegen import cli, parse, specific_implementations, \
     intermediate
 from aas_core_csharp_codegen.common import LinenoColumner
@@ -145,11 +148,39 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     # endregion
 
+    # region Dependencies
+
+    symbol_to_rdfs_range, error = rdf_shacl_common.determine_symbol_to_rdfs_range(
+        symbol_table=ir_symbol_table, spec_impls=spec_impls)
+    if error:
+        cli.write_error_report(
+            message=f"Failed to determine the mapping symbol 🠒 ``rdfs:range`` "
+                    f"based on {params.model_path}",
+            errors=[lineno_columner.error_message(error)],
+            stderr=stderr,
+        )
+
+        return 1
+
+    url_prefix_key = specific_implementations.ImplementationKey(
+        "url_prefix.txt"
+    )
+    url_prefix = spec_impls.get(url_prefix_key, None)
+    if url_prefix is None:
+        stderr.write(
+            f"The implementation snippet for the URL prefix of the ontology "
+            f"is missing: {url_prefix_key}\n")
+        return 1
+
+    # endregion
+
     # region RDF ontology
 
     rdf_code, errors = aas_core_csharp_codegen.rdf_shacl.rdf.generate(
         symbol_table=ir_symbol_table,
-        spec_impls=spec_impls)
+        symbol_to_rdfs_range=symbol_to_rdfs_range,
+        spec_impls=spec_impls,
+        url_prefix=url_prefix)
 
     if errors is not None:
         cli.write_error_report(
@@ -175,9 +206,11 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     # region SHACL schema
 
-    rdf_code, errors = aas_core_csharp_codegen.rdf_shacl.shacl.generate(
+    shacl_code, errors = aas_core_csharp_codegen.rdf_shacl.shacl.generate(
         symbol_table=ir_symbol_table,
-        spec_impls=spec_impls)
+        symbol_to_rdfs_range=symbol_to_rdfs_range,
+        spec_impls=spec_impls,
+        url_prefix=url_prefix)
 
     if errors is not None:
         cli.write_error_report(
@@ -187,11 +220,11 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
             stderr=stderr)
         return 1
 
-    assert rdf_code is not None
+    assert shacl_code is not None
 
     pth = params.output_dir / "shacl-schema.ttl"
     try:
-        pth.write_text(rdf_code)
+        pth.write_text(shacl_code)
     except Exception as exception:
         cli.write_error_report(
             message=f"Failed to write the SHACL schema to {pth}",

@@ -10,62 +10,76 @@ from aas_core_csharp_codegen import intermediate, specific_implementations
 from aas_core_csharp_codegen.common import Stripped, Error, assert_never
 
 
-def _define_for_enumeration(
-        enumeration: intermediate.Enumeration
-) -> Stripped:
-    """Generate the definition for an ``enumeration``."""
-    raise NotImplementedError()
-
-
-# TODO: fix
-_BUILTIN_MAP = {
-    intermediate.BuiltinAtomicType.BOOL: "boolean",
-    intermediate.BuiltinAtomicType.INT: "integer",
-    intermediate.BuiltinAtomicType.FLOAT: "number",
-    intermediate.BuiltinAtomicType.STR: "string"
-}
-assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType)
-
-
-def _generate_for_class_or_interface(
-        symbol: Union[intermediate.Interface, intermediate.Class]
-) -> Stripped:
-    """Generate the constraints for the intermediate ``symbol``."""
-    raise NotImplementedError()
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def generate(
         symbol_table: intermediate.SymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations
+        symbol_to_rdfs_range: MutableMapping[
+            Union[intermediate.Interface, intermediate.Class], Stripped],
+        spec_impls: specific_implementations.SpecificImplementations,
+        url_prefix: Stripped
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the SHACL schema based on the ``symbol_table."""
+    errors = []  # type: List[Error]
+
     preamble_key = specific_implementations.ImplementationKey(
         "shacl/preamble.ttl"
     )
 
     preamble = spec_impls.get(preamble_key, None)
     if preamble is None:
-        return None, [
-            Error(
-                None,
-                f"The implementation snippet for the SHACL preamble "
-                f"is missing: {preamble_key}")]
+        errors.append(Error(
+            None,
+            f"The implementation snippet for the SHACL preamble "
+            f"is missing: {preamble_key}"))
 
-    blocks = []  # type: List[Stripped]
+    if len(errors) > 0:
+        return None, errors
 
-    # TODO: uncomment once implemented
-    # for symbol in symbol_table.symbols:
-    #     block = None  # type: Optional[Stripped]
-    #
-    #     if isinstance(symbol, intermediate.Enumeration):
-    #         block = _define_for_enumeration(enumeration=symbol)
-    #     elif isinstance(symbol, (intermediate.Interface, intermediate.Class)):
-    #         block = _generate_for_class_or_interface(symbol=symbol)
-    #     else:
-    #         assert_never(symbol)
-    #
-    #     assert block is not None
-    #     blocks.append(block)
+    blocks = [
+        preamble
+    ]  # type: List[Stripped]
+
+    for symbol in symbol_table.symbols:
+        block = None  # type: Optional[Stripped]
+
+        if isinstance(symbol, intermediate.Enumeration):
+            continue
+
+        if isinstance(symbol, (intermediate.Interface, intermediate.Class)):
+            if (
+                    isinstance(symbol, intermediate.Class)
+                    and symbol.is_implementation_specific
+            ):
+                implementation_key = specific_implementations.ImplementationKey(
+                    f"shacl/{symbol.name}/shape.ttl")
+
+                implementation = spec_impls.get(implementation_key, None)
+                if implementation is None:
+                    errors.append(Error(
+                        symbol.parsed.node,
+                        f"The implementation snippet for "
+                        f"the entity {symbol.parsed.name} "
+                        f"is missing: {implementation_key}"))
+                else:
+                    blocks.append(implementation)
+
+            else:
+                block, error = _define_for_class_or_interface(
+                    symbol=symbol,
+                    symbol_to_rdfs_range=symbol_to_rdfs_range,
+                    url_prefix=url_prefix)
+
+                if error is not None:
+                    errors.append(error)
+                else:
+                    assert block is not None
+                    blocks.append(block)
+        else:
+            assert_never(symbol)
+
+    if len(errors) > 0:
+        return None, errors
 
     return Stripped('\n\n'.join(blocks)), None

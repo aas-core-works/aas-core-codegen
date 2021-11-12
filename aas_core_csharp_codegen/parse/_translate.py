@@ -92,6 +92,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("require", "icontract"),
             ("abstract", "aas_core3_meta.marker"),
             ("implementation_specific", "aas_core3_meta.marker"),
+            ("is_superset_of", "aas_core3_meta.marker"),
             ("json_serialization", "aas_core3_meta.marker"),
             ("xml_serialization", "aas_core3_meta.marker"),
             ("comment", "aas_core3_meta.marker"),
@@ -148,10 +149,66 @@ def _enum_to_symbol(
         node: ast.ClassDef, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Enumeration], Optional[Error]]:
     """Interpret a class which defines an enumeration."""
+    is_superset_of = None  # type: Optional[List[Identifier]]
+    for decorator_node in node.decorator_list:
+        if (
+                isinstance(decorator_node, ast.Call)
+                and isinstance(decorator_node.func, ast.Name)
+                and decorator_node.func.id == 'is_superset_of'
+        ):
+            if is_superset_of is not None:
+                return None, Error(
+                    decorator_node,
+                    "Double definitions of ``is_superset_of`` are not allowed")
+
+            superset_arg_node = None  # type: Optional[ast.AST]
+            if len(decorator_node.args) >= 1:
+                superset_arg_node = decorator_node.args[0]
+            elif len(decorator_node.keywords) > 0:
+                for keyword in decorator_node.keywords:
+                    if keyword.arg == 'enums':
+                        superset_arg_node = keyword.value
+            else:
+                pass
+
+            if superset_arg_node is None:
+                return None, Error(
+                    decorator_node,
+                    "The ``enums`` argument is missing in the ``is_superset_of`` "
+                    "decorator")
+
+            if not isinstance(superset_arg_node, ast.List):
+                return None, Error(
+                    decorator_node,
+                    "Expected the ``enums`` argument of the ``is_superset_of`` "
+                    "to be a list literal, but it is not")
+
+            is_superset_of = []
+
+            for elt in superset_arg_node.elts:
+                if not isinstance(elt, ast.Name):
+                    return None, Error(
+                        decorator_node,
+                        f"Expected all elements of the ``enums`` argument to "
+                        f"the ``is_superset_of`` to be a list literal of enum names, "
+                        f"but got: {ast.dump(elt)}")
+
+                is_superset_of.append(Identifier(elt.id))
+        else:
+            return None, Error(
+                decorator_node,
+                f"We do not know how to handle this decorator node "
+                f"for an Enum: {ast.dump(decorator_node)}")
+
+    if is_superset_of is None:
+        is_superset_of = []
+
     if len(node.body) == 0:
         return (
             Enumeration(
-                name=Identifier(node.name), literals=[], description=None, node=node
+                name=Identifier(node.name),
+                is_superset_of=is_superset_of,
+                literals=[], description=None, node=node
             ),
             None,
         )
@@ -225,9 +282,7 @@ def _enum_to_symbol(
                     name=literal_name,
                     value=Identifier(literal_value),
                     description=literal_description,
-                    node=assign,
-                )
-            )
+                    node=assign))
 
             cursor += 1
 
@@ -243,12 +298,11 @@ def _enum_to_symbol(
     return (
         Enumeration(
             name=Identifier(node.name),
+            is_superset_of=is_superset_of,
             literals=enumeration_literals,
             description=description,
-            node=node,
-        ),
-        None,
-    )
+            node=node),
+        None)
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))

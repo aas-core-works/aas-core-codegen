@@ -564,11 +564,13 @@ class Enumeration:
             self,
             name: Identifier,
             literals: Sequence[EnumerationLiteral],
+            is_superset_of: Sequence['Enumeration'],
             description: Optional[Description],
             parsed: parse.Enumeration,
     ) -> None:
         self.name = name
         self.literals = literals
+        self.is_superset_of = is_superset_of
         self.description = description
         self.parsed = parsed
 

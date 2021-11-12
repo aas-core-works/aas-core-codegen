@@ -456,11 +456,13 @@ class Enumeration:
     def __init__(
             self,
             name: Identifier,
+            is_superset_of: Sequence[Identifier],
             literals: Sequence[EnumerationLiteral],
             description: Optional[Description],
             node: ast.ClassDef,
     ) -> None:
         self.name = name
+        self.is_superset_of = is_superset_of
         self.literals = literals
         self.description = description
         self.node = node

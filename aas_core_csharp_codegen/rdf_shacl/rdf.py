@@ -62,15 +62,18 @@ def _define_for_enumeration(
     cls_name = rdf_shacl_naming.class_name(enumeration.name)
     cls_label = rdf_shacl_naming.class_label(enumeration.name)
 
-    # TODO: we need to implement subclassing of Enums even though Python does not support it!
-    #  🠒 we can still parse it!
-    # TODO: then we need to add it here as subClassOf
-
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         ### {url_prefix}/{cls_name}
-        aas:{cls_name} rdf:type owl:Class ;
-        {I}rdfs:label {rdf_shacl_common.string_literal(cls_label)}^^xsd:string ;'''))
+        aas:{cls_name} rdf:type owl:Class ;'''))
+
+    if len(enumeration.is_superset_of) > 0:
+        for subset_enum in enumeration.is_superset_of:
+            subset_enum_name = rdf_shacl_naming.class_name(subset_enum.name)
+            writer.write(f'\nrdfs:subClassOf aas:{subset_enum_name} ;')
+
+    writer.write(
+        '\n{I}rdfs:label {rdf_shacl_common.string_literal(cls_label)}^^xsd:string ;')
 
     errors = []  # type: List[Error]
 
@@ -102,8 +105,19 @@ def _define_for_enumeration(
             writer.write(textwrap.dedent(f'''\
                 ### {url_prefix}/{cls_name}/{literal_name}
                 <{url_prefix}/{cls_name}/{literal_name}> rdf:type aas:{cls_name} ;
-                {I}rdfs:label {rdf_shacl_common.string_literal(literal_label)}^^xsd:string ;
-                .'''))
+                {I}rdfs:label {rdf_shacl_common.string_literal(literal_label)}^^xsd:string ;'''))
+
+            if literal.description is not None:
+                comment, error = _generate_comment(literal.description)
+                if error is not None:
+                    errors.append(error)
+                else:
+                    assert comment is not None
+                    writer.write(
+                        f'\n{I}rdfs:comment '
+                        f'{rdf_shacl_common.string_literal(comment)}@en ;')
+
+            writer.write('\n.')
 
     if len(errors) > 0:
         return None, Error(
@@ -112,24 +126,6 @@ def _define_for_enumeration(
             underlying=errors)
 
     return Stripped(writer.getvalue()), None
-
-    # ### https://admin-shell.io/aas/3/0/RC01/IdentifiableElements
-    # aas:IdentifiableElements rdf:type owl:Class ;
-    #     rdfs:subClassOf aas:ReferableElements ;
-    #     rdfs:label "Identifiable Element"^^xsd:string ;
-    #     rdfs:comment "Enumeration of all identifiable elements within an asset administration shell that are not identifiable"@en ;
-    #     owl:oneOf (
-    #         <https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/ASSET>
-    #         <https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/ASSET_ADMINISTRATION_SHELL>
-    #         <https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/CONCEPT_DESCRIPTION>
-    #         <https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/SUBMODEL>
-    #     ) ;
-    # .
-    #
-    # ###  https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/ASSET
-    # <https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/ASSET> rdf:type aas:IdentifiableElements ;
-    #     rdfs:label "Asset"^^xsd:string ;
-    # .
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -293,8 +289,8 @@ def _define_for_class_or_interface(
     blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]
 
-    owl_class, error = _define_owl_class_for_class_or_interface(symbol=symbol,
-                                                                url_prefix=url_prefix)
+    owl_class, error = _define_owl_class_for_class_or_interface(
+        symbol=symbol, url_prefix=url_prefix)
     if error is not None:
         errors.append(error)
     else:
@@ -318,7 +314,9 @@ def _define_for_class_or_interface(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def generate(
         symbol_table: intermediate.SymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations
+        symbol_to_rdfs_range: rdf_shacl_common.SymbolToRdfsRange,
+        spec_impls: specific_implementations.SpecificImplementations,
+        url_prefix: Stripped
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the RDF ontology based on the ``symbol_table."""
     errors = []  # type: List[Error]
@@ -333,45 +331,12 @@ def generate(
             f"The implementation snippet for the RDF preamble "
             f"is missing: {preamble_key}"))
 
-    url_prefix_key = specific_implementations.ImplementationKey(
-        "url_prefix.txt"
-    )
-    url_prefix = spec_impls.get(url_prefix_key, None)
-    if url_prefix is None:
-        errors.append(Error(
-            None,
-            f"The implementation snippet for the URL prefix of the ontology "
-            f"is missing: {url_prefix_key}"))
-
     if len(errors) > 0:
         return None, errors
 
     blocks = [
         preamble
     ]  # type: List[Stripped]
-
-    symbol_to_rdfs_range: MutableMapping[
-        Union[intermediate.Interface, intermediate.Class], Stripped] = dict()
-
-    for symbol in symbol_table.symbols:
-        if (
-                isinstance(symbol, intermediate.Class)
-                and symbol.is_implementation_specific
-        ):
-            implementation_key = specific_implementations.ImplementationKey(
-                f"rdf/{symbol.name}/as_rdfs_range.ttl")
-            implementation = spec_impls.get(implementation_key, None)
-            if implementation is None:
-                errors.append(Error(
-                    symbol.parsed.node,
-                    f"The implementation snippet for "
-                    f"how to represent the entity {symbol.parsed.name} "
-                    f"as ``rdfs:range`` is missing: {implementation_key}"))
-            else:
-                symbol_to_rdfs_range[symbol] = implementation
-        else:
-            symbol_to_rdfs_range[symbol] = Stripped(
-                f"aas:{rdf_shacl_naming.class_name(symbol.name)}")
 
     for symbol in symbol_table.symbols:
         block = None  # type: Optional[Stripped]
@@ -414,8 +379,8 @@ def generate(
                 else:
                     assert block is not None
                     blocks.append(block)
-        # else:
-        #     assert_never(symbol)
+        else:
+            assert_never(symbol)
 
     if len(errors) > 0:
         return None, errors

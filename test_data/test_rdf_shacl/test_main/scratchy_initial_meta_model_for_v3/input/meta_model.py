@@ -163,7 +163,7 @@ class Identifier_type(Enum):
     """
 
     IRI = "IRI"
-    """IRI according to Rfc 3987. Every URIis an IRI"""
+    """IRI according to Rfc 3987. Every URI is an IRI"""
 
     CUSTOM = "Custom"
     """Custom identifiers like GUIDs (globally unique identifiers)"""
@@ -213,7 +213,6 @@ class Administrative_information(DBC):
 @abstract
 class Identifiable(Referable):
     """An element that has a globally unique identifier."""
-
     identification: Identifier
     administration: Optional[Administrative_information]
 
@@ -238,8 +237,9 @@ class Identifiable(Referable):
 
 
 class Modeling_kind(Enum):
-    Template = "Template"
-    Instance = "Instance"
+    # TODO (mristin, 2021-05-28): how to document the enums?
+    TEMPLATE = "Template"
+    INSTANCE = "Instance"
 
 
 @abstract
@@ -255,8 +255,13 @@ class Local_key_type(Enum):
     FRAGMENT_ID = "FragmentId"
 
 
-class Key_type(Local_key_type, Identifier_type):
-    pass
+@is_superset_of(enums=[Local_key_type, Identifier_type])
+class Key_type(Enum):
+    ID_SHORT = "IdShort"
+    FRAGMENT_ID = "FragmentId"
+    CUSTOM = "Custom"
+    IRDI = "IRDI"
+    IRI = "IRI"
 
 
 class Identifiable_elements(Enum):
@@ -266,6 +271,7 @@ class Identifiable_elements(Enum):
     SUBMODEL = "Submodel"
 
 
+@is_superset_of(enums=[Identifiable_elements])
 class Referable_elements(Enum):
     ACCESS_PERMISSION_RULE = "AccessPermissionRule"
     ANNOTATED_RELATIONSHIP_ELEMENT = "AnnotatedRelationshipElement"
@@ -292,9 +298,33 @@ class Referable_elements(Enum):
     VIEW = "View"
 
 
-class Key_elements(Referable_elements):
+@is_superset_of(enums=[Referable_elements])
+class Key_elements(Enum):
     GLOBAL_REFERENCE = "GlobalReference"
     FRAGMENT_REFERENCE = "FragmentReference"
+    ACCESS_PERMISSION_RULE = "AccessPermissionRule"
+    ANNOTATED_RELATIONSHIP_ELEMENT = "AnnotatedRelationshipElement"
+    ASSET = "Asset"
+    ASSET_ADMINISTRATION_SHELL = "AssetAdministrationShell"
+    BASIC_EVENT = "BasicEvent"
+    BLOB = "Blob"
+    CAPABILITY = "Capability"
+    CONCEPT_DESCRIPTION = "ConceptDescription"
+    CONCEPT_DICTIONARY = "ConceptDictionary"
+    DATA_ELEMENT = "DataElement"
+    ENTITY = "Entity"
+    EVENT = "Event"
+    FILE = "File"
+    MULTI_LANGUAGE_PROPERTY = "MultiLanguageProperty"
+    OPERATION = "Operation"
+    PROPERTY = "Property"
+    RANGE = "Range"
+    REFERENCE_ELEMENT = "ReferenceElement"
+    RELATIONSHIP_ELEMENT = "RelationshipElement"
+    SUBMODEL = "Submodel"
+    SUBMODEL_ELEMENT = "SubmodelElement"
+    SUBMODEL_ELEMENT_COLLECTION = "SubmodelElementCollection"
+    VIEW = "View"
 
 
 # TODO (mristin, 2021-05-28): add assertion that KeyElements also contains

@@ -110,22 +110,12 @@ class Renderer(
                 '\n' not in token.content
                 for token in result[0]
                 if isinstance(token, TokenText)
-            )
-        )
-    )
+            )))
     # fmt: on
     def transform_text(
             self, element: docutils.nodes.Text
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
-        lines = element.astext().splitlines()
-        result = []  # type: List[Token]
-        for i, line in enumerate(lines):
-            if i > 0:
-                result.append(TokenLineBreak())
-
-            result.append(TokenText(line))
-
-        return result, None
+        return [TokenText(element.astext().replace('\n', ' '))], None
 
     def transform_symbol_reference_in_doc(
             self, element: intermediate.SymbolReferenceInDoc

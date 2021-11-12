@@ -2,7 +2,7 @@
 import ast
 import itertools
 from typing import Sequence, List, Mapping, Optional, MutableMapping, Tuple, Union, \
-    Iterator, Generator, TypeVar, Generic
+    Iterator, Generator, TypeVar, Generic, cast
 
 import asttokens
 import docutils.nodes
@@ -39,8 +39,6 @@ from aas_core_csharp_codegen.intermediate._types import (
     Description, PropertyReferenceInDoc, SymbolReferenceInDoc,
     SubscriptedTypeAnnotation, DefaultEnumerationLiteral, XmlSerialization,
 )
-# noinspection PyUnusedLocal
-from aas_core_csharp_codegen.specific_implementations import ImplementationKey
 
 
 # noinspection PyUnusedLocal
@@ -119,6 +117,14 @@ def _parsed_description_to_description(parsed: parse.Description) -> Description
     return Description(document=parsed.document, node=parsed.node)
 
 
+class _PlaceholderSymbol:
+    """Reference a symbol which will be resolved once the table is built."""
+
+    def __init__(self, identifier: str) -> None:
+        """Initialize with the given values."""
+        self.identifier = identifier
+
+
 def _parsed_enumeration_to_enumeration(
         parsed: parse.Enumeration
 ) -> Enumeration:
@@ -137,20 +143,18 @@ def _parsed_enumeration_to_enumeration(
             )
             for parsed_literal in parsed.literals
         ],
+        # Postpone the resolution to the second pass once the symbol table has been
+        # completely built
+        is_superset_of=cast(List[Enumeration], [
+            _PlaceholderSymbol(identifier=identifier)
+            for identifier in parsed.is_superset_of
+        ]),
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
             else None),
         parsed=parsed,
     )
-
-
-class _PlaceholderSymbol:
-    """Reference a symbol which will be resolved once the table is built."""
-
-    def __init__(self, identifier: str) -> None:
-        """Initialize with the given values."""
-        self.identifier = identifier
 
 
 def _parsed_type_annotation_to_type_annotation(
@@ -1285,11 +1289,70 @@ def translate(
 
     # endregion
 
+    # region Second pass to resolve the supersets of the enumerations
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Enumeration):
+            continue
+
+        is_superset_of = []  # type: List[Enumeration]
+        for placeholder in symbol.is_superset_of:
+            assert isinstance(placeholder, _PlaceholderSymbol), (
+                f"Expected the subset in a ``is_superset_of`` to be resolved "
+                f"only in the second pass for enumeration {symbol.name}, "
+                f"but got: {placeholder}")
+
+            referenced_symbol = symbol_table.find(
+                name=Identifier(placeholder.identifier))
+
+            if referenced_symbol is None:
+                underlying_errors.append(Error(
+                    symbol.parsed.node,
+                    f"The subset enumeration in ``is_superset_of`` has "
+                    f"not been defined: {placeholder.identifier}"))
+                continue
+
+            if not isinstance(referenced_symbol, Enumeration):
+                underlying_errors.append(Error(
+                    symbol.parsed.node,
+                    f"An element, {placeholder.identifier}, of ``is_superset_of`` is "
+                    f"not an Enumeration, but: {type(referenced_symbol)}"))
+                continue
+
+            is_superset_of.append(referenced_symbol)
+
+        for subset_enum in is_superset_of:
+            for subset_literal in subset_enum.literals:
+                literal = symbol.literals_by_name.get(subset_literal.name, None)
+                if literal is None:
+                    underlying_errors.append(Error(
+                        symbol.parsed.node,
+                        f"The literal {subset_literal.name} "
+                        f"from the subset enumeration {subset_enum.name} "
+                        f"is missing in the enumeration {symbol.name}"))
+                    continue
+
+                if literal.value != subset_literal.value:
+                    underlying_errors.append(Error(
+                        symbol.parsed.node,
+                        f"The value {subset_literal.value!r} "
+                        f"of the literal {subset_literal.name} "
+                        f"from the subset enumeration {subset_enum.name} "
+                        f"does not equal the value {literal.value!r} "
+                        f"of the literal {literal.name } "
+                        f"in the enumeration {symbol.name}"))
+                    continue
+
+        symbol.is_superset_of = is_superset_of
+
+    # endregion
+
     # region Second pass to resolve the interfaces and inheritances
 
     for symbol in symbols:
         if isinstance(symbol, Enumeration):
             continue
+
         elif isinstance(symbol, Interface):
             resolved_inheritances = []  # type: List[Interface]
             for inheritance in symbol.inheritances:
