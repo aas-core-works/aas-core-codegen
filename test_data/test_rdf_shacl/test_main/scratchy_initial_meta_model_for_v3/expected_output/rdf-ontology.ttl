@@ -1,0 +1,102 @@
+@prefix aas: <https://admin-shell.io/aas/3/0/RC01/> .
+@prefix iec61360: <https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0/RC01/> .
+@prefix phys_unit: <https://admin-shell.io/DataSpecificationTemplates/DataSpecificationPhysicalUnit/3/0/RC01/> .
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@base <https://admin-shell.io/aas/3/0/RC01/> .
+
+<https://admin-shell.io/aas/3/0/RC01/> rdf:type owl:Ontology ;
+    vann:preferredNamespaceUri "https://admin-shell.io/aas/3/0/RC01/"^^xsd:anyURI ;
+    owl:versionInfo "3.0.RC01" ;
+    rdfs:comment "This ontology represents the data model for the Asset Administration Shell according to the specification 'Details of the Asset Administration Shell - Part 1 - Version 3.0.RC01'."@en ;
+    skos:prefLabel "aas"^^xsd:string ;
+    vann:preferredNamespacePrefix "aas"^^xsd:string ;
+    rdfs:isDefinedBy <https://admin-shell.io/aas/3/0/RC01/> ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/HasExtension
+aas:HasExtension rdf:type owl:Class ;
+    rdfs:label "Has Extension"^^xsd:string ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/LangString
+aas:LangString rdf:type owl:Class ;
+    rdfs:comment "Give a text in a specific language."@en ;
+    rdfs:label "Lang String"^^xsd:string ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/LangStringSet
+aas:LangStringSet rdf:type owl:Class ;
+    rdfs:comment """A set of strings, each annotated by the language of the string.
+
+The meaning of the string in each language shall be the same."""@en ;
+    rdfs:label "Lang String Set"^^xsd:string ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/Referable
+aas:Referable rdf:type owl:Class ;
+    rdfs:comment """An element that is referable by its 'idShort'.
+
+This identifier is not globally unique.
+This identifier is unique within the name space of the element."""@en ;
+    rdfs:label "Referable"^^xsd:string ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/Identifier
+aas:Identifier rdf:type owl:Class ;
+    rdfs:label "Identifier"^^xsd:string ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/AdministrativeInformation
+aas:AdministrativeInformation rdf:type owl:Class ;
+    rdfs:label "Administrative Information"^^xsd:string ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/Identifiable
+aas:Identifiable rdf:type owl:Class ;
+    rdfs:label "Identifiable"^^xsd:string ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/HasKind
+aas:HasKind rdf:type owl:Class ;
+    rdfs:label "Has Kind"^^xsd:string ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/Key
+aas:Key rdf:type owl:Class ;
+    rdfs:label "Key"^^xsd:string ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/Reference
+aas:Reference rdf:type owl:Class ;
+    rdfs:label "Reference"^^xsd:string ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/HasSemantics
+aas:HasSemantics rdf:type owl:Class ;
+    rdfs:label "Has Semantics"^^xsd:string ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/HasDataSpecification
+aas:HasDataSpecification rdf:type owl:Class ;
+    rdfs:label "Has Data Specification"^^xsd:string ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell
+aas:AssetAdministrationShell rdf:type owl:Class ;
+    rdfs:comment "Structure a digital representation of an Asset."@en ;
+    rdfs:label "Asset Administration Shell"^^xsd:string ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/Environment
+aas:Environment rdf:type owl:Class ;
+    rdfs:comment "Model the environment as the entry point for referencing and serialization."@en ;
+    rdfs:label "Environment"^^xsd:string ;
+.

@@ -308,7 +308,7 @@ class _DescriptionElementRenderer(
             self, element: docutils.nodes.document
     ) -> Tuple[Optional[str], Optional[str]]:
         if len(element.children) == 0:
-            return Stripped(""), None
+            return "", None
 
         summary = None  # type: Optional[docutils.nodes.paragraph]
         remarks = None  # type: Optional[List[docutils.nodes.paragraph]]
