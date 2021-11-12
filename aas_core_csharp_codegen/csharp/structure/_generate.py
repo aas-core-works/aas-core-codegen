@@ -9,7 +9,7 @@ import docutils.parsers.rst.roles
 import docutils.utils
 from icontract import ensure, require
 
-from aas_core_csharp_codegen import intermediate
+from aas_core_csharp_codegen import intermediate, rendering
 from aas_core_csharp_codegen.intermediate import (
     construction as intermediate_construction
 )
@@ -210,6 +210,41 @@ def verify(
 # endregion
 
 # region Generation
+
+# TODO: continue here
+class _DescriptionElementRenderer(rendering.DocutilsElementTransformer[str]):
+    """Render descriptions as C# docstring XML."""
+
+    def transform_property_reference_in_doc(
+            self, element: intermediate.PropertyReferenceInDoc
+    ) -> Tuple[Optional[T], Optional[str]]:
+        raise
+
+    def transform_literal(
+            self, element: docutils.nodes.literal
+    ) -> Tuple[Optional[T], Optional[str]]:
+        raise
+
+    def transform_paragraph(
+            self, element: docutils.nodes.paragraph
+    ) -> Tuple[Optional[T], Optional[str]]:
+        raise
+
+    def tranform_emphasis(
+            self, element: docutils.nodes.emphasis
+    ) -> Tuple[Optional[T], Optional[str]]:
+        raise
+
+    def transform_list_item(
+            self, element: docutils.nodes.list_item
+    ) -> Tuple[Optional[T], Optional[str]]:
+        raise
+
+    def transform_bullet_list(
+            self, element: docutils.nodes.bullet_list
+    ) -> Tuple[Optional[T], Optional[str]]:
+        raise
+
 
 def _render_description_element(
         element: docutils.nodes.Element
