@@ -22,7 +22,7 @@ class Has_extension(DBC):
     pass
 
 
-@xml_serialization(property_as_text="text")
+@implementation_specific
 class Lang_string(DBC):
     """Give a text in a specific language."""
 
@@ -212,6 +212,8 @@ class Administrative_information(DBC):
 
 @abstract
 class Identifiable(Referable):
+    """An element that has a globally unique identifier."""
+
     identification: Identifier
     administration: Optional[Administrative_information]
 

@@ -345,6 +345,8 @@ class Interface:
         self.description = description
         self.parsed = parsed
 
+        self.property_id_set = frozenset(id(prop) for prop in self.properties)
+
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
         return (

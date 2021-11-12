@@ -225,3 +225,31 @@ def indent_but_first_line(text: str, indention: str) -> str:
         indention + line if i > 0 else line
         for i, line in enumerate(text.splitlines())
     )
+
+
+@ensure(lambda identifier, result: plural_to_singular(result) == identifier)
+def singular_to_plural(identifier: Identifier) -> Identifier:
+    """Translate the singular form of the identifier to its plural form."""
+    # NOTE (mristin, 2021-11-12):
+    # We apply the simplest of the heuristics here. Please consider using the package
+    # inflect (https://pypi.org/project/inflect/) if this does not suffice.
+
+    parts = identifier.split('_')
+    return Identifier('_'.join(parts[:-1] + [parts[-1] + 's']))
+
+
+@ensure(lambda identifier, result: singular_to_plural(result) == identifier)
+def plural_to_singular(identifier: Identifier) -> Identifier:
+    """Translate the plural form of the identifier to its singular form."""
+    parts = identifier.split('_')
+
+    if parts[-1].endswith('s'):
+        parts[-1] = parts[-1][:-1]
+    else:
+        raise NotImplementedError(
+            "(mristin, 2021-11-12): "
+            "We implemented only a bare minimum on singular/plural conversion. "
+            "The implementation needs to be refined. If you see this message, "
+            "than it is a good time to do it.")
+
+    return Identifier('_'.join(parts))

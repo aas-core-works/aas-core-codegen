@@ -101,3 +101,11 @@ def property_label(identifier: Identifier) -> Stripped:
             cased.append(part.lower())
 
     return Stripped(" ".join(cased))
+
+def enumeration_literal(identifier: Identifier) -> Stripped:
+    """
+    Generate the enumeration literal for its intermediate ``identifier``.
+
+    >>> enumeration_literal(Identifier())
+    """
+    # TODO: continue here, implement the doctests and then go back to rdf

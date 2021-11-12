@@ -7,9 +7,11 @@ import asttokens
 from icontract import ensure
 
 from aas_core_csharp_codegen import parse, intermediate
+from aas_core_csharp_codegen.intermediate import (
+    construction as intermediate_construction,
+    _hierarchy as intermediate_hierarchy
+)
 from aas_core_csharp_codegen.common import Error
-import aas_core_csharp_codegen.understand.constructor as understand_constructor
-import aas_core_csharp_codegen.understand.hierarchy as understand_hierarchy
 
 
 def most_underlying_message(error: Error) -> str:
@@ -113,12 +115,12 @@ def translate_source_to_intermediate(
     assert error is None, f"{error=}"
     assert parsed_symbol_table is not None
 
-    ontology, errors = understand_hierarchy.map_symbol_table_to_ontology(
+    ontology, errors = intermediate_hierarchy.map_symbol_table_to_ontology(
         symbol_table=parsed_symbol_table)
     assert errors is None, f"{errors=}"
     assert ontology is not None
 
-    constructor_table, error = understand_constructor.understand_all(
+    constructor_table, error = intermediate_construction.understand_all(
         symbol_table=parsed_symbol_table,
         atok=atok)
 
