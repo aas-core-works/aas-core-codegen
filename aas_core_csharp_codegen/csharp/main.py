@@ -141,8 +141,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         return 1
 
     verified_ir_table, errors = csharp_structure.verify(
-        symbol_table=ir_symbol_table,
-        spec_impls=spec_impls)
+        symbol_table=ir_symbol_table)
 
     if errors is not None:
         cli.write_error_report(

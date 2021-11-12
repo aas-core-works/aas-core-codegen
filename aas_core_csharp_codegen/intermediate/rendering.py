@@ -5,20 +5,9 @@ from typing import TypeVar, Generic, Tuple, Optional
 import docutils.nodes
 from icontract import ensure, DBC
 
-from aas_core_csharp_codegen import intermediate
-
-
-def indent_but_first_line(text: str, indention: str) -> str:
-    """
-    Indent all but the first of the given ``text`` by ``indention``.
-
-    For example, this helps you insert indented blocks into formatted string literals.
-    """
-    return "\n".join(
-        indention + line if i > 0 else line
-        for i, line in enumerate(text.splitlines())
-    )
-
+from aas_core_csharp_codegen.intermediate._types import (
+    SymbolReferenceInDoc, PropertyReferenceInDoc
+)
 
 T = TypeVar('T')
 
@@ -42,10 +31,10 @@ class DocutilsElementTransformer(Generic[T], DBC):
         if isinstance(element, docutils.nodes.Text):
             return self.transform_text(element)
 
-        elif isinstance(element, intermediate.SymbolReferenceInDoc):
+        elif isinstance(element, SymbolReferenceInDoc):
             return self.transform_symbol_reference_in_doc(element)
 
-        elif isinstance(element, intermediate.PropertyReferenceInDoc):
+        elif isinstance(element, PropertyReferenceInDoc):
             return self.transform_property_reference_in_doc(element)
 
         elif isinstance(element, docutils.nodes.literal):
@@ -55,13 +44,16 @@ class DocutilsElementTransformer(Generic[T], DBC):
             return self.transform_paragraph(element)
 
         elif isinstance(element, docutils.nodes.emphasis):
-            return self.tranform_emphasis(element)
+            return self.transform_emphasis(element)
 
         elif isinstance(element, docutils.nodes.list_item):
             return self.transform_list_item(element)
 
         elif isinstance(element, docutils.nodes.bullet_list):
             return self.transform_bullet_list(element)
+
+        elif isinstance(element, docutils.nodes.document):
+            return self.transform_document(element)
 
         else:
             return None, (
@@ -79,48 +71,55 @@ class DocutilsElementTransformer(Generic[T], DBC):
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_symbol_reference_in_doc(
-            self, element: intermediate.SymbolReferenceInDoc
+            self, element: SymbolReferenceInDoc
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_property_reference_in_doc(
-            self, element: intermediate.PropertyReferenceInDoc
+            self, element: PropertyReferenceInDoc
     ) -> Tuple[Optional[T], Optional[str]]:
-        raise
+        raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_literal(
             self, element: docutils.nodes.literal
     ) -> Tuple[Optional[T], Optional[str]]:
-        raise
+        raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_paragraph(
             self, element: docutils.nodes.paragraph
     ) -> Tuple[Optional[T], Optional[str]]:
-        raise
+        raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def tranform_emphasis(
+    def transform_emphasis(
             self, element: docutils.nodes.emphasis
     ) -> Tuple[Optional[T], Optional[str]]:
-        raise
+        raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_list_item(
             self, element: docutils.nodes.list_item
     ) -> Tuple[Optional[T], Optional[str]]:
-        raise
+        raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_bullet_list(
             self, element: docutils.nodes.bullet_list
     ) -> Tuple[Optional[T], Optional[str]]:
-        raise
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_document(
+            self, element: docutils.nodes.document
+    ) -> Tuple[Optional[T], Optional[str]]:
+        raise NotImplementedError()
