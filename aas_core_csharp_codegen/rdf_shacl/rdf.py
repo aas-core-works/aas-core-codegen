@@ -8,14 +8,14 @@ from icontract import ensure, require
 from aas_core_csharp_codegen import intermediate, specific_implementations
 from aas_core_csharp_codegen.common import Stripped, Error, assert_never, \
     plural_to_singular, Identifier
-from aas_core_csharp_codegen.csharp.common import (
-    INDENT as I,
-    INDENT2 as II
-)
 from aas_core_csharp_codegen.rdf_shacl import (
     naming as rdf_shacl_naming,
     common as rdf_shacl_common,
     _description as rdf_shacl_description
+)
+from aas_core_csharp_codegen.rdf_shacl.common import (
+    INDENT as I,
+    INDENT2 as II
 )
 
 
@@ -169,16 +169,8 @@ def _define_owl_class_for_class_or_interface(
     return Stripped(writer.getvalue()), None
 
 
-_BUILTIN_MAP = {
-    intermediate.BuiltinAtomicType.BOOL: "xsd:boolean",
-    intermediate.BuiltinAtomicType.INT: "xsd:integer",
-    intermediate.BuiltinAtomicType.FLOAT: "xsd:double",
-    intermediate.BuiltinAtomicType.STR: "xsd:string"
-}
-assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType)
-
-
 @require(lambda prop, symbol: id(prop) in symbol.property_id_set)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_property(
         prop: intermediate.Property,
         symbol: Union[intermediate.Interface, intermediate.Class],
@@ -208,13 +200,15 @@ def _define_property(
         prop_name = rdf_shacl_naming.property_name(prop.name)
         prop_label = rdf_shacl_naming.property_label(prop.name)
         rdf_type = "owl:ObjectProperty"
-        rdfs_range = symbol_to_rdfs_range[type_anno.symbol]
+        rdfs_range = symbol_to_rdfs_range.get(
+            type_anno.symbol,
+            Stripped(f"aas:{rdf_shacl_naming.class_name(type_anno.symbol.name)}"))
 
     elif isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
         prop_name = rdf_shacl_naming.property_name(prop.name)
         prop_label = rdf_shacl_naming.property_label(prop.name)
         rdf_type = "owl:DatatypeProperty"
-        rdfs_range = _BUILTIN_MAP[type_anno.a_type]
+        rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno.a_type]
 
     elif isinstance(
             type_anno,
@@ -227,11 +221,14 @@ def _define_property(
 
         if isinstance(type_anno.items, intermediate.OurAtomicTypeAnnotation):
             rdf_type = "owl:ObjectProperty"
-            rdfs_range = symbol_to_rdfs_range[type_anno.items.symbol]
+            rdfs_range = symbol_to_rdfs_range.get(
+                type_anno.items.symbol,
+                Stripped(
+                    f"aas:{rdf_shacl_naming.class_name(type_anno.items.symbol.name)}"))
 
         elif isinstance(type_anno.items, intermediate.BuiltinAtomicTypeAnnotation):
             rdf_type = "owl:DatatypeProperty"
-            rdfs_range = _BUILTIN_MAP[type_anno.items.a_type]
+            rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno.items.a_type]
 
         else:
             missing_implementation = True
@@ -308,6 +305,12 @@ def _define_for_class_or_interface(
             assert prop_def is not None
             blocks.append(prop_def)
 
+    if len(errors) > 0:
+        return None, Error(
+            None,
+            f"Failed to generate the definition for {symbol.name}",
+            errors)
+
     return Stripped('\n\n'.join(blocks)), None
 
 
@@ -350,7 +353,8 @@ def generate(
             else:
                 assert block is not None
                 blocks.append(block)
-        if isinstance(symbol, (intermediate.Interface, intermediate.Class)):
+
+        elif isinstance(symbol, (intermediate.Interface, intermediate.Class)):
             if (
                     isinstance(symbol, intermediate.Class)
                     and symbol.is_implementation_specific

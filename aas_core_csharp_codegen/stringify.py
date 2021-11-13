@@ -44,11 +44,14 @@ class Entity:
     """
 
     def __init__(
-        self, name: str, properties: Sequence[Union[Property, PropertyEllipsis]]
+            self, name: str, properties: Sequence[Union[Property, PropertyEllipsis]]
     ) -> None:
         """Initialize with the given values."""
         self.name = name
         self.properties = properties
+
+    def __repr__(self) -> str:
+        return dump(self)
 
 
 def dump(stringifiable: Stringifiable) -> str:
@@ -104,6 +107,19 @@ def dump(stringifiable: Stringifiable) -> str:
 
     else:
         raise AssertionError(f"Unexpected: {stringifiable}")
+
+
+def compares_against_dict(entity: Entity, obj: object) -> bool:
+    """
+    Compare that the properties in the ``entity`` and ``obj.__dict__`` match.
+
+    Mind that the dunders and "protected" properties are excluded.
+    """
+    entity_property_set = {prop.name for prop in entity.properties}
+
+    obj_property_set = {key for key in obj.__dict__.keys() if not key.startswith("_")}
+
+    return entity_property_set == obj_property_set
 
 
 @require(lambda obj: hasattr(obj, "__dict__"), error=ValueError)

@@ -47,6 +47,27 @@ This identifier is not globally unique. This identifier is unique within the nam
     rdfs:comment "In case of identifiables this attribute is a short name of the element. In case of referable this id is an identifying string of the element within its name space."@en ;
 .
 
+### https://admin-shell.io/aas/3/0/RC01/Referable/displayName
+<https://admin-shell.io/aas/3/0/RC01/Referable/displayName> rdf:type owl:ObjectProperty ;
+    rdfs:label "display name"^^xsd:string ;
+    rdfs:domain aas:Referable ;
+    rdfs:range rdf:langString ;
+    rdfs:comment """Display name. Can be provided in several languages.
+
+If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
+
+* the preferred name in the requested language of the concept description defining the semantics of the element
+
+
+* If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
+
+
+* the English preferred name of the concept description defining the semantics of the element
+
+
+* the short name of the concept description-the idShort of the element"""@en ;
+.
+
 ### https://admin-shell.io/aas/3/0/RC01/Referable/category
 <https://admin-shell.io/aas/3/0/RC01/Referable/category> rdf:type owl:DatatypeProperty ;
     rdfs:label "category"^^xsd:string ;
@@ -653,6 +674,27 @@ aas:AssetAdministrationShell rdf:type owl:Class ;
     rdfs:domain aas:AssetAdministrationShell ;
     rdfs:range xsd:string ;
     rdfs:comment "In case of identifiables this attribute is a short name of the element. In case of referable this id is an identifying string of the element within its name space."@en ;
+.
+
+### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/displayName
+<https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/displayName> rdf:type owl:ObjectProperty ;
+    rdfs:label "display name"^^xsd:string ;
+    rdfs:domain aas:AssetAdministrationShell ;
+    rdfs:range rdf:langString ;
+    rdfs:comment """Display name. Can be provided in several languages.
+
+If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
+
+* the preferred name in the requested language of the concept description defining the semantics of the element
+
+
+* If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
+
+
+* the English preferred name of the concept description defining the semantics of the element
+
+
+* the short name of the concept description-the idShort of the element"""@en ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/category

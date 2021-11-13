@@ -5,9 +5,11 @@ from icontract import ensure
 
 from aas_core_csharp_codegen import intermediate, specific_implementations
 from aas_core_csharp_codegen.common import Stripped, Error
-from aas_core_csharp_codegen.rdf_shacl import (
-    naming as rdf_shacl_naming
-)
+
+INDENT = "    "
+INDENT2 = INDENT * 2
+INDENT3 = INDENT * 3
+INDENT4 = INDENT * 4
 
 
 def string_literal(text: str) -> Stripped:
@@ -56,9 +58,6 @@ def determine_symbol_to_rdfs_range(
                     f"as ``rdfs:range`` is missing: {implementation_key}"))
             else:
                 symbol_to_rdfs_range[symbol] = implementation
-        else:
-            symbol_to_rdfs_range[symbol] = Stripped(
-                f"aas:{rdf_shacl_naming.class_name(symbol.name)}")
 
     if len(errors) > 0:
         return None, Error(
@@ -68,3 +67,12 @@ def determine_symbol_to_rdfs_range(
             errors)
 
     return symbol_to_rdfs_range, None
+
+
+BUILTIN_MAP = {
+    intermediate.BuiltinAtomicType.BOOL: "xsd:boolean",
+    intermediate.BuiltinAtomicType.INT: "xsd:integer",
+    intermediate.BuiltinAtomicType.FLOAT: "xsd:double",
+    intermediate.BuiltinAtomicType.STR: "xsd:string"
+}
+assert all(literal in BUILTIN_MAP for literal in intermediate.BuiltinAtomicType)

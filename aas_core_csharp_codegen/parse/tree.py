@@ -347,15 +347,10 @@ class Transformer(Generic[T], DBC):
 class _StringifyTransformer(Transformer[stringify.Entity]):
     """Transform a node into a stringifiable representation."""
 
-    # fmt: off
-    @ensure(lambda node, result: result.name == node.__class__.__name__)
-    @ensure(
-        lambda node, result:
-        stringify.assert_compares_against_dict(entity=result, obj=node)
-    )
-    # fmt: on
     def transform(self, node: Node) -> stringify.Entity:
         """Dispatch to the appropriate transformation method."""
+        result = node.transform(self)
+        stringify.assert_compares_against_dict(entity=result, obj=node)
         return node.transform(self)
 
     def transform_member(self, node: Member) -> stringify.Entity:
@@ -363,7 +358,8 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             name=Member.__name__,
             properties=[
                 stringify.Property("instance", self.transform(node.instance)),
-                stringify.Property("name", node.name)
+                stringify.Property("name", node.name),
+                stringify.PropertyEllipsis("original_node", node.original_node)
             ])
 
     def transform_comparison(self, node: Comparison) -> stringify.Entity:
@@ -373,6 +369,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
                 stringify.Property("left", self.transform(node.left)),
                 stringify.Property("op", str(node.op.value)),
                 stringify.Property("right", self.transform(node.right)),
+                stringify.PropertyEllipsis("original_node", node.original_node)
             ])
 
     def transform_implication(self, node: Implication) -> stringify.Entity:
@@ -381,6 +378,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             properties=[
                 stringify.Property("antecedent", self.transform(node.antecedent)),
                 stringify.Property("consequent", self.transform(node.consequent)),
+                stringify.PropertyEllipsis("original_node", node.original_node)
             ])
 
     def transform_method_call(self, node: MethodCall) -> stringify.Entity:
@@ -388,7 +386,8 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             name=MethodCall.__name__,
             properties=[
                 stringify.Property("member", self.transform(node.member)),
-                stringify.Property("args", [self.transform(arg) for arg in node.args])
+                stringify.Property("args", [self.transform(arg) for arg in node.args]),
+                stringify.PropertyEllipsis("original_node", node.original_node)
             ])
 
     def transform_function_call(self, node: FunctionCall) -> stringify.Entity:
@@ -396,13 +395,17 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             name=FunctionCall.__name__,
             properties=[
                 stringify.Property("name", node.name),
-                stringify.Property("args", [self.transform(arg) for arg in node.args])
+                stringify.Property("args", [self.transform(arg) for arg in node.args]),
+                stringify.PropertyEllipsis("original_node", node.original_node)
             ])
 
     def transform_constant(self, node: Constant) -> stringify.Entity:
         return stringify.Entity(
             name=Constant.__name__,
-            properties=[stringify.Property("value", node.value)])
+            properties=[
+                stringify.Property("value", node.value),
+                stringify.PropertyEllipsis("original_node", node.original_node)
+            ])
 
     def transform_is_none(self, node: IsNone) -> stringify.Entity:
         return stringify.Entity(
@@ -412,27 +415,35 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
     def transform_is_not_none(self, node: IsNotNone) -> stringify.Entity:
         return stringify.Entity(
             name=IsNotNone.__name__,
-            properties=[stringify.Property("value", self.transform(node.value))])
+            properties=[
+                stringify.Property("value", self.transform(node.value)),
+                stringify.PropertyEllipsis("original_node", node.original_node)
+            ])
 
     def transform_name(self, node: Name) -> stringify.Entity:
         return stringify.Entity(
             name=Name.__name__,
-            properties=[stringify.Property("identifier", node.identifier)])
+            properties=[
+                stringify.Property("identifier", node.identifier),
+                stringify.PropertyEllipsis("original_node", node.original_node)
+            ])
 
     def transform_and(self, node: And) -> stringify.Entity:
         return stringify.Entity(
             name=And.__name__,
             properties=[
-                stringify.Property("values",
-                                   [self.transform(value) for value in node.values])
+                stringify.Property(
+                    "values", [self.transform(value) for value in node.values]),
+                stringify.PropertyEllipsis("original_node", node.original_node)
             ])
 
     def transform_or(self, node: Or) -> stringify.Entity:
         return stringify.Entity(
             name=Or.__name__,
             properties=[
-                stringify.Property("values",
-                                   [self.transform(value) for value in node.values])
+                stringify.Property(
+                    "values", [self.transform(value) for value in node.values]),
+                stringify.PropertyEllipsis("original_node", node.original_node)
             ])
 
     def transform_declaration(self, node: Declaration) -> stringify.Entity:
@@ -441,6 +452,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             properties=[
                 stringify.Property("identifier", node.identifier),
                 stringify.Property("value", self.transform(node.value)),
+                stringify.PropertyEllipsis("original_node", node.original_node)
             ])
 
     def transform_expression_with_declarations(
@@ -454,7 +466,8 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
                         self.transform(declaration)
                         for declaration in node.declarations
                     ]),
-                stringify.Property("expression", self.transform(node.expression))
+                stringify.Property("expression", self.transform(node.expression)),
+                stringify.PropertyEllipsis("original_node", node.original_node)
             ])
 
 

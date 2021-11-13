@@ -164,20 +164,6 @@ class Renderer(
 
         return tokens, None
 
-    # fmt: off
-    @ensure(
-        lambda result:
-        not (result[0] is not None)
-        or (
-                len(result[0]) > 0
-                and not isinstance(result[-1], TokenLineBreak)
-                and not any(
-            isinstance(token, TokenParagraphBreak)
-            for token in result[0]
-        )
-        )
-    )
-    # fmt: on
     def transform_list_item(
             self, element: docutils.nodes.list_item
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
@@ -193,30 +179,9 @@ class Renderer(
             if error is not None:
                 return None, error
 
-            if any(isinstance(token, TokenParagraphBreak) for token in
-                   child_tokens):
-                return None, f'Unexpected paragraph break in the list item: {element}'
-
-            # Indent the line breaks
-            lines = []  # type: List[List[TokenText]]
-            line = []  # type: List[TokenText]
-            for token in child_tokens:
-                if isinstance(token, TokenLineBreak):
-                    lines.append(line)
-                    line = []
-                elif isinstance(token, TokenText):
-                    line.append(token)
-                else:
-                    raise AssertionError(f"Unexpected token: {token}")
-
-            for i, line in enumerate(lines):
-                if i == 0:
-                    tokens.append(TokenText("* "))
-                    tokens.extend(line)
-                else:
-                    tokens.append(TokenLineBreak())
-                    tokens.append(TokenText("  "))
-                    tokens.extend(line)
+            assert child_tokens is not None
+            tokens.append(TokenText('* '))
+            tokens.extend(child_tokens)
 
         return tokens, None
 

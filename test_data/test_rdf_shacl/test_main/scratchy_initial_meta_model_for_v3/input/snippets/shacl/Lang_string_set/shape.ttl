@@ -1,0 +1,1 @@
+# The shape for the Lang_string_set is intentionally missing since we define it as rdf:langString.

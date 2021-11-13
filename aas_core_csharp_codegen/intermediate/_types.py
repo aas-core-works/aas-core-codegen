@@ -345,6 +345,10 @@ class Interface:
         self.description = description
         self.parsed = parsed
 
+        self.properties_by_name: Mapping[Identifier, Property] = {
+            prop.name: prop for prop in self.properties
+        }
+
         self.property_id_set = frozenset(id(prop) for prop in self.properties)
 
     def __repr__(self) -> str:
