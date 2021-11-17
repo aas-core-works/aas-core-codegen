@@ -298,6 +298,7 @@ def _understand_assignment(
         assign: ast.Assign,
         init: Method,
         parsed_class: parse.Class,
+        parsed_symbol_table: parse.SymbolTable,
         atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Statement], Optional[Error]]:
     if len(assign.targets) > 1:
@@ -354,6 +355,8 @@ def _understand_assignment(
             argument=Identifier(target.attr),
             default=None), None
     elif isinstance(assign.value, ast.IfExp):
+        default_node = None  # type: Optional[ast.AST]
+
         if_exp = assign.value
         if (
                 isinstance(if_exp.test, ast.Compare)
@@ -366,32 +369,67 @@ def _understand_assignment(
                 and isinstance(if_exp.test.comparators[0], ast.Constant)
                 and if_exp.test.comparators[0].value is None
                 and isinstance(if_exp.body, ast.Name)
-                and isinstance(if_exp.body.ctx, ast.Load)
                 and if_exp.body.id == if_exp.test.left.id
                 and if_exp.orelse is not None
         ):
+            default_node = if_exp.orelse
+
+        elif (
+            isinstance(if_exp.test, ast.Compare)
+            and isinstance(if_exp.test.left, ast.Name)
+            and if_exp.test.left.id in init.argument_map
+            and len(if_exp.test.ops) == 1
+            and isinstance(if_exp.test.ops[0], ast.Is)
+            and len(if_exp.test.comparators) == 1
+            and isinstance(if_exp.test.comparators[0], ast.Constant)
+            and if_exp.test.comparators[0].value is None
+            and isinstance(if_exp.orelse, ast.Name)
+            and if_exp.orelse.id == if_exp.test.left.id
+            and if_exp.body is not None
+        ):
+            default_node = if_exp.body
+        else:
+            # We did not match this case.
+            pass
+
+        if default_node is not None:
             default = None  # type: Optional[Default]
             if (
-                    isinstance(if_exp.orelse, ast.List)
-                    and if_exp.orelse.elts == []
-                    and isinstance(if_exp.orelse.ctx, ast.Load)
+                    isinstance(default_node, ast.List)
+                    and default_node.elts == []
             ):
-                default = EmptyList(node=if_exp.orelse)
+                default = EmptyList(node=default_node)
+            elif (
+                isinstance(default_node, ast.Attribute)
+                and isinstance(default_node.value, ast.Name)
+            ):
+                symbol = parsed_symbol_table.find(
+                    name=Identifier(default_node.value.id))
+
+                if isinstance(symbol, parse.Enumeration):
+                    literal = symbol.literals_by_name.get(Identifier(default_node.attr))
+                    if literal is not None:
+                        default = DefaultEnumLiteral(
+                            enum=symbol, literal=literal, node=default_node)
             else:
+                assert default is None
+
+            if default is None:
                 return None, Error(
                     if_exp.orelse,
                     f"The handling of this default value for "
                     f"the property {target.attr} has not been implemented: "
-                    f"{ast.dump(if_exp.orelse)}")
-
-            assert default is not None
-            return AssignArgument(
-                name=Identifier(target.attr),
-                argument=Identifier(if_exp.test.left.id),
-                default=default), None
+                    f"{ast.dump(default_node)}")
+            else:
+                return AssignArgument(
+                    name=Identifier(target.attr),
+                    argument=Identifier(if_exp.test.left.id),
+                    default=default), None
 
     return None, Error(
-        assign, "The handling of the constructor statement has not been implemented")
+        assign,
+        f"The handling of the constructor statement "
+        f"has not been implemented: {ast.dump(assign)}")
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -432,6 +470,7 @@ def _understand_body(
                 assign=stmt,
                 init=init,
                 parsed_class=parsed_class,
+                parsed_symbol_table=parsed_symbol_table,
                 atok=atok)
 
             if error is not None:

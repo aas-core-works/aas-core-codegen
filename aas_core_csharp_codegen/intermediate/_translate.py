@@ -2,7 +2,7 @@
 import ast
 import itertools
 from typing import Sequence, List, Mapping, Optional, MutableMapping, Tuple, Union, \
-    Iterator, Generator, TypeVar, Generic, cast
+    Iterator, Generator, TypeVar, Generic, cast, Set
 
 import asttokens
 import docutils.nodes
@@ -103,7 +103,7 @@ def _property_reference_role(
 #
 # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
 docutils.parsers.rst.roles.register_local_role('class', _symbol_reference_role)
-docutils.parsers.rst.roles.register_local_role('py:attr', _property_reference_role)
+docutils.parsers.rst.roles.register_local_role('attr', _property_reference_role)
 
 
 def _parsed_description_to_description(parsed: parse.Description) -> Description:
@@ -1197,11 +1197,11 @@ def translate(
         for description in _over_descriptions(symbol):
             for symbol_ref_in_doc in description.document.traverse(
                     condition=SymbolReferenceInDoc):
-                assert isinstance(
-                    symbol_ref_in_doc.symbol, _PlaceholderSymbol), (
-                    f"Expected all symbol references in the descriptions "
-                    f"to be placeholder since only the first pass has been executed, "
-                    f"but we got: {symbol_ref_in_doc.symbol}")
+
+                # Symbol references can be repeated as docutils will cache them
+                # so we need to skip them.
+                if not isinstance(symbol_ref_in_doc.symbol, _PlaceholderSymbol):
+                    continue
 
                 raw_identifier = symbol_ref_in_doc.symbol.identifier
                 if not raw_identifier.startswith("."):
@@ -1338,7 +1338,7 @@ def translate(
                         f"of the literal {subset_literal.name} "
                         f"from the subset enumeration {subset_enum.name} "
                         f"does not equal the value {literal.value!r} "
-                        f"of the literal {literal.name } "
+                        f"of the literal {literal.name} "
                         f"in the enumeration {symbol.name}"))
                     continue
 
@@ -1407,21 +1407,71 @@ def translate(
         for description in _over_descriptions(symbol):
             for prop_ref_in_doc in description.document.traverse(
                     condition=PropertyReferenceInDoc):
-                if "." in prop_ref_in_doc.property_name:
+                parts = prop_ref_in_doc.path.split('.')
+
+                if any(not IDENTIFIER_RE.match(part) for part in parts):
                     underlying_errors.append(
                         Error(
                             description.node,
-                            f"Unexpected complex reference to a property: "
-                            f"{prop_ref_in_doc.property_name}"))
+                            f"Invalid reference to a property; each part of the path "
+                            f"needs to be an identifier, "
+                            f"but it is not: {prop_ref_in_doc.path}"))
                     continue
 
-                if not IDENTIFIER_RE.match(prop_ref_in_doc.property_name):
+                part_identifiers = [Identifier(part) for part in parts]
+
+                if len(part_identifiers) == 0:
                     underlying_errors.append(
                         Error(
                             description.node,
-                            f"Invalid identifier of a property: "
-                            f"{prop_ref_in_doc.property_name}"))
+                            "Unexpected empty reference to a property"))
                     continue
+
+                target_symbol = None  # type: Optional[Symbol]
+                prop_identifier = None  # type: Optional[Identifier]
+                if len(part_identifiers) == 1:
+                    target_symbol = symbol
+                    prop_identifier = part_identifiers[0]
+                elif len(part_identifiers) == 2:
+                    target_symbol = symbol_table.find(part_identifiers[0])
+                    if target_symbol is None:
+                        underlying_errors.append(
+                            Error(
+                                description.node,
+                                f"Dangling reference to a non-existing "
+                                f"symbol: {prop_ref_in_doc.path}"))
+                        continue
+
+                    prop_identifier = part_identifiers[1]
+                else:
+                    underlying_errors.append(
+                        Error(
+                            description.node,
+                            f"We did not implement the resolution of such "
+                            f"long references to a property: {prop_ref_in_doc.path}"))
+                    continue
+
+                assert target_symbol is not None
+                assert prop_identifier is not None
+
+                if isinstance(target_symbol, Enumeration):
+                    if prop_identifier not in target_symbol.literals_by_name:
+                        underlying_errors.append(
+                            Error(
+                                description.node,
+                                f"Dangling reference to a non-existing literal "
+                                f"in the enumeration {target_symbol.name}: "
+                                f"{prop_ref_in_doc.path}"))
+                        continue
+                    elif isinstance(target_symbol, (Class, Interface)):
+                        if prop_identifier not in target_symbol.properties_by_name:
+                            underlying_errors.append(
+                                Error(
+                                    description.node,
+                                    f"Dangling reference to a non-existing property "
+                                    f"of a class {target_symbol.name}: "
+                                    f"{prop_ref_in_doc.path}"))
+                            continue
 
     # endregion
 

@@ -126,7 +126,7 @@ class Renderer(
     def transform_property_reference_in_doc(
             self, element: intermediate.PropertyReferenceInDoc
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
-        prop_name = rdf_shacl_naming.property_name(Identifier(element.property_name))
+        prop_name = rdf_shacl_naming.property_name(Identifier(element.path))
         return [TokenText(f"'{prop_name}'")], None
 
     def transform_literal(

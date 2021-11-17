@@ -4,7 +4,7 @@ import pathlib
 from typing import Sequence, Optional, Union, Final, Mapping, Any
 
 import docutils.nodes
-from icontract import require, DBC, ensure
+from icontract import require, DBC, ensure, invariant
 
 from aas_core_csharp_codegen.common import Identifier, assert_never
 from aas_core_csharp_codegen.parse import tree
@@ -450,6 +450,16 @@ class EnumerationLiteral:
         self.node = node
 
 
+# fmt: off
+@invariant(
+    lambda self:
+    all(
+        literal == self.literals_by_name[literal.name]
+        for literal in self.literals
+    ) and len(self.literals) == len(self.literals_by_name),
+    "Literal map consistent on name"
+)
+# fmt: on
 class Enumeration:
     """Represent an enumeration."""
 
@@ -466,6 +476,11 @@ class Enumeration:
         self.literals = literals
         self.description = description
         self.node = node
+
+        self.literals_by_name = {
+            literal.name: literal
+            for literal in self.literals
+        }  # type: Mapping[Identifier, EnumerationLiteral]
 
 
 Symbol = Union[AbstractClass, ConcreteClass, Enumeration]

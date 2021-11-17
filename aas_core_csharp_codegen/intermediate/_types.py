@@ -741,10 +741,10 @@ class PropertyReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
     """Represent a reference in the documentation to a property of a class."""
 
     def __init__(
-            self, property_name: str, rawsource='', text='', *children, **attributes
+            self, path: str, rawsource='', text='', *children, **attributes
     ) -> None:
         """Initialize with ``property_name`` and propagate the rest to the parent."""
-        self.property_name = property_name
+        self.path = path
         docutils.nodes.TextElement.__init__(
             self, rawsource, text, *children, **attributes)
 

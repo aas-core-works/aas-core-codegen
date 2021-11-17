@@ -2,12 +2,15 @@
 import ast
 import collections
 import enum
+import io
 import textwrap
 from typing import List, Any, Optional, cast, Type, Tuple, Union, Mapping
 
 import asttokens
+import docutils.io
 import docutils.core
 import docutils.nodes
+import docutils.utils.error_reporting
 from icontract import ensure, require
 
 from aas_core_csharp_codegen.common import (
@@ -1043,12 +1046,26 @@ def _string_constant_to_description(
     assert isinstance(text, str), (
         f"Expected a string constant node, but got: {ast.dump(constant)!r}")
 
-    # noinspection PyUnusedLocal
+    dedented = textwrap.dedent(text)
+
+    warnings = io.StringIO()
     document = None  # type: Optional[docutils.nodes.document]
     try:
-        document = docutils.core.publish_doctree(textwrap.dedent(text))
+        document = docutils.core.publish_doctree(
+            dedented,
+            settings_overrides={
+                "warning_stream": warnings
+            })
     except Exception as err:
-        return None, Error(constant, str(err))
+        return None, Error(
+            constant,
+            f"Failed to parse the description with docutils: {err}")
+
+    warnings_text = warnings.getvalue()
+    if warnings_text:
+        return None, Error(
+            constant,
+            f"Failed to parse the description with docutils:\n{warnings_text.strip()}")
 
     assert document is not None
 

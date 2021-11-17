@@ -3,46 +3,19 @@
   "title": "AssetAdministrationShellEnvironment",
   "$id": "http://www.admin-shell.io/schema/json/V3.0RC01",
   "type": "object",
-  "allOf": {
-    "$ref": "#/definitions/Environment"
-  },
+  "allOf": [
+    {
+      "$ref": "#/definitions/Environment"
+    }
+  ],
   "definitions": {
-    "HasExtension": {
+    "HasExtensions": {
       "type": "object"
-    },
-    "LangString": {
-      "type": "object",
-      "properties": {
-        "language": {
-          "type": "string"
-        },
-        "text": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "language",
-        "text"
-      ]
-    },
-    "LangStringSet": {
-      "type": "object",
-      "properties": {
-        "langStrings": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/LangString"
-          }
-        }
-      },
-      "required": [
-        "langStrings"
-      ]
     },
     "Referable": {
       "allOf": [
         {
-          "$ref": "#/definitions/HasExtension"
+          "$ref": "#/definitions/HasExtensions"
         },
         {
           "type": "object",
@@ -69,40 +42,6 @@
         }
       ]
     },
-    "IdentifierType": {
-      "type": "string",
-      "enum": [
-        "IRDI",
-        "IRI",
-        "Custom"
-      ]
-    },
-    "Identifier": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "idType": {
-          "$ref": "#/definitions/IdentifierType"
-        }
-      },
-      "required": [
-        "id",
-        "idType"
-      ]
-    },
-    "AdministrativeInformation": {
-      "type": "object",
-      "properties": {
-        "version": {
-          "type": "string"
-        },
-        "revision": {
-          "type": "string"
-        }
-      }
-    },
     "Identifiable": {
       "allOf": [
         {
@@ -111,11 +50,11 @@
         {
           "type": "object",
           "properties": {
-            "identification": {
-              "$ref": "#/definitions/Identifier"
-            },
             "administration": {
               "$ref": "#/definitions/AdministrativeInformation"
+            },
+            "identification": {
+              "$ref": "#/definitions/Identifier"
             },
             "modelType": {
               "$ref": "#/definitions/ModelType"
@@ -125,6 +64,29 @@
             "identification"
           ]
         }
+      ]
+    },
+    "Identifier": {
+      "type": "object",
+      "properties": {
+        "idType": {
+          "$ref": "#/definitions/IdentifierType"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "idType",
+        "id"
+      ]
+    },
+    "IdentifierType": {
+      "type": "string",
+      "enum": [
+        "IRDI",
+        "IRI",
+        "Custom"
       ]
     },
     "ModelingKind": {
@@ -140,63 +102,730 @@
         "kind": {
           "$ref": "#/definitions/ModelingKind"
         }
+      }
+    },
+    "AdministrativeInformation": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        }
+      }
+    },
+    "HasSemantics": {
+      "type": "object",
+      "properties": {
+        "semanticId": {
+          "$ref": "#/definitions/Reference"
+        }
+      }
+    },
+    "Qualifiable": {
+      "type": "object",
+      "properties": {
+        "qualifiers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Constraint"
+          }
+        }
+      }
+    },
+    "Constraint": {
+      "type": "object"
+    },
+    "Qualifier": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Constraint"
+        },
+        {
+          "$ref": "#/definitions/HasSemantics"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "valueType": {
+              "$ref": "#/definitions/DataTypeDef"
+            },
+            "value": {
+              "type": "string"
+            },
+            "valueId": {
+              "$ref": "#/definitions/Reference"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          },
+          "required": [
+            "type",
+            "valueType"
+          ]
+        }
+      ]
+    },
+    "Formula": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Constraint"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "dependsOn": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Reference"
+              }
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          }
+        }
+      ]
+    },
+    "HasDataSpecification": {
+      "type": "object",
+      "properties": {
+        "dataSpecifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Reference"
+          }
+        }
+      }
+    },
+    "AssetAdministrationShell": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Identifiable"
+        },
+        {
+          "$ref": "#/definitions/HasDataSpecification"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "derivedFrom": {
+              "$ref": "#/definitions/AssetAdministrationShell"
+            },
+            "assetInformation": {
+              "$ref": "#/definitions/AssetInformation"
+            },
+            "submodels": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Submodel"
+              }
+            },
+            "views": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/View"
+              }
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          },
+          "required": [
+            "assetInformation"
+          ]
+        }
+      ]
+    },
+    "Asset": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Identifiable"
+        },
+        {
+          "$ref": "#/definitions/HasDataSpecification"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          }
+        }
+      ]
+    },
+    "AssetInformation": {
+      "type": "object",
+      "properties": {
+        "assetKind": {
+          "$ref": "#/definitions/AssetKind"
+        },
+        "globalAssetId": {
+          "$ref": "#/definitions/Reference"
+        },
+        "specificAssetId": {
+          "$ref": "#/definitions/IdentifierKeyValuePair"
+        },
+        "billOfMaterial": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Submodel"
+          }
+        },
+        "defaultThumbnail": {
+          "$ref": "#/definitions/File"
+        }
       },
       "required": [
-        "kind"
+        "assetKind"
       ]
     },
-    "LocalKeyType": {
+    "AssetKind": {
       "type": "string",
       "enum": [
-        "IdShort",
-        "FragmentId"
+        "Type",
+        "Instance"
       ]
     },
-    "KeyType": {
-      "type": "string",
-      "enum": [
-        "IdShort",
-        "FragmentId",
-        "Custom",
-        "IRDI",
-        "IRI"
+    "IdentifierKeyValuePair": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/HasSemantics"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            },
+            "externalSubjectId": {
+              "$ref": "#/definitions/Reference"
+            }
+          },
+          "required": [
+            "key"
+          ]
+        }
       ]
     },
-    "IdentifiableElements": {
-      "type": "string",
-      "enum": [
-        "Asset",
-        "AssetAdministrationShell",
-        "ConceptDescription",
-        "Submodel"
+    "Submodel": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Identifiable"
+        },
+        {
+          "$ref": "#/definitions/HasKind"
+        },
+        {
+          "$ref": "#/definitions/HasSemantics"
+        },
+        {
+          "$ref": "#/definitions/Qualifiable"
+        },
+        {
+          "$ref": "#/definitions/HasDataSpecification"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "submodelElements": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SubmodelElement"
+              }
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          },
+          "required": [
+            "submodelElements"
+          ]
+        }
       ]
     },
-    "ReferableElements": {
+    "SubmodelElement": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Referable"
+        },
+        {
+          "$ref": "#/definitions/HasKind"
+        },
+        {
+          "$ref": "#/definitions/HasSemantics"
+        },
+        {
+          "$ref": "#/definitions/Qualifiable"
+        },
+        {
+          "$ref": "#/definitions/HasDataSpecification"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          }
+        }
+      ]
+    },
+    "RelationshipElement": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/SubmodelElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "first": {
+              "$ref": "#/definitions/Referable"
+            },
+            "second": {
+              "$ref": "#/definitions/Referable"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          },
+          "required": [
+            "first",
+            "second"
+          ]
+        }
+      ]
+    },
+    "SubmodelElementCollection": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/SubmodelElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SubmodelElement"
+              }
+            },
+            "ordered": {
+              "type": "boolean"
+            },
+            "allowDuplicates": {
+              "type": "boolean"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          }
+        }
+      ]
+    },
+    "DataElement": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/SubmodelElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          }
+        }
+      ]
+    },
+    "Property": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/DataElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "valueType": {
+              "$ref": "#/definitions/DataTypeDef"
+            },
+            "value": {
+              "type": "string"
+            },
+            "valueId": {
+              "$ref": "#/definitions/Reference"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          },
+          "required": [
+            "valueType"
+          ]
+        }
+      ]
+    },
+    "MultiLanguageProperty": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/DataElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "$ref": "#/definitions/LangStringSet"
+            },
+            "valueId": {
+              "$ref": "#/definitions/Reference"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          }
+        }
+      ]
+    },
+    "Range": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/DataElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "valueType": {
+              "$ref": "#/definitions/DataTypeDef"
+            },
+            "min": {
+              "type": "string"
+            },
+            "max": {
+              "type": "string"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          },
+          "required": [
+            "valueType"
+          ]
+        }
+      ]
+    },
+    "ReferenceElement": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/DataElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "$ref": "#/definitions/Reference"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          }
+        }
+      ]
+    },
+    "Blob": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/DataElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "mimeType": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          },
+          "required": [
+            "mimeType"
+          ]
+        }
+      ]
+    },
+    "File": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/DataElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "mimeType": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          },
+          "required": [
+            "mimeType"
+          ]
+        }
+      ]
+    },
+    "AnnotatedRelationshipElement": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/RelationshipElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "annotation": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DataElement"
+              }
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          }
+        }
+      ]
+    },
+    "EntityType": {
       "type": "string",
       "enum": [
-        "AccessPermissionRule",
-        "AnnotatedRelationshipElement",
-        "Asset",
-        "AssetAdministrationShell",
-        "BasicEvent",
-        "Blob",
-        "Capability",
-        "ConceptDescription",
-        "ConceptDictionary",
-        "DataElement",
-        "Entity",
-        "Event",
-        "File",
-        "MultiLanguageProperty",
-        "Operation",
-        "Property",
-        "Range",
-        "ReferenceElement",
-        "RelationshipElement",
-        "Submodel",
-        "SubmodelElement",
-        "SubmodelElementCollection",
-        "View"
+        "CoManagedEntity",
+        "SelfManagedEntity"
+      ]
+    },
+    "Entity": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/SubmodelElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "$ref": "#/definitions/EntityType"
+            },
+            "statements": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SubmodelElement"
+              }
+            },
+            "globalAssetId": {
+              "$ref": "#/definitions/Reference"
+            },
+            "specificAssetId": {
+              "$ref": "#/definitions/IdentifierKeyValuePair"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          },
+          "required": [
+            "entityType"
+          ]
+        }
+      ]
+    },
+    "Event": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/SubmodelElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          }
+        }
+      ]
+    },
+    "BasicEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Event"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "observed": {
+              "$ref": "#/definitions/Referable"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          },
+          "required": [
+            "observed"
+          ]
+        }
+      ]
+    },
+    "Operation": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/SubmodelElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "inputVariables": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/OperationVariable"
+              }
+            },
+            "outputVariables": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/OperationVariable"
+              }
+            },
+            "inoutputVariables": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/OperationVariable"
+              }
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          }
+        }
+      ]
+    },
+    "OperationVariable": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/SubmodelElement"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "Capability": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/SubmodelElement"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          }
+        }
+      ]
+    },
+    "ConceptDescription": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Identifiable"
+        },
+        {
+          "$ref": "#/definitions/HasDataSpecification"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "isCaseOf": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Reference"
+              }
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          }
+        }
+      ]
+    },
+    "View": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Referable"
+        },
+        {
+          "$ref": "#/definitions/HasSemantics"
+        },
+        {
+          "$ref": "#/definitions/HasDataSpecification"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "containedElement": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Referable"
+              }
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          }
+        }
+      ]
+    },
+    "Reference": {
+      "type": "object",
+      "properties": {
+        "keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Key"
+          }
+        }
+      },
+      "required": [
+        "keys"
+      ]
+    },
+    "Key": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/KeyElements"
+        },
+        "value": {
+          "type": "string"
+        },
+        "idType": {
+          "$ref": "#/definitions/KeyType"
+        }
+      },
+      "required": [
+        "type",
+        "value",
+        "idType"
       ]
     },
     "KeyElements": {
@@ -229,77 +858,290 @@
         "View"
       ]
     },
-    "Key": {
+    "ReferableElements": {
+      "type": "string",
+      "enum": [
+        "AccessPermissionRule",
+        "AnnotatedRelationshipElement",
+        "Asset",
+        "AssetAdministrationShell",
+        "BasicEvent",
+        "Blob",
+        "Capability",
+        "ConceptDescription",
+        "ConceptDictionary",
+        "DataElement",
+        "Entity",
+        "Event",
+        "File",
+        "MultiLanguageProperty",
+        "Operation",
+        "Property",
+        "Range",
+        "ReferenceElement",
+        "RelationshipElement",
+        "Submodel",
+        "SubmodelElement",
+        "SubmodelElementCollection",
+        "View"
+      ]
+    },
+    "IdentifiableElements": {
+      "type": "string",
+      "enum": [
+        "Asset",
+        "AssetAdministrationShell",
+        "ConceptDescription",
+        "Submodel"
+      ]
+    },
+    "KeyType": {
+      "type": "string",
+      "enum": [
+        "IdShort",
+        "FragmentId",
+        "IRDI",
+        "IRI",
+        "Custom"
+      ]
+    },
+    "LocalKeyType": {
+      "type": "string",
+      "enum": [
+        "IdShort",
+        "FragmentId"
+      ]
+    },
+    "DataTypeDef": {
+      "type": "string",
+      "enum": [
+        "anyUri",
+        "base64Binary",
+        "boolean",
+        "date",
+        "dateTime",
+        "dateTimeStamp",
+        "decimal",
+        "integer",
+        "long",
+        "int",
+        "short",
+        "byte",
+        "nonNegativeInteger",
+        "positiveInteger",
+        "unsignedLong",
+        "unsignedInt",
+        "unsignedShort",
+        "unsignedByte",
+        "nonPositiveInteger",
+        "negativeInteger",
+        "double",
+        "duration",
+        "dayTimeDuration",
+        "yearMonthDuration",
+        "float",
+        "gDay",
+        "gMonth",
+        "gMonthDay",
+        "gYear",
+        "gYearMonth",
+        "hexBinary",
+        "NOTATION",
+        "QName",
+        "string",
+        "normalizedString",
+        "token",
+        "language",
+        "Name",
+        "NCName",
+        "ENTITY",
+        "ID",
+        "IDREF",
+        "NMTOKEN",
+        "time"
+      ]
+    },
+    "LangString": {
       "type": "object",
       "properties": {
-        "type": {
-          "$ref": "#/definitions/KeyElements"
+        "language": {
+          "type": "string"
         },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "language",
+        "text"
+      ]
+    },
+    "LangStringSet": {
+      "type": "object",
+      "properties": {
+        "langStrings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LangString"
+          }
+        }
+      },
+      "required": [
+        "langStrings"
+      ]
+    },
+    "DataSpecificationContent": {
+      "type": "object"
+    },
+    "DataTypeIec61360": {
+      "type": "string",
+      "enum": [
+        "DATE",
+        "STRING",
+        "STRING_TRANSLATABLE",
+        "INTEGER_MEASURE",
+        "INTEGER_COUNT",
+        "INTEGER_CURRENCY",
+        "REAL_MEASURE",
+        "REAL_COUNT",
+        "REAL_CURRENCY",
+        "BOOLEAN",
+        "URL",
+        "RATIONAL",
+        "RATIONAL_MEASURE",
+        "TIME",
+        "TIMESTAMP"
+      ]
+    },
+    "LevelType": {
+      "type": "string",
+      "enum": [
+        "Min",
+        "Max",
+        "Nom",
+        "Type"
+      ]
+    },
+    "ValueReferencePair": {
+      "type": "object",
+      "properties": {
         "value": {
           "type": "string"
         },
-        "idType": {
-          "$ref": "#/definitions/KeyType"
+        "valueId": {
+          "$ref": "#/definitions/Reference"
         }
       },
       "required": [
-        "type",
         "value",
-        "idType"
+        "valueId"
       ]
     },
-    "Reference": {
+    "ValueList": {
       "type": "object",
       "properties": {
-        "keys": {
+        "valuesReferencePairType": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Key"
+            "$ref": "#/definitions/ValueReferencePair"
           }
-        }
-      },
-      "required": [
-        "keys"
-      ]
-    },
-    "HasSemantics": {
-      "type": "object",
-      "properties": {
-        "semanticId": {
-          "$ref": "#/definitions/Reference"
         }
       }
     },
-    "HasDataSpecification": {
-      "type": "object",
-      "properties": {
-        "dataSpecifications": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Reference"
-          }
-        }
-      },
-      "required": [
-        "dataSpecifications"
-      ]
-    },
-    "AssetAdministrationShell": {
+    "DataSpecificationIec61360": {
       "allOf": [
         {
-          "$ref": "#/definitions/Identifiable"
-        },
-        {
-          "$ref": "#/definitions/HasDataSpecification"
+          "$ref": "#/definitions/DataSpecificationContent"
         },
         {
           "type": "object",
           "properties": {
-            "derivedFrom": {
-              "$ref": "#/definitions/AssetAdministrationShell"
+            "preferredName": {
+              "$ref": "#/definitions/LangStringSet"
             },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
+            "shortName": {
+              "$ref": "#/definitions/LangStringSet"
+            },
+            "unit": {
+              "type": "string"
+            },
+            "unitId": {
+              "$ref": "#/definitions/Reference"
+            },
+            "sourceOfDefinition": {
+              "type": "string"
+            },
+            "symbol": {
+              "type": "string"
+            },
+            "dataType": {
+              "$ref": "#/definitions/DataTypeIec61360"
+            },
+            "definition": {
+              "$ref": "#/definitions/LangStringSet"
+            },
+            "valueFormat": {
+              "type": "string"
+            },
+            "valueList": {
+              "$ref": "#/definitions/ValueList"
+            },
+            "value": {
+              "type": "string"
+            },
+            "valueId": {
+              "$ref": "#/definitions/Reference"
+            },
+            "levelType": {
+              "$ref": "#/definitions/LevelType"
+            }
+          }
+        }
+      ]
+    },
+    "DataSpecificationPhysicalUnit": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/DataSpecificationContent"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "unitName": {
+              "type": "string"
+            },
+            "unitSymbol": {
+              "type": "string"
+            },
+            "definition": {
+              "$ref": "#/definitions/LangStringSet"
+            },
+            "siNotation": {
+              "type": "string"
+            },
+            "dinNotation": {
+              "type": "string"
+            },
+            "eceName": {
+              "type": "string"
+            },
+            "eceCode": {
+              "type": "string"
+            },
+            "nistName": {
+              "type": "string"
+            },
+            "sourceOfDefinition": {
+              "type": "string"
+            },
+            "conversionFactor": {
+              "type": "string"
+            },
+            "registrationAuthorityId": {
+              "type": "string"
+            },
+            "supplier": {
+              "type": "string"
             }
           }
         }
@@ -313,10 +1155,55 @@
           "items": {
             "$ref": "#/definitions/AssetAdministrationShell"
           }
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Asset"
+          }
+        },
+        "submodels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Submodel"
+          }
+        },
+        "conceptDescriptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ConceptDescription"
+          }
         }
       },
       "required": [
-        "assetAdministrationShells"
+        "assetAdministrationShells",
+        "assets",
+        "submodels",
+        "conceptDescriptions"
+      ]
+    },
+    "ModelType": {
+      "type": "string",
+      "enum": [
+        "Qualifier",
+        "Formula",
+        "AssetAdministrationShell",
+        "Asset",
+        "Submodel",
+        "SubmodelElementCollection",
+        "Property",
+        "MultiLanguageProperty",
+        "Range",
+        "ReferenceElement",
+        "Blob",
+        "File",
+        "AnnotatedRelationshipElement",
+        "Entity",
+        "BasicEvent",
+        "Operation",
+        "Capability",
+        "ConceptDescription",
+        "View"
       ]
     }
   }

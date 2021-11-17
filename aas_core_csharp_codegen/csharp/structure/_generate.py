@@ -239,7 +239,7 @@ class _DescriptionElementRenderer(
     def transform_property_reference_in_doc(
             self, element: intermediate.PropertyReferenceInDoc
     ) -> Tuple[Optional[str], Optional[str]]:
-        prop_name = csharp_naming.property_name(Identifier(element.property_name))
+        prop_name = csharp_naming.property_name(Identifier(element.path))
         return f'<see cref={xml.sax.saxutils.quoteattr(prop_name)} />', None
 
     def transform_literal(

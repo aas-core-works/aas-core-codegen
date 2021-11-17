@@ -202,8 +202,28 @@ def _generate(
     if model_type is not None:
         errors.append(Error(
             None,
-            f"Unexpected definition of ``modelType`` "
+            f"Unexpected definition of ``ModelType`` "
             f"in the definitions: {json.dumps(model_type)}"))
+
+    model_types = definitions.get(Identifier('ModelTypes'), None)
+    if model_types is not None:
+        errors.append(Error(
+            None,
+            f"Unexpected definition of ``ModelTypes`` "
+            f"in the definitions: {json.dumps(model_types)}"))
+
+    model_type_literals = []  # type: List[Identifier]
+    for symbol in symbol_table.symbols:
+        if (
+                isinstance(symbol, intermediate.Class)
+                and symbol.json_serialization.with_model_type
+        ):
+            model_type_literals.append(naming.json_model_type(symbol.name))
+
+    definitions["ModelType"] = {
+        "type": "string",
+        "enum": model_type_literals
+    }
 
     schema["definitions"] = definitions
 
