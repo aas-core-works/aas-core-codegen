@@ -54,7 +54,7 @@ def determine_symbol_to_rdfs_range(
                 errors.append(Error(
                     symbol.parsed.node,
                     f"The implementation snippet for "
-                    f"how to represent the entity {symbol.parsed.name} "
+                    f"how to represent the class {symbol.parsed.name} "
                     f"as ``rdfs:range`` is missing: {implementation_key}"))
             else:
                 symbol_to_rdfs_range[symbol] = implementation

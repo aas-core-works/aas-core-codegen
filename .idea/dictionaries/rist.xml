@@ -3,6 +3,8 @@
     <words>
       <w>anno</w>
       <w>atok</w>
+      <w>bytearray</w>
+      <w>cardinalities</w>
       <w>classdef</w>
       <w>codegen</w>
       <w>columner</w>

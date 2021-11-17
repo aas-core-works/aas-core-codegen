@@ -162,7 +162,7 @@ def _generate_serialization(
                         f"(mristin, 2021-11-10):\n"
                         f"We did not implement an XML serialization "
                         f"of atomic built-in values in a descendable property. "
-                        f"The property was {prop.name} of entity {cls.parsed.name}. "
+                        f"The property was {prop.name} of class {cls.parsed.name}. "
                         f"Please have a closer look and implement this feature "
                         f"once the context is more clear.\n\n"
                         f"{type_anno=}, {item_count=}, {current_var_name=}")
@@ -191,7 +191,7 @@ def _generate_serialization(
                             f"We did not implement an XML serialization "
                             f"of enumerations in a descendable property. "
                             f"The property was {prop.name} of "
-                            f"entity {cls.parsed.name}. Please have a closer look "
+                            f"class {cls.parsed.name}. Please have a closer look "
                             f"and implement this feature once the context is "
                             f"more clear.\n\n"
                             f"{type_anno=}, {item_count=}, {current_var_name=}")
@@ -253,7 +253,7 @@ def _generate_serialization(
                     f"We did not implement an XML serialization "
                     f"of dictionaries in a descendable property. "
                     f"The property was {prop.name} of "
-                    f"entity {cls.parsed.name}. Please have a closer look "
+                    f"class {cls.parsed.name}. Please have a closer look "
                     f"and implement this feature once the context is "
                     f"more clear.\n\n"
                     f"{type_anno=}, {item_count=}, {current_var_name=}")
@@ -343,7 +343,7 @@ def _generate_serializer(
             {I}_writer = writer;
             }}''')),
         Stripped(textwrap.dedent(f'''\
-            public void Visit(IEntity that)
+            public void Visit(IClass that)
             {{
             {I}that.Accept(this);
             }}'''))

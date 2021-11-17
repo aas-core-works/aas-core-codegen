@@ -43,7 +43,7 @@ def _generate_ivisitor(
             /// </summary>
             public interface IVisitor
             {
-                public void Visit(IEntity that);
+                public void Visit(IClass that);
             '''))
 
     for i, block in enumerate(blocks):
@@ -94,11 +94,11 @@ def _generate_visitor_through(
             /// <remarks>
             /// This class is meaningless for itself. However, it is a good base if you
             /// want to descend through instances and apply actions only on a subset of
-            /// entities.
+            /// classes.
             /// </remarks> 
             public class VisitorThrough
             {
-                public void Visit(IEntity that)
+                public void Visit(IClass that)
                 {{
                     that.Accept(this);
                 }}
@@ -144,7 +144,7 @@ def _generate_ivisitor_with_context(
             /// <typeparam name="C">Context type</typeparam>
             public interface IVisitorWithContext<C>
             {
-                public void Visit(IEntity that, C context);
+                public void Visit(IClass that, C context);
             '''))
 
     for i, block in enumerate(blocks):
@@ -188,7 +188,7 @@ def _generate_itransformer(
             /// <typeparam name="T">The type of the transformation result</typeparam>
             public interface ITransformer<T>
             {
-                public T Transform(IEntity that);
+                public T Transform(IClass that);
             '''))
 
     for i, block in enumerate(blocks):
@@ -233,7 +233,7 @@ def _generate_itransformer_with_context(
             /// <typeparam name="C">Context type</typeparam>
             public interface ITransformerWithContext<C, T>
             {
-                public T Transform(IEntity that, C context);
+                public T Transform(IClass that, C context);
             '''))
 
     for i, block in enumerate(blocks):

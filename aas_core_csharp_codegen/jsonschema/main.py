@@ -39,7 +39,8 @@ _BUILTIN_MAP = {
     intermediate.BuiltinAtomicType.BOOL: "boolean",
     intermediate.BuiltinAtomicType.INT: "integer",
     intermediate.BuiltinAtomicType.FLOAT: "number",
-    intermediate.BuiltinAtomicType.STR: "string"
+    intermediate.BuiltinAtomicType.STR: "string",
+    intermediate.BuiltinAtomicType.BYTEARRAY: "string"
 }
 assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType)
 
@@ -280,7 +281,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
             stderr=stderr)
         return 1
 
-    text = params.model_path.read_text()
+    text = params.model_path.read_text(encoding='utf-8')
 
     # TODO: test all the following individual failure cases
     atok, parse_exception = parse.source_to_atok(source=text)

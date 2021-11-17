@@ -1,4 +1,4 @@
-"""Understand the constructors of the entities."""
+"""Understand the constructors of the classes."""
 import ast
 import collections
 import itertools
@@ -87,7 +87,7 @@ Statement = Union[CallSuperConstructor, AssignArgument]
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _call_as_call_to_super_init(
         call: ast.Call,
-        entity: parse.Entity,
+        parsed_class: parse.Class,
         parsed_symbol_table: parse.SymbolTable,
         atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[CallSuperConstructor], Optional[Error]]:
@@ -127,26 +127,26 @@ def _call_as_call_to_super_init(
 
     identifier = Identifier(call.func.value.id)
 
-    if identifier not in entity.inheritances:
+    if identifier not in parsed_class.inheritances:
         return (
             None,
             Error(
                 call.func.value,
                 f"Expected a super class in the call "
                 f"to a super ``__init__``, "
-                f"but {entity.name} does not inherit "
+                f"but {parsed_class.name} does not inherit "
                 f"from {identifier}",
             ),
         )
 
-    super_entity = parsed_symbol_table.must_find_entity(name=identifier)
+    parsed_super_class = parsed_symbol_table.must_find_class(name=identifier)
 
-    if "__init__" not in super_entity.method_map:
+    if "__init__" not in parsed_super_class.method_map:
         return (
             None,
             Error(
                 call.func,
-                f"The super entity {super_entity.name} "
+                f"The super class {parsed_super_class.name} "
                 f"does not define a ``__init__``",
             ),
         )
@@ -192,7 +192,7 @@ def _call_as_call_to_super_init(
             ),
         )
 
-    super_init = super_entity.method_map[Identifier("__init__")]
+    super_init = parsed_super_class.method_map[Identifier("__init__")]
     resolved_kwargs = dict()  # type: MutableMapping[str, str]
 
     if len(call.args) > len(super_init.arguments):
@@ -200,7 +200,7 @@ def _call_as_call_to_super_init(
             None,
             Error(
                 call,
-                f"The ``{super_entity.name}.__init__`` "
+                f"The ``{parsed_super_class.name}.__init__`` "
                 f"expected {len(super_init.arguments)} argument(s), "
                 f"but the call provides "
                 f"{len(call.args)} positional argument(s)",
@@ -218,7 +218,7 @@ def _call_as_call_to_super_init(
             underlying_errors.append(
                 Error(
                     keyword,
-                    f"The ``{super_entity.name}.__init__`` does not expect "
+                    f"The ``{parsed_super_class.name}.__init__`` does not expect "
                     f"the argument {keyword.arg}",
                 )
             )
@@ -237,17 +237,17 @@ def _call_as_call_to_super_init(
             ),
         )
 
-    init = entity.method_map[Identifier("__init__")]
+    init = parsed_class.method_map[Identifier("__init__")]
     for key, val in resolved_kwargs.items():
         if val not in init.argument_map:
             underlying_errors.append(
                 Error(
                     call,
                     f"Expected all the arguments to "
-                    f"``{super_entity.name}.__init__`` "
+                    f"``{parsed_super_class.name}.__init__`` "
                     f"to be propagation of the original ``__init__`` "
                     f"arguments, but the name {key} is not an argument "
-                    f"of ``{entity.name}.__init__``",
+                    f"of ``{parsed_class.name}.__init__``",
                 )
             )
 
@@ -273,7 +273,7 @@ def _call_as_call_to_super_init(
         underlying_errors.append(
             Error(
                 call,
-                f"The call to ``{super_entity.name}.__init__`` "
+                f"The call to ``{parsed_super_class.name}.__init__`` "
                 f"is missing one or more arguments: "
                 f"{missing_args_str}",
             )
@@ -290,14 +290,14 @@ def _call_as_call_to_super_init(
         )
     # endregion
 
-    return CallSuperConstructor(super_name=super_entity.name), None
+    return CallSuperConstructor(super_name=parsed_super_class.name), None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _understand_assignment(
         assign: ast.Assign,
         init: Method,
-        entity: parse.Entity,
+        parsed_class: parse.Class,
         atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Statement], Optional[Error]]:
     if len(assign.targets) > 1:
@@ -322,13 +322,13 @@ def _understand_assignment(
                 f"Expected a property as the target of an assignment, "
                 f"but got: {atok.get_text(target)}"))
 
-    if target.attr not in entity.property_map:
+    if target.attr not in parsed_class.property_map:
         return (
             None,
             Error(
                 target.value,
                 f"The property has not been previously "
-                f"defined in {entity.name}: {target.attr}"))
+                f"defined in {parsed_class.name}: {target.attr}"))
 
     if isinstance(assign.value, ast.Name):
         if assign.value.id not in init.argument_map:
@@ -381,7 +381,8 @@ def _understand_assignment(
                 return None, Error(
                     if_exp.orelse,
                     f"The handling of this default value for "
-                    f"the property {target.attr} has not been implemented")
+                    f"the property {target.attr} has not been implemented: "
+                    f"{ast.dump(if_exp.orelse)}")
 
             assert default is not None
             return AssignArgument(
@@ -395,13 +396,13 @@ def _understand_assignment(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _understand_body(
-        entity: parse.Entity,
+        parsed_class: parse.Class,
         parsed_symbol_table: parse.SymbolTable,
         atok: asttokens.ASTTokens
 ) -> Tuple[Optional[List[Statement]], Optional[Error]]:
-    """Try to understand the body of the constructor for the given ``entity``."""
+    """Try to understand the body of the constructor for the given ``parsed_class``."""
     init = None  # type: Optional[parse.Method]
-    for method in entity.methods:
+    for method in parsed_class.methods:
         if method.name == "__init__":
             init = method
             break
@@ -417,7 +418,7 @@ def _understand_body(
             continue
         elif isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
             call_super_init, error = _call_as_call_to_super_init(
-                call=stmt.value, entity=entity, parsed_symbol_table=parsed_symbol_table, atok=atok
+                call=stmt.value, parsed_class=parsed_class, parsed_symbol_table=parsed_symbol_table, atok=atok
             )
 
             if error is not None:
@@ -430,7 +431,7 @@ def _understand_body(
             prop_assignment, error = _understand_assignment(
                 assign=stmt,
                 init=init,
-                entity=entity,
+                parsed_class=parsed_class,
                 atok=atok)
 
             if error is not None:
@@ -454,7 +455,8 @@ def _understand_body(
             None,
             Error(
                 init.node,
-                f"Failed to understand the constructor of the entity {entity.name}",
+                f"Failed to understand the constructor "
+                f"of the class {parsed_class.name}",
                 underlying=errors),
         )
 
@@ -462,30 +464,30 @@ def _understand_body(
 
 
 class ConstructorTable:
-    """Map understanding of constructors for the entities."""
+    """Map understanding of constructors for the classes."""
 
-    def __init__(self, mapping: Mapping[parse.Entity, Sequence[Statement]]) -> None:
+    def __init__(self, mapping: Mapping[parse.Class, Sequence[Statement]]) -> None:
         self._mapping = mapping
 
-    def has(self, entity: parse.Entity) -> bool:
-        """Check whether there is an entry in the table for the given ``entity``."""
-        return entity in self._mapping
+    def has(self, parsed_class: parse.Class) -> bool:
+        """Check if there is an entry in the table for the given ``parsed_class``."""
+        return parsed_class in self._mapping
 
-    def must_find(self, entity: parse.Entity) -> Sequence[Statement]:
+    def must_find(self, parsed_class: parse.Class) -> Sequence[Statement]:
         """
-        Find the constructor corresponding to this entity.
+        Find the constructor corresponding to this ``parsed_class``.
 
         :raise: :py:attr:`KeyError` if the entry does not exist.
         """
-        result = self._mapping.get(entity, None)
+        result = self._mapping.get(parsed_class, None)
         if result is None:
             raise KeyError(
-                f"No entry found in the constructor table for the entity: {entity}"
+                f"No entry found in the constructor table for the class: {parsed_class}"
             )
 
         return result
 
-    def entries(self) -> AbstractSet[Tuple[parse.Entity, Sequence[Statement]]]:
+    def entries(self) -> AbstractSet[Tuple[parse.Class, Sequence[Statement]]]:
         """Retrieve all the entries in the table."""
         return self._mapping.items()
 
@@ -497,27 +499,27 @@ class ConstructorTable:
     or all(
         result[0].has(symbol)
         for symbol in parsed_symbol_table.symbols
-        if isinstance(symbol, parse.Entity)
+        if isinstance(symbol, parse.Class)
     ),
-    "Constructor understood for each entity"
+    "Constructor understood for each class"
 )
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def understand_all(
         parsed_symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[ConstructorTable], Optional[Error]]:
-    """Understand the constructors of all the entities in the symbol table."""
+    """Understand the constructors of all the classes in the symbol table."""
     errors = []  # type: List[Error]
     mapping = (
         collections.OrderedDict()
-    )  # type: MutableMapping[parse.Entity, List[Statement]]
+    )  # type: MutableMapping[parse.Class, List[Statement]]
 
     for symbol in parsed_symbol_table.symbols:
-        if not isinstance(symbol, parse.Entity):
+        if not isinstance(symbol, parse.Class):
             continue
 
         statements, error = _understand_body(
-            entity=symbol, parsed_symbol_table=parsed_symbol_table, atok=atok
+            parsed_class=symbol, parsed_symbol_table=parsed_symbol_table, atok=atok
         )
 
         if error is not None:

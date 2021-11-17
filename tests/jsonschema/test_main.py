@@ -55,8 +55,11 @@ class Test_against_recorded(unittest.TestCase):
                 return_code = aas_core_csharp_codegen.jsonschema.main.run(
                     params=params, stdout=stdout, stderr=stderr)
 
-                self.assertEqual(
-                    "", stderr.getvalue(), "Expected no stderr on valid models")
+                if stderr.getvalue() != "":
+                    raise AssertionError(
+                        f"Expected no stderr on valid models, but got:\n"
+                        f"{stderr.getvalue()}"
+                    )
 
                 self.assertEqual(
                     0, return_code, "Expected 0 return code on valid models")

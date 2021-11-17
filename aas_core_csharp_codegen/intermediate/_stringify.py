@@ -60,7 +60,7 @@ def _stringify_default_enumeration_literal(
 def _stringify_atomic_type_annotation(
         type_annotation: AtomicTypeAnnotation,
 ) -> stringify.Entity:
-    result = None  # type: Optional[stringify.Entity]
+    result = None  # type: Optional[stringify.Class]
 
     if isinstance(type_annotation, BuiltinAtomicTypeAnnotation):
         result = stringify.Entity(
@@ -87,7 +87,7 @@ def _stringify_atomic_type_annotation(
 def _stringify_subscripted_type_annotation(
         type_annotation: SubscriptedTypeAnnotation,
 ) -> stringify.Entity:
-    result = None  # type: Optional[stringify.Entity]
+    result = None  # type: Optional[stringify.Class]
 
     if isinstance(type_annotation, ListTypeAnnotation):
         result = stringify.Entity(
@@ -481,7 +481,7 @@ Dumpable = Union[
 
 def _stringify(dumpable: Dumpable) -> stringify.Entity:
     """Translate the ``dumpable`` into a stringified entity."""
-    stringified = None  # type: Optional[stringify.Entity]
+    stringified = None  # type: Optional[stringify.Class]
 
     if isinstance(dumpable, Argument):
         stringified = _stringify_argument(dumpable)

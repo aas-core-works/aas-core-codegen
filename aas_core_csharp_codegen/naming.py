@@ -39,7 +39,7 @@ def json_model_type(identifier: Identifier) -> Identifier:
 
 def xml_name(identifier: Identifier) -> Identifier:
     """
-    Generate the XML tag name for the given entity based on its ``identifier``.
+    Generate the XML tag name for the given class based on its ``identifier``.
 
     >>> xml_name(Identifier("something"))
     'something'

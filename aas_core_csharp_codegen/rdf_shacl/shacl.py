@@ -36,7 +36,7 @@ def _infer_cardinalities_by_properties_from_invariants(
     """Infer the cardinality of a property based on the ``symbol``'s invariants."""
     result = dict()  # type: MutableMapping[intermediate.Property, Cardinality]
 
-    # Go over the original entity invariants which follows the structure of
+    # Go over the original invariants which follows the structure of
     # the SHACL schema (instead of classes and interfaces)
     for invariant in symbol.parsed.invariants:
         if isinstance(invariant.body, parse_tree.Comparison):
@@ -100,7 +100,7 @@ def _infer_patterns_by_property_from_invariants(
     """Infer the pattern of a property based on the ``symbol``'s invariants."""
     result = dict()  # type: MutableMapping[intermediate.Property, str]
 
-    # Go over the original entity invariants which follows the structure of
+    # Go over the original invariants which follows the structure of
     # the SHACL schema (instead of classes and interfaces)
     for invariant in symbol.parsed.invariants:
         body = invariant.body
@@ -399,7 +399,7 @@ def generate(
                     errors.append(Error(
                         symbol.parsed.node,
                         f"The implementation snippet for "
-                        f"the entity {symbol.parsed.name} "
+                        f"the class {symbol.parsed.name} "
                         f"is missing: {implementation_key}"))
                 else:
                     blocks.append(implementation)

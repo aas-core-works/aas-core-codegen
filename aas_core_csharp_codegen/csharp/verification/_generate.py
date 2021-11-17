@@ -782,7 +782,7 @@ def _generate_implementation_class(
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
             /// <summary>
-            /// Verify the instances of the model entities non-recursively.
+            /// Verify the instances of the model classes non-recursively.
             /// </summary>
             /// <remarks>
             /// The methods provided by this class are re-used in the verification
@@ -806,7 +806,7 @@ def _generate_implementation_class(
 def _generate_non_recursive_verifier(
         symbol_table: intermediate.SymbolTable
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
-    """Generate the non-recursive verifier which visits the entities."""
+    """Generate the non-recursive verifier which visits the classes."""
     blocks = [
         Stripped("public readonly Verification.Errors Errors;"),
         Stripped(textwrap.dedent(f'''\
@@ -821,7 +821,7 @@ def _generate_non_recursive_verifier(
             {csharp_common.INDENT}Errors = errors;
             }}''')),
         Stripped(textwrap.dedent(f'''\
-            public void Visit(Aas.IEntity that, string context)
+            public void Visit(Aas.IClass that, string context)
             {{
             {csharp_common.INDENT}that.Accept(this, context);
             }}'''))
@@ -848,7 +848,7 @@ def _generate_non_recursive_verifier(
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         /// <summary>
-        /// Verify the instances of the model entities non-recursively.
+        /// Verify the instances of the model classes non-recursively.
         /// </summary>
         public class NonRecursiveVerifier : 
         {csharp_common.INDENT}Visitation.IVisitorWithContext<string>
@@ -1053,7 +1053,7 @@ def _generate_recursive_verifier(
         symbol_table: intermediate.SymbolTable,
         spec_impls: specific_implementations.SpecificImplementations
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
-    """Generate the ``Verifier`` class which visits the entities and verifies them."""
+    """Generate the ``Verifier`` class which visits the classes and verifies them."""
     blocks = [
         Stripped("public readonly Errors Errors;"),
         Stripped(textwrap.dedent(f'''\
@@ -1068,7 +1068,7 @@ def _generate_recursive_verifier(
             {csharp_common.INDENT}Errors = errors;
             }}''')),
         Stripped(textwrap.dedent(f'''\
-            public void Visit(IEntity that, string context)
+            public void Visit(IClass that, string context)
             {{
             {csharp_common.INDENT}that.Accept(this, context);
             }}'''))
@@ -1105,7 +1105,7 @@ def _generate_recursive_verifier(
     writer = io.StringIO()
     writer.write(textwrap.dedent(f'''\
         /// <summary>
-        /// Verify the instances of the model entities recursively.
+        /// Verify the instances of the model classes recursively.
         /// </summary>
         public class RecursiveVerifier : 
         {csharp_common.INDENT}Visitation.IVisitorWithContext<string>

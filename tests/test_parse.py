@@ -113,12 +113,12 @@ class Test_parsing_docstring(unittest.TestCase):
         """
         Parse the ``source`` and extract a description.
 
-        The description is expected to belong to a single entity, ``Some_class``.
+        The description is expected to belong to a single class, ``Some_class``.
         """
         symbol_table, error = tests.common.parse_source(source)
         assert error is None, f'{error}'
 
-        symbol = symbol_table.must_find_entity(Identifier('Some_class'))
+        symbol = symbol_table.must_find_class(Identifier('Some_class'))
         return symbol.description.document
 
     def test_empty(self) -> None:
@@ -203,10 +203,10 @@ class Test_against_recorded(unittest.TestCase):
                 self.assertEqual(expected_error_str, error_str, f"{case_dir=}")
 
 
-class Test_unexpected_entity_definitions(unittest.TestCase):
+class Test_unexpected_class_definitions(unittest.TestCase):
     @staticmethod
     def error_from_source(source: str) -> Optional[Error]:
-        """Encapsulate the observation of the error when parsing an entity."""
+        """Encapsulate the observation of the error when parsing a class."""
         atok, parse_exception = parse.source_to_atok(source=source)
         assert parse_exception is None, f'{parse_exception=}'
         assert atok is not None

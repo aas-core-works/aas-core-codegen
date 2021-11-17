@@ -166,7 +166,7 @@ def _parsed_type_annotation_to_type_annotation(
     We need a two-pass translation to translate atomic type annotations to
     intermediate ones. Namely, we are translating the type annotations as we are
     building the symbol table. At that point, the atomic type annotations referring to
-    meta-model entities can not be resolved (as the symbol table is not completely
+    meta-model classes can not be resolved (as the symbol table is not completely
     built yet). Therefore, we use placeholders which are eventually resolved in the
     second pass.
     """
@@ -296,11 +296,11 @@ def _parsed_arguments_to_arguments(
     ]
 
 
-def _parsed_abstract_entity_to_interface(
-        parsed: parse.AbstractEntity,
-        json_serializations: Mapping[parse.Entity, JsonSerialization]
+def _parsed_abstract_class_to_interface(
+        parsed: parse.AbstractClass,
+        json_serializations: Mapping[parse.Class, JsonSerialization]
 ) -> Interface:
-    """Translate an abstract entity of a meta-model to an intermediate interface."""
+    """Translate an abstract class of a meta-model to an intermediate interface."""
     # noinspection PyTypeChecker
     return Interface(
         name=parsed.name,
@@ -329,7 +329,7 @@ def _parsed_abstract_entity_to_interface(
             if parsed_method.name != "__init__"
         ],
         properties=[
-            _parsed_property_to_property(parsed=parsed_prop, entity=parsed)
+            _parsed_property_to_property(parsed=parsed_prop, cls=parsed)
             for parsed_prop in parsed.properties
         ],
         json_serialization=json_serializations[parsed],
@@ -343,9 +343,9 @@ def _parsed_abstract_entity_to_interface(
 
 def _parsed_property_to_property(
         parsed: parse.Property,
-        entity: parse.Entity
+        cls: parse.Class
 ) -> Property:
-    """Translate a parsed property of an entity to an intermediate one."""
+    """Translate a parsed property of a class to an intermediate one."""
     # noinspection PyTypeChecker
     return Property(
         name=parsed.name,
@@ -356,7 +356,7 @@ def _parsed_property_to_property(
             if parsed.description is not None
             else None),
         is_readonly=parsed.is_readonly,
-        implemented_for=_PlaceholderSymbol(entity.name),
+        implemented_for=_PlaceholderSymbol(cls.name),
         parsed=parsed,
     )
 
@@ -404,8 +404,7 @@ def _parsed_contracts_to_contracts(
 )
 # fmt: on
 def _parsed_method_to_method(
-        parsed: parse.Method,
-        original_entity: parse.Entity
+        parsed: parse.Method
 ) -> Method:
     """Translate the parsed method into an intermediate representation."""
     return Method(
@@ -431,29 +430,29 @@ def _in_line_constructors(
         parsed_symbol_table: parse.SymbolTable,
         ontology: _hierarchy.Ontology,
         constructor_table: construction.ConstructorTable,
-) -> Mapping[parse.Entity, Sequence[construction.AssignArgument]]:
+) -> Mapping[parse.Class, Sequence[construction.AssignArgument]]:
     """In-line recursively all the constructor bodies."""
     result = (
         dict()
-    )  # type: MutableMapping[parse.Entity, List[construction.AssignArgument]]
+    )  # type: MutableMapping[parse.Class, List[construction.AssignArgument]]
 
-    for entity in ontology.entities:
+    for cls in ontology.classes:
         # We explicitly check at the stage of
         # :py:mod:`aas_core_csharp_codegen.intermediate.constructor` that all the calls
         # are calls to constructors of a super class or property assignments.
 
-        constructor_body = constructor_table.must_find(entity)
+        constructor_body = constructor_table.must_find(cls)
         in_lined = []  # type: List[construction.AssignArgument]
         for statement in constructor_body:
             if isinstance(statement, construction.CallSuperConstructor):
-                antecedent = parsed_symbol_table.must_find_entity(statement.super_name)
+                antecedent = parsed_symbol_table.must_find_class(statement.super_name)
 
                 in_lined_of_antecedent = result.get(antecedent, None)
 
                 assert in_lined_of_antecedent is not None, (
                     f"Expected all the constructors of the antecedents "
-                    f"of the entity {entity.name} to have been in-lined before "
-                    f"due to the topological order of entities in the ontology, "
+                    f"of the class {cls.name} to have been in-lined before "
+                    f"due to the topological order of classes in the ontology, "
                     f"but the antecedent {antecedent.name} has not had its "
                     f"constructor in-lined yet"
                 )
@@ -462,13 +461,13 @@ def _in_line_constructors(
             else:
                 in_lined.append(statement)
 
-        assert entity not in result, (
-            f"Expected the entity {entity} not to be inserted into the registry of "
+        assert cls not in result, (
+            f"Expected the class {cls} not to be inserted into the registry of "
             f"in-lined constructors since its in-lined constructor "
             f"has just been computed."
         )
 
-        result[entity] = in_lined
+        result[cls] = in_lined
 
     return result
 
@@ -496,7 +495,7 @@ class _SettingWithSource(Generic[T]):
     For example, a setting for JSON serialization.
     """
 
-    def __init__(self, value: T, source: parse.Entity):
+    def __init__(self, value: T, source: parse.Class):
         """Initialize with the given values."""
         self.value = value
         self.source = source
@@ -518,7 +517,7 @@ class _SettingWithSource(Generic[T]):
 def _resolve_json_serializations(
         ontology: _hierarchy.Ontology,
         parsed_symbol_table: parse.SymbolTable
-) -> Tuple[Optional[MutableMapping[parse.Entity, JsonSerialization]], Optional[Error]]:
+) -> Tuple[Optional[MutableMapping[parse.Class, JsonSerialization]], Optional[Error]]:
     """Resolve how JSON serialization settings stack through the ontology."""
     # NOTE (mristin, 2021-11-03):
     # We do not abstract away different settings of the JSON serialization at this point
@@ -532,26 +531,26 @@ def _resolve_json_serializations(
     with_model_type_map = dict(
     )  # type: MutableMapping[Identifier, Optional[_SettingWithSource]]
 
-    for entity in ontology.entities:
-        assert entity.name not in with_model_type_map, (
+    for cls in ontology.classes:
+        assert cls.name not in with_model_type_map, (
             f"Expected the ontology to be a correctly linearized DAG, "
-            f"but the entity {entity.name!r} has been already visited before")
+            f"but the class {cls.name!r} has been already visited before")
 
         settings = []  # type: List[_SettingWithSource[bool]]
 
         if (
-                entity.json_serialization is not None
-                and entity.json_serialization.with_model_type
+                cls.json_serialization is not None
+                and cls.json_serialization.with_model_type
         ):
             settings.append(
                 _SettingWithSource(
-                    value=entity.json_serialization.with_model_type,
-                    source=entity))
+                    value=cls.json_serialization.with_model_type,
+                    source=cls))
 
-        for inheritance in entity.inheritances:
+        for inheritance in cls.inheritances:
             assert inheritance in with_model_type_map, (
                 f"Expected the ontology to be a correctly linearized DAG, "
-                f"but the inheritance {inheritance!r} of the entity {entity.name!r} "
+                f"but the inheritance {inheritance!r} of the class {cls.name!r} "
                 f"has not been visited before."
             )
 
@@ -562,7 +561,7 @@ def _resolve_json_serializations(
             settings.append(setting)
 
         if len(settings) > 1:
-            # Verify that the setting for the entity as well as all the inherited
+            # Verify that the setting for the class as well as all the inherited
             # settings are consistent.
             for setting in settings[1:]:
                 if setting.value != settings[0].value:
@@ -573,14 +572,14 @@ def _resolve_json_serializations(
                     # points for a viable error recovery.
 
                     return None, Error(
-                        entity.node,
+                        cls.node,
                         f"The setting ``with_model_type`` "
                         f"for JSON serialization "
-                        f"between the entity {setting.source} "
+                        f"between the class {setting.source} "
                         f"and {settings[0].source} is "
                         f"inconsistent")
 
-        with_model_type_map[entity.name] = (
+        with_model_type_map[cls.name] = (
             None
             if len(settings) == 0
             else settings[0])
@@ -588,16 +587,16 @@ def _resolve_json_serializations(
     # endregion
 
     mapping = dict(
-    )  # type: MutableMapping[parse.Entity, JsonSerialization]
+    )  # type: MutableMapping[parse.Class, JsonSerialization]
 
     for identifier, setting in with_model_type_map.items():
-        entity = parsed_symbol_table.must_find_entity(name=identifier)
+        cls = parsed_symbol_table.must_find_class(name=identifier)
         if setting is None:
-            # Neither the current entity nor its antecedents specified the setting
+            # Neither the current class nor its antecedents specified the setting
             # so we assume the default value.
-            mapping[entity] = JsonSerialization(with_model_type=False)
+            mapping[cls] = JsonSerialization(with_model_type=False)
         else:
-            mapping[entity] = JsonSerialization(with_model_type=setting.value)
+            mapping[cls] = JsonSerialization(with_model_type=setting.value)
 
     return mapping, None
 
@@ -618,7 +617,7 @@ def _resolve_json_serializations(
 def _resolve_xml_serializations(
         ontology: _hierarchy.Ontology,
         parsed_symbol_table: parse.SymbolTable
-) -> Tuple[Optional[MutableMapping[parse.Entity, XmlSerialization]], Optional[Error]]:
+) -> Tuple[Optional[MutableMapping[parse.Class, XmlSerialization]], Optional[Error]]:
     """Resolve how JSON serialization settings stack through the ontology."""
     # NOTE (mristin, 2021-11-03):
     # We do not abstract away different settings of the XML serialization at this point
@@ -627,39 +626,39 @@ def _resolve_xml_serializations(
     # for a setting each), or maybe we can even think of a more general approach to
     # inheritance of serialization settings.
 
-    # Logic behind the inheritance (the entities refer to abstract and concrete entities
+    # Logic behind the inheritance (the classes refer to abstract and concrete classes
     # in the ontology):
     #
-    # * If there is the setting ``property_as_text`` specified for an entity, 
+    # * If there is the setting ``property_as_text`` specified for a class,
     #   that setting overrides any "inherited" setting.
-    # * If an entity lacks the setting ``property_as_text``, but 
-    #   inherits from one or more entities, and some entities specify
+    # * If a class lacks the setting ``property_as_text``, but
+    #   inherits from one or more classes, and some classes specify
     #   a ``property_as_text`` setting, these settings must agree, and the current 
-    #   entity inherits the setting.
+    #   class inherits the setting.
 
     property_as_text_map = dict(
     )  # type: MutableMapping[Identifier, Optional[_SettingWithSource[Identifier]]]
 
-    for entity in ontology.entities:
-        assert entity.name not in property_as_text_map, (
+    for cls in ontology.classes:
+        assert cls.name not in property_as_text_map, (
             f"Expected the ontology to be a correctly linearized DAG, "
-            f"but the entity {entity.name!r} has been already visited before")
+            f"but the class {cls.name!r} has been already visited before")
 
         if (
-                entity.xml_serialization is not None
-                and entity.xml_serialization.property_as_text
+                cls.xml_serialization is not None
+                and cls.xml_serialization.property_as_text
         ):
-            # The setting at the entity overrides any inherited settings. 
-            property_as_text_map[entity.name] = _SettingWithSource(
-                value=entity.xml_serialization.property_as_text,
-                source=entity)
+            # The setting at the class overrides any inherited settings.
+            property_as_text_map[cls.name] = _SettingWithSource(
+                value=cls.xml_serialization.property_as_text,
+                source=cls)
 
         else:
             settings = []  # type: List[_SettingWithSource[Identifier]]
-            for inheritance in entity.inheritances:
+            for inheritance in cls.inheritances:
                 assert inheritance in property_as_text_map, (
                     f"Expected the ontology to be a correctly linearized DAG, "
-                    f"but the inheritance {inheritance!r} of the entity {entity.name!r} "
+                    f"but the inheritance {inheritance!r} of the class {cls.name!r} "
                     f"has not been visited before."
                 )
 
@@ -680,14 +679,14 @@ def _resolve_xml_serializations(
                         # points for a viable error recovery.
 
                         return None, Error(
-                            entity.node,
+                            cls.node,
                             f"The setting ``property_as_text`` "
                             f"for XML serialization "
-                            f"between the entity {setting.source} "
+                            f"between the class {setting.source} "
                             f"and {settings[0].source} is "
                             f"inconsistent")
 
-            property_as_text_map[entity.name] = (
+            property_as_text_map[cls.name] = (
                 None
                 if len(settings) == 0
                 else settings[0])
@@ -695,31 +694,31 @@ def _resolve_xml_serializations(
     # endregion
 
     mapping = dict(
-    )  # type: MutableMapping[parse.Entity, XmlSerialization]
+    )  # type: MutableMapping[parse.Class, XmlSerialization]
 
     for identifier, setting in property_as_text_map.items():
-        entity = parsed_symbol_table.must_find_entity(name=identifier)
+        cls = parsed_symbol_table.must_find_class(name=identifier)
         if setting is None:
-            # Neither the current entity nor its antecedents specified the setting
+            # Neither the current class nor its antecedents specified the setting
             # so we assume the default value.
-            mapping[entity] = XmlSerialization(property_as_text=None)
+            mapping[cls] = XmlSerialization(property_as_text=None)
         else:
-            mapping[entity] = XmlSerialization(property_as_text=setting.value)
+            mapping[cls] = XmlSerialization(property_as_text=setting.value)
 
     return mapping, None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _parsed_entity_to_class(
-        parsed: parse.ConcreteEntity,
+def _parsed_class_to_class(
+        parsed: parse.ConcreteClass,
         ontology: _hierarchy.Ontology,
-        json_serializations: Mapping[parse.Entity, JsonSerialization],
-        xml_serializations: Mapping[parse.Entity, XmlSerialization],
+        json_serializations: Mapping[parse.Class, JsonSerialization],
+        xml_serializations: Mapping[parse.Class, XmlSerialization],
         in_lined_constructors: Mapping[
-            parse.Entity, Sequence[construction.AssignArgument]]
+            parse.Class, Sequence[construction.AssignArgument]]
 ) -> Tuple[Optional[Class], Optional[Error]]:
-    """Translate a concrete entity to an intermediate class."""
-    antecedents = ontology.list_antecedents(entity=parsed)
+    """Translate a concrete parsed class to an intermediate class."""
+    antecedents = ontology.list_antecedents(cls=parsed)
 
     # region Stack properties from the antecedents
 
@@ -730,13 +729,13 @@ def _parsed_entity_to_class(
 
     for antecedent in antecedents:
         properties.extend(
-            _parsed_property_to_property(parsed=parsed_prop, entity=antecedent)
+            _parsed_property_to_property(parsed=parsed_prop, cls=antecedent)
             for parsed_prop in antecedent.properties
         )
 
     for parsed_prop in parsed.properties:
         properties.append(
-            _parsed_property_to_property(parsed=parsed_prop, entity=parsed))
+            _parsed_property_to_property(parsed=parsed_prop, cls=parsed))
 
     # endregion
 
@@ -756,14 +755,14 @@ def _parsed_entity_to_class(
     arguments = []
     init_is_implementation_specific = False
 
-    parsed_entity_init = parsed.method_map.get(Identifier("__init__"), None)
-    if parsed_entity_init is not None:
-        arguments = _parsed_arguments_to_arguments(parsed=parsed_entity_init.arguments)
+    parsed_class_init = parsed.method_map.get(Identifier("__init__"), None)
+    if parsed_class_init is not None:
+        arguments = _parsed_arguments_to_arguments(parsed=parsed_class_init.arguments)
 
-        init_is_implementation_specific = parsed_entity_init.is_implementation_specific
+        init_is_implementation_specific = parsed_class_init.is_implementation_specific
 
         contracts = _stack_contracts(
-            contracts, _parsed_contracts_to_contracts(parsed_entity_init.contracts)
+            contracts, _parsed_contracts_to_contracts(parsed_class_init.contracts)
         )
 
     ctor = Constructor(
@@ -784,7 +783,7 @@ def _parsed_entity_to_class(
 
     for antecedent in antecedents:
         methods.extend(
-            _parsed_method_to_method(parsed=parsed_method, original_entity=antecedent)
+            _parsed_method_to_method(parsed=parsed_method)
             for parsed_method in antecedent.methods
             if parsed_method.name != "__init__"
         )
@@ -796,7 +795,7 @@ def _parsed_entity_to_class(
             continue
 
         methods.append(
-            _parsed_method_to_method(parsed=parsed_method, original_entity=parsed))
+            _parsed_method_to_method(parsed=parsed_method))
 
     # endregion
 
@@ -907,7 +906,7 @@ def _over_our_atomic_type_annotations(
 def _over_descriptions(
         something: Union[Class, Interface, Enumeration]
 ) -> Iterator[Description]:
-    """Iterate over all the descriptions from the entity ``something``."""
+    """Iterate over all the descriptions from the ``something``."""
     if isinstance(something, Class):
         if something.description is not None:
             yield something.description
@@ -1130,13 +1129,13 @@ def translate(
         if isinstance(parsed_symbol, parse.Enumeration):
             symbol = _parsed_enumeration_to_enumeration(parsed=parsed_symbol)
 
-        elif isinstance(parsed_symbol, parse.AbstractEntity):
-            symbol = _parsed_abstract_entity_to_interface(
+        elif isinstance(parsed_symbol, parse.AbstractClass):
+            symbol = _parsed_abstract_class_to_interface(
                 parsed=parsed_symbol,
                 json_serializations=json_serializations)
 
-        elif isinstance(parsed_symbol, parse.ConcreteEntity):
-            symbol, error = _parsed_entity_to_class(
+        elif isinstance(parsed_symbol, parse.ConcreteClass):
+            symbol, error = _parsed_class_to_class(
                 parsed=parsed_symbol,
                 ontology=ontology,
                 json_serializations=json_serializations,
@@ -1385,7 +1384,7 @@ def translate(
 
     # endregion
 
-    # region Second pass to resolve the resulting entity of the ``implemented_for``
+    # region Second pass to resolve the resulting class of the ``implemented_for``
 
     for symbol in symbols:
         if isinstance(symbol, Enumeration):
@@ -1442,7 +1441,7 @@ def translate(
                     symbol.parsed.xml_serialization.node,
                     f"The property {symbol.xml_serialization.property_as_text} "
                     f"given in ``property_as_text`` setting for XML serialization "
-                    f"is not available in the entity {symbol.parsed.name}"))
+                    f"is not available in the class {symbol.parsed.name}"))
                 property_exists = False
 
             if property_exists:

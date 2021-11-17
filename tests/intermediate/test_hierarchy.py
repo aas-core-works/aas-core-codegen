@@ -23,9 +23,9 @@ class Test_ontology_ok(unittest.TestCase):
         assert ontology is not None
 
         antecedents = ontology.list_antecedents(
-            entity=symbol_table.must_find_entity(Identifier("Something")))
+            cls=symbol_table.must_find_class(Identifier("Something")))
 
-        antecedent_names = [entity.name for entity in antecedents]
+        antecedent_names = [cls.name for cls in antecedents]
         self.assertListEqual([], antecedent_names)
 
     def test_complex_graph(self) -> None:
@@ -59,9 +59,9 @@ class Test_ontology_ok(unittest.TestCase):
         assert ontology is not None
 
         antecedents = ontology.list_antecedents(
-            entity=symbol_table.must_find_entity(Identifier("Something")))
+            cls=symbol_table.must_find_class(Identifier("Something")))
 
-        antecedent_names = [entity.name for entity in antecedents]
+        antecedent_names = [cls.name for cls in antecedents]
 
         self.assertListEqual(
             ['Another_grand_parent', 'Grand_parent', 'Another_parent',
@@ -90,7 +90,7 @@ class Test_ontology_fail(unittest.TestCase):
 
         self.assertEqual(
             "The property has already been defined "
-            "in the antecedent entity Abstract: x",
+            "in the antecedent class Abstract: x",
             tests.common.most_underlying_message(errors[0]))
 
     def test_duplicate_methods_in_antecedents(self) -> None:
@@ -115,7 +115,7 @@ class Test_ontology_fail(unittest.TestCase):
 
         self.assertEqual(
             "The method has already been defined "
-            "in the antecedent entity Abstract: do_something",
+            "in the antecedent class Abstract: do_something",
             tests.common.most_underlying_message(errors[0]))
 
     def test_missing_constructor_when_the_parent_has_one(self) -> None:
@@ -137,8 +137,8 @@ class Test_ontology_fail(unittest.TestCase):
         assert errors is not None and len(errors) == 1
 
         self.assertEqual(
-            "The entity Something does not specify a constructor, "
-            "but the antecedent entity Abstract specifies a constructor "
+            "The class Something does not specify a constructor, "
+            "but the antecedent class Abstract specifies a constructor "
             "with arguments: self, x",
             tests.common.most_underlying_message(errors[0]))
 
@@ -162,7 +162,7 @@ class Test_ontology_fail(unittest.TestCase):
 
         self.assertEqual(
             "Expected no cycles in the inheritance, "
-            "but the entity Cycle has been observed in a cycle",
+            "but the class Cycle has been observed in a cycle",
             tests.common.most_underlying_message(errors[0]))
 
 

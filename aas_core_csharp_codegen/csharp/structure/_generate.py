@@ -578,7 +578,7 @@ def _generate_interface(
     inheritances = (
             [
                 inheritance.name for inheritance in symbol.inheritances
-            ] + [Identifier('Entity')])
+            ] + [Identifier('Class')])
 
     assert len(inheritances) > 0
     if len(inheritances) == 1:
@@ -821,10 +821,10 @@ def _generate_descend_once_method(
 
     return Stripped(f'''\
 /// <summary>
-/// Iterate over all the entity instances referenced from this instance 
+/// Iterate over all the class instances referenced from this instance 
 /// without further recursion.
 /// </summary>
-public IEnumerable<IEntity> DescendOnce()
+public IEnumerable<IClass> DescendOnce()
 {{
 {indented_body}
 }}''')
@@ -841,9 +841,9 @@ def _generate_descend_method(
 
     return Stripped(f'''\
 /// <summary>
-/// Iterate recursively over all the entity instances referenced from this instance.
+/// Iterate recursively over all the class instances referenced from this instance.
 /// </summary>
-public IEnumerable<IEntity> Descend()
+public IEnumerable<IClass> Descend()
 {{
 {indented_body}
 }}''')
@@ -1073,7 +1073,7 @@ def _generate_class(
             [
                 interface.name
                 for interface in symbol.interfaces
-            ] + [Identifier('Entity')])
+            ] + [Identifier('Class')])
 
     assert len(interfaces) > 0
     if len(interfaces) == 1:
@@ -1272,20 +1272,20 @@ def generate(
 
     blocks.append(Rstripped(textwrap.indent(textwrap.dedent(f'''\
         /// <summary>
-        /// Represent a general entity of an AAS model.
+        /// Represent a general class of an AAS model.
         /// </summary>
-        public interface IEntity
+        public interface IClass
         {{
             /// <summary>
-            /// Iterate over all the entity instances referenced from this instance 
+            /// Iterate over all the class instances referenced from this instance 
             /// without further recursion.
             /// </summary>
-            public IEnumerable<IEntity> DescendOnce();
+            public IEnumerable<IClass> DescendOnce();
             
             /// <summary>
-            /// Iterate recursively over all the entity instances referenced from this instance.
+            /// Iterate recursively over all the class instances referenced from this instance.
             /// </summary>
-            public IEnumerable<IEntity> Descend();
+            public IEnumerable<IClass> Descend();
 
             /// <summary>
             /// Accept the <paramref name="visitor" /> to visit this instance 

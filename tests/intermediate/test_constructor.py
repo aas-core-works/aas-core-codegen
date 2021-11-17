@@ -36,21 +36,21 @@ def understand_constructor_table(
 def must_find_item_for(
         constructor_table: construction.ConstructorTable,
         name: str
-) -> Tuple[parse.Entity, Sequence[construction.Statement]]:
+) -> Tuple[parse.Class, Sequence[construction.Statement]]:
     """
-    Find the constructor statements for the entity given with ``identifier``.
+    Find the constructor statements for the class given with ``identifier``.
 
     :raise: :py:class:`KeyError` if not found in the table
     """
-    for entity, statements in constructor_table.entries():
-        if entity.name == name:
-            return entity, statements
+    for cls, statements in constructor_table.entries():
+        if cls.name == name:
+            return cls, statements
 
-    raise KeyError(f"Could not find the constructor statements for the entity: {name}")
+    raise KeyError(f"Could not find the constructor statements for the class: {name}")
 
 
 class Test_empty_ok(unittest.TestCase):
-    def test_no_entities(self) -> None:
+    def test_no_classes(self) -> None:
         constructor_table, error = understand_constructor_table(source="")
         assert error is None, f"{error=}"
         assert constructor_table is not None
@@ -70,8 +70,8 @@ class Test_empty_ok(unittest.TestCase):
 
         self.assertEqual(1, len(constructor_table.entries()))
 
-        entity, statements = must_find_item_for(constructor_table, "Something")
-        self.assertEqual("Something", entity.name)
+        cls, statements = must_find_item_for(constructor_table, "Something")
+        self.assertEqual("Something", cls.name)
         self.assertEqual(0, len(statements))
 
     def test_pass(self) -> None:
@@ -383,7 +383,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         assert error is not None
 
         self.assertEqual(
-            "The super entity Parent does not define a ``__init__``",
+            "The super class Parent does not define a ``__init__``",
             tests.common.most_underlying_message(error))
 
     def test_positional_argument_to_super_init_transformed(self) -> None:

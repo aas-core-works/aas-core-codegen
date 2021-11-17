@@ -367,7 +367,7 @@ def generate(
                     errors.append(Error(
                         symbol.parsed.node,
                         f"The implementation snippet for "
-                        f"the entity {symbol.parsed.name} "
+                        f"the class {symbol.parsed.name} "
                         f"is missing: {implementation_key}"))
                 else:
                     blocks.append(implementation)

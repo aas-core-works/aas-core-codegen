@@ -13,7 +13,7 @@ class TestDescription(unittest.TestCase):
         """
         Generate the C# description comment based on ``source``.
 
-        The ``source`` is expected to contain only a single entity, a class
+        The ``source`` is expected to contain only a single class, a class
         ``Some_class``.
         """
         symbol_table, error = tests.common.translate_source_to_intermediate(

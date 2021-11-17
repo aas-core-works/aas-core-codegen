@@ -4,14 +4,14 @@ from typing import Optional, Union
 from aas_core_csharp_codegen import stringify
 from aas_core_csharp_codegen.common import assert_never
 from aas_core_csharp_codegen.parse._types import (
-    AbstractEntity,
+    AbstractClass,
     Argument,
     AtomicTypeAnnotation,
-    ConcreteEntity,
+    ConcreteClass,
     Contract,
     Contracts,
     Default,
-    Entity,
+    Class,
     Enumeration,
     EnumerationLiteral,
     Method,
@@ -140,8 +140,8 @@ def _stringify_invariant(invariant: Invariant) -> stringify.Entity:
         name=Invariant.__name__,
         properties=[
             stringify.Property(
-                "description", _stringify_description(invariant.description)),
-            stringify.PropertyEllipsis("condition", invariant.condition),
+                "description", invariant.description),
+            stringify.PropertyEllipsis("body", invariant.body),
             stringify.PropertyEllipsis("node", invariant.node),
         ],
     )
@@ -156,7 +156,7 @@ def _stringify_contract(contract: Contract) -> stringify.Entity:
         properties=[
             stringify.Property("args", contract.args),
             stringify.Property(
-                "description", _stringify_description(contract.description)),
+                "description", contract.description),
             stringify.PropertyEllipsis("condition", contract.condition),
             stringify.PropertyEllipsis("node", contract.node),
         ],
@@ -239,8 +239,8 @@ def _stringify_method(method: Method) -> stringify.Entity:
 
 
 def _stringify_symbol(symbol: Symbol) -> stringify.Entity:
-    if isinstance(symbol, Entity):
-        return _stringify_entity(symbol)
+    if isinstance(symbol, Class):
+        return _stringify_class(symbol)
 
     elif isinstance(symbol, Enumeration):
         return _stringify_enumeration(symbol)
@@ -250,30 +250,30 @@ def _stringify_symbol(symbol: Symbol) -> stringify.Entity:
         raise AssertionError(symbol)
 
 
-def _stringify_entity(entity: Entity) -> stringify.Entity:
+def _stringify_class(cls: Class) -> stringify.Entity:
     result = stringify.Entity(
-        name=entity.__class__.__name__,
+        name=cls.__class__.__name__,
         properties=[
-            stringify.Property("name", entity.name),
+            stringify.Property("name", cls.name),
             stringify.Property(
-                "is_implementation_specific", entity.is_implementation_specific
+                "is_implementation_specific", cls.is_implementation_specific
             ),
-            stringify.Property("inheritances", entity.inheritances),
+            stringify.Property("inheritances", cls.inheritances),
             stringify.Property(
-                "properties", [_stringify_property(prop) for prop in entity.properties]
+                "properties", [_stringify_property(prop) for prop in cls.properties]
             ),
-            stringify.PropertyEllipsis("property_map", entity.property_map),
+            stringify.PropertyEllipsis("property_map", cls.property_map),
             stringify.Property(
-                "methods", [_stringify_method(method) for method in entity.methods]
+                "methods", [_stringify_method(method) for method in cls.methods]
             ),
-            stringify.PropertyEllipsis("method_map", entity.method_map),
+            stringify.PropertyEllipsis("method_map", cls.method_map),
             stringify.Property(
-                "description", _stringify_description(entity.description)),
-            stringify.PropertyEllipsis("node", entity.node),
+                "description", _stringify_description(cls.description)),
+            stringify.PropertyEllipsis("node", cls.node),
         ],
     )
 
-    stringify.assert_compares_against_dict(result, entity)
+    stringify.assert_compares_against_dict(result, cls)
     return result
 
 
@@ -353,14 +353,14 @@ def _stringify_symbol_table(symbol_table: SymbolTable) -> stringify.Entity:
 
 
 Dumpable = Union[
-    AbstractEntity,
+    AbstractClass,
     Argument,
     AtomicTypeAnnotation,
-    ConcreteEntity,
+    ConcreteClass,
     Contract,
     Contracts,
     Default,
-    Entity,
+    Class,
     Enumeration,
     EnumerationLiteral,
     Invariant,
@@ -388,8 +388,8 @@ def dump(dumpable: Dumpable) -> str:
         stringified = _stringify_contracts(dumpable)
     elif isinstance(dumpable, Default):
         stringified = _stringify_default(dumpable)
-    elif isinstance(dumpable, Entity):
-        stringified = _stringify_entity(dumpable)
+    elif isinstance(dumpable, Class):
+        stringified = _stringify_class(dumpable)
     elif isinstance(dumpable, Enumeration):
         stringified = _stringify_enumeration(dumpable)
     elif isinstance(dumpable, EnumerationLiteral):
@@ -402,7 +402,7 @@ def dump(dumpable: Dumpable) -> str:
         stringified = _stringify_property(dumpable)
     elif isinstance(dumpable, Snapshot):
         stringified = _stringify_snapshot(dumpable)
-    elif isinstance(dumpable, (Enumeration, AbstractEntity, ConcreteEntity)):
+    elif isinstance(dumpable, (Enumeration, AbstractClass, ConcreteClass)):
         stringified = _stringify_symbol(dumpable)
     elif isinstance(dumpable, SymbolTable):
         stringified = _stringify_symbol_table(dumpable)

@@ -1,5 +1,4 @@
 """Translate the abstract syntax tree of the meta-model into parsed structures."""
-import abc
 import ast
 import collections
 import enum
@@ -20,15 +19,15 @@ from aas_core_csharp_codegen.common import (
 )
 from aas_core_csharp_codegen.parse import tree, _rules
 from aas_core_csharp_codegen.parse._types import (
-    AbstractEntity,
+    AbstractClass,
     Argument,
     AtomicTypeAnnotation,
-    ConcreteEntity,
+    ConcreteClass,
     Invariant,
     Contract,
     Contracts,
     Default,
-    Entity,
+    Class,
     Enumeration,
     EnumerationLiteral,
     final_in_type_annotation,
@@ -90,15 +89,16 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("invariant", "icontract"),
             ("ensure", "icontract"),
             ("require", "icontract"),
-            ("abstract", "aas_core3_meta.marker"),
-            ("implementation_specific", "aas_core3_meta.marker"),
-            ("is_superset_of", "aas_core3_meta.marker"),
-            ("json_serialization", "aas_core3_meta.marker"),
-            ("xml_serialization", "aas_core3_meta.marker"),
-            ("comment", "aas_core3_meta.marker"),
-            ("is_IRI", "aas_core3_meta.pattern"),
-            ("is_IRDI", "aas_core3_meta.pattern"),
-            ("is_ID_short", "aas_core3_meta.pattern"),
+            ("abstract", "aas_core_meta.marker"),
+            ("implementation_specific", "aas_core_meta.marker"),
+            ('reference_in_the_book', "aas_core_meta.marker"),
+            ("is_superset_of", "aas_core_meta.marker"),
+            ("json_serialization", "aas_core_meta.marker"),
+            ("xml_serialization", "aas_core_meta.marker"),
+            ("are_unique", "aas_core_meta.verification"),
+            ("is_IRI", "aas_core_meta.verification"),
+            ("is_IRDI", "aas_core_meta.verification"),
+            ("is_ID_short", "aas_core_meta.verification"),
         ]
     )
 
@@ -194,6 +194,17 @@ def _enum_to_symbol(
                         f"but got: {ast.dump(elt)}")
 
                 is_superset_of.append(Identifier(elt.id))
+
+        elif (
+                isinstance(decorator_node, ast.Call)
+                and isinstance(decorator_node.func, ast.Name)
+                and decorator_node.func.id == 'reference_in_the_book'
+        ):
+            # NOTE (mristin, 2021-11-17):
+            # We ignore references at the moment. At some later point, it might
+            # make sense to integrate them in the generated code.
+            pass
+
         else:
             return None, Error(
                 decorator_node,
@@ -773,7 +784,7 @@ def _parse_snapshot(
 def _function_def_to_method(
         node: ast.FunctionDef, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Method], Optional[Error]]:
-    """Parse the function definition into an entity method."""
+    """Parse the function definition into a class method."""
     name = node.name
 
     if name != "__init__" and name.startswith("__") and name.endswith("__"):
@@ -1044,31 +1055,31 @@ def _string_constant_to_description(
     return Description(document=document, node=constant), None
 
 
-class _EntityMarker(enum.Enum):
+class _ClassMarker(enum.Enum):
     ABSTRACT = "abstract"
     IMPLEMENTATION_SPECIFIC = "implementation_specific"
 
 
-_ENTITY_MARKER_FROM_STRING: Mapping[str, _EntityMarker] = {
+_CLASS_MARKER_FROM_STRING: Mapping[str, _ClassMarker] = {
     marker.value: marker
-    for marker in _EntityMarker
+    for marker in _ClassMarker
 }
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _entity_decorator_to_marker(
+def _class_decorator_to_marker(
         decorator: ast.Name
-) -> Tuple[Optional[_EntityMarker], Optional[Error]]:
-    """Parse a simple decorator as an entity marker."""
-    entity_marker = _ENTITY_MARKER_FROM_STRING.get(decorator.id, None)
+) -> Tuple[Optional[_ClassMarker], Optional[Error]]:
+    """Parse a simple decorator as a class marker."""
+    class_marker = _CLASS_MARKER_FROM_STRING.get(decorator.id, None)
 
-    if entity_marker is None:
+    if class_marker is None:
         return (None, Error(
             decorator,
             f"The handling of the marker has not been implemented: {decorator.id!r}"
         ))
 
-    return entity_marker, None
+    return class_marker, None
 
 
 # fmt: off
@@ -1080,7 +1091,7 @@ def _entity_decorator_to_marker(
 )
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
-def _entity_decorator_to_json_serialization(
+def _class_decorator_to_json_serialization(
         decorator: ast.Call
 ) -> Tuple[Optional[JsonSerialization], Optional[Error]]:
     """Translate a decorator to settings of the JSON serialization."""
@@ -1127,7 +1138,7 @@ def _entity_decorator_to_json_serialization(
 )
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
-def _entity_decorator_to_xml_serialization(
+def _class_decorator_to_xml_serialization(
         decorator: ast.Call
 ) -> Tuple[Optional[XmlSerialization], Optional[Error]]:
     """Translate a decorator to settings of the XML serialization."""
@@ -1182,7 +1193,7 @@ def _entity_decorator_to_xml_serialization(
 )
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
-def _entity_decorator_to_invariant(
+def _class_decorator_to_invariant(
         decorator: ast.Call,
         atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Invariant], Optional[Error]]:
@@ -1263,7 +1274,7 @@ def _classdef_to_symbol(
     if node.name.lower() in ['verification']:
         underlying_errors.append(Error(
             node,
-            f"The name of the entity is reserved for "
+            f"The name of the class is reserved for "
             f"aas-core: {node.name!r}"))
 
     base_names = []  # type: List[str]
@@ -1290,7 +1301,7 @@ def _classdef_to_symbol(
     if "Enum" in base_names:
         return _enum_to_symbol(node=node, atok=atok)
 
-    # We have to parse the class definition as entity definition from here on.
+    # We have to parse the class definition from here on.
 
     # DBC is only used for inheritance of the contracts in the meta-model
     # so that the developers tinkering with the meta-model can play with it
@@ -1312,17 +1323,17 @@ def _classdef_to_symbol(
 
     for decorator in node.decorator_list:
         if isinstance(decorator, ast.Name):
-            entity_marker, error = _entity_decorator_to_marker(decorator=decorator)
+            class_marker, error = _class_decorator_to_marker(decorator=decorator)
             if error is not None:
                 underlying_errors.append(error)
                 continue
 
-            if entity_marker == _EntityMarker.ABSTRACT:
+            if class_marker == _ClassMarker.ABSTRACT:
                 is_abstract = True
-            elif entity_marker == _EntityMarker.IMPLEMENTATION_SPECIFIC:
+            elif class_marker == _ClassMarker.IMPLEMENTATION_SPECIFIC:
                 is_implementation_specific = True
             else:
-                raise AssertionError(f"Unhandled enum: {entity_marker}")
+                raise AssertionError(f"Unhandled enum: {class_marker}")
 
         elif (
                 isinstance(decorator, ast.Call)
@@ -1330,7 +1341,7 @@ def _classdef_to_symbol(
                 and isinstance(decorator.func.ctx, ast.Load)
         ):
             if decorator.func.id == 'invariant':
-                invariant, error = _entity_decorator_to_invariant(
+                invariant, error = _class_decorator_to_invariant(
                     decorator=decorator, atok=atok)
 
                 if error is not None:
@@ -1345,7 +1356,7 @@ def _classdef_to_symbol(
                         "Repeated markings for JSON serialization are not allowed"))
                     continue
 
-                json_serialization, error = _entity_decorator_to_json_serialization(
+                json_serialization, error = _class_decorator_to_json_serialization(
                     decorator=decorator)
 
                 if error is not None:
@@ -1359,18 +1370,24 @@ def _classdef_to_symbol(
                         "Repeated markings for XML serialization are not allowed"))
                     continue
 
-                xml_serialization, error = _entity_decorator_to_xml_serialization(
+                xml_serialization, error = _class_decorator_to_xml_serialization(
                     decorator=decorator)
 
                 if error is not None:
                     underlying_errors.append(error)
                     continue
 
+            elif decorator.func.id == 'reference_in_the_book':
+                # NOTE (mristin, 2021-11-17):
+                # We ignore references at the moment. At some later point, it might
+                # make sense to integrate them in the generated code.
+                pass
+
             else:
                 underlying_errors.append(Error(
                     decorator,
                     f"Handling of a decorator has not been "
-                    f"implemented: {decorator.id!r}"))
+                    f"implemented: {decorator.func.id!r}"))
         else:
             underlying_errors.append(
                 Error(
@@ -1391,7 +1408,7 @@ def _classdef_to_symbol(
             None,
             Error(
                 node,
-                message=f"Abstract entities can not be implementation-specific "
+                message=f"Abstract classes can not be implementation-specific "
                         f"at the same time "
                         f"(otherwise we can not convert them to interfaces etc.)"))
 
@@ -1476,14 +1493,14 @@ def _classdef_to_symbol(
         assert old_cursor < cursor, f"Loop invariant: {old_cursor=}, {cursor=}"
 
     if is_abstract:
-        entity_cls = (
-            AbstractEntity
-        )  # type: Union[Type[AbstractEntity], Type[ConcreteEntity]]
+        factory_for_class = (
+            AbstractClass
+        )  # type: Union[Type[AbstractClass], Type[ConcreteClass]]
     else:
-        entity_cls = ConcreteEntity
+        factory_for_class = ConcreteClass
 
     return (
-        entity_cls(
+        factory_for_class(
             name=Identifier(node.name),
             is_implementation_specific=is_implementation_specific,
             inheritances=inheritances,
@@ -1557,10 +1574,10 @@ def _verify_symbol_table(
         'aas',
         'accept',
         'context',
-        'entity',
+        'class',
         'error',
         'errors',
-        'ientity',
+        'iclass',
         'itransformer_with_context',
         'ivisitor',
         'ivisitor_with_context',
@@ -1587,7 +1604,7 @@ def _verify_symbol_table(
                 f"The name of the symbol is reserved "
                 f"for the code generation: {symbol.name!r}"))
 
-        if isinstance(symbol, Entity):
+        if isinstance(symbol, Class):
             for method in symbol.methods:
                 if method.name in reserved_member_names:
                     errors.append(Error(
@@ -1606,7 +1623,7 @@ def _verify_symbol_table(
     # region Check dangling inheritances
 
     for symbol in symbol_table.symbols:
-        if not isinstance(symbol, Entity):
+        if not isinstance(symbol, Class):
             continue
 
         for inheritance in symbol.inheritances:
@@ -1616,24 +1633,24 @@ def _verify_symbol_table(
                 errors.append(
                     Error(
                         symbol.node,
-                        f"The inheritance for entity {symbol.name} "
+                        f"The inheritance for class {symbol.name} "
                         f"is dangling: {inheritance}"))
 
-            elif not isinstance(parent_symbol, Entity):
+            elif not isinstance(parent_symbol, Class):
                 errors.append(
                     Error(
                         symbol.node,
-                        f"Expected the entity {symbol.name} to inherit "
-                        f"from an abstract entity, "
+                        f"Expected the class {symbol.name} to inherit "
+                        f"from an abstract class, "
                         f"but it inherits from a symbol of type "
                         f"{parent_symbol.__class__.__name__}: {parent_symbol.name}"))
 
-            elif not isinstance(parent_symbol, AbstractEntity):
+            elif not isinstance(parent_symbol, AbstractClass):
                 errors.append(
                     Error(
                         symbol.node,
-                        f"Expected the entity {symbol.name} to inherit from "
-                        f"an abstract entity, but it inherits "
+                        f"Expected the class {symbol.name} to inherit from "
+                        f"an abstract class, but it inherits "
                         f"from a non-abstract one: {parent_symbol.name}",
                     )
                 )
@@ -1699,7 +1716,7 @@ def _verify_symbol_table(
             raise AssertionError(type_annotation)
 
     for symbol in symbol_table.symbols:
-        if not isinstance(symbol, Entity):
+        if not isinstance(symbol, Class):
             continue
 
         for prop in symbol.properties:

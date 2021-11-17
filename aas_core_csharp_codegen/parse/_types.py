@@ -11,7 +11,7 @@ from aas_core_csharp_codegen.parse import tree
 
 _MODULE_NAME = pathlib.Path(__file__).parent.name
 
-BUILTIN_ATOMIC_TYPES = {"bool", "int", "float", "str"}
+BUILTIN_ATOMIC_TYPES = {"bool", "int", "float", "str", "bytearray"}
 
 BUILTIN_COMPOSITE_TYPES = {
     "List",
@@ -121,7 +121,7 @@ class Description:
 
 
 class Property:
-    """Represent a property of an entity."""
+    """Represent a property of a class."""
 
     # fmt: off
     @require(
@@ -155,7 +155,7 @@ class Default:
 
 
 class Argument:
-    """Represent an argument of an entity's method."""
+    """Represent an argument of a method."""
 
     @require(
         lambda type_annotation: not final_in_type_annotation(type_annotation),
@@ -176,7 +176,7 @@ class Argument:
 
 
 class Invariant:
-    """Represent an invariant of an entity."""
+    """Represent an invariant of a class."""
 
     def __init__(
             self,
@@ -258,7 +258,7 @@ def is_string_expr(expr: ast.AST) -> bool:
 
 
 class Method:
-    """Represent a method of an entity."""
+    """Represent a method of a class."""
 
     # fmt: off
     @require(
@@ -328,7 +328,7 @@ class Method:
 
 
 class JsonSerialization:
-    """Define settings for JSON de/serialization of a specific entity."""
+    """Define settings for JSON de/serialization of a specific class."""
 
     def __init__(self, with_model_type: Optional[bool]) -> None:
         """
@@ -340,7 +340,7 @@ class JsonSerialization:
 
 
 class XmlSerialization:
-    """Define settings for XML de/serialization of a specific entity."""
+    """Define settings for XML de/serialization of a specific class."""
     def __init__(self, property_as_text: Optional[Identifier], node: ast.AST) -> None:
         """
         Initialize with the given values.
@@ -351,8 +351,8 @@ class XmlSerialization:
         self.node = node
 
 
-class Entity:
-    """Represent an entity of the meta-model."""
+class Class:
+    """Represent a class of the meta-model."""
 
     # fmt: off
     @require(
@@ -405,30 +405,30 @@ class Entity:
         }  # type: Mapping[Identifier, Method]
 
 
-class AbstractEntity(Entity):
+class AbstractClass(Class):
     """
-    Represent an abstract entity of the meta-model.
+    Represent an abstract class of the meta-model.
 
     For example, ``Referable``.
     """
 
     def __repr__(self) -> str:
-        """Represent the entity with a name for easier debugging."""
+        """Represent the class with a name for easier debugging."""
         return (
             f"<{_MODULE_NAME}.{self.__class__.__name__} "
             f"{self.name} at 0x{id(self):x}>"
         )
 
 
-class ConcreteEntity(Entity):
+class ConcreteClass(Class):
     """
-    Represent a concrete entity of the meta-model.
+    Represent a concrete class of the meta-model.
 
     For example, ``Asset``.
     """
 
     def __repr__(self) -> str:
-        """Represent the entity with a name for easier debugging."""
+        """Represent the class with a name for easier debugging."""
         return (
             f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
         )
@@ -468,12 +468,12 @@ class Enumeration:
         self.node = node
 
 
-Symbol = Union[AbstractEntity, ConcreteEntity, Enumeration]
+Symbol = Union[AbstractClass, ConcreteClass, Enumeration]
 
 
 class UnverifiedSymbolTable(DBC):
     """
-    Represent the original entities in the meta-model.
+    Represent the original classes in the meta-model.
 
     This symbol table is unverified and may contain inconsistencies.
     """
@@ -511,14 +511,14 @@ class UnverifiedSymbolTable(DBC):
 
         return symbol
 
-    def must_find_entity(self, name: Identifier) -> Entity:
+    def must_find_class(self, name: Identifier) -> Class:
         """
-        Find the entity with the given name.
+        Find the class with the given name.
 
-        :param name: identifier of the entity
-        :return: the entity
+        :param name: identifier of the class
+        :return: the class
         :raise: :py:class:`NameError` if the name is not in the symbol table.
-        :raise: :py:class:`TypeError` if the symbol is not an entity.
+        :raise: :py:class:`TypeError` if the symbol is not a class.
         """
         symbol = self._name_to_symbol.get(name, None)
         if symbol is None:
@@ -526,9 +526,9 @@ class UnverifiedSymbolTable(DBC):
                 f"The symbol {name!r} could not be found in the symbol table."
             )
 
-        if not isinstance(symbol, Entity):
+        if not isinstance(symbol, Class):
             raise TypeError(
-                f"The symbol {name!r} is expected to be an entity, "
+                f"The symbol {name!r} is expected to be a class, "
                 f"but it is not: {symbol}"
             )
 

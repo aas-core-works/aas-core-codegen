@@ -31,6 +31,7 @@ class BuiltinAtomicType(enum.Enum):
     INT = "int"
     FLOAT = "float"
     STR = "str"
+    BYTEARRAY = "bytearray"
 
 
 assert (
@@ -334,7 +335,7 @@ class Interface:
             properties: Sequence[Property],
             json_serialization: JsonSerialization,
             description: Optional[Description],
-            parsed: parse.Entity,
+            parsed: parse.Class,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -505,7 +506,7 @@ class Constructor:
     """
     Represent an understood constructor of a class stacked.
 
-    The constructor is expected to be stacked from the entity and all the antecedents.
+    The constructor is expected to be stacked from the class and all the antecedents.
     """
 
     @require(
@@ -616,7 +617,7 @@ class Class:
             json_serialization: JsonSerialization,
             xml_serialization: XmlSerialization,
             description: Optional[Description],
-            parsed: parse.Entity,
+            parsed: parse.Class,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -737,7 +738,7 @@ class SymbolReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
 
 
 class PropertyReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
-    """Represent a reference in the documentation to a property of an entity."""
+    """Represent a reference in the documentation to a property of a class."""
 
     def __init__(
             self, property_name: str, rawsource='', text='', *children, **attributes
@@ -754,9 +755,9 @@ def map_descendability(
     """
     Map the type annotation recursively by the descendability.
 
-    The descendability means that the type annotation references an entity (an interface
-    or a class) *or* that it is a subscripted type annotation which subscribes one or
-    more entities of the meta-model.
+    The descendability means that the type annotation references an interface
+    or a class *or* that it is a subscripted type annotation which subscribes one or
+    more classes of the meta-model.
 
     The mapping is a form of caching. Otherwise, the time complexity would be quadratic
     if we queried at each type annotation subscript.
