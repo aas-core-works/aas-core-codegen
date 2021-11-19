@@ -73,7 +73,7 @@ def _define_for_enumeration(
             writer.write(f'\nrdfs:subClassOf aas:{subset_enum_name} ;')
 
     writer.write(
-        '\n{I}rdfs:label {rdf_shacl_common.string_literal(cls_label)}^^xsd:string ;')
+        f'\n{I}rdfs:label {rdf_shacl_common.string_literal(cls_label)}^^xsd:string ;')
 
     errors = []  # type: List[Error]
 

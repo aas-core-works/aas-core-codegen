@@ -528,6 +528,8 @@ class Enumeration:
             for literal in self.literals
         }
 
+        self.literal_id_set = frozenset(id(literal) for literal in literals)
+
 
 class Class:
     """Represent a class implementing zero, one or more interfaces."""
@@ -588,6 +590,7 @@ class Class:
         return (
             f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
         )
+
 
 Symbol = Union[Interface, Enumeration, Class]
 
@@ -681,14 +684,39 @@ class SymbolReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
             self, rawsource, text, *children, **attributes)
 
 
-class PropertyReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
-    """Represent a reference in the documentation to a property of a class."""
+class PropertyReferenceInDoc:
+    """Model a reference to a property, usually used in the docstrings."""
+
+    @require(lambda symbol, prop: id(prop) in symbol.property_id_set)
+    def __init__(self, symbol: Union[Class, Interface], prop: Property) -> None:
+        self.symbol = symbol
+        self.prop = prop
+
+
+class EnumerationLiteralReferenceInDoc:
+    """Model a reference to an enumeration literal, usually used in the docstrings."""
+
+    @require(lambda symbol, literal: id(literal) in symbol.literal_id_set)
+    def __init__(self, symbol: Enumeration, literal: EnumerationLiteral) -> None:
+        self.symbol = symbol
+        self.literal = literal
+
+
+class AttributeReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
+    """
+    Represent a reference in the documentation to an "attribute".
+
+    The attribute, in this context, refers to the role ``:attr:``. The references
+    implies either a reference to a property of a class or a literal of an enumeration.
+    """
 
     def __init__(
-            self, path: str, rawsource='', text='', *children, **attributes
+            self,
+            reference: Union[PropertyReferenceInDoc, EnumerationLiteralReferenceInDoc],
+            rawsource='', text='', *children, **attributes
     ) -> None:
         """Initialize with ``property_name`` and propagate the rest to the parent."""
-        self.path = path
+        self.reference = reference
         docutils.nodes.TextElement.__init__(
             self, rawsource, text, *children, **attributes)
 

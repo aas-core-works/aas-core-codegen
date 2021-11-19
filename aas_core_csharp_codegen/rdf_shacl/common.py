@@ -73,6 +73,7 @@ BUILTIN_MAP = {
     intermediate.BuiltinAtomicType.BOOL: "xsd:boolean",
     intermediate.BuiltinAtomicType.INT: "xsd:integer",
     intermediate.BuiltinAtomicType.FLOAT: "xsd:double",
-    intermediate.BuiltinAtomicType.STR: "xsd:string"
+    intermediate.BuiltinAtomicType.STR: "xsd:string",
+    intermediate.BuiltinAtomicType.BYTEARRAY: "xsd:byte"
 }
 assert all(literal in BUILTIN_MAP for literal in intermediate.BuiltinAtomicType)

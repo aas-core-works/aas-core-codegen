@@ -1,6 +1,7 @@
 """Translate the parsed representation into the intermediate representation."""
 import ast
 import itertools
+import re
 from typing import Sequence, List, Mapping, Optional, MutableMapping, Tuple, Union, \
     Iterator, Generator, TypeVar, Generic, cast, Set
 
@@ -36,8 +37,9 @@ from aas_core_csharp_codegen.intermediate._types import (
     Symbol, ListTypeAnnotation,
     OptionalTypeAnnotation,
     OurAtomicTypeAnnotation, STR_TO_BUILTIN_ATOMIC_TYPE, BuiltinAtomicTypeAnnotation,
-    Description, PropertyReferenceInDoc, SymbolReferenceInDoc,
+    Description, AttributeReferenceInDoc, SymbolReferenceInDoc,
     SubscriptedTypeAnnotation, DefaultEnumerationLiteral, XmlSerialization,
+    EnumerationLiteralReferenceInDoc, PropertyReferenceInDoc,
 )
 
 
@@ -68,10 +70,29 @@ def _symbol_reference_role(
     return [node], []
 
 
+_ATTRIBUTE_REFERENCE_RE = re.compile(
+    r'[a-zA-Z_][a-zA-Z_0-9]*(\.[a-zA-Z_][a-zA-Z_0-9]*)?')
+
+
+class _PlaceholderAttributeReference:
+    """
+    Represent a placeholder object masking a proper attribute reference.
+
+    The attribute, in this context, refers either to a property of a class or a literal
+    of an enumeration. This placeholder needs to be used till we create the symbol
+    table in full, so that we can properly de-reference the symbols.
+    """
+
+    @require(lambda path: _ATTRIBUTE_REFERENCE_RE.fullmatch(path))
+    def __init__(self, path: str) -> None:
+        """Initialize with the given values."""
+        self.path = path
+
+
 # noinspection PyUnusedLocal
-def _property_reference_role(
+def _attribute_reference_role(
         role, rawtext, text, lineno, inliner, options=None, content=None):
-    """Create an element of the description as a reference to a property."""
+    """Create a reference in the documentation to a property or a literal."""
     # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
     if content is None:
         content = []
@@ -81,19 +102,21 @@ def _property_reference_role(
 
     docutils.parsers.rst.roles.set_classes(options)
 
+    # We strip the tilde based on the convention as we ignore the appearance.
+    # See: https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-syntax
+    path = text[1:] if text.startswith('~') else text
+
     # We need to create a placeholder as the symbol table might not be fully created
     # at the point when we translate the documentation.
     #
     # We have to resolve the placeholders in the second pass of the translation with
     # the actual references to the symbol table.
-    symbol = _PlaceholderSymbol(identifier=text)
 
-    # We strip the tilde based on the convention as we ignore the appearance.
-    # See: https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-syntax
-    property_name = text[1:] if text.startswith('~') else text
+    placeholder = _PlaceholderAttributeReference(path=path)
 
-    node = PropertyReferenceInDoc(
-        property_name, rawtext, docutils.utils.unescape(text), refuri=text, **options
+    # noinspection PyTypeChecker
+    node = AttributeReferenceInDoc(
+        placeholder, rawtext, docutils.utils.unescape(text), refuri=text, **options
     )
     return [node], []
 
@@ -103,7 +126,7 @@ def _property_reference_role(
 #
 # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
 docutils.parsers.rst.roles.register_local_role('class', _symbol_reference_role)
-docutils.parsers.rst.roles.register_local_role('attr', _property_reference_role)
+docutils.parsers.rst.roles.register_local_role('attr', _attribute_reference_role)
 
 
 def _parsed_description_to_description(parsed: parse.Description) -> Description:
@@ -1345,78 +1368,104 @@ def translate(
 
     # endregion
 
-    # region Verify that all property references in the descriptions are valid
+    # region Second pass to resolve the attribute references in the descriptions
 
-    # TODO: test this
+    # TODO: test this, especially the failure cases
     for symbol in symbols:
         for description in _over_descriptions(symbol):
-            for prop_ref_in_doc in description.document.traverse(
-                    condition=PropertyReferenceInDoc):
-                parts = prop_ref_in_doc.path.split('.')
+            for attr_ref_in_doc in description.document.traverse(
+                    condition=AttributeReferenceInDoc):
+                if isinstance(
+                        attr_ref_in_doc.reference, _PlaceholderAttributeReference):
+                    pth = attr_ref_in_doc.reference.path
+                    parts = pth.split('.')
 
-                if any(not IDENTIFIER_RE.match(part) for part in parts):
-                    underlying_errors.append(
-                        Error(
-                            description.node,
-                            f"Invalid reference to a property; each part of the path "
-                            f"needs to be an identifier, "
-                            f"but it is not: {prop_ref_in_doc.path}"))
-                    continue
-
-                part_identifiers = [Identifier(part) for part in parts]
-
-                if len(part_identifiers) == 0:
-                    underlying_errors.append(
-                        Error(
-                            description.node,
-                            "Unexpected empty reference to a property"))
-                    continue
-
-                target_symbol = None  # type: Optional[Symbol]
-                prop_identifier = None  # type: Optional[Identifier]
-                if len(part_identifiers) == 1:
-                    target_symbol = symbol
-                    prop_identifier = part_identifiers[0]
-                elif len(part_identifiers) == 2:
-                    target_symbol = symbol_table.find(part_identifiers[0])
-                    if target_symbol is None:
+                    if any(not IDENTIFIER_RE.match(part) for part in parts):
                         underlying_errors.append(
                             Error(
                                 description.node,
-                                f"Dangling reference to a non-existing "
-                                f"symbol: {prop_ref_in_doc.path}"))
+                                f"Invalid reference to a property or a literal; "
+                                f"each part of the path needs to be an identifier, "
+                                f"but it is not: {pth}"))
                         continue
 
-                    prop_identifier = part_identifiers[1]
-                else:
-                    underlying_errors.append(
-                        Error(
-                            description.node,
-                            f"We did not implement the resolution of such "
-                            f"long references to a property: {prop_ref_in_doc.path}"))
-                    continue
+                    part_identifiers = [Identifier(part) for part in parts]
 
-                assert target_symbol is not None
-                assert prop_identifier is not None
-
-                if isinstance(target_symbol, Enumeration):
-                    if prop_identifier not in target_symbol.literals_by_name:
+                    if len(part_identifiers) == 0:
                         underlying_errors.append(
                             Error(
                                 description.node,
-                                f"Dangling reference to a non-existing literal "
-                                f"in the enumeration {target_symbol.name}: "
-                                f"{prop_ref_in_doc.path}"))
+                                "Unexpected empty reference "
+                                "to a property or a literal"))
                         continue
+
+                    target_symbol = None  # type: Optional[Symbol]
+                    attr_identifier = None  # type: Optional[Identifier]
+                    if len(part_identifiers) == 1:
+                        target_symbol = symbol
+                        attr_identifier = part_identifiers[0]
+                    elif len(part_identifiers) == 2:
+                        target_symbol = symbol_table.find(part_identifiers[0])
+                        if target_symbol is None:
+                            underlying_errors.append(
+                                Error(
+                                    description.node,
+                                    f"Dangling reference to a non-existing "
+                                    f"symbol: {pth}"))
+                            continue
+
+                        attr_identifier = part_identifiers[1]
+                    else:
+                        underlying_errors.append(
+                            Error(
+                                description.node,
+                                f"We did not implement the resolution of such "
+                                f"a reference to a property or a literal: {pth}"))
+                        continue
+
+                    assert target_symbol is not None
+                    assert attr_identifier is not None
+
+                    reference: Optional[
+                        Union[
+                            PropertyReferenceInDoc,
+                            EnumerationLiteralReferenceInDoc]] = None
+
+                    if isinstance(target_symbol, Enumeration):
+                        literal = target_symbol.literals_by_name.get(
+                            attr_identifier, None)
+
+                        if literal is None:
+                            underlying_errors.append(
+                                Error(
+                                    description.node,
+                                    f"Dangling reference to a non-existing literal "
+                                    f"in the enumeration {target_symbol.name}: {pth}"))
+                            continue
+
+                        reference = EnumerationLiteralReferenceInDoc(
+                            symbol=target_symbol, literal=literal)
+
                     elif isinstance(target_symbol, (Class, Interface)):
-                        if prop_identifier not in target_symbol.properties_by_name:
+                        prop = target_symbol.properties_by_name.get(
+                            attr_identifier, None)
+
+                        if prop is None:
                             underlying_errors.append(
                                 Error(
                                     description.node,
                                     f"Dangling reference to a non-existing property "
-                                    f"of a class {target_symbol.name}: "
-                                    f"{prop_ref_in_doc.path}"))
+                                    f"of a class {target_symbol.name}: {pth}"))
                             continue
+
+                        reference = PropertyReferenceInDoc(
+                            symbol=target_symbol, prop=prop)
+
+                    else:
+                        assert_never(target_symbol)
+
+                    assert reference is not None
+                    attr_ref_in_doc.reference = reference
 
     # endregion
 

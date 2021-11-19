@@ -236,8 +236,8 @@ class _DescriptionElementRenderer(
         assert name is not None
         return f'<see cref={xml.sax.saxutils.quoteattr(name)} />', None
 
-    def transform_property_reference_in_doc(
-            self, element: intermediate.PropertyReferenceInDoc
+    def transform_attribute_reference_in_doc(
+            self, element: intermediate.AttributeReferenceInDoc
     ) -> Tuple[Optional[str], Optional[str]]:
         prop_name = csharp_naming.property_name(Identifier(element.path))
         return f'<see cref={xml.sax.saxutils.quoteattr(prop_name)} />', None

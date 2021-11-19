@@ -12,11 +12,11 @@ from typing import (
     Union,
     Iterator,
     Sequence,
-    NoReturn, TypeVar, Generic, )
+    NoReturn, )
 
-import docutils.nodes
 import asttokens
 from icontract import require, DBC, ensure
+import inflect
 
 IDENTIFIER_RE = re.compile(r"[a-zA-Z_][a-zA-Z_0-9]*")
 
@@ -227,29 +227,34 @@ def indent_but_first_line(text: str, indention: str) -> str:
     )
 
 
+_INFLECT_ENGINE = inflect.engine()
+
+
 @ensure(lambda identifier, result: plural_to_singular(result) == identifier)
 def singular_to_plural(identifier: Identifier) -> Identifier:
     """Translate the singular form of the identifier to its plural form."""
-    # NOTE (mristin, 2021-11-12):
-    # We apply the simplest of the heuristics here. Please consider using the package
-    # inflect (https://pypi.org/project/inflect/) if this does not suffice.
+    text = identifier.replace('_', ' ')
 
-    parts = identifier.split('_')
-    return Identifier('_'.join(parts[:-1] + [parts[-1] + 's']))
+    if text == 'permissions per object':
+        result = 'permissions per objects'
+    else:
+        result = _INFLECT_ENGINE.plural(text)
+
+    return Identifier('_'.join(result.split(' ')))
 
 
 @ensure(lambda identifier, result: singular_to_plural(result) == identifier)
 def plural_to_singular(identifier: Identifier) -> Identifier:
     """Translate the plural form of the identifier to its singular form."""
-    parts = identifier.split('_')
+    text = identifier.replace('_', ' ')
 
-    if parts[-1].endswith('s'):
-        parts[-1] = parts[-1][:-1]
+    if text == 'permissions per objects':
+        result = 'permissions per object'
     else:
-        raise NotImplementedError(
-            "(mristin, 2021-11-12): "
-            "We implemented only a bare minimum on singular/plural conversion. "
-            "The implementation needs to be refined. If you see this message, "
-            "than it is a good time to do it.")
+        result = _INFLECT_ENGINE.singular_noun(text)
 
-    return Identifier('_'.join(parts))
+    if result is False:
+        raise RuntimeError(f"Failed to find the singular noun of: {identifier=}")
+
+    assert isinstance(result, str)
+    return Identifier('_'.join(result.split(' ')))

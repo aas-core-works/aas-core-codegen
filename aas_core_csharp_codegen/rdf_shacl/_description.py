@@ -1,16 +1,14 @@
 """Render the description of a class or a property as a plain text."""
-import xml.sax.saxutils
-from typing import Optional, List, Tuple, Sequence
+from typing import Optional, List, Tuple, Sequence, cast
 
 import docutils.nodes
 from icontract import ensure
 
 from aas_core_csharp_codegen import intermediate
-from aas_core_csharp_codegen.common import Identifier
+from aas_core_csharp_codegen.common import assert_never
 from aas_core_csharp_codegen.intermediate import (
     rendering as intermediate_rendering
 )
-from aas_core_csharp_codegen.intermediate.rendering import T
 from aas_core_csharp_codegen.rdf_shacl import (
     naming as rdf_shacl_naming
 )
@@ -98,7 +96,7 @@ def without_redundant_breaks(tokens: Sequence[Token]) -> List[Token]:
 
 
 class Renderer(
-    intermediate_rendering.DocutilsElementTransformer[List[Token]]):
+        intermediate_rendering.DocutilsElementTransformer[List[Token]]):
     """Render descriptions as C# docstring XML."""
 
     # fmt: off
@@ -123,11 +121,22 @@ class Renderer(
         cls_name = rdf_shacl_naming.class_name(element.symbol.name)
         return [TokenText(f"'{cls_name}'")], None
 
-    def transform_property_reference_in_doc(
-            self, element: intermediate.PropertyReferenceInDoc
+    def transform_attribute_reference_in_doc(
+            self, element: intermediate.AttributeReferenceInDoc
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
-        prop_name = rdf_shacl_naming.property_name(Identifier(element.path))
-        return [TokenText(f"'{prop_name}'")], None
+        if isinstance(element.reference, intermediate.PropertyReferenceInDoc):
+            prop_name = rdf_shacl_naming.property_name(element.reference.prop.name)
+            return [TokenText(f"'{prop_name}'")], None
+
+        elif isinstance(
+                element.reference, intermediate.EnumerationLiteralReferenceInDoc):
+            literal_name = rdf_shacl_naming.enumeration_literal(
+                element.reference.literal.name)
+
+            return [TokenText(f"'{literal_name}'")], None
+
+        else:
+            assert_never(element.reference)
 
     def transform_literal(
             self, element: docutils.nodes.literal
@@ -187,6 +196,38 @@ class Renderer(
 
     def transform_bullet_list(
             self, element: docutils.nodes.bullet_list
+    ) -> Tuple[Optional[List[Token]], Optional[str]]:
+        tokens = []  # type: List[Token]
+        for child in element.children:
+            child_tokens, error = self.transform(child)
+            if error is not None:
+                return None, error
+
+            assert child_tokens is not None
+            tokens.extend(child_tokens)
+            tokens.append(TokenLineBreak())
+
+        return tokens, None
+
+    def transform_note(
+            self, element: docutils.nodes.note
+    ) -> Tuple[Optional[List[Token]], Optional[str]]:
+        tokens = []  # type: List[Token]
+        for child in element.children:
+            child_tokens, error = self.transform(child)
+            if error is not None:
+                return None, error
+
+            assert child_tokens is not None
+            tokens.extend(child_tokens)
+            tokens.append(TokenLineBreak())
+
+        tokens = cast(List[Token], [TokenText("NOTE:"), TokenLineBreak()]) + tokens
+
+        return tokens, None
+
+    def transform_reference(
+            self, element: docutils.nodes.reference
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
         tokens = []  # type: List[Token]
         for child in element.children:
