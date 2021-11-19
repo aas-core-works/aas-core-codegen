@@ -55,9 +55,6 @@
             },
             "identification": {
               "$ref": "#/definitions/Identifier"
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
@@ -234,9 +231,6 @@
               "items": {
                 "$ref": "#/definitions/View"
               }
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
@@ -252,14 +246,6 @@
         },
         {
           "$ref": "#/definitions/HasDataSpecification"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
-            }
-          }
         }
       ]
     },
@@ -345,9 +331,6 @@
               "items": {
                 "$ref": "#/definitions/SubmodelElement"
               }
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
@@ -372,14 +355,6 @@
         },
         {
           "$ref": "#/definitions/HasDataSpecification"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
-            }
-          }
         }
       ]
     },
@@ -396,9 +371,6 @@
             },
             "second": {
               "$ref": "#/definitions/Referable"
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
@@ -427,9 +399,6 @@
             },
             "allowDuplicates": {
               "type": "boolean"
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           }
         }
@@ -439,14 +408,6 @@
       "allOf": [
         {
           "$ref": "#/definitions/SubmodelElement"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
-            }
-          }
         }
       ]
     },
@@ -466,9 +427,6 @@
             },
             "valueId": {
               "$ref": "#/definitions/Reference"
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
@@ -490,9 +448,6 @@
             },
             "valueId": {
               "$ref": "#/definitions/Reference"
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           }
         }
@@ -514,9 +469,6 @@
             },
             "max": {
               "type": "string"
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
@@ -535,9 +487,6 @@
           "properties": {
             "value": {
               "$ref": "#/definitions/Reference"
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           }
         }
@@ -556,9 +505,6 @@
             },
             "value": {
               "type": "string"
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
@@ -580,9 +526,6 @@
             },
             "value": {
               "type": "string"
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
@@ -604,9 +547,6 @@
               "items": {
                 "$ref": "#/definitions/DataElement"
               }
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           }
         }
@@ -641,9 +581,6 @@
             },
             "specificAssetId": {
               "$ref": "#/definitions/IdentifierKeyValuePair"
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
@@ -656,14 +593,6 @@
       "allOf": [
         {
           "$ref": "#/definitions/SubmodelElement"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
-            }
-          }
         }
       ]
     },
@@ -677,9 +606,6 @@
           "properties": {
             "observed": {
               "$ref": "#/definitions/Referable"
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
@@ -713,9 +639,6 @@
               "items": {
                 "$ref": "#/definitions/OperationVariable"
               }
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           }
         }
@@ -736,14 +659,6 @@
       "allOf": [
         {
           "$ref": "#/definitions/SubmodelElement"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
-            }
-          }
         }
       ]
     },
@@ -763,9 +678,6 @@
               "items": {
                 "$ref": "#/definitions/Reference"
               }
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           }
         }
@@ -785,14 +697,11 @@
         {
           "type": "object",
           "properties": {
-            "containedElement": {
+            "containedElements": {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/Referable"
               }
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           }
         }
@@ -1043,7 +952,7 @@
     "ValueList": {
       "type": "object",
       "properties": {
-        "valuesReferencePairType": {
+        "valueReferencePairTypes": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/ValueReferencePair"
@@ -1271,9 +1180,6 @@
               "items": {
                 "$ref": "#/definitions/PermissionsPerObject"
               }
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
@@ -1303,7 +1209,7 @@
         "selectableSubjectAttributes": {
           "$ref": "#/definitions/Submodel"
         },
-        "defaultenvironmentattributes": {
+        "defaultEnvironmentAttributes": {
           "$ref": "#/definitions/Submodel"
         }
       },
@@ -1400,7 +1306,7 @@
             "$ref": "#/definitions/Certificate"
           }
         },
-        "requiredCertificatesExtension": {
+        "requiredCertificatesExtensions": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Reference"

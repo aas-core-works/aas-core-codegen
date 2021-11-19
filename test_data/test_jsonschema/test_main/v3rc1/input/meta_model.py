@@ -1698,7 +1698,7 @@ class View(Referable, Has_semantics, Has_data_specification):
        They are not equivalent to submodels.
     """
 
-    contained_element: Optional[List["Referable"]]
+    contained_elements: Optional[List["Referable"]]
     """
     Reference to a referable element that is contained in the view.
     """
@@ -1711,7 +1711,7 @@ class View(Referable, Has_semantics, Has_data_specification):
         description: Optional["Lang_string_set"] = None,
         semantic_ID: Optional["Reference"] = None,
         data_specifications: Optional[List["Reference"]] = None,
-        contained_element: Optional[List["Referable"]] = None,
+        contained_elements: Optional[List["Referable"]] = None,
     ) -> None:
         Referable.__init__(
             self,
@@ -1728,7 +1728,7 @@ class View(Referable, Has_semantics, Has_data_specification):
             data_specifications=data_specifications,
         )
 
-        self.contained_element = contained_element
+        self.contained_elements = contained_elements
 
 
 @invariant(lambda self: len(self.keys) >= 1)
@@ -1783,7 +1783,7 @@ class Key(DBC):
     In case type = :attr:`~Key_elements.Global_reference` then the key represents
     a global unique id.
 
-    In case type = :attr:`~Fragment_ID` the key represents a bookmark or
+    In case type = :attr:`~Key_type.Fragment_ID` the key represents a bookmark or
     a similar local identifier within its parent element as specified by the key that
     precedes this key.
 
@@ -2181,15 +2181,15 @@ class Value_list(DBC):
     A set of value reference pairs.
     """
 
-    values_reference_pair_type: Optional[List["Value_reference_pair"]]
+    value_reference_pair_types: Optional[List["Value_reference_pair"]]
     """
     A pair of a value together with its global unique id.
     """
 
     def __init__(
-        self, values_reference_pair_type: Optional[List["Value_reference_pair"]] = None
+        self, value_reference_pair_types: Optional[List["Value_reference_pair"]] = None
     ) -> None:
-        self.values_reference_pair_type = values_reference_pair_type
+        self.value_reference_pair_types = value_reference_pair_types
 
 
 @reference_in_the_book(section=(4, 7, 8, 2))
@@ -2684,7 +2684,7 @@ class Access_control(DBC):
     Default: reference to the submodel referenced via defaultSubjectAttributes.
     """
 
-    defaultEnvironmentAttributes: Optional["Submodel"]
+    default_environment_attributes: Optional["Submodel"]
     """
     Reference to a submodel defining default environment attributes, *i.e.* attributes 
     that are not describing the asset itself.
@@ -2703,14 +2703,14 @@ class Access_control(DBC):
         default_permissions: "Submodel",
         access_permission_rules: Optional[List["Access_permission_rule"]] = None,
         selectable_subject_attributes: Optional["Submodel"] = None,
-        defaultEnvironmentAttributes: Optional["Submodel"] = None,
+        default_environment_attributes: Optional["Submodel"] = None,
     ) -> None:
         self.default_subject_attributes = default_subject_attributes
         self.selectable_permissions = selectable_permissions
         self.default_permissions = default_permissions
         self.access_permission_rules = access_permission_rules
         self.selectable_subject_attributes = selectable_subject_attributes
-        self.defaultEnvironmentAttributes = defaultEnvironmentAttributes
+        self.default_environment_attributes = default_environment_attributes
 
 
 @reference_in_the_book(section=(5, 3, 4), index=1)
@@ -2862,7 +2862,7 @@ class Security(DBC):
     Authenticating Certificates of the AAS and its submodels etc.
     """
 
-    required_certificates_extension: Optional[List["Reference"]]
+    required_certificates_extensions: Optional[List["Reference"]]
     """
     Certificate extensions as required by the AAS
     """
@@ -2871,11 +2871,11 @@ class Security(DBC):
         self,
         access_control_policy_points: "Access_control_policy_points",
         certificates: Optional[List["Certificate"]] = None,
-        required_certificates_extension: Optional[List["Reference"]] = None,
+        required_certificates_extensions: Optional[List["Reference"]] = None,
     ) -> None:
         self.access_control_policy_points = access_control_policy_points
         self.certificates = certificates
-        self.required_certificates_extension = required_certificates_extension
+        self.required_certificates_extensions = required_certificates_extensions
 
 
 @reference_in_the_book(section=(5, 3, 5), index=6)

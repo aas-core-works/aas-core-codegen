@@ -353,7 +353,7 @@ aas:AssetInformationShape  a sh:NodeShape ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/AssetInformation/material> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/AssetInformation/billOfMaterialItem> ;
         sh:class aas:Submodel ;
         sh:minCount 0 ;
     ] ;
@@ -1389,7 +1389,7 @@ aas:ConceptDescriptionShape  a sh:NodeShape ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/ConceptDescription/allowedCase> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/ConceptDescription/isCaseOf> ;
         sh:class aas:Reference ;
         sh:minCount 0 ;
     ] ;

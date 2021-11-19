@@ -615,9 +615,9 @@ This attribute is required as soon as the AAS is exchanged via partners in the l
 For example, serial number."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetInformation/material
-<https://admin-shell.io/aas/3/0/RC01/AssetInformation/material> rdf:type owl:ObjectProperty ;
-    rdfs:label "material"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/AssetInformation/billOfMaterialItem
+<https://admin-shell.io/aas/3/0/RC01/AssetInformation/billOfMaterialItem> rdf:type owl:ObjectProperty ;
+    rdfs:label "bill of material item"^^xsd:string ;
     rdfs:domain aas:AssetInformation ;
     rdfs:range aas:Submodel ;
     rdfs:comment """A reference to a Submodel that defines the bill of material of the asset represented by the AAS.
@@ -2423,9 +2423,9 @@ Some of the administrative information like the version number might need to be 
     rdfs:comment "The globally unique identification of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ConceptDescription/allowedCase
-<https://admin-shell.io/aas/3/0/RC01/ConceptDescription/allowedCase> rdf:type owl:ObjectProperty ;
-    rdfs:label "allowed case"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/ConceptDescription/isCaseOf
+<https://admin-shell.io/aas/3/0/RC01/ConceptDescription/isCaseOf> rdf:type owl:ObjectProperty ;
+    rdfs:label "is case of"^^xsd:string ;
     rdfs:domain aas:ConceptDescription ;
     rdfs:range aas:Reference ;
     rdfs:comment """Reference to an external definition the concept is compatible to or was derived from.

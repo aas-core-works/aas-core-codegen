@@ -575,7 +575,7 @@ class Asset_information:
     For example, serial number.
     """
 
-    materials: Optional[List["Submodel"]]
+    bill_of_material: Optional[List["Submodel"]]
     """
     A reference to a Submodel that defines the bill of material of the asset represented
     by the AAS.
@@ -596,7 +596,7 @@ class Asset_information:
         asset_kind: "Asset_kind",
         global_asset_ID: Optional["Reference"] = None,
         specific_asset_ID: Optional["Identifier_key_value_pair"] = None,
-        materials: Optional[List["Submodel"]] = None,
+        bill_of_material: Optional[List["Submodel"]] = None,
         default_thumbnail: Optional["File"] = None,
     ) -> None:
         # TODO (Nico & Marko, 2021-09-24):
@@ -605,7 +605,7 @@ class Asset_information:
         self.asset_kind = asset_kind
         self.global_asset_ID = global_asset_ID
         self.specific_asset_ID = specific_asset_ID
-        self.materials = materials if materials is not None else []
+        self.bill_of_material = bill_of_material if bill_of_material is not None else []
         self.default_thumbnail = default_thumbnail
 
 
@@ -1649,7 +1649,7 @@ class Concept_description(Identifiable, Has_data_specification):
     FUNCTION, EVENT, ENTITY, APPLICATION_CLASS, QUALIFIER, VIEW. Default: PROPERTY.
     """
 
-    allowed_cases: Optional[List["Reference"]]
+    is_cases_of: Optional[List["Reference"]]
     """
     Reference to an external definition the concept is compatible to or was derived 
     from.
@@ -1666,7 +1666,7 @@ class Concept_description(Identifiable, Has_data_specification):
         category: Optional[str] = None,
         description: Optional["Lang_string_set"] = None,
         administration: Optional["Administrative_information"] = None,
-        allowed_cases: Optional[List["Reference"]] = None,
+        is_cases_of: Optional[List["Reference"]] = None,
         data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Identifiable.__init__(
@@ -1681,7 +1681,7 @@ class Concept_description(Identifiable, Has_data_specification):
 
         Has_data_specification.__init__(self, data_specifications=data_specifications)
 
-        self.allowed_cases = allowed_cases
+        self.is_cases_of = is_cases_of
 
 
 @reference_in_the_book(section=(4, 7, 10))
