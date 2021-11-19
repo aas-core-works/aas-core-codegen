@@ -66,7 +66,7 @@ def _define_type(
             f'We did not implement them at the moment since we need more information '
             f'about the context.\n\n'
             f'This feature needs yet to be implemented.\n\n'
-            f'{type_annotation.value=}')
+            f'{type_annotation=}')
 
 
 def _define_for_class_or_interface(

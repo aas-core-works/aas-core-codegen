@@ -14,8 +14,8 @@ _MODULE_NAME = pathlib.Path(__file__).parent.name
 BUILTIN_ATOMIC_TYPES = {"bool", "int", "float", "str", "bytearray"}
 
 BUILTIN_COMPOSITE_TYPES = {
-    "List",
-    "Optional"
+    Identifier("List"),
+    Identifier("Optional")
 }
 
 
@@ -91,9 +91,13 @@ class Description:
 
 
 class Property:
-    """Represent a property of a class."""
+    """
+    Represent a property of a class.
 
-    # TODO: require: type_annotation must not have Optional anywhere!
+    If a property is optional (non-required), the :py:attr:`type_annotation` needs to
+    be set with the appropriate ``Optional`` composite type.
+    """
+
     def __init__(
             self,
             name: Identifier,
@@ -119,7 +123,6 @@ class Default:
 class Argument:
     """Represent an argument of a method."""
 
-    # TODO: rewrite: require no optional_in_type_annotation
     def __init__(
             self,
             name: Identifier,

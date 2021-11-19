@@ -547,7 +547,6 @@ def _args_to_arguments(
 
         assert type_annotation is not None
 
-        # TODO: add check that no Optional is in the type annotation
         # endregion
 
         # region Default
@@ -1622,8 +1621,10 @@ def _verify_symbol_table(
 
     # region Check type annotations in properties and method signatures
 
-    expected_subscripted_types = BUILTIN_COMPOSITE_TYPES.copy()
-    # TODO: add Optional to expected_subscripted_types
+    expected_subscripted_types = BUILTIN_COMPOSITE_TYPES
+    # NOTE (mristin, 2021-11-19):
+    # If you expect type qualifiers such as ``Final``, make a copy of
+    # the ``BUILTIN_COMPOSITE_TYPES`` and add them to the copy.
 
     def verify_no_dangling_references_in_type_annotation(
             type_annotation: TypeAnnotation,
