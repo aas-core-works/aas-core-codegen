@@ -184,12 +184,7 @@ def _parsed_type_annotation_to_type_annotation(
             parsed=parsed)
 
     elif isinstance(parsed, parse.SubscriptedTypeAnnotation):
-        if parsed.identifier == 'Final':
-            raise AssertionError(
-                "Unexpected ``Final`` type annotation at this stage. "
-                "This type annotation should have been processed before.")
-
-        elif parsed.identifier == 'List':
+        if parsed.identifier == 'List':
             assert len(parsed.subscripts) == 1, (
                 f"Expected exactly one subscript for the List type annotation, "
                 f"but got: {parsed}; this should have been caught before!")
@@ -316,7 +311,6 @@ def _parsed_property_to_property(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
             else None),
-        is_readonly=parsed.is_readonly,
         implemented_for=_PlaceholderSymbol(cls.name),
         parsed=parsed,
     )

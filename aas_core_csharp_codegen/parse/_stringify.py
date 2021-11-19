@@ -94,7 +94,6 @@ def _stringify_property(prop: Property) -> stringify.Entity:
                 "type_annotation", _stringify_type_annotation(prop.type_annotation)
             ),
             stringify.Property("description", _stringify_description(prop.description)),
-            stringify.Property("is_readonly", prop.is_readonly),
             stringify.PropertyEllipsis("node", prop.node),
         ],
     )

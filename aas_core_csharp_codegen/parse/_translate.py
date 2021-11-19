@@ -33,7 +33,6 @@ from aas_core_csharp_codegen.parse._types import (
     Class,
     Enumeration,
     EnumerationLiteral,
-    final_in_type_annotation,
     is_string_expr,
     JsonSerialization,
     Method,
@@ -85,7 +84,6 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
     _EXPECTED_NAME_FROM_MODULE = collections.OrderedDict(
         [
             ("Enum", "enum"),
-            ("Final", "typing"),
             ("List", "typing"),
             ("Optional", "typing"),
             ("DBC", "icontract"),
@@ -325,16 +323,6 @@ def _type_annotation(
 ) -> Tuple[Optional[TypeAnnotation], Optional[Error]]:
     """Parse the type annotation."""
     if isinstance(node, ast.Name):
-        if node.id == "Final":
-            return (
-                None,
-                Error(
-                    node,
-                    "The type annotation is expected with subscript(s), "
-                    "but got none: Final",
-                ),
-            )
-
         return AtomicTypeAnnotation(identifier=Identifier(node.id), node=node), None
 
     elif isinstance(node, ast.Constant):
@@ -458,40 +446,11 @@ def _ann_assign_to_property(
             Error(node.value, f"Unexpected assignment of a value to a property"),
         )
 
-    is_readonly = False
-    if (
-            isinstance(type_annotation, SubscriptedTypeAnnotation)
-            and type_annotation.identifier == "Final"
-    ):
-        if len(type_annotation.subscripts) != 1:
-            return (
-                None,
-                Error(
-                    node.annotation,
-                    f"Expected a single subscript for Final type, "
-                    f"but got {len(type_annotation.subscripts)}",
-                ),
-            )
-
-        type_annotation = type_annotation.subscripts[0]
-        is_readonly = True
-
-        if final_in_type_annotation(type_annotation=type_annotation):
-            return (
-                None,
-                Error(
-                    node.annotation,
-                    f"Unexpected nested Final type qualifier: "
-                    f"{atok.get_text(node.annotation)}",
-                ),
-            )
-
     return (
         Property(
             name=Identifier(node.target.id),
             type_annotation=type_annotation,
             description=description,
-            is_readonly=is_readonly,
             node=node,
         ),
         None,
@@ -588,18 +547,7 @@ def _args_to_arguments(
 
         assert type_annotation is not None
 
-        if final_in_type_annotation(type_annotation=type_annotation):
-            return (
-                None,
-                Error(
-                    arg_node,
-                    f"Unexpected ``Final`` in the type annotation "
-                    f"of the method argument {arg_node.arg}: "
-                    f"{atok.get_text(arg_node.annotation)}",
-                ),
-            )
-
-        assert type_annotation is not None
+        # TODO: add check that no Optional is in the type annotation
         # endregion
 
         # region Default
@@ -1543,12 +1491,7 @@ def _verify_arity_of_type_annotation_subscript(
     """
     expected_arity_map = {
         "List": 1,
-        "Sequence": 1,
-        "Set": 1,
-        "Mapping": 2,
-        "MutableMapping": 2,
-        "Optional": 1,
-        "Final": 1
+        "Optional": 1
     }
     expected_arity = expected_arity_map.get(type_annotation.identifier, None)
     if expected_arity is None:
@@ -1680,7 +1623,7 @@ def _verify_symbol_table(
     # region Check type annotations in properties and method signatures
 
     expected_subscripted_types = BUILTIN_COMPOSITE_TYPES.copy()
-    expected_subscripted_types.add("Final")
+    # TODO: add Optional to expected_subscripted_types
 
     def verify_no_dangling_references_in_type_annotation(
             type_annotation: TypeAnnotation,

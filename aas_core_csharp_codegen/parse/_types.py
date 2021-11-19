@@ -15,10 +15,6 @@ BUILTIN_ATOMIC_TYPES = {"bool", "int", "float", "str", "bytearray"}
 
 BUILTIN_COMPOSITE_TYPES = {
     "List",
-    "Sequence",
-    "Set",
-    "Mapping",
-    "MutableMapping",
     "Optional"
 }
 
@@ -84,32 +80,6 @@ TypeAnnotation = Union[
 ]
 
 
-def final_in_type_annotation(type_annotation: TypeAnnotation) -> bool:
-    """Check whether the type annotation contains ``Final`` type qualifier."""
-    if isinstance(type_annotation, AtomicTypeAnnotation):
-        if type_annotation.identifier == "Final":
-            return True
-
-        return False
-
-    elif isinstance(type_annotation, SubscriptedTypeAnnotation):
-        if type_annotation.identifier == "Final":
-            return True
-
-        for subscript in type_annotation.subscripts:
-            if final_in_type_annotation(subscript):
-                return True
-
-        return False
-
-    elif isinstance(type_annotation, SelfTypeAnnotation):
-        return False
-
-    else:
-        assert_never(type_annotation)
-        raise AssertionError(type_annotation)
-
-
 class Description:
     """Represent a docstring describing something in the meta-model."""
 
@@ -123,26 +93,18 @@ class Description:
 class Property:
     """Represent a property of a class."""
 
-    # fmt: off
-    @require(
-        lambda type_annotation:
-        not final_in_type_annotation(type_annotation),
-        "The type qualifier ``Final`` extracted before and molded into ``is_readonly``"
-    )
-    # fmt: on
+    # TODO: require: type_annotation must not have Optional anywhere!
     def __init__(
             self,
             name: Identifier,
             type_annotation: TypeAnnotation,
             description: Optional[Description],
-            is_readonly: bool,
             node: ast.AnnAssign,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
         self.type_annotation = type_annotation
         self.description = description
-        self.is_readonly = is_readonly
         self.node = node
 
 
@@ -157,10 +119,7 @@ class Default:
 class Argument:
     """Represent an argument of a method."""
 
-    @require(
-        lambda type_annotation: not final_in_type_annotation(type_annotation),
-        "No type qualifier ``Final`` expected in the type annotation of an argument",
-    )
+    # TODO: rewrite: require no optional_in_type_annotation
     def __init__(
             self,
             name: Identifier,

@@ -11,7 +11,6 @@ TypeAnnotation = _types.TypeAnnotation
 AtomicTypeAnnotation = _types.AtomicTypeAnnotation
 SelfTypeAnnotation = _types.SelfTypeAnnotation
 SubscriptedTypeAnnotation = _types.SubscriptedTypeAnnotation
-final_in_type_annotation = _types.final_in_type_annotation
 Description = _types.Description
 Property = _types.Property
 Default = _types.Default

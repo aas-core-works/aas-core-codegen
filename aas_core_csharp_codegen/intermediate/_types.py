@@ -158,7 +158,6 @@ class Property:
             name: Identifier,
             type_annotation: TypeAnnotation,
             description: Optional[Description],
-            is_readonly: bool,
             implemented_for: Optional['Symbol'],
             parsed: parse.Property,
     ) -> None:
@@ -166,7 +165,6 @@ class Property:
         self.name = name
         self.type_annotation = type_annotation
         self.description = description
-        self.is_readonly = is_readonly
         self.implemented_for = implemented_for
         self.parsed = parsed
 
