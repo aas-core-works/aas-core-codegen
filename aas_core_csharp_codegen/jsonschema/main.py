@@ -109,12 +109,26 @@ def _define_for_class_or_interface(
 
         properties[prop_name] = type_definition
 
-    if (
-            symbol.json_serialization is not None
-            and symbol.json_serialization.with_model_type
-    ):
-        properties['modelType'] = collections.OrderedDict(
-            [('$ref', '#/definitions/ModelType')])
+    if symbol.json_serialization.with_model_type:
+        # Add model type only if none of the interfaces already add it.
+        # Otherwise, the property ``modelType`` is already properly specified in
+        # the antecedent and need not to be re-specified.
+
+        needs_model_type = True
+        if isinstance(symbol, intermediate.Interface):
+            for inheritance in symbol.inheritances:
+                if inheritance.json_serialization.with_model_type:
+                    needs_model_type = False
+        elif isinstance(symbol, intermediate.Class):
+            for interface in symbol.interfaces:
+                if interface.json_serialization.with_model_type:
+                    needs_model_type = False
+        else:
+            assert_never(symbol)
+
+        if needs_model_type:
+            properties['modelType'] = collections.OrderedDict(
+                [('$ref', '#/definitions/ModelType')])
 
     definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
     definition["type"] = "object"
