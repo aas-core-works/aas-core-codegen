@@ -87,20 +87,6 @@ def generate_type(
         if isinstance(type_annotation, intermediate.ListTypeAnnotation):
             return Stripped(f"List<{generate_type(type_annotation.items)}>")
 
-        elif isinstance(type_annotation, intermediate.SequenceTypeAnnotation):
-            return Stripped(
-                f"ReadOnlyCollection<{generate_type(type_annotation.items)}>")
-
-        elif isinstance(type_annotation, intermediate.MappingTypeAnnotation):
-            keys = generate_type(type_annotation.keys)
-            values = generate_type(type_annotation.values)
-            return Stripped(f"ReadOnlyDictionary<{keys}, {values}>")
-
-        elif isinstance(type_annotation, intermediate.MutableMappingTypeAnnotation):
-            keys = generate_type(type_annotation.keys)
-            values = generate_type(type_annotation.values)
-            return Stripped(f"Dictionary<{keys}, {values}>")
-
         elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
             value = generate_type(type_annotation.value)
             return Stripped(f"{value}?")

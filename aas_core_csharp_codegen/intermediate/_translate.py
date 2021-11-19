@@ -33,8 +33,8 @@ from aas_core_csharp_codegen.intermediate._types import (
     Method,
     Class,
     Constructor,
-    Symbol, ListTypeAnnotation, SequenceTypeAnnotation, SetTypeAnnotation,
-    MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
+    Symbol, ListTypeAnnotation,
+    OptionalTypeAnnotation,
     OurAtomicTypeAnnotation, STR_TO_BUILTIN_ATOMIC_TYPE, BuiltinAtomicTypeAnnotation,
     Description, PropertyReferenceInDoc, SymbolReferenceInDoc,
     SubscriptedTypeAnnotation, DefaultEnumerationLiteral, XmlSerialization,
@@ -196,45 +196,6 @@ def _parsed_type_annotation_to_type_annotation(
 
             return ListTypeAnnotation(
                 items=_parsed_type_annotation_to_type_annotation(parsed.subscripts[0]),
-                parsed=parsed)
-
-        elif parsed.identifier == 'Sequence':
-            assert len(parsed.subscripts) == 1, (
-                f"Expected exactly one subscript for the Sequence type annotation, "
-                f"but got: {parsed}; this should have been caught before!")
-
-            return SequenceTypeAnnotation(
-                items=_parsed_type_annotation_to_type_annotation(parsed.subscripts[0]),
-                parsed=parsed)
-
-        elif parsed.identifier == 'Set':
-            assert len(parsed.subscripts) == 1, (
-                f"Expected exactly one subscript for the Set type annotation, "
-                f"but got: {parsed}; this should have been caught before!")
-
-            return SetTypeAnnotation(
-                items=_parsed_type_annotation_to_type_annotation(parsed.subscripts[0]),
-                parsed=parsed)
-
-        elif parsed.identifier == 'Mapping':
-            assert len(parsed.subscripts) == 2, (
-                f"Expected exactly two subscripts for the Mapping type annotation, "
-                f"but got: {parsed}; this should have been caught before!")
-
-            return MappingTypeAnnotation(
-                keys=_parsed_type_annotation_to_type_annotation(parsed.subscripts[0]),
-                values=_parsed_type_annotation_to_type_annotation(parsed.subscripts[1]),
-                parsed=parsed)
-
-        elif parsed.identifier == 'MutableMapping':
-            assert len(parsed.subscripts) == 2, (
-                f"Expected exactly two subscripts "
-                f"for the MutableMapping type annotation, "
-                f"but got: {parsed}; this should have been caught before!")
-
-            return MutableMappingTypeAnnotation(
-                keys=_parsed_type_annotation_to_type_annotation(parsed.subscripts[0]),
-                values=_parsed_type_annotation_to_type_annotation(parsed.subscripts[1]),
                 parsed=parsed)
 
         elif parsed.identifier == 'Optional':
@@ -860,16 +821,6 @@ def _over_our_atomic_type_annotations(
     elif isinstance(something, SubscriptedTypeAnnotation):
         if isinstance(something, ListTypeAnnotation):
             yield from _over_our_atomic_type_annotations(something.items)
-        elif isinstance(something, SequenceTypeAnnotation):
-            yield from _over_our_atomic_type_annotations(something.items)
-        elif isinstance(something, SetTypeAnnotation):
-            yield from _over_our_atomic_type_annotations(something.items)
-        elif isinstance(something, MappingTypeAnnotation):
-            yield from _over_our_atomic_type_annotations(something.keys)
-            yield from _over_our_atomic_type_annotations(something.values)
-        elif isinstance(something, MutableMappingTypeAnnotation):
-            yield from _over_our_atomic_type_annotations(something.keys)
-            yield from _over_our_atomic_type_annotations(something.values)
         elif isinstance(something, OptionalTypeAnnotation):
             yield from _over_our_atomic_type_annotations(something.value)
         else:

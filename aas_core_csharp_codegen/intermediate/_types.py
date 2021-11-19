@@ -73,7 +73,11 @@ class OurAtomicTypeAnnotation(AtomicTypeAnnotation):
 
 
 class SubscriptedTypeAnnotation:
-    """Represent a subscripted type annotation such as ``Mapping[..., ...]``."""
+    """Represent a subscripted (i.e. composite) type annotation.
+
+     The composite type annotations are, for example, ``List[...]`` (or
+     ``Mapping[..., ...]``, *etc.*).
+     """
 
 
 class ListTypeAnnotation(SubscriptedTypeAnnotation):
@@ -87,58 +91,16 @@ class ListTypeAnnotation(SubscriptedTypeAnnotation):
         return f"List[{self.items}]"
 
 
-class SequenceTypeAnnotation(SubscriptedTypeAnnotation):
-    """Represent a type annotation involving a ``Sequence[...]``."""
+# NOTE (mristin, 2021-11-19):
+# We do not support other composite types except for ``List``. In the future we might
+# add support for ``Set``, ``MutableMapping`` *etc.*
+#
+# Additionally, we allow only properties of a class to be optional, but not the values
+# of a composite type.
 
-    def __init__(self, items: 'TypeAnnotation', parsed: parse.TypeAnnotation):
-        self.items = items
-        self.parsed = parsed
-
-    def __str__(self) -> str:
-        return f"Sequence[{self.items}]"
-
-
-class SetTypeAnnotation(SubscriptedTypeAnnotation):
-    """Represent a type annotation involving a ``Set[...]``."""
-
-    def __init__(self, items: 'TypeAnnotation', parsed: parse.TypeAnnotation):
-        self.items = items
-        self.parsed = parsed
-
-    def __str__(self) -> str:
-        return f"Set[{self.items}]"
-
-
-class MappingTypeAnnotation(SubscriptedTypeAnnotation):
-    """Represent a type annotation involving a ``Mapping[..., ...]``."""
-
-    def __init__(
-            self, keys: 'TypeAnnotation', values: 'TypeAnnotation',
-            parsed: parse.TypeAnnotation):
-        self.keys = keys
-        self.values = values
-        self.parsed = parsed
-
-    def __str__(self) -> str:
-        return f"Mapping[{self.keys}, {self.values}]"
-
-
-class MutableMappingTypeAnnotation(SubscriptedTypeAnnotation):
-    """Represent a type annotation involving a ``MutableMapping[..., ...]``."""
-
-    def __init__(
-            self, keys: 'TypeAnnotation', values: 'TypeAnnotation',
-            parsed: parse.TypeAnnotation):
-        self.keys = keys
-        self.values = values
-        self.parsed = parsed
-
-    def __str__(self) -> str:
-        return f"MutableMapping[{self.keys}, {self.values}]"
-
-
+# TODO: move into the property — we do not support it — only a property can be optional!
 class OptionalTypeAnnotation(SubscriptedTypeAnnotation):
-    """Represent a type annotation involving a ``MutableMapping[..., ...]``."""
+    """Represent a type annotation involving an ``Optional[...]``."""
 
     def __init__(self, value: 'TypeAnnotation', parsed: parse.TypeAnnotation):
         self.value = value
@@ -171,22 +133,6 @@ def type_annotations_equal(that: TypeAnnotation, other: TypeAnnotation) -> bool:
     elif isinstance(that, ListTypeAnnotation):
         assert isinstance(other, ListTypeAnnotation)
         return type_annotations_equal(that.items, other.items)
-    elif isinstance(that, SequenceTypeAnnotation):
-        assert isinstance(other, SequenceTypeAnnotation)
-        return type_annotations_equal(that.items, other.items)
-    elif isinstance(that, SetTypeAnnotation):
-        assert isinstance(other, SetTypeAnnotation)
-        return type_annotations_equal(that.items, other.items)
-    elif isinstance(that, MappingTypeAnnotation):
-        assert isinstance(other, MappingTypeAnnotation)
-        return (
-                type_annotations_equal(that.keys, other.keys)
-                and type_annotations_equal(that.values, other.values))
-    elif isinstance(that, MutableMappingTypeAnnotation):
-        assert isinstance(other, MutableMappingTypeAnnotation)
-        return (
-                type_annotations_equal(that.keys, other.keys)
-                and type_annotations_equal(that.values, other.values))
     elif isinstance(that, OptionalTypeAnnotation):
         assert isinstance(other, OptionalTypeAnnotation)
         return type_annotations_equal(that.value, other.value)
@@ -783,19 +729,8 @@ def map_descendability(
             mapping[a_type_annotation] = result
             return result
 
-        elif isinstance(a_type_annotation, (
-                ListTypeAnnotation,
-                SequenceTypeAnnotation,
-                SetTypeAnnotation)):
+        elif isinstance(a_type_annotation, ListTypeAnnotation):
             result = recurse(a_type_annotation=a_type_annotation.items)
-            mapping[a_type_annotation] = result
-            return result
-
-        elif isinstance(a_type_annotation, (
-                MappingTypeAnnotation,
-                MutableMappingTypeAnnotation
-        )):
-            result = recurse(a_type_annotation=a_type_annotation.values)
             mapping[a_type_annotation] = result
             return result
 

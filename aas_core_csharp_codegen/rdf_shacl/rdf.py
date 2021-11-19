@@ -210,12 +210,7 @@ def _define_property(
         rdf_type = "owl:DatatypeProperty"
         rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno.a_type]
 
-    elif isinstance(
-            type_anno,
-            (intermediate.ListTypeAnnotation,
-             intermediate.SequenceTypeAnnotation,
-             intermediate.SetTypeAnnotation)
-    ):
+    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         prop_name = rdf_shacl_naming.property_name(plural_to_singular(prop.name))
         prop_label = rdf_shacl_naming.property_label(plural_to_singular(prop.name))
 

@@ -21,8 +21,8 @@ from aas_core_csharp_codegen.intermediate._types import (
     SubscriptedTypeAnnotation,
     Symbol,
     SymbolTable,
-    TypeAnnotation, ListTypeAnnotation, SequenceTypeAnnotation, SetTypeAnnotation,
-    MappingTypeAnnotation, MutableMappingTypeAnnotation, OptionalTypeAnnotation,
+    TypeAnnotation, ListTypeAnnotation,
+    OptionalTypeAnnotation,
     BuiltinAtomicTypeAnnotation, OurAtomicTypeAnnotation, Description, Invariant,
     DefaultConstant, DefaultEnumerationLiteral
 )
@@ -95,42 +95,6 @@ def _stringify_subscripted_type_annotation(
             properties=[
                 stringify.Property(
                     "items", _stringify(type_annotation.items)),
-                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-            ])
-    elif isinstance(type_annotation, SequenceTypeAnnotation):
-        result = stringify.Entity(
-            name=SequenceTypeAnnotation.__name__,
-            properties=[
-                stringify.Property(
-                    "items", _stringify(type_annotation.items)),
-                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-            ])
-    elif isinstance(type_annotation, SetTypeAnnotation):
-        result = stringify.Entity(
-            name=SetTypeAnnotation.__name__,
-            properties=[
-                stringify.Property(
-                    "items", _stringify(type_annotation.items)),
-                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-            ])
-    elif isinstance(type_annotation, MappingTypeAnnotation):
-        result = stringify.Entity(
-            name=MappingTypeAnnotation.__name__,
-            properties=[
-                stringify.Property(
-                    "keys", _stringify(type_annotation.keys)),
-                stringify.Property(
-                    "values", _stringify(type_annotation.values)),
-                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-            ])
-    elif isinstance(type_annotation, MutableMappingTypeAnnotation):
-        result = stringify.Entity(
-            name=MutableMappingTypeAnnotation.__name__,
-            properties=[
-                stringify.Property(
-                    "keys", _stringify(type_annotation.keys)),
-                stringify.Property(
-                    "values", _stringify(type_annotation.values)),
                 stringify.PropertyEllipsis("parsed", type_annotation.parsed),
             ])
     elif isinstance(type_annotation, OptionalTypeAnnotation):

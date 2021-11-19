@@ -739,10 +739,7 @@ def _generate_descend_body(
 
                 return result
 
-            elif isinstance(type_anno, (
-                    intermediate.ListTypeAnnotation,
-                    intermediate.SequenceTypeAnnotation,
-                    intermediate.SetTypeAnnotation)):
+            elif isinstance(type_anno, intermediate.ListTypeAnnotation):
                 item_var = var_name(item_count)
 
                 children = unroll(
@@ -758,24 +755,6 @@ def _generate_descend_body(
                     children=children)
 
                 return [node]
-
-            elif isinstance(type_anno, (
-                    intermediate.MappingTypeAnnotation,
-                    intermediate.MutableMappingTypeAnnotation
-            )):
-                item_var = var_name(item_count)
-
-                children = unroll(
-                    current_var_name=var_name(item_count),
-                    item_count=item_count + 1,
-                    type_anno=type_anno.values)
-
-                if len(children) == 0:
-                    return []
-
-                return [csharp_unrolling.Node(
-                    text=f"foreach (var {item_var} in {current_var_name}.Values)",
-                    children=children)]
 
             elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
                 children = unroll(
@@ -986,11 +965,7 @@ def _generate_default_value_for_type_annotation(
             assert_never(type_annotation.a_type)
     elif isinstance(type_annotation, (
             intermediate.OurAtomicTypeAnnotation,
-            intermediate.ListTypeAnnotation,
-            intermediate.SequenceTypeAnnotation,
-            intermediate.SetTypeAnnotation,
-            intermediate.MappingTypeAnnotation,
-            intermediate.MutableMappingTypeAnnotation
+            intermediate.ListTypeAnnotation
     )):
         code = f"new {csharp_common.generate_type(type_annotation)}()"
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):

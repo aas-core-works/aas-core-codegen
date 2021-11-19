@@ -211,10 +211,7 @@ def _generate_serialization(
                         return [csharp_unrolling.Node(
                             f'Visit({current_var_name});', children=[])]
 
-            elif isinstance(type_anno, (
-                    intermediate.ListTypeAnnotation,
-                    intermediate.SequenceTypeAnnotation,
-                    intermediate.SetTypeAnnotation)):
+            elif isinstance(type_anno, intermediate.ListTypeAnnotation):
                 item_var = var_name(item_count)
 
                 children = unroll(
@@ -243,20 +240,6 @@ def _generate_serialization(
                     ]
                 else:
                     return [node]
-
-            elif isinstance(type_anno, (
-                    intermediate.MappingTypeAnnotation,
-                    intermediate.MutableMappingTypeAnnotation
-            )):
-                raise NotImplementedError(
-                    f"(mristin, 2021-11-10):\n"
-                    f"We did not implement an XML serialization "
-                    f"of dictionaries in a descendable property. "
-                    f"The property was {prop.name} of "
-                    f"class {cls.parsed.name}. Please have a closer look "
-                    f"and implement this feature once the context is "
-                    f"more clear.\n\n"
-                    f"{type_anno=}, {item_count=}, {current_var_name=}")
 
             elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
                 children = unroll(

@@ -170,9 +170,7 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
                     }}'''),
                     children=[])]
 
-        elif isinstance(type_anno, (
-                intermediate.ListTypeAnnotation, intermediate.SequenceTypeAnnotation,
-                intermediate.SetTypeAnnotation)):
+        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             item_var = var_name(item_count, "Item")
 
             children = unroll(
@@ -190,35 +188,6 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
                 children=children)
 
             return [node]
-
-        elif isinstance(type_anno, (
-                intermediate.MappingTypeAnnotation,
-                intermediate.MutableMappingTypeAnnotation
-        )):
-            key_value_var = var_name(key_value_count + 1, "KeyValue")
-
-            key_children = unroll(
-                current_var_name=f'{key_value_var}.Key',
-                item_count=item_count,
-                key_value_count=key_value_count + 1,
-                path=path + [f'{{{key_value_var}.Key}}'],
-                type_anno=type_anno.keys)
-
-            value_children = unroll(
-                current_var_name=f'{key_value_var}.Value',
-                item_count=item_count,
-                key_value_count=key_value_count + 1,
-                path=path + [f'{{{key_value_var}.Key}}'],
-                type_anno=type_anno.values)
-
-            children = key_children + value_children
-
-            if len(children) > 0:
-                return [csharp_unrolling.Node(
-                    text=f'foreach (var {key_value_var} in {current_var_name})',
-                    children=children)]
-            else:
-                return []
 
         elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
             children = unroll(
@@ -908,10 +877,7 @@ def _unroll_recursion_in_recursive_verify(
                         ${csharp_common.string_literal(joined_pth)});'''),
                 children=[])]
 
-        elif isinstance(type_anno, (
-                intermediate.ListTypeAnnotation, intermediate.SequenceTypeAnnotation,
-                intermediate.SetTypeAnnotation)):
-
+        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             if item_count > 15:
                 index_var = f'i{item_count}'
             else:
@@ -942,26 +908,6 @@ def _unroll_recursion_in_recursive_verify(
                     {csharp_common.INDENT}{index_var}++)'''))
 
             return [csharp_unrolling.Node(text=text, children=children)]
-
-        elif isinstance(type_anno, (
-                intermediate.MappingTypeAnnotation,
-                intermediate.MutableMappingTypeAnnotation
-        )):
-            key_value_var = var_name(key_value_count + 1, "KeyValue")
-
-            children = unroll(
-                current_var_name=f'{key_value_var}.Value',
-                item_count=item_count,
-                key_value_count=key_value_count + 1,
-                path=path + [f'{{{key_value_var}.Key}}'],
-                type_anno=type_anno.values)
-
-            if len(children) > 0:
-                return [csharp_unrolling.Node(
-                    text=f'foreach (var {key_value_var} in {current_var_name})',
-                    children=children)]
-            else:
-                return []
 
         elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
             children = unroll(

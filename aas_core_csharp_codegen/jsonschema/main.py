@@ -56,22 +56,9 @@ def _define_type(
         return collections.OrderedDict(
             [('$ref',
               f"#/definitions/{naming.json_model_type(type_annotation.symbol.name)}")])
-    elif isinstance(
-            type_annotation, (
-                    intermediate.ListTypeAnnotation,
-                    intermediate.SequenceTypeAnnotation,
-                    intermediate.SetTypeAnnotation)):
+    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         return collections.OrderedDict(
             [('type', 'array'), ('items', _define_type(type_annotation.items))])
-    elif isinstance(
-            type_annotation, (
-                    intermediate.MutableMappingTypeAnnotation,
-                    intermediate.MappingTypeAnnotation)
-    ):
-        return collections.OrderedDict([
-            ('type', 'object'),
-            ('additionalProperties', _define_type(type_annotation.values))
-        ])
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         raise NotImplementedError(
             f'(mristin, 2021-11-10):\n'

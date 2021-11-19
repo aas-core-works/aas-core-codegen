@@ -163,12 +163,7 @@ def _define_property_shape(
         prop_name = rdf_shacl_naming.property_name(prop.name)
         rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno.a_type]
 
-    elif isinstance(
-            type_anno,
-            (intermediate.ListTypeAnnotation,
-             intermediate.SequenceTypeAnnotation,
-             intermediate.SetTypeAnnotation)
-    ):
+    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         prop_name = rdf_shacl_naming.property_name(plural_to_singular(prop.name))
 
         if isinstance(type_anno.items, intermediate.OurAtomicTypeAnnotation):
@@ -216,11 +211,7 @@ def _define_property_shape(
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
         card.min_count = 0
-    elif isinstance(
-            prop.type_annotation,
-            (intermediate.ListTypeAnnotation,
-             intermediate.SequenceTypeAnnotation,
-             intermediate.SetTypeAnnotation)):
+    elif isinstance(prop.type_annotation, intermediate.ListTypeAnnotation):
         card.min_count = 0
     elif isinstance(
             prop.type_annotation, intermediate.AtomicTypeAnnotation):
