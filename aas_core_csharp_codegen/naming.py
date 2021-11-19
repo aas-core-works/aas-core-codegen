@@ -1,4 +1,14 @@
+from typing import List
+
 from aas_core_csharp_codegen.common import Identifier
+
+UPPERCASE_ABBREVIATION_SET = {
+    "IRI",
+    "IRDI",
+    "IEC",
+    "ID",
+    "URL"
+}
 
 
 def json_property(identifier: Identifier) -> Identifier:
@@ -9,17 +19,21 @@ def json_property(identifier: Identifier) -> Identifier:
     'something'
 
     >>> json_property(Identifier("something_to_URL"))
-    'somethingToUrl'
+    'somethingToURL'
     """
     parts = identifier.split('_')
 
     if len(parts) == 1:
         return Identifier(parts[0].lower())
 
-    return Identifier(
-        "{}{}".format(
-            parts[0].lower(),
-            ''.join(part.capitalize() for part in parts[1:])))
+    cased_parts = [parts[0].lower()]  # type: List[str]
+    for part in parts[1:]:
+        if part.upper() in UPPERCASE_ABBREVIATION_SET:
+            cased_parts.append(part.upper())
+        else:
+            cased_parts.append(part.capitalize())
+
+    return Identifier(''.join(cased_parts))
 
 
 def json_model_type(identifier: Identifier) -> Identifier:
@@ -29,12 +43,19 @@ def json_model_type(identifier: Identifier) -> Identifier:
     >>> json_model_type(Identifier("something"))
     'Something'
 
-    >>> json_model_type(Identifier("URL_to_something"))
-    'UrlToSomething'
+    >>> json_model_type(Identifier("Data_type_IEC_61360"))
+    'DataTypeIEC61360'
     """
     parts = identifier.split('_')
 
-    return Identifier("{}".format(''.join(part.capitalize() for part in parts)))
+    cased_parts = []  # type: List[str]
+    for part in parts:
+        if part.upper() in UPPERCASE_ABBREVIATION_SET:
+            cased_parts.append(part.upper())
+        else:
+            cased_parts.append(part.capitalize())
+
+    return Identifier(''.join(cased_parts))
 
 
 def xml_name(identifier: Identifier) -> Identifier:

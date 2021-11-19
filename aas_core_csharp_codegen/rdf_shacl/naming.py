@@ -2,6 +2,7 @@
 from typing import List
 
 from aas_core_csharp_codegen.common import Identifier, Stripped
+from aas_core_csharp_codegen import naming
 
 
 def class_name(identifier: Identifier) -> Identifier:
@@ -25,11 +26,6 @@ def class_name(identifier: Identifier) -> Identifier:
             ''.join(part.capitalize() for part in parts[1:])))
 
 
-_UPPERCASE_ABBREVIATION_SET = {
-    "URL",
-    "ID"
-}
-
 _LOWERCASE_WORDS_IN_LABEL = {
     "to",
     "in"
@@ -50,7 +46,7 @@ def class_label(identifier: Identifier) -> Stripped:
 
     cased = []  # type: List[str]
     for part in parts:
-        if part in _UPPERCASE_ABBREVIATION_SET:
+        if part in naming.UPPERCASE_ABBREVIATION_SET:
             cased.append(part.upper())
         elif part in _LOWERCASE_WORDS_IN_LABEL:
             cased.append(part.lower())
@@ -95,7 +91,7 @@ def property_label(identifier: Identifier) -> Stripped:
 
     cased = []  # type: List[str]
     for part in parts:
-        if part in _UPPERCASE_ABBREVIATION_SET:
+        if part in naming.UPPERCASE_ABBREVIATION_SET:
             cased.append(part.upper())
         else:
             cased.append(part.lower())
@@ -130,7 +126,7 @@ def enumeration_literal_label(identifier: Identifier) -> Stripped:
 
     cased = []  # type: List[str]
     for part in parts:
-        if part in _UPPERCASE_ABBREVIATION_SET:
+        if part in naming.UPPERCASE_ABBREVIATION_SET:
             cased.append(part.upper())
         elif part in _LOWERCASE_WORDS_IN_LABEL:
             cased.append(part.lower())

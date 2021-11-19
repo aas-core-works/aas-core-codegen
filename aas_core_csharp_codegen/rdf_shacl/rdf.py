@@ -37,6 +37,8 @@ def _generate_comment(
 
     assert tokens is not None
 
+    tokens = rdf_shacl_description.without_redundant_breaks(tokens=tokens)
+
     parts = []  # type: List[str]
     for token in tokens:
         if isinstance(token, rdf_shacl_description.TokenText):
@@ -48,7 +50,9 @@ def _generate_comment(
         else:
             assert_never(token)
 
-    return ''.join(parts), None
+    result = ''.join(parts)
+
+    return result, None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))

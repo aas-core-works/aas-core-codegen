@@ -1,0 +1,31 @@
+{
+  "LangString": {
+    "type": "object",
+    "properties": {
+      "language": {
+        "type": "string"
+      },
+      "text": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "language",
+      "text"
+    ]
+  },
+  "LangStringSet": {
+    "type": "object",
+    "properties": {
+      "langStrings": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/LangString"
+        }
+      }
+    },
+    "required": [
+      "langStrings"
+    ]
+  }
+}

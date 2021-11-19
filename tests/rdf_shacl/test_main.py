@@ -69,10 +69,11 @@ class Test_against_recorded(unittest.TestCase):
                     str(output_dir), '<output dir>')
 
                 if Test_against_recorded.RERECORD:
-                    stdout_pth.write_text(normalized_stdout)
+                    stdout_pth.write_text(normalized_stdout, encoding='utf-8')
                 else:
                     self.assertEqual(
-                        normalized_stdout, stdout_pth.read_text(), stdout_pth)
+                        normalized_stdout,
+                        stdout_pth.read_text(encoding='utf-8'), stdout_pth)
 
                 for relevant_rel_pth in [
                     pathlib.Path('rdf-ontology.ttl'),
@@ -86,11 +87,13 @@ class Test_against_recorded(unittest.TestCase):
                             f"The output file is missing: {output_pth}")
 
                     if Test_against_recorded.RERECORD:
-                        expected_pth.write_text(output_pth.read_text())
+                        expected_pth.write_text(
+                            data=output_pth.read_text(encoding='utf-8'),
+                            encoding='utf-8')
                     else:
                         self.assertEqual(
-                            expected_pth.read_text(),
-                            output_pth.read_text(),
+                            expected_pth.read_text(encoding='utf-8'),
+                            output_pth.read_text(encoding='utf-8'),
                             f"The files {expected_pth} and {output_pth} do not match.")
 
 

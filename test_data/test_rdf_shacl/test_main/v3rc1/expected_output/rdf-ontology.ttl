@@ -57,14 +57,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -152,13 +146,13 @@ aas:IdentifierType rdf:type owl:Class ;
 
 ### https://admin-shell.io/aas/3/0/RC01/IdentifierType/IRDI
 <https://admin-shell.io/aas/3/0/RC01/IdentifierType/IRDI> rdf:type aas:IdentifierType ;
-    rdfs:label "Irdi"^^xsd:string ;
+    rdfs:label "IRDI"^^xsd:string ;
     rdfs:comment "IRDI according to ISO29002-5 as an Identifier scheme for properties and classifications."@en ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/IdentifierType/IRI
 <https://admin-shell.io/aas/3/0/RC01/IdentifierType/IRI> rdf:type aas:IdentifierType ;
-    rdfs:label "Iri"^^xsd:string ;
+    rdfs:label "IRI"^^xsd:string ;
     rdfs:comment "IRI according to Rfc 3987. Every URIis an IRI"@en ;
 .
 
@@ -194,10 +188,8 @@ aas:ModelingKind rdf:type owl:Class ;
 NOTE:
 It becomes an individual entity of a  template,  for example a device model, by defining specific property values.
 
-
 NOTE:
 In an object oriented view,  an instance denotes an object of a template (class).
-
 
 [SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV]  modified"""@en ;
 .
@@ -394,14 +386,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -528,14 +514,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -583,7 +563,7 @@ Some of the administrative information like the version number might need to be 
 aas:AssetInformation rdf:type owl:Class ;
     rdfs:comment """Identifying meta data of the asset that is represented by an AAS.
 
-The asset may either represent an asset type or an asset instance. The asset has a globally unique identifier plus ñ if needed ñ additional domain-specific (proprietary) identifiers. However, to support the corner case of very first phase of lifecycle where a stabilized/constant global asset identifier does not already exist, the corresponding attribute 'globalAssetId' is optional."""@en ;
+The asset may either represent an asset type or an asset instance. The asset has a globally unique identifier plus ‚Äì if needed ‚Äì additional domain-specific (proprietary) identifiers. However, to support the corner case of very first phase of lifecycle where a stabilized/constant global asset identifier does not already exist, the corresponding attribute 'globalAssetId' is optional."""@en ;
     rdfs:label "Asset Information"^^xsd:string ;
 .
 
@@ -661,10 +641,8 @@ aas:AssetKind rdf:type owl:Class ;
 NOTE:
 It becomes an individual entity of a type, for example a device, by defining specific property values.
 
-
 NOTE:
 In an object oriented view, an instance denotes an object of a class (of a type).
-
 
 [SOURCE: IEC 62890:2016, 3.1.16] 65/617/CDV"""@en ;
 .
@@ -776,14 +754,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -912,14 +884,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -1013,8 +979,7 @@ aas:DataElement rdf:type owl:Class ;
 A data element is a submodel element that has a value. The type of value differs for different subtypes of data elements.
 
 NOTE:
-A controlled value is a value whose meaning is given in an external source (see ìISO/TS 29002-10)
-
+A controlled value is a value whose meaning is given in an external source (see ‚ÄúISO/TS 29002-10)
 
 Constraint AASd-090: For data elements DataElement/category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE. Exception: File and Blob data elements."""@en ;
     rdfs:label "Data Element"^^xsd:string ;
@@ -1056,14 +1021,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -1137,7 +1096,7 @@ Default Value = Instance"""@en ;
     rdfs:range xsd:string ;
     rdfs:comment """The value of the property instance.
 
-See Constraint†AASd-065 See Constraint†AASd-007"""@en ;
+See Constraint¬†AASd-065 See Constraint¬†AASd-007"""@en ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/Property/valueId
@@ -1147,7 +1106,7 @@ See Constraint†AASd-065 See Constraint†AASd-007"""@en ;
     rdfs:range aas:Reference ;
     rdfs:comment """Reference to the global unique id of a coded value.
 
-See Constraint†AASd-065 See Constraint†AASd-007"""@en ;
+See Constraint¬†AASd-065 See Constraint¬†AASd-007"""@en ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty
@@ -1186,14 +1145,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -1257,7 +1210,7 @@ Default Value = Instance"""@en ;
     rdfs:label "value"^^xsd:string ;
     rdfs:domain aas:MultiLanguageProperty ;
     rdfs:range rdf:langString ;
-    rdfs:comment "The value of the property instance. See Constraint†AASd-012 See Constraint†AASd-065\""@en ;
+    rdfs:comment "The value of the property instance. See Constraint¬†AASd-012 See Constraint¬†AASd-065\""@en ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/valueId
@@ -1265,7 +1218,7 @@ Default Value = Instance"""@en ;
     rdfs:label "value ID"^^xsd:string ;
     rdfs:domain aas:MultiLanguageProperty ;
     rdfs:range aas:Reference ;
-    rdfs:comment "Reference to the global unique id of a coded value. See Constraint†AASd-012 See Constraint†AASd-065\""@en ;
+    rdfs:comment "Reference to the global unique id of a coded value. See Constraint¬†AASd-012 See Constraint¬†AASd-065\""@en ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/Range
@@ -1302,14 +1255,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -1420,14 +1367,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -1524,14 +1465,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -1597,7 +1532,7 @@ Default Value = Instance"""@en ;
     rdfs:range xsd:string ;
     rdfs:comment """MIME type of the content of the BLOB.
 
-The MIME type states which file extensions the file can have. Valid values are e.g. ìapplication/jsonî, ìapplication/xlsî, îimage/jpgî The allowed values are defined as in RFC2046."""@en ;
+The MIME type states which file extensions the file can have. Valid values are e.g. ‚Äúapplication/json‚Äù, ‚Äúapplication/xls‚Äù, ‚Äùimage/jpg‚Äù The allowed values are defined as in RFC2046."""@en ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/Blob/value
@@ -1609,7 +1544,6 @@ The MIME type states which file extensions the file can have. Valid values are e
 
 NOTE:
 In contrast to the file property the file content is stored directly as value in the Blob data element.
-
 
 Constraint AASd-057: The semanticId of a File or Blob submodel element shall only reference a ConceptDescription with the category DOCUMENT."""@en ;
 .
@@ -1644,14 +1578,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -1756,14 +1684,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -1898,14 +1820,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -1985,7 +1901,7 @@ Default Value = Instance"""@en ;
     rdfs:label "global asset id"^^xsd:string ;
     rdfs:domain aas:Entity ;
     rdfs:range aas:Reference ;
-    rdfs:comment "Reference to the asset the entity is representing. Constraint†AASd-014: Either the attribute globalAssetId or specificAssetId of an Entity must be set if Entity/entityType is set to ìSelfManagedEntityî. They are not existing otherwise."@en ;
+    rdfs:comment "Reference to the asset the entity is representing. Constraint¬†AASd-014: Either the attribute globalAssetId or specificAssetId of an Entity must be set if Entity/entityType is set to ‚ÄúSelfManagedEntity‚Äù. They are not existing otherwise."@en ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetId
@@ -2031,14 +1947,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -2135,14 +2045,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -2236,7 +2140,7 @@ aas:OperationVariable rdf:type owl:Class ;
     rdfs:label "value"^^xsd:string ;
     rdfs:domain aas:OperationVariable ;
     rdfs:range aas:SubmodelElement ;
-    rdfs:comment "Describes the needed argument for an operation via a submodel element of kind=Template. Constraint†AASd-008: The submodel element value of an operation variable shall be of kind=Template."@en ;
+    rdfs:comment "Describes the needed argument for an operation via a submodel element of kind=Template. Constraint¬†AASd-008: The submodel element value of an operation variable shall be of kind=Template."@en ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/Capability
@@ -2267,14 +2171,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -2372,14 +2270,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -2469,14 +2361,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -2974,13 +2860,13 @@ aas:KeyType rdf:type owl:Class ;
 
 ### https://admin-shell.io/aas/3/0/RC01/KeyType/IRDI
 <https://admin-shell.io/aas/3/0/RC01/KeyType/IRDI> rdf:type aas:KeyType ;
-    rdfs:label "Irdi"^^xsd:string ;
+    rdfs:label "IRDI"^^xsd:string ;
     rdfs:comment "IRDI according to ISO29002-5 as an Identifier scheme for properties and classifications."@en ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/KeyType/IRI
 <https://admin-shell.io/aas/3/0/RC01/KeyType/IRI> rdf:type aas:KeyType ;
-    rdfs:label "Iri"^^xsd:string ;
+    rdfs:label "IRI"^^xsd:string ;
     rdfs:comment "IRI according to Rfc 3987. Every URI is an IRI."@en ;
 .
 
@@ -3281,28 +3167,6 @@ aas:DataTypeDef rdf:type owl:Class ;
 ### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/TIME
 <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/TIME> rdf:type aas:DataTypeDef ;
     rdfs:label "Time"^^xsd:string ;
-.
-
-### https://admin-shell.io/aas/3/0/RC01/LangString
-aas:LangString rdf:type owl:Class ;
-    rdfs:comment "Give a text in a specific language."@en ;
-    rdfs:label "Lang String"^^xsd:string ;
-.
-
-### https://admin-shell.io/aas/3/0/RC01/LangString/language
-<https://admin-shell.io/aas/3/0/RC01/LangString/language> rdf:type owl:DatatypeProperty ;
-    rdfs:label "language"^^xsd:string ;
-    rdfs:domain aas:LangString ;
-    rdfs:range xsd:string ;
-    rdfs:comment "Language of the :attr`~text`"@en ;
-.
-
-### https://admin-shell.io/aas/3/0/RC01/LangString/text
-<https://admin-shell.io/aas/3/0/RC01/LangString/text> rdf:type owl:DatatypeProperty ;
-    rdfs:label "text"^^xsd:string ;
-    rdfs:domain aas:LangString ;
-    rdfs:range xsd:string ;
-    rdfs:comment "Content of the string"@en ;
 .
 
 # The class LangStringSet is implicitly defined in RDF through rdf:langString.
@@ -3788,7 +3652,7 @@ aas:Permission rdf:type owl:Class ;
     rdfs:range aas:Property ;
     rdfs:comment """Reference to a property that defines the semantics of the permission.
 
-Constraint†AASs-010: The property referenced in Permission/permission shall have the category ìCONSTANTî. Constraint†AASs-011: The property referenced in Permission/permission shall be part of the submodel that is referenced within the ìselectablePermissionsî attribute of ìAccessControlî.\""""@en ;
+Constraint¬†AASs-010: The property referenced in Permission/permission shall have the category ‚ÄúCONSTANT‚Äù. Constraint¬†AASs-011: The property referenced in Permission/permission shall be part of the submodel that is referenced within the ‚ÄúselectablePermissions‚Äù attribute of ‚ÄúAccessControl‚Äù.\""""@en ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/Permission/kindOfPermission
@@ -3814,7 +3678,7 @@ aas:SubjectAttributes rdf:type owl:Class ;
     rdfs:range aas:DataElement ;
     rdfs:comment """A data element that further classifies a specific subject.
 
-Constraint AASs-015: The data element SubjectAttributes/subjectAttribute shall be part of the submodel that is referenced within the ìselectableSubjectAttributesî attribute of ìAccessControlî.\""""@en ;
+Constraint AASs-015: The data element SubjectAttributes/subjectAttribute shall be part of the submodel that is referenced within the ‚ÄúselectableSubjectAttributes‚Äù attribute of ‚ÄúAccessControl‚Äù.\""""@en ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject
@@ -3876,14 +3740,8 @@ In case the element is a property and the property has a semantic definition ('H
 If no display name is defined in the language requested by the application, then the display name is selected in the following order if available:
 
 * the preferred name in the requested language of the concept description defining the semantics of the element
-
-
 * If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.
-
-
 * the English preferred name of the concept description defining the semantics of the element
-
-
 * the short name of the concept description-the idShort of the element"""@en ;
 .
 
@@ -3943,7 +3801,7 @@ aas:AccessControl rdf:type owl:Class ;
     rdfs:label "default subject attributes"^^xsd:string ;
     rdfs:domain aas:AccessControl ;
     rdfs:range aas:Submodel ;
-    rdfs:comment """Reference to a submodel defining the default subjectsí attributes for the AAS that can be used to describe access permission rules.
+    rdfs:comment """Reference to a submodel defining the default subjects‚Äô attributes for the AAS that can be used to describe access permission rules.
 
 The submodel is of kind=Template."""@en ;
 .
@@ -4017,7 +3875,7 @@ aas:PolicyAdministrationPoint rdf:type owl:Class ;
     rdfs:range aas:AccessControl ;
     rdfs:comment """The policy administration point of access control as realized by the AAS itself.
 
-Constraint†AASs-009:†Either there is an external policy administration point endpoint defined (PolicyAdministrationPoint/externalPolicyDecisionPoints=true) or the AAS has its own access control."""@en ;
+Constraint¬†AASs-009:¬†Either there is an external policy administration point endpoint defined (PolicyAdministrationPoint/externalPolicyDecisionPoints=true) or the AAS has its own access control."""@en ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/PolicyInformationPoints

@@ -42,6 +42,27 @@ class TokenLineBreak(Token):
     def __repr__(self) -> str:
         return f"{TokenLineBreak.__name__}()"
 
+def without_trailing_breaks(tokens: Sequence[Token]) -> List[Token]:
+    """Remove all the trailing breaks at the end of the ``tokens``."""
+    result = list(tokens)
+
+    first_non_break = None  # type: Optional[int]
+    for i, token in enumerate(reversed(result)):
+        if not isinstance(token, (TokenLineBreak, TokenParagraphBreak)):
+            first_non_break = i
+            break
+
+    if first_non_break is None:
+        result = []
+
+    elif first_non_break == 0:
+        pass
+
+    else:
+        result = result[:-first_non_break]
+
+    return result
+
 
 def without_redundant_breaks(tokens: Sequence[Token]) -> List[Token]:
     """Remove the redundant breaks from ``tokens`` and return a cleaned-up list."""
@@ -73,30 +94,13 @@ def without_redundant_breaks(tokens: Sequence[Token]) -> List[Token]:
 
     # endregion
 
-    # region Remove trailing breaks
-
-    first_non_break = None  # type: Optional[int]
-    for i, token in enumerate(reversed(result)):
-        if not isinstance(token, (TokenLineBreak, TokenParagraphBreak)):
-            first_non_break = i
-            break
-
-    if first_non_break is None:
-        result = []
-
-    elif first_non_break == 0:
-        pass
-
-    else:
-        result = result[:-first_non_break]
-
-    # endregion
+    result = without_trailing_breaks(tokens=tokens)
 
     return result
 
 
 class Renderer(
-        intermediate_rendering.DocutilsElementTransformer[List[Token]]):
+    intermediate_rendering.DocutilsElementTransformer[List[Token]]):
     """Render descriptions as C# docstring XML."""
 
     # fmt: off
@@ -104,11 +108,11 @@ class Renderer(
         lambda result:
         not (result[0] is not None)
         or (
-            all(
-                '\n' not in token.content
-                for token in result[0]
-                if isinstance(token, TokenText)
-            )))
+                all(
+                    '\n' not in token.content
+                    for token in result[0]
+                    if isinstance(token, TokenText)
+                )))
     # fmt: on
     def transform_text(
             self, element: docutils.nodes.Text
@@ -176,14 +180,25 @@ class Renderer(
     def transform_list_item(
             self, element: docutils.nodes.list_item
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
+        if (
+                len(element.children) != 1
+                or not isinstance(element.children[0], docutils.nodes.paragraph)
+        ):
+            return None, (
+                f"Expected the list item to contain a single child (paragraph), "
+                f"but got: {element}"
+            )
+
+        para_element = element.children[0]
+
         tokens = []  # type: List[Token]
 
-        if len(element.children) == 0:
+        if len(para_element.children) == 0:
             return (
                 [TokenText("* (empty)")], None
             )
 
-        for child in element.children:
+        for child in para_element.children:
             child_tokens, error = self.transform(child)
             if error is not None:
                 return None, error
@@ -213,6 +228,7 @@ class Renderer(
             self, element: docutils.nodes.note
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
         tokens = []  # type: List[Token]
+
         for child in element.children:
             child_tokens, error = self.transform(child)
             if error is not None:
@@ -220,7 +236,6 @@ class Renderer(
 
             assert child_tokens is not None
             tokens.extend(child_tokens)
-            tokens.append(TokenLineBreak())
 
         tokens = cast(List[Token], [TokenText("NOTE:"), TokenLineBreak()]) + tokens
 
@@ -256,5 +271,3 @@ class Renderer(
 
         result = without_redundant_breaks(tokens=tokens)
         return result, None
-
-

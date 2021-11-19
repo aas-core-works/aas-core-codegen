@@ -115,7 +115,7 @@
     "HasSemantics": {
       "type": "object",
       "properties": {
-        "semanticId": {
+        "semanticID": {
           "$ref": "#/definitions/Reference"
         }
       }
@@ -154,7 +154,7 @@
             "value": {
               "type": "string"
             },
-            "valueId": {
+            "valueID": {
               "$ref": "#/definitions/Reference"
             },
             "modelType": {
@@ -255,10 +255,10 @@
         "assetKind": {
           "$ref": "#/definitions/AssetKind"
         },
-        "globalAssetId": {
+        "globalAssetID": {
           "$ref": "#/definitions/Reference"
         },
-        "specificAssetId": {
+        "specificAssetIds": {
           "$ref": "#/definitions/IdentifierKeyValuePair"
         },
         "billOfMaterial": {
@@ -296,7 +296,7 @@
             "value": {
               "type": "string"
             },
-            "externalSubjectId": {
+            "externalSubjectID": {
               "$ref": "#/definitions/Reference"
             }
           },
@@ -332,10 +332,7 @@
                 "$ref": "#/definitions/SubmodelElement"
               }
             }
-          },
-          "required": [
-            "submodelElements"
-          ]
+          }
         }
       ]
     },
@@ -425,7 +422,7 @@
             "value": {
               "type": "string"
             },
-            "valueId": {
+            "valueID": {
               "$ref": "#/definitions/Reference"
             }
           },
@@ -446,7 +443,7 @@
             "value": {
               "$ref": "#/definitions/LangStringSet"
             },
-            "valueId": {
+            "valueID": {
               "$ref": "#/definitions/Reference"
             }
           }
@@ -576,11 +573,14 @@
                 "$ref": "#/definitions/SubmodelElement"
               }
             },
-            "globalAssetId": {
+            "globalAssetID": {
               "$ref": "#/definitions/Reference"
             },
-            "specificAssetId": {
-              "$ref": "#/definitions/IdentifierKeyValuePair"
+            "specificAssetIds": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IdentifierKeyValuePair"
+              }
             }
           },
           "required": [
@@ -905,7 +905,7 @@
     "DataSpecificationContent": {
       "type": "object"
     },
-    "DataTypeIec61360": {
+    "DataTypeIEC61360": {
       "type": "string",
       "enum": [
         "DATE",
@@ -940,13 +940,13 @@
         "value": {
           "type": "string"
         },
-        "valueId": {
+        "valueID": {
           "$ref": "#/definitions/Reference"
         }
       },
       "required": [
         "value",
-        "valueId"
+        "valueID"
       ]
     },
     "ValueList": {
@@ -960,7 +960,7 @@
         }
       }
     },
-    "DataSpecificationIec61360": {
+    "DataSpecificationIEC61360": {
       "allOf": [
         {
           "$ref": "#/definitions/DataSpecificationContent"
@@ -977,7 +977,7 @@
             "unit": {
               "type": "string"
             },
-            "unitId": {
+            "unitID": {
               "$ref": "#/definitions/Reference"
             },
             "sourceOfDefinition": {
@@ -987,7 +987,7 @@
               "type": "string"
             },
             "dataType": {
-              "$ref": "#/definitions/DataTypeIec61360"
+              "$ref": "#/definitions/DataTypeIEC61360"
             },
             "definition": {
               "$ref": "#/definitions/LangStringSet"
@@ -1001,7 +1001,7 @@
             "value": {
               "type": "string"
             },
-            "valueId": {
+            "valueID": {
               "$ref": "#/definitions/Reference"
             },
             "levelType": {
@@ -1049,7 +1049,7 @@
             "conversionFactor": {
               "type": "string"
             },
-            "registrationAuthorityId": {
+            "registrationAuthorityID": {
               "type": "string"
             },
             "supplier": {
@@ -1084,7 +1084,7 @@
             "lastCertificate": {
               "type": "boolean"
             },
-            "containedExtensions": {
+            "containedExtension": {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/Reference"
@@ -1175,7 +1175,7 @@
             "targetSubjectAttributes": {
               "$ref": "#/definitions/SubjectAttributes"
             },
-            "permissionsPerObjects": {
+            "permissionsPerObject": {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/PermissionsPerObject"
@@ -1306,7 +1306,7 @@
             "$ref": "#/definitions/Certificate"
           }
         },
-        "requiredCertificatesExtensions": {
+        "requiredCertificatesExtension": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Reference"

@@ -1480,24 +1480,6 @@ aas:KeyShape  a sh:NodeShape ;
     ] ;
 .
 
-aas:LangStringShape  a sh:NodeShape ;
-    sh:targetClass aas:LangString ;
-    sh:property [
-        a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/LangString/language> ;
-        sh:datatype xsd:string ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-    ] ;
-    sh:property [
-        a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/LangString/text> ;
-        sh:datatype xsd:string ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-    ] ;
-.
-
 # The shape for the Lang_string_set is intentionally missing since we define it as rdf:langString.
 
 aas:DataSpecificationContentShape  a sh:NodeShape ;

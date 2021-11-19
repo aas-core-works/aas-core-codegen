@@ -2043,21 +2043,6 @@ class Data_type_def(Enum):
     Time = "time"
 
 
-@reference_in_the_book(section=(4, 7, 13, 11))
-class Lang_string(DBC):
-    """Give a text in a specific language."""
-
-    language: str
-    """Language of the :attr`~text`"""
-
-    text: str
-    """Content of the string"""
-
-    # TODO (Nico & Marko, 2021-05-28): what is the format of the ``language``?
-    def __init__(self, language: str, text: str) -> None:
-        self.language = language
-        self.text = text
-
 
 # TODO (Nico & Marko, 2021-05-28):
 #  Should the language be unique?
@@ -2070,51 +2055,6 @@ class Lang_string_set(DBC):
 
     The meaning of the string in each language shall be the same.
     """
-
-    lang_strings: List[Lang_string]
-    """Strings in the specified languages."""
-
-    def __init__(self, lang_strings: List[Lang_string]) -> None:
-        self.lang_strings = lang_strings
-
-        # The strings need to be accessed by a dictionary;
-        # how this dictionary is initialized is left to the individual implementation.
-
-    # fmt: off
-    @ensure(
-        lambda self, language, result:
-        not result
-        or any(
-            language == lang_string.language for lang_string in self.lang_strings)
-    )
-    # fmt: on
-    def has_language(self, language: str) -> bool:
-        """
-        Check whether the string is available in the given language.
-
-        :param language: language of interest
-        :return: True if the string is available in the language
-        """
-        # The strings need to be accessed by a dictionary;
-        # how this dictionary is accessed is left to the individual implementation.
-
-    # fmt: off
-    @ensure(
-        lambda self, language, result:
-        not (
-                self.has_language(language) ^ (result is not None)
-        )
-    )
-    # fmt: on
-    def by_language(self, language: str) -> Optional[str]:
-        """
-        Retrieve the string in the given language.
-
-        :param language: language of interest
-        :return: the string in the language, if available
-        """
-        # The strings need to be accessed by a dictionary;
-        # how this dictionary is accessed is left to the individual implementation.
 
 
 @abstract

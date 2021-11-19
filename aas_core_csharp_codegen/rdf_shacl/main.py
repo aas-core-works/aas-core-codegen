@@ -194,7 +194,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     pth = params.output_dir / "rdf-ontology.ttl"
     try:
-        pth.write_text(rdf_code)
+        pth.write_text(rdf_code, encoding='utf-8')
     except Exception as exception:
         cli.write_error_report(
             message=f"Failed to write the RDF ontology to {pth}",
@@ -224,7 +224,7 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     pth = params.output_dir / "shacl-schema.ttl"
     try:
-        pth.write_text(shacl_code)
+        pth.write_text(shacl_code, encoding='utf-8')
     except Exception as exception:
         cli.write_error_report(
             message=f"Failed to write the SHACL schema to {pth}",

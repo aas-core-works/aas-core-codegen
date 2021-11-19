@@ -6,7 +6,6 @@ import pathlib
 import sys
 from typing import TextIO, Any, MutableMapping, Optional, Tuple, List, Union
 
-import asttokens
 from icontract import ensure
 
 import aas_core_csharp_codegen
@@ -188,16 +187,65 @@ def _generate(
     definitions = collections.OrderedDict()
 
     for symbol in symbol_table.symbols:
-        definition = None  # type: Optional[MutableMapping[str, Any]]
+        if (
+                isinstance(symbol, intermediate.Class)
+                and symbol.is_implementation_specific
+        ):
+            implementation_key = specific_implementations.ImplementationKey(
+                f"{symbol.name}.json")
 
-        if isinstance(symbol, intermediate.Enumeration):
-            definition = _define_for_enumeration(enumeration=symbol)
-        elif isinstance(symbol, (intermediate.Interface, intermediate.Class)):
-            definition = _define_for_class_or_interface(symbol=symbol)
+            code = spec_impls.get(implementation_key, None)
+            if code is None:
+                errors.append(Error(
+                    symbol.parsed.node,
+                    f"The implementation is missing "
+                    f"for the implementation-specific class: {implementation_key}"))
+                continue
+
+            try:
+                # noinspection PyTypeChecker
+                code_js = json.loads(code, object_pairs_hook=collections.OrderedDict)
+            except Exception as err:
+                errors.append(Error(
+                    symbol.parsed.node,
+                    f"Failed to parse the JSON out of "
+                    f"the specific implementation {implementation_key}: {err}"
+                ))
+                continue
+
+            if not isinstance(code_js, dict):
+                errors.append(Error(
+                    symbol.parsed.node,
+                    f"Expected the implementation-specific snippet "
+                    f"at {implementation_key} to be a JSON object, "
+                    f"but got: {type(code_js)}"
+                ))
+                continue
+
+            for key, value in code_js.items():
+                definitions[key] = value
+
         else:
-            assert_never(symbol)
+            name = naming.json_model_type(symbol.name)
+            if name in definitions:
+                errors.append(Error(
+                    symbol.parsed.node,
+                    f"The definition for the symbol {symbol.name} has been "
+                    f"already provided under the name: {name}; "
+                    f"did you already define it in an implementation-specific snippet?"
+                ))
+                continue
 
-        definitions[naming.json_model_type(symbol.name)] = definition
+            definition = None  # type: Optional[MutableMapping[str, Any]]
+
+            if isinstance(symbol, intermediate.Enumeration):
+                definition = _define_for_enumeration(enumeration=symbol)
+            elif isinstance(symbol, (intermediate.Interface, intermediate.Class)):
+                definition = _define_for_class_or_interface(symbol=symbol)
+            else:
+                assert_never(symbol)
+
+            definitions[name] = definition
 
     model_type = definitions.get(Identifier('ModelType'), None)
     if model_type is not None:

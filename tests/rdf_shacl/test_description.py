@@ -1,5 +1,8 @@
+import textwrap
 import unittest
 from typing import Sequence, List
+
+import tests.description
 
 from aas_core_csharp_codegen.rdf_shacl import (
     _description as rdf_shacl_description
@@ -25,6 +28,77 @@ def tokens_are_equal(
                 return False
 
     return True
+
+
+class Test_renderer(unittest.TestCase):
+    def test_bullet_list(self) -> None:
+        text = textwrap.dedent(f'''\
+            Some bullets:
+
+            * Test
+              me
+            * Well
+            ''')
+        doc = tests.description.parse_restructured_text(text)
+
+        renderer = rdf_shacl_description.Renderer()
+        got, error = renderer.transform(element=doc)
+        assert error is None, f"{error}="
+        assert got is not None
+
+        expected = [
+            rdf_shacl_description.TokenText('Some bullets:'),
+            rdf_shacl_description.TokenParagraphBreak(),
+            rdf_shacl_description.TokenText('* '),
+            rdf_shacl_description.TokenText('Test me'),
+            rdf_shacl_description.TokenLineBreak(),
+            rdf_shacl_description.TokenText('* '),
+            rdf_shacl_description.TokenText('Well')
+        ]
+        self.assertTrue(
+            tokens_are_equal(expected, got), f"Expected {expected!r}, got {got!r}")
+
+    def test_two_consecutive_notes(self)->None:
+        text = textwrap.dedent(f'''\
+            Some text.
+
+            .. note::
+        
+                A single paragraph in the note.
+        
+            .. note::
+        
+                Another note.
+
+                Yet another paragraph.
+        
+            Paragraph at root.
+            ''')
+
+        doc = tests.description.parse_restructured_text(text)
+        renderer = rdf_shacl_description.Renderer()
+        got, error = renderer.transform(element=doc)
+
+        assert error is None, f"{error}="
+        assert got is not None
+
+        expected = [
+            rdf_shacl_description.TokenText('Some text.'),
+            rdf_shacl_description.TokenParagraphBreak(),
+            rdf_shacl_description.TokenText('NOTE:'),
+            rdf_shacl_description.TokenLineBreak(),
+            rdf_shacl_description.TokenText('A single paragraph in the note.'),
+            rdf_shacl_description.TokenParagraphBreak(),
+            rdf_shacl_description.TokenText('NOTE:'),
+            rdf_shacl_description.TokenLineBreak(),
+            rdf_shacl_description.TokenText('Another note.'),
+            rdf_shacl_description.TokenParagraphBreak(),
+            rdf_shacl_description.TokenText('Yet another paragraph.'),
+            rdf_shacl_description.TokenParagraphBreak(),
+            rdf_shacl_description.TokenText('Paragraph at root.')
+        ]
+        self.assertTrue(
+            tokens_are_equal(expected, got), f"Expected {expected!r}, got {got!r}")
 
 
 class Test_without_redundant_breaks(unittest.TestCase):
@@ -104,13 +178,13 @@ class Test_without_redundant_breaks(unittest.TestCase):
         self.assertTrue(
             tokens_are_equal(expected, got), f"Expected {expected!r}, got {got!r}")
 
-    def test_regression_on_skipped_tokens(self)->None:
+    def test_regression_on_skipped_tokens(self) -> None:
         # This is an actual bug that caused unexpected cut-off of the tokens.
         tokens = [
-            rdf_shacl_description.TokenText('An element that is referable by its '), 
-            rdf_shacl_description.TokenText("'idShort'"), 
-            rdf_shacl_description.TokenText('.'), 
-            rdf_shacl_description.TokenParagraphBreak(), 
+            rdf_shacl_description.TokenText('An element that is referable by its '),
+            rdf_shacl_description.TokenText("'idShort'"),
+            rdf_shacl_description.TokenText('.'),
+            rdf_shacl_description.TokenParagraphBreak(),
             rdf_shacl_description.TokenText('Something.'),
             rdf_shacl_description.TokenParagraphBreak()
         ]
@@ -127,6 +201,38 @@ class Test_without_redundant_breaks(unittest.TestCase):
 
         self.assertTrue(
             tokens_are_equal(expected, got), f"Expected {expected!r}, got {got!r}")
+
+    def test_regression_on_text_paragraph_break_line_break_text(self) -> None:
+        tokens = [
+            rdf_shacl_description.TokenText('A'),
+            rdf_shacl_description.TokenParagraphBreak(),
+            rdf_shacl_description.TokenText('B'),
+            rdf_shacl_description.TokenParagraphBreak(),
+            rdf_shacl_description.TokenText('* '),
+            rdf_shacl_description.TokenText('C'),
+            rdf_shacl_description.TokenParagraphBreak(),
+            rdf_shacl_description.TokenLineBreak(),
+            rdf_shacl_description.TokenText('* '),
+            rdf_shacl_description.TokenText('D')
+        ]
+
+        got = rdf_shacl_description.without_redundant_breaks(tokens)
+
+        expected = [
+            rdf_shacl_description.TokenText('A'),
+            rdf_shacl_description.TokenParagraphBreak(),
+            rdf_shacl_description.TokenText('B'),
+            rdf_shacl_description.TokenParagraphBreak(),
+            rdf_shacl_description.TokenText('* '),
+            rdf_shacl_description.TokenText('C'),
+            rdf_shacl_description.TokenLineBreak(),
+            rdf_shacl_description.TokenText('* '),
+            rdf_shacl_description.TokenText('D')
+        ]
+
+        self.assertTrue(
+            tokens_are_equal(expected, got), f"Expected {expected!r}, got {got!r}")
+
 
 if __name__ == "__main__":
     unittest.main()
