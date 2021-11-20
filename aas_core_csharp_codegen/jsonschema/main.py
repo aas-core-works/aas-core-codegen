@@ -4,9 +4,10 @@ import collections
 import json
 import pathlib
 import sys
-from typing import TextIO, Any, MutableMapping, Optional, Tuple, List, Union
+from typing import TextIO, Any, MutableMapping, Optional, Tuple, List, Union, Sequence, \
+    Mapping
 
-from icontract import ensure
+from icontract import ensure, require
 
 import aas_core_csharp_codegen
 from aas_core_csharp_codegen import cli, parse, naming, specific_implementations, \
@@ -23,15 +24,22 @@ assert aas_core_csharp_codegen.jsonschema.__doc__ == __doc__
 def _define_for_enumeration(
         enumeration: intermediate.Enumeration
 ) -> MutableMapping[str, Any]:
-    """Generate the definition for an ``enumeration``."""
-    result = collections.OrderedDict()  # type: MutableMapping[str, Any]
-    result["type"] = "string"
-    result["enum"] = [
+    """
+    Generate the definition for an ``enumeration``.
+
+    The list of definitions is to be *extended* with the resulting mapping.
+    """
+    definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
+    definition["type"] = "string"
+    definition["enum"] = [
         literal.value
         for literal in enumeration.literals
     ]
 
-    return result
+    model_type = naming.json_model_type(enumeration.name)
+    e_model_type = f'E{model_type}'
+
+    return collections.OrderedDict([(e_model_type, definition)])
 
 
 _BUILTIN_MAP = {
@@ -51,13 +59,26 @@ def _define_type(
         return collections.OrderedDict(
             [('type', _BUILTIN_MAP[type_annotation.a_type])]
         )
+
     elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
-        return collections.OrderedDict(
-            [('$ref',
-              f"#/definitions/{naming.json_model_type(type_annotation.symbol.name)}")])
+        model_type = naming.json_model_type(type_annotation.symbol.name)
+
+        if isinstance(type_annotation.symbol, intermediate.Enumeration):
+            return collections.OrderedDict([('$ref', f"#/definitions/E{model_type}")])
+
+        elif isinstance(type_annotation.symbol, intermediate.Interface):
+            return collections.OrderedDict([('$ref', f"#/definitions/I{model_type}")])
+
+        elif isinstance(type_annotation.symbol, intermediate.Class):
+            return collections.OrderedDict([('$ref', f"#/definitions/C{model_type}")])
+
+        else:
+            assert_never(type_annotation.symbol)
+
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         return collections.OrderedDict(
             [('type', 'array'), ('items', _define_type(type_annotation.items))])
+
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         raise NotImplementedError(
             f'(mristin, 2021-11-10):\n'
@@ -68,32 +89,34 @@ def _define_type(
             f'{type_annotation=}')
 
 
-def _define_for_class_or_interface(
-        symbol: Union[intermediate.Interface, intermediate.Class]
+def _define_for_interface(
+        interface: intermediate.Interface,
+        implementers: Sequence[intermediate.Class]
 ) -> MutableMapping[str, Any]:
-    """Generate the definition for the intermediate ``symbol``."""
+    """
+    Generate the definitions resulting from the ``interface``.
+
+    The list of definitions is to be *extended* with the resulting mapping.
+    """
     all_of = []  # type: List[MutableMapping[str, Any]]
 
-    if isinstance(symbol, intermediate.Interface):
-        for inheritance in symbol.inheritances:
-            all_of.append(
-                {
-                    "$ref": f"#/definitions/{naming.json_model_type(inheritance.name)}"
-                })
-    elif isinstance(symbol, intermediate.Class):
-        for interface in symbol.interfaces:
-            all_of.append(
-                {
-                    "$ref": f"#/definitions/{naming.json_model_type(interface.name)}"
-                })
-    else:
-        assert_never(symbol)
+    # region Inheritance
+
+    for inheritance in interface.inheritances:
+        all_of.append(
+            {
+                "$ref": f"#/definitions/A{naming.json_model_type(inheritance.name)}"
+            })
+
+    # endregion
+
+    # region Properties
 
     properties = collections.OrderedDict()
     required = []  # type: List[Identifier]
 
-    for prop in symbol.properties:
-        if prop.implemented_for is not symbol:
+    for prop in interface.properties:
+        if prop.implemented_for is not interface:
             continue
 
         prop_name = naming.json_property(prop.name)
@@ -108,26 +131,96 @@ def _define_for_class_or_interface(
 
         properties[prop_name] = type_definition
 
-    if symbol.json_serialization.with_model_type:
-        # Add model type only if none of the interfaces already add it.
-        # Otherwise, the property ``modelType`` is already properly specified in
-        # the antecedent and need not to be re-specified.
+    if len(properties) > 0:
+        definition = collections.OrderedDict([
+            ('type', 'object'),
+            ('properties', properties)
+        ])
 
-        needs_model_type = True
-        if isinstance(symbol, intermediate.Interface):
-            for inheritance in symbol.inheritances:
-                if inheritance.json_serialization.with_model_type:
-                    needs_model_type = False
-        elif isinstance(symbol, intermediate.Class):
-            for interface in symbol.interfaces:
-                if interface.json_serialization.with_model_type:
-                    needs_model_type = False
+        if len(required) > 0:
+            definition['required'] = required
+
+        all_of.append(
+            definition
+        )
+
+    # endregion
+
+    # region Constrain to implementers
+
+    any_of = [
+        {
+            "$ref": f"#/definitions/C{naming.json_model_type(implementer.name)}"
+        }
+        for implementer in implementers
+    ]  # type: List[MutableMapping[str, Any]]
+
+    # endregion
+
+    model_type = naming.json_model_type(interface.name)
+
+    # "A" stands for "abstract", "I" for interface
+    a_model_type = f'A{model_type}'
+    i_model_type = f'I{model_type}'
+
+    return collections.OrderedDict(
+        [
+            (a_model_type, {'allOf': all_of})
+            if len(all_of) > 0
+            else (a_model_type, {'type': 'object'}),
+            (i_model_type, {'anyOf': any_of}),
+        ])
+
+
+def _define_for_class(cls: intermediate.Class) -> MutableMapping[str, Any]:
+    """
+    Generate the definition for the intermediate class ``cls``.
+
+    The list of definitions is to be *extended* with the resulting mapping.
+    """
+    all_of = []  # type: List[MutableMapping[str, Any]]
+
+    for interface in cls.interfaces:
+        # Please mind the difference to ``I{interface name}`` which is
+        # the full ``anyOf`` list of class implementers.
+        all_of.append(
+            {
+                "$ref": f"#/definitions/A{naming.json_model_type(interface.name)}"
+            })
+
+    properties = collections.OrderedDict()
+    required = []  # type: List[Identifier]
+
+    model_type = naming.json_model_type(cls.name)
+
+    for prop in cls.properties:
+        if prop.implemented_for is not cls:
+            continue
+
+        prop_name = naming.json_property(prop.name)
+
+        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            type_definition = _define_type(
+                type_annotation=prop.type_annotation.value)
         else:
-            assert_never(symbol)
+            type_definition = _define_type(
+                type_annotation=prop.type_annotation)
+            required.append(prop_name)
 
-        if needs_model_type:
-            properties['modelType'] = collections.OrderedDict(
-                [('$ref', '#/definitions/ModelType')])
+        properties[prop_name] = type_definition
+
+    if cls.json_serialization.with_model_type:
+        assert 'modelType' not in properties, (
+            f"Unexpected JSON property ``modelType`` to be present in "
+            f"the JSON properties of the class {cls.name}. This should have been "
+            f"caught before (hence the assertion violation)."
+        )
+
+        properties['modelType'] = collections.OrderedDict(
+            [
+                ('type', 'string'),
+                ('const', model_type)
+            ])
 
     definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
     definition["type"] = "object"
@@ -136,25 +229,22 @@ def _define_for_class_or_interface(
     if len(required) > 0:
         definition['required'] = required
 
-    if len(all_of) == 0 and len(properties) == 0:
-        return collections.OrderedDict([('type', 'object')])
+    all_of.append(definition)
 
-    elif len(all_of) > 0 and len(properties) == 0:
-        return collections.OrderedDict([('allOf', all_of)])
+    # "C" stands for "concrete"
+    c_model_type = f"C{model_type}"
 
-    elif len(all_of) == 0 and len(properties) > 0:
-        return definition
-
-    elif len(all_of) > 0 and len(properties) > 0:
-        return collections.OrderedDict([
-            ('allOf', all_of + [definition])
-        ])
+    if len(all_of) == 0:
+        return {c_model_type: {'type', 'object'}}
+    else:
+        return {c_model_type: {"allOf": all_of}}
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate(
         symbol_table: intermediate.SymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations
+        spec_impls: specific_implementations.SpecificImplementations,
+        interface_implementers: intermediate.InterfaceImplementers
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the JSON schema based on the ``symbol_table."""
     schema_base_key = specific_implementations.ImplementationKey(
@@ -187,6 +277,9 @@ def _generate(
     definitions = collections.OrderedDict()
 
     for symbol in symbol_table.symbols:
+        # Key-value-pairs to extend the definitions
+        extension = None  # type: Optional[Mapping[str, Any]]
+
         if (
                 isinstance(symbol, intermediate.Class)
                 and symbol.is_implementation_specific
@@ -204,7 +297,7 @@ def _generate(
 
             try:
                 # noinspection PyTypeChecker
-                code_js = json.loads(code, object_pairs_hook=collections.OrderedDict)
+                extension = json.loads(code, object_pairs_hook=collections.OrderedDict)
             except Exception as err:
                 errors.append(Error(
                     symbol.parsed.node,
@@ -213,71 +306,44 @@ def _generate(
                 ))
                 continue
 
-            if not isinstance(code_js, dict):
+            if not isinstance(extension, dict):
                 errors.append(Error(
                     symbol.parsed.node,
                     f"Expected the implementation-specific snippet "
                     f"at {implementation_key} to be a JSON object, "
-                    f"but got: {type(code_js)}"
+                    f"but got: {type(extension)}"
                 ))
                 continue
-
-            for key, value in code_js.items():
-                definitions[key] = value
-
         else:
-            name = naming.json_model_type(symbol.name)
-            if name in definitions:
-                errors.append(Error(
-                    symbol.parsed.node,
-                    f"The definition for the symbol {symbol.name} has been "
-                    f"already provided under the name: {name}; "
-                    f"did you already define it in an implementation-specific snippet?"
-                ))
-                continue
-
-            definition = None  # type: Optional[MutableMapping[str, Any]]
-
             if isinstance(symbol, intermediate.Enumeration):
-                definition = _define_for_enumeration(enumeration=symbol)
-            elif isinstance(symbol, (intermediate.Interface, intermediate.Class)):
-                definition = _define_for_class_or_interface(symbol=symbol)
+                extension = _define_for_enumeration(enumeration=symbol)
+            elif isinstance(symbol, intermediate.Interface):
+                extension = _define_for_interface(
+                    interface=symbol,
+                    implementers=interface_implementers.get(symbol, []))
+            elif isinstance(symbol, intermediate.Class):
+                extension = _define_for_class(cls=symbol)
             else:
                 assert_never(symbol)
 
-            definitions[name] = definition
-
-    model_type = definitions.get(Identifier('ModelType'), None)
-    if model_type is not None:
-        errors.append(Error(
-            None,
-            f"Unexpected definition of ``ModelType`` "
-            f"in the definitions: {json.dumps(model_type)}"))
-
-    model_types = definitions.get(Identifier('ModelTypes'), None)
-    if model_types is not None:
-        errors.append(Error(
-            None,
-            f"Unexpected definition of ``ModelTypes`` "
-            f"in the definitions: {json.dumps(model_types)}"))
-
-    model_type_literals = []  # type: List[Identifier]
-    for symbol in symbol_table.symbols:
-        if (
-                isinstance(symbol, intermediate.Class)
-                and symbol.json_serialization.with_model_type
-        ):
-            model_type_literals.append(naming.json_model_type(symbol.name))
-
-    definitions["ModelType"] = {
-        "type": "string",
-        "enum": model_type_literals
-    }
-
-    schema["definitions"] = definitions
+        assert extension is not None
+        for identifier, definition in extension.items():
+            if identifier in definitions:
+                errors.append(Error(
+                    symbol.parsed.node,
+                    f"A JSON definition for the symbol {symbol.name} has been "
+                    f"already provided in the definitions under "
+                    f"the name: {identifier}; did you already define it in an "
+                    f"implementation-specific snippet?"
+                ))
+                continue
+            else:
+                definitions[identifier] = definition
 
     if len(errors) > 0:
         return None, errors
+
+    schema["definitions"] = definitions
 
     return Stripped(json.dumps(schema, indent=2)), None
 
@@ -407,13 +473,17 @@ def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
         return 1
 
+    interface_implementers = intermediate.map_interface_implementers(
+        symbol_table=ir_symbol_table)
+
     # endregion
 
     # region Schema
 
     code, errors = _generate(
         symbol_table=ir_symbol_table,
-        spec_impls=spec_impls)
+        spec_impls=spec_impls,
+        interface_implementers=interface_implementers)
 
     if errors is not None:
         cli.write_error_report(

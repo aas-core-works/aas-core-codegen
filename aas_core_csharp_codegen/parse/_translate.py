@@ -1557,6 +1557,12 @@ def _verify_symbol_table(
     }
 
     for symbol in symbol_table.symbols:
+        if symbol.name.startswith("I_"):
+            errors.append(Error(
+                symbol.node,
+                f"The prefix ``I_`` in the name of the symbol is reserved "
+                f"for the code generation: {symbol.name!r}"))
+
         if symbol.name.lower() in reserved_symbol_names:
             errors.append(Error(
                 symbol.node,

@@ -1,5 +1,5 @@
 {
-  "LangString": {
+  "CLangString": {
     "type": "object",
     "properties": {
       "language": {
@@ -14,13 +14,13 @@
       "text"
     ]
   },
-  "LangStringSet": {
+  "CLangStringSet": {
     "type": "object",
     "properties": {
       "langStrings": {
         "type": "array",
         "items": {
-          "$ref": "#/definitions/LangString"
+          "$ref": "#/definitions/CLangString"
         }
       }
     },

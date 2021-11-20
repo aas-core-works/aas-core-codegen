@@ -584,6 +584,8 @@ class Class:
 
         self.property_id_set = frozenset(id(prop) for prop in self.properties)
         self.invariant_id_set = frozenset(id(inv) for inv in self.invariants)
+        self.interface_id_set = frozenset(
+            id(interface) for interface in self.interfaces)
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""

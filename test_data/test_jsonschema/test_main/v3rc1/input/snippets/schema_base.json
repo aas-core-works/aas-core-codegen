@@ -5,7 +5,7 @@
   "type": "object",
   "allOf": [
     {
-      "$ref": "#/definitions/Environment"
+      "$ref": "#/definitions/CEnvironment"
     }
   ]
 }
