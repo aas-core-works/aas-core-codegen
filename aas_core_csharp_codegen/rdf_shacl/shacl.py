@@ -1,8 +1,7 @@
 """Generate the SHACL schema based on the meta-model."""
 import io
 import textwrap
-from typing import Union, Tuple, Optional, List, MutableMapping, Sequence, Mapping, \
-    Pattern
+from typing import Union, Tuple, Optional, List, MutableMapping, Sequence, Mapping
 
 from icontract import ensure, require
 
