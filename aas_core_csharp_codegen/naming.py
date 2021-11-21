@@ -1,5 +1,7 @@
 from typing import List
 
+from icontract import ensure
+
 from aas_core_csharp_codegen.common import Identifier
 
 UPPERCASE_ABBREVIATION_SET = {
@@ -36,6 +38,11 @@ def json_property(identifier: Identifier) -> Identifier:
     return Identifier(''.join(cased_parts))
 
 
+# fmt: off
+@ensure(
+    lambda result: "_" not in result
+) # This post-condition avoids naming conflicts with prefixing in the JSON schema.
+# fmt: on
 def json_model_type(identifier: Identifier) -> Identifier:
     """
     Generate the ``modelType`` of the class based on its meta-model ``identifier``.

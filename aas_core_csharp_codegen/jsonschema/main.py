@@ -37,9 +37,8 @@ def _define_for_enumeration(
     ]
 
     model_type = naming.json_model_type(enumeration.name)
-    e_model_type = f'E{model_type}'
 
-    return collections.OrderedDict([(e_model_type, definition)])
+    return collections.OrderedDict([(model_type, definition)])
 
 
 _BUILTIN_MAP = {
@@ -62,18 +61,7 @@ def _define_type(
 
     elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
         model_type = naming.json_model_type(type_annotation.symbol.name)
-
-        if isinstance(type_annotation.symbol, intermediate.Enumeration):
-            return collections.OrderedDict([('$ref', f"#/definitions/E{model_type}")])
-
-        elif isinstance(type_annotation.symbol, intermediate.Interface):
-            return collections.OrderedDict([('$ref', f"#/definitions/I{model_type}")])
-
-        elif isinstance(type_annotation.symbol, intermediate.Class):
-            return collections.OrderedDict([('$ref', f"#/definitions/C{model_type}")])
-
-        else:
-            assert_never(type_annotation.symbol)
+        return collections.OrderedDict([('$ref', f"#/definitions/{model_type}")])
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         return collections.OrderedDict(
@@ -105,7 +93,7 @@ def _define_for_interface(
     for inheritance in interface.inheritances:
         all_of.append(
             {
-                "$ref": f"#/definitions/A{naming.json_model_type(inheritance.name)}"
+                "$ref": f"#/definitions/Part_{naming.json_model_type(inheritance.name)}"
             })
 
     # endregion
@@ -150,7 +138,7 @@ def _define_for_interface(
 
     any_of = [
         {
-            "$ref": f"#/definitions/C{naming.json_model_type(implementer.name)}"
+            "$ref": f"#/definitions/{naming.json_model_type(implementer.name)}"
         }
         for implementer in implementers
     ]  # type: List[MutableMapping[str, Any]]
@@ -158,17 +146,14 @@ def _define_for_interface(
     # endregion
 
     model_type = naming.json_model_type(interface.name)
-
-    # "A" stands for "abstract", "I" for interface
-    a_model_type = f'A{model_type}'
-    i_model_type = f'I{model_type}'
+    part_model_type = f'Part_{model_type}'
 
     return collections.OrderedDict(
         [
-            (a_model_type, {'allOf': all_of})
+            (part_model_type, {'allOf': all_of})
             if len(all_of) > 0
-            else (a_model_type, {'type': 'object'}),
-            (i_model_type, {'anyOf': any_of}),
+            else (part_model_type, {'type': 'object'}),
+            (model_type, {'anyOf': any_of}),
         ])
 
 
@@ -185,7 +170,7 @@ def _define_for_class(cls: intermediate.Class) -> MutableMapping[str, Any]:
         # the full ``anyOf`` list of class implementers.
         all_of.append(
             {
-                "$ref": f"#/definitions/A{naming.json_model_type(interface.name)}"
+                "$ref": f"#/definitions/Part_{naming.json_model_type(interface.name)}"
             })
 
     properties = collections.OrderedDict()
@@ -231,13 +216,10 @@ def _define_for_class(cls: intermediate.Class) -> MutableMapping[str, Any]:
 
     all_of.append(definition)
 
-    # "C" stands for "concrete"
-    c_model_type = f"C{model_type}"
-
     if len(all_of) == 0:
-        return {c_model_type: {'type', 'object'}}
+        return {model_type: {'type', 'object'}}
     else:
-        return {c_model_type: {"allOf": all_of}}
+        return {model_type: {"allOf": all_of}}
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
