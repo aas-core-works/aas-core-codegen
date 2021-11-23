@@ -30,7 +30,7 @@ from aas_core_csharp_codegen.intermediate._types import (
     Contracts,
     Contract,
     Snapshot,
-    JsonSerialization,
+    Serialization,
     Method,
     Class,
     Constructor,
@@ -38,7 +38,7 @@ from aas_core_csharp_codegen.intermediate._types import (
     OptionalTypeAnnotation,
     OurAtomicTypeAnnotation, STR_TO_BUILTIN_ATOMIC_TYPE, BuiltinAtomicTypeAnnotation,
     Description, AttributeReferenceInDoc, SymbolReferenceInDoc,
-    SubscriptedTypeAnnotation, DefaultEnumerationLiteral, XmlSerialization,
+    SubscriptedTypeAnnotation, DefaultEnumerationLiteral,
     EnumerationLiteralReferenceInDoc, PropertyReferenceInDoc,
 )
 
@@ -277,7 +277,7 @@ def _parsed_arguments_to_arguments(
 
 def _parsed_abstract_class_to_interface(
         parsed: parse.AbstractClass,
-        json_serializations: Mapping[parse.Class, JsonSerialization]
+        serializations: Mapping[parse.Class, Serialization]
 ) -> Interface:
     """Translate an abstract class of a meta-model to an intermediate interface."""
     # noinspection PyTypeChecker
@@ -311,7 +311,7 @@ def _parsed_abstract_class_to_interface(
             _parsed_property_to_property(parsed=parsed_prop, cls=parsed)
             for parsed_prop in parsed.properties
         ],
-        json_serialization=json_serializations[parsed],
+        serialization=serializations[parsed],
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
@@ -488,17 +488,17 @@ class _SettingWithSource(Generic[T]):
         for symbol in parsed_symbol_table.symbols
         if not isinstance(symbol, parse.Enumeration)
     ),
-    "Resolution of JSON settings performed for all non-enumeration symbols"
+    "Resolution of serialization settings performed for all non-enumeration symbols"
 )
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
-def _resolve_json_serializations(
+def _resolve_serializations(
         ontology: _hierarchy.Ontology,
         parsed_symbol_table: parse.SymbolTable
-) -> Tuple[Optional[MutableMapping[parse.Class, JsonSerialization]], Optional[Error]]:
-    """Resolve how JSON serialization settings stack through the ontology."""
+) -> Tuple[Optional[MutableMapping[parse.Class, Serialization]], Optional[Error]]:
+    """Resolve how general serialization settings stack through the ontology."""
     # NOTE (mristin, 2021-11-03):
-    # We do not abstract away different settings of the JSON serialization at this point
+    # We do not abstract away different serialization settings at this point
     # as there is only a single one, ``with_model_type``. In the future, if there are
     # more settings, this function needs to be split into multiple ones (one function
     # for a setting each), or maybe we can even think of a more general approach to
@@ -517,12 +517,12 @@ def _resolve_json_serializations(
         settings = []  # type: List[_SettingWithSource[bool]]
 
         if (
-                cls.json_serialization is not None
-                and cls.json_serialization.with_model_type
+                cls.serialization is not None
+                and cls.serialization.with_model_type
         ):
             settings.append(
                 _SettingWithSource(
-                    value=cls.json_serialization.with_model_type,
+                    value=cls.serialization.with_model_type,
                     source=cls))
 
         for inheritance in cls.inheritances:
@@ -551,8 +551,7 @@ def _resolve_json_serializations(
 
                     return None, Error(
                         cls.node,
-                        f"The setting ``with_model_type`` "
-                        f"for JSON serialization "
+                        f"The serialization setting ``with_model_type`` "
                         f"between the class {setting.source} "
                         f"and {settings[0].source} is "
                         f"inconsistent")
@@ -565,123 +564,16 @@ def _resolve_json_serializations(
     # endregion
 
     mapping = dict(
-    )  # type: MutableMapping[parse.Class, JsonSerialization]
+    )  # type: MutableMapping[parse.Class, Serialization]
 
     for identifier, setting in with_model_type_map.items():
         cls = parsed_symbol_table.must_find_class(name=identifier)
         if setting is None:
             # Neither the current class nor its antecedents specified the setting
             # so we assume the default value.
-            mapping[cls] = JsonSerialization(with_model_type=False)
+            mapping[cls] = Serialization(with_model_type=False)
         else:
-            mapping[cls] = JsonSerialization(with_model_type=setting.value)
-
-    return mapping, None
-
-
-# fmt: off
-@ensure(
-    lambda parsed_symbol_table, result:
-    not (result[0] is not None)
-    or all(
-        symbol in result[0]
-        for symbol in parsed_symbol_table.symbols
-        if not isinstance(symbol, parse.Enumeration)
-    ),
-    "Resolution of XML settings performed for all non-enumeration symbols"
-)
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-# fmt: on
-def _resolve_xml_serializations(
-        ontology: _hierarchy.Ontology,
-        parsed_symbol_table: parse.SymbolTable
-) -> Tuple[Optional[MutableMapping[parse.Class, XmlSerialization]], Optional[Error]]:
-    """Resolve how JSON serialization settings stack through the ontology."""
-    # NOTE (mristin, 2021-11-03):
-    # We do not abstract away different settings of the XML serialization at this point
-    # as there is only a single one, ``property_as_text``. In the future, if there are
-    # more settings, this function needs to be split into multiple ones (one function
-    # for a setting each), or maybe we can even think of a more general approach to
-    # inheritance of serialization settings.
-
-    # Logic behind the inheritance (the classes refer to abstract and concrete classes
-    # in the ontology):
-    #
-    # * If there is the setting ``property_as_text`` specified for a class,
-    #   that setting overrides any "inherited" setting.
-    # * If a class lacks the setting ``property_as_text``, but
-    #   inherits from one or more classes, and some classes specify
-    #   a ``property_as_text`` setting, these settings must agree, and the current 
-    #   class inherits the setting.
-
-    property_as_text_map = dict(
-    )  # type: MutableMapping[Identifier, Optional[_SettingWithSource[Identifier]]]
-
-    for cls in ontology.classes:
-        assert cls.name not in property_as_text_map, (
-            f"Expected the ontology to be a correctly linearized DAG, "
-            f"but the class {cls.name!r} has been already visited before")
-
-        if (
-                cls.xml_serialization is not None
-                and cls.xml_serialization.property_as_text
-        ):
-            # The setting at the class overrides any inherited settings.
-            property_as_text_map[cls.name] = _SettingWithSource(
-                value=cls.xml_serialization.property_as_text,
-                source=cls)
-
-        else:
-            settings = []  # type: List[_SettingWithSource[Identifier]]
-            for inheritance in cls.inheritances:
-                assert inheritance in property_as_text_map, (
-                    f"Expected the ontology to be a correctly linearized DAG, "
-                    f"but the inheritance {inheritance!r} of the class {cls.name!r} "
-                    f"has not been visited before."
-                )
-
-                setting = property_as_text_map[inheritance]
-                if setting is None:
-                    continue
-
-                settings.append(setting)
-
-            if len(settings) >= 2:
-                # Verify that the inherited settings are consistent.
-                for setting in settings:
-                    if setting.value != settings[0].value:
-                        # NOTE (mristin, 2021-11-03):
-                        # We have to return immediately at the first error and can not
-                        # continue to interpret the remainder of the hierarchy since
-                        # a single inconsistency impedes us to make synchronization
-                        # points for a viable error recovery.
-
-                        return None, Error(
-                            cls.node,
-                            f"The setting ``property_as_text`` "
-                            f"for XML serialization "
-                            f"between the class {setting.source} "
-                            f"and {settings[0].source} is "
-                            f"inconsistent")
-
-            property_as_text_map[cls.name] = (
-                None
-                if len(settings) == 0
-                else settings[0])
-
-    # endregion
-
-    mapping = dict(
-    )  # type: MutableMapping[parse.Class, XmlSerialization]
-
-    for identifier, setting in property_as_text_map.items():
-        cls = parsed_symbol_table.must_find_class(name=identifier)
-        if setting is None:
-            # Neither the current class nor its antecedents specified the setting
-            # so we assume the default value.
-            mapping[cls] = XmlSerialization(property_as_text=None)
-        else:
-            mapping[cls] = XmlSerialization(property_as_text=setting.value)
+            mapping[cls] = Serialization(with_model_type=setting.value)
 
     return mapping, None
 
@@ -690,8 +582,7 @@ def _resolve_xml_serializations(
 def _parsed_class_to_class(
         parsed: parse.ConcreteClass,
         ontology: _hierarchy.Ontology,
-        json_serializations: Mapping[parse.Class, JsonSerialization],
-        xml_serializations: Mapping[parse.Class, XmlSerialization],
+        serializations: Mapping[parse.Class, Serialization],
         in_lined_constructors: Mapping[
             parse.Class, Sequence[construction.AssignArgument]]
 ) -> Tuple[Optional[Class], Optional[Error]]:
@@ -817,8 +708,7 @@ def _parsed_class_to_class(
         methods=methods,
         constructor=ctor,
         invariants=invariants,
-        json_serialization=json_serializations[parsed],
-        xml_serialization=xml_serializations[parsed],
+        serialization=serializations[parsed],
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
@@ -1053,17 +943,7 @@ def translate(
 
     # region Resolve settings for the JSON serialization
 
-    json_serializations, error = _resolve_json_serializations(
-        ontology=ontology, parsed_symbol_table=parsed_symbol_table)
-
-    if error is not None:
-        underlying_errors.append(error)
-
-    # endregion
-
-    # region Resolve settings for the XML serialization
-
-    xml_serializations, error = _resolve_xml_serializations(
+    serializations, error = _resolve_serializations(
         ontology=ontology, parsed_symbol_table=parsed_symbol_table)
 
     if error is not None:
@@ -1086,7 +966,7 @@ def translate(
         constructor_table=constructor_table,
     )
 
-    assert json_serializations is not None
+    assert serializations is not None
 
     # Type annotations reference placeholder symbols at this point.
 
@@ -1100,14 +980,13 @@ def translate(
         elif isinstance(parsed_symbol, parse.AbstractClass):
             symbol = _parsed_abstract_class_to_interface(
                 parsed=parsed_symbol,
-                json_serializations=json_serializations)
+                serializations=serializations)
 
         elif isinstance(parsed_symbol, parse.ConcreteClass):
             symbol, error = _parsed_class_to_class(
                 parsed=parsed_symbol,
                 ontology=ontology,
-                json_serializations=json_serializations,
-                xml_serializations=xml_serializations,
+                serializations=serializations,
                 in_lined_constructors=in_lined_constructors)
 
             if error is not None:
@@ -1466,51 +1345,6 @@ def translate(
 
                     assert reference is not None
                     attr_ref_in_doc.reference = reference
-
-    # endregion
-
-    # region Verify that XML serialization is possible
-
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, Class):
-            continue
-
-        property_exists = True
-        if symbol.xml_serialization.property_as_text is not None:
-            if (
-                    symbol.xml_serialization.property_as_text not in
-                    symbol.properties_by_name
-            ):
-                underlying_errors.append(Error(
-                    symbol.parsed.xml_serialization.node,
-                    f"The property {symbol.xml_serialization.property_as_text} "
-                    f"given in ``property_as_text`` setting for XML serialization "
-                    f"is not available in the class {symbol.parsed.name}"))
-                property_exists = False
-
-            if property_exists:
-                for prop in symbol.properties:
-                    if prop.name == symbol.xml_serialization.property_as_text:
-                        continue
-
-                    xmlizable = isinstance(
-                        prop.type_annotation, BuiltinAtomicTypeAnnotation)
-
-                    xmlizable = (
-                            xmlizable
-                            or (
-                                    isinstance(prop.type_annotation,
-                                               OurAtomicTypeAnnotation)
-                                    and isinstance(prop.type_annotation.symbol,
-                                                   Enumeration)))
-                    if not xmlizable:
-                        underlying_errors.append(Error(
-                            prop.parsed.node,
-                            f"The ``property_as_text`` setting for XML serialization "
-                            f"has been defined, but the property {prop.name} has the "
-                            f"type annotation {prop.type_annotation} which is neither "
-                            f"a built-in type nor an enumeration, so we do not know "
-                            f"how to de/serialize it from/to an XML attribute"))
 
     # endregion
 

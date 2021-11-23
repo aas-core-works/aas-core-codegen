@@ -1,0 +1,1009 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.admin-shell.io/aas/3/0">
+  <xs:group name="hasExtensions_part">
+    <xs:sequence/>
+  </xs:group>
+  <xs:group name="hasExtensions_t">
+    <xs:choice>
+      <xs:element name="assetAdministrationShell" type="assetAdministrationShell_t"/>
+      <xs:element name="asset" type="asset_t"/>
+      <xs:element name="submodel" type="submodel_t"/>
+      <xs:element name="submodelElementCollection" type="submodelElementCollection_t"/>
+      <xs:element name="property" type="property_t"/>
+      <xs:element name="multiLanguageProperty" type="multiLanguageProperty_t"/>
+      <xs:element name="range" type="range_t"/>
+      <xs:element name="referenceElement" type="referenceElement_t"/>
+      <xs:element name="blob" type="blob_t"/>
+      <xs:element name="file" type="file_t"/>
+      <xs:element name="annotatedRelationshipElement" type="annotatedRelationshipElement_t"/>
+      <xs:element name="entity" type="entity_t"/>
+      <xs:element name="basicEvent" type="basicEvent_t"/>
+      <xs:element name="operation" type="operation_t"/>
+      <xs:element name="capability" type="capability_t"/>
+      <xs:element name="conceptDescription" type="conceptDescription_t"/>
+      <xs:element name="view" type="view_t"/>
+      <xs:element name="accessPermissionRule" type="accessPermissionRule_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="referable_part">
+    <xs:sequence>
+      <xs:group ref="hasExtensions_part"/>
+      <xs:element name="idShort" type="xs:string"/>
+      <xs:element name="displayName" type="langStringSet_t" minOccurs="0"/>
+      <xs:element name="category" type="xs:string" minOccurs="0"/>
+      <xs:element name="description" type="langStringSet_t" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="referable_t">
+    <xs:choice>
+      <xs:element name="assetAdministrationShell" type="assetAdministrationShell_t"/>
+      <xs:element name="asset" type="asset_t"/>
+      <xs:element name="submodel" type="submodel_t"/>
+      <xs:element name="submodelElementCollection" type="submodelElementCollection_t"/>
+      <xs:element name="property" type="property_t"/>
+      <xs:element name="multiLanguageProperty" type="multiLanguageProperty_t"/>
+      <xs:element name="range" type="range_t"/>
+      <xs:element name="referenceElement" type="referenceElement_t"/>
+      <xs:element name="blob" type="blob_t"/>
+      <xs:element name="file" type="file_t"/>
+      <xs:element name="annotatedRelationshipElement" type="annotatedRelationshipElement_t"/>
+      <xs:element name="entity" type="entity_t"/>
+      <xs:element name="basicEvent" type="basicEvent_t"/>
+      <xs:element name="operation" type="operation_t"/>
+      <xs:element name="capability" type="capability_t"/>
+      <xs:element name="conceptDescription" type="conceptDescription_t"/>
+      <xs:element name="view" type="view_t"/>
+      <xs:element name="accessPermissionRule" type="accessPermissionRule_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="identifiable_part">
+    <xs:sequence>
+      <xs:group ref="referable_part"/>
+      <xs:element name="administration" type="administrativeInformation_t" minOccurs="0"/>
+      <xs:element name="identification" type="identifier_t"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="identifiable_t">
+    <xs:choice>
+      <xs:element name="assetAdministrationShell" type="assetAdministrationShell_t"/>
+      <xs:element name="asset" type="asset_t"/>
+      <xs:element name="submodel" type="submodel_t"/>
+      <xs:element name="conceptDescription" type="conceptDescription_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:complexType name="identifier_t">
+    <xs:sequence>
+      <xs:element name="idType" type="identifierType_t"/>
+      <xs:element name="id" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="identifierType_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="IRDI"/>
+      <xs:enumeration value="IRI"/>
+      <xs:enumeration value="Custom"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="modelingKind_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Template"/>
+      <xs:enumeration value="Instance"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:group name="hasKind_part">
+    <xs:sequence>
+      <xs:element name="kind" type="modelingKind_t" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="hasKind_t">
+    <xs:choice>
+      <xs:element name="submodel" type="submodel_t"/>
+      <xs:element name="submodelElementCollection" type="submodelElementCollection_t"/>
+      <xs:element name="property" type="property_t"/>
+      <xs:element name="multiLanguageProperty" type="multiLanguageProperty_t"/>
+      <xs:element name="range" type="range_t"/>
+      <xs:element name="referenceElement" type="referenceElement_t"/>
+      <xs:element name="blob" type="blob_t"/>
+      <xs:element name="file" type="file_t"/>
+      <xs:element name="annotatedRelationshipElement" type="annotatedRelationshipElement_t"/>
+      <xs:element name="entity" type="entity_t"/>
+      <xs:element name="basicEvent" type="basicEvent_t"/>
+      <xs:element name="operation" type="operation_t"/>
+      <xs:element name="capability" type="capability_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:complexType name="administrativeInformation_t">
+    <xs:sequence>
+      <xs:element name="version" type="xs:string" minOccurs="0"/>
+      <xs:element name="revision" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:group name="hasSemantics_part">
+    <xs:sequence>
+      <xs:element name="semanticId" type="reference_t" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="hasSemantics_t">
+    <xs:choice>
+      <xs:element name="qualifier" type="qualifier_t"/>
+      <xs:element name="identifierKeyValuePair" type="identifierKeyValuePair_t"/>
+      <xs:element name="submodel" type="submodel_t"/>
+      <xs:element name="submodelElementCollection" type="submodelElementCollection_t"/>
+      <xs:element name="property" type="property_t"/>
+      <xs:element name="multiLanguageProperty" type="multiLanguageProperty_t"/>
+      <xs:element name="range" type="range_t"/>
+      <xs:element name="referenceElement" type="referenceElement_t"/>
+      <xs:element name="blob" type="blob_t"/>
+      <xs:element name="file" type="file_t"/>
+      <xs:element name="annotatedRelationshipElement" type="annotatedRelationshipElement_t"/>
+      <xs:element name="entity" type="entity_t"/>
+      <xs:element name="basicEvent" type="basicEvent_t"/>
+      <xs:element name="operation" type="operation_t"/>
+      <xs:element name="capability" type="capability_t"/>
+      <xs:element name="view" type="view_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="qualifiable_part">
+    <xs:sequence>
+      <xs:element name="qualifiers" minOccurs="0">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="constraint_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="qualifiable_t">
+    <xs:choice>
+      <xs:element name="submodel" type="submodel_t"/>
+      <xs:element name="submodelElementCollection" type="submodelElementCollection_t"/>
+      <xs:element name="property" type="property_t"/>
+      <xs:element name="multiLanguageProperty" type="multiLanguageProperty_t"/>
+      <xs:element name="range" type="range_t"/>
+      <xs:element name="referenceElement" type="referenceElement_t"/>
+      <xs:element name="blob" type="blob_t"/>
+      <xs:element name="file" type="file_t"/>
+      <xs:element name="annotatedRelationshipElement" type="annotatedRelationshipElement_t"/>
+      <xs:element name="entity" type="entity_t"/>
+      <xs:element name="basicEvent" type="basicEvent_t"/>
+      <xs:element name="operation" type="operation_t"/>
+      <xs:element name="capability" type="capability_t"/>
+      <xs:element name="accessPermissionRule" type="accessPermissionRule_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="constraint_part">
+    <xs:sequence/>
+  </xs:group>
+  <xs:group name="constraint_t">
+    <xs:choice>
+      <xs:element name="qualifier" type="qualifier_t"/>
+      <xs:element name="formula" type="formula_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:complexType name="qualifier_t">
+    <xs:sequence>
+      <xs:group ref="constraint_part"/>
+      <xs:group ref="hasSemantics_part"/>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="valueType" type="dataTypeDef_t"/>
+      <xs:element name="value" type="xs:string" minOccurs="0"/>
+      <xs:element name="valueId" type="reference_t" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="formula_t">
+    <xs:sequence>
+      <xs:group ref="constraint_part"/>
+      <xs:element name="dependsOn" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="reference" type="reference_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:group name="hasDataSpecification_part">
+    <xs:sequence>
+      <xs:element name="dataSpecifications" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="reference" type="reference_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="hasDataSpecification_t">
+    <xs:choice>
+      <xs:element name="assetAdministrationShell" type="assetAdministrationShell_t"/>
+      <xs:element name="asset" type="asset_t"/>
+      <xs:element name="submodel" type="submodel_t"/>
+      <xs:element name="submodelElementCollection" type="submodelElementCollection_t"/>
+      <xs:element name="property" type="property_t"/>
+      <xs:element name="multiLanguageProperty" type="multiLanguageProperty_t"/>
+      <xs:element name="range" type="range_t"/>
+      <xs:element name="referenceElement" type="referenceElement_t"/>
+      <xs:element name="blob" type="blob_t"/>
+      <xs:element name="file" type="file_t"/>
+      <xs:element name="annotatedRelationshipElement" type="annotatedRelationshipElement_t"/>
+      <xs:element name="entity" type="entity_t"/>
+      <xs:element name="basicEvent" type="basicEvent_t"/>
+      <xs:element name="operation" type="operation_t"/>
+      <xs:element name="capability" type="capability_t"/>
+      <xs:element name="conceptDescription" type="conceptDescription_t"/>
+      <xs:element name="view" type="view_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:complexType name="assetAdministrationShell_t">
+    <xs:sequence>
+      <xs:group ref="identifiable_part"/>
+      <xs:group ref="hasDataSpecification_part"/>
+      <xs:element name="derivedFrom" type="assetAdministrationShell_t" minOccurs="0"/>
+      <xs:element name="security" type="security_t" minOccurs="0"/>
+      <xs:element name="assetInformation" type="assetInformation_t"/>
+      <xs:element name="submodels" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="submodel" type="submodel_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="views" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="view" type="view_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="asset_t">
+    <xs:sequence>
+      <xs:group ref="identifiable_part"/>
+      <xs:group ref="hasDataSpecification_part"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="assetInformation_t">
+    <xs:sequence>
+      <xs:element name="assetKind" type="assetKind_t"/>
+      <xs:element name="globalAssetId" type="reference_t" minOccurs="0"/>
+      <xs:element name="specificAssetIds" type="identifierKeyValuePair_t" minOccurs="0"/>
+      <xs:element name="billOfMaterial" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="submodel" type="submodel_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="defaultThumbnail" type="file_t" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="assetKind_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Type"/>
+      <xs:enumeration value="Instance"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="identifierKeyValuePair_t">
+    <xs:sequence>
+      <xs:group ref="hasSemantics_part"/>
+      <xs:element name="key" type="xs:string"/>
+      <xs:element name="value" type="xs:string" minOccurs="0"/>
+      <xs:element name="externalSubjectId" type="reference_t" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="submodel_t">
+    <xs:sequence>
+      <xs:group ref="identifiable_part"/>
+      <xs:group ref="hasKind_part"/>
+      <xs:group ref="hasSemantics_part"/>
+      <xs:group ref="qualifiable_part"/>
+      <xs:group ref="hasDataSpecification_part"/>
+      <xs:element name="submodelElements" minOccurs="0">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="submodelElement_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:group name="submodelElement_part">
+    <xs:sequence>
+      <xs:group ref="referable_part"/>
+      <xs:group ref="hasKind_part"/>
+      <xs:group ref="hasSemantics_part"/>
+      <xs:group ref="qualifiable_part"/>
+      <xs:group ref="hasDataSpecification_part"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="submodelElement_t">
+    <xs:choice>
+      <xs:element name="submodelElementCollection" type="submodelElementCollection_t"/>
+      <xs:element name="property" type="property_t"/>
+      <xs:element name="multiLanguageProperty" type="multiLanguageProperty_t"/>
+      <xs:element name="range" type="range_t"/>
+      <xs:element name="referenceElement" type="referenceElement_t"/>
+      <xs:element name="blob" type="blob_t"/>
+      <xs:element name="file" type="file_t"/>
+      <xs:element name="annotatedRelationshipElement" type="annotatedRelationshipElement_t"/>
+      <xs:element name="entity" type="entity_t"/>
+      <xs:element name="basicEvent" type="basicEvent_t"/>
+      <xs:element name="operation" type="operation_t"/>
+      <xs:element name="capability" type="capability_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="relationshipElement_part">
+    <xs:sequence>
+      <xs:group ref="submodelElement_part"/>
+      <xs:element name="first">
+        <xs:complexType>
+          <xs:choice>
+            <xs:group ref="referable_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="second">
+        <xs:complexType>
+          <xs:choice>
+            <xs:group ref="referable_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="relationshipElement_t">
+    <xs:choice>
+      <xs:element name="annotatedRelationshipElement" type="annotatedRelationshipElement_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:complexType name="submodelElementCollection_t">
+    <xs:sequence>
+      <xs:group ref="submodelElement_part"/>
+      <xs:element name="values" minOccurs="0">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="submodelElement_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ordered" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="allowDuplicates" type="xs:boolean" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:group name="dataElement_part">
+    <xs:sequence>
+      <xs:group ref="submodelElement_part"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="dataElement_t">
+    <xs:choice>
+      <xs:element name="property" type="property_t"/>
+      <xs:element name="multiLanguageProperty" type="multiLanguageProperty_t"/>
+      <xs:element name="range" type="range_t"/>
+      <xs:element name="referenceElement" type="referenceElement_t"/>
+      <xs:element name="blob" type="blob_t"/>
+      <xs:element name="file" type="file_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:complexType name="property_t">
+    <xs:sequence>
+      <xs:group ref="dataElement_part"/>
+      <xs:element name="valueType" type="dataTypeDef_t"/>
+      <xs:element name="value" type="xs:string" minOccurs="0"/>
+      <xs:element name="valueId" type="reference_t" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="multiLanguageProperty_t">
+    <xs:sequence>
+      <xs:group ref="dataElement_part"/>
+      <xs:element name="value" type="langStringSet_t" minOccurs="0"/>
+      <xs:element name="valueId" type="reference_t" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="range_t">
+    <xs:sequence>
+      <xs:group ref="dataElement_part"/>
+      <xs:element name="valueType" type="dataTypeDef_t"/>
+      <xs:element name="min" type="xs:string" minOccurs="0"/>
+      <xs:element name="max" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="referenceElement_t">
+    <xs:sequence>
+      <xs:group ref="dataElement_part"/>
+      <xs:element name="value" type="reference_t" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="blob_t">
+    <xs:sequence>
+      <xs:group ref="dataElement_part"/>
+      <xs:element name="mimeType" type="xs:string"/>
+      <xs:element name="value" type="xs:base64Binary" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="file_t">
+    <xs:sequence>
+      <xs:group ref="dataElement_part"/>
+      <xs:element name="mimeType" type="xs:string"/>
+      <xs:element name="value" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="annotatedRelationshipElement_t">
+    <xs:sequence>
+      <xs:group ref="relationshipElement_part"/>
+      <xs:element name="annotation" minOccurs="0">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="dataElement_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="entityType_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CoManagedEntity"/>
+      <xs:enumeration value="SelfManagedEntity"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="entity_t">
+    <xs:sequence>
+      <xs:group ref="submodelElement_part"/>
+      <xs:element name="entityType" type="entityType_t"/>
+      <xs:element name="statements" minOccurs="0">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="submodelElement_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="globalAssetId" type="reference_t" minOccurs="0"/>
+      <xs:element name="specificAssetIds" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="identifierKeyValuePair" type="identifierKeyValuePair_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:group name="event_part">
+    <xs:sequence>
+      <xs:group ref="submodelElement_part"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="event_t">
+    <xs:choice>
+      <xs:element name="basicEvent" type="basicEvent_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:complexType name="basicEvent_t">
+    <xs:sequence>
+      <xs:group ref="event_part"/>
+      <xs:element name="observed">
+        <xs:complexType>
+          <xs:choice>
+            <xs:group ref="referable_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="operation_t">
+    <xs:sequence>
+      <xs:group ref="submodelElement_part"/>
+      <xs:element name="inputVariables" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="operationVariable" type="operationVariable_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="outputVariables" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="operationVariable" type="operationVariable_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="inoutputVariables" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="operationVariable" type="operationVariable_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="operationVariable_t">
+    <xs:sequence>
+      <xs:element name="value">
+        <xs:complexType>
+          <xs:choice>
+            <xs:group ref="submodelElement_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="capability_t">
+    <xs:sequence>
+      <xs:group ref="submodelElement_part"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="conceptDescription_t">
+    <xs:sequence>
+      <xs:group ref="identifiable_part"/>
+      <xs:group ref="hasDataSpecification_part"/>
+      <xs:element name="isCaseOf" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="reference" type="reference_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="view_t">
+    <xs:sequence>
+      <xs:group ref="referable_part"/>
+      <xs:group ref="hasSemantics_part"/>
+      <xs:group ref="hasDataSpecification_part"/>
+      <xs:element name="containedElements" minOccurs="0">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="referable_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="reference_t">
+    <xs:sequence>
+      <xs:element name="keys">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="key" type="key_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="key_t">
+    <xs:sequence>
+      <xs:element name="type" type="keyElements_t"/>
+      <xs:element name="value" type="xs:string"/>
+      <xs:element name="idType" type="keyType_t"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="keyElements_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="GlobalReference"/>
+      <xs:enumeration value="FragmentReference"/>
+      <xs:enumeration value="AccessPermissionRule"/>
+      <xs:enumeration value="AnnotatedRelationshipElement"/>
+      <xs:enumeration value="Asset"/>
+      <xs:enumeration value="AssetAdministrationShell"/>
+      <xs:enumeration value="BasicEvent"/>
+      <xs:enumeration value="Blob"/>
+      <xs:enumeration value="Capability"/>
+      <xs:enumeration value="ConceptDescription"/>
+      <xs:enumeration value="ConceptDictionary"/>
+      <xs:enumeration value="DataElement"/>
+      <xs:enumeration value="Entity"/>
+      <xs:enumeration value="Event"/>
+      <xs:enumeration value="File"/>
+      <xs:enumeration value="MultiLanguageProperty"/>
+      <xs:enumeration value="Operation"/>
+      <xs:enumeration value="Property"/>
+      <xs:enumeration value="Range"/>
+      <xs:enumeration value="ReferenceElement"/>
+      <xs:enumeration value="RelationshipElement"/>
+      <xs:enumeration value="Submodel"/>
+      <xs:enumeration value="SubmodelElement"/>
+      <xs:enumeration value="SubmodelElementCollection"/>
+      <xs:enumeration value="View"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="referableElements_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AccessPermissionRule"/>
+      <xs:enumeration value="AnnotatedRelationshipElement"/>
+      <xs:enumeration value="Asset"/>
+      <xs:enumeration value="AssetAdministrationShell"/>
+      <xs:enumeration value="BasicEvent"/>
+      <xs:enumeration value="Blob"/>
+      <xs:enumeration value="Capability"/>
+      <xs:enumeration value="ConceptDescription"/>
+      <xs:enumeration value="ConceptDictionary"/>
+      <xs:enumeration value="DataElement"/>
+      <xs:enumeration value="Entity"/>
+      <xs:enumeration value="Event"/>
+      <xs:enumeration value="File"/>
+      <xs:enumeration value="MultiLanguageProperty"/>
+      <xs:enumeration value="Operation"/>
+      <xs:enumeration value="Property"/>
+      <xs:enumeration value="Range"/>
+      <xs:enumeration value="ReferenceElement"/>
+      <xs:enumeration value="RelationshipElement"/>
+      <xs:enumeration value="Submodel"/>
+      <xs:enumeration value="SubmodelElement"/>
+      <xs:enumeration value="SubmodelElementCollection"/>
+      <xs:enumeration value="View"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="identifiableElements_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Asset"/>
+      <xs:enumeration value="AssetAdministrationShell"/>
+      <xs:enumeration value="ConceptDescription"/>
+      <xs:enumeration value="Submodel"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="keyType_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="IdShort"/>
+      <xs:enumeration value="FragmentId"/>
+      <xs:enumeration value="IRDI"/>
+      <xs:enumeration value="IRI"/>
+      <xs:enumeration value="Custom"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="localKeyType_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="IdShort"/>
+      <xs:enumeration value="FragmentId"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="dataTypeDef_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="anyUri"/>
+      <xs:enumeration value="base64Binary"/>
+      <xs:enumeration value="boolean"/>
+      <xs:enumeration value="date"/>
+      <xs:enumeration value="dateTime"/>
+      <xs:enumeration value="dateTimeStamp"/>
+      <xs:enumeration value="decimal"/>
+      <xs:enumeration value="integer"/>
+      <xs:enumeration value="long"/>
+      <xs:enumeration value="int"/>
+      <xs:enumeration value="short"/>
+      <xs:enumeration value="byte"/>
+      <xs:enumeration value="nonNegativeInteger"/>
+      <xs:enumeration value="positiveInteger"/>
+      <xs:enumeration value="unsignedLong"/>
+      <xs:enumeration value="unsignedInt"/>
+      <xs:enumeration value="unsignedShort"/>
+      <xs:enumeration value="unsignedByte"/>
+      <xs:enumeration value="nonPositiveInteger"/>
+      <xs:enumeration value="negativeInteger"/>
+      <xs:enumeration value="double"/>
+      <xs:enumeration value="duration"/>
+      <xs:enumeration value="dayTimeDuration"/>
+      <xs:enumeration value="yearMonthDuration"/>
+      <xs:enumeration value="float"/>
+      <xs:enumeration value="gDay"/>
+      <xs:enumeration value="gMonth"/>
+      <xs:enumeration value="gMonthDay"/>
+      <xs:enumeration value="gYear"/>
+      <xs:enumeration value="gYearMonth"/>
+      <xs:enumeration value="hexBinary"/>
+      <xs:enumeration value="NOTATION"/>
+      <xs:enumeration value="QName"/>
+      <xs:enumeration value="string"/>
+      <xs:enumeration value="normalizedString"/>
+      <xs:enumeration value="token"/>
+      <xs:enumeration value="language"/>
+      <xs:enumeration value="Name"/>
+      <xs:enumeration value="NCName"/>
+      <xs:enumeration value="ENTITY"/>
+      <xs:enumeration value="ID"/>
+      <xs:enumeration value="IDREF"/>
+      <xs:enumeration value="NMTOKEN"/>
+      <xs:enumeration value="time"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="langString_t">
+    <xs:sequence>
+      <xs:element name="language">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:pattern value="^(([a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){2})?|[a-zA-Z]{4}|[a-zA-Z]{5,8})(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-(([a-zA-Z0-9]){5,8}|[0-9]([a-zA-Z0-9]){3}))*(-[0-9A-WY-Za-wy-z](-([a-zA-Z0-9]){2,8})+)*(-[xX](-([a-zA-Z0-9]){1,8})+)?|[xX](-([a-zA-Z0-9]){1,8})+|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="text" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="langStringSet_t">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" name="langString" type="langString_t"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:group name="dataSpecificationContent_part">
+    <xs:sequence/>
+  </xs:group>
+  <xs:group name="dataSpecificationContent_t">
+    <xs:choice>
+      <xs:element name="dataSpecificationIec61360" type="dataSpecificationIec61360_t"/>
+      <xs:element name="dataSpecificationPhysicalUnit" type="dataSpecificationPhysicalUnit_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:simpleType name="dataTypeIec61360_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DATE"/>
+      <xs:enumeration value="STRING"/>
+      <xs:enumeration value="STRING_TRANSLATABLE"/>
+      <xs:enumeration value="INTEGER_MEASURE"/>
+      <xs:enumeration value="INTEGER_COUNT"/>
+      <xs:enumeration value="INTEGER_CURRENCY"/>
+      <xs:enumeration value="REAL_MEASURE"/>
+      <xs:enumeration value="REAL_COUNT"/>
+      <xs:enumeration value="REAL_CURRENCY"/>
+      <xs:enumeration value="BOOLEAN"/>
+      <xs:enumeration value="URL"/>
+      <xs:enumeration value="RATIONAL"/>
+      <xs:enumeration value="RATIONAL_MEASURE"/>
+      <xs:enumeration value="TIME"/>
+      <xs:enumeration value="TIMESTAMP"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="levelType_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Min"/>
+      <xs:enumeration value="Max"/>
+      <xs:enumeration value="Nom"/>
+      <xs:enumeration value="Type"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="valueReferencePair_t">
+    <xs:sequence>
+      <xs:element name="value" type="xs:string"/>
+      <xs:element name="valueId" type="reference_t"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="valueList_t">
+    <xs:sequence>
+      <xs:element name="valueReferencePairTypes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="valueReferencePair" type="valueReferencePair_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dataSpecificationIec61360_t">
+    <xs:sequence>
+      <xs:group ref="dataSpecificationContent_part"/>
+      <xs:element name="preferredName" type="langStringSet_t" minOccurs="0"/>
+      <xs:element name="shortName" type="langStringSet_t" minOccurs="0"/>
+      <xs:element name="unit" type="xs:string" minOccurs="0"/>
+      <xs:element name="unitId" type="reference_t" minOccurs="0"/>
+      <xs:element name="sourceOfDefinition" type="xs:string" minOccurs="0"/>
+      <xs:element name="symbol" type="xs:string" minOccurs="0"/>
+      <xs:element name="dataType" type="dataTypeIec61360_t" minOccurs="0"/>
+      <xs:element name="definition" type="langStringSet_t" minOccurs="0"/>
+      <xs:element name="valueFormat" type="xs:string" minOccurs="0"/>
+      <xs:element name="valueList" type="valueList_t" minOccurs="0"/>
+      <xs:element name="value" type="xs:string" minOccurs="0"/>
+      <xs:element name="valueId" type="reference_t" minOccurs="0"/>
+      <xs:element name="levelType" type="levelType_t" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dataSpecificationPhysicalUnit_t">
+    <xs:sequence>
+      <xs:group ref="dataSpecificationContent_part"/>
+      <xs:element name="unitName" type="xs:string" minOccurs="0"/>
+      <xs:element name="unitSymbol" type="xs:string" minOccurs="0"/>
+      <xs:element name="definition" type="langStringSet_t" minOccurs="0"/>
+      <xs:element name="siNotation" type="xs:string" minOccurs="0"/>
+      <xs:element name="dinNotation" type="xs:string" minOccurs="0"/>
+      <xs:element name="eceName" type="xs:string" minOccurs="0"/>
+      <xs:element name="eceCode" type="xs:string" minOccurs="0"/>
+      <xs:element name="nistName" type="xs:string" minOccurs="0"/>
+      <xs:element name="sourceOfDefinition" type="xs:string" minOccurs="0"/>
+      <xs:element name="conversionFactor" type="xs:string" minOccurs="0"/>
+      <xs:element name="registrationAuthorityId" type="xs:string" minOccurs="0"/>
+      <xs:element name="supplier" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:group name="certificate_part">
+    <xs:sequence>
+      <xs:element name="policyAdministrationPoint" type="policyAdministrationPoint_t"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="certificate_t">
+    <xs:choice>
+      <xs:element name="blobCertificate" type="blobCertificate_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:complexType name="blobCertificate_t">
+    <xs:sequence>
+      <xs:group ref="certificate_part"/>
+      <xs:element name="blobCertificate" type="blob_t"/>
+      <xs:element name="lastCertificate" type="xs:boolean"/>
+      <xs:element name="containedExtension" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="reference" type="reference_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="objectAttributes_t">
+    <xs:sequence>
+      <xs:element name="objectAttributes">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="dataElement_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="permission_t">
+    <xs:sequence>
+      <xs:element name="permission" type="property_t"/>
+      <xs:element name="kindOfPermission" type="permissionKind_t"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="subjectAttributes_t">
+    <xs:sequence>
+      <xs:element name="subjectAttributes">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="dataElement_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="permissionsPerObject_t">
+    <xs:sequence>
+      <xs:element name="object">
+        <xs:complexType>
+          <xs:choice>
+            <xs:group ref="referable_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="targetObjectAttributes" type="objectAttributes_t" minOccurs="0"/>
+      <xs:element name="permissions" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="permission" type="permission_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="accessPermissionRule_t">
+    <xs:sequence>
+      <xs:group ref="referable_part"/>
+      <xs:group ref="qualifiable_part"/>
+      <xs:element name="targetSubjectAttributes" type="subjectAttributes_t"/>
+      <xs:element name="permissionsPerObject" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="permissionsPerObject" type="permissionsPerObject_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="accessControl_t">
+    <xs:sequence>
+      <xs:element name="defaultSubjectAttributes" type="submodel_t"/>
+      <xs:element name="selectablePermissions" type="submodel_t"/>
+      <xs:element name="defaultPermissions" type="submodel_t"/>
+      <xs:element name="accessPermissionRules" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="accessPermissionRule" type="accessPermissionRule_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="selectableSubjectAttributes" type="submodel_t" minOccurs="0"/>
+      <xs:element name="defaultEnvironmentAttributes" type="submodel_t" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="policyAdministrationPoint_t">
+    <xs:sequence>
+      <xs:element name="externalAccessControl" type="xs:boolean"/>
+      <xs:element name="localAccessControl" type="accessControl_t" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="policyInformationPoints_t">
+    <xs:sequence>
+      <xs:element name="externalInformationPoints" type="xs:boolean"/>
+      <xs:element name="internalInformationPoints" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="submodel" type="submodel_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="policyEnforcementPoints_t">
+    <xs:sequence>
+      <xs:element name="externalPolicyEnforcementPoint" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="policyDecisionPoint_t">
+    <xs:sequence>
+      <xs:element name="externalPolicyDecisionPoints" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="accessControlPolicyPoints_t">
+    <xs:sequence>
+      <xs:element name="policyAdministrationPoint" type="policyAdministrationPoint_t"/>
+      <xs:element name="policyDecisionPoint" type="policyDecisionPoint_t"/>
+      <xs:element name="policyEnforcementPoint" type="policyEnforcementPoints_t"/>
+      <xs:element name="policyInformationPoints" type="policyInformationPoints_t" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="security_t">
+    <xs:sequence>
+      <xs:element name="accessControlPolicyPoints" type="accessControlPolicyPoints_t"/>
+      <xs:element name="certificates" minOccurs="0">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="certificate_t"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="requiredCertificatesExtension" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="reference" type="reference_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="permissionKind_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Allow"/>
+      <xs:enumeration value="Deny"/>
+      <xs:enumeration value="NotApplicable"/>
+      <xs:enumeration value="Undefined"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="environment_t">
+    <xs:sequence>
+      <xs:element name="assetAdministrationShells">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="assetAdministrationShell" type="assetAdministrationShell_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="assets">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="asset" type="asset_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="submodels">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="submodel" type="submodel_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="conceptDescriptions">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="conceptDescription" type="conceptDescription_t"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

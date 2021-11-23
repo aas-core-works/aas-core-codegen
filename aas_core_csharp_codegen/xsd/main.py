@@ -1,0 +1,598 @@
+"""Generate XML Schema Definition (XSD) corresponding to the meta-model."""
+import argparse
+import pathlib
+import re
+import sys
+import xml.etree.ElementTree as ET
+from typing import TextIO, MutableMapping, Optional, Tuple, List, Sequence
+
+# noinspection PyUnresolvedReferences
+import xml.dom.minidom
+from icontract import ensure
+
+import aas_core_csharp_codegen
+from aas_core_csharp_codegen import cli, parse, naming, specific_implementations, \
+    intermediate
+from aas_core_csharp_codegen.common import LinenoColumner, Error, \
+    assert_never
+from aas_core_csharp_codegen.xsd import (
+    naming as xsd_naming
+)
+
+# TODO: this needs to be moved to a separate package once we are done with
+#  the development.
+
+assert aas_core_csharp_codegen.xsd.__doc__ == __doc__
+
+
+def _define_for_enumeration(
+        enumeration: intermediate.Enumeration
+) -> List[ET.Element]:
+    """
+    Generate the definitions for an ``enumeration``.
+
+    The root element is to be *extended* with the resulting list.
+    """
+    restriction = ET.Element("xs:restriction", {"base": "xs:string"})
+    for literal in enumeration.literals:
+        restriction.append(ET.Element("xs:enumeration", {"value": literal.value}))
+
+    element = ET.Element("xs:simpleType",
+                         {'name': xsd_naming.model_type(enumeration.name)})
+    element.append(restriction)
+
+    return [element]
+
+
+_BUILTIN_MAP = {
+    intermediate.BuiltinAtomicType.BOOL: "xs:boolean",
+    intermediate.BuiltinAtomicType.INT: "xs:integer",
+    intermediate.BuiltinAtomicType.FLOAT: "xs:double",
+    intermediate.BuiltinAtomicType.STR: "xs:string",
+    intermediate.BuiltinAtomicType.BYTEARRAY: "xs:base64Binary"
+}
+assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType)
+
+
+def _define_for_property(
+        prop: intermediate.Property
+) -> ET.Element:
+    """Generate the definition of a property element."""
+    type_anno = prop.type_annotation
+    while isinstance(type_anno, intermediate.OptionalTypeAnnotation):
+        type_anno = type_anno.value
+
+    prop_element = None  # type: Optional[ET.Element]
+    if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
+        prop_element = ET.Element(
+            "xs:element",
+            {
+                "name": naming.xml_property(prop.name),
+                "type": _BUILTIN_MAP[type_anno.a_type]
+            })
+
+    elif isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
+        if isinstance(type_anno.symbol, (intermediate.Enumeration, intermediate.Class)):
+            prop_element = ET.Element(
+                "xs:element",
+                {
+                    "name": naming.xml_property(prop.name),
+                    "type": xsd_naming.model_type(type_anno.symbol.name)
+                })
+
+        elif isinstance(type_anno.symbol, intermediate.Interface):
+            prop_choice = ET.Element("xs:choice")
+            prop_choice.append(ET.Element(
+                "xs:group", {"ref": xsd_naming.model_type(type_anno.symbol.name)}
+            ))
+
+            prop_complex_type = ET.Element("xs:complexType")
+            prop_complex_type.append(prop_choice)
+
+            prop_element = ET.Element(
+                "xs:element",
+                {
+                    "name": naming.xml_property(prop.name)
+                })
+            prop_element.append(prop_complex_type)
+
+        else:
+            assert_never(type_anno.symbol)
+
+    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+        if isinstance(type_anno.items, intermediate.OurAtomicTypeAnnotation):
+            # NOTE (mristin, 2021-11-13):
+            # We need to nest the enumerations and concrete classes in the tag
+            # element to delineate them in the sequence. On the other hand,
+            # an interface already implies the tag element since interfaces need
+            # to discriminate on the concrete classes.
+
+            list_element = None  # type: Optional[ET.Element]
+
+            if isinstance(
+                    type_anno.items.symbol,
+                    (intermediate.Enumeration, intermediate.Class)):
+
+                list_element = ET.Element("xs:sequence")
+                list_element.append(ET.Element(
+                    "xs:element",
+                    {
+                        "minOccurs": "0",
+                        "maxOccurs": "unbounded",
+                        "name": naming.xml_class_name(type_anno.items.symbol.name),
+                        "type": xsd_naming.model_type(type_anno.items.symbol.name)
+                    }))
+
+            elif isinstance(type_anno.items.symbol, intermediate.Interface):
+                list_element = ET.Element(
+                    "xs:choice",
+                    {"minOccurs": "0", "maxOccurs": "unbounded"})
+
+                list_element.append(
+                    ET.Element(
+                        "xs:group",
+                        {"ref": xsd_naming.model_type(type_anno.items.symbol.name)}
+                    ))
+
+            else:
+                assert_never(type_anno.items.symbol)
+
+            assert list_element is not None
+
+            prop_complex_type = ET.Element('xs:complexType')
+            prop_complex_type.append(list_element)
+
+            prop_element = ET.Element(
+                "xs:element",
+                {
+                    "name": naming.xml_property(prop.name)
+                })
+            prop_element.append(prop_complex_type)
+
+    if prop_element is None:
+        raise NotImplementedError(
+            f'(mristin, 2021-11-23):\n'
+            f'We implemented only a subset of possible type annotations '
+            f'to be represented in an XML Schema Definition since we lacked more '
+            f'information about the context.\n\n'
+            f'This feature needs yet to be implemented.\n\n'
+            f'{type_anno=}')
+
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        prop_element.attrib['minOccurs'] = "0"
+
+    return prop_element
+
+
+def _define_for_interface(
+        interface: intermediate.Interface,
+        implementers: Sequence[intermediate.Class]
+) -> List[ET.Element]:
+    """
+    Generate the definitions for the ``interface``.
+
+    The root element is to be *extended* with the resulting list.
+    """
+    # region Part definition
+
+    sequence = ET.Element("xs:sequence")
+
+    for inheritance in interface.inheritances:
+        inheritance_part = ET.Element(
+            "xs:group",
+            {"ref": xsd_naming.interface_part(inheritance.name)})
+        sequence.append(inheritance_part)
+
+    for prop in interface.properties:
+        if prop.implemented_for is not interface:
+            continue
+
+        prop_element = _define_for_property(prop=prop)
+
+        sequence.append(prop_element)
+
+    part_group = ET.Element(
+        "xs:group",
+        {"name": xsd_naming.interface_part(interface.name)})
+
+    part_group.append(sequence)
+
+    # endregion
+
+    # region Define interface as choice of concrete classes
+
+    choice = ET.Element("xs:choice")
+    for implementer in implementers:
+        element = ET.Element(
+            "xs:element",
+            {
+                "name": naming.xml_class_name(implementer.name),
+                "type": xsd_naming.model_type(implementer.name)
+            })
+        choice.append(element)
+
+    interface_group = ET.Element(
+        "xs:group",
+        {"name": xsd_naming.model_type(interface.name)})
+    interface_group.append(choice)
+
+    # endregion
+
+    return [part_group, interface_group]
+
+
+def _define_for_class(
+        cls: intermediate.Class
+) -> List[ET.Element]:
+    """
+    Generate the definitions for the class ``cls``.
+
+    The root element is to be *extended* with the resulting list.
+    """
+    sequence = ET.Element("xs:sequence")
+
+    for interface in cls.interfaces:
+        interface_part = ET.Element(
+            "xs:group",
+            {"ref": xsd_naming.interface_part(interface.name)})
+        sequence.append(interface_part)
+
+    for prop in cls.properties:
+        if prop.implemented_for is not cls:
+            continue
+
+        prop_element = _define_for_property(prop=prop)
+
+        sequence.append(prop_element)
+
+    complex_type = ET.Element(
+        "xs:complexType",
+        {"name": xsd_naming.model_type(cls.name)})
+
+    if len(sequence) > 0:
+        complex_type.append(sequence)
+
+    return [complex_type]
+
+
+_WHITESPACE_RE = re.compile(r'\s+')
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate(
+        symbol_table: intermediate.SymbolTable,
+        spec_impls: specific_implementations.SpecificImplementations,
+        interface_implementers: intermediate.InterfaceImplementers
+) -> Tuple[Optional[str], Optional[List[Error]]]:
+    """Generate the XML Schema Definition (XSD) based on the ``symbol_table."""
+    root_element_key = specific_implementations.ImplementationKey("root_element.xml")
+
+    root_element_as_text = spec_impls.get(root_element_key, None)
+    if root_element_as_text is None:
+        return None, [
+            Error(
+                None,
+                f"The implementation snippet for the root element "
+                f"is missing: {root_element_key}")]
+
+    # noinspection PyUnusedLocal
+    root = None  # type: Optional[ET.Element]
+    try:
+        root = ET.fromstring(root_element_as_text)
+    except ET.ParseError as err:
+        return None, [Error(
+            None,
+            f"Failed to parse the root element from {root_element_key}: {err}"
+        )]
+
+    assert root is not None
+
+    errors = []  # type: List[Error]
+
+    for symbol in symbol_table.symbols:
+        elements = None  # type: Optional[List[ET.Element]]
+
+        if (
+                isinstance(symbol, intermediate.Class)
+                and symbol.is_implementation_specific
+        ):
+            implementation_key = specific_implementations.ImplementationKey(
+                f"{symbol.name}.xml")
+
+            text = spec_impls.get(implementation_key, None)
+            if text is None:
+                errors.append(Error(
+                    symbol.parsed.node,
+                    f"The implementation is missing "
+                    f"for the implementation-specific class: {implementation_key}"))
+                continue
+
+            # noinspection PyUnusedLocal
+            implementation_root = None  # type: Optional[ET.Element]
+
+            try:
+                implementation_root = ET.fromstring(text)
+            except Exception as err:
+                errors.append(Error(
+                    symbol.parsed.node,
+                    f"Failed to parse the XML out of "
+                    f"the specific implementation {implementation_key}: {err}"
+                ))
+                continue
+
+            assert implementation_root is not None
+
+            # Prepare for pretty-print later
+            for descendant in implementation_root.iter():
+                if descendant.text is not None:
+                    assert _WHITESPACE_RE.fullmatch(descendant.text), (
+                        f"Expected text of a node to be all whitespace, "
+                        f"but got: {descendant.text}")
+                    descendant.text = ''
+
+                if descendant.tail is not None:
+                    assert _WHITESPACE_RE.fullmatch(descendant.tail), (
+                        f"Expected text of a node to be all whitespace, "
+                        f"but got: {descendant.tail}")
+
+                    descendant.tail = ''
+
+            # Ignore the implementation root since it defines a partial schema
+            elements = []
+            for child in implementation_root:
+                elements.append(child)
+        else:
+            if isinstance(symbol, intermediate.Enumeration):
+                elements = _define_for_enumeration(enumeration=symbol)
+
+            elif isinstance(symbol, intermediate.Interface):
+                elements = _define_for_interface(
+                    interface=symbol,
+                    implementers=interface_implementers.get(symbol, []))
+
+            elif isinstance(symbol, intermediate.Class):
+                elements = _define_for_class(cls=symbol)
+
+            else:
+                assert_never(symbol)
+
+        assert elements is not None
+        root.extend(elements)
+
+    observed_definitions = dict()  # type: MutableMapping[str, ET.Element]
+    for element in root:
+        name = element.attrib.get('name', None)
+        if name is None:
+            continue
+
+        observed = observed_definitions.get(name, None)
+        if observed is not None:
+            ours = ET.tostring(element, encoding='unicode', method='xml')
+            theirs = ET.tostring(observed, encoding='unicode', method='xml')
+
+            errors.append(Error(
+                None,
+                f"There are conflicting definitions in the schema "
+                f"with the name {name!r}:\n"
+                f"\n"
+                f"{ours}\n"
+                f"\n"
+                f"and\n"
+                f"\n"
+                f"{theirs}"))
+        else:
+            observed_definitions[name] = element
+
+    if len(errors) > 0:
+        return None, errors
+
+    text = ET.tostring(root, encoding='unicode', method='xml')
+
+    # NOTE (mristin, 2021-11-23):
+    # This approach is slow, but effective. As long as the meta-model is not too big,
+    # this should work.
+    # noinspection PyUnresolvedReferences
+    pretty_text = xml.dom.minidom.parseString(text).toprettyxml(indent='  ')
+
+    return pretty_text, None
+
+
+class Parameters:
+    """Represent the program parameters."""
+
+    def __init__(
+            self,
+            model_path: pathlib.Path,
+            snippets_dir: pathlib.Path,
+            output_dir: pathlib.Path
+    ) -> None:
+        """Initialize with the given values."""
+        self.model_path = model_path
+        self.snippets_dir = snippets_dir
+        self.output_dir = output_dir
+
+
+def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
+    """Run the program."""
+    # region Basic checks
+    # TODO: test this failure case
+    if not params.model_path.exists():
+        stderr.write(f"The --model_path does not exist: {params.model_path}\n")
+        return 1
+
+    # TODO: test this failure case
+    if not params.model_path.is_file():
+        stderr.write(
+            f"The --model_path does not point to a file: {params.model_path}\n")
+        return 1
+
+    # TODO: test this failure case
+    if not params.snippets_dir.exists():
+        stderr.write(f"The --snippets_dir does not exist: {params.snippets_dir}\n")
+        return 1
+
+    # TODO: test this failure case
+    if not params.snippets_dir.is_dir():
+        stderr.write(
+            f"The --snippets_dir does not point to a directory: "
+            f"{params.snippets_dir}\n")
+        return 1
+
+    # TODO: test the happy path
+    if not params.output_dir.exists():
+        params.output_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        # TODO: test this failure case
+        if not params.snippets_dir.is_dir():
+            stderr.write(
+                f"The --output_dir does not point to a directory: "
+                f"{params.output_dir}\n")
+            return 1
+
+    # endregion
+
+    # region Parse
+
+    spec_impls, spec_impls_errors = (
+        specific_implementations.read_from_directory(
+            snippets_dir=params.snippets_dir))
+
+    if spec_impls_errors:
+        cli.write_error_report(
+            message="Failed to resolve the implementation-specific "
+                    "XML Schema Definition snippets",
+            errors=spec_impls_errors,
+            stderr=stderr)
+        return 1
+
+    text = params.model_path.read_text(encoding='utf-8')
+
+    # TODO: test all the following individual failure cases
+    atok, parse_exception = parse.source_to_atok(source=text)
+    if parse_exception:
+        if isinstance(parse_exception, SyntaxError):
+            stderr.write(
+                f"Failed to parse the meta-model {params.model_path}: "
+                f"invalid syntax at line {parse_exception.lineno}\n"
+            )
+        else:
+            stderr.write(
+                f"Failed to parse the meta-model {params.model_path}: "
+                f"{parse_exception}\n"
+            )
+
+        return 1
+
+    import_errors = parse.check_expected_imports(atok=atok)
+    if import_errors:
+        cli.write_error_report(
+            message="One or more unexpected imports in the meta-model",
+            errors=import_errors,
+            stderr=stderr,
+        )
+
+        return 1
+
+    lineno_columner = LinenoColumner(atok=atok)
+
+    parsed_symbol_table, error = parse.atok_to_symbol_table(atok=atok)
+    if error is not None:
+        cli.write_error_report(
+            message=f"Failed to construct the symbol table from {params.model_path}",
+            errors=[lineno_columner.error_message(error)],
+            stderr=stderr,
+        )
+
+        return 1
+
+    assert parsed_symbol_table is not None
+
+    ir_symbol_table, error = intermediate.translate(
+        parsed_symbol_table=parsed_symbol_table,
+        atok=atok,
+    )
+    if error is not None:
+        cli.write_error_report(
+            message=f"Failed to translate the parsed symbol table "
+                    f"to intermediate symbol table "
+                    f"based on {params.model_path}",
+            errors=[lineno_columner.error_message(error)],
+            stderr=stderr,
+        )
+
+        return 1
+
+    interface_implementers = intermediate.map_interface_implementers(
+        symbol_table=ir_symbol_table)
+
+    # endregion
+
+    # region Schema
+
+    code, errors = _generate(
+        symbol_table=ir_symbol_table,
+        spec_impls=spec_impls,
+        interface_implementers=interface_implementers)
+
+    if errors is not None:
+        cli.write_error_report(
+            message=f"Failed to generate the XML Schema Definition "
+                    f"based on {params.model_path}",
+            errors=[lineno_columner.error_message(error) for error in errors],
+            stderr=stderr)
+        return 1
+
+    assert code is not None
+
+    pth = params.output_dir / "schema.xml"
+    try:
+        pth.write_text(code)
+    except Exception as exception:
+        cli.write_error_report(
+            message=f"Failed to write the XML Schema Definition to {pth}",
+            errors=[str(exception)],
+            stderr=stderr)
+        return 1
+
+    # endregion
+
+    stdout.write(f"Code generated to: {params.output_dir}\n")
+    return 0
+
+
+def main(prog: str) -> int:
+    """
+    Execute the main routine.
+
+    :param prog: name of the program to be displayed in the help
+    :return: exit code
+    """
+    parser = argparse.ArgumentParser(prog=prog, description=__doc__)
+    parser.add_argument("--model_path", help="path to the meta-model", required=True)
+    parser.add_argument(
+        "--snippets_dir",
+        help="path to the directory containing implementation-specific code snippets",
+        required=True)
+    parser.add_argument(
+        "--output_dir", help="path to the generated code", required=True
+    )
+    args = parser.parse_args()
+
+    params = Parameters(
+        model_path=pathlib.Path(args.model_path),
+        snippets_dir=pathlib.Path(args.snippets_dir),
+        output_dir=pathlib.Path(args.output_dir),
+    )
+
+    run(params=params, stdout=sys.stdout, stderr=sys.stderr)
+
+    return 0
+
+
+def entry_point() -> int:
+    """Provide an entry point for a console script."""
+    return main(prog="aas-core-csharp-codegen")
+
+
+if __name__ == "__main__":
+    sys.exit(main("aas-core-csharp-codegen"))

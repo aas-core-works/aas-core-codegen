@@ -289,8 +289,8 @@ class Method:
         )
 
 
-class JsonSerialization:
-    """Define settings for JSON de/serialization of a specific class."""
+class Serialization:
+    """Define general settings for the de/serialization of a specific class."""
 
     def __init__(self, with_model_type: Optional[bool]) -> None:
         """
@@ -299,18 +299,6 @@ class JsonSerialization:
         :param with_model_type: The parsed ``with_model_type`` argument
         """
         self.with_model_type = with_model_type
-
-
-class XmlSerialization:
-    """Define settings for XML de/serialization of a specific class."""
-    def __init__(self, property_as_text: Optional[Identifier], node: ast.AST) -> None:
-        """
-        Initialize with the given values.
-
-        :param property_as_text: The parsed ``property_as_text`` argument
-        """
-        self.property_as_text = property_as_text
-        self.node = node
 
 
 class Class:
@@ -342,8 +330,7 @@ class Class:
             properties: Sequence[Property],
             methods: Sequence[Method],
             invariants: Sequence[Invariant],
-            json_serialization: Optional[JsonSerialization],
-            xml_serialization: Optional[XmlSerialization],
+            serialization: Optional[Serialization],
             description: Optional[Description],
             node: ast.ClassDef,
     ) -> None:
@@ -353,8 +340,7 @@ class Class:
         self.properties = properties
         self.methods = methods
         self.invariants = invariants
-        self.json_serialization = json_serialization
-        self.xml_serialization = xml_serialization
+        self.serialization = serialization
         self.description = description
         self.node = node
 

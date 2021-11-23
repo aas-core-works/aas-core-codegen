@@ -247,20 +247,17 @@ class Signature:
         self.parsed = parsed
 
 
-class JsonSerialization:
-    """Specify the settings for JSON serialization of an interface or a class."""
+class Serialization:
+    """Specify the general settings for serialization of an interface or a class."""
 
     def __init__(self, with_model_type: bool) -> None:
-        """Initialize with the given values."""
+        """
+        Initialize with the given values.
+
+        :param with_model_type:
+            if set, the serialization needs to include a discriminator.
+        """
         self.with_model_type = with_model_type
-
-
-class XmlSerialization:
-    """Specify the settings for XML serialization of an interface or a class."""
-
-    def __init__(self, property_as_text: Optional[Identifier]) -> None:
-        """Initialize with the given values."""
-        self.property_as_text = property_as_text
 
 
 class Interface:
@@ -277,7 +274,7 @@ class Interface:
             inheritances: Sequence['Interface'],
             signatures: Sequence[Signature],
             properties: Sequence[Property],
-            json_serialization: JsonSerialization,
+            serialization: Serialization,
             description: Optional[Description],
             parsed: parse.Class,
     ) -> None:
@@ -286,7 +283,7 @@ class Interface:
         self.inheritances = inheritances
         self.signatures = signatures
         self.properties = properties
-        self.json_serialization = json_serialization
+        self.serialization = serialization
         self.description = description
         self.parsed = parsed
 
@@ -560,8 +557,7 @@ class Class:
             methods: Sequence[Method],
             constructor: Constructor,
             invariants: Sequence[Invariant],
-            json_serialization: JsonSerialization,
-            xml_serialization: XmlSerialization,
+            serialization: Serialization,
             description: Optional[Description],
             parsed: parse.Class,
     ) -> None:
@@ -573,8 +569,7 @@ class Class:
         self.methods = methods
         self.constructor = constructor
         self.invariants = invariants
-        self.json_serialization = json_serialization
-        self.xml_serialization = xml_serialization
+        self.serialization = serialization
         self.description = description
         self.parsed = parsed
 

@@ -65,14 +65,14 @@ def json_model_type(identifier: Identifier) -> Identifier:
     return Identifier(''.join(cased_parts))
 
 
-def xml_name(identifier: Identifier) -> Identifier:
+def xml_class_name(identifier: Identifier) -> Identifier:
     """
     Generate the XML tag name for the given class based on its ``identifier``.
 
-    >>> xml_name(Identifier("something"))
+    >>> xml_class_name(Identifier("something"))
     'something'
 
-    >>> xml_name(Identifier("URL_to_something"))
+    >>> xml_class_name(Identifier("URL_to_something"))
     'urlToSomething'
     """
     parts = identifier.split('_')
@@ -86,14 +86,14 @@ def xml_name(identifier: Identifier) -> Identifier:
         parts[0].lower(), ''.join(part.capitalize() for part in parts[1:])))
 
 
-def xml_attribute(identifier: Identifier) -> Identifier:
+def xml_property(identifier: Identifier) -> Identifier:
     """
-    Generate the XML attribute name for the given property based on its ``identifier``.
+    Generate the XML name for the given property based on its ``identifier``.
 
-    >>> xml_attribute(Identifier("something"))
+    >>> xml_property(Identifier("something"))
     'something'
 
-    >>> xml_attribute(Identifier("URL_to_something"))
+    >>> xml_property(Identifier("URL_to_something"))
     'urlToSomething'
     """
     parts = identifier.split('_')

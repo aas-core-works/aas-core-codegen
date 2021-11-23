@@ -4,10 +4,10 @@ import collections
 import json
 import pathlib
 import sys
-from typing import TextIO, Any, MutableMapping, Optional, Tuple, List, Union, Sequence, \
+from typing import TextIO, Any, MutableMapping, Optional, Tuple, List, Sequence, \
     Mapping
 
-from icontract import ensure, require
+from icontract import ensure
 
 import aas_core_csharp_codegen
 from aas_core_csharp_codegen import cli, parse, naming, specific_implementations, \
@@ -72,6 +72,15 @@ def _define_type(
             f'(mristin, 2021-11-10):\n'
             f'Nested optional values are unexpected in the JSON schema. '
             f'We did not implement them at the moment since we need more information '
+            f'about the context.\n\n'
+            f'This feature needs yet to be implemented.\n\n'
+            f'{type_annotation=}')
+
+    else:
+        raise NotImplementedError(
+            f'(mristin, 2021-11-10):\n'
+            f'We implemented only a subset of possible type annotations '
+            f'to be represented in a JSON schema since we lacked more information '
             f'about the context.\n\n'
             f'This feature needs yet to be implemented.\n\n'
             f'{type_annotation=}')
@@ -166,7 +175,7 @@ def _define_for_class(cls: intermediate.Class) -> MutableMapping[str, Any]:
     all_of = []  # type: List[MutableMapping[str, Any]]
 
     for interface in cls.interfaces:
-        # Please mind the difference to ``I{interface name}`` which is
+        # Please mind the difference to ``{interface name}`` which is
         # the full ``anyOf`` list of class implementers.
         all_of.append(
             {
@@ -194,7 +203,7 @@ def _define_for_class(cls: intermediate.Class) -> MutableMapping[str, Any]:
 
         properties[prop_name] = type_definition
 
-    if cls.json_serialization.with_model_type:
+    if cls.serialization.with_model_type:
         assert 'modelType' not in properties, (
             f"Unexpected JSON property ``modelType`` to be present in "
             f"the JSON properties of the class {cls.name}. This should have been "
@@ -241,20 +250,26 @@ def _generate(
                 f"The implementation snippet for the base schema "
                 f"is missing: {schema_base_key}")]
 
-    # noinspection PyTypeChecker
-    schema = json.loads(
-        schema_base_json,
-        object_pairs_hook=collections.OrderedDict)
+    schema = None  # type: Optional[MutableMapping[str, Any]]
 
-    errors = []  # type: List[Error]
+    try:
+        # noinspection PyTypeChecker
+        schema = json.loads(
+            schema_base_json,
+            object_pairs_hook=collections.OrderedDict)
+    except json.JSONDecodeError as err:
+        return None, [Error(
+            None,
+            f"Failed to parse the base schema from {schema_base_key}: {err}")]
+
+    assert schema is not None
 
     if 'definitions' in schema:
-        errors.append(Error(
+        return None, [Error(
             None,
-            "The property ``definitions`` unexpected in the base JSON schema"))
+            "The property ``definitions`` unexpected in the base JSON schema")]
 
-    if len(errors) > 0:
-        return None, errors
+    errors = []  # type: List[Error]
 
     definitions = collections.OrderedDict()
 

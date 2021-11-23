@@ -8,7 +8,7 @@ from icontract import invariant, ensure, DBC
 from aas_core_meta.marker import (
     abstract,
     implementation_specific,
-    json_serialization,
+    serialization,
     reference_in_the_book,
 )
 from aas_core_meta.verification import is_IRI, is_IRDI, is_ID_short
@@ -36,7 +36,7 @@ class Has_extensions(DBC):
 
 @abstract
 @invariant(lambda self: is_ID_short(self.ID_short), "Constraint AASd-002")
-@json_serialization(with_model_type=True)
+@serialization(with_model_type=True)
 @reference_in_the_book(section=(4, 7, 2, 2))
 class Referable(Has_extensions):
     """
@@ -349,7 +349,7 @@ class Constraint(DBC):
 #     "Constraint AASd-020"
 # )
 @reference_in_the_book(section=(4, 7, 2, 11))
-@json_serialization(with_model_type=True)
+@serialization(with_model_type=True)
 # fmt: on
 class Qualifier(Constraint, Has_semantics):
     """
@@ -395,7 +395,7 @@ class Qualifier(Constraint, Has_semantics):
 
 
 @reference_in_the_book(section=(4, 7, 2, 12))
-@json_serialization(with_model_type=True)
+@serialization(with_model_type=True)
 class Formula(Constraint):
     """
     A formula is used to describe constraints by a logical expression.

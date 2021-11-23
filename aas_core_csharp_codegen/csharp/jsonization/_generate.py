@@ -472,7 +472,7 @@ def _generate_read_for_class(
 case Json.JsonTokenType.EndObject:
 {I}{indent_but_first_line(return_writer.getvalue(), I)}''')]
 
-    if len(cls.properties) > 0 or cls.json_serialization.with_model_type:
+    if len(cls.properties) > 0 or cls.serialization.with_model_type:
         property_switch_writer = io.StringIO()
         property_switch_writer.write(textwrap.dedent(f'''\
             string propertyName = reader.GetString()
@@ -501,7 +501,7 @@ case Json.JsonTokenType.EndObject:
                 {I}break;
                 '''), I))
 
-        if cls.json_serialization.with_model_type:
+        if cls.serialization.with_model_type:
             property_switch_writer.write(textwrap.indent(textwrap.dedent(f'''\
                 case "modelType": 
                 {I}// Ignore the property modelType as we already know the exact type
@@ -588,7 +588,7 @@ def _generate_write_for_class(
     """Generate the ``Write`` method for serializing the class ``cls``."""
     blocks = [Stripped('writer.WriteStartObject();')]
 
-    if cls.json_serialization.with_model_type:
+    if cls.serialization.with_model_type:
         json_model_type = naming.json_model_type(cls.name)
         blocks.append(Stripped(textwrap.dedent(f'''\
             writer.WritePropertyName("modelType");
@@ -717,7 +717,7 @@ def generate(
         elif isinstance(symbol, intermediate.Interface):
             # Only interfaces with ``modelType`` property can be deserialized as
             # otherwise we would lack the discriminating property.
-            if not symbol.json_serialization.with_model_type:
+            if not symbol.serialization.with_model_type:
                 continue
 
             implementers = interface_implementers[symbol]

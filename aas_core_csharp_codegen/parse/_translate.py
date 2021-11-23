@@ -34,7 +34,7 @@ from aas_core_csharp_codegen.parse._types import (
     Enumeration,
     EnumerationLiteral,
     is_string_expr,
-    JsonSerialization,
+    Serialization,
     Method,
     Property,
     SelfTypeAnnotation,
@@ -43,8 +43,7 @@ from aas_core_csharp_codegen.parse._types import (
     Symbol,
     SymbolTable,
     TypeAnnotation,
-    UnverifiedSymbolTable, BUILTIN_ATOMIC_TYPES, BUILTIN_COMPOSITE_TYPES, Description,
-    XmlSerialization
+    UnverifiedSymbolTable, BUILTIN_ATOMIC_TYPES, BUILTIN_COMPOSITE_TYPES, Description
 )
 
 
@@ -94,8 +93,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("implementation_specific", "aas_core_meta.marker"),
             ('reference_in_the_book', "aas_core_meta.marker"),
             ("is_superset_of", "aas_core_meta.marker"),
-            ("json_serialization", "aas_core_meta.marker"),
-            ("xml_serialization", "aas_core_meta.marker"),
+            ("serialization", "aas_core_meta.marker"),
             ("are_unique", "aas_core_meta.verification"),
             ("is_IRI", "aas_core_meta.verification"),
             ("is_IRDI", "aas_core_meta.verification"),
@@ -1051,14 +1049,14 @@ def _class_decorator_to_marker(
     lambda decorator:
     isinstance(decorator.func, ast.Name)
     and isinstance(decorator.func.ctx, ast.Load)
-    and decorator.func.id == 'json_serialization'
+    and decorator.func.id == 'serialization'
 )
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
-def _class_decorator_to_json_serialization(
+def _class_decorator_to_serialization(
         decorator: ast.Call
-) -> Tuple[Optional[JsonSerialization], Optional[Error]]:
-    """Translate a decorator to settings of the JSON serialization."""
+) -> Tuple[Optional[Serialization], Optional[Error]]:
+    """Translate a decorator to general serialization settings."""
     with_model_type_node = None  # type: Optional[ast.AST]
 
     if len(decorator.args) >= 1:
@@ -1072,7 +1070,7 @@ def _class_decorator_to_json_serialization(
                 return (None, Error(
                     decorator,
                     f"Handling of the keyword argument {kwarg.arg!r} "
-                    f"for the json_serialization has not been implemented"))
+                    f"for the serialization decorator has not been implemented"))
 
     with_model_type = None  # type: Optional[bool]
     if with_model_type_node is not None:
@@ -1090,62 +1088,7 @@ def _class_decorator_to_json_serialization(
 
         with_model_type = with_model_type_node.value
 
-    return JsonSerialization(with_model_type=with_model_type), None
-
-
-# fmt: off
-@require(
-    lambda decorator:
-    isinstance(decorator.func, ast.Name)
-    and isinstance(decorator.func.ctx, ast.Load)
-    and decorator.func.id == 'xml_serialization'
-)
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-# fmt: on
-def _class_decorator_to_xml_serialization(
-        decorator: ast.Call
-) -> Tuple[Optional[XmlSerialization], Optional[Error]]:
-    """Translate a decorator to settings of the XML serialization."""
-    property_as_text_node = None  # type: Optional[ast.AST]
-
-    if len(decorator.args) >= 1:
-        property_as_text_node = decorator.args[0]
-
-    if len(decorator.keywords) > 0:
-        for kwarg in decorator.keywords:
-            if kwarg.arg == 'property_as_text':
-                property_as_text_node = kwarg.value
-            else:
-                return (None, Error(
-                    decorator,
-                    f"Handling of the keyword argument {kwarg.arg!r} "
-                    f"for the xml_serialization has not been implemented"))
-
-    property_as_text = None  # type: Optional[Identifier]
-    if property_as_text_node is not None:
-        if not isinstance(property_as_text_node, ast.Constant):
-            return (None, Error(
-                property_as_text_node,
-                f"Expected the value for ``property_as_text`` parameter "
-                f"to be a constant, but got: {ast.dump(property_as_text_node)}"))
-
-        if not isinstance(property_as_text_node.value, str):
-            return (None, Error(
-                property_as_text_node,
-                f"Expected the value for ``property_as_text`` parameter "
-                f"to be a string, but got: {property_as_text_node.value}"))
-
-        if not IDENTIFIER_RE.fullmatch(property_as_text_node.value):
-            return (None, Error(
-                property_as_text_node,
-                f"Expected the value for ``property_as_text`` parameter "
-                f"to be a valid identifier, but got: {property_as_text_node.value}"))
-
-        property_as_text = Identifier(property_as_text_node.value)
-
-    return XmlSerialization(
-        property_as_text=property_as_text,
-        node=decorator), None
+    return Serialization(with_model_type=with_model_type), None
 
 
 # fmt: off
@@ -1282,8 +1225,7 @@ def _classdef_to_symbol(
     is_abstract = False
     is_implementation_specific = False
 
-    json_serialization = None  # type: Optional[JsonSerialization]
-    xml_serialization = None  # type: Optional[XmlSerialization]
+    serialization = None  # type: Optional[Serialization]
 
     for decorator in node.decorator_list:
         if isinstance(decorator, ast.Name):
@@ -1313,28 +1255,14 @@ def _classdef_to_symbol(
                     continue
 
                 invariants.append(invariant)
-            elif decorator.func.id == 'json_serialization':
-                if json_serialization is not None:
+            elif decorator.func.id == 'serialization':
+                if serialization is not None:
                     underlying_errors.append(Error(
                         decorator,
-                        "Repeated markings for JSON serialization are not allowed"))
+                        "Repeated markings for serialization settings are not allowed"))
                     continue
 
-                json_serialization, error = _class_decorator_to_json_serialization(
-                    decorator=decorator)
-
-                if error is not None:
-                    underlying_errors.append(error)
-                    continue
-
-            elif decorator.func.id == 'xml_serialization':
-                if xml_serialization is not None:
-                    underlying_errors.append(Error(
-                        decorator,
-                        "Repeated markings for XML serialization are not allowed"))
-                    continue
-
-                xml_serialization, error = _class_decorator_to_xml_serialization(
+                serialization, error = _class_decorator_to_serialization(
                     decorator=decorator)
 
                 if error is not None:
@@ -1471,8 +1399,7 @@ def _classdef_to_symbol(
             properties=properties,
             methods=methods,
             invariants=invariants,
-            json_serialization=json_serialization,
-            xml_serialization=xml_serialization,
+            serialization=serialization,
             description=description,
             node=node,
         ),

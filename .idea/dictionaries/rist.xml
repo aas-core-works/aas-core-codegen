@@ -20,6 +20,7 @@
       <w>dunders</w>
       <w>golang</w>
       <w>icontract</w>
+      <w>idref</w>
       <w>ientity</w>
       <w>imapper</w>
       <w>inliner</w>
@@ -37,6 +38,7 @@
       <w>mypy</w>
       <w>nameof</w>
       <w>netcore</w>
+      <w>nist</w>
       <w>paramref</w>
       <w>pathed</w>
       <w>posonlyargs</w>
