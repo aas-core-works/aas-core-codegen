@@ -235,14 +235,9 @@ def singular_to_plural(identifier: Identifier) -> Identifier:
     """Translate the singular form of the identifier to its plural form."""
     text = identifier.replace('_', ' ')
 
-    if text == 'permissions per object':
-        result = 'permissions per objects'
-    elif text == 'bill of material item':
-        result = 'bill of material'
-    elif text == 'is case of':
-        result = 'is cases of'
-    else:
-        result = _INFLECT_ENGINE.plural(text)
+    result = _INFLECT_ENGINE.plural(text)
+    if result is False:
+        raise RuntimeError(f"Failed to find the plural of: {identifier=}")
 
     return Identifier('_'.join(result.split(' ')))
 
@@ -252,14 +247,7 @@ def plural_to_singular(identifier: Identifier) -> Identifier:
     """Translate the plural form of the identifier to its singular form."""
     text = identifier.replace('_', ' ')
 
-    if text == 'permissions per objects':
-        result = 'permissions per object'
-    elif text == 'bill of material':
-        result = 'bill of material item'
-    elif text == 'is cases of':
-        result = 'is case of'
-    else:
-        result = _INFLECT_ENGINE.singular_noun(text)
+    result = _INFLECT_ENGINE.singular_noun(text)
 
     if result is False:
         raise RuntimeError(f"Failed to find the singular noun of: {identifier=}")

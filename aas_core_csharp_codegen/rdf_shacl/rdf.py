@@ -6,8 +6,7 @@ from typing import Union, Tuple, Optional, List, MutableMapping
 from icontract import ensure, require
 
 from aas_core_csharp_codegen import intermediate, specific_implementations
-from aas_core_csharp_codegen.common import Stripped, Error, assert_never, \
-    plural_to_singular, Identifier
+from aas_core_csharp_codegen.common import Stripped, Error, assert_never, Identifier
 from aas_core_csharp_codegen.rdf_shacl import (
     naming as rdf_shacl_naming,
     common as rdf_shacl_common,
@@ -215,8 +214,8 @@ def _define_property(
         rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno.a_type]
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        prop_name = rdf_shacl_naming.property_name(plural_to_singular(prop.name))
-        prop_label = rdf_shacl_naming.property_label(plural_to_singular(prop.name))
+        prop_name = rdf_shacl_naming.property_name(prop.name)
+        prop_label = rdf_shacl_naming.property_label(prop.name)
 
         if isinstance(type_anno.items, intermediate.OurAtomicTypeAnnotation):
             rdf_type = "owl:ObjectProperty"

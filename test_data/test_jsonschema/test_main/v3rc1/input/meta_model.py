@@ -51,11 +51,11 @@ class Referable(Has_extensions):
     In case of identifiable this attribute is a short name of the element.
     In case of referable this ID is an identifying string of
     the element within its name space.
-    
+
     .. note::
-    
-        In case the element is a property and the property has a semantic definition 
-        (:class:`.Has_semantics`) conformant to IEC61360 the idShort is typically 
+
+        In case the element is a property and the property has a semantic definition
+        (:class:`.Has_semantics`) conformant to IEC61360 the idShort is typically
         identical to the short name in English.
     """
 
@@ -82,13 +82,13 @@ class Referable(Has_extensions):
     w.r.t. to the class of the element.
     It affects the expected existence of attributes and the applicability of
     constraints.
-    
+
     .. note::
-    
-        The category is not identical to the semantic definition 
-        (:class:`.Has_semantics`) of an element. The category 
-        *e.g.* could denote that the element is a measurement value whereas the 
-        semantic definition of the element would 
+
+        The category is not identical to the semantic definition
+        (:class:`.Has_semantics`) of an element. The category
+        *e.g.* could denote that the element is a measurement value whereas the
+        semantic definition of the element would
         denote that it is the measured temperature.
     """
 
@@ -104,11 +104,11 @@ class Referable(Has_extensions):
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
+        self,
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
     ) -> None:
         self.ID_short = ID_short
         self.display_name = display_name
@@ -135,13 +135,13 @@ class Identifiable(Referable):
     """The globally unique identification of the element."""
 
     def __init__(
-            self,
-            identification: "Identifier",
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            administration: Optional["Administrative_information"] = None,
+        self,
+        identification: "Identifier",
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        administration: Optional["Administrative_information"] = None,
     ) -> None:
         Referable.__init__(
             self,
@@ -185,9 +185,9 @@ class Identifier(DBC):
     """
 
     def __init__(
-            self,
-            ID: str,
-            ID_type: "Identifier_type",
+        self,
+        ID: str,
+        ID_type: "Identifier_type",
     ) -> None:
         self.ID = ID
         self.ID_type = ID_type
@@ -253,7 +253,7 @@ class Has_kind(DBC):
     kind: Optional["Modeling_kind"]
     """
     Kind of the element: either type or instance.
-    
+
     Default Value = Instance
     """
 
@@ -284,7 +284,7 @@ class Administrative_information(DBC):
     """Revision of the element."""
 
     def __init__(
-            self, version: Optional[str] = None, revision: Optional[str] = None
+        self, version: Optional[str] = None, revision: Optional[str] = None
     ) -> None:
         self.version = version
         self.revision = revision
@@ -379,12 +379,12 @@ class Qualifier(Constraint, Has_semantics):
     """
 
     def __init__(
-            self,
-            type: str,
-            value_type: "Data_type_def",
-            value: Optional[str] = None,
-            value_ID: Optional["Reference"] = None,
-            semantic_ID: Optional["Reference"] = None,
+        self,
+        type: str,
+        value_type: "Data_type_def",
+        value: Optional[str] = None,
+        value_ID: Optional["Reference"] = None,
+        semantic_ID: Optional["Reference"] = None,
     ) -> None:
         Has_semantics.__init__(self, semantic_ID=semantic_ID)
 
@@ -473,19 +473,19 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
     """
 
     def __init__(
-            self,
-            identification: "Identifier",
-            ID_short: str,
-            asset_information: "Asset_information",
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            administration: Optional["Administrative_information"] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-            derived_from: Optional["Asset_administration_shell"] = None,
-            security: Optional["Security"] = None,
-            submodels: Optional[List["Submodel"]] = None,
-            views: Optional[List["View"]] = None,
+        self,
+        identification: "Identifier",
+        ID_short: str,
+        asset_information: "Asset_information",
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        administration: Optional["Administrative_information"] = None,
+        data_specifications: Optional[List["Reference"]] = None,
+        derived_from: Optional["Asset_administration_shell"] = None,
+        security: Optional["Security"] = None,
+        submodels: Optional[List["Submodel"]] = None,
+        views: Optional[List["View"]] = None,
     ) -> None:
         Identifiable.__init__(
             self,
@@ -516,14 +516,14 @@ class Asset(Identifiable, Has_data_specification):
     """
 
     def __init__(
-            self,
-            identification: "Identifier",
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            administration: Optional["Administrative_information"] = None,
-            data_specifications: Optional[List["Reference"]] = None,
+        self,
+        identification: "Identifier",
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        administration: Optional["Administrative_information"] = None,
+        data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Identifiable.__init__(
             self,
@@ -590,12 +590,12 @@ class Asset_information(DBC):
     """
 
     def __init__(
-            self,
-            asset_kind: "Asset_kind",
-            global_asset_ID: Optional["Reference"] = None,
-            specific_asset_IDs: Optional["Identifier_key_value_pair"] = None,
-            bill_of_material: Optional[List["Submodel"]] = None,
-            default_thumbnail: Optional["File"] = None,
+        self,
+        asset_kind: "Asset_kind",
+        global_asset_ID: Optional["Reference"] = None,
+        specific_asset_IDs: Optional["Identifier_key_value_pair"] = None,
+        bill_of_material: Optional[List["Submodel"]] = None,
+        default_thumbnail: Optional["File"] = None,
     ) -> None:
         # TODO (Nico & Marko, 2021-09-24):
         #  We did not know how to implement Constraint AASd-023,
@@ -655,11 +655,11 @@ class Identifier_key_value_pair(Has_semantics):
     """The (external) subject the key belongs to or has meaning to."""
 
     def __init__(
-            self,
-            key: str,
-            value: Optional[str] = None,
-            external_subject_ID: Optional["Reference"] = None,
-            semantic_ID: Optional["Reference"] = None,
+        self,
+        key: str,
+        value: Optional[str] = None,
+        external_subject_ID: Optional["Reference"] = None,
+        semantic_ID: Optional["Reference"] = None,
     ) -> None:
         Has_semantics.__init__(self, semantic_ID)
         self.key = key
@@ -684,18 +684,18 @@ class Submodel(
     """A submodel consists of zero or more submodel elements."""
 
     def __init__(
-            self,
-            identification: "Identifier",
-            ID_short: str,
-            submodel_elements: Optional[List["Submodel_element"]],
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            administration: Optional["Administrative_information"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List["Constraint"]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
+        self,
+        identification: "Identifier",
+        ID_short: str,
+        submodel_elements: Optional[List["Submodel_element"]],
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        administration: Optional["Administrative_information"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List["Constraint"]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         # TODO (Nico & Marko, 2021-09-24):
         #  How should we implement Constraint AASd-062 (page 64 in V3RC1)?
@@ -736,15 +736,15 @@ class Submodel_element(
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List["Constraint"]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
+        self,
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List["Constraint"]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Referable.__init__(
             self,
@@ -792,17 +792,17 @@ class Relationship_element(Submodel_element):
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            first: Referable,
-            second: Referable,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List["Constraint"]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
+        self,
+        ID_short: str,
+        first: Referable,
+        second: Referable,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List["Constraint"]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -854,38 +854,38 @@ class Submodel_element_collection(Submodel_element):
 
     ordered: Optional[bool]
     """
-    If ordered=false, then the elements in the collection are not ordered. 
+    If ordered=false, then the elements in the collection are not ordered.
     If ordered=true, then the elements in the collection are ordered.
     Default = false
 
     .. note::
-      An ordered submodel element collection is typically implemented as an indexed 
+      An ordered submodel element collection is typically implemented as an indexed
       array.
     """
 
     allow_duplicates: Optional[bool]
     """
-    If allowDuplicates==true, then it is allowed that the collection contains several 
+    If allowDuplicates==true, then it is allowed that the collection contains several
     elements with the same semantics (i.e. the same semanticId).
-    Constraint AASd-026: If allowDuplicates==false then it is not allowed that 
-    the collection contains several elements with the same semantics (i.e. the same 
+    Constraint AASd-026: If allowDuplicates==false then it is not allowed that
+    the collection contains several elements with the same semantics (i.e. the same
     semanticId).
     Default = false
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List["Constraint"]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-            values: Optional[List["Submodel_element"]] = None,
-            ordered: Optional[bool] = None,
-            allow_duplicates: Optional[bool] = None,
+        self,
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List["Constraint"]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
+        values: Optional[List["Submodel_element"]] = None,
+        ordered: Optional[bool] = None,
+        allow_duplicates: Optional[bool] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -925,15 +925,15 @@ class Data_element(Submodel_element):
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List[Constraint]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
+        self,
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List[Constraint]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -996,18 +996,18 @@ class Property(Data_element):
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            value_type: "Data_type_def",
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List[Constraint]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-            value: Optional[str] = None,
-            value_ID: Optional["Reference"] = None,
+        self,
+        ID_short: str,
+        value_type: "Data_type_def",
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List[Constraint]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
+        value: Optional[str] = None,
+        value_ID: Optional["Reference"] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1049,7 +1049,7 @@ class Multi_language_property(Data_element):
 
     value: Optional["Lang_string_set"]
     """
-    The value of the property instance. 
+    The value of the property instance.
     See Constraint AASd-012
     See Constraint AASd-065"
     """
@@ -1057,22 +1057,22 @@ class Multi_language_property(Data_element):
     value_ID: Optional["Reference"]
     """
     Reference to the global unique id of a coded value.
-    See Constraint AASd-012 
+    See Constraint AASd-012
     See Constraint AASd-065"
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List[Constraint]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-            value: Optional["Lang_string_set"] = None,
-            value_ID: Optional["Reference"] = None,
+        self,
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List[Constraint]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
+        value: Optional["Lang_string_set"] = None,
+        value_ID: Optional["Reference"] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1125,18 +1125,18 @@ class Range(Data_element):
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            value_type: "Data_type_def",
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List[Constraint]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-            min: Optional[str] = None,
-            max: Optional[str] = None,
+        self,
+        ID_short: str,
+        value_type: "Data_type_def",
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List[Constraint]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
+        min: Optional[str] = None,
+        max: Optional[str] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1165,25 +1165,25 @@ class Reference_element(Data_element):
 
     value: Optional["Reference"]
     """
-    Reference to any other referable element of the same of any other AAS or a 
+    Reference to any other referable element of the same of any other AAS or a
     reference to an external object or entity.
 
-    Constraint AASd-054: If the semanticId of a ReferenceElement submodel element 
+    Constraint AASd-054: If the semanticId of a ReferenceElement submodel element
     references a ConceptDescription then the ConceptDescription/category shall be one of
     following values: REFERENCE.
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List[Constraint]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-            value: Optional["Reference"] = None,
+        self,
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List[Constraint]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
+        value: Optional["Reference"] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1210,7 +1210,7 @@ class Blob(Data_element):
     MIME_type: str
     """
     MIME type of the content of the BLOB.
-    
+
     The MIME type states which file extensions the file can have.
     Valid values are e.g. “application/json”, “application/xls”, ”image/jpg”
     The allowed values are defined as in RFC2046.
@@ -1224,22 +1224,22 @@ class Blob(Data_element):
       In contrast to the file property the file content is stored directly as value
       in the Blob data element.
 
-    Constraint AASd-057: The semanticId of a File or Blob submodel element shall only 
+    Constraint AASd-057: The semanticId of a File or Blob submodel element shall only
     reference a ConceptDescription with the category DOCUMENT.
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            MIME_type: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List[Constraint]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-            value: Optional[bytearray] = None,
+        self,
+        ID_short: str,
+        MIME_type: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List[Constraint]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
+        value: Optional[bytearray] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1269,7 +1269,7 @@ class File(Data_element):
     MIME_type: str
     """
     MIME  type of the content of the BLOB.
-    
+
     The  MIME  type states which file extensions the file can have.
     """
 
@@ -1280,17 +1280,17 @@ class File(Data_element):
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            MIME_type: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List[Constraint]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-            value: Optional[str] = None,
+        self,
+        ID_short: str,
+        MIME_type: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List[Constraint]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
+        value: Optional[str] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1322,18 +1322,18 @@ class Annotated_relationship_element(Relationship_element):
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            first: Referable,
-            second: Referable,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List[Constraint]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-            annotation: Optional[List[Data_element]] = None,
+        self,
+        ID_short: str,
+        first: Referable,
+        second: Referable,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List[Constraint]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
+        annotation: Optional[List[Data_element]] = None,
     ) -> None:
         Relationship_element.__init__(
             self,
@@ -1376,14 +1376,14 @@ class Entity_type(Enum):
 
     Co_managed_entity = "CoManagedEntity"
     """
-    For co-managed entities there is no separate AAS. Co-managed entities need to be 
+    For co-managed entities there is no separate AAS. Co-managed entities need to be
     part of a self-managed entity.
     """
 
     Self_managed_entity = "SelfManagedEntity"
     """
-    Self-Managed Entities have their own AAS but can be part of the bill of material of 
-    a composite self-managed entity. The asset of an I4.0 Component is a self-managed 
+    Self-Managed Entities have their own AAS but can be part of the bill of material of
+    a composite self-managed entity. The asset of an I4.0 Component is a self-managed
     entity per definition."
     """
 
@@ -1406,39 +1406,39 @@ class Entity(Submodel_element):
 
     statements: Optional[List["Submodel_element"]]
     """
-    Describes statements applicable to the entity by a set of submodel elements, 
+    Describes statements applicable to the entity by a set of submodel elements,
     typically with a qualified value.
     """
 
     global_asset_ID: Optional["Reference"]
     """
     Reference to the asset the entity is representing.
-    Constraint AASd-014: Either the attribute globalAssetId or specificAssetId of an 
-    Entity must be set if Entity/entityType is set to “SelfManagedEntity”. They are 
+    Constraint AASd-014: Either the attribute globalAssetId or specificAssetId of an
+    Entity must be set if Entity/entityType is set to “SelfManagedEntity”. They are
     not existing otherwise.
     """
 
     specific_asset_IDs: Optional[List["Identifier_key_value_pair"]]
     """
-    Reference to an identifier key value pair representing a specific identifier 
+    Reference to an identifier key value pair representing a specific identifier
     of the asset represented by the asset administration shell.
     See Constraint AASd-014
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            entity_type: "Entity_type",
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List["Constraint"]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-            statements: Optional[List["Submodel_element"]] = None,
-            global_asset_ID: Optional["Reference"] = None,
-            specific_asset_IDs: Optional[List["Identifier_key_value_pair"]] = None,
+        self,
+        ID_short: str,
+        entity_type: "Entity_type",
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List["Constraint"]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
+        statements: Optional[List["Submodel_element"]] = None,
+        global_asset_ID: Optional["Reference"] = None,
+        specific_asset_IDs: Optional[List["Identifier_key_value_pair"]] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -1466,15 +1466,15 @@ class Event(Submodel_element):
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional[Modeling_kind] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List[Constraint]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
+        self,
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional[Modeling_kind] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List[Constraint]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -1497,21 +1497,21 @@ class Basic_Event(Event):
 
     observed: Referable
     """
-    Reference to a referable, e.g. a data element or a submodel, that is being 
+    Reference to a referable, e.g. a data element or a submodel, that is being
     observed.
     """
 
     def __init__(
-            self,
-            observed: Referable,
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional[Modeling_kind] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List[Constraint]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
+        self,
+        observed: Referable,
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional[Modeling_kind] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List[Constraint]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Event.__init__(
             self,
@@ -1554,18 +1554,18 @@ class Operation(Submodel_element):
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List["Constraint"]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-            input_variables: Optional[List["Operation_variable"]] = None,
-            output_variables: Optional[List["Operation_variable"]] = None,
-            inoutput_variables: Optional[List["Operation_variable"]] = None,
+        self,
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List["Constraint"]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
+        input_variables: Optional[List["Operation_variable"]] = None,
+        output_variables: Optional[List["Operation_variable"]] = None,
+        inoutput_variables: Optional[List["Operation_variable"]] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -1593,9 +1593,9 @@ class Operation_variable:
 
     value: "Submodel_element"
     """
-    Describes the needed argument for an operation via a submodel element of 
+    Describes the needed argument for an operation via a submodel element of
     kind=Template.
-    Constraint AASd-008: The submodel element value of an operation variable shall be 
+    Constraint AASd-008: The submodel element value of an operation variable shall be
     of kind=Template.
     """
 
@@ -1611,15 +1611,15 @@ class Capability(Submodel_element):
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List["Constraint"]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
+        self,
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        kind: Optional["Modeling_kind"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        qualifiers: Optional[List["Constraint"]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -1649,7 +1649,7 @@ class Concept_description(Identifiable, Has_data_specification):
 
     is_case_of: Optional[List["Reference"]]
     """
-    Reference to an external definition the concept is compatible to or was derived 
+    Reference to an external definition the concept is compatible to or was derived
     from.
 
     .. note::
@@ -1657,15 +1657,15 @@ class Concept_description(Identifiable, Has_data_specification):
     """
 
     def __init__(
-            self,
-            identification: "Identifier",
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            administration: Optional["Administrative_information"] = None,
-            is_case_of: Optional[List["Reference"]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
+        self,
+        identification: "Identifier",
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        administration: Optional["Administrative_information"] = None,
+        is_case_of: Optional[List["Reference"]] = None,
+        data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Identifiable.__init__(
             self,
@@ -1702,14 +1702,14 @@ class View(Referable, Has_semantics, Has_data_specification):
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-            contained_elements: Optional[List["Referable"]] = None,
+        self,
+        ID_short: str,
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        semantic_ID: Optional["Reference"] = None,
+        data_specifications: Optional[List["Reference"]] = None,
+        contained_elements: Optional[List["Referable"]] = None,
     ) -> None:
         Referable.__init__(
             self,
@@ -1795,11 +1795,11 @@ class Key(DBC):
     ID_type: "Key_type"
     """
     Type of the key value.
-    
-    Constraint AASd-080: In case Key/type == GlobalReference idType shall not be any 
+
+    Constraint AASd-080: In case Key/type == GlobalReference idType shall not be any
     LocalKeyType (IdShort, FragmentId).
-    
-    Constraint AASd-081: In case Key/type==AssetAdministrationShell Key/idType shall 
+
+    Constraint AASd-081: In case Key/type==AssetAdministrationShell Key/idType shall
     not be any LocalKeyType (IdShort, FragmentId).
     """
 
@@ -2041,9 +2041,6 @@ class Data_type_def(Enum):
     Time = "time"
 
 
-# TODO (Nico & Marko, 2021-05-28):
-#  Should the language be unique?
-#  Or can we have duplicate entries for, say, "EN"?
 @implementation_specific
 @reference_in_the_book(section=(4, 7, 13, 2), index=2)
 class Lang_string_set(DBC):
@@ -2123,8 +2120,7 @@ class Value_list(DBC):
     """
 
     def __init__(
-            self,
-            value_reference_pair_types: Optional[List["Value_reference_pair"]] = None
+        self, value_reference_pair_types: Optional[List["Value_reference_pair"]] = None
     ) -> None:
         self.value_reference_pair_types = value_reference_pair_types
 
@@ -2148,8 +2144,8 @@ class Data_specification_IEC_61360(Data_specification_content):
     preferred_name: Optional["Lang_string_set"]
     """
     Preferred name
-    Constraint AASd-076: For all ConceptDescriptions using data specification template 
-    IEC61360 (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) 
+    Constraint AASd-076: For all ConceptDescriptions using data specification template
+    IEC61360 (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0)
     at least a preferred name in English shall be defined.
     """
 
@@ -2181,43 +2177,43 @@ class Data_specification_IEC_61360(Data_specification_content):
     data_type: Optional["Data_type_IEC_61360"]
     """
     Data Type
-    
-    Constraint AASd-070: For a ConceptDescription with category PROPERTY or VALUE using 
-    data specification template IEC61360 
-    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) - 
+
+    Constraint AASd-070: For a ConceptDescription with category PROPERTY or VALUE using
+    data specification template IEC61360
+    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
     DataSpecificationIEC61360/dataType is mandatory and shall be defined.
 
-    Constraint AASd-071: For a ConceptDescription with category REFERENCE using data 
-    specification template IEC61360 
-    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) - 
+    Constraint AASd-071: For a ConceptDescription with category REFERENCE using data
+    specification template IEC61360
+    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
     DataSpecificationIEC61360/dataType is STRING by default.
 
-    Constraint AASd-072: For a ConceptDescription with category DOCUMENT using data 
-    specification template IEC61360 
-    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) - 
-    DataSpecificationIEC61360/dataType shall be one of the following values: STRING or 
+    Constraint AASd-072: For a ConceptDescription with category DOCUMENT using data
+    specification template IEC61360
+    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
+    DataSpecificationIEC61360/dataType shall be one of the following values: STRING or
     URL.
 
-    Constraint AASd-073: For a ConceptDescription with category QUALIFIER using data 
-    specification template IEC61360 
-    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) - 
+    Constraint AASd-073: For a ConceptDescription with category QUALIFIER using data
+    specification template IEC61360
+    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
     DataSpecificationIEC61360/dataType is mandatory and shall be defined.
     """
 
     definition: Optional["Lang_string_set"]
     """
     Definition in different languages
-    
-    Constraint AASd-074: For all ConceptDescriptions except for ConceptDescriptions of 
-    category VALUE using data specification template IEC61360 
-    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) - 
-    DataSpecificationIEC61360/definition is mandatory and shall be defined at least in 
+
+    Constraint AASd-074: For all ConceptDescriptions except for ConceptDescriptions of
+    category VALUE using data specification template IEC61360
+    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
+    DataSpecificationIEC61360/definition is mandatory and shall be defined at least in
     English.
     """
 
     value_format: Optional[str]
     """
-    Value Format 
+    Value Format
     """
 
     value_list: Optional["Value_list"]
@@ -2241,20 +2237,20 @@ class Data_specification_IEC_61360(Data_specification_content):
     """
 
     def __init__(
-            self,
-            preferred_name: Optional["Lang_string_set"] = None,
-            short_name: Optional["Lang_string_set"] = None,
-            unit: Optional[str] = None,
-            unit_ID: Optional["Reference"] = None,
-            source_of_definition: Optional[str] = None,
-            symbol: Optional[str] = None,
-            data_type: Optional["Data_type_IEC_61360"] = None,
-            definition: Optional["Lang_string_set"] = None,
-            value_format: Optional[str] = None,
-            value_list: Optional["Value_list"] = None,
-            value: Optional[str] = None,
-            value_ID: Optional["Reference"] = None,
-            level_type: Optional["Level_type"] = None,
+        self,
+        preferred_name: Optional["Lang_string_set"] = None,
+        short_name: Optional["Lang_string_set"] = None,
+        unit: Optional[str] = None,
+        unit_ID: Optional["Reference"] = None,
+        source_of_definition: Optional[str] = None,
+        symbol: Optional[str] = None,
+        data_type: Optional["Data_type_IEC_61360"] = None,
+        definition: Optional["Lang_string_set"] = None,
+        value_format: Optional[str] = None,
+        value_list: Optional["Value_list"] = None,
+        value: Optional[str] = None,
+        value_ID: Optional["Reference"] = None,
+        level_type: Optional["Level_type"] = None,
     ) -> None:
         self.preferred_name = preferred_name
         self.short_name = short_name
@@ -2336,19 +2332,19 @@ class Data_specification_physical_unit(Data_specification_content):
     """
 
     def __init__(
-            self,
-            unit_name: Optional[str] = None,
-            unit_symbol: Optional[str] = None,
-            definition: Optional["Lang_string_set"] = None,
-            SI_notation: Optional[str] = None,
-            DIN_notation: Optional[str] = None,
-            ECE_name: Optional[str] = None,
-            ECE_code: Optional[str] = None,
-            NIST_name: Optional[str] = None,
-            source_of_definition: Optional[str] = None,
-            conversion_factor: Optional[str] = None,
-            registration_authority_ID: Optional[str] = None,
-            supplier: Optional[str] = None,
+        self,
+        unit_name: Optional[str] = None,
+        unit_symbol: Optional[str] = None,
+        definition: Optional["Lang_string_set"] = None,
+        SI_notation: Optional[str] = None,
+        DIN_notation: Optional[str] = None,
+        ECE_name: Optional[str] = None,
+        ECE_code: Optional[str] = None,
+        NIST_name: Optional[str] = None,
+        source_of_definition: Optional[str] = None,
+        conversion_factor: Optional[str] = None,
+        registration_authority_ID: Optional[str] = None,
+        supplier: Optional[str] = None,
     ) -> None:
         self.unit_name = unit_name
         self.unit_symbol = unit_symbol
@@ -2387,7 +2383,7 @@ class Certificate(DBC):
     """
 
     def __init__(
-            self, policy_administration_point: "Policy_administration_point"
+        self, policy_administration_point: "Policy_administration_point"
     ) -> None:
         self.policy_administration_point = policy_administration_point
 
@@ -2414,11 +2410,11 @@ class Blob_certificate(Certificate):
     """
 
     def __init__(
-            self,
-            policy_administration_point: "Policy_administration_point",
-            blob_certificate: "Blob",
-            last_certificate: bool,
-            contained_extension: Optional[List["Reference"]] = None,
+        self,
+        policy_administration_point: "Policy_administration_point",
+        blob_certificate: "Blob",
+        last_certificate: bool,
+        contained_extension: Optional[List["Reference"]] = None,
     ) -> None:
         Certificate.__init__(
             self, policy_administration_point=policy_administration_point
@@ -2457,8 +2453,8 @@ class Permission(DBC):
 
     Constraint AASs-010: The property referenced in Permission/permission shall have the
     category “CONSTANT”.
-    Constraint AASs-011: The property referenced in Permission/permission shall be part 
-    of the submodel that is referenced within the “selectablePermissions” attribute of 
+    Constraint AASs-011: The property referenced in Permission/permission shall be part
+    of the submodel that is referenced within the “selectablePermissions” attribute of
     “AccessControl”."
     """
 
@@ -2475,7 +2471,7 @@ class Permission(DBC):
     """
 
     def __init__(
-            self, permission: "Property", kind_of_permission: "Permission_kind"
+        self, permission: "Property", kind_of_permission: "Permission_kind"
     ) -> None:
         self.permission = permission
         self.kind_of_permission = kind_of_permission
@@ -2490,9 +2486,9 @@ class Subject_attributes:
     subject_attributes: List["Data_element"]
     """
     A data element that further classifies a specific subject.
-    
-    Constraint AASs-015: The data element SubjectAttributes/subjectAttribute shall be 
-    part of the submodel that is referenced within the “selectableSubjectAttributes” 
+
+    Constraint AASs-015: The data element SubjectAttributes/subjectAttribute shall be
+    part of the submodel that is referenced within the “selectableSubjectAttributes”
     attribute of “AccessControl”."
     """
 
@@ -2526,10 +2522,10 @@ class Permissions_per_object(DBC):
     """
 
     def __init__(
-            self,
-            object: "Referable",
-            target_object_attributes: Optional["Object_attributes"] = None,
-            permissions: Optional[List["Permission"]] = None,
+        self,
+        object: "Referable",
+        target_object_attributes: Optional["Object_attributes"] = None,
+        permissions: Optional[List["Permission"]] = None,
     ) -> None:
         self.object = object
         self.target_object_attributes = target_object_attributes
@@ -2545,7 +2541,7 @@ class Access_permission_rule(Referable, Qualifiable):
 
     target_subject_attributes: "Subject_attributes"
     """
-    Target subject attributes that need to be fulfilled by accessing subject to get the 
+    Target subject attributes that need to be fulfilled by accessing subject to get the
     permissions defined by this rule.
     """
 
@@ -2556,14 +2552,14 @@ class Access_permission_rule(Referable, Qualifiable):
     """
 
     def __init__(
-            self,
-            ID_short: str,
-            target_subject_attributes: "Subject_attributes",
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[str] = None,
-            description: Optional["Lang_string_set"] = None,
-            qualifiers: Optional[List["Constraint"]] = None,
-            permissions_per_object: Optional[List["Permissions_per_object"]] = None,
+        self,
+        ID_short: str,
+        target_subject_attributes: "Subject_attributes",
+        display_name: Optional["Lang_string_set"] = None,
+        category: Optional[str] = None,
+        description: Optional["Lang_string_set"] = None,
+        qualifiers: Optional[List["Constraint"]] = None,
+        permissions_per_object: Optional[List["Permissions_per_object"]] = None,
     ) -> None:
         Referable.__init__(
             self,
@@ -2588,7 +2584,7 @@ class Access_control(DBC):
 
     default_subject_attributes: "Submodel"
     """
-    Reference to a submodel defining the default subjects’ attributes for the AAS that 
+    Reference to a submodel defining the default subjects’ attributes for the AAS that
     can be used to describe access permission rules.
 
     The submodel is of kind=Template.
@@ -2608,39 +2604,39 @@ class Access_control(DBC):
 
     access_permission_rules: Optional[List["Access_permission_rule"]]
     """
-    Access permission rules of the AAS describing the rights assigned to (already 
+    Access permission rules of the AAS describing the rights assigned to (already
     authenticated) subjects to access elements of the AAS.
     """
 
     selectable_subject_attributes: Optional["Submodel"]
     """
-    Reference to a submodel defining the authenticated subjects that are configured for 
-    the AAS. They are selectable by the access permission rules to assign permissions 
+    Reference to a submodel defining the authenticated subjects that are configured for
+    the AAS. They are selectable by the access permission rules to assign permissions
     to the subjects.
-    
+
     Default: reference to the submodel referenced via defaultSubjectAttributes.
     """
 
     default_environment_attributes: Optional["Submodel"]
     """
-    Reference to a submodel defining default environment attributes, *i.e.* attributes 
+    Reference to a submodel defining default environment attributes, *i.e.* attributes
     that are not describing the asset itself.
-    
+
     The submodel is of kind=Template.
-    
-    At the same type the values of these environment attributes need to be accessible 
-    when evaluating the access permission rules. This is realized as a policy 
+
+    At the same type the values of these environment attributes need to be accessible
+    when evaluating the access permission rules. This is realized as a policy
     information point.
     """
 
     def __init__(
-            self,
-            default_subject_attributes: "Submodel",
-            selectable_permissions: "Submodel",
-            default_permissions: "Submodel",
-            access_permission_rules: Optional[List["Access_permission_rule"]] = None,
-            selectable_subject_attributes: Optional["Submodel"] = None,
-            default_environment_attributes: Optional["Submodel"] = None,
+        self,
+        default_subject_attributes: "Submodel",
+        selectable_permissions: "Submodel",
+        default_permissions: "Submodel",
+        access_permission_rules: Optional[List["Access_permission_rule"]] = None,
+        selectable_subject_attributes: Optional["Submodel"] = None,
+        default_environment_attributes: Optional["Submodel"] = None,
     ) -> None:
         self.default_subject_attributes = default_subject_attributes
         self.selectable_permissions = selectable_permissions
@@ -2658,24 +2654,24 @@ class Policy_administration_point(DBC):
 
     external_access_control: bool
     """
-    If :attr:`~external_access_control` True then an Endpoint to an external access 
-    control defining a policy administration point to be used by the AAS needs 
+    If :attr:`~external_access_control` True then an Endpoint to an external access
+    control defining a policy administration point to be used by the AAS needs
     to be configured.
     """
 
     local_access_control: Optional["Access_control"]
     """
     The policy administration point of access control as realized by the AAS itself.
-    
-    Constraint AASs-009: Either there is an external policy administration point 
-    endpoint defined (PolicyAdministrationPoint/externalPolicyDecisionPoints=true) or 
+
+    Constraint AASs-009: Either there is an external policy administration point
+    endpoint defined (PolicyAdministrationPoint/externalPolicyDecisionPoints=true) or
     the AAS has its own access control.
     """
 
     def __init__(
-            self,
-            external_access_control: bool,
-            local_access_control: Optional["Access_control"] = None,
+        self,
+        external_access_control: bool,
+        local_access_control: Optional["Access_control"] = None,
     ) -> None:
         self.external_access_control = external_access_control
         self.local_access_control = local_access_control
@@ -2692,20 +2688,20 @@ class Policy_information_points(DBC):
 
     external_information_points: bool
     """
-    If externalInformationPoints True then at least one Endpoint to external available 
+    If externalInformationPoints True then at least one Endpoint to external available
     information needs to be configured for the AAS.
     """
 
     internal_information_points: Optional[List["Submodel"]]
     """
-    Reference to a  Submodel defining information used by security access permission 
+    Reference to a  Submodel defining information used by security access permission
     rules.
     """
 
     def __init__(
-            self,
-            external_information_points: bool,
-            internal_information_points: Optional[List["Submodel"]] = None,
+        self,
+        external_information_points: bool,
+        internal_information_points: Optional[List["Submodel"]] = None,
     ) -> None:
         self.external_information_points = external_information_points
         self.internal_information_points = internal_information_points
@@ -2719,7 +2715,7 @@ class Policy_enforcement_points(DBC):
 
     external_policy_enforcement_point: bool
     """
-    If externalPolicyEnforcementPoint True then an Endpoint to external available 
+    If externalPolicyEnforcementPoint True then an Endpoint to external available
     enforcement point taking needs to be configured for the AAS.
     """
 
@@ -2735,8 +2731,8 @@ class Policy_decision_point(DBC):
 
     external_policy_decision_points: bool
     """
-    If externalPolicyDecisionPoints True then Endpoints to external available decision  
-    points taking into consideration for access control for the AAS need to be 
+    If externalPolicyDecisionPoints True then Endpoints to external available decision
+    points taking into consideration for access control for the AAS need to be
     configured.
     """
 
@@ -2771,11 +2767,11 @@ class Access_control_policy_points(DBC):
     """
 
     def __init__(
-            self,
-            policy_administration_point: "Policy_administration_point",
-            policy_decision_point: "Policy_decision_point",
-            policy_enforcement_point: "Policy_enforcement_points",
-            policy_information_points: Optional["Policy_information_points"] = None,
+        self,
+        policy_administration_point: "Policy_administration_point",
+        policy_decision_point: "Policy_decision_point",
+        policy_enforcement_point: "Policy_enforcement_points",
+        policy_information_points: Optional["Policy_information_points"] = None,
     ) -> None:
         self.policy_administration_point = policy_administration_point
         self.policy_decision_point = policy_decision_point
@@ -2805,10 +2801,10 @@ class Security(DBC):
     """
 
     def __init__(
-            self,
-            access_control_policy_points: "Access_control_policy_points",
-            certificates: Optional[List["Certificate"]] = None,
-            required_certificates_extension: Optional[List["Reference"]] = None,
+        self,
+        access_control_policy_points: "Access_control_policy_points",
+        certificates: Optional[List["Certificate"]] = None,
+        required_certificates_extension: Optional[List["Reference"]] = None,
     ) -> None:
         self.access_control_policy_points = access_control_policy_points
         self.certificates = certificates
@@ -2839,7 +2835,7 @@ class Permission_kind(Enum):
 
     Undefined = "Undefined"
     """
-    It is undefined whether the permission is allowed, not applicable or denied to 
+    It is undefined whether the permission is allowed, not applicable or denied to
     the subject.
     """
 
@@ -2859,12 +2855,11 @@ class Environment:
     concept_descriptions: List[Concept_description]
 
     def __init__(
-            self,
-            asset_administration_shells: Optional[
-                List[Asset_administration_shell]] = None,
-            assets: Optional[List[Asset]] = None,
-            submodels: Optional[List[Submodel]] = None,
-            concept_descriptions: Optional[List[Concept_description]] = None,
+        self,
+        asset_administration_shells: Optional[List[Asset_administration_shell]] = None,
+        assets: Optional[List[Asset]] = None,
+        submodels: Optional[List[Submodel]] = None,
+        concept_descriptions: Optional[List[Concept_description]] = None,
     ) -> None:
         self.asset_administration_shells = (
             asset_administration_shells

@@ -6,8 +6,7 @@ from typing import Union, Tuple, Optional, List, MutableMapping, Sequence, Mappi
 from icontract import ensure, require
 
 from aas_core_csharp_codegen import intermediate, specific_implementations
-from aas_core_csharp_codegen.common import Stripped, Error, assert_never, \
-    plural_to_singular, Identifier
+from aas_core_csharp_codegen.common import Stripped, Error, assert_never, Identifier
 from aas_core_csharp_codegen.parse import (
     tree as parse_tree
 )
@@ -163,7 +162,7 @@ def _define_property_shape(
         rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno.a_type]
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        prop_name = rdf_shacl_naming.property_name(plural_to_singular(prop.name))
+        prop_name = rdf_shacl_naming.property_name(prop.name)
 
         if isinstance(type_anno.items, intermediate.OurAtomicTypeAnnotation):
             rdfs_range = symbol_to_rdfs_range.get(

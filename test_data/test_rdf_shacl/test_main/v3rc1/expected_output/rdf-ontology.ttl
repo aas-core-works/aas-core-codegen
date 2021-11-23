@@ -254,9 +254,9 @@ aas:Qualifiable rdf:type owl:Class ;
     rdfs:label "Qualifiable"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Qualifiable/qualifier
-<https://admin-shell.io/aas/3/0/RC01/Qualifiable/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Qualifiable/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/Qualifiable/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:Qualifiable ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -310,7 +310,7 @@ aas:Qualifier rdf:type owl:Class ;
 
 ### https://admin-shell.io/aas/3/0/RC01/Qualifier/valueId
 <https://admin-shell.io/aas/3/0/RC01/Qualifier/valueId> rdf:type owl:ObjectProperty ;
-    rdfs:label "value id"^^xsd:string ;
+    rdfs:label "value ID"^^xsd:string ;
     rdfs:domain aas:Qualifier ;
     rdfs:range aas:Reference ;
     rdfs:comment "Reference to the global unique ID of a coded value."@en ;
@@ -323,9 +323,9 @@ aas:Formula rdf:type owl:Class ;
     rdfs:label "Formula"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Formula/dependency
-<https://admin-shell.io/aas/3/0/RC01/Formula/dependency> rdf:type owl:ObjectProperty ;
-    rdfs:label "dependency"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Formula/dependsOn
+<https://admin-shell.io/aas/3/0/RC01/Formula/dependsOn> rdf:type owl:ObjectProperty ;
+    rdfs:label "depends on"^^xsd:string ;
     rdfs:domain aas:Formula ;
     rdfs:range aas:Reference ;
     rdfs:comment """A formula may depend on referable or even external global elements that are used in the logical expression.
@@ -341,9 +341,9 @@ A data specification template defines a named set of additional attributes an el
     rdfs:label "Has Data Specification"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/HasDataSpecification/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/HasDataSpecification/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/HasDataSpecification/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/HasDataSpecification/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:HasDataSpecification ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -357,9 +357,9 @@ aas:AssetAdministrationShell rdf:type owl:Class ;
     rdfs:label "Asset Administration Shell"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:AssetAdministrationShell ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -455,9 +455,9 @@ Some of the administrative information like the version number might need to be 
     rdfs:comment "Meta-information about the asset the AAS is representing."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/submodel
-<https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/submodel> rdf:type owl:ObjectProperty ;
-    rdfs:label "submodel"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/submodels
+<https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/submodels> rdf:type owl:ObjectProperty ;
+    rdfs:label "submodels"^^xsd:string ;
     rdfs:domain aas:AssetAdministrationShell ;
     rdfs:range aas:Submodel ;
     rdfs:comment """References to submodels of the AAS.
@@ -465,9 +465,9 @@ Some of the administrative information like the version number might need to be 
 A submodel is a description of an aspect of the asset the AAS is representing. The asset of an AAS is typically described by one or more submodels. Temporarily no submodel might be assigned to the AAS."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/view
-<https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/view> rdf:type owl:ObjectProperty ;
-    rdfs:label "view"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/views
+<https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/views> rdf:type owl:ObjectProperty ;
+    rdfs:label "views"^^xsd:string ;
     rdfs:domain aas:AssetAdministrationShell ;
     rdfs:range aas:View ;
     rdfs:comment """Stakeholder-specific views defined for the AAS.
@@ -485,9 +485,9 @@ The asset has a globally unique identifier."""@en ;
     rdfs:label "Asset"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Asset/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/Asset/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Asset/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/Asset/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:Asset ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -582,12 +582,12 @@ The asset may either represent an asset type or an asset instance. The asset has
     rdfs:range aas:Reference ;
     rdfs:comment """Reference to either an Asset object or a global reference to the asset the AAS is representing.
 
-This attribute is required as soon as the AAS is exchanged via partners in the life cycle of the asset. In a first phase of the life cycle the asset might not yet have a global ID but already an internal identifier. The internal identifier would be modelled via 'specificAssetId'."""@en ;
+This attribute is required as soon as the AAS is exchanged via partners in the life cycle of the asset. In a first phase of the life cycle the asset might not yet have a global ID but already an internal identifier. The internal identifier would be modelled via 'specificAssetIds'."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetInformation/specificAssetId
-<https://admin-shell.io/aas/3/0/RC01/AssetInformation/specificAssetId> rdf:type owl:ObjectProperty ;
-    rdfs:label "specific asset ID"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/AssetInformation/specificAssetIds
+<https://admin-shell.io/aas/3/0/RC01/AssetInformation/specificAssetIds> rdf:type owl:ObjectProperty ;
+    rdfs:label "specific asset ids"^^xsd:string ;
     rdfs:domain aas:AssetInformation ;
     rdfs:range aas:IdentifierKeyValuePair ;
     rdfs:comment """Additional domain-specific, typically proprietary, Identifier for the asset.
@@ -595,9 +595,9 @@ This attribute is required as soon as the AAS is exchanged via partners in the l
 For example, serial number."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetInformation/billOfMaterialItem
-<https://admin-shell.io/aas/3/0/RC01/AssetInformation/billOfMaterialItem> rdf:type owl:ObjectProperty ;
-    rdfs:label "bill of material item"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/AssetInformation/billOfMaterial
+<https://admin-shell.io/aas/3/0/RC01/AssetInformation/billOfMaterial> rdf:type owl:ObjectProperty ;
+    rdfs:label "bill of material"^^xsd:string ;
     rdfs:domain aas:AssetInformation ;
     rdfs:range aas:Submodel ;
     rdfs:comment """A reference to a Submodel that defines the bill of material of the asset represented by the AAS.
@@ -699,9 +699,9 @@ A submodel is used to structure the digital representation and technical functio
     rdfs:label "Submodel"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Submodel/qualifier
-<https://admin-shell.io/aas/3/0/RC01/Submodel/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Submodel/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/Submodel/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:Submodel ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -725,9 +725,9 @@ Default Value = Instance"""@en ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Submodel/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/Submodel/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Submodel/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/Submodel/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:Submodel ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -799,9 +799,9 @@ Some of the administrative information like the version number might need to be 
     rdfs:comment "The globally unique identification of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Submodel/submodelElement
-<https://admin-shell.io/aas/3/0/RC01/Submodel/submodelElement> rdf:type owl:ObjectProperty ;
-    rdfs:label "submodel element"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Submodel/submodelElements
+<https://admin-shell.io/aas/3/0/RC01/Submodel/submodelElements> rdf:type owl:ObjectProperty ;
+    rdfs:label "submodel elements"^^xsd:string ;
     rdfs:domain aas:Submodel ;
     rdfs:range aas:SubmodelElement ;
     rdfs:comment "A submodel consists of zero or more submodel elements."@en ;
@@ -910,9 +910,9 @@ The category is not identical to the semantic definition ('HasSemantics') of an 
 The description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/qualifier
-<https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:SubmodelElementCollection ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -936,17 +936,17 @@ Default Value = Instance"""@en ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:SubmodelElementCollection ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/value
-<https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/value> rdf:type owl:ObjectProperty ;
-    rdfs:label "value"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/values
+<https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/values> rdf:type owl:ObjectProperty ;
+    rdfs:label "values"^^xsd:string ;
     rdfs:domain aas:SubmodelElementCollection ;
     rdfs:range aas:SubmodelElement ;
     rdfs:comment "Submodel element contained in the collection."@en ;
@@ -1047,9 +1047,9 @@ The category is not identical to the semantic definition ('HasSemantics') of an 
 The description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Property/qualifier
-<https://admin-shell.io/aas/3/0/RC01/Property/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Property/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/Property/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:Property ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -1073,9 +1073,9 @@ Default Value = Instance"""@en ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Property/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/Property/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Property/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/Property/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:Property ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -1171,9 +1171,9 @@ The category is not identical to the semantic definition ('HasSemantics') of an 
 The description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/qualifier
-<https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:MultiLanguageProperty ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -1197,9 +1197,9 @@ Default Value = Instance"""@en ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:MultiLanguageProperty ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -1281,9 +1281,9 @@ The category is not identical to the semantic definition ('HasSemantics') of an 
 The description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Range/qualifier
-<https://admin-shell.io/aas/3/0/RC01/Range/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Range/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/Range/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:Range ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -1307,9 +1307,9 @@ Default Value = Instance"""@en ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Range/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/Range/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Range/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/Range/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:Range ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -1393,9 +1393,9 @@ The category is not identical to the semantic definition ('HasSemantics') of an 
 The description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferenceElement/qualifier
-<https://admin-shell.io/aas/3/0/RC01/ReferenceElement/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/ReferenceElement/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/ReferenceElement/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:ReferenceElement ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -1419,9 +1419,9 @@ Default Value = Instance"""@en ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferenceElement/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/ReferenceElement/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/ReferenceElement/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/ReferenceElement/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:ReferenceElement ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -1491,9 +1491,9 @@ The category is not identical to the semantic definition ('HasSemantics') of an 
 The description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Blob/qualifier
-<https://admin-shell.io/aas/3/0/RC01/Blob/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Blob/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/Blob/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:Blob ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -1517,9 +1517,9 @@ Default Value = Instance"""@en ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Blob/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/Blob/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Blob/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/Blob/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:Blob ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -1604,9 +1604,9 @@ The category is not identical to the semantic definition ('HasSemantics') of an 
 The description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/File/qualifier
-<https://admin-shell.io/aas/3/0/RC01/File/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/File/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/File/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:File ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -1630,9 +1630,9 @@ Default Value = Instance"""@en ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/File/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/File/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/File/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/File/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:File ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -1710,9 +1710,9 @@ The category is not identical to the semantic definition ('HasSemantics') of an 
 The description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/qualifier
-<https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:AnnotatedRelationshipElement ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -1736,9 +1736,9 @@ Default Value = Instance"""@en ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:AnnotatedRelationshipElement ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -1846,9 +1846,9 @@ The category is not identical to the semantic definition ('HasSemantics') of an 
 The description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Entity/qualifier
-<https://admin-shell.io/aas/3/0/RC01/Entity/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Entity/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/Entity/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:Entity ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -1872,9 +1872,9 @@ Default Value = Instance"""@en ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Entity/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/Entity/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Entity/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/Entity/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:Entity ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -1888,9 +1888,9 @@ Default Value = Instance"""@en ;
     rdfs:comment "Describes whether the entity is a co- managed entity or a self-managed entity."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Entity/statement
-<https://admin-shell.io/aas/3/0/RC01/Entity/statement> rdf:type owl:ObjectProperty ;
-    rdfs:label "statement"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Entity/statements
+<https://admin-shell.io/aas/3/0/RC01/Entity/statements> rdf:type owl:ObjectProperty ;
+    rdfs:label "statements"^^xsd:string ;
     rdfs:domain aas:Entity ;
     rdfs:range aas:SubmodelElement ;
     rdfs:comment "Describes statements applicable to the entity by a set of submodel elements, typically with a qualified value."@en ;
@@ -1898,15 +1898,15 @@ Default Value = Instance"""@en ;
 
 ### https://admin-shell.io/aas/3/0/RC01/Entity/globalAssetId
 <https://admin-shell.io/aas/3/0/RC01/Entity/globalAssetId> rdf:type owl:ObjectProperty ;
-    rdfs:label "global asset id"^^xsd:string ;
+    rdfs:label "global asset ID"^^xsd:string ;
     rdfs:domain aas:Entity ;
     rdfs:range aas:Reference ;
     rdfs:comment "Reference to the asset the entity is representing. Constraint AASd-014: Either the attribute globalAssetId or specificAssetId of an Entity must be set if Entity/entityType is set to “SelfManagedEntity”. They are not existing otherwise."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetId
-<https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetId> rdf:type owl:ObjectProperty ;
-    rdfs:label "specific asset id"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetIds
+<https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetIds> rdf:type owl:ObjectProperty ;
+    rdfs:label "specific asset ids"^^xsd:string ;
     rdfs:domain aas:Entity ;
     rdfs:range aas:IdentifierKeyValuePair ;
     rdfs:comment "Reference to an identifier key value pair representing a specific identifier of the asset represented by the asset administration shell. See Constraint AASd-014"@en ;
@@ -1973,9 +1973,9 @@ The category is not identical to the semantic definition ('HasSemantics') of an 
 The description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/BasicEvent/qualifier
-<https://admin-shell.io/aas/3/0/RC01/BasicEvent/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/BasicEvent/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/BasicEvent/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:BasicEvent ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -1999,9 +1999,9 @@ Default Value = Instance"""@en ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/BasicEvent/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/BasicEvent/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/BasicEvent/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/BasicEvent/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:BasicEvent ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -2071,9 +2071,9 @@ The category is not identical to the semantic definition ('HasSemantics') of an 
 The description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Operation/qualifier
-<https://admin-shell.io/aas/3/0/RC01/Operation/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Operation/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/Operation/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:Operation ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -2097,33 +2097,33 @@ Default Value = Instance"""@en ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Operation/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/Operation/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Operation/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/Operation/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:Operation ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Operation/inputVariable
-<https://admin-shell.io/aas/3/0/RC01/Operation/inputVariable> rdf:type owl:ObjectProperty ;
-    rdfs:label "input variable"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Operation/inputVariables
+<https://admin-shell.io/aas/3/0/RC01/Operation/inputVariables> rdf:type owl:ObjectProperty ;
+    rdfs:label "input variables"^^xsd:string ;
     rdfs:domain aas:Operation ;
     rdfs:range aas:OperationVariable ;
     rdfs:comment "Input parameter of the operation."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Operation/outputVariable
-<https://admin-shell.io/aas/3/0/RC01/Operation/outputVariable> rdf:type owl:ObjectProperty ;
-    rdfs:label "output variable"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Operation/outputVariables
+<https://admin-shell.io/aas/3/0/RC01/Operation/outputVariables> rdf:type owl:ObjectProperty ;
+    rdfs:label "output variables"^^xsd:string ;
     rdfs:domain aas:Operation ;
     rdfs:range aas:OperationVariable ;
     rdfs:comment "Output parameter of the operation."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Operation/inoutputVariable
-<https://admin-shell.io/aas/3/0/RC01/Operation/inoutputVariable> rdf:type owl:ObjectProperty ;
-    rdfs:label "inoutput variable"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Operation/inoutputVariables
+<https://admin-shell.io/aas/3/0/RC01/Operation/inoutputVariables> rdf:type owl:ObjectProperty ;
+    rdfs:label "inoutput variables"^^xsd:string ;
     rdfs:domain aas:Operation ;
     rdfs:range aas:OperationVariable ;
     rdfs:comment "Parameter that is input and output of the operation."@en ;
@@ -2197,9 +2197,9 @@ The category is not identical to the semantic definition ('HasSemantics') of an 
 The description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Capability/qualifier
-<https://admin-shell.io/aas/3/0/RC01/Capability/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Capability/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/Capability/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:Capability ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -2223,9 +2223,9 @@ Default Value = Instance"""@en ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Capability/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/Capability/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Capability/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/Capability/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:Capability ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -2241,9 +2241,9 @@ Constraint AASd-051: A ConceptDescription shall have one of the following catego
     rdfs:label "Concept Description"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ConceptDescription/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/ConceptDescription/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/ConceptDescription/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/ConceptDescription/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:ConceptDescription ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
@@ -2395,17 +2395,17 @@ The description can be provided in several languages. If no description is defin
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/View/dataSpecification
-<https://admin-shell.io/aas/3/0/RC01/View/dataSpecification> rdf:type owl:ObjectProperty ;
-    rdfs:label "data specification"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/View/dataSpecifications
+<https://admin-shell.io/aas/3/0/RC01/View/dataSpecifications> rdf:type owl:ObjectProperty ;
+    rdfs:label "data specifications"^^xsd:string ;
     rdfs:domain aas:View ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/View/containedElement
-<https://admin-shell.io/aas/3/0/RC01/View/containedElement> rdf:type owl:ObjectProperty ;
-    rdfs:label "contained element"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/View/containedElements
+<https://admin-shell.io/aas/3/0/RC01/View/containedElements> rdf:type owl:ObjectProperty ;
+    rdfs:label "contained elements"^^xsd:string ;
     rdfs:domain aas:View ;
     rdfs:range aas:Referable ;
     rdfs:comment "Reference to a referable element that is contained in the view."@en ;
@@ -2419,9 +2419,9 @@ A reference is an ordered list of keys, each key referencing an element. The com
     rdfs:label "Reference"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Reference/key
-<https://admin-shell.io/aas/3/0/RC01/Reference/key> rdf:type owl:ObjectProperty ;
-    rdfs:label "key"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Reference/keys
+<https://admin-shell.io/aas/3/0/RC01/Reference/keys> rdf:type owl:ObjectProperty ;
+    rdfs:label "keys"^^xsd:string ;
     rdfs:domain aas:Reference ;
     rdfs:range aas:Key ;
     rdfs:comment "Unique references in their name space."@en ;
@@ -3178,7 +3178,7 @@ aas:DataSpecificationContent rdf:type owl:Class ;
 
 ### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360
 aas:DataTypeIec61360 rdf:type owl:Class ;
-    rdfs:label "Data Type Iec61360"^^xsd:string ;
+    rdfs:label "Data Type IEC 61360"^^xsd:string ;
     owl:oneOf (
         <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/DATE>
         <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/STRING>
@@ -3332,9 +3332,9 @@ aas:ValueList rdf:type owl:Class ;
     rdfs:label "Value List"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ValueList/valueReferencePair
-<https://admin-shell.io/aas/3/0/RC01/ValueList/valueReferencePair> rdf:type owl:ObjectProperty ;
-    rdfs:label "value reference pair"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/ValueList/valueReferencePairTypes
+<https://admin-shell.io/aas/3/0/RC01/ValueList/valueReferencePairTypes> rdf:type owl:ObjectProperty ;
+    rdfs:label "value reference pair types"^^xsd:string ;
     rdfs:domain aas:ValueList ;
     rdfs:range aas:ValueReferencePair ;
     rdfs:comment "A pair of a value together with its global unique id."@en ;
@@ -3347,7 +3347,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
 
 Constraint AASd-075: For all ConceptDescriptions using data specification template IEC61360 (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0
 ) values for the attributes not being marked as mandatory or optional in tables Table 7, Table 8, Table 9 and Table 10.depending on its category are ignored and handled as undefined."""@en ;
-    rdfs:label "Data Specification Iec61360"^^xsd:string ;
+    rdfs:label "Data Specification IEC 61360"^^xsd:string ;
 .
 
 ### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/preferredName
@@ -3631,9 +3631,9 @@ aas:ObjectAttributes rdf:type owl:Class ;
     rdfs:label "Object Attributes"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ObjectAttributes/objectAttribute
-<https://admin-shell.io/aas/3/0/RC01/ObjectAttributes/objectAttribute> rdf:type owl:ObjectProperty ;
-    rdfs:label "object attribute"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/ObjectAttributes/objectAttributes
+<https://admin-shell.io/aas/3/0/RC01/ObjectAttributes/objectAttributes> rdf:type owl:ObjectProperty ;
+    rdfs:label "object attributes"^^xsd:string ;
     rdfs:domain aas:ObjectAttributes ;
     rdfs:range aas:DataElement ;
     rdfs:comment "Reference to a data element that further classifies an object."@en ;
@@ -3671,9 +3671,9 @@ aas:SubjectAttributes rdf:type owl:Class ;
     rdfs:label "Subject Attributes"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/SubjectAttributes/subjectAttribute
-<https://admin-shell.io/aas/3/0/RC01/SubjectAttributes/subjectAttribute> rdf:type owl:ObjectProperty ;
-    rdfs:label "subject attribute"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/SubjectAttributes/subjectAttributes
+<https://admin-shell.io/aas/3/0/RC01/SubjectAttributes/subjectAttributes> rdf:type owl:ObjectProperty ;
+    rdfs:label "subject attributes"^^xsd:string ;
     rdfs:domain aas:SubjectAttributes ;
     rdfs:range aas:DataElement ;
     rdfs:comment """A data element that further classifies a specific subject.
@@ -3703,9 +3703,9 @@ aas:PermissionsPerObject rdf:type owl:Class ;
     rdfs:comment "Target object attributes that need to be fulfilled so that the access permissions apply to the accessing subject."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject/permission
-<https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject/permission> rdf:type owl:ObjectProperty ;
-    rdfs:label "permission"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject/permissions
+<https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject/permissions> rdf:type owl:ObjectProperty ;
+    rdfs:label "permissions"^^xsd:string ;
     rdfs:domain aas:PermissionsPerObject ;
     rdfs:range aas:Permission ;
     rdfs:comment "Permissions assigned to the object. The permissions hold for all subjects as specified in the access permission rule.\""@en ;
@@ -3766,9 +3766,9 @@ The category is not identical to the semantic definition ('HasSemantics') of an 
 The description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessPermissionRule/qualifier
-<https://admin-shell.io/aas/3/0/RC01/AccessPermissionRule/qualifier> rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifier"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/AccessPermissionRule/qualifiers
+<https://admin-shell.io/aas/3/0/RC01/AccessPermissionRule/qualifiers> rdf:type owl:ObjectProperty ;
+    rdfs:label "qualifiers"^^xsd:string ;
     rdfs:domain aas:AccessPermissionRule ;
     rdfs:range aas:Constraint ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
@@ -3824,9 +3824,9 @@ Default: reference to the submodel referenced via defaultPermissions"""@en ;
     rdfs:comment "Reference to a submodel defining the default permissions for the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControl/accessPermissionRule
-<https://admin-shell.io/aas/3/0/RC01/AccessControl/accessPermissionRule> rdf:type owl:ObjectProperty ;
-    rdfs:label "access permission rule"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/AccessControl/accessPermissionRules
+<https://admin-shell.io/aas/3/0/RC01/AccessControl/accessPermissionRules> rdf:type owl:ObjectProperty ;
+    rdfs:label "access permission rules"^^xsd:string ;
     rdfs:domain aas:AccessControl ;
     rdfs:range aas:AccessPermissionRule ;
     rdfs:comment "Access permission rules of the AAS describing the rights assigned to (already authenticated) subjects to access elements of the AAS."@en ;
@@ -3842,9 +3842,9 @@ Default: reference to the submodel referenced via defaultPermissions"""@en ;
 Default: reference to the submodel referenced via defaultSubjectAttributes."""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControl/defaultenvironmentattributes
-<https://admin-shell.io/aas/3/0/RC01/AccessControl/defaultenvironmentattributes> rdf:type owl:ObjectProperty ;
-    rdfs:label "defaultenvironmentattributes"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/AccessControl/defaultEnvironmentAttributes
+<https://admin-shell.io/aas/3/0/RC01/AccessControl/defaultEnvironmentAttributes> rdf:type owl:ObjectProperty ;
+    rdfs:label "default environment attributes"^^xsd:string ;
     rdfs:domain aas:AccessControl ;
     rdfs:range aas:Submodel ;
     rdfs:comment """Reference to a submodel defining default environment attributes, i.e. attributes that are not describing the asset itself.
@@ -3892,9 +3892,9 @@ aas:PolicyInformationPoints rdf:type owl:Class ;
     rdfs:comment "If externalInformationPoints True then at least one Endpoint to external available information needs to be configured for the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PolicyInformationPoints/internalInformationPoint
-<https://admin-shell.io/aas/3/0/RC01/PolicyInformationPoints/internalInformationPoint> rdf:type owl:ObjectProperty ;
-    rdfs:label "internal information point"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/PolicyInformationPoints/internalInformationPoints
+<https://admin-shell.io/aas/3/0/RC01/PolicyInformationPoints/internalInformationPoints> rdf:type owl:ObjectProperty ;
+    rdfs:label "internal information points"^^xsd:string ;
     rdfs:domain aas:PolicyInformationPoints ;
     rdfs:range aas:Submodel ;
     rdfs:comment "Reference to a  Submodel defining information used by security access permission rules."@en ;
@@ -3980,9 +3980,9 @@ aas:Security rdf:type owl:Class ;
     rdfs:comment "Access control policy points of the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Security/certificate
-<https://admin-shell.io/aas/3/0/RC01/Security/certificate> rdf:type owl:ObjectProperty ;
-    rdfs:label "certificate"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Security/certificates
+<https://admin-shell.io/aas/3/0/RC01/Security/certificates> rdf:type owl:ObjectProperty ;
+    rdfs:label "certificates"^^xsd:string ;
     rdfs:domain aas:Security ;
     rdfs:range aas:Certificate ;
     rdfs:comment "Authenticating Certificates of the AAS and its submodels etc."@en ;
@@ -4038,30 +4038,30 @@ aas:Environment rdf:type owl:Class ;
     rdfs:label "Environment"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Environment/assetAdministrationShell
-<https://admin-shell.io/aas/3/0/RC01/Environment/assetAdministrationShell> rdf:type owl:ObjectProperty ;
-    rdfs:label "asset administration shell"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Environment/assetAdministrationShells
+<https://admin-shell.io/aas/3/0/RC01/Environment/assetAdministrationShells> rdf:type owl:ObjectProperty ;
+    rdfs:label "asset administration shells"^^xsd:string ;
     rdfs:domain aas:Environment ;
     rdfs:range aas:AssetAdministrationShell ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Environment/asset
-<https://admin-shell.io/aas/3/0/RC01/Environment/asset> rdf:type owl:ObjectProperty ;
-    rdfs:label "asset"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Environment/assets
+<https://admin-shell.io/aas/3/0/RC01/Environment/assets> rdf:type owl:ObjectProperty ;
+    rdfs:label "assets"^^xsd:string ;
     rdfs:domain aas:Environment ;
     rdfs:range aas:Asset ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Environment/submodel
-<https://admin-shell.io/aas/3/0/RC01/Environment/submodel> rdf:type owl:ObjectProperty ;
-    rdfs:label "submodel"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Environment/submodels
+<https://admin-shell.io/aas/3/0/RC01/Environment/submodels> rdf:type owl:ObjectProperty ;
+    rdfs:label "submodels"^^xsd:string ;
     rdfs:domain aas:Environment ;
     rdfs:range aas:Submodel ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Environment/conceptDescription
-<https://admin-shell.io/aas/3/0/RC01/Environment/conceptDescription> rdf:type owl:ObjectProperty ;
-    rdfs:label "concept description"^^xsd:string ;
+### https://admin-shell.io/aas/3/0/RC01/Environment/conceptDescriptions
+<https://admin-shell.io/aas/3/0/RC01/Environment/conceptDescriptions> rdf:type owl:ObjectProperty ;
+    rdfs:label "concept descriptions"^^xsd:string ;
     rdfs:domain aas:Environment ;
     rdfs:range aas:ConceptDescription ;
 .
