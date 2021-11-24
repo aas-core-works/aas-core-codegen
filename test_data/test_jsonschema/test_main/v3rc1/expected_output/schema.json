@@ -12,64 +12,6 @@
     "HasExtensions": {
       "type": "object"
     },
-    "HasExtensions_abstract": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/AssetAdministrationShell"
-        },
-        {
-          "$ref": "#/definitions/Asset"
-        },
-        {
-          "$ref": "#/definitions/Submodel"
-        },
-        {
-          "$ref": "#/definitions/SubmodelElementCollection"
-        },
-        {
-          "$ref": "#/definitions/Property"
-        },
-        {
-          "$ref": "#/definitions/MultiLanguageProperty"
-        },
-        {
-          "$ref": "#/definitions/Range"
-        },
-        {
-          "$ref": "#/definitions/ReferenceElement"
-        },
-        {
-          "$ref": "#/definitions/Blob"
-        },
-        {
-          "$ref": "#/definitions/File"
-        },
-        {
-          "$ref": "#/definitions/AnnotatedRelationshipElement"
-        },
-        {
-          "$ref": "#/definitions/Entity"
-        },
-        {
-          "$ref": "#/definitions/BasicEvent"
-        },
-        {
-          "$ref": "#/definitions/Operation"
-        },
-        {
-          "$ref": "#/definitions/Capability"
-        },
-        {
-          "$ref": "#/definitions/ConceptDescription"
-        },
-        {
-          "$ref": "#/definitions/View"
-        },
-        {
-          "$ref": "#/definitions/AccessPermissionRule"
-        }
-      ]
-    },
     "Referable": {
       "allOf": [
         {
@@ -238,49 +180,6 @@
         }
       ]
     },
-    "HasKind_abstract": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/Submodel"
-        },
-        {
-          "$ref": "#/definitions/SubmodelElementCollection"
-        },
-        {
-          "$ref": "#/definitions/Property"
-        },
-        {
-          "$ref": "#/definitions/MultiLanguageProperty"
-        },
-        {
-          "$ref": "#/definitions/Range"
-        },
-        {
-          "$ref": "#/definitions/ReferenceElement"
-        },
-        {
-          "$ref": "#/definitions/Blob"
-        },
-        {
-          "$ref": "#/definitions/File"
-        },
-        {
-          "$ref": "#/definitions/AnnotatedRelationshipElement"
-        },
-        {
-          "$ref": "#/definitions/Entity"
-        },
-        {
-          "$ref": "#/definitions/BasicEvent"
-        },
-        {
-          "$ref": "#/definitions/Operation"
-        },
-        {
-          "$ref": "#/definitions/Capability"
-        }
-      ]
-    },
     "AdministrativeInformation": {
       "allOf": [
         {
@@ -308,58 +207,6 @@
         }
       ]
     },
-    "HasSemantics_abstract": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/Qualifier"
-        },
-        {
-          "$ref": "#/definitions/IdentifierKeyValuePair"
-        },
-        {
-          "$ref": "#/definitions/Submodel"
-        },
-        {
-          "$ref": "#/definitions/SubmodelElementCollection"
-        },
-        {
-          "$ref": "#/definitions/Property"
-        },
-        {
-          "$ref": "#/definitions/MultiLanguageProperty"
-        },
-        {
-          "$ref": "#/definitions/Range"
-        },
-        {
-          "$ref": "#/definitions/ReferenceElement"
-        },
-        {
-          "$ref": "#/definitions/Blob"
-        },
-        {
-          "$ref": "#/definitions/File"
-        },
-        {
-          "$ref": "#/definitions/AnnotatedRelationshipElement"
-        },
-        {
-          "$ref": "#/definitions/Entity"
-        },
-        {
-          "$ref": "#/definitions/BasicEvent"
-        },
-        {
-          "$ref": "#/definitions/Operation"
-        },
-        {
-          "$ref": "#/definitions/Capability"
-        },
-        {
-          "$ref": "#/definitions/View"
-        }
-      ]
-    },
     "Qualifiable": {
       "allOf": [
         {
@@ -372,52 +219,6 @@
               }
             }
           }
-        }
-      ]
-    },
-    "Qualifiable_abstract": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/Submodel"
-        },
-        {
-          "$ref": "#/definitions/SubmodelElementCollection"
-        },
-        {
-          "$ref": "#/definitions/Property"
-        },
-        {
-          "$ref": "#/definitions/MultiLanguageProperty"
-        },
-        {
-          "$ref": "#/definitions/Range"
-        },
-        {
-          "$ref": "#/definitions/ReferenceElement"
-        },
-        {
-          "$ref": "#/definitions/Blob"
-        },
-        {
-          "$ref": "#/definitions/File"
-        },
-        {
-          "$ref": "#/definitions/AnnotatedRelationshipElement"
-        },
-        {
-          "$ref": "#/definitions/Entity"
-        },
-        {
-          "$ref": "#/definitions/BasicEvent"
-        },
-        {
-          "$ref": "#/definitions/Operation"
-        },
-        {
-          "$ref": "#/definitions/Capability"
-        },
-        {
-          "$ref": "#/definitions/AccessPermissionRule"
         }
       ]
     },
@@ -503,61 +304,6 @@
               }
             }
           }
-        }
-      ]
-    },
-    "HasDataSpecification_abstract": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/AssetAdministrationShell"
-        },
-        {
-          "$ref": "#/definitions/Asset"
-        },
-        {
-          "$ref": "#/definitions/Submodel"
-        },
-        {
-          "$ref": "#/definitions/SubmodelElementCollection"
-        },
-        {
-          "$ref": "#/definitions/Property"
-        },
-        {
-          "$ref": "#/definitions/MultiLanguageProperty"
-        },
-        {
-          "$ref": "#/definitions/Range"
-        },
-        {
-          "$ref": "#/definitions/ReferenceElement"
-        },
-        {
-          "$ref": "#/definitions/Blob"
-        },
-        {
-          "$ref": "#/definitions/File"
-        },
-        {
-          "$ref": "#/definitions/AnnotatedRelationshipElement"
-        },
-        {
-          "$ref": "#/definitions/Entity"
-        },
-        {
-          "$ref": "#/definitions/BasicEvent"
-        },
-        {
-          "$ref": "#/definitions/Operation"
-        },
-        {
-          "$ref": "#/definitions/Capability"
-        },
-        {
-          "$ref": "#/definitions/ConceptDescription"
-        },
-        {
-          "$ref": "#/definitions/View"
         }
       ]
     },
@@ -1437,16 +1183,6 @@
     "DataSpecificationContent": {
       "type": "object"
     },
-    "DataSpecificationContent_abstract": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/DataSpecificationIEC61360"
-        },
-        {
-          "$ref": "#/definitions/DataSpecificationPhysicalUnit"
-        }
-      ]
-    },
     "DataTypeIEC61360": {
       "type": "string",
       "enum": [
@@ -1621,13 +1357,6 @@
           "required": [
             "policyAdministrationPoint"
           ]
-        }
-      ]
-    },
-    "Certificate_abstract": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/BlobCertificate"
         }
       ]
     },

@@ -193,27 +193,28 @@ def _define_for_interface(
 
     # endregion
 
-    # region Define interface as choice of concrete classes
+    result = [interface_group]
 
-    choice = ET.Element("xs:choice")
-    for implementer in implementers:
-        element = ET.Element(
-            "xs:element",
-            {
-                "name": naming.xml_class_name(implementer.name),
-                "type": xsd_naming.model_type(implementer.name)
-            })
-        choice.append(element)
+    if interface.serialization.with_model_type:
 
-    abstract_group = ET.Element(
-        "xs:group",
-        {"name": xsd_naming.interface_abstract(interface.name)})
-    abstract_group.append(choice)
+        choice = ET.Element("xs:choice")
+        for implementer in implementers:
+            element = ET.Element(
+                "xs:element",
+                {
+                    "name": naming.xml_class_name(implementer.name),
+                    "type": xsd_naming.model_type(implementer.name)
+                })
+            choice.append(element)
 
-    # endregion
+        abstract_group = ET.Element(
+            "xs:group",
+            {"name": xsd_naming.interface_abstract(interface.name)})
+        abstract_group.append(choice)
 
-    return [interface_group, abstract_group]
+        result.append(abstract_group)
 
+    return result
 
 def _define_for_class(
         cls: intermediate.Class

@@ -142,27 +142,27 @@ def _define_for_interface(
 
     # endregion
 
-    # region Constrain to implementers
-
-    any_of = [
-        {
-            "$ref": f"#/definitions/{naming.json_model_type(implementer.name)}"
-        }
-        for implementer in implementers
-    ]  # type: List[MutableMapping[str, Any]]
-
-    # endregion
-
     model_type = naming.json_model_type(interface.name)
     model_type_abstract = f'{model_type}_abstract'
 
-    return collections.OrderedDict(
-        [
-            (model_type, {'allOf': all_of})
-            if len(all_of) > 0
-            else (model_type, {'type': 'object'}),
-            (model_type_abstract, {'anyOf': any_of}),
-        ])
+    result = collections.OrderedDict()  # type: MutableMapping[str, Any]
+    result[model_type] = (
+        {'allOf': all_of}
+        if len(all_of) > 0
+        else {'type': 'object'}
+    )
+
+    if interface.serialization.with_model_type:
+        any_of = [
+            {
+                "$ref": f"#/definitions/{naming.json_model_type(implementer.name)}"
+            }
+            for implementer in implementers
+        ]  # type: List[MutableMapping[str, Any]]
+
+        result[model_type_abstract] = {'anyOf': any_of}
+
+    return result
 
 
 def _define_for_class(cls: intermediate.Class) -> MutableMapping[str, Any]:
