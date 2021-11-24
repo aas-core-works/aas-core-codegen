@@ -293,6 +293,9 @@ def _define_for_class_or_interface(
         blocks.append(owl_class)
 
     for prop in symbol.properties:
+        if prop.implemented_for is not symbol:
+            continue
+
         prop_def, error = _define_property(
             prop=prop, symbol=symbol, url_prefix=url_prefix,
             symbol_to_rdfs_range=symbol_to_rdfs_range
