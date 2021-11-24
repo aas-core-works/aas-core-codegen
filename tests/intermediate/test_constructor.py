@@ -5,9 +5,9 @@ from typing import Tuple, Optional, Sequence
 from icontract import ensure
 
 import tests.common
-from aas_core_csharp_codegen import parse
-from aas_core_csharp_codegen.common import Error
-from aas_core_csharp_codegen.intermediate import construction
+from aas_core_codegen import parse
+from aas_core_codegen.common import Error
+from aas_core_codegen.intermediate import construction
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))

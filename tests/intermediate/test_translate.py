@@ -6,8 +6,8 @@ import unittest
 import docutils.nodes
 
 import tests.common
-from aas_core_csharp_codegen import intermediate
-from aas_core_csharp_codegen.common import Identifier
+from aas_core_codegen import intermediate
+from aas_core_codegen.common import Identifier
 
 
 class Test_in_lining_of_constructor_statements(unittest.TestCase):

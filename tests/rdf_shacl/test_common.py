@@ -1,6 +1,6 @@
 import unittest
 
-from aas_core_csharp_codegen.rdf_shacl import (
+from aas_core_codegen.rdf_shacl import (
     common as rdf_shacl_common
 )
 

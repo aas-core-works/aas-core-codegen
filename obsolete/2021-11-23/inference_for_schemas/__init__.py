@@ -8,9 +8,9 @@ from typing import Optional, List, Union, MutableMapping, Tuple
 
 from icontract import require, ensure
 
-from aas_core_csharp_codegen import intermediate
-from aas_core_csharp_codegen.common import assert_never, Error
-from aas_core_csharp_codegen.parse import (
+from aas_core_codegen import intermediate
+from aas_core_codegen.common import assert_never, Error
+from aas_core_codegen.parse import (
     tree as parse_tree
 )
 

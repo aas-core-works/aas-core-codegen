@@ -6,12 +6,12 @@ from typing import List, Tuple, Optional
 import asttokens
 from icontract import ensure
 
-from aas_core_csharp_codegen import parse, intermediate
-from aas_core_csharp_codegen.intermediate import (
+from aas_core_codegen import parse, intermediate
+from aas_core_codegen.intermediate import (
     construction as intermediate_construction,
     _hierarchy as intermediate_hierarchy
 )
-from aas_core_csharp_codegen.common import Error
+from aas_core_codegen.common import Error
 
 
 def most_underlying_message(error: Error) -> str:

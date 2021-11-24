@@ -4,7 +4,7 @@ from typing import Sequence, List
 
 import tests.description
 
-from aas_core_csharp_codegen.rdf_shacl import (
+from aas_core_codegen.rdf_shacl import (
     _description as rdf_shacl_description
 )
 

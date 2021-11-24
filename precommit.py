@@ -70,7 +70,7 @@ def main() -> int:
         print("Black'ing...")
         # fmt: off
         black_targets = [
-            "aas_core_csharp_codegen",
+            "aas_core_codegen",
             "precommit.py",
             "setup.py",
             "check_init_and_setup_coincide.py",
@@ -90,7 +90,7 @@ def main() -> int:
     if Step.MYPY in selects and Step.MYPY not in skips:
         print("Mypy'ing...")
         # fmt: off
-        mypy_targets = ["aas_core_csharp_codegen", "tests"]
+        mypy_targets = ["aas_core_codegen", "tests"]
         subprocess.check_call(["mypy", "--strict"] + mypy_targets, cwd=str(repo_root))
         # fmt: on
     else:
@@ -99,7 +99,7 @@ def main() -> int:
     if Step.PYLINT in selects and Step.PYLINT not in skips:
         # fmt: off
         print("Pylint'ing...")
-        pylint_targets = ["aas_core_csharp_codegen"]
+        pylint_targets = ["aas_core_codegen"]
         subprocess.check_call(
             ["pylint", "--rcfile=pylint.rc"] + pylint_targets, cwd=str(repo_root)
         )
@@ -116,7 +116,7 @@ def main() -> int:
         subprocess.check_call(
             [
                 "coverage", "run",
-                "--source", "aas_core_csharp_codegen",
+                "--source", "aas_core_codegen",
                 "-m", "unittest", "discover"
             ],
             cwd=str(repo_root),
@@ -147,12 +147,12 @@ def main() -> int:
         and Step.CHECK_INIT_AND_SETUP_COINCIDE not in skips
     ):
         print(
-            "Checking that aas_core_csharp_codegen/__init__.py and setup.py coincide..."
+            "Checking that aas_core_codegen/__init__.py and setup.py coincide..."
         )
         subprocess.check_call([sys.executable, "check_init_and_setup_coincide.py"])
     else:
         print(
-            "Skipped checking that aas_core_csharp_codegen/__init__.py and "
+            "Skipped checking that aas_core_codegen/__init__.py and "
             "setup.py coincide."
         )
 

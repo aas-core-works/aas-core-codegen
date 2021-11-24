@@ -5,7 +5,7 @@ import pathlib
 import tempfile
 import unittest
 
-import aas_core_csharp_codegen.jsonschema.main
+import aas_core_codegen.jsonschema.main
 
 
 class Test_against_recorded(unittest.TestCase):
@@ -44,7 +44,7 @@ class Test_against_recorded(unittest.TestCase):
                     exit_stack.push(tmp_dir)
                     output_dir = pathlib.Path(tmp_dir.name)
 
-                params = aas_core_csharp_codegen.jsonschema.main.Parameters(
+                params = aas_core_codegen.jsonschema.main.Parameters(
                     model_path=model_pth,
                     snippets_dir=snippets_dir,
                     output_dir=output_dir)
@@ -52,7 +52,7 @@ class Test_against_recorded(unittest.TestCase):
                 stdout = io.StringIO()
                 stderr = io.StringIO()
 
-                return_code = aas_core_csharp_codegen.jsonschema.main.run(
+                return_code = aas_core_codegen.jsonschema.main.run(
                     params=params, stdout=stdout, stderr=stderr)
 
                 if stderr.getvalue() != "":

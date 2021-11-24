@@ -1,9 +1,9 @@
 import textwrap
 import unittest
 
-import aas_core_csharp_codegen.intermediate._hierarchy as _hierarchy
+import aas_core_codegen.intermediate._hierarchy as _hierarchy
 import tests.common
-from aas_core_csharp_codegen.common import Identifier
+from aas_core_codegen.common import Identifier
 
 
 class Test_ontology_ok(unittest.TestCase):

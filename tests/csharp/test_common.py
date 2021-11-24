@@ -1,6 +1,6 @@
 import unittest
 
-import aas_core_csharp_codegen.csharp.common as csharp_common
+import aas_core_codegen.csharp.common as csharp_common
 
 
 class TestStringLiteral(unittest.TestCase):

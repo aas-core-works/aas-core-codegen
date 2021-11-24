@@ -10,8 +10,8 @@ import asttokens
 import docutils.nodes
 
 import tests.common
-from aas_core_csharp_codegen import parse
-from aas_core_csharp_codegen.common import Error, LinenoColumner, Identifier
+from aas_core_codegen import parse
+from aas_core_codegen.common import Error, LinenoColumner, Identifier
 
 
 class Test_parsing_AST(unittest.TestCase):

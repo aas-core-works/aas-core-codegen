@@ -11,7 +11,7 @@ import sys
 import tempfile
 import textwrap
 
-import aas_core_csharp_codegen.csharp.main
+import aas_core_codegen.csharp.main
 
 
 def main() -> int:
@@ -56,7 +56,7 @@ def main() -> int:
                 f"to: {output_dir} ...")
 
             output_dir.mkdir(exist_ok=True, parents=True)
-            params = aas_core_csharp_codegen.csharp.main.Parameters(
+            params = aas_core_codegen.csharp.main.Parameters(
                 model_path=model_pth,
                 snippets_dir=snippets_dir,
                 namespace=namespace,
@@ -65,7 +65,7 @@ def main() -> int:
             stdout = io.StringIO()
             stderr = io.StringIO()
 
-            return_code = aas_core_csharp_codegen.csharp.main.run(
+            return_code = aas_core_codegen.csharp.main.run(
                 params=params, stdout=stdout, stderr=stderr)
 
             assert stderr.getvalue() == "", (

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-"""Check that the distribution and aas_core_csharp_codegen/__init__.py are in sync."""
+"""Check that the distribution and aas_core_codegen/__init__.py are in sync."""
 import subprocess
 import sys
 from typing import Optional, Dict
 
-import aas_core_csharp_codegen
+import aas_core_codegen
 
 
 def main() -> int:
@@ -26,38 +26,38 @@ def main() -> int:
 
         setup_py[field] = out
 
-    if setup_py["version"] != aas_core_csharp_codegen.__version__:
+    if setup_py["version"] != aas_core_codegen.__version__:
         print(
             f"The version in the setup.py is {setup_py['version']}, "
-            f"while the version in aas_core_csharp_codegen/__init__.py is: "
-            f"{aas_core_csharp_codegen.__version__}",
+            f"while the version in aas_core_codegen/__init__.py is: "
+            f"{aas_core_codegen.__version__}",
             file=sys.stderr,
         )
         success = False
 
-    if setup_py["author"] != aas_core_csharp_codegen.__author__:
+    if setup_py["author"] != aas_core_codegen.__author__:
         print(
             f"The author in the setup.py is {setup_py['author']}, "
-            f"while the author in aas_core_csharp_codegen/__init__.py is: "
-            f"{aas_core_csharp_codegen.__author__}",
+            f"while the author in aas_core_codegen/__init__.py is: "
+            f"{aas_core_codegen.__author__}",
             file=sys.stderr,
         )
         success = False
 
-    if setup_py["license"] != aas_core_csharp_codegen.__license__:
+    if setup_py["license"] != aas_core_codegen.__license__:
         print(
             f"The license in the setup.py is {setup_py['license']}, "
-            f"while the license in aas_core_csharp_codegen/__init__.py is: "
-            f"{aas_core_csharp_codegen.__license__}",
+            f"while the license in aas_core_codegen/__init__.py is: "
+            f"{aas_core_codegen.__license__}",
             file=sys.stderr,
         )
         success = False
 
-    if setup_py["description"] != aas_core_csharp_codegen.__doc__:
+    if setup_py["description"] != aas_core_codegen.__doc__:
         print(
             f"The description in the setup.py is {setup_py['description']}, "
-            f"while the description in aas_core_csharp_codegen/__init__.py is: "
-            f"{aas_core_csharp_codegen.__doc__}",
+            f"while the description in aas_core_codegen/__init__.py is: "
+            f"{aas_core_codegen.__doc__}",
             file=sys.stderr,
         )
         success = False
@@ -101,11 +101,11 @@ def main() -> int:
     else:
         expected_status_in_init = status_map[status_classifier]
 
-        if expected_status_in_init != aas_core_csharp_codegen.__status__:
+        if expected_status_in_init != aas_core_codegen.__status__:
             print(
                 f"Expected status {expected_status_in_init} "
-                f"according to setup.py in aas_core_csharp_codegen/__init__.py, "
-                f"but found: {aas_core_csharp_codegen.__status__}"
+                f"according to setup.py in aas_core_codegen/__init__.py, "
+                f"but found: {aas_core_codegen.__status__}"
             )
             success = False
 

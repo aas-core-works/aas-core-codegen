@@ -2,9 +2,9 @@ import textwrap
 import unittest.mock
 
 # noinspection PyProtectedMember
-import aas_core_csharp_codegen.csharp.structure._generate as csharp_structure_generate
+import aas_core_codegen.csharp.structure._generate as csharp_structure_generate
 import tests.common
-from aas_core_csharp_codegen.common import Stripped, Identifier
+from aas_core_codegen.common import Stripped, Identifier
 
 
 class TestDescription(unittest.TestCase):
