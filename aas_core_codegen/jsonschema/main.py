@@ -2,7 +2,7 @@
 import collections
 import json
 from typing import TextIO, Any, MutableMapping, Optional, Tuple, List, Sequence, \
-    Mapping
+    Mapping, Set
 
 from icontract import ensure
 
@@ -87,7 +87,8 @@ def _define_type(
 
 def _define_for_interface(
         interface: intermediate.Interface,
-        implementers: Sequence[intermediate.Class]
+        implementers: Sequence[intermediate.Class],
+        ids_of_used_interfaces: Set[int]
 ) -> MutableMapping[str, Any]:
     """
     Generate the definitions resulting from the ``interface``.
@@ -152,7 +153,7 @@ def _define_for_interface(
         else {'type': 'object'}
     )
 
-    if interface.serialization.with_model_type:
+    if id(interface) in ids_of_used_interfaces:
         any_of = [
             {
                 "$ref": f"#/definitions/{naming.json_model_type(implementer.name)}"
@@ -273,6 +274,9 @@ def _generate(
 
     definitions = collections.OrderedDict()
 
+    ids_of_used_interfaces = intermediate.collect_ids_of_interfaces_in_properties(
+        symbol_table=symbol_table)
+
     for symbol in symbol_table.symbols:
         # Key-value-pairs to extend the definitions
         extension = None  # type: Optional[Mapping[str, Any]]
@@ -317,7 +321,8 @@ def _generate(
             elif isinstance(symbol, intermediate.Interface):
                 extension = _define_for_interface(
                     interface=symbol,
-                    implementers=interface_implementers.get(symbol, []))
+                    implementers=interface_implementers.get(symbol, []),
+                    ids_of_used_interfaces=ids_of_used_interfaces)
             elif isinstance(symbol, intermediate.Class):
                 extension = _define_for_class(cls=symbol)
             else:

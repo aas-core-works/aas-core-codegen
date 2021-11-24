@@ -118,22 +118,6 @@
         }
       ]
     },
-    "Identifiable_abstract": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/AssetAdministrationShell"
-        },
-        {
-          "$ref": "#/definitions/Asset"
-        },
-        {
-          "$ref": "#/definitions/Submodel"
-        },
-        {
-          "$ref": "#/definitions/ConceptDescription"
-        }
-      ]
-    },
     "Identifier": {
       "allOf": [
         {
@@ -545,13 +529,6 @@
         }
       ]
     },
-    "RelationshipElement_abstract": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/AnnotatedRelationshipElement"
-        }
-      ]
-    },
     "SubmodelElementCollection": {
       "allOf": [
         {
@@ -826,13 +803,6 @@
       "allOf": [
         {
           "$ref": "#/definitions/SubmodelElement"
-        }
-      ]
-    },
-    "Event_abstract": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/BasicEvent"
         }
       ]
     },
@@ -1360,6 +1330,13 @@
         }
       ]
     },
+    "Certificate_abstract": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/BlobCertificate"
+        }
+      ]
+    },
     "BlobCertificate": {
       "allOf": [
         {
@@ -1379,6 +1356,10 @@
               "items": {
                 "$ref": "#/definitions/Reference"
               }
+            },
+            "modelType": {
+              "type": "string",
+              "const": "BlobCertificate"
             }
           },
           "required": [

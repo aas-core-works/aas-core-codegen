@@ -41,14 +41,6 @@
       <xs:element name="identification" type="identifier_t"/>
     </xs:sequence>
   </xs:group>
-  <xs:group name="identifiable_abstract">
-    <xs:choice>
-      <xs:element name="assetAdministrationShell" type="assetAdministrationShell_t"/>
-      <xs:element name="asset" type="asset_t"/>
-      <xs:element name="submodel" type="submodel_t"/>
-      <xs:element name="conceptDescription" type="conceptDescription_t"/>
-    </xs:choice>
-  </xs:group>
   <xs:complexType name="identifier_t">
     <xs:sequence>
       <xs:element name="idType" type="identifierType_t"/>
@@ -255,11 +247,6 @@
       </xs:element>
     </xs:sequence>
   </xs:group>
-  <xs:group name="relationshipElement_abstract">
-    <xs:choice>
-      <xs:element name="annotatedRelationshipElement" type="annotatedRelationshipElement_t"/>
-    </xs:choice>
-  </xs:group>
   <xs:complexType name="submodelElementCollection_t">
     <xs:sequence>
       <xs:group ref="submodelElement_t"/>
@@ -375,11 +362,6 @@
     <xs:sequence>
       <xs:group ref="submodelElement_t"/>
     </xs:sequence>
-  </xs:group>
-  <xs:group name="event_abstract">
-    <xs:choice>
-      <xs:element name="basicEvent" type="basicEvent_t"/>
-    </xs:choice>
   </xs:group>
   <xs:complexType name="basicEvent_t">
     <xs:sequence>

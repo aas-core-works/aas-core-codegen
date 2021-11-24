@@ -1,7 +1,7 @@
 """Generate XML Schema Definition (XSD) corresponding to the meta-model."""
 import re
 import xml.etree.ElementTree as ET
-from typing import TextIO, MutableMapping, Optional, Tuple, List, Sequence
+from typing import TextIO, MutableMapping, Optional, Tuple, List, Sequence, Set
 
 # noinspection PyUnresolvedReferences
 import xml.dom.minidom
@@ -122,11 +122,11 @@ def _define_for_property(
 
                 list_element.append(
                     ET.Element("xs:group",
-                        {
-                            "ref": xsd_naming.interface_abstract(
-                                type_anno.items.symbol.name)
-                        }
-                    ))
+                               {
+                                   "ref": xsd_naming.interface_abstract(
+                                       type_anno.items.symbol.name)
+                               }
+                               ))
 
             else:
                 assert_never(type_anno.items.symbol)
@@ -160,7 +160,8 @@ def _define_for_property(
 
 def _define_for_interface(
         interface: intermediate.Interface,
-        implementers: Sequence[intermediate.Class]
+        implementers: Sequence[intermediate.Class],
+        ids_of_used_interfaces: Set[int]
 ) -> List[ET.Element]:
     """
     Generate the definitions for the ``interface``.
@@ -195,8 +196,7 @@ def _define_for_interface(
 
     result = [interface_group]
 
-    if interface.serialization.with_model_type:
-
+    if id(interface) in ids_of_used_interfaces:
         choice = ET.Element("xs:choice")
         for implementer in implementers:
             element = ET.Element(
@@ -215,6 +215,7 @@ def _define_for_interface(
         result.append(abstract_group)
 
     return result
+
 
 def _define_for_class(
         cls: intermediate.Class
@@ -284,6 +285,9 @@ def _generate(
 
     errors = []  # type: List[Error]
 
+    ids_of_used_interfaces = intermediate.collect_ids_of_interfaces_in_properties(
+        symbol_table=symbol_table)
+
     for symbol in symbol_table.symbols:
         elements = None  # type: Optional[List[ET.Element]]
 
@@ -343,7 +347,8 @@ def _generate(
             elif isinstance(symbol, intermediate.Interface):
                 elements = _define_for_interface(
                     interface=symbol,
-                    implementers=interface_implementers.get(symbol, []))
+                    implementers=interface_implementers.get(symbol, []),
+                    ids_of_used_interfaces=ids_of_used_interfaces)
 
             elif isinstance(symbol, intermediate.Class):
                 elements = _define_for_class(cls=symbol)

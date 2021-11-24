@@ -3,7 +3,7 @@ import ast
 import enum
 import pathlib
 from typing import (
-    Sequence, Optional, Union, TypeVar, Mapping, MutableMapping, List, Tuple)
+    Sequence, Optional, Union, TypeVar, Mapping, MutableMapping, List, Tuple, Set)
 
 import docutils.nodes
 from icontract import require, invariant
@@ -829,3 +829,42 @@ def make_union_of_properties(
                prop_of_cls.prop.name: prop_of_cls.prop.type_annotation
                for prop_of_cls in property_union.values()
            }, None
+
+
+def collect_ids_of_interfaces_in_properties(symbol_table: SymbolTable) -> Set[int]:
+    """
+    Collect the IDs of the interfaces occurring in type annotations of the properties.
+
+    The IDs refer to IDs of the Python objects in this context.
+    """
+    result = set()  # type: Set[int]
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, Enumeration):
+            continue
+
+        elif isinstance(symbol, (Interface, Class)):
+            for prop in symbol.properties:
+                type_anno = prop.type_annotation
+
+                old_type_anno = None  # type: Optional[TypeAnnotation]
+                while True:
+                    if isinstance(type_anno, OptionalTypeAnnotation):
+                        type_anno = type_anno.value
+                    elif isinstance(type_anno, ListTypeAnnotation):
+                        type_anno = type_anno.items
+                    elif isinstance(type_anno, BuiltinAtomicTypeAnnotation):
+                        break
+                    elif isinstance(type_anno, OurAtomicTypeAnnotation):
+                        if isinstance(type_anno.symbol, Interface):
+                            result.add(id(type_anno.symbol))
+
+                        break
+                    else:
+                        assert_never(type_anno)
+
+                    assert old_type_anno is not type_anno, "Loop invariant"
+                    old_type_anno = type_anno
+        else:
+            assert_never(symbol)
+
+    return result
