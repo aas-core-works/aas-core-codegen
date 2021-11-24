@@ -8,24 +8,24 @@ these identifiers are used only for the XSD.
 from aas_core_codegen.common import Identifier
 
 
-def interface_part(identifier: Identifier)->Identifier:
+def interface_abstract(identifier: Identifier)->Identifier:
     """
-    Generate the identifier for a partial definition of a concrete class.
+    Generate the identifier for an abstract definition of an interface.
 
-    >>> interface_part(Identifier("Something"))
-    'something_part'
+    >>> interface_abstract(Identifier("Something"))
+    'something_abstract'
 
-    >>> interface_part(Identifier("Something_to_URL"))
-    'somethingToUrl_part'
+    >>> interface_abstract(Identifier("Something_to_URL"))
+    'somethingToUrl_abstract'
     """
     parts = identifier.split('_')
     assert len(parts) >= 1, (
         f"Expected at least one part for the valid identifier: {identifier}")
 
     if len(parts) == 1:
-        return Identifier(f"{parts[0].lower()}_part")
+        return Identifier(f"{parts[0].lower()}_abstract")
 
-    return Identifier("{}{}_part".format(
+    return Identifier("{}{}_abstract".format(
         parts[0].lower(), ''.join(part.capitalize() for part in parts[1:])))
 
 

@@ -9,10 +9,10 @@
     }
   ],
   "definitions": {
-    "Part_HasExtensions": {
+    "HasExtensions": {
       "type": "object"
     },
-    "HasExtensions": {
+    "HasExtensions_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/AssetAdministrationShell"
@@ -70,10 +70,10 @@
         }
       ]
     },
-    "Part_Referable": {
+    "Referable": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_HasExtensions"
+          "$ref": "#/definitions/HasExtensions"
         },
         {
           "type": "object",
@@ -97,7 +97,7 @@
         }
       ]
     },
-    "Referable": {
+    "Referable_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/AssetAdministrationShell"
@@ -155,10 +155,10 @@
         }
       ]
     },
-    "Part_Identifiable": {
+    "Identifiable": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_Referable"
+          "$ref": "#/definitions/Referable"
         },
         {
           "type": "object",
@@ -176,7 +176,7 @@
         }
       ]
     },
-    "Identifiable": {
+    "Identifiable_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/AssetAdministrationShell"
@@ -226,7 +226,7 @@
         "Instance"
       ]
     },
-    "Part_HasKind": {
+    "HasKind": {
       "allOf": [
         {
           "type": "object",
@@ -238,7 +238,7 @@
         }
       ]
     },
-    "HasKind": {
+    "HasKind_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/Submodel"
@@ -296,7 +296,7 @@
         }
       ]
     },
-    "Part_HasSemantics": {
+    "HasSemantics": {
       "allOf": [
         {
           "type": "object",
@@ -308,7 +308,7 @@
         }
       ]
     },
-    "HasSemantics": {
+    "HasSemantics_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/Qualifier"
@@ -360,7 +360,7 @@
         }
       ]
     },
-    "Part_Qualifiable": {
+    "Qualifiable": {
       "allOf": [
         {
           "type": "object",
@@ -368,14 +368,14 @@
             "qualifiers": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Constraint"
+                "$ref": "#/definitions/Constraint_abstract"
               }
             }
           }
         }
       ]
     },
-    "Qualifiable": {
+    "Qualifiable_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/Submodel"
@@ -421,10 +421,10 @@
         }
       ]
     },
-    "Part_Constraint": {
+    "Constraint": {
       "type": "object"
     },
-    "Constraint": {
+    "Constraint_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/Qualifier"
@@ -437,10 +437,10 @@
     "Qualifier": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_Constraint"
+          "$ref": "#/definitions/Constraint"
         },
         {
-          "$ref": "#/definitions/Part_HasSemantics"
+          "$ref": "#/definitions/HasSemantics"
         },
         {
           "type": "object",
@@ -472,7 +472,7 @@
     "Formula": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_Constraint"
+          "$ref": "#/definitions/Constraint"
         },
         {
           "type": "object",
@@ -491,7 +491,7 @@
         }
       ]
     },
-    "Part_HasDataSpecification": {
+    "HasDataSpecification": {
       "allOf": [
         {
           "type": "object",
@@ -506,7 +506,7 @@
         }
       ]
     },
-    "HasDataSpecification": {
+    "HasDataSpecification_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/AssetAdministrationShell"
@@ -564,10 +564,10 @@
     "AssetAdministrationShell": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_Identifiable"
+          "$ref": "#/definitions/Identifiable"
         },
         {
-          "$ref": "#/definitions/Part_HasDataSpecification"
+          "$ref": "#/definitions/HasDataSpecification"
         },
         {
           "type": "object",
@@ -607,10 +607,10 @@
     "Asset": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_Identifiable"
+          "$ref": "#/definitions/Identifiable"
         },
         {
-          "$ref": "#/definitions/Part_HasDataSpecification"
+          "$ref": "#/definitions/HasDataSpecification"
         },
         {
           "type": "object",
@@ -663,7 +663,7 @@
     "IdentifierKeyValuePair": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_HasSemantics"
+          "$ref": "#/definitions/HasSemantics"
         },
         {
           "type": "object",
@@ -687,19 +687,19 @@
     "Submodel": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_Identifiable"
+          "$ref": "#/definitions/Identifiable"
         },
         {
-          "$ref": "#/definitions/Part_HasKind"
+          "$ref": "#/definitions/HasKind"
         },
         {
-          "$ref": "#/definitions/Part_HasSemantics"
+          "$ref": "#/definitions/HasSemantics"
         },
         {
-          "$ref": "#/definitions/Part_Qualifiable"
+          "$ref": "#/definitions/Qualifiable"
         },
         {
-          "$ref": "#/definitions/Part_HasDataSpecification"
+          "$ref": "#/definitions/HasDataSpecification"
         },
         {
           "type": "object",
@@ -707,7 +707,7 @@
             "submodelElements": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement"
+                "$ref": "#/definitions/SubmodelElement_abstract"
               }
             },
             "modelType": {
@@ -718,26 +718,26 @@
         }
       ]
     },
-    "Part_SubmodelElement": {
+    "SubmodelElement": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_Referable"
+          "$ref": "#/definitions/Referable"
         },
         {
-          "$ref": "#/definitions/Part_HasKind"
+          "$ref": "#/definitions/HasKind"
         },
         {
-          "$ref": "#/definitions/Part_HasSemantics"
+          "$ref": "#/definitions/HasSemantics"
         },
         {
-          "$ref": "#/definitions/Part_Qualifiable"
+          "$ref": "#/definitions/Qualifiable"
         },
         {
-          "$ref": "#/definitions/Part_HasDataSpecification"
+          "$ref": "#/definitions/HasDataSpecification"
         }
       ]
     },
-    "SubmodelElement": {
+    "SubmodelElement_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/SubmodelElementCollection"
@@ -777,19 +777,19 @@
         }
       ]
     },
-    "Part_RelationshipElement": {
+    "RelationshipElement": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_SubmodelElement"
+          "$ref": "#/definitions/SubmodelElement"
         },
         {
           "type": "object",
           "properties": {
             "first": {
-              "$ref": "#/definitions/Referable"
+              "$ref": "#/definitions/Referable_abstract"
             },
             "second": {
-              "$ref": "#/definitions/Referable"
+              "$ref": "#/definitions/Referable_abstract"
             }
           },
           "required": [
@@ -799,7 +799,7 @@
         }
       ]
     },
-    "RelationshipElement": {
+    "RelationshipElement_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/AnnotatedRelationshipElement"
@@ -809,7 +809,7 @@
     "SubmodelElementCollection": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_SubmodelElement"
+          "$ref": "#/definitions/SubmodelElement"
         },
         {
           "type": "object",
@@ -817,7 +817,7 @@
             "values": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement"
+                "$ref": "#/definitions/SubmodelElement_abstract"
               }
             },
             "ordered": {
@@ -834,14 +834,14 @@
         }
       ]
     },
-    "Part_DataElement": {
+    "DataElement": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_SubmodelElement"
+          "$ref": "#/definitions/SubmodelElement"
         }
       ]
     },
-    "DataElement": {
+    "DataElement_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/Property"
@@ -866,7 +866,7 @@
     "Property": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_DataElement"
+          "$ref": "#/definitions/DataElement"
         },
         {
           "type": "object",
@@ -894,7 +894,7 @@
     "MultiLanguageProperty": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_DataElement"
+          "$ref": "#/definitions/DataElement"
         },
         {
           "type": "object",
@@ -916,7 +916,7 @@
     "Range": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_DataElement"
+          "$ref": "#/definitions/DataElement"
         },
         {
           "type": "object",
@@ -944,7 +944,7 @@
     "ReferenceElement": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_DataElement"
+          "$ref": "#/definitions/DataElement"
         },
         {
           "type": "object",
@@ -963,7 +963,7 @@
     "Blob": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_DataElement"
+          "$ref": "#/definitions/DataElement"
         },
         {
           "type": "object",
@@ -988,7 +988,7 @@
     "File": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_DataElement"
+          "$ref": "#/definitions/DataElement"
         },
         {
           "type": "object",
@@ -1013,7 +1013,7 @@
     "AnnotatedRelationshipElement": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_RelationshipElement"
+          "$ref": "#/definitions/RelationshipElement"
         },
         {
           "type": "object",
@@ -1021,7 +1021,7 @@
             "annotation": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/DataElement"
+                "$ref": "#/definitions/DataElement_abstract"
               }
             },
             "modelType": {
@@ -1042,7 +1042,7 @@
     "Entity": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_SubmodelElement"
+          "$ref": "#/definitions/SubmodelElement"
         },
         {
           "type": "object",
@@ -1053,7 +1053,7 @@
             "statements": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement"
+                "$ref": "#/definitions/SubmodelElement_abstract"
               }
             },
             "globalAssetID": {
@@ -1076,14 +1076,14 @@
         }
       ]
     },
-    "Part_Event": {
+    "Event": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_SubmodelElement"
+          "$ref": "#/definitions/SubmodelElement"
         }
       ]
     },
-    "Event": {
+    "Event_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/BasicEvent"
@@ -1093,13 +1093,13 @@
     "BasicEvent": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_Event"
+          "$ref": "#/definitions/Event"
         },
         {
           "type": "object",
           "properties": {
             "observed": {
-              "$ref": "#/definitions/Referable"
+              "$ref": "#/definitions/Referable_abstract"
             },
             "modelType": {
               "type": "string",
@@ -1115,7 +1115,7 @@
     "Operation": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_SubmodelElement"
+          "$ref": "#/definitions/SubmodelElement"
         },
         {
           "type": "object",
@@ -1152,7 +1152,7 @@
           "type": "object",
           "properties": {
             "value": {
-              "$ref": "#/definitions/SubmodelElement"
+              "$ref": "#/definitions/SubmodelElement_abstract"
             }
           },
           "required": [
@@ -1164,7 +1164,7 @@
     "Capability": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_SubmodelElement"
+          "$ref": "#/definitions/SubmodelElement"
         },
         {
           "type": "object",
@@ -1180,10 +1180,10 @@
     "ConceptDescription": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_Identifiable"
+          "$ref": "#/definitions/Identifiable"
         },
         {
-          "$ref": "#/definitions/Part_HasDataSpecification"
+          "$ref": "#/definitions/HasDataSpecification"
         },
         {
           "type": "object",
@@ -1205,13 +1205,13 @@
     "View": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_Referable"
+          "$ref": "#/definitions/Referable"
         },
         {
-          "$ref": "#/definitions/Part_HasSemantics"
+          "$ref": "#/definitions/HasSemantics"
         },
         {
-          "$ref": "#/definitions/Part_HasDataSpecification"
+          "$ref": "#/definitions/HasDataSpecification"
         },
         {
           "type": "object",
@@ -1219,7 +1219,7 @@
             "containedElements": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Referable"
+                "$ref": "#/definitions/Referable_abstract"
               }
             },
             "modelType": {
@@ -1434,10 +1434,10 @@
         "langStrings"
       ]
     },
-    "Part_DataSpecificationContent": {
+    "DataSpecificationContent": {
       "type": "object"
     },
-    "DataSpecificationContent": {
+    "DataSpecificationContent_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/DataSpecificationIEC61360"
@@ -1513,7 +1513,7 @@
     "DataSpecificationIEC61360": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_DataSpecificationContent"
+          "$ref": "#/definitions/DataSpecificationContent"
         },
         {
           "type": "object",
@@ -1564,7 +1564,7 @@
     "DataSpecificationPhysicalUnit": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_DataSpecificationContent"
+          "$ref": "#/definitions/DataSpecificationContent"
         },
         {
           "type": "object",
@@ -1609,7 +1609,7 @@
         }
       ]
     },
-    "Part_Certificate": {
+    "Certificate": {
       "allOf": [
         {
           "type": "object",
@@ -1624,7 +1624,7 @@
         }
       ]
     },
-    "Certificate": {
+    "Certificate_abstract": {
       "anyOf": [
         {
           "$ref": "#/definitions/BlobCertificate"
@@ -1634,7 +1634,7 @@
     "BlobCertificate": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_Certificate"
+          "$ref": "#/definitions/Certificate"
         },
         {
           "type": "object",
@@ -1667,7 +1667,7 @@
             "objectAttributes": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/DataElement"
+                "$ref": "#/definitions/DataElement_abstract"
               }
             }
           },
@@ -1704,7 +1704,7 @@
             "subjectAttributes": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/DataElement"
+                "$ref": "#/definitions/DataElement_abstract"
               }
             }
           },
@@ -1720,7 +1720,7 @@
           "type": "object",
           "properties": {
             "object": {
-              "$ref": "#/definitions/Referable"
+              "$ref": "#/definitions/Referable_abstract"
             },
             "targetObjectAttributes": {
               "$ref": "#/definitions/ObjectAttributes"
@@ -1741,10 +1741,10 @@
     "AccessPermissionRule": {
       "allOf": [
         {
-          "$ref": "#/definitions/Part_Referable"
+          "$ref": "#/definitions/Referable"
         },
         {
-          "$ref": "#/definitions/Part_Qualifiable"
+          "$ref": "#/definitions/Qualifiable"
         },
         {
           "type": "object",
@@ -1910,7 +1910,7 @@
             "certificates": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Certificate"
+                "$ref": "#/definitions/Certificate_abstract"
               }
             },
             "requiredCertificatesExtension": {

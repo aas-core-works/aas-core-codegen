@@ -71,9 +71,12 @@ def _define_for_property(
 
         elif isinstance(type_anno.symbol, intermediate.Interface):
             prop_choice = ET.Element("xs:choice")
-            prop_choice.append(ET.Element(
-                "xs:group", {"ref": xsd_naming.model_type(type_anno.symbol.name)}
-            ))
+            prop_choice.append(
+                ET.Element(
+                    "xs:group",
+                    {
+                        "ref": xsd_naming.interface_abstract(type_anno.symbol.name)
+                    }))
 
             prop_complex_type = ET.Element("xs:complexType")
             prop_complex_type.append(prop_choice)
@@ -118,9 +121,11 @@ def _define_for_property(
                     {"minOccurs": "0", "maxOccurs": "unbounded"})
 
                 list_element.append(
-                    ET.Element(
-                        "xs:group",
-                        {"ref": xsd_naming.model_type(type_anno.items.symbol.name)}
+                    ET.Element("xs:group",
+                        {
+                            "ref": xsd_naming.interface_abstract(
+                                type_anno.items.symbol.name)
+                        }
                     ))
 
             else:
@@ -169,7 +174,7 @@ def _define_for_interface(
     for inheritance in interface.inheritances:
         inheritance_part = ET.Element(
             "xs:group",
-            {"ref": xsd_naming.interface_part(inheritance.name)})
+            {"ref": xsd_naming.model_type(inheritance.name)})
         sequence.append(inheritance_part)
 
     for prop in interface.properties:
@@ -180,11 +185,11 @@ def _define_for_interface(
 
         sequence.append(prop_element)
 
-    part_group = ET.Element(
+    interface_group = ET.Element(
         "xs:group",
-        {"name": xsd_naming.interface_part(interface.name)})
+        {"name": xsd_naming.model_type(interface.name)})
 
-    part_group.append(sequence)
+    interface_group.append(sequence)
 
     # endregion
 
@@ -200,14 +205,14 @@ def _define_for_interface(
             })
         choice.append(element)
 
-    interface_group = ET.Element(
+    abstract_group = ET.Element(
         "xs:group",
-        {"name": xsd_naming.model_type(interface.name)})
-    interface_group.append(choice)
+        {"name": xsd_naming.interface_abstract(interface.name)})
+    abstract_group.append(choice)
 
     # endregion
 
-    return [part_group, interface_group]
+    return [interface_group, abstract_group]
 
 
 def _define_for_class(
@@ -223,7 +228,7 @@ def _define_for_class(
     for interface in cls.interfaces:
         interface_part = ET.Element(
             "xs:group",
-            {"ref": xsd_naming.interface_part(interface.name)})
+            {"ref": xsd_naming.model_type(interface.name)})
         sequence.append(interface_part)
 
     for prop in cls.properties:

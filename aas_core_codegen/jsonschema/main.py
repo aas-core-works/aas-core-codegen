@@ -50,7 +50,17 @@ def _define_type(
 
     elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
         model_type = naming.json_model_type(type_annotation.symbol.name)
-        return collections.OrderedDict([('$ref', f"#/definitions/{model_type}")])
+
+        if isinstance(
+                type_annotation.symbol, (intermediate.Enumeration, intermediate.Class)):
+            return collections.OrderedDict([('$ref', f"#/definitions/{model_type}")])
+
+        elif isinstance(type_annotation.symbol, intermediate.Interface):
+            return collections.OrderedDict(
+                [('$ref', f"#/definitions/{model_type}_abstract")])
+
+        else:
+            assert_never(type_annotation.symbol)
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         return collections.OrderedDict(
@@ -91,7 +101,7 @@ def _define_for_interface(
     for inheritance in interface.inheritances:
         all_of.append(
             {
-                "$ref": f"#/definitions/Part_{naming.json_model_type(inheritance.name)}"
+                "$ref": f"#/definitions/{naming.json_model_type(inheritance.name)}"
             })
 
     # endregion
@@ -144,14 +154,14 @@ def _define_for_interface(
     # endregion
 
     model_type = naming.json_model_type(interface.name)
-    part_model_type = f'Part_{model_type}'
+    model_type_abstract = f'{model_type}_abstract'
 
     return collections.OrderedDict(
         [
-            (part_model_type, {'allOf': all_of})
+            (model_type, {'allOf': all_of})
             if len(all_of) > 0
-            else (part_model_type, {'type': 'object'}),
-            (model_type, {'anyOf': any_of}),
+            else (model_type, {'type': 'object'}),
+            (model_type_abstract, {'anyOf': any_of}),
         ])
 
 
@@ -168,7 +178,7 @@ def _define_for_class(cls: intermediate.Class) -> MutableMapping[str, Any]:
         # the full ``anyOf`` list of class implementers.
         all_of.append(
             {
-                "$ref": f"#/definitions/Part_{naming.json_model_type(interface.name)}"
+                "$ref": f"#/definitions/{naming.json_model_type(interface.name)}"
             })
 
     properties = collections.OrderedDict()
