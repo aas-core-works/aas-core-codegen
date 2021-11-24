@@ -10,10 +10,6 @@ import aas_core_codegen
 from aas_core_codegen import (
     parse, run, specific_implementations, intermediate
 )
-import aas_core_codegen.csharp.main as csharp_main
-import aas_core_codegen.jsonschema.main as jsonschema_main
-import aas_core_codegen.rdf_shacl.main as rdf_shacl_main
-import aas_core_codegen.xsd.main as xsd_main
 from aas_core_codegen.common import LinenoColumner, assert_never
 
 assert aas_core_codegen.__doc__ == __doc__
@@ -165,18 +161,28 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         symbol_table=ir_symbol_table,
         spec_impls=spec_impls,
         interface_implementers=interface_implementers,
+        lineno_columner=lineno_columner,
         output_dir=params.output_dir)
 
+    # NOTE (mristin, 2021-11-24):
+    # Import the individual modules only if necessary to optimize for the start-up time.
+    # Additionally, bugs in the individual modules still allow us to run the other
+    # modules.
+
     if params.target == Target.CSHARP:
+        import aas_core_codegen.csharp.main as csharp_main
         return csharp_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
     elif params.target == Target.JSONSCHEMA:
+        import aas_core_codegen.jsonschema.main as jsonschema_main
         return jsonschema_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
     elif params.target == Target.RDF_SHACL:
+        import aas_core_codegen.rdf_shacl.main as rdf_shacl_main
         return rdf_shacl_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
     elif params.target == Target.XSD:
+        import aas_core_codegen.xsd.main as xsd_main
         return xsd_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
     else:

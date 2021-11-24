@@ -1,12 +1,7 @@
 """Generate C# code to handle asset administration shells based on the meta-model."""
-import argparse
-import pathlib
-import sys
 from typing import TextIO
 
-import aas_core_codegen
-from aas_core_codegen import cli, parse, intermediate, specific_implementations, run
-from aas_core_codegen.common import LinenoColumner
+from aas_core_codegen import intermediate, specific_implementations, run
 from aas_core_codegen.csharp import (
     common as csharp_common,
     structure as csharp_structure,
@@ -16,13 +11,14 @@ from aas_core_codegen.csharp import (
     jsonization as csharp_jsonization
 )
 
+
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     """Generate the code."""
     verified_ir_table, errors = csharp_structure.verify(
         symbol_table=context.symbol_table)
 
     if errors is not None:
-        cli.write_error_report(
+        run.write_error_report(
             message=f"Failed to verify the intermediate symbol table "
                     f"for generation of C# code"
                     f"based on {context.model_path}",
@@ -32,8 +28,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ],
             stderr=stderr)
         return 1
-
-    # TODO: continue fixing errors in this ``main``, then move to other mains
 
     namespace_key = specific_implementations.ImplementationKey("namespace.txt")
     namespace_text = context.spec_impls.get(namespace_key, None)
@@ -57,23 +51,23 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     code, errors = csharp_structure.generate(
         symbol_table=verified_ir_table,
         namespace=namespace,
-        spec_impls=spec_impls)
+        spec_impls=context.spec_impls)
 
     if errors is not None:
-        cli.write_error_report(
-            message=f"Failed to _generate_rdf the structures in the C# code "
-                    f"based on {params.model_path}",
-            errors=[lineno_columner.error_message(error) for error in errors],
+        run.write_error_report(
+            message=f"Failed to generate the structures in the C# code "
+                    f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
             stderr=stderr)
         return 1
 
     assert code is not None
 
-    pth = params.output_dir / "types.cs"
+    pth = context.output_dir / "types.cs"
     try:
         pth.write_text(code)
     except Exception as exception:
-        cli.write_error_report(
+        run.write_error_report(
             message=f"Failed to write the C# structures to {pth}",
             errors=[str(exception)],
             stderr=stderr)
@@ -84,26 +78,26 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # region Visitation
 
     code, errors = csharp_visitation.generate(
-        symbol_table=ir_symbol_table,
+        symbol_table=context.symbol_table,
         namespace=namespace)
 
     if errors is not None:
-        cli.write_error_report(
-            message=f"Failed to _generate_rdf the C# code for visitation "
-                    f"based on {params.model_path}",
+        run.write_error_report(
+            message=f"Failed to generate the C# code for visitation "
+                    f"based on {context.model_path}",
             errors=[
-                lineno_columner.error_message(error)
+                context.lineno_columner.error_message(error)
                 for error in errors],
             stderr=stderr)
         return 1
 
     assert code is not None
 
-    pth = params.output_dir / "visitation.cs"
+    pth = context.output_dir / "visitation.cs"
     try:
         pth.write_text(code)
     except Exception as exception:
-        cli.write_error_report(
+        run.write_error_report(
             message=f"Failed to write the visitation C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr)
@@ -113,9 +107,9 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Verification
 
-    errors = csharp_verification.verify(spec_impls=spec_impls)
+    errors = csharp_verification.verify(spec_impls=context.spec_impls)
     if errors is not None:
-        cli.write_error_report(
+        run.write_error_report(
             message=f"Failed to verify the C#-specific C# structures",
             errors=errors,
             stderr=stderr)
@@ -124,25 +118,25 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     code, errors = csharp_verification.generate(
         symbol_table=verified_ir_table,
         namespace=namespace,
-        spec_impls=spec_impls)
+        spec_impls=context.spec_impls)
 
     if errors is not None:
-        cli.write_error_report(
-            message=f"Failed to _generate_rdf the verification C# code "
-                    f"based on {params.model_path}",
+        run.write_error_report(
+            message=f"Failed to generate the verification C# code "
+                    f"based on {context.model_path}",
             errors=[
-                lineno_columner.error_message(error)
+                context.lineno_columner.error_message(error)
                 for error in errors],
             stderr=stderr)
         return 1
 
     assert code is not None
 
-    pth = params.output_dir / "verification.cs"
+    pth = context.output_dir / "verification.cs"
     try:
         pth.write_text(code)
     except Exception as exception:
-        cli.write_error_report(
+        run.write_error_report(
             message=f"Failed to write the verification C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr)
@@ -153,27 +147,27 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # region Stringification
 
     code, errors = csharp_stringification.generate(
-        symbol_table=ir_symbol_table, namespace=namespace)
+        symbol_table=context.symbol_table, namespace=namespace)
 
     if errors is not None:
-        cli.write_error_report(
-            message=f"Failed to _generate_rdf the stringification C# code "
-                    f"based on {params.model_path}",
+        run.write_error_report(
+            message=f"Failed to generate the stringification C# code "
+                    f"based on {context.model_path}",
             errors=[
-                lineno_columner.error_message(error)
+                context.lineno_columner.error_message(error)
                 for error in errors],
             stderr=stderr)
         return 1
 
     assert code is not None
 
-    pth = params.output_dir / "stringification.cs"
+    pth = context.output_dir / "stringification.cs"
     pth.parent.mkdir(exist_ok=True)
 
     try:
         pth.write_text(code)
     except Exception as exception:
-        cli.write_error_report(
+        run.write_error_report(
             message=f"Failed to write the stringification C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr)
@@ -182,35 +176,35 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # endregion
 
     interface_implementers = intermediate.map_interface_implementers(
-        symbol_table=ir_symbol_table)
+        symbol_table=context.symbol_table)
 
     # region Jsonization
 
     code, errors = csharp_jsonization.generate(
-        symbol_table=ir_symbol_table,
+        symbol_table=context.symbol_table,
         namespace=namespace,
         interface_implementers=interface_implementers,
-        spec_impls=spec_impls)
+        spec_impls=context.spec_impls)
 
     if errors is not None:
-        cli.write_error_report(
-            message=f"Failed to _generate_rdf the jsonization C# code "
-                    f"based on {params.model_path}",
+        run.write_error_report(
+            message=f"Failed to generate the jsonization C# code "
+                    f"based on {context.model_path}",
             errors=[
-                lineno_columner.error_message(error)
+                context.lineno_columner.error_message(error)
                 for error in errors],
             stderr=stderr)
         return 1
 
     assert code is not None
 
-    pth = params.output_dir / "jsonization.cs"
+    pth = context.output_dir / "jsonization.cs"
     pth.parent.mkdir(exist_ok=True)
 
     try:
         pth.write_text(code)
     except Exception as exception:
-        cli.write_error_report(
+        run.write_error_report(
             message=f"Failed to write the jsonization C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr)
@@ -218,43 +212,5 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # endregion
 
-    stdout.write(f"Code generated to: {params.output_dir}\n")
+    stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0
-
-
-def main(prog: str) -> int:
-    """
-    Execute the main routine.
-
-    :param prog: name of the program to be displayed in the help
-    :return: exit code
-    """
-    parser = argparse.ArgumentParser(prog=prog, description=__doc__)
-    parser.add_argument("--model_path", help="path to the meta-model", required=True)
-    parser.add_argument(
-        "--snippets_dir",
-        help="path to the directory containing implementation-specific code snippets",
-        required=True)
-    parser.add_argument(
-        "--output_dir", help="path to the generated code", required=True
-    )
-    args = parser.parse_args()
-
-    params = Parameters(
-        model_path=pathlib.Path(args.model_path),
-        snippets_dir=pathlib.Path(args.snippets_dir),
-        output_dir=pathlib.Path(args.output_dir),
-    )
-
-    run(params=params, stdout=sys.stdout, stderr=sys.stderr)
-
-    return 0
-
-
-def entry_point() -> int:
-    """Provide an entry point for a console script."""
-    return main(prog="aas-core-csharp-codegen")
-
-
-if __name__ == "__main__":
-    sys.exit(main("aas-core-csharp-codegen"))

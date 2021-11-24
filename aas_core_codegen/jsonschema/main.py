@@ -1,24 +1,13 @@
 """Generate JSON schema corresponding to the meta-model."""
-import argparse
 import collections
 import json
-import pathlib
-import sys
 from typing import TextIO, Any, MutableMapping, Optional, Tuple, List, Sequence, \
     Mapping
 
 from icontract import ensure
 
-import aas_core_codegen
-from aas_core_codegen import cli, parse, naming, specific_implementations, \
-    intermediate
-from aas_core_codegen.common import LinenoColumner, Stripped, Error, \
-    assert_never, Identifier
-
-# TODO: this needs to be moved to a separate package once we are done with
-#  the development.
-
-assert aas_core_codegen.jsonschema.__doc__ == __doc__
+from aas_core_codegen import naming, specific_implementations, intermediate, run
+from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
 
 
 def _define_for_enumeration(
@@ -250,6 +239,7 @@ def _generate(
                 f"The implementation snippet for the base schema "
                 f"is missing: {schema_base_key}")]
 
+    # noinspection PyUnusedLocal
     schema = None  # type: Optional[MutableMapping[str, Any]]
 
     try:
@@ -345,202 +335,32 @@ def _generate(
     return Stripped(json.dumps(schema, indent=2)), None
 
 
-class Parameters:
-    """Represent the program parameters."""
-
-    def __init__(
-            self,
-            model_path: pathlib.Path,
-            snippets_dir: pathlib.Path,
-            output_dir: pathlib.Path
-    ) -> None:
-        """Initialize with the given values."""
-        self.model_path = model_path
-        self.snippets_dir = snippets_dir
-        self.output_dir = output_dir
-
-
-def run(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
-    """Run the program."""
-    # region Basic checks
-    # TODO: test this failure case
-    if not params.model_path.exists():
-        stderr.write(f"The --model_path does not exist: {params.model_path}\n")
-        return 1
-
-    # TODO: test this failure case
-    if not params.model_path.is_file():
-        stderr.write(
-            f"The --model_path does not point to a file: {params.model_path}\n")
-        return 1
-
-    # TODO: test this failure case
-    if not params.snippets_dir.exists():
-        stderr.write(f"The --snippets_dir does not exist: {params.snippets_dir}\n")
-        return 1
-
-    # TODO: test this failure case
-    if not params.snippets_dir.is_dir():
-        stderr.write(
-            f"The --snippets_dir does not point to a directory: "
-            f"{params.snippets_dir}\n")
-        return 1
-
-    # TODO: test the happy path
-    if not params.output_dir.exists():
-        params.output_dir.mkdir(parents=True, exist_ok=True)
-    else:
-        # TODO: test this failure case
-        if not params.snippets_dir.is_dir():
-            stderr.write(
-                f"The --output_dir does not point to a directory: "
-                f"{params.output_dir}\n")
-            return 1
-
-    # endregion
-
-    # region Parse
-
-    spec_impls, spec_impls_errors = (
-        specific_implementations.read_from_directory(
-            snippets_dir=params.snippets_dir))
-
-    if spec_impls_errors:
-        cli.write_error_report(
-            message="Failed to resolve the implementation-specific "
-                    "JSON schema snippets",
-            errors=spec_impls_errors,
-            stderr=stderr)
-        return 1
-
-    text = params.model_path.read_text(encoding='utf-8')
-
-    # TODO: test all the following individual failure cases
-    atok, parse_exception = parse.source_to_atok(source=text)
-    if parse_exception:
-        if isinstance(parse_exception, SyntaxError):
-            stderr.write(
-                f"Failed to parse the meta-model {params.model_path}: "
-                f"invalid syntax at line {parse_exception.lineno}\n"
-            )
-        else:
-            stderr.write(
-                f"Failed to parse the meta-model {params.model_path}: "
-                f"{parse_exception}\n"
-            )
-
-        return 1
-
-    import_errors = parse.check_expected_imports(atok=atok)
-    if import_errors:
-        cli.write_error_report(
-            message="One or more unexpected imports in the meta-model",
-            errors=import_errors,
-            stderr=stderr,
-        )
-
-        return 1
-
-    lineno_columner = LinenoColumner(atok=atok)
-
-    parsed_symbol_table, error = parse.atok_to_symbol_table(atok=atok)
-    if error is not None:
-        cli.write_error_report(
-            message=f"Failed to construct the symbol table from {params.model_path}",
-            errors=[lineno_columner.error_message(error)],
-            stderr=stderr,
-        )
-
-        return 1
-
-    assert parsed_symbol_table is not None
-
-    ir_symbol_table, error = intermediate.translate(
-        parsed_symbol_table=parsed_symbol_table,
-        atok=atok,
-    )
-    if error is not None:
-        cli.write_error_report(
-            message=f"Failed to translate the parsed symbol table "
-                    f"to intermediate symbol table "
-                    f"based on {params.model_path}",
-            errors=[lineno_columner.error_message(error)],
-            stderr=stderr,
-        )
-
-        return 1
-
-    interface_implementers = intermediate.map_interface_implementers(
-        symbol_table=ir_symbol_table)
-
-    # endregion
-
-    # region Schema
-
+def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
+    """Generate the code."""
     code, errors = _generate(
-        symbol_table=ir_symbol_table,
-        spec_impls=spec_impls,
-        interface_implementers=interface_implementers)
+        symbol_table=context.symbol_table,
+        spec_impls=context.spec_impls,
+        interface_implementers=context.interface_implementers)
 
     if errors is not None:
-        cli.write_error_report(
+        run.write_error_report(
             message=f"Failed to generate the JSON Schema "
-                    f"based on {params.model_path}",
-            errors=[lineno_columner.error_message(error) for error in errors],
+                    f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
             stderr=stderr)
         return 1
 
     assert code is not None
 
-    pth = params.output_dir / "schema.json"
+    pth = context.output_dir / "schema.json"
     try:
         pth.write_text(code)
     except Exception as exception:
-        cli.write_error_report(
+        run.write_error_report(
             message=f"Failed to write the JSON schema to {pth}",
             errors=[str(exception)],
             stderr=stderr)
         return 1
 
-    # endregion
-
-    stdout.write(f"Code generated to: {params.output_dir}\n")
+    stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0
-
-
-def main(prog: str) -> int:
-    """
-    Execute the main routine.
-
-    :param prog: name of the program to be displayed in the help
-    :return: exit code
-    """
-    parser = argparse.ArgumentParser(prog=prog, description=__doc__)
-    parser.add_argument("--model_path", help="path to the meta-model", required=True)
-    parser.add_argument(
-        "--snippets_dir",
-        help="path to the directory containing implementation-specific code snippets",
-        required=True)
-    parser.add_argument(
-        "--output_dir", help="path to the generated code", required=True
-    )
-    args = parser.parse_args()
-
-    params = Parameters(
-        model_path=pathlib.Path(args.model_path),
-        snippets_dir=pathlib.Path(args.snippets_dir),
-        output_dir=pathlib.Path(args.output_dir),
-    )
-
-    run(params=params, stdout=sys.stdout, stderr=sys.stderr)
-
-    return 0
-
-
-def entry_point() -> int:
-    """Provide an entry point for a console script."""
-    return main(prog="aas-core-csharp-codegen")
-
-
-if __name__ == "__main__":
-    sys.exit(main("aas-core-csharp-codegen"))

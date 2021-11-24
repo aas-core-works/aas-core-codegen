@@ -5,7 +5,7 @@ import pathlib
 import tempfile
 import unittest
 
-import aas_core_codegen.rdf_shacl.main
+import aas_core_codegen.main
 
 
 class Test_against_recorded(unittest.TestCase):
@@ -44,15 +44,16 @@ class Test_against_recorded(unittest.TestCase):
                     exit_stack.push(tmp_dir)
                     output_dir = pathlib.Path(tmp_dir.name)
 
-                params = aas_core_codegen.rdf_shacl.main.Parameters(
+                params = aas_core_codegen.main.Parameters(
                     model_path=model_pth,
+                    target=aas_core_codegen.main.Target.RDF_SHACL,
                     snippets_dir=snippets_dir,
                     output_dir=output_dir)
 
                 stdout = io.StringIO()
                 stderr = io.StringIO()
 
-                return_code = aas_core_codegen.rdf_shacl.main.run(
+                return_code = aas_core_codegen.main.execute(
                     params=params, stdout=stdout, stderr=stderr)
 
                 if stderr.getvalue() != "":

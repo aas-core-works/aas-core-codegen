@@ -1,4 +1,4 @@
-"""Generate C# code to handle asset administration shells based on the meta-model."""
+"""Generate different implementations and schemas based on an AAS meta-model."""
 
 __version__ = "0.0.1rc1"
 __author__ = "Marko Ristin, Nico Braunisch, Robert Lehmann"
