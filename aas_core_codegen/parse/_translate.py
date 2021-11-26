@@ -92,6 +92,8 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("abstract", "aas_core_meta.marker"),
             ("implementation_specific", "aas_core_meta.marker"),
             ('reference_in_the_book', "aas_core_meta.marker"),
+            ('Ref', "aas_core_meta.marker"),
+            ('associate_ref_with', 'aas_core_meta.marker'),
             ("is_superset_of", "aas_core_meta.marker"),
             ("serialization", "aas_core_meta.marker"),
             ("are_unique", "aas_core_meta.verification"),
@@ -1407,6 +1409,37 @@ def _classdef_to_symbol(
     )
 
 
+# fmt: off
+@require(
+    lambda call:
+    isinstance(call.func, ast.Name)
+    and call.func.id == "associate_ref_with"
+)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+# fmt: on
+def _parse_associate_ref_with(call: ast.Call) -> Tuple[
+    Optional[Identifier], Optional[Error]]:
+    """Parse the call to ``associate_ref_with`` in the meta-model module."""
+    cls_node = None  # type: Optional[ast.AST]
+    if len(call.args) >= 1:
+        cls_node = call.args[0]
+
+    for keyword in call.keywords:
+        if keyword.arg == 'cls':
+            cls_node = keyword.value
+
+    if cls_node is None:
+        return None, Error(call, "The argument for ``cls`` has not been specified")
+
+    if isinstance(cls_node, ast.Name):
+        return Identifier(cls_node.id), None
+    else:
+        return None, Error(
+            cls_node,
+            f"We do not know how to interpret "
+            f"the ``cls`` argument: {ast.dump(cls_node)}")
+
+
 def _verify_arity_of_type_annotation_subscript(
         type_annotation: SubscriptedTypeAnnotation
 ) -> Optional[Error]:
@@ -1555,6 +1588,7 @@ def _verify_symbol_table(
     # region Check type annotations in properties and method signatures
 
     expected_subscripted_types = BUILTIN_COMPOSITE_TYPES
+
     # NOTE (mristin, 2021-11-19):
     # If you expect type qualifiers such as ``Final``, make a copy of
     # the ``BUILTIN_COMPOSITE_TYPES`` and add them to the copy.
@@ -1677,6 +1711,14 @@ def _atok_to_symbol_table(
     symbols = []  # type: List[Symbol]
     underlying_errors = []  # type: List[Error]
 
+    ref_association_call = None  # type: Optional[ast.Call]
+    ref_association_id = None  # type: Optional[Identifier]
+
+    book_url = None  # type: Optional[str]
+    book_version = None  # type: Optional[str]
+
+    # region Parse
+
     for node in atok.tree.body:
         if isinstance(node, ast.ClassDef):
             symbol, symbol_error = _classdef_to_symbol(node=node, atok=atok)
@@ -1691,11 +1733,104 @@ def _atok_to_symbol_table(
             else:
                 assert symbol is not None
                 symbols.append(symbol)
+        elif (
+                isinstance(node, ast.Expr)
+                and isinstance(node.value, ast.Constant)
+                and isinstance(node.value.value, str)
+        ):
+            # Ignore docstrings
+            pass
+
+        elif isinstance(node, ast.ImportFrom):
+            # Ignore import statements
+            pass
+
+        elif (
+                isinstance(node, ast.Assign)
+                and len(node.targets) == 1
+                and isinstance(node.targets[0], ast.Name)
+                and isinstance(node.value, ast.Constant)
+                and isinstance(node.value.value, str)
+        ):
+            if node.targets[0].id == '__book_url__':
+                book_url = node.targets[0].id
+            elif node.targets[0].id == '__book_version__':
+                book_version = node.targets[0].id
+            else:
+                underlying_errors.append(Error(
+                    node,
+                    f"We do not know how to interpret "
+                    f"the assignment node: {ast.dump(node)}"
+                ))
+                continue
+        elif (
+                isinstance(node, ast.Expr)
+                and isinstance(node.value, ast.Call)
+                and isinstance(node.value.func, ast.Name)
+        ):
+            func_name = Identifier(node.value.func.id)
+
+            if func_name == 'associate_ref_with':
+                ref_association_call = node.value
+                ref_association_id, error = _parse_associate_ref_with(
+                    call=ref_association_call)
+                if error:
+                    underlying_errors.append(error)
+                    continue
+            else:
+                underlying_errors.append(Error(
+                    node,
+                    f"We do not know how to interpret the call "
+                    f"to function {func_name!r}"
+                ))
+                continue
+
+        else:
+            underlying_errors.append(Error(
+                node,
+                f"We do not know how to parse the AST node: {ast.dump(node)}"))
+
+    if book_url is None:
+        underlying_errors.append(Error(
+            None,
+            "The book URL (given as assignment to ``__book_url__``) is missing"))
+
+    if book_version is None:
+        underlying_errors.append(Error(
+            None,
+            "The book version (given as assignment to ``__book_version__``) "
+            "is missing"))
 
     if len(underlying_errors) > 0:
         return None, Error(atok.tree, "Failed to parse the AST", underlying_errors)
 
-    unverified_symbol_table = UnverifiedSymbolTable(symbols=symbols)
+    assert ref_association_id is not None, (
+        "Expected ref_association_id to be set if no underlying errors")
+
+    ref_association = None  # type: Optional[Symbol]
+    for symbol in symbols:
+        if ref_association_id == symbol.name:
+            ref_association = symbol
+
+    if ref_association is None:
+        return None, Error(
+            ref_association_call,
+            "Could not find the symbol to be associated with ``Ref``")
+
+    if not isinstance(ref_association, ConcreteClass):
+        return None, Error(
+            ref_association_call,
+            f"Expected the symbol to be associated with ``Ref``, "
+            f"{ref_association.name} to be a concrete class, "
+            f"but got: {type(ref_association)}")
+
+    # endregion
+
+    unverified_symbol_table = UnverifiedSymbolTable(
+        symbols=symbols,
+        ref_association=ref_association,
+        book_url=book_url,
+        book_version=book_version)
 
     symbol_table, verification_errors = _verify_symbol_table(unverified_symbol_table)
 

@@ -6,7 +6,7 @@ from typing import Sequence, Optional, Union, Final, Mapping, Any
 import docutils.nodes
 from icontract import require, DBC, ensure, invariant
 
-from aas_core_codegen.common import Identifier, assert_never
+from aas_core_codegen.common import Identifier
 from aas_core_codegen.parse import tree
 
 _MODULE_NAME = pathlib.Path(__file__).parent.name
@@ -15,7 +15,8 @@ BUILTIN_ATOMIC_TYPES = {"bool", "int", "float", "str", "bytearray"}
 
 BUILTIN_COMPOSITE_TYPES = {
     Identifier("List"),
-    Identifier("Optional")
+    Identifier("Optional"),
+    Identifier("Ref")
 }
 
 
@@ -444,6 +445,17 @@ class UnverifiedSymbolTable(DBC):
     #: List of parsed symbols
     symbols: Final[Sequence[Symbol]]
 
+    #: Type to be used to represent a ``Ref[T]``
+    ref_association: Final[Symbol]
+
+    #: Specify the URL of the book that the meta-model is based on
+    book_url: Final[str]
+
+    #: Specify the version of the book that the meta-model is based on
+    book_version: Final[str]
+
+    _name_to_symbol: Final[Mapping[Identifier, Symbol]]
+
     @require(
         lambda symbols: (
                 names := [symbol.name for symbol in symbols],
@@ -451,9 +463,19 @@ class UnverifiedSymbolTable(DBC):
         )[1],
         "Symbol names unique",
     )
-    def __init__(self, symbols: Sequence[Symbol]) -> None:
+    def __init__(
+            self,
+            symbols: Sequence[Symbol],
+            ref_association: Symbol,
+            book_url: str,
+            book_version: str
+    ) -> None:
         """Initialize with the given values and map symbols to name."""
         self.symbols = symbols
+        self.ref_association = ref_association
+        self.book_url = book_url
+        self.book_version = book_version
+
         self._name_to_symbol = {symbol.name: symbol for symbol in symbols}
 
     def find(self, name: Identifier) -> Optional[Symbol]:
