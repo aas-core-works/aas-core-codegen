@@ -28,6 +28,7 @@ AbstractClass = _types.AbstractClass
 ConcreteClass = _types.ConcreteClass
 EnumerationLiteral = _types.EnumerationLiteral
 Enumeration = _types.Enumeration
+MetaModel = _types.MetaModel
 SymbolTable = _types.SymbolTable
 
 BUILTIN_ATOMIC_TYPES = _types.BUILTIN_ATOMIC_TYPES

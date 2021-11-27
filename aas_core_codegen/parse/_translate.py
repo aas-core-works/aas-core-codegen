@@ -43,7 +43,8 @@ from aas_core_codegen.parse._types import (
     Symbol,
     SymbolTable,
     TypeAnnotation,
-    UnverifiedSymbolTable, BUILTIN_ATOMIC_TYPES, BUILTIN_COMPOSITE_TYPES, Description
+    UnverifiedSymbolTable, BUILTIN_ATOMIC_TYPES, BUILTIN_COMPOSITE_TYPES, Description,
+    MetaModel
 )
 
 
@@ -1714,6 +1715,7 @@ def _atok_to_symbol_table(
     ref_association_call = None  # type: Optional[ast.Call]
     ref_association_id = None  # type: Optional[Identifier]
 
+    description = None  # type: Optional[Description]
     book_url = None  # type: Optional[str]
     book_version = None  # type: Optional[str]
 
@@ -1738,8 +1740,14 @@ def _atok_to_symbol_table(
                 and isinstance(node.value, ast.Constant)
                 and isinstance(node.value.value, str)
         ):
-            # Ignore docstrings
-            pass
+            # The first string literal is assumed to be the docstring of the meta-model.
+            description, description_error = _string_constant_to_description(
+                constant=node.value)
+
+            if description_error is not None:
+                assert description is None
+                underlying_errors.append(description_error)
+                continue
 
         elif isinstance(node, ast.ImportFrom):
             # Ignore import statements
@@ -1829,18 +1837,15 @@ def _atok_to_symbol_table(
     unverified_symbol_table = UnverifiedSymbolTable(
         symbols=symbols,
         ref_association=ref_association,
-        book_url=book_url,
-        book_version=book_version)
+        meta_model=MetaModel(
+            book_version=book_version, book_url=book_url, description=description))
 
     symbol_table, verification_errors = _verify_symbol_table(unverified_symbol_table)
 
     if verification_errors is not None:
-        return (
-            None,
-            Error(
-                atok.tree, "Verification of the meta-model failed", verification_errors
-            ),
-        )
+        return (None, Error(
+            atok.tree,
+            "Verification of the meta-model failed", verification_errors))
 
     assert symbol_table is not None
     return symbol_table, None

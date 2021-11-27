@@ -435,6 +435,28 @@ class Enumeration:
 Symbol = Union[AbstractClass, ConcreteClass, Enumeration]
 
 
+class MetaModel:
+    """Collect information about the underlying meta-model."""
+    #: Description of the meta-model extracted from the docstring
+    description: Final[Optional[Description]]
+
+    #: Specify the URL of the book that the meta-model is based on
+    book_url: Final[str]
+
+    #: Specify the version of the book that the meta-model is based on
+    book_version: Final[str]
+
+    def __init__(
+            self,
+            book_url: str,
+            book_version: str,
+            description: Optional[Description]
+    ) -> None:
+        self.book_url = book_url
+        self.book_version = book_version
+        self.description = description
+
+
 class UnverifiedSymbolTable(DBC):
     """
     Represent the original classes in the meta-model.
@@ -447,12 +469,6 @@ class UnverifiedSymbolTable(DBC):
 
     #: Type to be used to represent a ``Ref[T]``
     ref_association: Final[Symbol]
-
-    #: Specify the URL of the book that the meta-model is based on
-    book_url: Final[str]
-
-    #: Specify the version of the book that the meta-model is based on
-    book_version: Final[str]
 
     _name_to_symbol: Final[Mapping[Identifier, Symbol]]
 
@@ -467,14 +483,12 @@ class UnverifiedSymbolTable(DBC):
             self,
             symbols: Sequence[Symbol],
             ref_association: Symbol,
-            book_url: str,
-            book_version: str
+            meta_model: MetaModel
     ) -> None:
         """Initialize with the given values and map symbols to name."""
         self.symbols = symbols
         self.ref_association = ref_association
-        self.book_url = book_url
-        self.book_version = book_version
+        self.meta_model = meta_model
 
         self._name_to_symbol = {symbol.name: symbol for symbol in symbols}
 
