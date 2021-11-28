@@ -41,7 +41,9 @@ assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType
 
 
 def _define_type(
-        type_annotation: intermediate.TypeAnnotation) -> MutableMapping[str, Any]:
+        type_annotation: intermediate.TypeAnnotation,
+        ref_association: intermediate.Symbol
+) -> MutableMapping[str, Any]:
     """Generate the type definition for ``type_annotation``."""
     if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
         return collections.OrderedDict(
@@ -64,7 +66,16 @@ def _define_type(
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         return collections.OrderedDict(
-            [('type', 'array'), ('items', _define_type(type_annotation.items))])
+            [
+                ('type', 'array'),
+                (
+                    'items',
+                    _define_type(
+                        type_annotation=type_annotation.items,
+                        ref_association=ref_association)
+                )
+            ]
+        )
 
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         raise NotImplementedError(
@@ -74,6 +85,11 @@ def _define_type(
             f'about the context.\n\n'
             f'This feature needs yet to be implemented.\n\n'
             f'{type_annotation=}')
+
+    elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
+        model_type = naming.json_model_type(ref_association.name)
+
+        return collections.OrderedDict([('$ref', f"#/definitions/{model_type}")])
 
     else:
         raise NotImplementedError(
@@ -88,7 +104,8 @@ def _define_type(
 def _define_for_interface(
         interface: intermediate.Interface,
         implementers: Sequence[intermediate.Class],
-        ids_of_used_interfaces: Set[int]
+        ids_of_used_interfaces: Set[int],
+        ref_association: intermediate.Symbol
 ) -> MutableMapping[str, Any]:
     """
     Generate the definitions resulting from the ``interface``.
@@ -120,10 +137,12 @@ def _define_for_interface(
 
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             type_definition = _define_type(
-                type_annotation=prop.type_annotation.value)
+                type_annotation=prop.type_annotation.value,
+                ref_association=ref_association)
         else:
             type_definition = _define_type(
-                type_annotation=prop.type_annotation)
+                type_annotation=prop.type_annotation,
+                ref_association=ref_association)
             required.append(prop_name)
 
         properties[prop_name] = type_definition
@@ -166,7 +185,10 @@ def _define_for_interface(
     return result
 
 
-def _define_for_class(cls: intermediate.Class) -> MutableMapping[str, Any]:
+def _define_for_class(
+        cls: intermediate.Class,
+        ref_association: intermediate.Symbol
+) -> MutableMapping[str, Any]:
     """
     Generate the definition for the intermediate class ``cls``.
 
@@ -195,10 +217,12 @@ def _define_for_class(cls: intermediate.Class) -> MutableMapping[str, Any]:
 
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             type_definition = _define_type(
-                type_annotation=prop.type_annotation.value)
+                type_annotation=prop.type_annotation.value,
+                ref_association=ref_association)
         else:
             type_definition = _define_type(
-                type_annotation=prop.type_annotation)
+                type_annotation=prop.type_annotation,
+                ref_association=ref_association)
             required.append(prop_name)
 
         properties[prop_name] = type_definition
@@ -318,13 +342,19 @@ def _generate(
         else:
             if isinstance(symbol, intermediate.Enumeration):
                 extension = _define_for_enumeration(enumeration=symbol)
+
             elif isinstance(symbol, intermediate.Interface):
                 extension = _define_for_interface(
                     interface=symbol,
                     implementers=interface_implementers.get(symbol, []),
-                    ids_of_used_interfaces=ids_of_used_interfaces)
+                    ids_of_used_interfaces=ids_of_used_interfaces,
+                    ref_association=symbol_table.ref_association)
+
             elif isinstance(symbol, intermediate.Class):
-                extension = _define_for_class(cls=symbol)
+                extension = _define_for_class(
+                    cls=symbol,
+                    ref_association=symbol_table.ref_association)
+
             else:
                 assert_never(symbol)
 
@@ -333,10 +363,10 @@ def _generate(
             if identifier in definitions:
                 errors.append(Error(
                     symbol.parsed.node,
-                    f"A JSON definition for the symbol {symbol.name} has been "
-                    f"already provided in the definitions under "
-                    f"the name: {identifier}; did you already define it in an "
-                    f"implementation-specific snippet?"
+                    f"One of the JSON definitions, {identifier}, "
+                    f"for the symbol {symbol.name} has been "
+                    f"already provided in the definitions ; did you already define it "
+                    f"in another implementation-specific snippet?"
                 ))
                 continue
             else:

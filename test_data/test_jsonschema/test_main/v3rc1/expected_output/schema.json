@@ -9,8 +9,56 @@
     }
   ],
   "definitions": {
+    "HasSemantics": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "semanticID": {
+              "$ref": "#/definitions/Reference"
+            }
+          }
+        }
+      ]
+    },
+    "Extension": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/HasSemantics"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "valueType": {
+              "$ref": "#/definitions/DataTypeDef"
+            },
+            "value": {
+              "type": "string"
+            },
+            "refersTo": {
+              "$ref": "#/definitions/Reference"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    },
     "HasExtensions": {
-      "type": "object"
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "extension": {
+              "$ref": "#/definitions/Extension"
+            }
+          }
+        }
+      ]
     },
     "Referable": {
       "allOf": [
@@ -164,8 +212,26 @@
         }
       ]
     },
+    "HasDataSpecification": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "dataSpecifications": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Reference"
+              }
+            }
+          }
+        }
+      ]
+    },
     "AdministrativeInformation": {
       "allOf": [
+        {
+          "$ref": "#/definitions/HasDataSpecification"
+        },
         {
           "type": "object",
           "properties": {
@@ -174,18 +240,6 @@
             },
             "revision": {
               "type": "string"
-            }
-          }
-        }
-      ]
-    },
-    "HasSemantics": {
-      "allOf": [
-        {
-          "type": "object",
-          "properties": {
-            "semanticID": {
-              "$ref": "#/definitions/Reference"
             }
           }
         }
@@ -276,21 +330,6 @@
         }
       ]
     },
-    "HasDataSpecification": {
-      "allOf": [
-        {
-          "type": "object",
-          "properties": {
-            "dataSpecifications": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Reference"
-              }
-            }
-          }
-        }
-      ]
-    },
     "AssetAdministrationShell": {
       "allOf": [
         {
@@ -303,7 +342,7 @@
           "type": "object",
           "properties": {
             "derivedFrom": {
-              "$ref": "#/definitions/AssetAdministrationShell"
+              "$ref": "#/definitions/Reference"
             },
             "security": {
               "$ref": "#/definitions/Security"
@@ -314,7 +353,7 @@
             "submodels": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Submodel"
+                "$ref": "#/definitions/Reference"
               }
             },
             "views": {
@@ -370,7 +409,7 @@
             "billOfMaterial": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Submodel"
+                "$ref": "#/definitions/Reference"
               }
             },
             "defaultThumbnail": {
@@ -516,10 +555,10 @@
           "type": "object",
           "properties": {
             "first": {
-              "$ref": "#/definitions/Referable_abstract"
+              "$ref": "#/definitions/Reference"
             },
             "second": {
-              "$ref": "#/definitions/Referable_abstract"
+              "$ref": "#/definitions/Reference"
             }
           },
           "required": [
@@ -744,7 +783,7 @@
             "annotation": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/DataElement_abstract"
+                "$ref": "#/definitions/Reference"
               }
             },
             "modelType": {
@@ -815,7 +854,7 @@
           "type": "object",
           "properties": {
             "observed": {
-              "$ref": "#/definitions/Referable_abstract"
+              "$ref": "#/definitions/Reference"
             },
             "modelType": {
               "type": "string",
@@ -935,7 +974,7 @@
             "containedElements": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Referable_abstract"
+                "$ref": "#/definitions/Reference"
               }
             },
             "modelType": {
@@ -987,34 +1026,13 @@
         }
       ]
     },
-    "KeyElements": {
+    "IdentifiableElements": {
       "type": "string",
       "enum": [
-        "GlobalReference",
-        "FragmentReference",
-        "AccessPermissionRule",
-        "AnnotatedRelationshipElement",
         "Asset",
         "AssetAdministrationShell",
-        "BasicEvent",
-        "Blob",
-        "Capability",
         "ConceptDescription",
-        "ConceptDictionary",
-        "DataElement",
-        "Entity",
-        "Event",
-        "File",
-        "MultiLanguageProperty",
-        "Operation",
-        "Property",
-        "Range",
-        "ReferenceElement",
-        "RelationshipElement",
-        "Submodel",
-        "SubmodelElement",
-        "SubmodelElementCollection",
-        "View"
+        "Submodel"
       ]
     },
     "ReferableElements": {
@@ -1045,13 +1063,41 @@
         "View"
       ]
     },
-    "IdentifiableElements": {
+    "KeyElements": {
       "type": "string",
       "enum": [
+        "GlobalReference",
+        "FragmentReference",
+        "AccessPermissionRule",
+        "AnnotatedRelationshipElement",
         "Asset",
         "AssetAdministrationShell",
+        "BasicEvent",
+        "Blob",
+        "Capability",
         "ConceptDescription",
-        "Submodel"
+        "ConceptDictionary",
+        "DataElement",
+        "Entity",
+        "Event",
+        "File",
+        "MultiLanguageProperty",
+        "Operation",
+        "Property",
+        "Range",
+        "ReferenceElement",
+        "RelationshipElement",
+        "Submodel",
+        "SubmodelElement",
+        "SubmodelElementCollection",
+        "View"
+      ]
+    },
+    "LocalKeyType": {
+      "type": "string",
+      "enum": [
+        "IdShort",
+        "FragmentId"
       ]
     },
     "KeyType": {
@@ -1062,13 +1108,6 @@
         "IRDI",
         "IRI",
         "Custom"
-      ]
-    },
-    "LocalKeyType": {
-      "type": "string",
-      "enum": [
-        "IdShort",
-        "FragmentId"
       ]
     },
     "DataTypeDef": {
@@ -1356,10 +1395,6 @@
               "items": {
                 "$ref": "#/definitions/Reference"
               }
-            },
-            "modelType": {
-              "type": "string",
-              "const": "BlobCertificate"
             }
           },
           "required": [
@@ -1377,7 +1412,7 @@
             "objectAttributes": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/DataElement_abstract"
+                "$ref": "#/definitions/Reference"
               }
             }
           },
@@ -1393,7 +1428,7 @@
           "type": "object",
           "properties": {
             "permission": {
-              "$ref": "#/definitions/Property"
+              "$ref": "#/definitions/Reference"
             },
             "kindOfPermission": {
               "$ref": "#/definitions/PermissionKind"
@@ -1430,7 +1465,7 @@
           "type": "object",
           "properties": {
             "object": {
-              "$ref": "#/definitions/Referable_abstract"
+              "$ref": "#/definitions/Reference"
             },
             "targetObjectAttributes": {
               "$ref": "#/definitions/ObjectAttributes"
@@ -1484,15 +1519,6 @@
         {
           "type": "object",
           "properties": {
-            "defaultSubjectAttributes": {
-              "$ref": "#/definitions/Submodel"
-            },
-            "selectablePermissions": {
-              "$ref": "#/definitions/Submodel"
-            },
-            "defaultPermissions": {
-              "$ref": "#/definitions/Submodel"
-            },
             "accessPermissionRules": {
               "type": "array",
               "items": {
@@ -1500,10 +1526,22 @@
               }
             },
             "selectableSubjectAttributes": {
-              "$ref": "#/definitions/Submodel"
+              "$ref": "#/definitions/Reference"
+            },
+            "defaultSubjectAttributes": {
+              "$ref": "#/definitions/Reference"
+            },
+            "selectablePermissions": {
+              "$ref": "#/definitions/Reference"
+            },
+            "defaultPermissions": {
+              "$ref": "#/definitions/Reference"
+            },
+            "selectableEnvironmentAttributes": {
+              "$ref": "#/definitions/Reference"
             },
             "defaultEnvironmentAttributes": {
-              "$ref": "#/definitions/Submodel"
+              "$ref": "#/definitions/Reference"
             }
           },
           "required": [
@@ -1543,7 +1581,7 @@
             "internalInformationPoints": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Submodel"
+                "$ref": "#/definitions/Reference"
               }
             }
           },

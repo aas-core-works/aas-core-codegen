@@ -3,7 +3,8 @@ import ast
 import enum
 import pathlib
 from typing import (
-    Sequence, Optional, Union, TypeVar, Mapping, MutableMapping, List, Tuple, Set)
+    Sequence, Optional, Union, TypeVar, Mapping, MutableMapping, List, Tuple, Set,
+    Final, FrozenSet)
 
 import docutils.nodes
 from icontract import require, invariant
@@ -94,11 +95,7 @@ class ListTypeAnnotation(SubscriptedTypeAnnotation):
 # NOTE (mristin, 2021-11-19):
 # We do not support other composite types except for ``List``. In the future we might
 # add support for ``Set``, ``MutableMapping`` *etc.*
-#
-# Additionally, we allow only properties of a class to be optional, but not the values
-# of a composite type.
 
-# TODO: move into the property — we do not support it — only a property can be optional!
 class OptionalTypeAnnotation(SubscriptedTypeAnnotation):
     """Represent a type annotation involving an ``Optional[...]``."""
 
@@ -108,6 +105,14 @@ class OptionalTypeAnnotation(SubscriptedTypeAnnotation):
 
     def __str__(self) -> str:
         return f"Optional[{self.value}]"
+
+
+class RefTypeAnnotation(SubscriptedTypeAnnotation):
+    """Represent a type annotation involving a reference ``Ref[...]``."""
+
+    def __init__(self, value: 'TypeAnnotation', parsed: parse.TypeAnnotation):
+        self.value = value
+        self.parsed = parsed
 
 
 TypeAnnotation = Union[
@@ -506,6 +511,20 @@ class EnumerationLiteral:
 class Enumeration:
     """Represent an enumeration."""
 
+    #: Name of the enumeration
+    name: Final[Identifier]
+
+    #: Literals associated with the enumeration
+    literals: Final[Sequence[EnumerationLiteral]]
+
+    # TODO: document all properties, also do the same for Class, Method etc.
+
+    #: Map literals by their identifiers
+    literals_by_name: Final[Mapping[str, EnumerationLiteral]]
+
+    #: Collect IDs (with :py:func:`id`) of the literal objects in a set
+    literal_id_set: Final[FrozenSet[int]]
+
     def __init__(
             self,
             name: Identifier,
@@ -530,6 +549,18 @@ class Enumeration:
 
 class Class:
     """Represent a class implementing zero, one or more interfaces."""
+
+    #: Map all properties by their identifiers to the corresponding objects
+    properties_by_name: Final[Mapping[Identifier, Property]]
+
+    #: Collect IDs (with :py:func:`id`) of the property objects in a set
+    property_id_set: Final[FrozenSet[int]]
+
+    #: Collect IDs (with :py:func:`id`) of the invariant objects in a set
+    invariant_id_set: Final[FrozenSet[int]]
+
+    #: Collect IDs (with :py:func:`id`) of the interface objects in a set
+    interface_id_set: Final[FrozenSet[int]]
 
     # fmt: off
     @require(
@@ -594,8 +625,41 @@ Symbol = Union[Interface, Enumeration, Class]
 T = TypeVar("T")  # pylint: disable=invalid-name
 
 
+class MetaModel:
+    """Collect information about the underlying meta-model."""
+    #: Description of the meta-model extracted from the docstring
+    description: Final[Optional[Description]]
+
+    #: Specify the URL of the book that the meta-model is based on
+    book_url: Final[str]
+
+    #: Specify the version of the book that the meta-model is based on
+    book_version: Final[str]
+
+    def __init__(
+            self,
+            book_url: str,
+            book_version: str,
+            description: Optional[Description]
+    ) -> None:
+        self.book_url = book_url
+        self.book_version = book_version
+        self.description = description
+
+
 class SymbolTable:
     """Represent all the symbols of the intermediate representation."""
+
+    #: List of all symbols that we need for the code generation
+    symbols: Final[Sequence[Symbol]]
+
+    #: Type to be used to represent a ``Ref[T]``
+    ref_association: Final[Symbol]
+
+    #: Additional information about the source meta-model
+    meta_model: Final[MetaModel]
+
+    _name_to_symbol: Final[Mapping[Identifier, Symbol]]
 
     @require(
         lambda symbols: (
@@ -604,9 +668,17 @@ class SymbolTable:
         )[1],
         "Symbol names unique",
     )
-    def __init__(self, symbols: Sequence[Symbol]) -> None:
+    def __init__(
+            self,
+            symbols: Sequence[Symbol],
+            ref_association: Symbol,
+            meta_model: parse.MetaModel
+    ) -> None:
         """Initialize with the given values and map symbols to name."""
         self.symbols = symbols
+        self.ref_association = ref_association
+        self.meta_model = meta_model
+
         self._name_to_symbol = {symbol.name: symbol for symbol in symbols}
 
     def find(self, name: Identifier) -> Optional[Symbol]:
@@ -849,9 +921,12 @@ def collect_ids_of_interfaces_in_properties(symbol_table: SymbolTable) -> Set[in
                 old_type_anno = None  # type: Optional[TypeAnnotation]
                 while True:
                     if isinstance(type_anno, OptionalTypeAnnotation):
+                        # noinspection PyUnresolvedReferences
                         type_anno = type_anno.value
                     elif isinstance(type_anno, ListTypeAnnotation):
                         type_anno = type_anno.items
+                    elif isinstance(type_anno, RefTypeAnnotation):
+                        type_anno = type_anno.value
                     elif isinstance(type_anno, BuiltinAtomicTypeAnnotation):
                         break
                     elif isinstance(type_anno, OurAtomicTypeAnnotation):

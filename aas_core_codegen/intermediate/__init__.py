@@ -12,6 +12,7 @@ OurAtomicTypeAnnotation = _types.OurAtomicTypeAnnotation
 SubscriptedTypeAnnotation = _types.SubscriptedTypeAnnotation
 ListTypeAnnotation = _types.ListTypeAnnotation
 OptionalTypeAnnotation = _types.OptionalTypeAnnotation
+RefTypeAnnotation = _types.RefTypeAnnotation
 Description = _types.Description
 Property = _types.Property
 Default = _types.Default

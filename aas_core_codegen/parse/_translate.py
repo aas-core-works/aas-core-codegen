@@ -93,6 +93,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("abstract", "aas_core_meta.marker"),
             ("implementation_specific", "aas_core_meta.marker"),
             ('reference_in_the_book', "aas_core_meta.marker"),
+            ('template', "aas_core_meta.marker"),
             ('Ref', "aas_core_meta.marker"),
             ('associate_ref_with', 'aas_core_meta.marker'),
             ("is_superset_of", "aas_core_meta.marker"),
@@ -1023,6 +1024,7 @@ def _string_constant_to_description(
 class _ClassMarker(enum.Enum):
     ABSTRACT = "abstract"
     IMPLEMENTATION_SPECIFIC = "implementation_specific"
+    TEMPLATE = "template"
 
 
 _CLASS_MARKER_FROM_STRING: Mapping[str, _ClassMarker] = {
@@ -1241,6 +1243,13 @@ def _classdef_to_symbol(
                 is_abstract = True
             elif class_marker == _ClassMarker.IMPLEMENTATION_SPECIFIC:
                 is_implementation_specific = True
+            elif class_marker == _ClassMarker.TEMPLATE:
+                # NOTE (mristin, 2021-11-28):
+                # We ignore the template marker at this moment. However, we will most
+                # probably have to consider them in the future so we leave them in the
+                # meta-model, but ignore them in the code generation.
+                pass
+
             else:
                 raise AssertionError(f"Unhandled enum: {class_marker}")
 
@@ -1451,7 +1460,8 @@ def _verify_arity_of_type_annotation_subscript(
     """
     expected_arity_map = {
         "List": 1,
-        "Optional": 1
+        "Optional": 1,
+        "Ref": 1
     }
     expected_arity = expected_arity_map.get(type_annotation.identifier, None)
     if expected_arity is None:

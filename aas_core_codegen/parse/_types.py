@@ -470,6 +470,9 @@ class UnverifiedSymbolTable(DBC):
     #: Type to be used to represent a ``Ref[T]``
     ref_association: Final[Symbol]
 
+    #: Additional information about the source meta-model
+    meta_model: Final[MetaModel]
+
     _name_to_symbol: Final[Mapping[Identifier, Symbol]]
 
     @require(
