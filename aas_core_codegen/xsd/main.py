@@ -44,7 +44,8 @@ assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType
 
 
 def _define_for_property(
-        prop: intermediate.Property
+        prop: intermediate.Property,
+        ref_association: intermediate.Symbol
 ) -> ET.Element:
     """Generate the definition of a property element."""
     type_anno = prop.type_annotation
@@ -91,15 +92,24 @@ def _define_for_property(
         else:
             assert_never(type_anno.symbol)
 
+    elif isinstance(type_anno, intermediate.RefTypeAnnotation):
+        if isinstance(type_anno.value, intermediate.OurAtomicTypeAnnotation):
+            prop_element = ET.Element(
+                "xs:element",
+                {
+                    "name": naming.xml_property(prop.name),
+                    "type": xsd_naming.model_type(ref_association.name)
+                })
+
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+        list_element = None  # type: Optional[ET.Element]
+
         if isinstance(type_anno.items, intermediate.OurAtomicTypeAnnotation):
             # NOTE (mristin, 2021-11-13):
             # We need to nest the enumerations and concrete classes in the tag
             # element to delineate them in the sequence. On the other hand,
             # an interface already implies the tag element since interfaces need
             # to discriminate on the concrete classes.
-
-            list_element = None  # type: Optional[ET.Element]
 
             if isinstance(
                     type_anno.items.symbol,
@@ -131,8 +141,23 @@ def _define_for_property(
             else:
                 assert_never(type_anno.items.symbol)
 
-            assert list_element is not None
+        elif isinstance(type_anno.items, intermediate.RefTypeAnnotation):
+            list_element = ET.Element("xs:sequence")
+            list_element.append(ET.Element(
+                "xs:element",
+                {
+                    "minOccurs": "0",
+                    "maxOccurs": "unbounded",
+                    "name": naming.xml_class_name(ref_association.name),
+                    "type": xsd_naming.model_type(ref_association.name)
+                }))
 
+        else:
+            # NOTE (mristin, 2021-11-28):
+            # We did not implement this case yet as we lacked the context.
+            pass
+
+        if list_element is not None:
             prop_complex_type = ET.Element('xs:complexType')
             prop_complex_type.append(list_element)
 
@@ -161,7 +186,8 @@ def _define_for_property(
 def _define_for_interface(
         interface: intermediate.Interface,
         implementers: Sequence[intermediate.Class],
-        ids_of_used_interfaces: Set[int]
+        ids_of_used_interfaces: Set[int],
+        ref_association: intermediate.Symbol
 ) -> List[ET.Element]:
     """
     Generate the definitions for the ``interface``.
@@ -182,7 +208,7 @@ def _define_for_interface(
         if prop.implemented_for is not interface:
             continue
 
-        prop_element = _define_for_property(prop=prop)
+        prop_element = _define_for_property(prop=prop, ref_association=ref_association)
 
         sequence.append(prop_element)
 
@@ -218,7 +244,8 @@ def _define_for_interface(
 
 
 def _define_for_class(
-        cls: intermediate.Class
+        cls: intermediate.Class,
+        ref_association: intermediate.Symbol
 ) -> List[ET.Element]:
     """
     Generate the definitions for the class ``cls``.
@@ -237,7 +264,7 @@ def _define_for_class(
         if prop.implemented_for is not cls:
             continue
 
-        prop_element = _define_for_property(prop=prop)
+        prop_element = _define_for_property(prop=prop, ref_association=ref_association)
 
         sequence.append(prop_element)
 
@@ -348,10 +375,13 @@ def _generate(
                 elements = _define_for_interface(
                     interface=symbol,
                     implementers=interface_implementers.get(symbol, []),
-                    ids_of_used_interfaces=ids_of_used_interfaces)
+                    ids_of_used_interfaces=ids_of_used_interfaces,
+                    ref_association=symbol_table.ref_association)
 
             elif isinstance(symbol, intermediate.Class):
-                elements = _define_for_class(cls=symbol)
+                elements = _define_for_class(
+                    cls=symbol,
+                    ref_association=symbol_table.ref_association)
 
             else:
                 assert_never(symbol)
