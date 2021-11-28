@@ -77,3 +77,17 @@ BUILTIN_MAP = {
     intermediate.BuiltinAtomicType.BYTEARRAY: "xsd:byte"
 }
 assert all(literal in BUILTIN_MAP for literal in intermediate.BuiltinAtomicType)
+
+
+def beneath_optional_and_ref(
+        type_annotation: intermediate.TypeAnnotation
+) -> intermediate.TypeAnnotation:
+    """Descend below ``Optional[...]`` and ``Ref[...]`` to the underlying type."""
+    type_anno = type_annotation
+    while (
+            isinstance(type_anno, intermediate.OptionalTypeAnnotation)
+            or isinstance(type_anno, intermediate.RefTypeAnnotation)
+    ):
+        type_anno = type_anno.value
+
+    return type_anno

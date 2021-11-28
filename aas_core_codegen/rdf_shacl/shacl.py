@@ -88,9 +88,11 @@ def _infer_cardinalities_by_properties_from_invariants(
 
     return result
 
+
 _PATTERN_BY_FUNCTION = {
     'is_ID_short': r'^[a-zA-Z][a-zA-Z_0-9]*$'
 }
+
 
 def _infer_patterns_by_property_from_invariants(
         symbol: Union[intermediate.Interface, intermediate.Class]
@@ -105,12 +107,12 @@ def _infer_patterns_by_property_from_invariants(
         # noinspection PyUnresolvedReferences
         if (
                 isinstance(body, parse_tree.FunctionCall)
-            and body.name in _PATTERN_BY_FUNCTION
-            and len(body.args) == 1
-            and isinstance(body.args[0], parse_tree.Member)
-            and isinstance(body.args[0].instance, parse_tree.Name)
-            and body.args[0].instance.identifier == 'self'
-            and body.args[0].name in symbol.properties_by_name
+                and body.name in _PATTERN_BY_FUNCTION
+                and len(body.args) == 1
+                and isinstance(body.args[0], parse_tree.Member)
+                and isinstance(body.args[0].instance, parse_tree.Name)
+                and body.args[0].instance.identifier == 'self'
+                and body.args[0].name in symbol.properties_by_name
         ):
             prop = symbol.properties_by_name[body.args[0].name]
             pattern = _PATTERN_BY_FUNCTION[body.name]
@@ -129,7 +131,8 @@ def _define_property_shape(
         symbol_to_rdfs_range: MutableMapping[
             Union[intermediate.Interface, intermediate.Class],
             Stripped],
-        inferred_cardinalities_by_properties: Mapping[intermediate.Property, Cardinality],
+        inferred_cardinalities_by_properties: Mapping[
+            intermediate.Property, Cardinality],
         inferred_patterns_by_property: Mapping[intermediate.Property, str]
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the shape of a property ``prop`` of the intermediate ``symbol``."""
@@ -140,9 +143,7 @@ def _define_property_shape(
 
     # Resolve the type annotation to the actual value, regardless if the property is
     # mandatory or optional
-    type_anno = prop.type_annotation
-    while isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-        type_anno = type_anno.value
+    type_anno = rdf_shacl_common.beneath_optional_and_ref(prop.type_annotation)
 
     # region Define path and type
 
@@ -164,14 +165,16 @@ def _define_property_shape(
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         prop_name = rdf_shacl_naming.property_name(prop.name)
 
-        if isinstance(type_anno.items, intermediate.OurAtomicTypeAnnotation):
-            rdfs_range = symbol_to_rdfs_range.get(
-                type_anno.items.symbol,
-                Stripped(
-                    f"aas:{rdf_shacl_naming.class_name(type_anno.items.symbol.name)}"))
+        type_anno_items = rdf_shacl_common.beneath_optional_and_ref(type_anno.items)
 
-        elif isinstance(type_anno.items, intermediate.BuiltinAtomicTypeAnnotation):
-            rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno.items.a_type]
+        if isinstance(type_anno_items, intermediate.OurAtomicTypeAnnotation):
+            rdfs_range = symbol_to_rdfs_range.get(
+                type_anno_items.symbol,
+                Stripped(
+                    f"aas:{rdf_shacl_naming.class_name(type_anno_items.symbol.name)}"))
+
+        elif isinstance(type_anno_items, intermediate.BuiltinAtomicTypeAnnotation):
+            rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno_items.a_type]
 
         else:
             missing_implementation = True
@@ -185,7 +188,8 @@ def _define_property_shape(
             f"We did not refine the shape definition of "
             f"the non-atomic and non-sequential properties. "
             f"If you see this message, it is time to implement "
-            f"this missing functionality.")
+            f"this missing functionality.\n"
+            f"{prop=}, {type_anno=}, {symbol=}")
 
     assert prop_name is not None
     assert rdfs_range is not None
@@ -211,6 +215,9 @@ def _define_property_shape(
         card.min_count = 0
     elif isinstance(prop.type_annotation, intermediate.ListTypeAnnotation):
         card.min_count = 0
+    elif isinstance(prop.type_annotation, intermediate.RefTypeAnnotation):
+        card.min_count = 1
+        card.max_count = 1
     elif isinstance(
             prop.type_annotation, intermediate.AtomicTypeAnnotation):
         card.min_count = 1

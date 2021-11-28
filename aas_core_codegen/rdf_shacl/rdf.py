@@ -60,8 +60,6 @@ def _define_for_enumeration(
         url_prefix: Stripped
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Define an RDF definition of an enumeration."""
-    blocks = []  # type: List[Stripped]
-
     cls_name = rdf_shacl_naming.class_name(enumeration.name)
     cls_label = rdf_shacl_naming.class_label(enumeration.name)
 
@@ -183,11 +181,7 @@ def _define_property(
             Stripped],
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of a property ``prop`` of the intermediate ``symbol``."""
-    # Resolve the type annotation to the actual value, regardless if the property is
-    # mandatory or optional
-    type_anno = prop.type_annotation
-    while isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-        type_anno = type_anno.value
+    type_anno = rdf_shacl_common.beneath_optional_and_ref(prop.type_annotation)
 
     cls_name = rdf_shacl_naming.class_name(symbol.name)
     rdfs_domain = f"aas:{cls_name}"
@@ -217,16 +211,18 @@ def _define_property(
         prop_name = rdf_shacl_naming.property_name(prop.name)
         prop_label = rdf_shacl_naming.property_label(prop.name)
 
-        if isinstance(type_anno.items, intermediate.OurAtomicTypeAnnotation):
+        type_anno_items = rdf_shacl_common.beneath_optional_and_ref(type_anno.items)
+
+        if isinstance(type_anno_items, intermediate.OurAtomicTypeAnnotation):
             rdf_type = "owl:ObjectProperty"
             rdfs_range = symbol_to_rdfs_range.get(
-                type_anno.items.symbol,
+                type_anno_items.symbol,
                 Stripped(
-                    f"aas:{rdf_shacl_naming.class_name(type_anno.items.symbol.name)}"))
+                    f"aas:{rdf_shacl_naming.class_name(type_anno_items.symbol.name)}"))
 
-        elif isinstance(type_anno.items, intermediate.BuiltinAtomicTypeAnnotation):
+        elif isinstance(type_anno_items, intermediate.BuiltinAtomicTypeAnnotation):
             rdf_type = "owl:DatatypeProperty"
-            rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno.items.a_type]
+            rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno_items.a_type]
 
         else:
             missing_implementation = True
@@ -239,7 +235,8 @@ def _define_property(
             f"(mristin, 2021-11-12): "
             f"We did not refine the definition of the non-atomic and non-sequential "
             f"properties. If you see this message, it is time to implement "
-            f"this missing functionality.")
+            f"this missing functionality.\n"
+            f"{prop=}, {type_anno=}, {symbol=}")
 
     assert prop_name is not None
     assert prop_label is not None
@@ -343,8 +340,6 @@ def generate(
     ]  # type: List[Stripped]
 
     for symbol in symbol_table.symbols:
-        block = None  # type: Optional[Stripped]
-
         if isinstance(symbol, intermediate.Enumeration):
             block, error = _define_for_enumeration(
                 enumeration=symbol, url_prefix=url_prefix)
