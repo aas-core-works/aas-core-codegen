@@ -5,7 +5,7 @@ from typing import Union, Tuple, Optional, List, MutableMapping, Sequence, Mappi
 
 from icontract import ensure, require
 
-from aas_core_codegen import intermediate, specific_implementations
+from aas_core_codegen import intermediate, specific_implementations, infer_for_schema
 from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
 from aas_core_codegen.parse import (
     tree as parse_tree
@@ -17,77 +17,6 @@ from aas_core_codegen.rdf_shacl import (
 from aas_core_codegen.rdf_shacl.common import (
     INDENT as I
 )
-
-
-class Cardinality:
-    """Represent cardinality of a property."""
-
-    def __init__(self, min_count: Optional[int], max_count: Optional[int]) -> None:
-        """Initialize with the given values."""
-        self.min_count = min_count
-        self.max_count = max_count
-
-
-def _infer_cardinalities_by_properties_from_invariants(
-        symbol: Union[intermediate.Interface, intermediate.Class]
-) -> MutableMapping[intermediate.Property, Cardinality]:
-    """Infer the cardinality of a property based on the ``symbol``'s invariants."""
-    result = dict()  # type: MutableMapping[intermediate.Property, Cardinality]
-
-    # Go over the original invariants which follows the structure of
-    # the SHACL schema (instead of classes and interfaces)
-    for invariant in symbol.parsed.invariants:
-        if isinstance(invariant.body, parse_tree.Comparison):
-            left = invariant.body.left
-            right = invariant.body.right
-
-            # noinspection PyUnresolvedReferences
-            if (
-                    isinstance(left, parse_tree.FunctionCall)
-                    and left.name == 'len'
-                    and len(left.args) == 1
-                    and isinstance(left.args[0], parse_tree.Member)
-                    and isinstance(left.args[0].instance, parse_tree.Name)
-                    and left.args[0].instance.identifier == 'self'
-                    and left.args[0].name in symbol.properties_by_name
-                    and isinstance(right, parse_tree.Constant)
-                    and isinstance(right.value, int)
-            ):
-                prop = symbol.properties_by_name[left.args[0].name]
-                constant = right.value
-
-                card = result.get(prop, None)
-                if card is None:
-                    card = Cardinality(min_count=None, max_count=None)
-                    result[prop] = card
-
-                # NOTE (mristin, 2021-11-13):
-                # We simply overwrite the cardinality as we go.
-                # Mind that this might lead to conflicts. For example,
-                # imagine an invariant that says len(self.n) == 3 followed by
-                # an invariant len(self.n) > 5. We ignore such conflicts and assume
-                # that the invariants are consistent.
-
-                if invariant.body.op == parse_tree.Comparator.LT:
-                    card.max_count = constant - 1
-                elif invariant.body.op == parse_tree.Comparator.LE:
-                    card.max_count = constant
-                elif invariant.body.op == parse_tree.Comparator.EQ:
-                    card.max_count = constant
-                    card.min_count = constant
-                elif invariant.body.op == parse_tree.Comparator.GT:
-                    card.min_count = constant + 1
-                elif invariant.body.op == parse_tree.Comparator.GE:
-                    card.min_count = constant
-                elif invariant.body.op == parse_tree.Comparator.NE:
-                    # We intentionally ignore the invariants of the form len(n) != X
-                    # as there is no meaningful way to represent it simply in SHACL.
-                    pass
-                else:
-                    assert_never(invariant.body.op)
-
-    return result
-
 
 _PATTERN_BY_FUNCTION = {
     'is_ID_short': r'^[a-zA-Z][a-zA-Z_0-9]*$'
@@ -114,6 +43,7 @@ def _infer_patterns_by_property_from_invariants(
                 and body.args[0].instance.identifier == 'self'
                 and body.args[0].name in symbol.properties_by_name
         ):
+            # noinspection PyUnresolvedReferences
             prop = symbol.properties_by_name[body.args[0].name]
             pattern = _PATTERN_BY_FUNCTION[body.name]
 
@@ -131,8 +61,8 @@ def _define_property_shape(
         symbol_to_rdfs_range: MutableMapping[
             Union[intermediate.Interface, intermediate.Class],
             Stripped],
-        inferred_cardinalities_by_properties: Mapping[
-            intermediate.Property, Cardinality],
+        len_constraints_by_property: Mapping[
+            intermediate.Property, infer_for_schema.LenConstraint],
         inferred_patterns_by_property: Mapping[intermediate.Property, str]
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the shape of a property ``prop`` of the intermediate ``symbol``."""
@@ -209,19 +139,21 @@ def _define_property_shape(
 
     # region Define cardinality
 
-    card = Cardinality(min_count=None, max_count=None)
+    # noinspection PyUnusedLocal
+    min_count = None  # type: Optional[int]
+    max_count = None  # type: Optional[int]
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        card.min_count = 0
+        min_count = 0
     elif isinstance(prop.type_annotation, intermediate.ListTypeAnnotation):
-        card.min_count = 0
+        min_count = 0
     elif isinstance(prop.type_annotation, intermediate.RefTypeAnnotation):
-        card.min_count = 1
-        card.max_count = 1
+        min_count = 1
+        max_count = 1
     elif isinstance(
             prop.type_annotation, intermediate.AtomicTypeAnnotation):
-        card.min_count = 1
-        card.max_count = 1
+        min_count = 1
+        max_count = 1
     else:
         return None, Error(
             prop.parsed.node,
@@ -231,26 +163,36 @@ def _define_property_shape(
             f"this logic."
         )
 
-    inferred_card = inferred_cardinalities_by_properties.get(prop, None)
+    # NOTE (mristin, 2021-12-01):
+    # We model only shape of the lists since SHACL interpretation of the string
+    # length would not match the cardinality.
 
-    if inferred_card is not None:
-        if inferred_card.min_count is not None:
-            card.min_count = (
-                max(card.min_count, inferred_card.min_count)
-                if card.min_count is not None
-                else inferred_card.min_count)
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        len_constraint = len_constraints_by_property.get(prop, None)
 
-        if inferred_card.max_count is not None:
-            card.max_count = (
-                min(card.max_count, inferred_card.max_count)
-                if card.max_count is not None
-                else inferred_card.max_count)
+        if len_constraint is not None:
 
-    if card.min_count is not None:
-        stmts.append(Stripped(f'sh:minCount {card.min_count} ;'))
+            # NOTE (mristin, 2021-12-01):
+            # Mind that this will relax the exactly expected length if the list is optional.
+            # However, there is not clean way to model this in SHACL that I know of.
 
-    if card.max_count is not None:
-        stmts.append(Stripped(f'sh:maxCount {card.max_count} ;'))
+            if len_constraint.min_value is not None:
+                min_count = (
+                    max(min_count, len_constraint.min_value)
+                    if min_count is not None
+                    else len_constraint.min_value)
+
+            if len_constraint.max_value is not None:
+                max_count = (
+                    min(max_count, len_constraint.max_value)
+                    if max_count is not None
+                    else len_constraint.max_value)
+
+    if min_count is not None:
+        stmts.append(Stripped(f'sh:minCount {min_count} ;'))
+
+    if max_count is not None:
+        stmts.append(Stripped(f'sh:maxCount {max_count} ;'))
 
     # endregion
 
@@ -291,11 +233,19 @@ def _define_for_class_or_interface(
     prop_blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]
 
-    inferred_cardinalities_by_properties = _infer_cardinalities_by_properties_from_invariants(
-        symbol=symbol)
+    len_constraints_by_property, len_constraints_errors = (
+        infer_for_schema.infer_len_constraints(symbol=symbol))
+
+    if len_constraints_errors is not None:
+        errors.extend(len_constraints_errors)
 
     inferred_patterns_by_property = _infer_patterns_by_property_from_invariants(
         symbol=symbol)
+
+    if len(errors) > 0:
+        return None, Error(
+            symbol.parsed.node,
+            f"Failed to infer the constraints for {symbol.name}")
 
     for prop in symbol.properties:
         prop_block, error = _define_property_shape(
@@ -303,7 +253,7 @@ def _define_for_class_or_interface(
             symbol=symbol,
             url_prefix=url_prefix,
             symbol_to_rdfs_range=symbol_to_rdfs_range,
-            inferred_cardinalities_by_properties=inferred_cardinalities_by_properties,
+            len_constraints_by_property=len_constraints_by_property,
             inferred_patterns_by_property=inferred_patterns_by_property)
 
         if error is not None:
@@ -377,6 +327,7 @@ def generate(
     ]  # type: List[Stripped]
 
     for symbol in symbol_table.symbols:
+        # noinspection PyUnusedLocal
         block = None  # type: Optional[Stripped]
 
         if isinstance(symbol, intermediate.Enumeration):
