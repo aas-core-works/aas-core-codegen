@@ -40,7 +40,8 @@ from aas_core_codegen.intermediate._types import (
     Description, AttributeReferenceInDoc, SymbolReferenceInDoc,
     SubscriptedTypeAnnotation, DefaultEnumerationLiteral,
     EnumerationLiteralReferenceInDoc, PropertyReferenceInDoc, MetaModel,
-    RefTypeAnnotation,
+    RefTypeAnnotation, collect_ids_of_interfaces_in_properties,
+    map_interface_implementers,
 )
 
 
@@ -1348,6 +1349,34 @@ def translate(
 
             prop.implemented_for = symbol_table.must_find(
                 Identifier(prop.implemented_for.identifier))
+
+    # endregion
+
+    # region Check that all implementers of interfaces have ``with_model_type``
+
+    ids_of_used_interfaces = collect_ids_of_interfaces_in_properties(
+        symbol_table=symbol_table)
+
+    interface_implementers = map_interface_implementers(symbol_table=symbol_table)
+
+    for symbol in symbol_table.symbols:
+        if (
+                isinstance(symbol, Interface)
+                and id(symbol) in ids_of_used_interfaces
+        ):
+            implementers = interface_implementers.get(symbol, None)
+            if implementers is not None:
+                for implementer in implementers:
+                    if not implementer.serialization.with_model_type:
+                        underlying_errors.append(Error(
+                            implementer.parsed.node,
+                            f"The class {implementer.name} needs to have "
+                            f"serialization setting ``with_model_type`` set since "
+                            f"it is among the concrete classes of "
+                            f"the abstract class {symbol.name}. Otherwise, "
+                            f"the abstract class {symbol.name} can not be "
+                            f"de/serialized properly."
+                        ))
 
     # endregion
 

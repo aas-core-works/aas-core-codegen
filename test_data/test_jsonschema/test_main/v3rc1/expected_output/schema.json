@@ -1395,6 +1395,10 @@
               "items": {
                 "$ref": "#/definitions/Reference"
               }
+            },
+            "modelType": {
+              "type": "string",
+              "const": "BlobCertificate"
             }
           },
           "required": [

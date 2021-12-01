@@ -344,7 +344,6 @@ def _generate(
                 extension = _define_for_enumeration(enumeration=symbol)
 
             elif isinstance(symbol, intermediate.Interface):
-                # TODO: continue here: raise an error if any of the implementers lack the with_model_type!
                 extension = _define_for_interface(
                     interface=symbol,
                     implementers=interface_implementers.get(symbol, []),

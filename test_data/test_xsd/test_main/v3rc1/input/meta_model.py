@@ -2477,6 +2477,7 @@ class Data_specification_physical_unit(Data_specification_content):
 
 @abstract
 @reference_in_the_book(section=(5, 3, 3))
+@serialization(with_model_type=True)
 class Certificate(DBC):
     """
     Certificate
