@@ -47,9 +47,6 @@ class _ExactLength(_Constraint):
         self.value = value
 
 
-# TODO: simplify shacl.py once the constraints are in place!
-
-
 def _match_len_on_property(
         node: parse_tree.Node
 ) -> Optional[Identifier]:
