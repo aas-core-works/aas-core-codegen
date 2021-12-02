@@ -7,9 +7,6 @@ from icontract import ensure, require
 
 from aas_core_codegen import intermediate, specific_implementations, infer_for_schema
 from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
-from aas_core_codegen.parse import (
-    tree as parse_tree
-)
 from aas_core_codegen.rdf_shacl import (
     naming as rdf_shacl_naming,
     common as rdf_shacl_common
@@ -17,39 +14,6 @@ from aas_core_codegen.rdf_shacl import (
 from aas_core_codegen.rdf_shacl.common import (
     INDENT as I
 )
-
-_PATTERN_BY_FUNCTION = {
-    'is_ID_short': r'^[a-zA-Z][a-zA-Z_0-9]*$'
-}
-
-
-def _infer_patterns_by_property_from_invariants(
-        symbol: Union[intermediate.Interface, intermediate.Class]
-) -> MutableMapping[intermediate.Property, str]:
-    """Infer the pattern of a property based on the ``symbol``'s invariants."""
-    result = dict()  # type: MutableMapping[intermediate.Property, str]
-
-    # Go over the original invariants which follows the structure of
-    # the SHACL schema (instead of classes and interfaces)
-    for invariant in symbol.parsed.invariants:
-        body = invariant.body
-        # noinspection PyUnresolvedReferences
-        if (
-                isinstance(body, parse_tree.FunctionCall)
-                and body.name in _PATTERN_BY_FUNCTION
-                and len(body.args) == 1
-                and isinstance(body.args[0], parse_tree.Member)
-                and isinstance(body.args[0].instance, parse_tree.Name)
-                and body.args[0].instance.identifier == 'self'
-                and body.args[0].name in symbol.properties_by_name
-        ):
-            # noinspection PyUnresolvedReferences
-            prop = symbol.properties_by_name[body.args[0].name]
-            pattern = _PATTERN_BY_FUNCTION[body.name]
-
-            result[prop] = pattern
-
-    return result
 
 
 @require(lambda prop, symbol: id(prop) in symbol.property_id_set)
@@ -63,7 +27,8 @@ def _define_property_shape(
             Stripped],
         len_constraints_by_property: Mapping[
             intermediate.Property, infer_for_schema.LenConstraint],
-        inferred_patterns_by_property: Mapping[intermediate.Property, str]
+        pattern_constraints_by_property: Mapping[
+            intermediate.Property, List[infer_for_schema.PatternConstraint]]
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the shape of a property ``prop`` of the intermediate ``symbol``."""
 
@@ -198,10 +163,13 @@ def _define_property_shape(
 
     # region Define pattern
 
-    pattern = inferred_patterns_by_property.get(prop, None)
-    if pattern:
-        stmts.append(Stripped(
-            f'sh:pattern {rdf_shacl_common.string_literal(pattern)} ;'))
+    pattern_constraints = pattern_constraints_by_property.get(prop, None)
+    if pattern_constraints is not None and len(pattern_constraints) > 0:
+        for pattern_constraint in pattern_constraints:
+            pattern_literal = rdf_shacl_common.string_literal(
+                pattern_constraint.pattern)
+
+            stmts.append(Stripped(f'sh:pattern {pattern_literal} ;'))
 
     # endregion
 
@@ -239,7 +207,7 @@ def _define_for_class_or_interface(
     if len_constraints_errors is not None:
         errors.extend(len_constraints_errors)
 
-    inferred_patterns_by_property = _infer_patterns_by_property_from_invariants(
+    pattern_constraints_by_property = infer_for_schema.infer_pattern_constraints(
         symbol=symbol)
 
     if len(errors) > 0:
@@ -254,7 +222,7 @@ def _define_for_class_or_interface(
             url_prefix=url_prefix,
             symbol_to_rdfs_range=symbol_to_rdfs_range,
             len_constraints_by_property=len_constraints_by_property,
-            inferred_patterns_by_property=inferred_patterns_by_property)
+            pattern_constraints_by_property=pattern_constraints_by_property)
 
         if error is not None:
             errors.append(error)

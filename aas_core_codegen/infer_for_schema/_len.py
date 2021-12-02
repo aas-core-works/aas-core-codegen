@@ -93,12 +93,9 @@ def _match_len_constraint_on_property(
         node: parse_tree.Node
 ) -> Optional[_LenConstraintOnProperty]:
     """
-    Match the constraint on ``len`` of a property.
+    Match the constraint on ``len`` of a property such as ``len(self.something) < X``.
 
-    Mind that we match the constraint even for optional properties for which
-    the invariant is conditioned on the property being specified (``is not None``).
-    
-    Return the property name and the constraint, or None if not matched.
+    Return the match, or None if not matched.
     """
     if not isinstance(node, parse_tree.Comparison):
         return None
@@ -209,7 +206,7 @@ def infer_len_constraints(
     The constraints are not exhaustive. We only infer constraints based on invariants
     which involve constants. It might be that the actual invariants are tighter.
     """
-    constraint_map = dict()  # MutableMapping[intermediate.Property, List[_Constraint]]
+    constraint_map = dict()  # type: MutableMapping[Identifier, List[_Constraint]]
 
     # region Infer the constraints in the loose form from all the invariants
 
