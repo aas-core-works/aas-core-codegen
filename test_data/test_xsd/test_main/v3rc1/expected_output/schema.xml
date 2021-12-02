@@ -443,7 +443,7 @@
       <xs:element name="keys">
         <xs:complexType>
           <xs:sequence>
-            <xs:element minOccurs="0" maxOccurs="unbounded" name="key" type="key_t"/>
+            <xs:element minOccurs="1" maxOccurs="unbounded" name="key" type="key_t"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -711,7 +711,7 @@
       <xs:element name="objectAttributes">
         <xs:complexType>
           <xs:sequence>
-            <xs:element minOccurs="0" maxOccurs="unbounded" name="reference" type="reference_t"/>
+            <xs:element minOccurs="1" maxOccurs="unbounded" name="reference" type="reference_t"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>

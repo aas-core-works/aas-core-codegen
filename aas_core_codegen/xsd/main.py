@@ -1,13 +1,14 @@
 """Generate XML Schema Definition (XSD) corresponding to the meta-model."""
 import re
 import xml.etree.ElementTree as ET
-from typing import TextIO, MutableMapping, Optional, Tuple, List, Sequence, Set
+from typing import TextIO, MutableMapping, Optional, Tuple, List, Sequence, Set, Union
 
 # noinspection PyUnresolvedReferences
 import xml.dom.minidom
 from icontract import ensure
 
-from aas_core_codegen import naming, specific_implementations, intermediate, run
+from aas_core_codegen import naming, specific_implementations, intermediate, run, \
+    infer_for_schema
 from aas_core_codegen.common import Error, assert_never
 from aas_core_codegen.xsd import (
     naming as xsd_naming
@@ -45,7 +46,8 @@ assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType
 
 def _define_for_property(
         prop: intermediate.Property,
-        ref_association: intermediate.Symbol
+        ref_association: intermediate.Symbol,
+        len_constraint: Optional[infer_for_schema.LenConstraint]
 ) -> ET.Element:
     """Generate the definition of a property element."""
     type_anno = prop.type_annotation
@@ -104,6 +106,15 @@ def _define_for_property(
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         list_element = None  # type: Optional[ET.Element]
 
+        min_occurs = '0'
+        max_occurs = 'unbounded'
+        if len_constraint is not None:
+            if len_constraint.min_value is not None:
+                min_occurs = str(len_constraint.min_value)
+
+            if len_constraint.max_value is not None:
+                max_occurs = str(len_constraint.max_value)
+
         if isinstance(type_anno.items, intermediate.OurAtomicTypeAnnotation):
             # NOTE (mristin, 2021-11-13):
             # We need to nest the enumerations and concrete classes in the tag
@@ -119,8 +130,8 @@ def _define_for_property(
                 list_element.append(ET.Element(
                     "xs:element",
                     {
-                        "minOccurs": "0",
-                        "maxOccurs": "unbounded",
+                        "minOccurs": min_occurs,
+                        "maxOccurs": max_occurs,
                         "name": naming.xml_class_name(type_anno.items.symbol.name),
                         "type": xsd_naming.model_type(type_anno.items.symbol.name)
                     }))
@@ -128,7 +139,7 @@ def _define_for_property(
             elif isinstance(type_anno.items.symbol, intermediate.Interface):
                 list_element = ET.Element(
                     "xs:choice",
-                    {"minOccurs": "0", "maxOccurs": "unbounded"})
+                    {"minOccurs": min_occurs, "maxOccurs": max_occurs})
 
                 list_element.append(
                     ET.Element("xs:group",
@@ -146,8 +157,8 @@ def _define_for_property(
             list_element.append(ET.Element(
                 "xs:element",
                 {
-                    "minOccurs": "0",
-                    "maxOccurs": "unbounded",
+                    "minOccurs": min_occurs,
+                    "maxOccurs": max_occurs,
                     "name": naming.xml_class_name(ref_association.name),
                     "type": xsd_naming.model_type(ref_association.name)
                 }))
@@ -183,12 +194,45 @@ def _define_for_property(
     return prop_element
 
 
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _define_properties(
+        symbol: Union[intermediate.Interface, intermediate.Class],
+        ref_association: intermediate.Symbol
+) -> Tuple[Optional[List[ET.Element]], Optional[List[Error]]]:
+    """Define the properties of the ``symbol`` as a sequence of tags."""
+    len_constraints, len_constraints_errors = (
+        infer_for_schema.infer_len_constraints(symbol=symbol))
+
+    if len_constraints_errors is not None:
+        return None, len_constraints_errors
+
+    assert len_constraints is not None
+
+    sequence = []  # type: List[ET.Element]
+
+    for prop in symbol.properties:
+        if prop.implemented_for is not symbol:
+            continue
+
+        len_constraint = len_constraints.get(prop, None)
+
+        prop_element = _define_for_property(
+            prop=prop,
+            ref_association=ref_association,
+            len_constraint=len_constraint)
+
+        sequence.append(prop_element)
+
+    return sequence, None
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_for_interface(
         interface: intermediate.Interface,
         implementers: Sequence[intermediate.Class],
         ids_of_used_interfaces: Set[int],
         ref_association: intermediate.Symbol
-) -> List[ET.Element]:
+) -> Tuple[Optional[List[ET.Element]], Optional[List[Error]]]:
     """
     Generate the definitions for the ``interface``.
 
@@ -204,13 +248,15 @@ def _define_for_interface(
             {"ref": xsd_naming.model_type(inheritance.name)})
         sequence.append(inheritance_part)
 
-    for prop in interface.properties:
-        if prop.implemented_for is not interface:
-            continue
+    properties, properties_errors = _define_properties(
+        symbol=interface,
+        ref_association=ref_association)
 
-        prop_element = _define_for_property(prop=prop, ref_association=ref_association)
+    if properties_errors is not None:
+        return None, properties_errors
 
-        sequence.append(prop_element)
+    assert properties is not None
+    sequence.extend(properties)
 
     interface_group = ET.Element(
         "xs:group",
@@ -240,13 +286,14 @@ def _define_for_interface(
 
         result.append(abstract_group)
 
-    return result
+    return result, None
 
 
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_for_class(
         cls: intermediate.Class,
         ref_association: intermediate.Symbol
-) -> List[ET.Element]:
+) -> Tuple[Optional[List[ET.Element]], Optional[List[Error]]]:
     """
     Generate the definitions for the class ``cls``.
 
@@ -260,13 +307,15 @@ def _define_for_class(
             {"ref": xsd_naming.model_type(interface.name)})
         sequence.append(interface_part)
 
-    for prop in cls.properties:
-        if prop.implemented_for is not cls:
-            continue
+    properties, properties_errors = _define_properties(
+        symbol=cls,
+        ref_association=ref_association)
 
-        prop_element = _define_for_property(prop=prop, ref_association=ref_association)
+    if properties_errors is not None:
+        return None, properties_errors
 
-        sequence.append(prop_element)
+    assert properties is not None
+    sequence.extend(properties)
 
     complex_type = ET.Element(
         "xs:complexType",
@@ -275,7 +324,7 @@ def _define_for_class(
     if len(sequence) > 0:
         complex_type.append(sequence)
 
-    return [complex_type]
+    return [complex_type], None
 
 
 _WHITESPACE_RE = re.compile(r'\s+')
@@ -372,22 +421,32 @@ def _generate(
                 elements = _define_for_enumeration(enumeration=symbol)
 
             elif isinstance(symbol, intermediate.Interface):
-                elements = _define_for_interface(
+                elements, definition_errors = _define_for_interface(
                     interface=symbol,
                     implementers=interface_implementers.get(symbol, []),
                     ids_of_used_interfaces=ids_of_used_interfaces,
                     ref_association=symbol_table.ref_association)
 
+                if definition_errors is not None:
+                    errors.extend(definition_errors)
+                    continue
+
             elif isinstance(symbol, intermediate.Class):
-                elements = _define_for_class(
+                elements, definition_errors = _define_for_class(
                     cls=symbol,
                     ref_association=symbol_table.ref_association)
 
+                if definition_errors is not None:
+                    errors.extend(definition_errors)
+                    continue
             else:
                 assert_never(symbol)
 
         assert elements is not None
         root.extend(elements)
+
+    if len(errors) > 0:
+        return None, errors
 
     observed_definitions = dict()  # type: MutableMapping[str, ET.Element]
     for element in root:
