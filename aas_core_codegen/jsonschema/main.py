@@ -46,7 +46,7 @@ def _define_type(
         type_annotation: intermediate.TypeAnnotation,
         ref_association: intermediate.Symbol,
         len_constraint: Optional[infer_for_schema.LenConstraint],
-        pattern_constraints: Optional[List[infer_for_schema.PatternConstraint]]
+        pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]]
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[Error]]:
     """Generate the type definition for ``type_annotation``."""
     if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
@@ -175,13 +175,13 @@ def _define_properties_and_required(
     if len_constraints_errors is not None:
         errors.extend(len_constraints_errors)
 
-    pattern_constraints_by_property = infer_for_schema.infer_pattern_constraints(
-        symbol=symbol)
-
     if len(errors) > 0:
         return None, None, errors
 
     assert len_constraints_by_property is not None
+
+    pattern_constraints_by_property = infer_for_schema.infer_pattern_constraints(
+        symbol=symbol)
 
     properties = collections.OrderedDict()
     required = []  # type: List[Identifier]

@@ -47,7 +47,8 @@ assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType
 def _define_for_property(
         prop: intermediate.Property,
         ref_association: intermediate.Symbol,
-        len_constraint: Optional[infer_for_schema.LenConstraint]
+        len_constraint: Optional[infer_for_schema.LenConstraint],
+        pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]]
 ) -> ET.Element:
     """Generate the definition of a property element."""
     type_anno = prop.type_annotation
@@ -56,12 +57,44 @@ def _define_for_property(
 
     prop_element = None  # type: Optional[ET.Element]
     if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
-        prop_element = ET.Element(
-            "xs:element",
-            {
-                "name": naming.xml_property(prop.name),
-                "type": _BUILTIN_MAP[type_anno.a_type]
-            })
+        if (
+                pattern_constraints is not None
+                and len(pattern_constraints) > 0
+        ):
+            prop_element = ET.Element(
+                "xs:element", {"name": naming.xml_property(prop.name)})
+
+            restriction = ET.Element(
+                "xs:restriction", {"base": _BUILTIN_MAP[type_anno.a_type]})
+
+            simple_type = ET.Element("xs:simpleType")
+            simple_type.append(restriction)
+
+            prop_element.append(simple_type)
+
+            if len(pattern_constraints) == 1:
+                pattern = ET.Element(
+                    "xs:pattern", {"value": pattern_constraints[0].pattern})
+
+                restriction.append(pattern)
+            else:
+                # TODO: test this and check that the XSD makes sense with somebody else!
+                parent_restriction = restriction
+                for pattern_constraint in pattern_constraints:
+                    nested_restriction = ET.Element("xs:restriction")
+                    pattern = ET.Element(
+                        "xs:pattern", {"value": pattern_constraint.pattern})
+
+                    nested_restriction.append(pattern)
+                    parent_restriction.append(nested_restriction)
+                    parent_restriction = nested_restriction
+        else:
+            prop_element = ET.Element(
+                "xs:element",
+                {
+                    "name": naming.xml_property(prop.name),
+                    "type": _BUILTIN_MAP[type_anno.a_type]
+                })
 
     elif isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
         if isinstance(type_anno.symbol, (intermediate.Enumeration, intermediate.Class)):
@@ -200,13 +233,16 @@ def _define_properties(
         ref_association: intermediate.Symbol
 ) -> Tuple[Optional[List[ET.Element]], Optional[List[Error]]]:
     """Define the properties of the ``symbol`` as a sequence of tags."""
-    len_constraints, len_constraints_errors = (
+    len_constraints_by_property, len_constraints_errors = (
         infer_for_schema.infer_len_constraints(symbol=symbol))
 
     if len_constraints_errors is not None:
         return None, len_constraints_errors
 
-    assert len_constraints is not None
+    assert len_constraints_by_property is not None
+
+    pattern_constraints_by_property = infer_for_schema.infer_pattern_constraints(
+        symbol=symbol)
 
     sequence = []  # type: List[ET.Element]
 
@@ -214,12 +250,14 @@ def _define_properties(
         if prop.implemented_for is not symbol:
             continue
 
-        len_constraint = len_constraints.get(prop, None)
+        len_constraint = len_constraints_by_property.get(prop, None)
+        pattern_constraints = pattern_constraints_by_property.get(prop, None)
 
         prop_element = _define_for_property(
             prop=prop,
             ref_association=ref_association,
-            len_constraint=len_constraint)
+            len_constraint=len_constraint,
+            pattern_constraints=pattern_constraints)
 
         sequence.append(prop_element)
 
