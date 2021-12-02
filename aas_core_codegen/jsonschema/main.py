@@ -2,7 +2,7 @@
 import collections
 import json
 from typing import TextIO, Any, MutableMapping, Optional, Tuple, List, Sequence, \
-    Mapping, Set
+    Mapping, Set, Union
 
 from icontract import ensure
 
@@ -41,62 +41,70 @@ _BUILTIN_MAP = {
 assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType)
 
 
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_type(
         type_annotation: intermediate.TypeAnnotation,
         ref_association: intermediate.Symbol,
         len_constraint: Optional[infer_for_schema.LenConstraint]
-) -> MutableMapping[str, Any]:
+) -> Tuple[Optional[MutableMapping[str, Any]], Optional[Error]]:
     """Generate the type definition for ``type_annotation``."""
     if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
         return collections.OrderedDict(
             [('type', _BUILTIN_MAP[type_annotation.a_type])]
-        )
+        ), None
 
     elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
         model_type = naming.json_model_type(type_annotation.symbol.name)
 
         if isinstance(
                 type_annotation.symbol, (intermediate.Enumeration, intermediate.Class)):
-            return collections.OrderedDict([('$ref', f"#/definitions/{model_type}")])
+            return collections.OrderedDict(
+                [('$ref', f"#/definitions/{model_type}")]), None
 
         elif isinstance(type_annotation.symbol, intermediate.Interface):
             return collections.OrderedDict(
-                [('$ref', f"#/definitions/{model_type}_abstract")])
+                [('$ref', f"#/definitions/{model_type}_abstract")]), None
 
         else:
             assert_never(type_annotation.symbol)
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-        # TODO: continue here, finish this
-        if len_constraint is not None:
-            if len_constraint.min_value is not None:
-                if 'minItems' in type_definition:
-                    errors.append(Error(
-
-                    ))
-
-                assert 'minItems' not in type_definition, (
-                    f"Unexpected property 'minItems' in the JSON type definition of the property {prop_name} for the symbol {symbol.name}"
-                )
-
         # NOTE (mristin, 2021-12-02):
         # We do not propagate the inference of constraints on the length to sub-lists
         # so in this case we set the length constraint on the ``items`` to ``None``.
         # This behavior might change in the future if we ever encounter such
         # constraints.
 
-        return collections.OrderedDict(
+        items_type_definition, items_error = _define_type(
+            type_annotation=type_annotation.items,
+            ref_association=ref_association,
+            len_constraint=None)
+
+        if items_error is not None:
+            return None, items_error
+
+        assert items_type_definition is not None
+
+        type_definition = collections.OrderedDict(
             [
                 ('type', 'array'),
-                (
-                    'items',
-                    _define_type(
-                        type_annotation=type_annotation.items,
-                        ref_association=ref_association,
-                        len_constraint=None)
-                )
-            ]
-        )
+                ('items', items_type_definition)
+            ])
+
+        if len_constraint is not None:
+            if len_constraint.min_value is not None:
+                assert 'minItems' not in type_definition, (
+                    f"Unexpected property 'minItems' in the JSON type definition")
+
+                type_definition['minItems'] = len_constraint.min_value
+
+            if len_constraint.max_value is not None:
+                assert 'maxItems' not in type_definition, (
+                    f"Unexpected property 'maxItems' in the JSON type definition")
+
+                type_definition['maxItems'] = len_constraint.max_value
+
+        return type_definition, None
 
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         raise NotImplementedError(
@@ -110,7 +118,7 @@ def _define_type(
     elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
         model_type = naming.json_model_type(ref_association.name)
 
-        return collections.OrderedDict([('$ref', f"#/definitions/{model_type}")])
+        return collections.OrderedDict([('$ref', f"#/definitions/{model_type}")]), None
 
     else:
         raise NotImplementedError(
@@ -122,6 +130,75 @@ def _define_type(
             f'{type_annotation=}')
 
 
+# fmt: off
+@ensure(
+    lambda result:
+    (result[0] is not None) ^ (result[1] is not None and result[2] is not None)
+)
+# fmt: on
+def _define_properties_and_required(
+        symbol: Union[intermediate.Interface, intermediate.Class],
+        ref_association: intermediate.Symbol
+) -> Tuple[
+    Optional[MutableMapping[str, Any]],
+    Optional[List[Identifier]],
+    Optional[List[Error]]
+]:
+    """Define the ``properties`` and ``required`` part for the given ``symbol``."""
+    errors = []  # type: List[Error]
+
+    len_constraints, len_constraints_errors = (
+        infer_for_schema.infer_len_constraints(symbol=symbol))
+
+    if len_constraints_errors is not None:
+        errors.extend(len_constraints_errors)
+
+    # TODO: add constraint on patterns here as well
+
+    if len(errors) > 0:
+        return None, None, errors
+
+    assert len_constraints is not None
+
+    properties = collections.OrderedDict()
+    required = []  # type: List[Identifier]
+
+    for prop in symbol.properties:
+        if prop.implemented_for is not symbol:
+            continue
+
+        prop_name = naming.json_property(prop.name)
+
+        len_constraint = len_constraints.get(prop, None)
+
+        # noinspection PyUnusedLocal
+        type_anno = None  # type: Optional[intermediate.TypeAnnotation]
+        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            type_anno = prop.type_annotation.value
+        else:
+            type_anno = prop.type_annotation
+
+            required.append(prop_name)
+
+        assert type_anno is not None
+        type_definition, error = _define_type(
+            type_annotation=type_anno,
+            ref_association=ref_association,
+            len_constraint=len_constraint)
+
+        if error is not None:
+            errors.append(error)
+        else:
+            assert type_definition is not None
+            properties[prop_name] = type_definition
+
+    if len(errors) > 0:
+        return None, None, errors
+
+    return properties, required, None
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_for_interface(
         interface: intermediate.Interface,
         implementers: Sequence[intermediate.Class],
@@ -149,41 +226,18 @@ def _define_for_interface(
 
     errors = []  # type: List[Error]
 
-    len_constraints, len_constraints_errors = (
-        infer_for_schema.infer_len_constraints(symbol=interface))
+    properties, required, properties_error = _define_properties_and_required(
+        symbol=interface,
+        ref_association=ref_association)
 
-    if len_constraints_errors is not None:
-        errors.extend(len_constraints_errors)
-
-    # TODO: add constraint on patterns here as well
+    if properties_error is not None:
+        errors.extend(properties_error)
 
     if len(errors) > 0:
         return None, errors
 
-    properties = collections.OrderedDict()
-    required = []  # type: List[Identifier]
-
-    for prop in interface.properties:
-        if prop.implemented_for is not interface:
-            continue
-
-        prop_name = naming.json_property(prop.name)
-
-        len_constraint = len_constraints.get(prop, None)
-
-        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            type_definition = _define_type(
-                type_annotation=prop.type_annotation.value,
-                ref_association=ref_association,
-                len_constraint=len_constraint)
-        else:
-            type_definition = _define_type(
-                type_annotation=prop.type_annotation,
-                ref_association=ref_association,
-                len_constraint=len_constraint)
-            required.append(prop_name)
-
-        properties[prop_name] = type_definition
+    assert properties is not None
+    assert required is not None
 
     if len(properties) > 0:
         definition = collections.OrderedDict([
@@ -194,9 +248,7 @@ def _define_for_interface(
         if len(required) > 0:
             definition['required'] = required
 
-        all_of.append(
-            definition
-        )
+        all_of.append(definition)
 
     # endregion
 
@@ -220,19 +272,22 @@ def _define_for_interface(
 
         result[model_type_abstract] = {'anyOf': any_of}
 
-    return result
+    return result, None
 
 
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_for_class(
         cls: intermediate.Class,
         ref_association: intermediate.Symbol
-) -> MutableMapping[str, Any]:
+) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
     Generate the definition for the intermediate class ``cls``.
 
     The list of definitions is to be *extended* with the resulting mapping.
     """
     all_of = []  # type: List[MutableMapping[str, Any]]
+
+    # region Inheritance
 
     for interface in cls.interfaces:
         # Please mind the difference to ``{interface name}`` which is
@@ -242,28 +297,26 @@ def _define_for_class(
                 "$ref": f"#/definitions/{naming.json_model_type(interface.name)}"
             })
 
-    properties = collections.OrderedDict()
-    required = []  # type: List[Identifier]
+    # endregion
+
+    # region Properties
+
+    errors = []  # type: List[Error]
+
+    properties, required, properties_error = _define_properties_and_required(
+        symbol=cls,
+        ref_association=ref_association)
+
+    if properties_error is not None:
+        errors.extend(properties_error)
+
+    if len(errors) > 0:
+        return None, errors
+
+    assert properties is not None
+    assert required is not None
 
     model_type = naming.json_model_type(cls.name)
-
-    for prop in cls.properties:
-        if prop.implemented_for is not cls:
-            continue
-
-        prop_name = naming.json_property(prop.name)
-
-        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            type_definition = _define_type(
-                type_annotation=prop.type_annotation.value,
-                ref_association=ref_association)
-        else:
-            type_definition = _define_type(
-                type_annotation=prop.type_annotation,
-                ref_association=ref_association)
-            required.append(prop_name)
-
-        properties[prop_name] = type_definition
 
     if cls.serialization.with_model_type:
         assert 'modelType' not in properties, (
@@ -278,6 +331,8 @@ def _define_for_class(
                 ('const', model_type)
             ])
 
+    # endregion
+
     definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
     definition["type"] = "object"
     definition['properties'] = properties
@@ -288,9 +343,9 @@ def _define_for_class(
     all_of.append(definition)
 
     if len(all_of) == 0:
-        return {model_type: {'type', 'object'}}
+        return {model_type: {'type', 'object'}}, None
     else:
-        return {model_type: {"allOf": all_of}}
+        return {model_type: {"allOf": all_of}}, None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -382,16 +437,24 @@ def _generate(
                 extension = _define_for_enumeration(enumeration=symbol)
 
             elif isinstance(symbol, intermediate.Interface):
-                extension = _define_for_interface(
+                extension, definition_errors = _define_for_interface(
                     interface=symbol,
                     implementers=interface_implementers.get(symbol, []),
                     ids_of_used_interfaces=ids_of_used_interfaces,
                     ref_association=symbol_table.ref_association)
 
+                if definition_errors is not None:
+                    errors.extend(definition_errors)
+                    continue
+
             elif isinstance(symbol, intermediate.Class):
-                extension = _define_for_class(
+                extension, definition_errors = _define_for_class(
                     cls=symbol,
                     ref_association=symbol_table.ref_association)
+
+                if definition_errors is not None:
+                    errors.extend(definition_errors)
+                    continue
 
             else:
                 assert_never(symbol)

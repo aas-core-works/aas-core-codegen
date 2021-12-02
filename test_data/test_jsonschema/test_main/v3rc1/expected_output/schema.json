@@ -994,7 +994,8 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/Key"
-              }
+              },
+              "minItems": 1
             }
           },
           "required": [
@@ -1417,7 +1418,8 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/Reference"
-              }
+              },
+              "minItems": 1
             }
           },
           "required": [
