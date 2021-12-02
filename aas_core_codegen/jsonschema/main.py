@@ -6,7 +6,8 @@ from typing import TextIO, Any, MutableMapping, Optional, Tuple, List, Sequence,
 
 from icontract import ensure
 
-from aas_core_codegen import naming, specific_implementations, intermediate, run
+from aas_core_codegen import naming, specific_implementations, intermediate, run, \
+    infer_for_schema
 from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
 
 
@@ -42,7 +43,8 @@ assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType
 
 def _define_type(
         type_annotation: intermediate.TypeAnnotation,
-        ref_association: intermediate.Symbol
+        ref_association: intermediate.Symbol,
+        len_constraint: Optional[infer_for_schema.LenConstraint]
 ) -> MutableMapping[str, Any]:
     """Generate the type definition for ``type_annotation``."""
     if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
@@ -65,6 +67,24 @@ def _define_type(
             assert_never(type_annotation.symbol)
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
+        # TODO: continue here, finish this
+        if len_constraint is not None:
+            if len_constraint.min_value is not None:
+                if 'minItems' in type_definition:
+                    errors.append(Error(
+
+                    ))
+
+                assert 'minItems' not in type_definition, (
+                    f"Unexpected property 'minItems' in the JSON type definition of the property {prop_name} for the symbol {symbol.name}"
+                )
+
+        # NOTE (mristin, 2021-12-02):
+        # We do not propagate the inference of constraints on the length to sub-lists
+        # so in this case we set the length constraint on the ``items`` to ``None``.
+        # This behavior might change in the future if we ever encounter such
+        # constraints.
+
         return collections.OrderedDict(
             [
                 ('type', 'array'),
@@ -72,7 +92,8 @@ def _define_type(
                     'items',
                     _define_type(
                         type_annotation=type_annotation.items,
-                        ref_association=ref_association)
+                        ref_association=ref_association,
+                        len_constraint=None)
                 )
             ]
         )
@@ -106,7 +127,7 @@ def _define_for_interface(
         implementers: Sequence[intermediate.Class],
         ids_of_used_interfaces: Set[int],
         ref_association: intermediate.Symbol
-) -> MutableMapping[str, Any]:
+) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
     Generate the definitions resulting from the ``interface``.
 
@@ -126,6 +147,19 @@ def _define_for_interface(
 
     # region Properties
 
+    errors = []  # type: List[Error]
+
+    len_constraints, len_constraints_errors = (
+        infer_for_schema.infer_len_constraints(symbol=interface))
+
+    if len_constraints_errors is not None:
+        errors.extend(len_constraints_errors)
+
+    # TODO: add constraint on patterns here as well
+
+    if len(errors) > 0:
+        return None, errors
+
     properties = collections.OrderedDict()
     required = []  # type: List[Identifier]
 
@@ -135,14 +169,18 @@ def _define_for_interface(
 
         prop_name = naming.json_property(prop.name)
 
+        len_constraint = len_constraints.get(prop, None)
+
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             type_definition = _define_type(
                 type_annotation=prop.type_annotation.value,
-                ref_association=ref_association)
+                ref_association=ref_association,
+                len_constraint=len_constraint)
         else:
             type_definition = _define_type(
                 type_annotation=prop.type_annotation,
-                ref_association=ref_association)
+                ref_association=ref_association,
+                len_constraint=len_constraint)
             required.append(prop_name)
 
         properties[prop_name] = type_definition
