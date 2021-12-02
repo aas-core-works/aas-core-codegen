@@ -69,7 +69,8 @@
           "type": "object",
           "properties": {
             "idShort": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^[a-zA-Z][a-zA-Z_0-9]*$"
             },
             "displayName": {
               "$ref": "#/definitions/LangStringSet"

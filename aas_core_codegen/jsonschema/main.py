@@ -45,13 +45,34 @@ assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType
 def _define_type(
         type_annotation: intermediate.TypeAnnotation,
         ref_association: intermediate.Symbol,
-        len_constraint: Optional[infer_for_schema.LenConstraint]
+        len_constraint: Optional[infer_for_schema.LenConstraint],
+        pattern_constraints: Optional[List[infer_for_schema.PatternConstraint]]
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[Error]]:
     """Generate the type definition for ``type_annotation``."""
     if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
-        return collections.OrderedDict(
+        type_definition = collections.OrderedDict(
             [('type', _BUILTIN_MAP[type_annotation.a_type])]
-        ), None
+        )
+
+        if (
+                type_annotation.a_type == intermediate.BuiltinAtomicType.STR
+                and pattern_constraints is not None
+                and len(pattern_constraints) > 0
+        ):
+            if len(pattern_constraints) == 1:
+                type_definition['pattern'] = pattern_constraints[0].pattern
+            else:
+                all_of = []  # type: List[MutableMapping[str, Any]]
+
+                for pattern_constraint in pattern_constraints:
+                    type_definition_with_pattern = type_definition.copy()
+                    type_definition_with_pattern['pattern'] = pattern_constraint.pattern
+
+                    all_of.append(type_definition_with_pattern)
+
+                type_definition = collections.OrderedDict([('allOf', all_of)])
+
+        return type_definition, None
 
     elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
         model_type = naming.json_model_type(type_annotation.symbol.name)
@@ -70,15 +91,16 @@ def _define_type(
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         # NOTE (mristin, 2021-12-02):
-        # We do not propagate the inference of constraints on the length to sub-lists
-        # so in this case we set the length constraint on the ``items`` to ``None``.
-        # This behavior might change in the future if we ever encounter such
-        # constraints.
+        # We do not propagate the inference of constraints to sub-lists
+        # so in this case we set all the constraint on the ``items`` to ``None``.
+        # This behavior might change in the future when we encounter such
+        # constraints and have more context available.
 
         items_type_definition, items_error = _define_type(
             type_annotation=type_annotation.items,
             ref_association=ref_association,
-            len_constraint=None)
+            len_constraint=None,
+            pattern_constraints=None)
 
         if items_error is not None:
             return None, items_error
@@ -147,18 +169,19 @@ def _define_properties_and_required(
     """Define the ``properties`` and ``required`` part for the given ``symbol``."""
     errors = []  # type: List[Error]
 
-    len_constraints, len_constraints_errors = (
+    len_constraints_by_property, len_constraints_errors = (
         infer_for_schema.infer_len_constraints(symbol=symbol))
 
     if len_constraints_errors is not None:
         errors.extend(len_constraints_errors)
 
-    # TODO: add constraint on patterns here as well
+    pattern_constraints_by_property = infer_for_schema.infer_pattern_constraints(
+        symbol=symbol)
 
     if len(errors) > 0:
         return None, None, errors
 
-    assert len_constraints is not None
+    assert len_constraints_by_property is not None
 
     properties = collections.OrderedDict()
     required = []  # type: List[Identifier]
@@ -169,7 +192,8 @@ def _define_properties_and_required(
 
         prop_name = naming.json_property(prop.name)
 
-        len_constraint = len_constraints.get(prop, None)
+        len_constraint = len_constraints_by_property.get(prop, None)
+        pattern_constraints = pattern_constraints_by_property.get(prop, None)
 
         # noinspection PyUnusedLocal
         type_anno = None  # type: Optional[intermediate.TypeAnnotation]
@@ -184,7 +208,8 @@ def _define_properties_and_required(
         type_definition, error = _define_type(
             type_annotation=type_anno,
             ref_association=ref_association,
-            len_constraint=len_constraint)
+            len_constraint=len_constraint,
+            pattern_constraints=pattern_constraints)
 
         if error is not None:
             errors.append(error)
