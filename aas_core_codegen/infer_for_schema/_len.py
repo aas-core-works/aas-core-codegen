@@ -78,7 +78,7 @@ class _LenConstraintOnProperty:
 
 
 def _match_len_constraint_on_property(
-    node: parse_tree.Node,
+        node: parse_tree.Node,
 ) -> Optional[_LenConstraintOnProperty]:
     """
     Match the constraint on ``len`` of a property such as ``len(self.something) < X``.
@@ -179,7 +179,7 @@ class LenConstraint:
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def infer_len_constraints(
-    symbol: Union[intermediate.Interface, intermediate.Class]
+        symbol: Union[intermediate.Interface, intermediate.Class]
 ) -> Tuple[
     Optional[MutableMapping[intermediate.Property, LenConstraint]],
     Optional[List[Error]],
@@ -202,6 +202,8 @@ def infer_len_constraints(
     # We iterate only once through the invariants instead of inferring the constraints
     # for each property individually to be able to keep linear time complexity.
 
+    errors = []  # type: List[Error]
+
     for invariant in symbol.parsed.invariants:
         len_constraint_on_prop = None  # type: Optional[_LenConstraintOnProperty]
 
@@ -220,6 +222,16 @@ def infer_len_constraints(
             len_constraint_on_prop = _match_len_constraint_on_property(invariant.body)
 
         if len_constraint_on_prop is not None:
+            if len_constraint_on_prop.prop_name not in symbol.properties_by_name:
+                errors.append(
+                    Error(
+                        invariant.body.original_node,
+                        f"The property {len_constraint_on_prop.prop_name} does not "
+                        f"appear in the properties of the class {symbol.name}"
+                    )
+                )
+                continue
+
             constraints = constraint_map.get(len_constraint_on_prop.prop_name, None)
             if constraints is None:
                 constraints = []
@@ -229,10 +241,12 @@ def infer_len_constraints(
 
     # endregion
 
+    if len(errors) > 0:
+        return None, errors
+
     # region Compress the loose constraints
 
     result = dict()  # type: MutableMapping[intermediate.Property, LenConstraint]
-    errors = []  # type: List[Error]
 
     for prop_name, constraints in constraint_map.items():
         min_len = None  # type: Optional[int]
@@ -308,8 +322,11 @@ def infer_len_constraints(
 
         prop = symbol.properties_by_name.get(prop_name, None)
         assert (
-            prop is not None
-        ), f"Expected the property {prop_name} in the class {symbol}"
+                prop is not None
+        ), (
+            f"Expected the property {prop_name!r} in the properties "
+            f"of the symbol {symbol}"
+        )
 
         result[prop] = LenConstraint(min_value=min_len, max_value=max_len)
 

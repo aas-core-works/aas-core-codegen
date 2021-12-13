@@ -1,4 +1,5 @@
 """Provide the types into which we parse the original meta-model."""
+import abc
 import ast
 import pathlib
 from typing import Sequence, Optional, Union, Final, Mapping, Any
@@ -50,10 +51,10 @@ class SubscriptedTypeAnnotation:
     """Represent a subscripted type annotation such as ``Optional[...]``."""
 
     def __init__(
-        self,
-        identifier: Identifier,
-        subscripts: Sequence["TypeAnnotation"],
-        node: ast.AST,
+            self,
+            identifier: Identifier,
+            subscripts: Sequence["TypeAnnotation"],
+            node: ast.AST,
     ) -> None:
         """Initialize with the given values."""
         self.identifier = identifier
@@ -102,11 +103,11 @@ class Property:
     """
 
     def __init__(
-        self,
-        name: Identifier,
-        type_annotation: TypeAnnotation,
-        description: Optional[Description],
-        node: ast.AnnAssign,
+            self,
+            name: Identifier,
+            type_annotation: TypeAnnotation,
+            description: Optional[Description],
+            node: ast.AnnAssign,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -127,11 +128,11 @@ class Argument:
     """Represent an argument of a method."""
 
     def __init__(
-        self,
-        name: Identifier,
-        type_annotation: TypeAnnotation,
-        default: Optional[Default],
-        node: ast.arg,
+            self,
+            name: Identifier,
+            type_annotation: TypeAnnotation,
+            default: Optional[Default],
+            node: ast.arg,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -144,7 +145,7 @@ class Invariant:
     """Represent an invariant of a class."""
 
     def __init__(
-        self, description: Optional[str], body: tree.Expression, node: ast.AST
+            self, description: Optional[str], body: tree.Expression, node: ast.AST
     ) -> None:
         self.description = description
         self.body = body
@@ -155,11 +156,11 @@ class Contract:
     """Represent a contract of a method."""
 
     def __init__(
-        self,
-        args: Sequence[Identifier],
-        description: Optional[str],
-        condition: ast.Lambda,
-        node: ast.AST,
+            self,
+            args: Sequence[Identifier],
+            description: Optional[str],
+            condition: ast.Lambda,
+            node: ast.AST,
     ) -> None:
         self.args = args
         self.description = description
@@ -171,11 +172,11 @@ class Snapshot:
     """Represent a snapshot of an OLD value capture before the method execution."""
 
     def __init__(
-        self,
-        args: Sequence[Identifier],
-        name: Identifier,
-        capture: ast.Lambda,
-        node: ast.AST,
+            self,
+            args: Sequence[Identifier],
+            name: Identifier,
+            capture: ast.Lambda,
+            node: ast.AST,
     ) -> None:
         """Initialize with the given values."""
         self.args = args
@@ -188,10 +189,10 @@ class Contracts:
     """Represent the set of contracts for a method."""
 
     def __init__(
-        self,
-        preconditions: Sequence[Contract],
-        snapshots: Sequence[Snapshot],
-        postconditions: Sequence[Contract],
+            self,
+            preconditions: Sequence[Contract],
+            snapshots: Sequence[Snapshot],
+            postconditions: Sequence[Contract],
     ) -> None:
         """Initialize with the given values."""
         self.preconditions = preconditions
@@ -213,9 +214,9 @@ class Contracts:
 def is_string_expr(expr: ast.AST) -> bool:
     """Check that the expression is a string literal."""
     return (
-        isinstance(expr, ast.Expr)
-        and isinstance(expr.value, ast.Constant)
-        and isinstance(expr.value.value, str)
+            isinstance(expr, ast.Expr)
+            and isinstance(expr.value, ast.Constant)
+            and isinstance(expr.value.value, str)
     )
 
 
@@ -258,15 +259,15 @@ class Method:
     )
     # fmt: on
     def __init__(
-        self,
-        name: Identifier,
-        is_implementation_specific: bool,
-        arguments: Sequence[Argument],
-        returns: Optional[TypeAnnotation],
-        description: Optional[Description],
-        contracts: Contracts,
-        body: Sequence[ast.AST],
-        node: ast.AST,
+            self,
+            name: Identifier,
+            is_implementation_specific: bool,
+            arguments: Sequence[Argument],
+            returns: Optional[TypeAnnotation],
+            description: Optional[Description],
+            contracts: Contracts,
+            body: Sequence[ast.AST],
+            node: ast.AST,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -301,7 +302,7 @@ class Serialization:
         self.with_model_type = with_model_type
 
 
-class Class:
+class Class(DBC):
     """Represent a class of the meta-model."""
 
     # fmt: off
@@ -323,16 +324,16 @@ class Class:
     )
     # fmt: on
     def __init__(
-        self,
-        name: Identifier,
-        is_implementation_specific: bool,
-        inheritances: Sequence[Identifier],
-        properties: Sequence[Property],
-        methods: Sequence[Method],
-        invariants: Sequence[Invariant],
-        serialization: Optional[Serialization],
-        description: Optional[Description],
-        node: ast.ClassDef,
+            self,
+            name: Identifier,
+            is_implementation_specific: bool,
+            inheritances: Sequence[Identifier],
+            properties: Sequence[Property],
+            methods: Sequence[Method],
+            invariants: Sequence[Invariant],
+            serialization: Optional[Serialization],
+            description: Optional[Description],
+            node: ast.ClassDef,
     ) -> None:
         self.name = name
         self.is_implementation_specific = is_implementation_specific
@@ -351,6 +352,10 @@ class Class:
         self.method_map = {
             method.name: method for method in methods
         }  # type: Mapping[Identifier, Method]
+
+    @abc.abstractmethod
+    def __repr__(self) -> None:
+        raise NotImplementedError()
 
 
 class AbstractClass(Class):
@@ -386,11 +391,11 @@ class EnumerationLiteral:
     """Represent a single enumeration literal."""
 
     def __init__(
-        self,
-        name: Identifier,
-        value: Identifier,
-        description: Optional[Description],
-        node: ast.Assign,
+            self,
+            name: Identifier,
+            value: Identifier,
+            description: Optional[Description],
+            node: ast.Assign,
     ) -> None:
         self.name = name
         self.value = value
@@ -412,12 +417,12 @@ class Enumeration:
     """Represent an enumeration."""
 
     def __init__(
-        self,
-        name: Identifier,
-        is_superset_of: Sequence[Identifier],
-        literals: Sequence[EnumerationLiteral],
-        description: Optional[Description],
-        node: ast.ClassDef,
+            self,
+            name: Identifier,
+            is_superset_of: Sequence[Identifier],
+            literals: Sequence[EnumerationLiteral],
+            description: Optional[Description],
+            node: ast.ClassDef,
     ) -> None:
         self.name = name
         self.is_superset_of = is_superset_of
@@ -446,7 +451,7 @@ class MetaModel:
     book_version: Final[str]
 
     def __init__(
-        self, book_url: str, book_version: str, description: Optional[Description]
+            self, book_url: str, book_version: str, description: Optional[Description]
     ) -> None:
         self.book_url = book_url
         self.book_version = book_version
@@ -473,13 +478,14 @@ class UnverifiedSymbolTable(DBC):
 
     @require(
         lambda symbols: (
-            names := [symbol.name for symbol in symbols],
-            len(names) == len(set(names)),
+                names := [symbol.name for symbol in symbols],
+                len(names) == len(set(names)),
         )[1],
         "Symbol names unique",
     )
     def __init__(
-        self, symbols: Sequence[Symbol], ref_association: Symbol, meta_model: MetaModel
+            self, symbols: Sequence[Symbol], ref_association: Symbol,
+            meta_model: MetaModel
     ) -> None:
         """Initialize with the given values and map symbols to name."""
         self.symbols = symbols

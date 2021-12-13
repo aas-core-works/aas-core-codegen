@@ -177,7 +177,7 @@ def _define_type(
 # fmt: off
 @ensure(
     lambda result:
-    (result[0] is not None) ^ (result[1] is not None and result[2] is not None)
+    (result[0] is not None and result[1] is not None) ^ (result[2] is not None)
 )
 # fmt: on
 def _define_properties_and_required(

@@ -13,7 +13,7 @@ from aas_core_codegen.infer_for_schema import _common as infer_for_schema_common
 # https://github.com/aas-core-works/abnf-to-regexp/tree/main/test_data/nested-python
 _PATTERN_BY_FUNCTION = {
     "is_ID_short": r"^[a-zA-Z][a-zA-Z_0-9]*$",
-    "is_MIME": r'([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+|"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*"))*',
+    "is_MIME_type": r'([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+|"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*"))*',
 }
 
 
