@@ -45,6 +45,7 @@
       <w>posonlyargs</w>
       <w>postcondition</w>
       <w>postconditions</w>
+      <w>precommit</w>
       <w>prog</w>
       <w>pylint</w>
       <w>rawsource</w>

@@ -33,7 +33,7 @@ setup(
     ],
     license="License :: OSI Approved :: MIT License",
     keywords="asset administration shell code generation csharp c#",
-    packages=find_packages(exclude=["tests"]),
+    packages=find_packages(exclude=["tests", "continuous_integration"]),
     install_requires=install_requires,
     # fmt: off
     extras_require={

@@ -9,7 +9,7 @@ import sys
 
 
 class Step(enum.Enum):
-    BLACK = "black"
+    REFORMAT = "reformat"
     MYPY = "mypy"
     PYLINT = "pylint"
     TEST = "test"
@@ -29,11 +29,11 @@ def main() -> int:
     parser.add_argument(
         "--select",
         help=(
-            "If set, only the selected steps are executed. "
-            "This is practical if some of the steps failed and you want to "
-            "fix them in isolation. "
-            "The steps are given as a space-separated list of: "
-            + " ".join(value.value for value in Step)
+                "If set, only the selected steps are executed. "
+                "This is practical if some of the steps failed and you want to "
+                "fix them in isolation. "
+                "The steps are given as a space-separated list of: "
+                + " ".join(value.value for value in Step)
         ),
         metavar="",
         nargs="+",
@@ -42,11 +42,11 @@ def main() -> int:
     parser.add_argument(
         "--skip",
         help=(
-            "If set, skips the specified steps. "
-            "This is practical if some of the steps passed and "
-            "you want to fix the remainder in isolation. "
-            "The steps are given as a space-separated list of: "
-            + " ".join(value.value for value in Step)
+                "If set, skips the specified steps. "
+                "This is practical if some of the steps passed and "
+                "you want to fix the remainder in isolation. "
+                "The steps are given as a space-separated list of: "
+                + " ".join(value.value for value in Step)
         ),
         metavar="",
         nargs="+",
@@ -64,33 +64,36 @@ def main() -> int:
     )
     skips = [Step(value) for value in args.skip] if args.skip is not None else []
 
-    repo_root = pathlib.Path(__file__).parent
+    repo_root = pathlib.Path(__file__).parent.parent
 
-    if Step.BLACK in selects and Step.BLACK not in skips:
-        print("Black'ing...")
+    if Step.REFORMAT in selects and Step.REFORMAT not in skips:
+        print("Re-formatting...")
         # fmt: off
-        black_targets = [
+        reformat_targets = [
             "aas_core_codegen",
-            "precommit.py",
-            "setup.py",
-            "check_init_and_setup_coincide.py",
-            "check_help_in_readme.py"
+            "continuous_integration",
+            "tests"
+            "setup.py"
         ]
         # fmt: on
 
+        reformat_pth = pathlib.Path("continuous_integration") / "reformat.py"
+
         if overwrite:
-            subprocess.check_call(["black"] + black_targets, cwd=str(repo_root))
+            subprocess.check_call(
+                [sys.executable, str(reformat_pth), "--overwrite"] + reformat_targets,
+                cwd=str(repo_root))
         else:
             subprocess.check_call(
-                ["black", "--check"] + black_targets, cwd=str(repo_root)
-            )
+                [sys.executable, str(reformat_pth)] + reformat_targets,
+                cwd=str(repo_root))
     else:
-        print("Skipped black'ing.")
+        print("Skipped re-formatting.")
 
     if Step.MYPY in selects and Step.MYPY not in skips:
         print("Mypy'ing...")
         # fmt: off
-        mypy_targets = ["aas_core_codegen", "tests"]
+        mypy_targets = ["aas_core_codegen", "tests", "continuous_integration"]
         subprocess.check_call(["mypy", "--strict"] + mypy_targets, cwd=str(repo_root))
         # fmt: on
     else:
@@ -100,8 +103,10 @@ def main() -> int:
         # fmt: off
         print("Pylint'ing...")
         pylint_targets = ["aas_core_codegen"]
+        rcfile = pathlib.Path("continuous_integration") / "pylint.rc"
+
         subprocess.check_call(
-            ["pylint", "--rcfile=pylint.rc"] + pylint_targets, cwd=str(repo_root)
+            ["pylint", f"--rcfile={rcfile}"] + pylint_targets, cwd=str(repo_root)
         )
         # fmt: on
     else:
@@ -129,22 +134,23 @@ def main() -> int:
         print("Skipped testing.")
 
     if Step.DOCTEST in selects and Step.DOCTEST not in skips:
-        # We doctest the documentation in a separate step from testing so that
-        # the two steps can run in isolation.
-        #
-        # It is indeed possible to doctest the documentation *together* with
-        # the other tests (and even measure the code coverage),
-        # but this is not desirable as tests can take quite long to run.
-        # This would slow down the development if all we want is to iterate
-        # on documentation doctests.
-        print("Doctesting...")
-        subprocess.check_call([sys.executable, "-m", "doctest", "README.rst"])
+        print("Doctest'ing...")
+
+        doc_files = ["README.rst"]
+        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        #  Add ``{repo_root}/docs/source/**/*.rst`` as well here
+        subprocess.check_call(
+            [sys.executable, "-m", "doctest"] + doc_files, cwd=str(repo_root))
+
+        for pth in (repo_root / "aas_core_codegen").glob("**/*.py"):
+            subprocess.check_call([sys.executable, "-m", "doctest", str(pth)])
+
     else:
-        print("Skipped doctesting.")
+        print("Skipped doctest'ing.")
 
     if (
-        Step.CHECK_INIT_AND_SETUP_COINCIDE in selects
-        and Step.CHECK_INIT_AND_SETUP_COINCIDE not in skips
+            Step.CHECK_INIT_AND_SETUP_COINCIDE in selects
+            and Step.CHECK_INIT_AND_SETUP_COINCIDE not in skips
     ):
         print(
             "Checking that aas_core_codegen/__init__.py and setup.py coincide..."
@@ -162,9 +168,9 @@ def main() -> int:
             cmd.append("--overwrite")
 
         if not overwrite:
-            print("Checking that --help's and the doc coincide...")
+            print("Checking that --help's and the readme coincide...")
         else:
-            print("Overwriting the --help's in the doc...")
+            print("Overwriting the --help's in the readme...")
 
         subprocess.check_call(cmd)
     else:
