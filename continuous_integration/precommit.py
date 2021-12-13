@@ -77,15 +77,13 @@ def main() -> int:
         ]
         # fmt: on
 
-        reformat_pth = pathlib.Path("continuous_integration") / "reformat.py"
-
         if overwrite:
             subprocess.check_call(
-                [sys.executable, str(reformat_pth), "--overwrite"] + reformat_targets,
+                ['black'] + reformat_targets,
                 cwd=str(repo_root))
         else:
             subprocess.check_call(
-                [sys.executable, str(reformat_pth)] + reformat_targets,
+                ['black', '--check'] + reformat_targets,
                 cwd=str(repo_root))
     else:
         print("Skipped re-formatting.")
