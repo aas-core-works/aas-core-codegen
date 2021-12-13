@@ -727,9 +727,12 @@ def _parse_snapshot(
     )
 
 
-# TODO: include severity levels for contracts in the meta model and
+# TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+#  include severity levels for contracts in the meta model and
 #  consider them in the imports
-# TODO: test for unknown severity level
+
+# TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+#  test for unknown severity level
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -1113,7 +1116,7 @@ def _class_decorator_to_invariant(
     condition_node = None  # type: Optional[ast.AST]
     description_node = None  # type: Optional[ast.AST]
 
-    # TODO: test parsing of args and kwargs
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test parsing of args and kwargs
     if len(decorator.args) >= 1:
         condition_node = decorator.args[0]
 
@@ -1666,7 +1669,7 @@ def _verify_symbol_table(
             if error is not None:
                 errors.append(error)
             else:
-                # TODO: test
+                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
                 if isinstance(prop.type_annotation, SubscriptedTypeAnnotation):
                     error = _verify_arity_of_type_annotation_subscript(
                         prop.type_annotation)
@@ -1682,7 +1685,7 @@ def _verify_symbol_table(
                 if error is not None:
                     errors.append(error)
                 else:
-                    # TODO: test
+                    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
                     if isinstance(arg.type_annotation, SubscriptedTypeAnnotation):
                         error = _verify_arity_of_type_annotation_subscript(
                             arg.type_annotation)
@@ -1691,14 +1694,14 @@ def _verify_symbol_table(
                             errors.append(error)
 
             if method.returns is not None:
-                # TODO: test
+                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
                 error = verify_no_dangling_references_in_type_annotation(
                     type_annotation=method.returns
                 )
                 if error is not None:
                     errors.append(error)
                 else:
-                    # TODO: test
+                    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
                     if isinstance(method.returns, SubscriptedTypeAnnotation):
                         error = _verify_arity_of_type_annotation_subscript(
                             method.returns)

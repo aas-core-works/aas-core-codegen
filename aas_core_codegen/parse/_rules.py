@@ -281,7 +281,7 @@ class _ParseDeclaration(_Parse):
                 original_node=node), None)
 
 
-# TODO: continue here, implement generators and other constructs
+# TODO-BEFORE-RELEASE (mristin, 2021-12-13): implement generators and other constructs
 
 
 _CHAIN_OF_RULES = [
@@ -298,7 +298,8 @@ _CHAIN_OF_RULES = [
 ]  # type: Sequence[_Parse]
 
 
-# TODO: implement _Simplify(node) -> node
+# TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+#  implement _Simplify(node) -> node so that we can already optimize a bit
 
 
 def _assert_chains_follow_file_structure() -> None:

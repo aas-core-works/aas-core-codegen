@@ -192,7 +192,7 @@ def generate(
             writer.write('\n\n')
 
         writer.write(
-            textwrap.indent(stringification_block, csharp_common.INDENT2))
+            textwrap.indent(stringification_block, II))
 
     writer.write(
         f"\n{I}}}  // public static class Stringification")

@@ -517,7 +517,8 @@ class Enumeration:
     #: Literals associated with the enumeration
     literals: Final[Sequence[EnumerationLiteral]]
 
-    # TODO: document all properties, also do the same for Class, Method etc.
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+    #  document all properties, also do the same for Class, Method etc.
 
     #: Map literals by their identifiers
     literals_by_name: Final[Mapping[str, EnumerationLiteral]]

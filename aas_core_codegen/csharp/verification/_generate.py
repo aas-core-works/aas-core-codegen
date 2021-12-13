@@ -13,6 +13,11 @@ from aas_core_codegen.csharp import (
     naming as csharp_naming,
     unrolling as csharp_unrolling
 )
+from aas_core_codegen.csharp.common import (
+    INDENT as I,
+    INDENT2 as II,
+    INDENT3 as III
+)
 from aas_core_codegen.parse import (tree as parse_tree)
 
 
@@ -80,7 +85,7 @@ def _generate_pattern_class(
         if i > 0:
             writer.write('\n\n')
 
-        writer.write(textwrap.indent(block.strip(), csharp_common.INDENT))
+        writer.write(textwrap.indent(block.strip(), I))
 
     writer.write('\n}')
     return Stripped(writer.getvalue()), None
@@ -97,7 +102,7 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
         enum_name = csharp_naming.enum_name(symbol.name)
         blocks.append(Stripped(
             f"public static HashSet<int> For{enum_name} = new HashSet<int>(\n"
-            f"{csharp_common.INDENT}System.Enum.GetValues(typeof(Aas.{enum_name})).Cast<int>());"))
+            f"{I}System.Enum.GetValues(typeof(Aas.{enum_name})).Cast<int>());"))
 
     writer = io.StringIO()
     writer.write(textwrap.dedent('''\
@@ -111,7 +116,7 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
         if i > 0:
             writer.write('\n\n')
 
-        writer.write(textwrap.indent(block, csharp_common.INDENT))
+        writer.write(textwrap.indent(block, I))
 
     writer.write('\n}  // private static class EnumValueSet')
 
@@ -161,12 +166,12 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
                 csharp_unrolling.Node(
                     text=textwrap.dedent(f'''\
                     if (!Verification.Implementation.EnumValueSet.For{enum_name}.Contains(
-                    {csharp_common.INDENT2}(int){current_var_name}))
+                    {II}(int){current_var_name}))
                     {{
-                    {csharp_common.INDENT}errors.Add(
-                    {csharp_common.INDENT2}new Verification.Error(
-                    {csharp_common.INDENT3}$"{{path}}/{joined_pth}",
-                    {csharp_common.INDENT3}$"Invalid {{nameof(Aas.{enum_name})}}: {{{current_var_name}}}"));
+                    {I}errors.Add(
+                    {II}new Verification.Error(
+                    {III}$"{{path}}/{joined_pth}",
+                    {III}$"Invalid {{nameof(Aas.{enum_name})}}: {{{current_var_name}}}"));
                     }}'''),
                     children=[])]
 
@@ -375,7 +380,8 @@ class _InvariantTranspiler(
 
         method_name = csharp_naming.method_name(node.member.name)
 
-        # TODO: add heuristic for breaking the lines
+        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        #  add heuristic for breaking the lines
         joined_args = ", ".join(args)
 
         return Stripped(f"{instance}.{method_name}({joined_args})"), None
@@ -400,7 +406,8 @@ class _InvariantTranspiler(
             return None, Error(
                 node.original_node, "Failed to transpile the function call", errors)
 
-        # TODO: add heuristic for breaking the lines
+        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        #  add heuristic for breaking the lines
         joined_args = ", ".join(args)
 
         if node.name == "is_IRDI":
@@ -523,7 +530,8 @@ class _InvariantTranspiler(
             return None, Error(
                 node.original_node, "Failed to transpile the conjunction", errors)
 
-        # TODO: add heuristic for breaking the lines
+        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        #  add heuristic for breaking the lines
         return Stripped(" && ".join(values)), None
 
     def transform_or(
@@ -553,21 +561,24 @@ class _InvariantTranspiler(
             return None, Error(
                 node.original_node, "Failed to transpile the conjunction", errors)
 
-        # TODO: add heuristic for breaking the lines
+        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        #  add heuristic for breaking the lines
         return Stripped(" || ".join(values)), None
 
     def transform_declaration(
             self,
             node: parse_tree.Declaration
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        # TODO: implement once we got to end-to-end with serialization
+        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        #  implement once we got to end-to-end with serialization
         raise NotImplementedError()
 
     def transform_expression_with_declarations(
             self,
             node: parse_tree.ExpressionWithDeclarations
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        # TODO: implement once we got to end-to-end with serialization
+        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        #  implement once we got to end-to-end with serialization
         raise NotImplementedError()
 
 
@@ -601,7 +612,7 @@ def _transpile_invariant(
     writer = io.StringIO()
     if len(expr) > 50 or '\n' in expr:
         writer.write("if (!(\n")
-        writer.write(textwrap.indent(expr, csharp_common.INDENT))
+        writer.write(textwrap.indent(expr, I))
         writer.write("))\n{\n")
     else:
         if isinstance(
@@ -617,10 +628,10 @@ def _transpile_invariant(
 
     writer.write(textwrap.indent(textwrap.dedent(f'''\
         errors.Add(
-        {csharp_common.INDENT}new Verification.Error(
-        {csharp_common.INDENT2}path,
-        {csharp_common.INDENT2}"Invariant violated:\\n" +
-        '''), csharp_common.INDENT))
+        {I}new Verification.Error(
+        {II}path,
+        {II}"Invariant violated:\\n" +
+        '''), I))
 
     lines = []  # type: List[str]
     if invariant.description is not None:
@@ -632,10 +643,10 @@ def _transpile_invariant(
         if i < len(lines) - 1:
             line_literal = csharp_common.string_literal(line + "\n")
             writer.write(
-                f'{csharp_common.INDENT3}{line_literal} +\n')
+                f'{III}{line_literal} +\n')
         else:
             writer.write(
-                f'{csharp_common.INDENT3}{csharp_common.string_literal(line)}));')
+                f'{III}{csharp_common.string_literal(line)}));')
 
     writer.write("\n}")
 
@@ -690,16 +701,16 @@ def _generate_implementation_verify(
         /// The <paramref name="path" /> localizes <paramref name="that" /> instance.
         /// </summary>
         public static void Verify{cls_name} (
-        {csharp_common.INDENT}Aas.{cls_name} that,
-        {csharp_common.INDENT}string path,
-        {csharp_common.INDENT}Verification.Errors errors)
+        {I}Aas.{cls_name} that,
+        {I}string path,
+        {I}Verification.Errors errors)
         {{
         '''))
 
     for i, block in enumerate(blocks):
         if i > 0:
             writer.write('\n\n')
-        writer.write(textwrap.indent(block, csharp_common.INDENT))
+        writer.write(textwrap.indent(block, I))
 
     writer.write('\n}')
 
@@ -764,7 +775,7 @@ def _generate_implementation_class(
         if i > 0:
             writer.write('\n\n')
 
-        writer.write(textwrap.indent(block, csharp_common.INDENT))
+        writer.write(textwrap.indent(block, I))
 
     writer.write('\n}  // private static class Implementation')
 
@@ -787,12 +798,12 @@ def _generate_non_recursive_verifier(
             /// </summary>
             NonRecursiveVerifier(Verification.Errors errors)
             {{
-            {csharp_common.INDENT}Errors = errors;
+            {I}Errors = errors;
             }}''')),
         Stripped(textwrap.dedent(f'''\
             public void Visit(Aas.IClass that, string context)
             {{
-            {csharp_common.INDENT}that.Accept(this, context);
+            {I}that.Accept(this, context);
             }}'''))
     ]  # type: List[Stripped]
 
@@ -810,8 +821,8 @@ def _generate_non_recursive_verifier(
             /// </summary>
             public void Visit(Aas.{cls_name} that, string context)
             {{
-            {csharp_common.INDENT}Implementation.Verify{cls_name}(
-            {csharp_common.INDENT2}that, context, Errors);
+            {I}Implementation.Verify{cls_name}(
+            {II}that, context, Errors);
             }}''')))
 
     writer = io.StringIO()
@@ -820,14 +831,14 @@ def _generate_non_recursive_verifier(
         /// Verify the instances of the model classes non-recursively.
         /// </summary>
         public class NonRecursiveVerifier : 
-        {csharp_common.INDENT}Visitation.IVisitorWithContext<string>
+        {I}Visitation.IVisitorWithContext<string>
         {{
         '''))
     for i, block in enumerate(blocks):
         if i > 0:
             writer.write('\n\n')
 
-        writer.write(textwrap.indent(block, csharp_common.INDENT))
+        writer.write(textwrap.indent(block, I))
 
     writer.write('\n}  // public class NonRecursiveVerifier')
 
@@ -903,9 +914,9 @@ def _unroll_recursion_in_recursive_verify(
             if len(text) > 50:
                 text = Stripped(textwrap.dedent(f'''\
                     for(
-                    {csharp_common.INDENT}var {index_var} = 0;
-                    {csharp_common.INDENT}{index_var} < {current_var_name}.Count;
-                    {csharp_common.INDENT}{index_var}++)'''))
+                    {I}var {index_var} = 0;
+                    {I}{index_var} < {current_var_name}.Count;
+                    {I}{index_var}++)'''))
 
             return [csharp_unrolling.Node(text=text, children=children)]
 
@@ -967,7 +978,7 @@ def _generate_recursive_verifier_visit(
     blocks = [
         Stripped(textwrap.dedent(f'''\
         Implementation.Verify{cls_name}(
-        {csharp_common.INDENT}that, context, Errors);'''))
+        {I}that, context, Errors);'''))
     ]  # type: List[Stripped]
 
     # region Unroll
@@ -988,7 +999,7 @@ def _generate_recursive_verifier_visit(
         if i > 0:
             writer.write('\n\n')
 
-        writer.write(textwrap.indent(block, csharp_common.INDENT))
+        writer.write(textwrap.indent(block, I))
 
     writer.write('\n}')
     return Stripped(writer.getvalue())
@@ -1011,12 +1022,12 @@ def _generate_recursive_verifier(
             /// </summary>
             RecursiveVerifier(Errors errors)
             {{
-            {csharp_common.INDENT}Errors = errors;
+            {I}Errors = errors;
             }}''')),
         Stripped(textwrap.dedent(f'''\
             public void Visit(IClass that, string context)
             {{
-            {csharp_common.INDENT}that.Accept(this, context);
+            {I}that.Accept(this, context);
             }}'''))
     ]  # type: List[Stripped]
 
@@ -1054,14 +1065,14 @@ def _generate_recursive_verifier(
         /// Verify the instances of the model classes recursively.
         /// </summary>
         public class RecursiveVerifier : 
-        {csharp_common.INDENT}Visitation.IVisitorWithContext<string>
+        {I}Visitation.IVisitorWithContext<string>
         {{
         '''))
     for i, block in enumerate(blocks):
         if i > 0:
             writer.write('\n\n')
 
-        writer.write(textwrap.indent(block, csharp_common.INDENT))
+        writer.write(textwrap.indent(block, I))
 
     writer.write('\n}  // public class RecursiveVerifier')
 
@@ -1147,18 +1158,17 @@ def generate(
     verification_writer = io.StringIO()
     verification_writer.write(f"namespace {namespace}\n{{\n")
     verification_writer.write(
-        f"{csharp_common.INDENT}public static class Verification\n"
-        f"{csharp_common.INDENT}{{\n")
+        f"{I}public static class Verification\n"
+        f"{I}{{\n")
 
     for i, verification_block in enumerate(verification_blocks):
         if i > 0:
             verification_writer.write('\n\n')
 
-        verification_writer.write(
-            textwrap.indent(verification_block, 2 * csharp_common.INDENT))
+        verification_writer.write(textwrap.indent(verification_block, II))
 
     verification_writer.write(
-        f"\n{csharp_common.INDENT}}}  // public static class Verification")
+        f"\n{I}}}  // public static class Verification")
     verification_writer.write(f"\n}}  // namespace {namespace}")
 
     blocks.append(Stripped(verification_writer.getvalue()))

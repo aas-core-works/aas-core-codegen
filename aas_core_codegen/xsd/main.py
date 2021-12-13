@@ -78,7 +78,8 @@ def _define_for_property(
 
                 restriction.append(pattern)
             else:
-                # TODO: test this and check that the XSD makes sense with somebody else!
+                # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+                #  test this and check that the XSD makes sense with somebody else!
                 parent_restriction = restriction
                 for pattern_constraint in pattern_constraints:
                     nested_restriction = ET.Element("xs:restriction")

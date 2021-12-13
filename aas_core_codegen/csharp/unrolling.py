@@ -3,7 +3,9 @@ import io
 import textwrap
 from typing import Sequence
 
-from aas_core_codegen.csharp import (common as csharp_common)
+from aas_core_codegen.csharp.common import (
+    INDENT as I
+)
 
 
 class Node:
@@ -37,7 +39,7 @@ def render(node: Node) -> str:
         else:
             writer.write('\n\n')
 
-        writer.write(textwrap.indent(render(child), csharp_common.INDENT))
+        writer.write(textwrap.indent(render(child), I))
 
     writer.write('\n}')
 

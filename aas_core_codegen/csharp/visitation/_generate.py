@@ -8,6 +8,9 @@ from typing import Tuple, Optional, List
 from icontract import ensure
 
 import aas_core_codegen.csharp.common as csharp_common
+from aas_core_codegen.csharp.common import (
+    INDENT2 as II
+)
 import aas_core_codegen.csharp.naming as csharp_naming
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Error, Stripped, Rstripped, assert_never
@@ -49,7 +52,7 @@ def _generate_ivisitor(
     for i, block in enumerate(blocks):
         if i > 0:
             writer.write('\n')
-        writer.write(textwrap.indent(block, csharp_common.INDENT))
+        writer.write(textwrap.indent(block, I))
 
     writer.write(f'\n}}  // public interface IVisitor')
 
@@ -107,7 +110,7 @@ def _generate_visitor_through(
     for i, block in enumerate(blocks):
         if i > 0:
             writer.write('\n')
-        writer.write(textwrap.indent(block, csharp_common.INDENT))
+        writer.write(textwrap.indent(block, I))
 
     writer.write(f'\n}}  // public class VisitorThrough')
 
@@ -150,7 +153,7 @@ def _generate_ivisitor_with_context(
     for i, block in enumerate(blocks):
         if i > 0:
             writer.write('\n')
-        writer.write(textwrap.indent(block, csharp_common.INDENT))
+        writer.write(textwrap.indent(block, I))
 
     writer.write(f'\n}}  // public interface IVisitorWithContext')
 
@@ -194,7 +197,7 @@ def _generate_itransformer(
     for i, block in enumerate(blocks):
         if i > 0:
             writer.write('\n')
-        writer.write(textwrap.indent(block, csharp_common.INDENT))
+        writer.write(textwrap.indent(block, I))
 
     writer.write(f'\n}}  // public interface ITransformer')
 
@@ -239,7 +242,7 @@ def _generate_itransformer_with_context(
     for i, block in enumerate(blocks):
         if i > 0:
             writer.write('\n')
-        writer.write(textwrap.indent(block, csharp_common.INDENT))
+        writer.write(textwrap.indent(block, I))
 
     writer.write(f'\n}}  // public interface ITransformerWithContext')
 
@@ -268,8 +271,8 @@ def generate(
     writer = io.StringIO()
     writer.write(f"namespace {namespace}\n{{\n")
     writer.write(
-        f"{csharp_common.INDENT}public static class Visitation\n"
-        f"{csharp_common.INDENT}{{\n")
+        f"{I}public static class Visitation\n"
+        f"{I}{{\n")
 
     visitation_blocks = [
         _generate_ivisitor(symbol_table=symbol_table),
@@ -283,10 +286,9 @@ def generate(
             writer.write('\n\n')
 
         writer.write(
-            textwrap.indent(visitation_block, csharp_common.INDENT2))
+            textwrap.indent(visitation_block, II))
 
-    writer.write(
-        f"\n{csharp_common.INDENT}}}  // public static class Visitation")
+    writer.write(f"\n{I}}}  // public static class Visitation")
     writer.write(f"\n}}  // namespace {namespace}")
 
     blocks.append(Stripped(writer.getvalue()))

@@ -23,6 +23,10 @@ from aas_core_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming,
     unrolling as csharp_unrolling)
+from aas_core_codegen.csharp.common import (
+    INDENT as I,
+    INDENT2 as II
+)
 
 
 # region Checks
@@ -49,14 +53,13 @@ def _verify_structure_name_collisions(
 
         assert name is not None
         if name in observed_structure_names:
-            # TODO: test
-            errors.append(
-                Error(
-                    symbol.parsed.node,
-                    f"The C# name {name!r} "
-                    f"of the meta-model symbol {symbol.name!r} collides "
-                    f"with another meta-model symbol "
-                    f"{observed_structure_names[name].name!r}"))
+            # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+            errors.append(Error(
+                symbol.parsed.node,
+                f"The C# name {name!r} "
+                f"of the meta-model symbol {symbol.name!r} collides "
+                f"with another meta-model symbol "
+                f"{observed_structure_names[name].name!r}"))
         else:
             observed_structure_names[name] = symbol
 
@@ -83,14 +86,12 @@ def _verify_intra_structure_collisions(
         for prop in intermediate_symbol.properties:
             prop_name = csharp_naming.property_name(prop.name)
             if prop_name in observed_member_names:
-                # TODO: test
-                errors.append(
-                    Error(
-                        prop.parsed.node,
-                        f"C# property {prop_name!r} corresponding "
-                        f"to the meta-model property {prop.name!r} collides with "
-                        f"the {observed_member_names[prop_name]}"
-                    ))
+                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+                errors.append(Error(
+                    prop.parsed.node,
+                    f"C# property {prop_name!r} corresponding "
+                    f"to the meta-model property {prop.name!r} collides with "
+                    f"the {observed_member_names[prop_name]}"))
             else:
                 observed_member_names[prop_name] = (
                     f"C# property {prop_name!r} corresponding to "
@@ -100,14 +101,12 @@ def _verify_intra_structure_collisions(
             method_name = csharp_naming.method_name(signature.name)
 
             if method_name in observed_member_names:
-                # TODO: test
-                errors.append(
-                    Error(
-                        signature.parsed.node,
-                        f"C# method {method_name!r} corresponding "
-                        f"to the meta-model method {signature.name!r} collides with "
-                        f"the {observed_member_names[method_name]}"
-                    ))
+                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+                errors.append(Error(
+                    signature.parsed.node,
+                    f"C# method {method_name!r} corresponding "
+                    f"to the meta-model method {signature.name!r} collides with "
+                    f"the {observed_member_names[method_name]}"))
             else:
                 observed_member_names[method_name] = (
                     f"C# method {method_name!r} corresponding to "
@@ -119,14 +118,12 @@ def _verify_intra_structure_collisions(
         for prop in intermediate_symbol.properties:
             prop_name = csharp_naming.property_name(prop.name)
             if prop_name in observed_member_names:
-                # TODO: test
-                errors.append(
-                    Error(
-                        prop.parsed.node,
-                        f"C# property {prop_name!r} corresponding "
-                        f"to the meta-model property {prop.name!r} collides with "
-                        f"the {observed_member_names[prop_name]}"
-                    ))
+                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+                errors.append(Error(
+                    prop.parsed.node,
+                    f"C# property {prop_name!r} corresponding "
+                    f"to the meta-model property {prop.name!r} collides with "
+                    f"the {observed_member_names[prop_name]}"))
             else:
                 observed_member_names[prop_name] = (
                     f"C# property {prop_name!r} corresponding to "
@@ -146,14 +143,12 @@ def _verify_intra_structure_collisions(
             method_name = csharp_naming.method_name(signature.name)
 
             if method_name in observed_member_names:
-                # TODO: test
-                errors.append(
-                    Error(
+                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+                errors.append(Error(
                         signature.parsed.node,
                         f"C# method {method_name!r} corresponding "
                         f"to the meta-model method {signature.name!r} collides with "
-                        f"the {observed_member_names[method_name]}"
-                    ))
+                        f"the {observed_member_names[method_name]}"))
             else:
                 observed_member_names[method_name] = (
                     f"C# method {method_name!r} corresponding to "
@@ -400,7 +395,7 @@ class _DescriptionElementRenderer(
                         f'</remarks>'))
 
         for tail_element in tail:
-            # TODO: test
+            # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
             if not isinstance(tail_element, docutils.nodes.field_list):
                 return None, (
                     f"Expected only a field list to follow the summary and remarks, "
@@ -443,7 +438,7 @@ class _DescriptionElementRenderer(
                 name = field_name.children[0].astext()
                 name_parts = name.split()
                 if len(name_parts) > 2:
-                    # TODO: test
+                    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
                     return (
                         None,
                         f"Expected one or two parts in a field name, "
@@ -453,7 +448,7 @@ class _DescriptionElementRenderer(
                 if len(name_parts) == 1:
                     directive = name_parts[0]
                     if directive in ('return', 'returns'):
-                        body_indented = textwrap.indent(body, csharp_common.INDENT)
+                        body_indented = textwrap.indent(body, I)
                         blocks.append(
                             Stripped(f'<returns>\n{body_indented}\n</returns>'))
                     else:
@@ -466,7 +461,7 @@ class _DescriptionElementRenderer(
                         arg_name = csharp_naming.argument_name(directive_arg)
 
                         if body != "":
-                            indented_body = textwrap.indent(body, csharp_common.INDENT)
+                            indented_body = textwrap.indent(body, I)
                             blocks.append(
                                 Stripped(
                                     f'<param name={xml.sax.saxutils.quoteattr(arg_name)}>\n'
@@ -544,14 +539,14 @@ def _generate_enum(
             if error:
                 return None, error
 
-            writer.write(textwrap.indent(literal_comment, csharp_common.INDENT))
+            writer.write(textwrap.indent(literal_comment, I))
             writer.write('\n')
 
         writer.write(
             textwrap.indent(
                 f'[EnumMember(Value = {csharp_common.string_literal(literal.value)})]\n'
                 f'{csharp_naming.enum_literal_name(literal.name)}',
-                csharp_common.INDENT))
+                I))
 
     writer.write("\n}")
 
@@ -591,7 +586,7 @@ def _generate_interface(
             if i > 0:
                 writer.write(",\n")
 
-            writer.write(textwrap.indent(inheritance, csharp_common.INDENT2))
+            writer.write(textwrap.indent(inheritance, II))
 
         writer.write("\n{\n")
 
@@ -645,7 +640,7 @@ def _generate_interface(
         signature_name = csharp_naming.method_name(signature.name)
         if len(arg_codes) > 2:
             arg_block = ",\n".join(arg_codes)
-            arg_block_indented = textwrap.indent(arg_block, csharp_common.INDENT)
+            arg_block_indented = textwrap.indent(arg_block, I)
             signature_blocks.append(
                 Stripped(f"public {returns} {signature_name}(\n{arg_block_indented});"))
         elif len(arg_codes) == 1:
@@ -663,7 +658,7 @@ def _generate_interface(
         if i > 0:
             writer.write("\n\n")
 
-        writer.write(textwrap.indent(code, csharp_common.INDENT))
+        writer.write(textwrap.indent(code, I))
 
     writer.write("\n}")
 
@@ -796,7 +791,7 @@ def _generate_descend_once_method(
 
     body = _generate_descend_body(symbol=symbol, recurse=False)
 
-    indented_body = textwrap.indent(body, csharp_common.INDENT)
+    indented_body = textwrap.indent(body, I)
 
     return Stripped(f'''\
 /// <summary>
@@ -816,7 +811,7 @@ def _generate_descend_method(
 
     body = _generate_descend_body(symbol=symbol, recurse=True)
 
-    indented_body = textwrap.indent(body, csharp_common.INDENT)
+    indented_body = textwrap.indent(body, I)
 
     return Stripped(f'''\
 /// <summary>
@@ -891,7 +886,7 @@ def _generate_constructor(
         blocks.append(f"public {cls_name}({arg_codes[0]})\n{{")
     else:
         arg_block = ",\n".join(arg_codes)
-        arg_block_indented = textwrap.indent(arg_block, csharp_common.INDENT)
+        arg_block_indented = textwrap.indent(arg_block, I)
         blocks.append(
             Stripped(f"public {cls_name}(\n{arg_block_indented})\n{{"))
 
@@ -915,10 +910,8 @@ def _generate_constructor(
                     writer.write(
                         f'({arg_name} != null)\n')
                     writer.write(
-                        textwrap.indent(f'? {arg_name}\n', csharp_common.INDENT))
-                    writer.write(
-                        textwrap.indent(
-                            f': new {prop_type}();', csharp_common.INDENT))
+                        textwrap.indent(f'? {arg_name}\n', I))
+                    writer.write(textwrap.indent(f': new {prop_type}();', I))
 
                     body.append(writer.getvalue())
                 elif isinstance(
@@ -937,10 +930,9 @@ def _generate_constructor(
         else:
             assert_never(stmt)
 
-    blocks.append(
-        '\n'.join(
-            textwrap.indent(stmt_code, csharp_common.INDENT)
-            for stmt_code in body))
+    blocks.append('\n'.join(
+        textwrap.indent(stmt_code, I)
+        for stmt_code in body))
 
     blocks.append("}")
 
@@ -1010,7 +1002,7 @@ def _generate_default_constructor(
     else:
         writer.write(f"public {cls_name}() : this(\n")
         for i, default_value in enumerate(default_values):
-            writer.write(f"{csharp_common.INDENT}{default_value}")
+            writer.write(f"{I}{default_value}")
 
             if i < len(default_values) - 1:
                 writer.write(",\n")
@@ -1019,7 +1011,7 @@ def _generate_default_constructor(
 
     writer.write(
         "{\n"
-        f"{csharp_common.INDENT}// Intentionally left empty.\n"
+        f"{I}// Intentionally left empty.\n"
         "}")
 
     return Stripped(writer.getvalue())
@@ -1061,7 +1053,7 @@ def _generate_class(
             if i > 0:
                 writer.write(",\n")
 
-            writer.write(textwrap.indent(interface_name, csharp_common.INDENT2))
+            writer.write(textwrap.indent(interface_name, II))
 
         writer.write("\n{\n")
 
@@ -1130,7 +1122,7 @@ def _generate_class(
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {{
-        {csharp_common.INDENT}visitor.Visit(this);
+        {I}visitor.Visit(this);
         }}''')))
 
     blocks.append(Stripped(textwrap.dedent(f'''\
@@ -1140,7 +1132,7 @@ def _generate_class(
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
         {{
-        {csharp_common.INDENT}visitor.Visit(this, context);
+        {I}visitor.Visit(this, context);
         }}''')))
 
     blocks.append(Stripped(textwrap.dedent(f'''\
@@ -1150,7 +1142,7 @@ def _generate_class(
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {{
-        {csharp_common.INDENT}return transformer.Transform(this);
+        {I}return transformer.Transform(this);
         }}''')))
 
     blocks.append(Stripped(textwrap.dedent(f'''\
@@ -1159,9 +1151,9 @@ def _generate_class(
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
-        {csharp_common.INDENT}Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {I}Visitation.ITransformerWithContext<C, T> transformer, C context)
         {{
-        {csharp_common.INDENT}return transformer.Transform(this, context);
+        {I}return transformer.Transform(this, context);
         }}''')))
 
     # endregion
@@ -1208,7 +1200,7 @@ def _generate_class(
         if i > 0:
             writer.write("\n\n")
 
-        writer.write(textwrap.indent(code, csharp_common.INDENT))
+        writer.write(textwrap.indent(code, I))
 
     writer.write("\n}")
 
@@ -1285,9 +1277,9 @@ def generate(
             /// for double dispatch with the <paramref name="context" />.
             /// </summary>
             public T Transform<C, T>(
-            {csharp_common.INDENT}Visitation.ITransformerWithContext<C, T> transformer, C context);                        
+            {I}Visitation.ITransformerWithContext<C, T> transformer, C context);                        
         }}'''),
-                                            csharp_common.INDENT)))
+                                            I)))
 
     errors = []  # type: List[Error]
 
@@ -1310,12 +1302,11 @@ def generate(
                     f"for the implementation-specific class: {implementation_key}")
         else:
             if isinstance(intermediate_symbol, intermediate.Enumeration):
-                # TODO: test
+                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
                 code, error = _generate_enum(symbol=intermediate_symbol)
             elif isinstance(intermediate_symbol, intermediate.Interface):
-                # TODO: test
-                code, error = _generate_interface(
-                    symbol=intermediate_symbol)
+                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+                code, error = _generate_interface(symbol=intermediate_symbol)
 
             elif isinstance(intermediate_symbol, intermediate.Class):
                 code, error = _generate_class(

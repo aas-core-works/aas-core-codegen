@@ -13,7 +13,7 @@ from aas_core_codegen.parse import (
 )
 
 
-# TODO: test this module
+# TODO-BEFORE-RELEASE (mristin, 2021-12-13): test this module
 
 
 def match_property(node: parse_tree.Node) -> Optional[Identifier]:

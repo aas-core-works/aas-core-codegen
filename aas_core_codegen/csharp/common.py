@@ -62,7 +62,8 @@ def generate_type(
             intermediate.SubscriptedTypeAnnotation, intermediate.AtomicTypeAnnotation]
 ) -> Stripped:
     """Generate the C# type for the given type annotation."""
-    # TODO: test with general snippets, do not test in isolation
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+    #  test with general snippets, do not test in isolation
     if isinstance(type_annotation, intermediate.AtomicTypeAnnotation):
         if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
             return _BUILTING_ATOMIC_TYPE_MAP[type_annotation.a_type]

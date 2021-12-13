@@ -13,7 +13,6 @@ from aas_core_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming
 )
-# TODO: apply this trick to everything
 from aas_core_codegen.csharp.common import (
     INDENT as I,
     INDENT2 as II,
@@ -792,7 +791,7 @@ def generate(
         return None, errors
 
     writer = io.StringIO()
-    # TODO (mristin, 2021-11-06): add a good docstring 🠒 add examples!
+    # TODO-BEFORE-RELEASE (mristin, 2021-11-06): add a good docstring 🠒 add examples!
     writer.write(textwrap.dedent(f'''\
         namespace {namespace}
         {{

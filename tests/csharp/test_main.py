@@ -75,7 +75,8 @@ class Test_against_recorded(unittest.TestCase):
                     self.assertEqual(
                         normalized_stdout, stdout_pth.read_text(), stdout_pth)
 
-                # TODO: check the remainder of the generated files
+                # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+                #  check the remainder of the generated files
                 for relevant_rel_pth in [
                     pathlib.Path('types.cs'),
                     pathlib.Path('visitation.cs'),

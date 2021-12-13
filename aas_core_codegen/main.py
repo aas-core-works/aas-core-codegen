@@ -42,34 +42,34 @@ class Parameters:
 def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     """Run the program."""
     # region Basic checks
-    # TODO: test this failure case
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test this failure case
     if not params.model_path.exists():
         stderr.write(f"The --model_path does not exist: {params.model_path}\n")
         return 1
 
-    # TODO: test this failure case
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test this failure case
     if not params.model_path.is_file():
         stderr.write(
             f"The --model_path does not point to a file: {params.model_path}\n")
         return 1
 
-    # TODO: test this failure case
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test this failure case
     if not params.snippets_dir.exists():
         stderr.write(f"The --snippets_dir does not exist: {params.snippets_dir}\n")
         return 1
 
-    # TODO: test this failure case
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test this failure case
     if not params.snippets_dir.is_dir():
         stderr.write(
             f"The --snippets_dir does not point to a directory: "
             f"{params.snippets_dir}\n")
         return 1
 
-    # TODO: test the happy path
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test the happy path
     if not params.output_dir.exists():
         params.output_dir.mkdir(parents=True, exist_ok=True)
     else:
-        # TODO: test this failure case
+        # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test this failure case
         if not params.output_dir.is_dir():
             stderr.write(
                 f"The --output_dir does not point to a directory: "
@@ -94,7 +94,8 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     text = params.model_path.read_text(encoding='utf-8')
 
-    # TODO: test all the following individual failure cases
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+    #  test all the following individual failure cases
     atok, parse_exception = parse.source_to_atok(source=text)
     if parse_exception:
         if isinstance(parse_exception, SyntaxError):

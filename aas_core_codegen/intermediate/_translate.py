@@ -1090,7 +1090,8 @@ def translate(
     # region Second pass to resolve the attribute references in the descriptions
 
     for symbol, description in symbols_descriptions:
-        # TODO: test this, especially the failure cases
+        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        #  test this, especially the failure cases
         for attr_ref_in_doc in description.document.traverse(
                 condition=AttributeReferenceInDoc):
             if isinstance(attr_ref_in_doc.reference, _PlaceholderAttributeReference):
