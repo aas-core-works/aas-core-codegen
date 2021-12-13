@@ -77,6 +77,7 @@ def _define_property_shape(
         missing_implementation = True
 
     if missing_implementation:
+        # fmt: off
         return None, Error(
             prop.parsed.node,
             f"(mristin, 2021-11-12): "
@@ -85,6 +86,7 @@ def _define_property_shape(
             f"If you see this message, it is time to implement "
             f"this missing functionality.\n"
             f"{prop=}, {type_anno=}, {symbol=}")
+        # fmt: on
 
     assert prop_name is not None
     assert rdfs_range is not None

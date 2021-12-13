@@ -702,10 +702,10 @@ def _parsed_class_to_class(
 
     if len(errors) > 0:
         return None, Error(
-            node=parsed.node,
-            message=f"Failed to translate the class {parsed.name} "
-                    f"to the intermediate representation",
-            underlying=errors)
+            parsed.node,
+            f"Failed to translate the class {parsed.name} "
+            f"to the intermediate representation",
+            errors)
 
     # noinspection PyTypeChecker
     return Class(

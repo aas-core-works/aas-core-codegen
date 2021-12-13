@@ -292,7 +292,10 @@ class _InvariantTranspiler(
 
         if len(errors) > 0:
             return None, Error(
-                node.original_node, "Failed to transpile the comparison", errors)
+                node.original_node,
+                "Failed to transpile the comparison",
+                errors)
+
 
         no_parentheses_types = (
             parse_tree.Member,
@@ -326,7 +329,9 @@ class _InvariantTranspiler(
 
         if len(errors) > 0:
             return None, Error(
-                node.original_node, "Failed to transpile the implication", errors)
+                node.original_node,
+                "Failed to transpile the implication",
+                errors)
 
         assert antecedent is not None
         assert consequent is not None
@@ -371,7 +376,9 @@ class _InvariantTranspiler(
 
         if len(errors) > 0:
             return None, Error(
-                node.original_node, "Failed to transpile the method call", errors)
+                node.original_node,
+                "Failed to transpile the method call",
+                errors)
 
         assert instance is not None
 
@@ -404,7 +411,9 @@ class _InvariantTranspiler(
 
         if len(errors) > 0:
             return None, Error(
-                node.original_node, "Failed to transpile the function call", errors)
+                node.original_node,
+                "Failed to transpile the function call",
+                errors)
 
         # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
         #  add heuristic for breaking the lines
@@ -680,7 +689,7 @@ def _generate_implementation_verify(
         return None, Error(
             cls.parsed.node,
             f"Failed to parse one or more invariants of the class {cls}",
-            underlying=errors)
+            errors)
 
     for prop in cls.properties:
         enum_check_block = _unroll_enumeration_check(prop=prop)
