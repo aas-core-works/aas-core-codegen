@@ -6,10 +6,11 @@ import docutils.nodes
 from icontract import ensure, DBC
 
 from aas_core_codegen.intermediate._types import (
-    SymbolReferenceInDoc, AttributeReferenceInDoc
+    SymbolReferenceInDoc,
+    AttributeReferenceInDoc,
 )
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class DocutilsElementTransformer(Generic[T], DBC):
@@ -26,7 +27,7 @@ class DocutilsElementTransformer(Generic[T], DBC):
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform(
-            self, element: docutils.nodes.Element
+        self, element: docutils.nodes.Element
     ) -> Tuple[Optional[T], Optional[str]]:
         if isinstance(element, docutils.nodes.Text):
             return self.transform_text(element)
@@ -70,76 +71,76 @@ class DocutilsElementTransformer(Generic[T], DBC):
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_text(
-            self, element: docutils.nodes.Text
+        self, element: docutils.nodes.Text
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_symbol_reference_in_doc(
-            self, element: SymbolReferenceInDoc
+        self, element: SymbolReferenceInDoc
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_attribute_reference_in_doc(
-            self, element: AttributeReferenceInDoc
+        self, element: AttributeReferenceInDoc
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_literal(
-            self, element: docutils.nodes.literal
+        self, element: docutils.nodes.literal
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_paragraph(
-            self, element: docutils.nodes.paragraph
+        self, element: docutils.nodes.paragraph
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_emphasis(
-            self, element: docutils.nodes.emphasis
+        self, element: docutils.nodes.emphasis
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_list_item(
-            self, element: docutils.nodes.list_item
+        self, element: docutils.nodes.list_item
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_bullet_list(
-            self, element: docutils.nodes.bullet_list
+        self, element: docutils.nodes.bullet_list
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_note(
-            self, element: docutils.nodes.note
+        self, element: docutils.nodes.note
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_reference(
-            self, element: docutils.nodes.reference
+        self, element: docutils.nodes.reference
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_document(
-            self, element: docutils.nodes.document
+        self, element: docutils.nodes.document
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()

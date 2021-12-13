@@ -8,7 +8,7 @@ these identifiers are used only for the XSD.
 from aas_core_codegen.common import Identifier
 
 
-def interface_abstract(identifier: Identifier)->Identifier:
+def interface_abstract(identifier: Identifier) -> Identifier:
     """
     Generate the identifier for an abstract definition of an interface.
 
@@ -18,15 +18,19 @@ def interface_abstract(identifier: Identifier)->Identifier:
     >>> interface_abstract(Identifier("Something_to_URL"))
     'somethingToUrl_abstract'
     """
-    parts = identifier.split('_')
-    assert len(parts) >= 1, (
-        f"Expected at least one part for the valid identifier: {identifier}")
+    parts = identifier.split("_")
+    assert (
+        len(parts) >= 1
+    ), f"Expected at least one part for the valid identifier: {identifier}"
 
     if len(parts) == 1:
         return Identifier(f"{parts[0].lower()}_abstract")
 
-    return Identifier("{}{}_abstract".format(
-        parts[0].lower(), ''.join(part.capitalize() for part in parts[1:])))
+    return Identifier(
+        "{}{}_abstract".format(
+            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
+        )
+    )
 
 
 def model_type(identifier: Identifier) -> Identifier:
@@ -39,12 +43,16 @@ def model_type(identifier: Identifier) -> Identifier:
     >>> model_type(Identifier("URL_to_something"))
     'urlToSomething_t'
     """
-    parts = identifier.split('_')
-    assert len(parts) >= 1, (
-        f"Expected at least one part for the valid identifier: {identifier}")
+    parts = identifier.split("_")
+    assert (
+        len(parts) >= 1
+    ), f"Expected at least one part for the valid identifier: {identifier}"
 
     if len(parts) == 1:
         return Identifier(f"{parts[0].lower()}_t")
 
-    return Identifier("{}{}_t".format(
-        parts[0].lower(), ''.join(part.capitalize() for part in parts[1:])))
+    return Identifier(
+        "{}{}_t".format(
+            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
+        )
+    )

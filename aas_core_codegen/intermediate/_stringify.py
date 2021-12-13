@@ -21,10 +21,15 @@ from aas_core_codegen.intermediate._types import (
     SubscriptedTypeAnnotation,
     Symbol,
     SymbolTable,
-    TypeAnnotation, ListTypeAnnotation,
+    TypeAnnotation,
+    ListTypeAnnotation,
     OptionalTypeAnnotation,
-    BuiltinAtomicTypeAnnotation, OurAtomicTypeAnnotation, Description, Invariant,
-    DefaultConstant, DefaultEnumerationLiteral
+    BuiltinAtomicTypeAnnotation,
+    OurAtomicTypeAnnotation,
+    Description,
+    Invariant,
+    DefaultConstant,
+    DefaultEnumerationLiteral,
 )
 
 
@@ -42,7 +47,7 @@ def _stringify_default_constant(default: DefaultConstant) -> stringify.Entity:
 
 
 def _stringify_default_enumeration_literal(
-        default: DefaultEnumerationLiteral
+    default: DefaultEnumerationLiteral,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=Default.__name__,
@@ -58,7 +63,7 @@ def _stringify_default_enumeration_literal(
 
 
 def _stringify_atomic_type_annotation(
-        type_annotation: AtomicTypeAnnotation,
+    type_annotation: AtomicTypeAnnotation,
 ) -> stringify.Entity:
     result = None  # type: Optional[stringify.Class]
 
@@ -68,14 +73,16 @@ def _stringify_atomic_type_annotation(
             properties=[
                 stringify.Property("a_type", type_annotation.a_type.value),
                 stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-            ])
+            ],
+        )
     elif isinstance(type_annotation, OurAtomicTypeAnnotation):
         result = stringify.Entity(
             name=AtomicTypeAnnotation.__name__,
             properties=[
                 stringify.Property("symbol", type_annotation.symbol.name),
                 stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-            ])
+            ],
+        )
     else:
         assert_never(type_annotation)
 
@@ -85,7 +92,7 @@ def _stringify_atomic_type_annotation(
 
 
 def _stringify_subscripted_type_annotation(
-        type_annotation: SubscriptedTypeAnnotation,
+    type_annotation: SubscriptedTypeAnnotation,
 ) -> stringify.Entity:
     result = None  # type: Optional[stringify.Class]
 
@@ -93,18 +100,18 @@ def _stringify_subscripted_type_annotation(
         result = stringify.Entity(
             name=ListTypeAnnotation.__name__,
             properties=[
-                stringify.Property(
-                    "items", _stringify(type_annotation.items)),
+                stringify.Property("items", _stringify(type_annotation.items)),
                 stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-            ])
+            ],
+        )
     elif isinstance(type_annotation, OptionalTypeAnnotation):
         result = stringify.Entity(
             name=OptionalTypeAnnotation.__name__,
             properties=[
-                stringify.Property(
-                    "value", _stringify(type_annotation.value)),
+                stringify.Property("value", _stringify(type_annotation.value)),
                 stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-            ])
+            ],
+        )
     else:
         assert_never(type_annotation)
 
@@ -118,14 +125,10 @@ def _stringify_argument(argument: Argument) -> stringify.Entity:
         name=Argument.__name__,
         properties=[
             stringify.Property("name", argument.name),
-            stringify.Property(
-                "type_annotation", _stringify(argument.type_annotation)
-            ),
+            stringify.Property("type_annotation", _stringify(argument.type_annotation)),
             stringify.Property(
                 "default",
-                None
-                if argument.default is None
-                else _stringify(argument.default),
+                None if argument.default is None else _stringify(argument.default),
             ),
             stringify.PropertyEllipsis("parsed", argument.parsed),
         ],
@@ -140,8 +143,9 @@ def _stringify_description(description: Description) -> stringify.Entity:
         name=Description.__name__,
         properties=[
             stringify.PropertyEllipsis("document", description.document),
-            stringify.PropertyEllipsis("node", description.node)
-        ])
+            stringify.PropertyEllipsis("node", description.node),
+        ],
+    )
 
 
 def _stringify_signature(signature: Signature) -> stringify.Entity:
@@ -155,12 +159,11 @@ def _stringify_signature(signature: Signature) -> stringify.Entity:
             ),
             stringify.Property(
                 "returns",
-                None
-                if signature.returns is None
-                else _stringify(signature.returns),
+                None if signature.returns is None else _stringify(signature.returns),
             ),
             stringify.Property(
-                "description", _stringify_description(signature.description)),
+                "description", _stringify_description(signature.description)
+            ),
             stringify.PropertyEllipsis("parsed", signature.parsed),
         ],
     )
@@ -174,9 +177,7 @@ def _stringify_property(prop: Property) -> stringify.Entity:
         name=Property.__name__,
         properties=[
             stringify.Property("name", prop.name),
-            stringify.Property(
-                "type_annotation", _stringify(prop.type_annotation)
-            ),
+            stringify.Property("type_annotation", _stringify(prop.type_annotation)),
             stringify.Property("description", _stringify_description(prop.description)),
             stringify.PropertyEllipsis("parsed", prop.parsed),
         ],
@@ -196,7 +197,8 @@ def _stringify_interface(interface: Interface) -> stringify.Entity:
                 [
                     f"reference to {inheritance}"
                     for inheritance in interface.inheritances
-                ]),
+                ],
+            ),
             stringify.Property(
                 "signatures",
                 [_stringify_signature(signature) for signature in interface.signatures],
@@ -214,7 +216,7 @@ def _stringify_interface(interface: Interface) -> stringify.Entity:
 
 
 def _stringify_enumeration_literal(
-        enumeration_literal: EnumerationLiteral,
+    enumeration_literal: EnumerationLiteral,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=EnumerationLiteral.__name__,
@@ -222,7 +224,8 @@ def _stringify_enumeration_literal(
             stringify.Property("name", enumeration_literal.name),
             stringify.Property("value", enumeration_literal.value),
             stringify.Property(
-                "description", _stringify_description(enumeration_literal.description)),
+                "description", _stringify_description(enumeration_literal.description)
+            ),
             stringify.PropertyEllipsis("parsed", enumeration_literal.parsed),
         ],
     )
@@ -244,7 +247,8 @@ def _stringify_enumeration(enumeration: Enumeration) -> stringify.Entity:
                 ],
             ),
             stringify.Property(
-                "description", _stringify_description(enumeration.description)),
+                "description", _stringify_description(enumeration.description)
+            ),
             stringify.PropertyEllipsis("parsed", enumeration.parsed),
         ],
     )
@@ -257,8 +261,7 @@ def _stringify_invariant(invariant: Invariant) -> stringify.Entity:
     result = stringify.Entity(
         name=Invariant.__name__,
         properties=[
-            stringify.Property(
-                "description", invariant.description),
+            stringify.Property("description", invariant.description),
             stringify.PropertyEllipsis("parsed", invariant.parsed),
         ],
     )
@@ -272,8 +275,7 @@ def _stringify_contract(contract: Contract) -> stringify.Entity:
         name=Contract.__name__,
         properties=[
             stringify.Property("args", contract.args),
-            stringify.Property(
-                "description", contract.description),
+            stringify.Property("description", contract.description),
             stringify.PropertyEllipsis("body", contract.body),
             stringify.PropertyEllipsis("parsed", contract.parsed),
         ],
@@ -338,12 +340,11 @@ def _stringify_method(method: Method) -> stringify.Entity:
             ),
             stringify.Property(
                 "returns",
-                None
-                if method.returns is None
-                else _stringify(method.returns),
+                None if method.returns is None else _stringify(method.returns),
             ),
             stringify.Property(
-                "description", _stringify_description(method.description)),
+                "description", _stringify_description(method.description)
+            ),
             stringify.Property("contracts", _stringify_contracts(method.contracts)),
             stringify.PropertyEllipsis("body", method.body),
             stringify.PropertyEllipsis("parsed", method.parsed),
@@ -383,7 +384,8 @@ def _stringify_class(cls: Class) -> stringify.Entity:
             stringify.Property("name", cls.name),
             stringify.Property(
                 "interfaces",
-                [f"reference to {interface.name}" for interface in cls.interfaces]),
+                [f"reference to {interface.name}" for interface in cls.interfaces],
+            ),
             stringify.Property(
                 "is_implementation_specific", cls.is_implementation_specific
             ),

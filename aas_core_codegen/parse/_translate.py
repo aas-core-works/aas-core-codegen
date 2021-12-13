@@ -43,14 +43,17 @@ from aas_core_codegen.parse._types import (
     Symbol,
     SymbolTable,
     TypeAnnotation,
-    UnverifiedSymbolTable, BUILTIN_ATOMIC_TYPES, BUILTIN_COMPOSITE_TYPES, Description,
-    MetaModel
+    UnverifiedSymbolTable,
+    BUILTIN_ATOMIC_TYPES,
+    BUILTIN_COMPOSITE_TYPES,
+    Description,
+    MetaModel,
 )
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def source_to_atok(
-        source: str,
+    source: str,
 ) -> Tuple[Optional[asttokens.ASTTokens], Optional[Exception]]:
     """
     Parse the Python code.
@@ -74,11 +77,12 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
         self.errors = []  # type: List[Error]
 
     def visit_Import(self, node: ast.Import) -> Any:
-        self.errors.append(Error(
-            node,
-            f"Unexpected ``import ...``. "
-            f"Only ``from ... import...`` statements are expected.",
-        )
+        self.errors.append(
+            Error(
+                node,
+                f"Unexpected ``import ...``. "
+                f"Only ``from ... import...`` statements are expected.",
+            )
         )
 
     _EXPECTED_NAME_FROM_MODULE = collections.OrderedDict(
@@ -92,10 +96,10 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("require", "icontract"),
             ("abstract", "aas_core_meta.marker"),
             ("implementation_specific", "aas_core_meta.marker"),
-            ('reference_in_the_book', "aas_core_meta.marker"),
-            ('template', "aas_core_meta.marker"),
-            ('Ref', "aas_core_meta.marker"),
-            ('associate_ref_with', 'aas_core_meta.marker'),
+            ("reference_in_the_book", "aas_core_meta.marker"),
+            ("template", "aas_core_meta.marker"),
+            ("Ref", "aas_core_meta.marker"),
+            ("associate_ref_with", "aas_core_meta.marker"),
             ("is_superset_of", "aas_core_meta.marker"),
             ("serialization", "aas_core_meta.marker"),
             ("are_unique", "aas_core_meta.verification"),
@@ -109,24 +113,30 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
         for name in node.names:
             assert isinstance(name, ast.alias)
             if name.asname is not None:
-                self.errors.append(Error(
-                    name,
-                    f"Unexpected ``from ... import ... as ...``. "
-                    f"Only ``from ... import...`` statements are expected."))
+                self.errors.append(
+                    Error(
+                        name,
+                        f"Unexpected ``from ... import ... as ...``. "
+                        f"Only ``from ... import...`` statements are expected.",
+                    )
+                )
             else:
                 if name.name not in self._EXPECTED_NAME_FROM_MODULE:
-                    self.errors.append(Error(
-                        name,
-                        f"Unexpected import of a name {name.name!r}."))
+                    self.errors.append(
+                        Error(name, f"Unexpected import of a name {name.name!r}.")
+                    )
 
                 else:
                     expected_module = self._EXPECTED_NAME_FROM_MODULE[name.name]
                     if expected_module != node.module:
-                        self.errors.append(Error(
-                            name,
-                            f"Expected to import {name.name!r} "
-                            f"from the module {expected_module}, "
-                            f"but it is imported from {node.module}."))
+                        self.errors.append(
+                            Error(
+                                name,
+                                f"Expected to import {name.name!r} "
+                                f"from the module {expected_module}, "
+                                f"but it is imported from {node.module}.",
+                            )
+                        )
 
 
 def check_expected_imports(atok: asttokens.ASTTokens) -> List[str]:
@@ -149,27 +159,28 @@ def check_expected_imports(atok: asttokens.ASTTokens) -> List[str]:
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _enum_to_symbol(
-        node: ast.ClassDef, atok: asttokens.ASTTokens
+    node: ast.ClassDef, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Enumeration], Optional[Error]]:
     """Interpret a class which defines an enumeration."""
     is_superset_of = None  # type: Optional[List[Identifier]]
     for decorator_node in node.decorator_list:
         if (
-                isinstance(decorator_node, ast.Call)
-                and isinstance(decorator_node.func, ast.Name)
-                and decorator_node.func.id == 'is_superset_of'
+            isinstance(decorator_node, ast.Call)
+            and isinstance(decorator_node.func, ast.Name)
+            and decorator_node.func.id == "is_superset_of"
         ):
             if is_superset_of is not None:
                 return None, Error(
                     decorator_node,
-                    "Double definitions of ``is_superset_of`` are not allowed")
+                    "Double definitions of ``is_superset_of`` are not allowed",
+                )
 
             superset_arg_node = None  # type: Optional[ast.AST]
             if len(decorator_node.args) >= 1:
                 superset_arg_node = decorator_node.args[0]
             elif len(decorator_node.keywords) > 0:
                 for keyword in decorator_node.keywords:
-                    if keyword.arg == 'enums':
+                    if keyword.arg == "enums":
                         superset_arg_node = keyword.value
             else:
                 pass
@@ -178,13 +189,15 @@ def _enum_to_symbol(
                 return None, Error(
                     decorator_node,
                     "The ``enums`` argument is missing in the ``is_superset_of`` "
-                    "decorator")
+                    "decorator",
+                )
 
             if not isinstance(superset_arg_node, ast.List):
                 return None, Error(
                     decorator_node,
                     "Expected the ``enums`` argument of the ``is_superset_of`` "
-                    "to be a list literal, but it is not")
+                    "to be a list literal, but it is not",
+                )
 
             is_superset_of = []
 
@@ -194,14 +207,15 @@ def _enum_to_symbol(
                         decorator_node,
                         f"Expected all elements of the ``enums`` argument to "
                         f"the ``is_superset_of`` to be a list literal of enum names, "
-                        f"but got: {ast.dump(elt)}")
+                        f"but got: {ast.dump(elt)}",
+                    )
 
                 is_superset_of.append(Identifier(elt.id))
 
         elif (
-                isinstance(decorator_node, ast.Call)
-                and isinstance(decorator_node.func, ast.Name)
-                and decorator_node.func.id == 'reference_in_the_book'
+            isinstance(decorator_node, ast.Call)
+            and isinstance(decorator_node.func, ast.Name)
+            and decorator_node.func.id == "reference_in_the_book"
         ):
             # NOTE (mristin, 2021-11-17):
             # We ignore references at the moment. At some later point, it might
@@ -212,7 +226,8 @@ def _enum_to_symbol(
             return None, Error(
                 decorator_node,
                 f"We do not know how to handle this decorator node "
-                f"for an Enum: {ast.dump(decorator_node)}")
+                f"for an Enum: {ast.dump(decorator_node)}",
+            )
 
     if is_superset_of is None:
         is_superset_of = []
@@ -222,7 +237,9 @@ def _enum_to_symbol(
             Enumeration(
                 name=Identifier(node.name),
                 is_superset_of=is_superset_of,
-                literals=[], description=None, node=node
+                literals=[],
+                description=None,
+                node=node,
             ),
             None,
         )
@@ -252,28 +269,44 @@ def _enum_to_symbol(
             assign = body_node
 
             if len(assign.targets) != 1:
-                return (None, Error(
-                    assign,
-                    f"Expected a single target in the assignment, "
-                    f"but got: {len(assign.targets)}"))
+                return (
+                    None,
+                    Error(
+                        assign,
+                        f"Expected a single target in the assignment, "
+                        f"but got: {len(assign.targets)}",
+                    ),
+                )
 
             if not isinstance(assign.targets[0], ast.Name):
-                return (None, Error(
-                    assign.targets[0],
-                    f"Expected a name as a target of the assignment, "
-                    f"but got: {assign.targets[0]}"))
+                return (
+                    None,
+                    Error(
+                        assign.targets[0],
+                        f"Expected a name as a target of the assignment, "
+                        f"but got: {assign.targets[0]}",
+                    ),
+                )
 
             if not isinstance(assign.value, ast.Constant):
-                return (None, Error(
-                    assign.value,
-                    f"Expected a constant in the enumeration assignment, "
-                    f"but got: {atok.get_text(assign.value)}"))
+                return (
+                    None,
+                    Error(
+                        assign.value,
+                        f"Expected a constant in the enumeration assignment, "
+                        f"but got: {atok.get_text(assign.value)}",
+                    ),
+                )
 
             if not isinstance(assign.value.value, str):
-                return (None, Error(
-                    assign.value,
-                    f"Expected a string literal in the enumeration, "
-                    f"but got: {assign.value.value}"))
+                return (
+                    None,
+                    Error(
+                        assign.value,
+                        f"Expected a string literal in the enumeration, "
+                        f"but got: {assign.value.value}",
+                    ),
+                )
 
             literal_name = Identifier(assign.targets[0].id)
             literal_value = assign.value.value
@@ -284,7 +317,8 @@ def _enum_to_symbol(
             if next_expr is not None and is_string_expr(next_expr):
                 assert isinstance(next_expr, ast.Expr)
                 literal_description, error = _string_constant_to_description(
-                    next_expr.value)
+                    next_expr.value
+                )
 
                 if error is not None:
                     return None, error
@@ -296,16 +330,22 @@ def _enum_to_symbol(
                     name=literal_name,
                     value=Identifier(literal_value),
                     description=literal_description,
-                    node=assign))
+                    node=assign,
+                )
+            )
 
             cursor += 1
 
         else:
-            return (None, Error(
-                node.body[cursor],
-                f"Expected either a docstring or an assignment "
-                f"in an enumeration, "
-                f"but got: {atok.get_text(node.body[cursor])}"))
+            return (
+                None,
+                Error(
+                    node.body[cursor],
+                    f"Expected either a docstring or an assignment "
+                    f"in an enumeration, "
+                    f"but got: {atok.get_text(node.body[cursor])}",
+                ),
+            )
 
         assert cursor > old_cursor, f"Loop invariant: {cursor=}, {old_cursor=}"
 
@@ -315,13 +355,15 @@ def _enum_to_symbol(
             is_superset_of=is_superset_of,
             literals=enumeration_literals,
             description=description,
-            node=node),
-        None)
+            node=node,
+        ),
+        None,
+    )
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _type_annotation(
-        node: ast.AST, atok: asttokens.ASTTokens
+    node: ast.AST, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[TypeAnnotation], Optional[Error]]:
     """Parse the type annotation."""
     if isinstance(node, ast.Name):
@@ -329,22 +371,30 @@ def _type_annotation(
 
     elif isinstance(node, ast.Constant):
         if not isinstance(node.value, str):
-            return (None, Error(
-                node.value,
-                f"Expected a string literal "
-                f"if the type annotation is given as a constant, "
-                f"but got: "
-                f"{node.value!r} (as {type(node.value)})"))
+            return (
+                None,
+                Error(
+                    node.value,
+                    f"Expected a string literal "
+                    f"if the type annotation is given as a constant, "
+                    f"but got: "
+                    f"{node.value!r} (as {type(node.value)})",
+                ),
+            )
 
         return AtomicTypeAnnotation(identifier=Identifier(node.value), node=node), None
 
     elif isinstance(node, ast.Subscript):
         if not isinstance(node.value, ast.Name):
-            return (None, Error(
-                node.value,
-                f"Expected a name to define "
-                f"a subscripted type annotation,"
-                f"but got: {atok.get_text(node.value)}"))
+            return (
+                None,
+                Error(
+                    node.value,
+                    f"Expected a name to define "
+                    f"a subscripted type annotation,"
+                    f"but got: {atok.get_text(node.value)}",
+                ),
+            )
 
         if isinstance(node.slice, ast.Index):
             subscripts = []  # type: List[TypeAnnotation]
@@ -383,18 +433,23 @@ def _type_annotation(
 
             return (
                 SubscriptedTypeAnnotation(
-                    identifier=Identifier(node.value.id), subscripts=subscripts,
-                    node=node
+                    identifier=Identifier(node.value.id),
+                    subscripts=subscripts,
+                    node=node,
                 ),
                 None,
             )
 
         else:
-            return (None, Error(
-                node.slice,
-                f"Expected an index to define "
-                f"a subscripted type annotation, "
-                f"but got: {atok.get_text(node.slice)}"))
+            return (
+                None,
+                Error(
+                    node.slice,
+                    f"Expected an index to define "
+                    f"a subscripted type annotation, "
+                    f"but got: {atok.get_text(node.slice)}",
+                ),
+            )
     else:
         return (
             None,
@@ -409,7 +464,7 @@ def _type_annotation(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _ann_assign_to_property(
-        node: ast.AnnAssign, description: Optional[str], atok: asttokens.ASTTokens
+    node: ast.AnnAssign, description: Optional[str], atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Property], Optional[Error]]:
     if not isinstance(node.target, ast.Name):
         return (
@@ -461,7 +516,7 @@ def _ann_assign_to_property(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _args_to_arguments(
-        node: ast.arguments, atok: asttokens.ASTTokens
+    node: ast.arguments, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[List[Argument]], Optional[Error]]:
     """Parse arguments of a method."""
     if hasattr(node, "posonlyargs") and len(node.posonlyargs) > 0:
@@ -575,7 +630,7 @@ def _args_to_arguments(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _parse_contract_condition(
-        node: ast.Call, atok: asttokens.ASTTokens
+    node: ast.Call, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Contract], Optional[Error]]:
     """Parse the contract decorator."""
     condition_node = None  # type: Optional[ast.AST]
@@ -617,8 +672,8 @@ def _parse_contract_condition(
     description = None  # type: Optional[Description]
     if description_node is not None:
         if not (
-                isinstance(description_node, ast.Constant)
-                and isinstance(description_node.value, str)
+            isinstance(description_node, ast.Constant)
+            and isinstance(description_node.value, str)
         ):
             return (
                 None,
@@ -626,7 +681,8 @@ def _parse_contract_condition(
                     description_node,
                     f"Expected a string literal as a contract description, "
                     f"but got: {atok.get_text(description_node)!r}",
-                ))
+                ),
+            )
 
         description, error = _string_constant_to_description(description_node)
         if error is not None:
@@ -637,14 +693,15 @@ def _parse_contract_condition(
             args=[Identifier(arg.arg) for arg in condition_node.args.args],
             description=description,
             condition=condition_node,
-            node=node
+            node=node,
         ),
-        None)
+        None,
+    )
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _parse_snapshot(
-        node: ast.Call, atok: asttokens.ASTTokens
+    node: ast.Call, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Snapshot], Optional[Error]]:
     """Parse the snapshot decorator."""
     capture_node = None  # type: Optional[ast.AST]
@@ -677,11 +734,11 @@ def _parse_snapshot(
                 capture_node,
                 f"Expected a lambda function as a capture of a snapshot, "
                 f"but got: {atok.get_text(capture_node)}",
-            )
+            ),
         )
 
     if name_node is not None and not (
-            isinstance(name_node, ast.Constant) and isinstance(name_node.value, str)
+        isinstance(name_node, ast.Constant) and isinstance(name_node.value, str)
     ):
         return (
             None,
@@ -721,7 +778,7 @@ def _parse_snapshot(
             args=[Identifier(arg.arg) for arg in capture_node.args.args],
             name=Identifier(name),
             capture=capture_node,
-            node=node
+            node=node,
         ),
         None,
     )
@@ -737,7 +794,7 @@ def _parse_snapshot(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _function_def_to_method(
-        node: ast.FunctionDef, atok: asttokens.ASTTokens
+    node: ast.FunctionDef, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Method], Optional[Error]]:
     """Parse the function definition into a class method."""
     name = node.name
@@ -859,7 +916,8 @@ def _function_def_to_method(
         assert isinstance(node.body[0].value, ast.Constant)
 
         description, error = _string_constant_to_description(
-            constant=node.body[0].value)
+            constant=node.body[0].value
+        )
 
         if error is not None:
             return None, error
@@ -991,12 +1049,13 @@ def _function_def_to_method(
 @require(lambda constant: isinstance(constant.value, str))
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _string_constant_to_description(
-        constant: ast.Constant
+    constant: ast.Constant,
 ) -> Tuple[Optional[Description], Optional[Error]]:
     """Extract the docstring from the given string constant."""
     text = constant.value
-    assert isinstance(text, str), (
-        f"Expected a string constant node, but got: {ast.dump(constant)!r}")
+    assert isinstance(
+        text, str
+    ), f"Expected a string constant node, but got: {ast.dump(constant)!r}"
 
     dedented = textwrap.dedent(text)
 
@@ -1004,20 +1063,19 @@ def _string_constant_to_description(
     document = None  # type: Optional[docutils.nodes.document]
     try:
         document = docutils.core.publish_doctree(
-            dedented,
-            settings_overrides={
-                "warning_stream": warnings
-            })
+            dedented, settings_overrides={"warning_stream": warnings}
+        )
     except Exception as err:
         return None, Error(
-            constant,
-            f"Failed to parse the description with docutils: {err}")
+            constant, f"Failed to parse the description with docutils: {err}"
+        )
 
     warnings_text = warnings.getvalue()
     if warnings_text:
         return None, Error(
             constant,
-            f"Failed to parse the description with docutils:\n{warnings_text.strip()}")
+            f"Failed to parse the description with docutils:\n{warnings_text.strip()}",
+        )
 
     assert document is not None
 
@@ -1031,23 +1089,25 @@ class _ClassMarker(enum.Enum):
 
 
 _CLASS_MARKER_FROM_STRING: Mapping[str, _ClassMarker] = {
-    marker.value: marker
-    for marker in _ClassMarker
+    marker.value: marker for marker in _ClassMarker
 }
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _class_decorator_to_marker(
-        decorator: ast.Name
+    decorator: ast.Name,
 ) -> Tuple[Optional[_ClassMarker], Optional[Error]]:
     """Parse a simple decorator as a class marker."""
     class_marker = _CLASS_MARKER_FROM_STRING.get(decorator.id, None)
 
     if class_marker is None:
-        return (None, Error(
-            decorator,
-            f"The handling of the marker has not been implemented: {decorator.id!r}"
-        ))
+        return (
+            None,
+            Error(
+                decorator,
+                f"The handling of the marker has not been implemented: {decorator.id!r}",
+            ),
+        )
 
     return class_marker, None
 
@@ -1062,7 +1122,7 @@ def _class_decorator_to_marker(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def _class_decorator_to_serialization(
-        decorator: ast.Call
+    decorator: ast.Call,
 ) -> Tuple[Optional[Serialization], Optional[Error]]:
     """Translate a decorator to general serialization settings."""
     with_model_type_node = None  # type: Optional[ast.AST]
@@ -1072,27 +1132,39 @@ def _class_decorator_to_serialization(
 
     if len(decorator.keywords) > 0:
         for kwarg in decorator.keywords:
-            if kwarg.arg == 'with_model_type':
+            if kwarg.arg == "with_model_type":
                 with_model_type_node = kwarg.value
             else:
-                return (None, Error(
-                    decorator,
-                    f"Handling of the keyword argument {kwarg.arg!r} "
-                    f"for the serialization decorator has not been implemented"))
+                return (
+                    None,
+                    Error(
+                        decorator,
+                        f"Handling of the keyword argument {kwarg.arg!r} "
+                        f"for the serialization decorator has not been implemented",
+                    ),
+                )
 
     with_model_type = None  # type: Optional[bool]
     if with_model_type_node is not None:
         if not isinstance(with_model_type_node, ast.Constant):
-            return (None, Error(
-                with_model_type_node,
-                f"Expected the value for ``with_model_type`` parameter "
-                f"to be a constant, but got: {ast.dump(with_model_type_node)}"))
+            return (
+                None,
+                Error(
+                    with_model_type_node,
+                    f"Expected the value for ``with_model_type`` parameter "
+                    f"to be a constant, but got: {ast.dump(with_model_type_node)}",
+                ),
+            )
 
         if not isinstance(with_model_type_node.value, bool):
-            return (None, Error(
-                with_model_type_node,
-                f"Expected the value for ``with_model_type`` parameter "
-                f"to be a boolean, but got: {with_model_type_node.value}"))
+            return (
+                None,
+                Error(
+                    with_model_type_node,
+                    f"Expected the value for ``with_model_type`` parameter "
+                    f"to be a boolean, but got: {with_model_type_node.value}",
+                ),
+            )
 
         with_model_type = with_model_type_node.value
 
@@ -1109,8 +1181,7 @@ def _class_decorator_to_serialization(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def _class_decorator_to_invariant(
-        decorator: ast.Call,
-        atok: asttokens.ASTTokens
+    decorator: ast.Call, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Invariant], Optional[Error]]:
     """Parse the decorator node as a class invariant."""
     condition_node = None  # type: Optional[ast.AST]
@@ -1125,93 +1196,119 @@ def _class_decorator_to_invariant(
 
     if len(decorator.keywords) > 0:
         for kwarg in decorator.keywords:
-            if kwarg.arg == 'condition':
+            if kwarg.arg == "condition":
                 condition_node = kwarg.value
-            elif kwarg.arg == 'description':
+            elif kwarg.arg == "description":
                 description_node = kwarg.value
             else:
                 return (
-                    None, Error(
+                    None,
+                    Error(
                         decorator,
                         f"Handling of the keyword argument {kwarg.arg!r} "
-                        f"for the invariant has not been implemented"))
+                        f"for the invariant has not been implemented",
+                    ),
+                )
 
     if not isinstance(condition_node, ast.Lambda):
-        return (None, Error(
-            decorator,
-            f"Expected the condition of an invariant to be a lambda, "
-            f"but got {type(condition_node)}: {atok.get_text(decorator)}"))
+        return (
+            None,
+            Error(
+                decorator,
+                f"Expected the condition of an invariant to be a lambda, "
+                f"but got {type(condition_node)}: {atok.get_text(decorator)}",
+            ),
+        )
 
-    if (
-            description_node is not None
-            and (not isinstance(description_node, ast.Constant)
-                 or not isinstance(description_node.value, str))
+    if description_node is not None and (
+        not isinstance(description_node, ast.Constant)
+        or not isinstance(description_node.value, str)
     ):
-        return (None, Error(
-            decorator,
-            f"Expected the description of an invariant to be "
-            f"a string literal, but got: {type(description_node)}"))
+        return (
+            None,
+            Error(
+                decorator,
+                f"Expected the description of an invariant to be "
+                f"a string literal, but got: {type(description_node)}",
+            ),
+        )
 
-    if (
-            len(condition_node.args.args) != 1
-            or condition_node.args.args[0].arg != 'self'
-    ):
-        return (None, Error(
-            decorator,
-            "Expected the invariant to have a single argument, ``self``"))
+    if len(condition_node.args.args) != 1 or condition_node.args.args[0].arg != "self":
+        return (
+            None,
+            Error(
+                decorator, "Expected the invariant to have a single argument, ``self``"
+            ),
+        )
 
     body, error = _rules.ast_node_to_our_node(node=condition_node.body)
     if error is not None:
         return None, Error(
-            condition_node.body, "Failed to parse the invariant", [error])
+            condition_node.body, "Failed to parse the invariant", [error]
+        )
 
     if not isinstance(body, tree.Expression):
         return None, Error(
-            condition_node.body,
-            f"Expected an expression, but got: {tree.dump(body)}")
+            condition_node.body, f"Expected an expression, but got: {tree.dump(body)}"
+        )
 
-    return Invariant(
-        description=(
-            description_node.value
-            if description_node is not None
-            else None),
-        body=body,
-        node=decorator), None
+    return (
+        Invariant(
+            description=(
+                description_node.value if description_node is not None else None
+            ),
+            body=body,
+            node=decorator,
+        ),
+        None,
+    )
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _classdef_to_symbol(
-        node: ast.ClassDef, atok: asttokens.ASTTokens
+    node: ast.ClassDef, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Symbol], Optional[Error]]:
     """Interpret the class definition as a symbol."""
     underlying_errors = []  # type: List[Error]
 
-    if node.name.lower() in ['verification']:
-        underlying_errors.append(Error(
-            node,
-            f"The name of the class is reserved for "
-            f"aas-core: {node.name!r}"))
+    if node.name.lower() in ["verification"]:
+        underlying_errors.append(
+            Error(
+                node,
+                f"The name of the class is reserved for " f"aas-core: {node.name!r}",
+            )
+        )
 
     base_names = []  # type: List[str]
     for base in node.bases:
         if not isinstance(base, ast.Name):
-            underlying_errors.append(Error(
-                base,
-                f"Expected a base as a name, but got: {atok.get_text(base)}"))
+            underlying_errors.append(
+                Error(
+                    base, f"Expected a base as a name, but got: {atok.get_text(base)}"
+                )
+            )
         else:
             base_names.append(base.id)
 
     if len(underlying_errors) > 0:
-        return (None, Error(
-            node,
-            f"Failed to parse the class definition: {node.name}",
-            underlying=underlying_errors))
+        return (
+            None,
+            Error(
+                node,
+                f"Failed to parse the class definition: {node.name}",
+                underlying=underlying_errors,
+            ),
+        )
 
     if "Enum" in base_names and len(base_names) > 1:
-        return (None, Error(
-            node,
-            f"Expected an enumeration to only inherit from ``Enum``, "
-            f"but it inherits from: {base_names}"))
+        return (
+            None,
+            Error(
+                node,
+                f"Expected an enumeration to only inherit from ``Enum``, "
+                f"but it inherits from: {base_names}",
+            ),
+        )
 
     if "Enum" in base_names:
         return _enum_to_symbol(node=node, atok=atok)
@@ -1257,56 +1354,70 @@ def _classdef_to_symbol(
                 raise AssertionError(f"Unhandled enum: {class_marker}")
 
         elif (
-                isinstance(decorator, ast.Call)
-                and isinstance(decorator.func, ast.Name)
-                and isinstance(decorator.func.ctx, ast.Load)
+            isinstance(decorator, ast.Call)
+            and isinstance(decorator.func, ast.Name)
+            and isinstance(decorator.func.ctx, ast.Load)
         ):
-            if decorator.func.id == 'invariant':
+            if decorator.func.id == "invariant":
                 invariant, error = _class_decorator_to_invariant(
-                    decorator=decorator, atok=atok)
+                    decorator=decorator, atok=atok
+                )
 
                 if error is not None:
                     underlying_errors.append(error)
                     continue
 
                 invariants.append(invariant)
-            elif decorator.func.id == 'serialization':
+            elif decorator.func.id == "serialization":
                 if serialization is not None:
-                    underlying_errors.append(Error(
-                        decorator,
-                        "Repeated markings for serialization settings are not allowed"))
+                    underlying_errors.append(
+                        Error(
+                            decorator,
+                            "Repeated markings for serialization settings are not allowed",
+                        )
+                    )
                     continue
 
                 serialization, error = _class_decorator_to_serialization(
-                    decorator=decorator)
+                    decorator=decorator
+                )
 
                 if error is not None:
                     underlying_errors.append(error)
                     continue
 
-            elif decorator.func.id == 'reference_in_the_book':
+            elif decorator.func.id == "reference_in_the_book":
                 # NOTE (mristin, 2021-11-17):
                 # We ignore references at the moment. At some later point, it might
                 # make sense to integrate them in the generated code.
                 pass
 
             else:
-                underlying_errors.append(Error(
-                    decorator,
-                    f"Handling of a decorator has not been "
-                    f"implemented: {decorator.func.id!r}"))
+                underlying_errors.append(
+                    Error(
+                        decorator,
+                        f"Handling of a decorator has not been "
+                        f"implemented: {decorator.func.id!r}",
+                    )
+                )
         else:
             underlying_errors.append(
                 Error(
                     decorator,
                     message=f"Handling of a decorator has not been "
-                            f"implemented: {decorator.id!r}"))
+                    f"implemented: {decorator.id!r}",
+                )
+            )
 
     if len(underlying_errors) > 0:
-        return (None, Error(
-            node,
-            f"Failed to parse the class definition: {node.name}",
-            underlying=underlying_errors))
+        return (
+            None,
+            Error(
+                node,
+                f"Failed to parse the class definition: {node.name}",
+                underlying=underlying_errors,
+            ),
+        )
 
     # endregion
 
@@ -1316,8 +1427,10 @@ def _classdef_to_symbol(
             Error(
                 node,
                 message=f"Abstract classes can not be implementation-specific "
-                        f"at the same time "
-                        f"(otherwise we can not convert them to interfaces etc.)"))
+                f"at the same time "
+                f"(otherwise we can not convert them to interfaces etc.)",
+            ),
+        )
 
     description = None  # type: Optional[Description]
 
@@ -1350,7 +1463,8 @@ def _classdef_to_symbol(
             if next_expr is not None and is_string_expr(next_expr):
                 assert isinstance(next_expr, ast.Expr)
                 property_description, error = _string_constant_to_description(
-                    next_expr.value)
+                    next_expr.value
+                )
 
                 if error is not None:
                     return None, error
@@ -1390,12 +1504,15 @@ def _classdef_to_symbol(
             cursor += 1
 
         else:
-            return (None, Error(
-                expr,
-                f"Expected only either "
-                f"properties explicitly annotated with types or "
-                f"instance methods, but got: {atok.get_text(expr)}",
-            ))
+            return (
+                None,
+                Error(
+                    expr,
+                    f"Expected only either "
+                    f"properties explicitly annotated with types or "
+                    f"instance methods, but got: {atok.get_text(expr)}",
+                ),
+            )
 
         assert old_cursor < cursor, f"Loop invariant: {old_cursor=}, {cursor=}"
 
@@ -1430,15 +1547,16 @@ def _classdef_to_symbol(
 )
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
-def _parse_associate_ref_with(call: ast.Call) -> Tuple[
-    Optional[Identifier], Optional[Error]]:
+def _parse_associate_ref_with(
+    call: ast.Call,
+) -> Tuple[Optional[Identifier], Optional[Error]]:
     """Parse the call to ``associate_ref_with`` in the meta-model module."""
     cls_node = None  # type: Optional[ast.AST]
     if len(call.args) >= 1:
         cls_node = call.args[0]
 
     for keyword in call.keywords:
-        if keyword.arg == 'cls':
+        if keyword.arg == "cls":
             cls_node = keyword.value
 
     if cls_node is None:
@@ -1450,26 +1568,24 @@ def _parse_associate_ref_with(call: ast.Call) -> Tuple[
         return None, Error(
             cls_node,
             f"We do not know how to interpret "
-            f"the ``cls`` argument: {ast.dump(cls_node)}")
+            f"the ``cls`` argument: {ast.dump(cls_node)}",
+        )
 
 
 def _verify_arity_of_type_annotation_subscript(
-        type_annotation: SubscriptedTypeAnnotation
+    type_annotation: SubscriptedTypeAnnotation,
 ) -> Optional[Error]:
     """
     Check that the subscripted type annotation has the expected number of arguments.
 
     :return: error message, if any
     """
-    expected_arity_map = {
-        "List": 1,
-        "Optional": 1,
-        "Ref": 1
-    }
+    expected_arity_map = {"List": 1, "Optional": 1, "Ref": 1}
     expected_arity = expected_arity_map.get(type_annotation.identifier, None)
     if expected_arity is None:
         raise AssertionError(
-            f"Unexpected subscripted type annotation: {type_annotation}")
+            f"Unexpected subscripted type annotation: {type_annotation}"
+        )
 
     assert expected_arity >= 0
     if len(type_annotation.subscripts) != expected_arity:
@@ -1477,7 +1593,8 @@ def _verify_arity_of_type_annotation_subscript(
             type_annotation.node,
             f"Expected {expected_arity} arguments of "
             f"a subscripted type annotation {type_annotation.identifier!r}, "
-            f"but got {len(type_annotation.subscripts)}: {type_annotation}")
+            f"but got {len(type_annotation.subscripts)}: {type_annotation}",
+        )
 
     return None
 
@@ -1491,7 +1608,7 @@ def _verify_arity_of_type_annotation_subscript(
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 # fmt: on
 def _verify_symbol_table(
-        symbol_table: UnverifiedSymbolTable,
+    symbol_table: UnverifiedSymbolTable,
 ) -> Tuple[Optional[SymbolTable], Optional[List[Error]]]:
     """
     Check that the symbol table is consistent.
@@ -1504,59 +1621,75 @@ def _verify_symbol_table(
     # region Check reserved names
 
     reserved_symbol_names = {
-        'aas',
-        'accept',
-        'context',
-        'class',
-        'error',
-        'errors',
-        'iclass',
-        'itransformer_with_context',
-        'ivisitor',
-        'ivisitor_with_context',
-        'jsonization',
-        'path',
-        'stringification',
-        'transform',
-        'transformer',
-        'transformer_with_context'
-        'verification',
-        'visit',
-        'visitation',
-        'visitor',
-        'visitor_with_context',
+        "aas",
+        "accept",
+        "context",
+        "class",
+        "error",
+        "errors",
+        "iclass",
+        "itransformer_with_context",
+        "ivisitor",
+        "ivisitor_with_context",
+        "jsonization",
+        "path",
+        "stringification",
+        "transform",
+        "transformer",
+        "transformer_with_context" "verification",
+        "visit",
+        "visitation",
+        "visitor",
+        "visitor_with_context",
     }
     reserved_member_names = {
-        'descend', 'descend_once', 'accept', 'transform', 'model_type', 'property_name'
+        "descend",
+        "descend_once",
+        "accept",
+        "transform",
+        "model_type",
+        "property_name",
     }
 
     for symbol in symbol_table.symbols:
         if symbol.name.startswith("I_"):
-            errors.append(Error(
-                symbol.node,
-                f"The prefix ``I_`` in the name of the symbol is reserved "
-                f"for the code generation: {symbol.name!r}"))
+            errors.append(
+                Error(
+                    symbol.node,
+                    f"The prefix ``I_`` in the name of the symbol is reserved "
+                    f"for the code generation: {symbol.name!r}",
+                )
+            )
 
         if symbol.name.lower() in reserved_symbol_names:
-            errors.append(Error(
-                symbol.node,
-                f"The name of the symbol is reserved "
-                f"for the code generation: {symbol.name!r}"))
+            errors.append(
+                Error(
+                    symbol.node,
+                    f"The name of the symbol is reserved "
+                    f"for the code generation: {symbol.name!r}",
+                )
+            )
 
         if isinstance(symbol, Class):
             for method in symbol.methods:
                 if method.name in reserved_member_names:
-                    errors.append(Error(
-                        method.node,
-                        f"The name of the method is reserved "
-                        f"for the code generation: {method.name!r}"))
+                    errors.append(
+                        Error(
+                            method.node,
+                            f"The name of the method is reserved "
+                            f"for the code generation: {method.name!r}",
+                        )
+                    )
 
             for prop in symbol.properties:
                 if prop.name in reserved_member_names:
-                    errors.append(Error(
-                        prop.node,
-                        f"The name of the property is reserved "
-                        f"for the code generation: {prop.name!r}"))
+                    errors.append(
+                        Error(
+                            prop.node,
+                            f"The name of the property is reserved "
+                            f"for the code generation: {prop.name!r}",
+                        )
+                    )
     # endregion
 
     # region Check dangling inheritances
@@ -1573,7 +1706,9 @@ def _verify_symbol_table(
                     Error(
                         symbol.node,
                         f"The inheritance for class {symbol.name} "
-                        f"is dangling: {inheritance}"))
+                        f"is dangling: {inheritance}",
+                    )
+                )
 
             elif not isinstance(parent_symbol, Class):
                 errors.append(
@@ -1582,7 +1717,9 @@ def _verify_symbol_table(
                         f"Expected the class {symbol.name} to inherit "
                         f"from an abstract class, "
                         f"but it inherits from a symbol of type "
-                        f"{parent_symbol.__class__.__name__}: {parent_symbol.name}"))
+                        f"{parent_symbol.__class__.__name__}: {parent_symbol.name}",
+                    )
+                )
 
             elif not isinstance(parent_symbol, AbstractClass):
                 errors.append(
@@ -1608,7 +1745,7 @@ def _verify_symbol_table(
     # the ``BUILTIN_COMPOSITE_TYPES`` and add them to the copy.
 
     def verify_no_dangling_references_in_type_annotation(
-            type_annotation: TypeAnnotation,
+        type_annotation: TypeAnnotation,
     ) -> Optional[Error]:
         """
         Check that the type annotation contains no dangling references.
@@ -1623,7 +1760,7 @@ def _verify_symbol_table(
                 return Error(
                     type_annotation.node,
                     f"The type annotation is expected with subscript(s), "
-                    f"but got none: {type_annotation.identifier}"
+                    f"but got none: {type_annotation.identifier}",
                 )
 
             if symbol_table.find(type_annotation.identifier) is not None:
@@ -1632,14 +1769,15 @@ def _verify_symbol_table(
             return Error(
                 type_annotation.node,
                 f"The type annotation could not be found "
-                f"in the symbol table: {type_annotation.identifier}"
+                f"in the symbol table: {type_annotation.identifier}",
             )
 
         elif isinstance(type_annotation, SubscriptedTypeAnnotation):
             if type_annotation.identifier not in expected_subscripted_types:
                 return Error(
                     type_annotation.node,
-                    f"Unexpected subscripted type: {type_annotation.identifier}")
+                    f"Unexpected subscripted type: {type_annotation.identifier}",
+                )
 
             for subscript in type_annotation.subscripts:
                 error_in_subscript = verify_no_dangling_references_in_type_annotation(
@@ -1672,7 +1810,8 @@ def _verify_symbol_table(
                 # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
                 if isinstance(prop.type_annotation, SubscriptedTypeAnnotation):
                     error = _verify_arity_of_type_annotation_subscript(
-                        prop.type_annotation)
+                        prop.type_annotation
+                    )
 
                     if error is not None:
                         errors.append(error)
@@ -1680,7 +1819,8 @@ def _verify_symbol_table(
         for method in symbol.methods:
             for arg in method.arguments:
                 error = verify_no_dangling_references_in_type_annotation(
-                    type_annotation=arg.type_annotation)
+                    type_annotation=arg.type_annotation
+                )
 
                 if error is not None:
                     errors.append(error)
@@ -1688,7 +1828,8 @@ def _verify_symbol_table(
                     # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
                     if isinstance(arg.type_annotation, SubscriptedTypeAnnotation):
                         error = _verify_arity_of_type_annotation_subscript(
-                            arg.type_annotation)
+                            arg.type_annotation
+                        )
 
                         if error is not None:
                             errors.append(error)
@@ -1704,7 +1845,8 @@ def _verify_symbol_table(
                     # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
                     if isinstance(method.returns, SubscriptedTypeAnnotation):
                         error = _verify_arity_of_type_annotation_subscript(
-                            method.returns)
+                            method.returns
+                        )
 
                         if error is not None:
                             errors.append(error)
@@ -1720,7 +1862,7 @@ def _verify_symbol_table(
 @require(lambda atok: isinstance(atok.tree, ast.Module))
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _atok_to_symbol_table(
-        atok: asttokens.ASTTokens,
+    atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[SymbolTable], Optional[Error]]:
     symbols = []  # type: List[Symbol]
     underlying_errors = []  # type: List[Error]
@@ -1749,13 +1891,14 @@ def _atok_to_symbol_table(
                 assert symbol is not None
                 symbols.append(symbol)
         elif (
-                isinstance(node, ast.Expr)
-                and isinstance(node.value, ast.Constant)
-                and isinstance(node.value.value, str)
+            isinstance(node, ast.Expr)
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
         ):
             # The first string literal is assumed to be the docstring of the meta-model.
             description, description_error = _string_constant_to_description(
-                constant=node.value)
+                constant=node.value
+            )
 
             if description_error is not None:
                 assert description is None
@@ -1767,66 +1910,80 @@ def _atok_to_symbol_table(
             pass
 
         elif (
-                isinstance(node, ast.Assign)
-                and len(node.targets) == 1
-                and isinstance(node.targets[0], ast.Name)
-                and isinstance(node.value, ast.Constant)
-                and isinstance(node.value.value, str)
+            isinstance(node, ast.Assign)
+            and len(node.targets) == 1
+            and isinstance(node.targets[0], ast.Name)
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
         ):
-            if node.targets[0].id == '__book_url__':
+            if node.targets[0].id == "__book_url__":
                 book_url = node.targets[0].id
-            elif node.targets[0].id == '__book_version__':
+            elif node.targets[0].id == "__book_version__":
                 book_version = node.targets[0].id
             else:
-                underlying_errors.append(Error(
-                    node,
-                    f"We do not know how to interpret "
-                    f"the assignment node: {ast.dump(node)}"
-                ))
+                underlying_errors.append(
+                    Error(
+                        node,
+                        f"We do not know how to interpret "
+                        f"the assignment node: {ast.dump(node)}",
+                    )
+                )
                 continue
         elif (
-                isinstance(node, ast.Expr)
-                and isinstance(node.value, ast.Call)
-                and isinstance(node.value.func, ast.Name)
+            isinstance(node, ast.Expr)
+            and isinstance(node.value, ast.Call)
+            and isinstance(node.value.func, ast.Name)
         ):
             func_name = Identifier(node.value.func.id)
 
-            if func_name == 'associate_ref_with':
+            if func_name == "associate_ref_with":
                 ref_association_call = node.value
                 ref_association_id, error = _parse_associate_ref_with(
-                    call=ref_association_call)
+                    call=ref_association_call
+                )
                 if error:
                     underlying_errors.append(error)
                     continue
             else:
-                underlying_errors.append(Error(
-                    node,
-                    f"We do not know how to interpret the call "
-                    f"to function {func_name!r}"
-                ))
+                underlying_errors.append(
+                    Error(
+                        node,
+                        f"We do not know how to interpret the call "
+                        f"to function {func_name!r}",
+                    )
+                )
                 continue
 
         else:
-            underlying_errors.append(Error(
-                node,
-                f"We do not know how to parse the AST node: {ast.dump(node)}"))
+            underlying_errors.append(
+                Error(
+                    node, f"We do not know how to parse the AST node: {ast.dump(node)}"
+                )
+            )
 
     if book_url is None:
-        underlying_errors.append(Error(
-            None,
-            "The book URL (given as assignment to ``__book_url__``) is missing"))
+        underlying_errors.append(
+            Error(
+                None,
+                "The book URL (given as assignment to ``__book_url__``) is missing",
+            )
+        )
 
     if book_version is None:
-        underlying_errors.append(Error(
-            None,
-            "The book version (given as assignment to ``__book_version__``) "
-            "is missing"))
+        underlying_errors.append(
+            Error(
+                None,
+                "The book version (given as assignment to ``__book_version__``) "
+                "is missing",
+            )
+        )
 
     if len(underlying_errors) > 0:
         return None, Error(atok.tree, "Failed to parse the AST", underlying_errors)
 
-    assert ref_association_id is not None, (
-        "Expected ref_association_id to be set if no underlying errors")
+    assert (
+        ref_association_id is not None
+    ), "Expected ref_association_id to be set if no underlying errors"
 
     ref_association = None  # type: Optional[Symbol]
     for symbol in symbols:
@@ -1836,14 +1993,16 @@ def _atok_to_symbol_table(
     if ref_association is None:
         return None, Error(
             ref_association_call,
-            "Could not find the symbol to be associated with ``Ref``")
+            "Could not find the symbol to be associated with ``Ref``",
+        )
 
     if not isinstance(ref_association, ConcreteClass):
         return None, Error(
             ref_association_call,
             f"Expected the symbol to be associated with ``Ref``, "
             f"{ref_association.name} to be a concrete class, "
-            f"but got: {type(ref_association)}")
+            f"but got: {type(ref_association)}",
+        )
 
     # endregion
 
@@ -1851,14 +2010,19 @@ def _atok_to_symbol_table(
         symbols=symbols,
         ref_association=ref_association,
         meta_model=MetaModel(
-            book_version=book_version, book_url=book_url, description=description))
+            book_version=book_version, book_url=book_url, description=description
+        ),
+    )
 
     symbol_table, verification_errors = _verify_symbol_table(unverified_symbol_table)
 
     if verification_errors is not None:
-        return (None, Error(
-            atok.tree,
-            "Verification of the meta-model failed", verification_errors))
+        return (
+            None,
+            Error(
+                atok.tree, "Verification of the meta-model failed", verification_errors
+            ),
+        )
 
     assert symbol_table is not None
     return symbol_table, None
@@ -1867,7 +2031,7 @@ def _atok_to_symbol_table(
 @require(lambda atok: isinstance(atok.tree, ast.Module))
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def atok_to_symbol_table(
-        atok: asttokens.ASTTokens,
+    atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[SymbolTable], Optional[Error]]:
     """Construct the symbol table based on the parsed AST."""
     table, error = _atok_to_symbol_table(atok=atok)

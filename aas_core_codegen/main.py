@@ -7,9 +7,7 @@ import sys
 from typing import TextIO
 
 import aas_core_codegen
-from aas_core_codegen import (
-    parse, run, specific_implementations, intermediate
-)
+from aas_core_codegen import parse, run, specific_implementations, intermediate
 from aas_core_codegen.common import LinenoColumner, assert_never
 
 assert aas_core_codegen.__doc__ == __doc__
@@ -26,11 +24,11 @@ class Parameters:
     """Represent the program parameters."""
 
     def __init__(
-            self,
-            model_path: pathlib.Path,
-            target: Target,
-            snippets_dir: pathlib.Path,
-            output_dir: pathlib.Path
+        self,
+        model_path: pathlib.Path,
+        target: Target,
+        snippets_dir: pathlib.Path,
+        output_dir: pathlib.Path,
     ) -> None:
         """Initialize with the given values."""
         self.model_path = model_path
@@ -50,7 +48,8 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test this failure case
     if not params.model_path.is_file():
         stderr.write(
-            f"The --model_path does not point to a file: {params.model_path}\n")
+            f"The --model_path does not point to a file: {params.model_path}\n"
+        )
         return 1
 
     # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test this failure case
@@ -62,7 +61,8 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     if not params.snippets_dir.is_dir():
         stderr.write(
             f"The --snippets_dir does not point to a directory: "
-            f"{params.snippets_dir}\n")
+            f"{params.snippets_dir}\n"
+        )
         return 1
 
     # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test the happy path
@@ -73,26 +73,28 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         if not params.output_dir.is_dir():
             stderr.write(
                 f"The --output_dir does not point to a directory: "
-                f"{params.output_dir}\n")
+                f"{params.output_dir}\n"
+            )
             return 1
 
     # endregion
 
     # region Parse
 
-    spec_impls, spec_impls_errors = (
-        specific_implementations.read_from_directory(
-            snippets_dir=params.snippets_dir))
+    spec_impls, spec_impls_errors = specific_implementations.read_from_directory(
+        snippets_dir=params.snippets_dir
+    )
 
     if spec_impls_errors:
         run.write_error_report(
             message="Failed to resolve the implementation-specific "
-                    "JSON schema snippets",
+            "JSON schema snippets",
             errors=spec_impls_errors,
-            stderr=stderr)
+            stderr=stderr,
+        )
         return 1
 
-    text = params.model_path.read_text(encoding='utf-8')
+    text = params.model_path.read_text(encoding="utf-8")
 
     # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
     #  test all the following individual failure cases
@@ -142,8 +144,8 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     if error is not None:
         run.write_error_report(
             message=f"Failed to translate the parsed symbol table "
-                    f"to intermediate symbol table "
-                    f"based on {params.model_path}",
+            f"to intermediate symbol table "
+            f"based on {params.model_path}",
             errors=[lineno_columner.error_message(error)],
             stderr=stderr,
         )
@@ -151,7 +153,8 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         return 1
 
     interface_implementers = intermediate.map_interface_implementers(
-        symbol_table=ir_symbol_table)
+        symbol_table=ir_symbol_table
+    )
 
     # endregion
 
@@ -163,7 +166,8 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         spec_impls=spec_impls,
         interface_implementers=interface_implementers,
         lineno_columner=lineno_columner,
-        output_dir=params.output_dir)
+        output_dir=params.output_dir,
+    )
 
     # NOTE (mristin, 2021-11-24):
     # Import the individual modules only if necessary to optimize for the start-up time.
@@ -172,18 +176,24 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     if params.target == Target.CSHARP:
         import aas_core_codegen.csharp.main as csharp_main
+
         return csharp_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
     elif params.target == Target.JSONSCHEMA:
         import aas_core_codegen.jsonschema.main as jsonschema_main
-        return jsonschema_main.execute(context=run_context, stdout=stdout, stderr=stderr)
+
+        return jsonschema_main.execute(
+            context=run_context, stdout=stdout, stderr=stderr
+        )
 
     elif params.target == Target.RDF_SHACL:
         import aas_core_codegen.rdf_shacl.main as rdf_shacl_main
+
         return rdf_shacl_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
     elif params.target == Target.XSD:
         import aas_core_codegen.xsd.main as xsd_main
+
         return xsd_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
     else:
@@ -207,13 +217,16 @@ def main(prog: str) -> int:
     parser.add_argument(
         "--snippets_dir",
         help="path to the directory containing implementation-specific code snippets",
-        required=True)
+        required=True,
+    )
     parser.add_argument(
         "--output_dir", help="path to the generated code", required=True
     )
     parser.add_argument(
-        "--target", help="target language or schema", required=True,
-        choices=[literal.value for literal in Target]
+        "--target",
+        help="target language or schema",
+        required=True,
+        choices=[literal.value for literal in Target],
     )
     args = parser.parse_args()
 
@@ -223,7 +236,7 @@ def main(prog: str) -> int:
         model_path=pathlib.Path(args.model_path),
         target=target_to_str[args.target],
         snippets_dir=pathlib.Path(args.snippets_dir),
-        output_dir=pathlib.Path(args.output_dir)
+        output_dir=pathlib.Path(args.output_dir),
     )
 
     return execute(params=params, stdout=sys.stdout, stderr=sys.stderr)

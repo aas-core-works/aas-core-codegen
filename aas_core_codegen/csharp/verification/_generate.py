@@ -6,35 +6,31 @@ from typing import Tuple, Optional, List
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate, specific_implementations
-from aas_core_codegen.common import Error, Stripped, assert_never, \
-    Identifier
+from aas_core_codegen.common import Error, Stripped, assert_never, Identifier
 from aas_core_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming,
-    unrolling as csharp_unrolling
+    unrolling as csharp_unrolling,
 )
-from aas_core_codegen.csharp.common import (
-    INDENT as I,
-    INDENT2 as II,
-    INDENT3 as III
-)
-from aas_core_codegen.parse import (tree as parse_tree)
+from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II, INDENT3 as III
+from aas_core_codegen.parse import tree as parse_tree
 
 
 # region Verify
 
+
 def verify(
-        spec_impls: specific_implementations.SpecificImplementations
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Optional[List[str]]:
     """Verify all the implementation snippets related to verification."""
     errors = []  # type: List[str]
 
     expected_keys = [
-        specific_implementations.ImplementationKey('Verification/is_IRI.cs'),
-        specific_implementations.ImplementationKey('Verification/is_IRDI.cs'),
-        specific_implementations.ImplementationKey('Verification/is_ID_short.cs'),
-        specific_implementations.ImplementationKey('Verification/Error.cs'),
-        specific_implementations.ImplementationKey('Verification/Errors.cs')
+        specific_implementations.ImplementationKey("Verification/is_IRI.cs"),
+        specific_implementations.ImplementationKey("Verification/is_IRDI.cs"),
+        specific_implementations.ImplementationKey("Verification/is_ID_short.cs"),
+        specific_implementations.ImplementationKey("Verification/Error.cs"),
+        specific_implementations.ImplementationKey("Verification/Errors.cs"),
     ]
     for key in expected_keys:
         if key not in spec_impls:
@@ -50,9 +46,10 @@ def verify(
 
 # region Generate
 
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_pattern_class(
-        spec_impls: specific_implementations.SpecificImplementations
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the Pattern class used for verifying different patterns.
 
@@ -62,17 +59,20 @@ def _generate_pattern_class(
     errors = []  # type: List[Error]
 
     implementation_keys = [
-        specific_implementations.ImplementationKey('Verification/is_IRI.cs'),
-        specific_implementations.ImplementationKey('Verification/is_IRDI.cs'),
-        specific_implementations.ImplementationKey('Verification/is_ID_short.cs')
+        specific_implementations.ImplementationKey("Verification/is_IRI.cs"),
+        specific_implementations.ImplementationKey("Verification/is_IRDI.cs"),
+        specific_implementations.ImplementationKey("Verification/is_ID_short.cs"),
     ]
 
     for implementation_key in implementation_keys:
         implementation = spec_impls.get(implementation_key, None)
         if implementation is None:
-            errors.append(Error(
-                None,
-                f"The implementation of the pattern is missing: {implementation_key}"))
+            errors.append(
+                Error(
+                    None,
+                    f"The implementation of the pattern is missing: {implementation_key}",
+                )
+            )
         else:
             blocks.append(implementation)
 
@@ -80,14 +80,14 @@ def _generate_pattern_class(
         return None, errors
 
     writer = io.StringIO()
-    writer.write('public static class Pattern\n{\n')
+    writer.write("public static class Pattern\n{\n")
     for i, block in enumerate(blocks):
         if i > 0:
-            writer.write('\n\n')
+            writer.write("\n\n")
 
         writer.write(textwrap.indent(block.strip(), I))
 
-    writer.write('\n}')
+    writer.write("\n}")
     return Stripped(writer.getvalue()), None
 
 
@@ -100,25 +100,32 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
             continue
 
         enum_name = csharp_naming.enum_name(symbol.name)
-        blocks.append(Stripped(
-            f"public static HashSet<int> For{enum_name} = new HashSet<int>(\n"
-            f"{I}System.Enum.GetValues(typeof(Aas.{enum_name})).Cast<int>());"))
+        blocks.append(
+            Stripped(
+                f"public static HashSet<int> For{enum_name} = new HashSet<int>(\n"
+                f"{I}System.Enum.GetValues(typeof(Aas.{enum_name})).Cast<int>());"
+            )
+        )
 
     writer = io.StringIO()
-    writer.write(textwrap.dedent('''\
+    writer.write(
+        textwrap.dedent(
+            """\
         /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary> 
         private static class EnumValueSet
         {
-        '''))
+        """
+        )
+    )
     for i, block in enumerate(blocks):
         if i > 0:
-            writer.write('\n\n')
+            writer.write("\n\n")
 
         writer.write(textwrap.indent(block, I))
 
-    writer.write('\n}  // private static class EnumValueSet')
+    writer.write("\n}  // private static class EnumValueSet")
 
     return Stripped(writer.getvalue())
 
@@ -131,10 +138,10 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
     def var_name(var_index: int, suffix: str) -> Identifier:
         """Generate the name of the loop variable."""
         if var_index == 0:
-            if suffix == 'Item':
+            if suffix == "Item":
                 return Identifier(f"an{suffix}")
             else:
-                assert suffix == 'KeyValue'
+                assert suffix == "KeyValue"
                 return Identifier(f"a{suffix}")
 
         elif var_index == 1:
@@ -145,11 +152,11 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
     prop_name = csharp_naming.property_name(prop.name)
 
     def unroll(
-            current_var_name: str,
-            item_count: int,
-            key_value_count: int,
-            path: List[str],
-            type_anno: intermediate.TypeAnnotation
+        current_var_name: str,
+        item_count: int,
+        key_value_count: int,
+        path: List[str],
+        type_anno: intermediate.TypeAnnotation,
     ) -> List[csharp_unrolling.Node]:
         """Generate the node corresponding to the ``type_anno`` and recurse."""
         if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
@@ -160,11 +167,12 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
                 return []
 
             enum_name = csharp_naming.enum_name(type_anno.symbol.name)
-            joined_pth = '/'.join(path)
+            joined_pth = "/".join(path)
 
             return [
                 csharp_unrolling.Node(
-                    text=textwrap.dedent(f'''\
+                    text=textwrap.dedent(
+                        f"""\
                     if (!Verification.Implementation.EnumValueSet.For{enum_name}.Contains(
                     {II}(int){current_var_name}))
                     {{
@@ -172,8 +180,11 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
                     {II}new Verification.Error(
                     {III}$"{{path}}/{joined_pth}",
                     {III}$"Invalid {{nameof(Aas.{enum_name})}}: {{{current_var_name}}}"));
-                    }}'''),
-                    children=[])]
+                    }}"""
+                    ),
+                    children=[],
+                )
+            ]
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             item_var = var_name(item_count, "Item")
@@ -182,15 +193,16 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
                 current_var_name=item_var,
                 item_count=item_count + 1,
                 key_value_count=key_value_count,
-                path=path + [f'{{{item_var}}}'],
-                type_anno=type_anno.items)
+                path=path + [f"{{{item_var}}}"],
+                type_anno=type_anno.items,
+            )
 
             if len(children) == 0:
                 return []
 
             node = csharp_unrolling.Node(
-                text=f"foreach (var {item_var} in {current_var_name}",
-                children=children)
+                text=f"foreach (var {item_var} in {current_var_name}", children=children
+            )
 
             return [node]
 
@@ -200,31 +212,37 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
                 item_count=item_count,
                 key_value_count=key_value_count,
                 path=path,
-                type_anno=type_anno.value)
+                type_anno=type_anno.value,
+            )
             if len(children) > 0:
-                return [csharp_unrolling.Node(
-                    text=f"if ({current_var_name} != null)", children=children)]
+                return [
+                    csharp_unrolling.Node(
+                        text=f"if ({current_var_name} != null)", children=children
+                    )
+                ]
             else:
                 return []
         else:
             assert_never(type_anno)
 
     roots = unroll(
-        current_var_name=f'that.{prop_name}',
+        current_var_name=f"that.{prop_name}",
         item_count=0,
         key_value_count=0,
         path=[prop_name],
-        type_anno=prop.type_annotation)
+        type_anno=prop.type_annotation,
+    )
 
     if len(roots) == 0:
-        return Stripped('')
+        return Stripped("")
 
     blocks = [csharp_unrolling.render(root) for root in roots]
-    return Stripped('\n\n'.join(blocks))
+    return Stripped("\n\n".join(blocks))
 
 
 class _InvariantTranspiler(
-        parse_tree.Transformer[Tuple[Optional[Stripped], Optional[Error]]]):
+    parse_tree.Transformer[Tuple[Optional[Stripped], Optional[Error]]]
+):
     """Transpile an invariant expression into a code, or an error."""
 
     def __init__(self, symbol_table: intermediate.SymbolTable) -> None:
@@ -233,16 +251,14 @@ class _InvariantTranspiler(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform(
-            self,
-            node: parse_tree.Node
+        self, node: parse_tree.Node
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         """Dispatch to the appropriate transformation method."""
         return node.transform(self)
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_member(
-            self,
-            node: parse_tree.Member
+        self, node: parse_tree.Member
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         instance, error = self.transform(node.instance)
         if error is not None:
@@ -270,13 +286,12 @@ class _InvariantTranspiler(
         parse_tree.Comparator.GT: ">",
         parse_tree.Comparator.GE: ">=",
         parse_tree.Comparator.EQ: "==",
-        parse_tree.Comparator.NE: "!="
+        parse_tree.Comparator.NE: "!=",
     }
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_comparison(
-            self,
-            node: parse_tree.Comparison
+        self, node: parse_tree.Comparison
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         comparator = _InvariantTranspiler._CSHARP_COMPARISON_MAP[node.op]
 
@@ -292,22 +307,19 @@ class _InvariantTranspiler(
 
         if len(errors) > 0:
             return None, Error(
-                node.original_node,
-                "Failed to transpile the comparison",
-                errors)
-
+                node.original_node, "Failed to transpile the comparison", errors
+            )
 
         no_parentheses_types = (
             parse_tree.Member,
             parse_tree.FunctionCall,
             parse_tree.MethodCall,
             parse_tree.Name,
-            parse_tree.Constant
+            parse_tree.Constant,
         )
 
-        if (
-                isinstance(node.left, no_parentheses_types)
-                and isinstance(node.right, no_parentheses_types)
+        if isinstance(node.left, no_parentheses_types) and isinstance(
+            node.right, no_parentheses_types
         ):
             return Stripped(f"{left} {comparator} {right}"), None
 
@@ -315,7 +327,7 @@ class _InvariantTranspiler(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_implication(
-            self, node: parse_tree.Implication
+        self, node: parse_tree.Implication
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []
 
@@ -329,9 +341,8 @@ class _InvariantTranspiler(
 
         if len(errors) > 0:
             return None, Error(
-                node.original_node,
-                "Failed to transpile the implication",
-                errors)
+                node.original_node, "Failed to transpile the implication", errors
+            )
 
         assert antecedent is not None
         assert consequent is not None
@@ -340,7 +351,7 @@ class _InvariantTranspiler(
             parse_tree.Member,
             parse_tree.FunctionCall,
             parse_tree.MethodCall,
-            parse_tree.Name
+            parse_tree.Name,
         )
 
         if isinstance(node.antecedent, no_parentheses_types):
@@ -351,13 +362,11 @@ class _InvariantTranspiler(
         if not isinstance(node.consequent, no_parentheses_types):
             consequent = f"({consequent})"
 
-        return Stripped(
-            f"{not_antecedent}\n"
-            f"|| {consequent}"), None
+        return Stripped(f"{not_antecedent}\n" f"|| {consequent}"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_method_call(
-            self, node: parse_tree.MethodCall
+        self, node: parse_tree.MethodCall
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
@@ -376,9 +385,8 @@ class _InvariantTranspiler(
 
         if len(errors) > 0:
             return None, Error(
-                node.original_node,
-                "Failed to transpile the method call",
-                errors)
+                node.original_node, "Failed to transpile the method call", errors
+            )
 
         assert instance is not None
 
@@ -395,8 +403,7 @@ class _InvariantTranspiler(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_function_call(
-            self,
-            node: parse_tree.FunctionCall
+        self, node: parse_tree.FunctionCall
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
@@ -411,9 +418,8 @@ class _InvariantTranspiler(
 
         if len(errors) > 0:
             return None, Error(
-                node.original_node,
-                "Failed to transpile the function call",
-                errors)
+                node.original_node, "Failed to transpile the function call", errors
+            )
 
         # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
         #  add heuristic for breaking the lines
@@ -440,8 +446,8 @@ class _InvariantTranspiler(
 
             collection_node = node.args[0]
             if not isinstance(
-                    collection_node,
-                    (parse_tree.Name, parse_tree.Member, parse_tree.MethodCall)
+                collection_node,
+                (parse_tree.Name, parse_tree.Member, parse_tree.MethodCall),
             ):
                 collection = f"({args[0]})"
             else:
@@ -451,11 +457,11 @@ class _InvariantTranspiler(
         else:
             return None, Error(
                 node.original_node,
-                f"The handling of the function is not implemented: {node.name}")
+                f"The handling of the function is not implemented: {node.name}",
+            )
 
     def transform_constant(
-            self,
-            node: parse_tree.Constant
+        self, node: parse_tree.Constant
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         if isinstance(node.value, bool):
             return Stripped("true" if node.value else "false"), None
@@ -467,7 +473,7 @@ class _InvariantTranspiler(
             assert_never(node.value)
 
     def transform_is_none(
-            self, node: parse_tree.IsNone
+        self, node: parse_tree.IsNone
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         value, error = self.transform(node.value)
         if error is not None:
@@ -477,7 +483,7 @@ class _InvariantTranspiler(
             parse_tree.Name,
             parse_tree.Member,
             parse_tree.MethodCall,
-            parse_tree.FunctionCall
+            parse_tree.FunctionCall,
         )
         if isinstance(node.value, no_parentheses_types):
             return Stripped(f"{value} == null"), None
@@ -485,8 +491,7 @@ class _InvariantTranspiler(
             return Stripped(f"({value}) == null"), None
 
     def transform_is_not_none(
-            self,
-            node: parse_tree.IsNotNone
+        self, node: parse_tree.IsNotNone
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         value, error = self.transform(node.value)
         if error is not None:
@@ -496,7 +501,7 @@ class _InvariantTranspiler(
             parse_tree.Name,
             parse_tree.Member,
             parse_tree.MethodCall,
-            parse_tree.FunctionCall
+            parse_tree.FunctionCall,
         )
         if isinstance(node.value, no_parentheses_types):
             return Stripped(f"{value} != null"), None
@@ -504,17 +509,17 @@ class _InvariantTranspiler(
             return Stripped(f"({value}) != null"), None
 
     def transform_name(
-            self, node: parse_tree.Name
+        self, node: parse_tree.Name
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if node.identifier == 'self':
+        if node.identifier == "self":
             # The ``that`` refers to the argument of the verification function.
             return Stripped("that"), None
 
         return Stripped(csharp_naming.variable_name(node.identifier)), None
 
     def transform_and(
-            self,
-            node: parse_tree.And) -> Tuple[Optional[Stripped], Optional[Error]]:
+        self, node: parse_tree.And
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
         values = []  # type: List[Stripped]
 
@@ -524,27 +529,31 @@ class _InvariantTranspiler(
                 errors.append(error)
                 continue
 
-            if not isinstance(value_node, (
+            if not isinstance(
+                value_node,
+                (
                     parse_tree.Member,
                     parse_tree.MethodCall,
                     parse_tree.FunctionCall,
                     parse_tree.Comparison,
-                    parse_tree.Name
-            )):
+                    parse_tree.Name,
+                ),
+            ):
                 value = f"({value})"
 
             values.append(value)
 
         if len(errors) > 0:
             return None, Error(
-                node.original_node, "Failed to transpile the conjunction", errors)
+                node.original_node, "Failed to transpile the conjunction", errors
+            )
 
         # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
         #  add heuristic for breaking the lines
         return Stripped(" && ".join(values)), None
 
     def transform_or(
-            self, node: parse_tree.Or
+        self, node: parse_tree.Or
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
         values = []  # type: List[Stripped]
@@ -555,36 +564,38 @@ class _InvariantTranspiler(
                 errors.append(error)
                 continue
 
-            if not isinstance(value_node, (
+            if not isinstance(
+                value_node,
+                (
                     parse_tree.Member,
                     parse_tree.MethodCall,
                     parse_tree.FunctionCall,
                     parse_tree.Comparison,
-                    parse_tree.Name
-            )):
+                    parse_tree.Name,
+                ),
+            ):
                 value = f"({value})"
 
             values.append(value)
 
         if len(errors) > 0:
             return None, Error(
-                node.original_node, "Failed to transpile the conjunction", errors)
+                node.original_node, "Failed to transpile the conjunction", errors
+            )
 
         # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
         #  add heuristic for breaking the lines
         return Stripped(" || ".join(values)), None
 
     def transform_declaration(
-            self,
-            node: parse_tree.Declaration
+        self, node: parse_tree.Declaration
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
         #  implement once we got to end-to-end with serialization
         raise NotImplementedError()
 
     def transform_expression_with_declarations(
-            self,
-            node: parse_tree.ExpressionWithDeclarations
+        self, node: parse_tree.ExpressionWithDeclarations
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
         #  implement once we got to end-to-end with serialization
@@ -593,22 +604,20 @@ class _InvariantTranspiler(
 
 # noinspection PyProtectedMember,PyProtectedMember
 assert all(
-    op in _InvariantTranspiler._CSHARP_COMPARISON_MAP
-    for op in parse_tree.Comparator
+    op in _InvariantTranspiler._CSHARP_COMPARISON_MAP for op in parse_tree.Comparator
 )
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _transpile_invariant(
-        invariant: intermediate.Invariant,
-        symbol_table: intermediate.SymbolTable
+    invariant: intermediate.Invariant, symbol_table: intermediate.SymbolTable
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Translate the invariant from the meta-model into C# code."""
     # NOTE (mristin, 2021-10-24):
     # We manually transpile the invariant from our custom syntax without additional
     # semantic analysis in the :py:mod:`aas_core_codegen.intermediate` layer.
     #
-    # While this might seem repetitive ("unDRY"), we are still not sure about 
+    # While this might seem repetitive ("unDRY"), we are still not sure about
     # the appropriate abstraction. After we implement the code generation for a couple
     # of languages, we hope to have a much better understanding about the necessary
     # abstractions.
@@ -619,15 +628,19 @@ def _transpile_invariant(
         return None, error
 
     writer = io.StringIO()
-    if len(expr) > 50 or '\n' in expr:
+    if len(expr) > 50 or "\n" in expr:
         writer.write("if (!(\n")
         writer.write(textwrap.indent(expr, I))
         writer.write("))\n{\n")
     else:
         if isinstance(
-                invariant.parsed.body,
-                (parse_tree.Name, parse_tree.Member, parse_tree.MethodCall,
-                 parse_tree.FunctionCall)
+            invariant.parsed.body,
+            (
+                parse_tree.Name,
+                parse_tree.Member,
+                parse_tree.MethodCall,
+                parse_tree.FunctionCall,
+            ),
         ):
             not_expr = f"!{expr}"
         else:
@@ -635,12 +648,19 @@ def _transpile_invariant(
 
         writer.write(f"if ({not_expr})\n{{\n")
 
-    writer.write(textwrap.indent(textwrap.dedent(f'''\
+    writer.write(
+        textwrap.indent(
+            textwrap.dedent(
+                f"""\
         errors.Add(
         {I}new Verification.Error(
         {II}path,
         {II}"Invariant violated:\\n" +
-        '''), I))
+        """
+            ),
+            I,
+        )
+    )
 
     lines = []  # type: List[str]
     if invariant.description is not None:
@@ -651,11 +671,9 @@ def _transpile_invariant(
     for i, line in enumerate(lines):
         if i < len(lines) - 1:
             line_literal = csharp_common.string_literal(line + "\n")
-            writer.write(
-                f'{III}{line_literal} +\n')
+            writer.write(f"{III}{line_literal} +\n")
         else:
-            writer.write(
-                f'{III}{csharp_common.string_literal(line)}));')
+            writer.write(f"{III}{csharp_common.string_literal(line)}));")
 
     writer.write("\n}")
 
@@ -664,8 +682,7 @@ def _transpile_invariant(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_implementation_verify(
-        cls: intermediate.Class,
-        symbol_table: intermediate.SymbolTable
+    cls: intermediate.Class, symbol_table: intermediate.SymbolTable
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verify function in the ``Implementation`` class."""
     errors = []  # type: List[Error]
@@ -674,11 +691,12 @@ def _generate_implementation_verify(
     cls_name = csharp_naming.class_name(cls.name)
 
     if len(cls.invariants) == 0:
-        blocks.append(Stripped(f'// There are no invariants defined for {cls_name}.'))
+        blocks.append(Stripped(f"// There are no invariants defined for {cls_name}."))
     else:
         for invariant in cls.invariants:
             invariant_code, error = _transpile_invariant(
-                invariant=invariant, symbol_table=symbol_table)
+                invariant=invariant, symbol_table=symbol_table
+            )
             if error is not None:
                 errors.append(error)
                 continue
@@ -689,20 +707,24 @@ def _generate_implementation_verify(
         return None, Error(
             cls.parsed.node,
             f"Failed to parse one or more invariants of the class {cls}",
-            errors)
+            errors,
+        )
 
     for prop in cls.properties:
         enum_check_block = _unroll_enumeration_check(prop=prop)
-        if enum_check_block != '':
+        if enum_check_block != "":
             blocks.append(Stripped("if (errors.Full()) return;"))
             blocks.append(enum_check_block)
 
     if len(blocks) == 0:
-        blocks.append(Stripped(
-            f'// There is no verification specified for {cls_name}.'))
+        blocks.append(
+            Stripped(f"// There is no verification specified for {cls_name}.")
+        )
 
     writer = io.StringIO()
-    writer.write(textwrap.dedent(f'''\
+    writer.write(
+        textwrap.dedent(
+            f"""\
         /// <summary>
         /// Verify <paramref name="that" /> instance and 
         /// append any errors to <paramref name="Errors" />.
@@ -714,14 +736,16 @@ def _generate_implementation_verify(
         {I}string path,
         {I}Verification.Errors errors)
         {{
-        '''))
+        """
+        )
+    )
 
     for i, block in enumerate(blocks):
         if i > 0:
-            writer.write('\n\n')
+            writer.write("\n\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write('\n}')
+    writer.write("\n}")
 
     assert len(errors) == 0
     return Stripped(writer.getvalue()), None
@@ -729,8 +753,8 @@ def _generate_implementation_verify(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_implementation_class(
-        symbol_table: intermediate.SymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations
+    symbol_table: intermediate.SymbolTable,
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate a private static class, ``Implementation``, with verification logic."""
     errors = []  # type: List[Error]
@@ -744,32 +768,38 @@ def _generate_implementation_class(
 
         if symbol.is_implementation_specific:
             verify_key = specific_implementations.ImplementationKey(
-                f'Verification/Implementation/verify_{symbol.name}.cs')
+                f"Verification/Implementation/verify_{symbol.name}.cs"
+            )
             if verify_key not in spec_impls:
                 errors.append(
                     Error(
                         symbol.parsed.node,
                         f"The implementation snippet is missing for "
                         f"the ``Verify`` method "
-                        f"of the ``Verification.Implementation`` class: {verify_key}"))
+                        f"of the ``Verification.Implementation`` class: {verify_key}",
+                    )
+                )
                 continue
 
             blocks.append(spec_impls[verify_key])
         else:
             implementation_verify, error = _generate_implementation_verify(
-                cls=symbol, symbol_table=symbol_table)
+                cls=symbol, symbol_table=symbol_table
+            )
             if error is not None:
                 errors.append(error)
                 continue
 
-            if implementation_verify != '':
+            if implementation_verify != "":
                 blocks.append(implementation_verify)
 
     if len(errors) > 0:
         return None, errors
 
     writer = io.StringIO()
-    writer.write(textwrap.dedent(f'''\
+    writer.write(
+        textwrap.dedent(
+            f"""\
             /// <summary>
             /// Verify the instances of the model classes non-recursively.
             /// </summary>
@@ -779,26 +809,30 @@ def _generate_implementation_class(
             /// </remarks>
             private static class Implementation
             {{
-            '''))
+            """
+        )
+    )
     for i, block in enumerate(blocks):
         if i > 0:
-            writer.write('\n\n')
+            writer.write("\n\n")
 
         writer.write(textwrap.indent(block, I))
 
-    writer.write('\n}  // private static class Implementation')
+    writer.write("\n}  // private static class Implementation")
 
     return Stripped(writer.getvalue()), None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_non_recursive_verifier(
-        symbol_table: intermediate.SymbolTable
+    symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the non-recursive verifier which visits the classes."""
     blocks = [
         Stripped("public readonly Verification.Errors Errors;"),
-        Stripped(textwrap.dedent(f'''\
+        Stripped(
+            textwrap.dedent(
+                f"""\
             /// <summary>
             /// Initialize the visitor with the given <paramref name="errors" />.
             ///
@@ -808,12 +842,18 @@ def _generate_non_recursive_verifier(
             NonRecursiveVerifier(Verification.Errors errors)
             {{
             {I}Errors = errors;
-            }}''')),
-        Stripped(textwrap.dedent(f'''\
+            }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
             public void Visit(Aas.IClass that, string context)
             {{
             {I}that.Accept(this, context);
-            }}'''))
+            }}"""
+            )
+        ),
     ]  # type: List[Stripped]
 
     for symbol in symbol_table.symbols:
@@ -822,7 +862,10 @@ def _generate_non_recursive_verifier(
 
         cls_name = csharp_naming.class_name(symbol.name)
 
-        blocks.append(Stripped(textwrap.dedent(f'''\
+        blocks.append(
+            Stripped(
+                textwrap.dedent(
+                    f"""\
             /// <summary>
             /// Verify <paramref name="that" /> instance and
             /// append any error to <see cref="Errors" /> 
@@ -832,30 +875,36 @@ def _generate_non_recursive_verifier(
             {{
             {I}Implementation.Verify{cls_name}(
             {II}that, context, Errors);
-            }}''')))
+            }}"""
+                )
+            )
+        )
 
     writer = io.StringIO()
-    writer.write(textwrap.dedent(f'''\
+    writer.write(
+        textwrap.dedent(
+            f"""\
         /// <summary>
         /// Verify the instances of the model classes non-recursively.
         /// </summary>
         public class NonRecursiveVerifier : 
         {I}Visitation.IVisitorWithContext<string>
         {{
-        '''))
+        """
+        )
+    )
     for i, block in enumerate(blocks):
         if i > 0:
-            writer.write('\n\n')
+            writer.write("\n\n")
 
         writer.write(textwrap.indent(block, I))
 
-    writer.write('\n}  // public class NonRecursiveVerifier')
+    writer.write("\n}  // public class NonRecursiveVerifier")
 
     return Stripped(writer.getvalue()), None
 
 
-def _unroll_recursion_in_recursive_verify(
-        prop: intermediate.Property) -> Stripped:
+def _unroll_recursion_in_recursive_verify(prop: intermediate.Property) -> Stripped:
     """Generate the code for unrolling the recursive visits  for the given property."""
 
     @require(lambda var_index: var_index >= 0)
@@ -863,7 +912,7 @@ def _unroll_recursion_in_recursive_verify(
     def var_name(var_index: int, suffix: str) -> Identifier:
         """Generate the name of the loop variable."""
         if var_index == 0:
-            if suffix == 'Item':
+            if suffix == "Item":
                 return Identifier(f"an{suffix}")
             else:
                 return Identifier(f"a{suffix}")
@@ -874,11 +923,11 @@ def _unroll_recursion_in_recursive_verify(
             return Identifier("yet" + "Yet" * (var_index - 1) + f"another{suffix}")
 
     def unroll(
-            current_var_name: str,
-            item_count: int,
-            key_value_count: int,
-            path: List[str],
-            type_anno: intermediate.TypeAnnotation
+        current_var_name: str,
+        item_count: int,
+        key_value_count: int,
+        path: List[str],
+        type_anno: intermediate.TypeAnnotation,
     ) -> List[csharp_unrolling.Node]:
         """Generate the node corresponding to the ``type_anno`` and recurse."""
         if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
@@ -888,44 +937,55 @@ def _unroll_recursion_in_recursive_verify(
             if isinstance(type_anno.symbol, intermediate.Enumeration):
                 return []
 
-            joined_pth = '/'.join(path)
-            return [csharp_unrolling.Node(
-                text=textwrap.dedent(f'''\
+            joined_pth = "/".join(path)
+            return [
+                csharp_unrolling.Node(
+                    text=textwrap.dedent(
+                        f"""\
                     if (Errors.Full()) return;
                     Visit(
                         {current_var_name},
-                        ${csharp_common.string_literal(joined_pth)});'''),
-                children=[])]
+                        ${csharp_common.string_literal(joined_pth)});"""
+                    ),
+                    children=[],
+                )
+            ]
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             if item_count > 15:
-                index_var = f'i{item_count}'
+                index_var = f"i{item_count}"
             else:
-                index_var = chr(ord('i') + item_count)
+                index_var = chr(ord("i") + item_count)
 
             children = unroll(
-                current_var_name=f'{current_var_name}[{index_var}]',
+                current_var_name=f"{current_var_name}[{index_var}]",
                 item_count=item_count + 1,
                 key_value_count=key_value_count,
-                path=path + [f'{{{index_var}}}'],
-                type_anno=type_anno.items)
+                path=path + [f"{{{index_var}}}"],
+                type_anno=type_anno.items,
+            )
 
             if len(children) == 0:
                 return []
 
             text = Stripped(
-                f'for(var {index_var} = 0; '
-                f'{index_var} < {current_var_name}.Count; '
-                f'{index_var}++)')
+                f"for(var {index_var} = 0; "
+                f"{index_var} < {current_var_name}.Count; "
+                f"{index_var}++)"
+            )
 
             # Break into lines if too long.
             # This is just a heuristics — we do not consider the actual indention.
             if len(text) > 50:
-                text = Stripped(textwrap.dedent(f'''\
+                text = Stripped(
+                    textwrap.dedent(
+                        f"""\
                     for(
                     {I}var {index_var} = 0;
                     {I}{index_var} < {current_var_name}.Count;
-                    {I}{index_var}++)'''))
+                    {I}{index_var}++)"""
+                    )
+                )
 
             return [csharp_unrolling.Node(text=text, children=children)]
 
@@ -935,10 +995,14 @@ def _unroll_recursion_in_recursive_verify(
                 item_count=item_count,
                 key_value_count=key_value_count,
                 path=path,
-                type_anno=type_anno.value)
+                type_anno=type_anno.value,
+            )
             if len(children) > 0:
-                return [csharp_unrolling.Node(
-                    text=f"if ({current_var_name} != null)", children=children)]
+                return [
+                    csharp_unrolling.Node(
+                        text=f"if ({current_var_name} != null)", children=children
+                    )
+                ]
             else:
                 return []
         else:
@@ -947,24 +1011,24 @@ def _unroll_recursion_in_recursive_verify(
     prop_name = csharp_naming.property_name(prop.name)
 
     roots = unroll(
-        current_var_name=f'that.{prop_name}',
+        current_var_name=f"that.{prop_name}",
         item_count=0,
         key_value_count=0,
-        path=['{context}', prop_name],
-        type_anno=prop.type_annotation)
+        path=["{context}", prop_name],
+        type_anno=prop.type_annotation,
+    )
 
     if len(roots) == 0:
-        return Stripped('')
+        return Stripped("")
 
     blocks = [csharp_unrolling.render(root) for root in roots]
-    return Stripped('\n\n'.join(blocks))
+    return Stripped("\n\n".join(blocks))
 
 
 # fmt: on
 @require(
-    lambda cls:
-    not cls.is_implementation_specific,
-    "Implementation-specific classes are handled elsewhere"
+    lambda cls: not cls.is_implementation_specific,
+    "Implementation-specific classes are handled elsewhere",
 )
 # fmt: off
 def _generate_recursive_verifier_visit(
@@ -1016,13 +1080,15 @@ def _generate_recursive_verifier_visit(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_recursive_verifier(
-        symbol_table: intermediate.SymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations
+    symbol_table: intermediate.SymbolTable,
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the ``Verifier`` class which visits the classes and verifies them."""
     blocks = [
         Stripped("public readonly Errors Errors;"),
-        Stripped(textwrap.dedent(f'''\
+        Stripped(
+            textwrap.dedent(
+                f"""\
             /// <summary>
             /// Initialize the visitor with the given <paramref name="errors" />.
             ///
@@ -1032,12 +1098,18 @@ def _generate_recursive_verifier(
             RecursiveVerifier(Errors errors)
             {{
             {I}Errors = errors;
-            }}''')),
-        Stripped(textwrap.dedent(f'''\
+            }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
             public void Visit(IClass that, string context)
             {{
             {I}that.Accept(this, context);
-            }}'''))
+            }}"""
+            )
+        ),
     ]  # type: List[Stripped]
 
     errors = []  # type: List[Error]
@@ -1048,7 +1120,8 @@ def _generate_recursive_verifier(
 
         if symbol.is_implementation_specific:
             visit_key = specific_implementations.ImplementationKey(
-                f'Verification/RecursiveVerifier/visit_{symbol.name}.cs')
+                f"Verification/RecursiveVerifier/visit_{symbol.name}.cs"
+            )
 
             implementation = spec_impls.get(visit_key, None)
             if implementation is None:
@@ -1058,7 +1131,9 @@ def _generate_recursive_verifier(
                         f"The implementation snippet is missing for "
                         f"the ``Visit`` method "
                         f"of the ``Verification.RecursiveVerifier`` class: "
-                        f"{visit_key}"))
+                        f"{visit_key}",
+                    )
+                )
                 continue
 
             blocks.append(implementation)
@@ -1069,21 +1144,25 @@ def _generate_recursive_verifier(
         return None, errors
 
     writer = io.StringIO()
-    writer.write(textwrap.dedent(f'''\
+    writer.write(
+        textwrap.dedent(
+            f"""\
         /// <summary>
         /// Verify the instances of the model classes recursively.
         /// </summary>
         public class RecursiveVerifier : 
         {I}Visitation.IVisitorWithContext<string>
         {{
-        '''))
+        """
+        )
+    )
     for i, block in enumerate(blocks):
         if i > 0:
-            writer.write('\n\n')
+            writer.write("\n\n")
 
         writer.write(textwrap.indent(block, I))
 
-    writer.write('\n}  // public class RecursiveVerifier')
+    writer.write("\n}  // public class RecursiveVerifier")
 
     return Stripped(writer.getvalue()), None
 
@@ -1097,9 +1176,9 @@ def _generate_recursive_verifier(
 )
 # fmt: on
 def generate(
-        symbol_table: intermediate.SymbolTable,
-        namespace: csharp_common.NamespaceIdentifier,
-        spec_impls: specific_implementations.SpecificImplementations
+    symbol_table: intermediate.SymbolTable,
+    namespace: csharp_common.NamespaceIdentifier,
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the C# code of the structures based on the symbol table.
@@ -1108,14 +1187,18 @@ def generate(
     """
     blocks = [
         csharp_common.WARNING,
-        Stripped(textwrap.dedent(f"""\
+        Stripped(
+            textwrap.dedent(
+                f"""\
             using Regex = System.Text.RegularExpressions.Regex;
             using System.Collections.Generic;  // can't alias
             using System.Collections.ObjectModel;  // can't alias
             using System.Linq;  // can't alias"
     
             using Aas = {namespace};
-            using Visitation = {namespace}.Visitation;"""))
+            using Visitation = {namespace}.Visitation;"""
+            )
+        ),
     ]  # type: List[Stripped]
 
     verification_blocks = []  # type: List[Stripped]
@@ -1128,8 +1211,8 @@ def generate(
         verification_blocks.append(pattern_class)
 
     for implementation_key in [
-        specific_implementations.ImplementationKey('Verification/Error.cs'),
-        specific_implementations.ImplementationKey('Verification/Errors.cs')
+        specific_implementations.ImplementationKey("Verification/Error.cs"),
+        specific_implementations.ImplementationKey("Verification/Errors.cs"),
     ]:
         implementation = spec_impls.get(implementation_key, None)
         if implementation is None:
@@ -1138,14 +1221,16 @@ def generate(
             verification_blocks.append(implementation)
 
     implementation_class, implementation_class_errors = _generate_implementation_class(
-        symbol_table=symbol_table, spec_impls=spec_impls)
+        symbol_table=symbol_table, spec_impls=spec_impls
+    )
     if implementation_class_errors:
         errors.extend(implementation_class_errors)
     else:
         verification_blocks.append(implementation_class)
 
     non_recursive, non_recursive_errors = _generate_non_recursive_verifier(
-        symbol_table=symbol_table)
+        symbol_table=symbol_table
+    )
 
     if non_recursive_errors is not None:
         errors.extend(non_recursive_errors)
@@ -1153,8 +1238,8 @@ def generate(
         verification_blocks.append(non_recursive)
 
     recursive, recursive_errors = _generate_recursive_verifier(
-        symbol_table=symbol_table,
-        spec_impls=spec_impls)
+        symbol_table=symbol_table, spec_impls=spec_impls
+    )
 
     if recursive_errors is not None:
         errors.extend(recursive_errors)
@@ -1166,18 +1251,15 @@ def generate(
 
     verification_writer = io.StringIO()
     verification_writer.write(f"namespace {namespace}\n{{\n")
-    verification_writer.write(
-        f"{I}public static class Verification\n"
-        f"{I}{{\n")
+    verification_writer.write(f"{I}public static class Verification\n" f"{I}{{\n")
 
     for i, verification_block in enumerate(verification_blocks):
         if i > 0:
-            verification_writer.write('\n\n')
+            verification_writer.write("\n\n")
 
         verification_writer.write(textwrap.indent(verification_block, II))
 
-    verification_writer.write(
-        f"\n{I}}}  // public static class Verification")
+    verification_writer.write(f"\n{I}}}  // public static class Verification")
     verification_writer.write(f"\n}}  // namespace {namespace}")
 
     blocks.append(Stripped(verification_writer.getvalue()))
@@ -1187,14 +1269,15 @@ def generate(
     out = io.StringIO()
     for i, block in enumerate(blocks):
         if i > 0:
-            out.write('\n\n')
+            out.write("\n\n")
 
-        assert not block.startswith('\n')
-        assert not block.endswith('\n')
+        assert not block.startswith("\n")
+        assert not block.endswith("\n")
         out.write(block)
 
-    out.write('\n')
+    out.write("\n")
 
     return out.getvalue(), None
+
 
 # endregion

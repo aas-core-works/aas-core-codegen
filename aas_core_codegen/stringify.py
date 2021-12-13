@@ -44,7 +44,7 @@ class Entity:
     """
 
     def __init__(
-            self, name: str, properties: Sequence[Union[Property, PropertyEllipsis]]
+        self, name: str, properties: Sequence[Union[Property, PropertyEllipsis]]
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -69,9 +69,10 @@ def dump(stringifiable: Stringifiable) -> str:
         for i, prop in enumerate(stringifiable.properties):
             if isinstance(prop, Property):
                 value_str = dump(prop.value)
-                indention = '  '
+                indention = "  "
                 writer.write(
-                    f"  {prop.name}={indent_but_first_line(value_str, indention)}")
+                    f"  {prop.name}={indent_but_first_line(value_str, indention)}"
+                )
             elif isinstance(prop, PropertyEllipsis):
                 value_str = "None" if prop.ignored_value is None else "..."
                 writer.write(f"  {prop.name}={value_str}")

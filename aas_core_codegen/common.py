@@ -13,7 +13,8 @@ from typing import (
     Union,
     Iterator,
     Sequence,
-    NoReturn, )
+    NoReturn,
+)
 
 import asttokens
 from icontract import require, DBC, ensure
@@ -39,8 +40,10 @@ class Error:
     """
 
     def __init__(
-            self, node: Optional[ast.AST], message: str,
-            underlying: Optional[List["Error"]] = None
+        self,
+        node: Optional[ast.AST],
+        message: str,
+        underlying: Optional[List["Error"]] = None,
     ) -> None:
         self.node = node
         self.message = message
@@ -182,12 +185,11 @@ class Rstripped(str):
     """
 
     @require(
-        lambda block:
-        not block.endswith('\n')
-        and not block.endswith(' ')
-        and not block.endswith('\t')
+        lambda block: not block.endswith("\n")
+        and not block.endswith(" ")
+        and not block.endswith("\t")
     )
-    def __new__(cls, block: str) -> 'Rstripped':
+    def __new__(cls, block: str) -> "Rstripped":
         return cast(Rstripped, block)
 
 
@@ -212,7 +214,7 @@ class Stripped(Rstripped):
         and not block.endswith('\t')
     )
     # fmt: on
-    def __new__(cls, block: str) -> 'Stripped':
+    def __new__(cls, block: str) -> "Stripped":
         return cast(Stripped, block)
 
 
@@ -223,8 +225,7 @@ def indent_but_first_line(text: str, indention: str) -> str:
     For example, this helps you insert indented blocks into formatted string literals.
     """
     return "\n".join(
-        indention + line if i > 0 else line
-        for i, line in enumerate(text.splitlines())
+        indention + line if i > 0 else line for i, line in enumerate(text.splitlines())
     )
 
 
@@ -234,19 +235,19 @@ _INFLECT_ENGINE = inflect.engine()
 @ensure(lambda identifier, result: plural_to_singular(result) == identifier)
 def singular_to_plural(identifier: Identifier) -> Identifier:
     """Translate the singular form of the identifier to its plural form."""
-    text = identifier.replace('_', ' ')
+    text = identifier.replace("_", " ")
 
     result = _INFLECT_ENGINE.plural(text)
     if result is False:
         raise RuntimeError(f"Failed to find the plural of: {identifier=}")
 
-    return Identifier('_'.join(result.split(' ')))
+    return Identifier("_".join(result.split(" ")))
 
 
 @ensure(lambda identifier, result: singular_to_plural(result) == identifier)
 def plural_to_singular(identifier: Identifier) -> Identifier:
     """Translate the plural form of the identifier to its singular form."""
-    text = identifier.replace('_', ' ')
+    text = identifier.replace("_", " ")
 
     result = _INFLECT_ENGINE.singular_noun(text)
 
@@ -254,4 +255,4 @@ def plural_to_singular(identifier: Identifier) -> Identifier:
         raise RuntimeError(f"Failed to find the singular noun of: {identifier=}")
 
     assert isinstance(result, str)
-    return Identifier('_'.join(result.split(' ')))
+    return Identifier("_".join(result.split(" ")))

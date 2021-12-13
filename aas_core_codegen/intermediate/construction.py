@@ -52,10 +52,7 @@ class DefaultEnumLiteral(Default):
 
     @require(lambda enum, literal: literal in enum.literals)
     def __init__(
-            self,
-            enum: parse.Enumeration,
-            literal: parse.EnumerationLiteral,
-            node: ast.AST
+        self, enum: parse.Enumeration, literal: parse.EnumerationLiteral, node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Default.__init__(self, node=node)
@@ -71,10 +68,8 @@ class AssignArgument:
     default: Optional[Default]  #: Default value if the argument is None
 
     def __init__(
-            self,
-            name: Identifier,
-            argument: Identifier,
-            default: Optional[Default]) -> None:
+        self, name: Identifier, argument: Identifier, default: Optional[Default]
+    ) -> None:
         """Initialize with the given values."""
         self.name = name
         self.argument = argument
@@ -86,10 +81,10 @@ Statement = Union[CallSuperConstructor, AssignArgument]
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _call_as_call_to_super_init(
-        call: ast.Call,
-        parsed_class: parse.Class,
-        parsed_symbol_table: parse.SymbolTable,
-        atok: asttokens.ASTTokens,
+    call: ast.Call,
+    parsed_class: parse.Class,
+    parsed_symbol_table: parse.SymbolTable,
+    atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[CallSuperConstructor], Optional[Error]]:
     """Understand a call as a call to the constructor of a super-class."""
     if not isinstance(call.func, ast.Attribute):
@@ -171,7 +166,7 @@ def _call_as_call_to_super_init(
     underlying_errors = []  # type: List[Error]
 
     for arg_node in itertools.chain(
-            call.args, (keyword.value for keyword in call.keywords)
+        call.args, (keyword.value for keyword in call.keywords)
     ):
         if not isinstance(arg_node, ast.Name):
             underlying_errors.append(
@@ -295,11 +290,11 @@ def _call_as_call_to_super_init(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _understand_assignment(
-        assign: ast.Assign,
-        init: Method,
-        parsed_class: parse.Class,
-        parsed_symbol_table: parse.SymbolTable,
-        atok: asttokens.ASTTokens
+    assign: ast.Assign,
+    init: Method,
+    parsed_class: parse.Class,
+    parsed_symbol_table: parse.SymbolTable,
+    atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[Statement], Optional[Error]]:
     if len(assign.targets) > 1:
         return (
@@ -307,21 +302,25 @@ def _understand_assignment(
             Error(
                 assign,
                 f"Expected only a single target for property assignment, "
-                f"but got {len(assign.targets)} targets"))
+                f"but got {len(assign.targets)} targets",
+            ),
+        )
 
     target = assign.targets[0]
 
     if not (
-            isinstance(target, ast.Attribute)
-            and isinstance(target.value, ast.Name)
-            and target.value.id == "self"
+        isinstance(target, ast.Attribute)
+        and isinstance(target.value, ast.Name)
+        and target.value.id == "self"
     ):
         return (
             None,
             Error(
                 target,
                 f"Expected a property as the target of an assignment, "
-                f"but got: {atok.get_text(target)}"))
+                f"but got: {atok.get_text(target)}",
+            ),
+        )
 
     if target.attr not in parsed_class.property_map:
         return (
@@ -329,7 +328,9 @@ def _understand_assignment(
             Error(
                 target.value,
                 f"The property has not been previously "
-                f"defined in {parsed_class.name}: {target.attr}"))
+                f"defined in {parsed_class.name}: {target.attr}",
+            ),
+        )
 
     if isinstance(assign.value, ast.Name):
         if assign.value.id not in init.argument_map:
@@ -339,7 +340,9 @@ def _understand_assignment(
                     assign.value,
                     f"Expected the property {target.attr} to be assigned "
                     f"to an argument, but it was assigned to a non-argument variable: "
-                    f"{atok.get_text(assign.value)}"))
+                    f"{atok.get_text(assign.value)}",
+                ),
+            )
 
         if target.attr != assign.value.id:
             return (
@@ -348,29 +351,35 @@ def _understand_assignment(
                     assign.value,
                     f"Expected the property {target.attr} to be assigned "
                     f"exactly the argument with the same name, "
-                    f"but got: {atok.get_text(assign.value)}"))
+                    f"but got: {atok.get_text(assign.value)}",
+                ),
+            )
 
-        return AssignArgument(
-            name=Identifier(target.attr),
-            argument=Identifier(target.attr),
-            default=None), None
+        return (
+            AssignArgument(
+                name=Identifier(target.attr),
+                argument=Identifier(target.attr),
+                default=None,
+            ),
+            None,
+        )
     elif isinstance(assign.value, ast.IfExp):
         default_node = None  # type: Optional[ast.AST]
 
         if_exp = assign.value
         if (
-                isinstance(if_exp.test, ast.Compare)
-                and isinstance(if_exp.test.left, ast.Name)
-                and isinstance(if_exp.test.left.ctx, ast.Load)
-                and if_exp.test.left.id in init.argument_map
-                and len(if_exp.test.ops) == 1
-                and isinstance(if_exp.test.ops[0], ast.IsNot)
-                and len(if_exp.test.comparators) == 1
-                and isinstance(if_exp.test.comparators[0], ast.Constant)
-                and if_exp.test.comparators[0].value is None
-                and isinstance(if_exp.body, ast.Name)
-                and if_exp.body.id == if_exp.test.left.id
-                and if_exp.orelse is not None
+            isinstance(if_exp.test, ast.Compare)
+            and isinstance(if_exp.test.left, ast.Name)
+            and isinstance(if_exp.test.left.ctx, ast.Load)
+            and if_exp.test.left.id in init.argument_map
+            and len(if_exp.test.ops) == 1
+            and isinstance(if_exp.test.ops[0], ast.IsNot)
+            and len(if_exp.test.comparators) == 1
+            and isinstance(if_exp.test.comparators[0], ast.Constant)
+            and if_exp.test.comparators[0].value is None
+            and isinstance(if_exp.body, ast.Name)
+            and if_exp.body.id == if_exp.test.left.id
+            and if_exp.orelse is not None
         ):
             default_node = if_exp.orelse
 
@@ -394,23 +403,21 @@ def _understand_assignment(
 
         if default_node is not None:
             default = None  # type: Optional[Default]
-            if (
-                    isinstance(default_node, ast.List)
-                    and default_node.elts == []
-            ):
+            if isinstance(default_node, ast.List) and default_node.elts == []:
                 default = EmptyList(node=default_node)
-            elif (
-                isinstance(default_node, ast.Attribute)
-                and isinstance(default_node.value, ast.Name)
+            elif isinstance(default_node, ast.Attribute) and isinstance(
+                default_node.value, ast.Name
             ):
                 symbol = parsed_symbol_table.find(
-                    name=Identifier(default_node.value.id))
+                    name=Identifier(default_node.value.id)
+                )
 
                 if isinstance(symbol, parse.Enumeration):
                     literal = symbol.literals_by_name.get(Identifier(default_node.attr))
                     if literal is not None:
                         default = DefaultEnumLiteral(
-                            enum=symbol, literal=literal, node=default_node)
+                            enum=symbol, literal=literal, node=default_node
+                        )
             else:
                 assert default is None
 
@@ -419,24 +426,30 @@ def _understand_assignment(
                     if_exp.orelse,
                     f"The handling of this default value for "
                     f"the property {target.attr} has not been implemented: "
-                    f"{ast.dump(default_node)}")
+                    f"{ast.dump(default_node)}",
+                )
             else:
-                return AssignArgument(
-                    name=Identifier(target.attr),
-                    argument=Identifier(if_exp.test.left.id),
-                    default=default), None
+                return (
+                    AssignArgument(
+                        name=Identifier(target.attr),
+                        argument=Identifier(if_exp.test.left.id),
+                        default=default,
+                    ),
+                    None,
+                )
 
     return None, Error(
         assign,
         f"The handling of the constructor statement "
-        f"has not been implemented: {ast.dump(assign)}")
+        f"has not been implemented: {ast.dump(assign)}",
+    )
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _understand_body(
-        parsed_class: parse.Class,
-        parsed_symbol_table: parse.SymbolTable,
-        atok: asttokens.ASTTokens
+    parsed_class: parse.Class,
+    parsed_symbol_table: parse.SymbolTable,
+    atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[List[Statement]], Optional[Error]]:
     """Try to understand the body of the constructor for the given ``parsed_class``."""
     init = None  # type: Optional[parse.Method]
@@ -456,7 +469,10 @@ def _understand_body(
             continue
         elif isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
             call_super_init, error = _call_as_call_to_super_init(
-                call=stmt.value, parsed_class=parsed_class, parsed_symbol_table=parsed_symbol_table, atok=atok
+                call=stmt.value,
+                parsed_class=parsed_class,
+                parsed_symbol_table=parsed_symbol_table,
+                atok=atok,
             )
 
             if error is not None:
@@ -471,7 +487,8 @@ def _understand_body(
                 init=init,
                 parsed_class=parsed_class,
                 parsed_symbol_table=parsed_symbol_table,
-                atok=atok)
+                atok=atok,
+            )
 
             if error is not None:
                 errors.append(error)
@@ -496,7 +513,8 @@ def _understand_body(
                 init.node,
                 f"Failed to understand the constructor "
                 f"of the class {parsed_class.name}",
-                underlying=errors),
+                underlying=errors,
+            ),
         )
 
     return result, None
@@ -545,7 +563,7 @@ class ConstructorTable:
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def understand_all(
-        parsed_symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
+    parsed_symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[ConstructorTable], Optional[Error]]:
     """Understand the constructors of all the classes in the symbol table."""
     errors = []  # type: List[Error]

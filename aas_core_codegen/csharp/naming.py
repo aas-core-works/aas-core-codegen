@@ -13,9 +13,9 @@ def interface_name(identifier: Identifier) -> Identifier:
     >>> interface_name(Identifier("URL_to_something"))
     'IUrlToSomething'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
-    return Identifier("I{}".format(''.join(part.capitalize() for part in parts)))
+    return Identifier("I{}".format("".join(part.capitalize() for part in parts)))
 
 
 def enum_name(identifier: Identifier) -> Identifier:
@@ -28,9 +28,9 @@ def enum_name(identifier: Identifier) -> Identifier:
     >>> enum_name(Identifier("URL_to_something"))
     'UrlToSomething'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
-    return Identifier("{}".format(''.join(part.capitalize() for part in parts)))
+    return Identifier("{}".format("".join(part.capitalize() for part in parts)))
 
 
 def enum_literal_name(identifier: Identifier) -> Identifier:
@@ -43,9 +43,9 @@ def enum_literal_name(identifier: Identifier) -> Identifier:
     >>> enum_literal_name(Identifier("URL_to_something"))
     'UrlToSomething'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
-    return Identifier("{}".format(''.join(part.capitalize() for part in parts)))
+    return Identifier("{}".format("".join(part.capitalize() for part in parts)))
 
 
 def class_name(identifier: Identifier) -> Identifier:
@@ -58,9 +58,9 @@ def class_name(identifier: Identifier) -> Identifier:
     >>> class_name(Identifier("URL_to_something"))
     'UrlToSomething'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
-    return Identifier("{}".format(''.join(part.capitalize() for part in parts)))
+    return Identifier("{}".format("".join(part.capitalize() for part in parts)))
 
 
 def property_name(identifier: Identifier) -> Identifier:
@@ -73,15 +73,16 @@ def property_name(identifier: Identifier) -> Identifier:
     >>> property_name(Identifier("something_to_URL"))
     'SomethingToUrl'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
     if len(parts) == 1:
         return Identifier(parts[0].capitalize())
 
     return Identifier(
         "{}{}".format(
-            parts[0].capitalize(),
-            ''.join(part.capitalize() for part in parts[1:])))
+            parts[0].capitalize(), "".join(part.capitalize() for part in parts[1:])
+        )
+    )
 
 
 def private_property_name(identifier: Identifier) -> Identifier:
@@ -94,15 +95,16 @@ def private_property_name(identifier: Identifier) -> Identifier:
     >>> private_property_name(Identifier("something_to_URL"))
     '_somethingToUrl'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
     if len(parts) == 1:
         return Identifier(f"_{Identifier(parts[0].lower())}")
 
     return Identifier(
         "_{}{}".format(
-            parts[0].lower(),
-            ''.join(part.capitalize() for part in parts[1:])))
+            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
+        )
+    )
 
 
 def method_name(identifier: Identifier) -> Identifier:
@@ -115,15 +117,17 @@ def method_name(identifier: Identifier) -> Identifier:
     >>> method_name(Identifier("do_something_to_URL"))
     'DoSomethingToUrl'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
     if len(parts) == 1:
         return Identifier(parts[0].capitalize())
 
     return Identifier(
         "{}{}".format(
-            parts[0].capitalize(),
-            ''.join(part.capitalize() for part in parts[1:])))
+            parts[0].capitalize(), "".join(part.capitalize() for part in parts[1:])
+        )
+    )
+
 
 def argument_name(identifier: Identifier) -> Identifier:
     """
@@ -135,15 +139,16 @@ def argument_name(identifier: Identifier) -> Identifier:
     >>> argument_name(Identifier("something_to_URL"))
     'somethingToUrl'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
     if len(parts) == 1:
         return Identifier(parts[0].lower())
 
     return Identifier(
         "{}{}".format(
-            parts[0].lower(),
-            ''.join(part.capitalize() for part in parts[1:])))
+            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
+        )
+    )
 
 
 def variable_name(identifier: Identifier) -> Identifier:
@@ -156,12 +161,13 @@ def variable_name(identifier: Identifier) -> Identifier:
     >>> variable_name(Identifier("something_to_URL"))
     'somethingToUrl'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
     if len(parts) == 1:
         return Identifier(parts[0].lower())
 
     return Identifier(
         "{}{}".format(
-            parts[0].lower(),
-            ''.join(part.capitalize() for part in parts[1:])))
+            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
+        )
+    )

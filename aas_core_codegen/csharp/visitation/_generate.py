@@ -8,9 +8,7 @@ from typing import Tuple, Optional, List
 from icontract import ensure
 
 import aas_core_codegen.csharp.common as csharp_common
-from aas_core_codegen.csharp.common import (
-    INDENT2 as II
-)
+from aas_core_codegen.csharp.common import INDENT2 as II
 import aas_core_codegen.csharp.naming as csharp_naming
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Error, Stripped, Rstripped, assert_never
@@ -18,9 +16,8 @@ from aas_core_codegen.common import Error, Stripped, Rstripped, assert_never
 
 # region Generate
 
-def _generate_ivisitor(
-        symbol_table: intermediate.SymbolTable
-) -> Stripped:
+
+def _generate_ivisitor(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the visitor interface."""
     blocks = []  # type: List[Stripped]
 
@@ -33,35 +30,36 @@ def _generate_ivisitor(
 
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
-            blocks.append(Stripped(f'public void Visit({cls_name} that);'))
+            blocks.append(Stripped(f"public void Visit({cls_name} that);"))
 
         else:
             assert_never(symbol)
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent('''\
+        textwrap.dedent(
+            """\
             /// <summary>
             /// Define the interface for a visitor which visits the instances of the model.
             /// </summary>
             public interface IVisitor
             {
                 public void Visit(IClass that);
-            '''))
+            """
+        )
+    )
 
     for i, block in enumerate(blocks):
         if i > 0:
-            writer.write('\n')
+            writer.write("\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write(f'\n}}  // public interface IVisitor')
+    writer.write(f"\n}}  // public interface IVisitor")
 
     return Stripped(writer.getvalue())
 
 
-def _generate_visitor_through(
-        symbol_table: intermediate.SymbolTable
-) -> Stripped:
+def _generate_visitor_through(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the visitor that simply iterates over the instances."""
     blocks = []  # type: List[Stripped]
 
@@ -74,7 +72,10 @@ def _generate_visitor_through(
 
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
-            blocks.append(Stripped(textwrap.dedent(f'''\
+            blocks.append(
+                Stripped(
+                    textwrap.dedent(
+                        f"""\
                 public void Visit({cls_name} that)
                 {{
                     // Just descend through, do nothing with the <c>that</c>
@@ -83,14 +84,18 @@ def _generate_visitor_through(
                         Visit(something);
                     }}
                 }}
-                ''')))
+                """
+                    )
+                )
+            )
 
         else:
             assert_never(symbol)
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent('''\
+        textwrap.dedent(
+            """\
             /// <summary>
             /// Just descend through the instances without any action.
             /// </summary>
@@ -105,21 +110,21 @@ def _generate_visitor_through(
                 {{
                     that.Accept(this);
                 }}
-            '''))
+            """
+        )
+    )
 
     for i, block in enumerate(blocks):
         if i > 0:
-            writer.write('\n')
+            writer.write("\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write(f'\n}}  // public class VisitorThrough')
+    writer.write(f"\n}}  // public class VisitorThrough")
 
     return Stripped(writer.getvalue())
 
 
-def _generate_ivisitor_with_context(
-        symbol_table: intermediate.SymbolTable
-) -> Stripped:
+def _generate_ivisitor_with_context(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the interface for the visitor with context."""
     blocks = []  # type: List[Stripped]
 
@@ -132,15 +137,15 @@ def _generate_ivisitor_with_context(
 
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
-            blocks.append(Stripped(
-                f'public void Visit({cls_name} that, C context);'))
+            blocks.append(Stripped(f"public void Visit({cls_name} that, C context);"))
 
         else:
             assert_never(symbol)
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent('''\
+        textwrap.dedent(
+            """\
             /// <summary>
             /// Define the interface for a visitor which visits the instances of the model.
             /// </summary>
@@ -148,21 +153,21 @@ def _generate_ivisitor_with_context(
             public interface IVisitorWithContext<C>
             {
                 public void Visit(IClass that, C context);
-            '''))
+            """
+        )
+    )
 
     for i, block in enumerate(blocks):
         if i > 0:
-            writer.write('\n')
+            writer.write("\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write(f'\n}}  // public interface IVisitorWithContext')
+    writer.write(f"\n}}  // public interface IVisitorWithContext")
 
     return Stripped(writer.getvalue())
 
 
-def _generate_itransformer(
-        symbol_table: intermediate.SymbolTable
-) -> Stripped:
+def _generate_itransformer(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the transformer interface."""
     blocks = []  # type: List[Stripped]
 
@@ -176,14 +181,15 @@ def _generate_itransformer(
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
             var_name = csharp_naming.argument_name(symbol.name)
-            blocks.append(Stripped(f'public T Transform({cls_name} that);'))
+            blocks.append(Stripped(f"public T Transform({cls_name} that);"))
 
         else:
             assert_never(symbol)
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent('''\
+        textwrap.dedent(
+            """\
             /// <summary>
             /// Define the interface for a transformer which transforms recursively 
             /// the instances into something else.
@@ -192,20 +198,22 @@ def _generate_itransformer(
             public interface ITransformer<T>
             {
                 public T Transform(IClass that);
-            '''))
+            """
+        )
+    )
 
     for i, block in enumerate(blocks):
         if i > 0:
-            writer.write('\n')
+            writer.write("\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write(f'\n}}  // public interface ITransformer')
+    writer.write(f"\n}}  // public interface ITransformer")
 
     return Stripped(writer.getvalue())
 
 
 def _generate_itransformer_with_context(
-        symbol_table: intermediate.SymbolTable
+    symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
     """Generate the interface for the transformer with context."""
     blocks = []  # type: List[Stripped]
@@ -219,15 +227,15 @@ def _generate_itransformer_with_context(
 
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
-            blocks.append(Stripped(
-                f'public T Transform({cls_name} that, C context);'))
+            blocks.append(Stripped(f"public T Transform({cls_name} that, C context);"))
 
         else:
             assert_never(symbol)
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent('''\
+        textwrap.dedent(
+            """\
             /// <summary>
             /// Define the interface for a transformer which recursively transforms
             /// the instances into something else while the context is passed along.
@@ -237,14 +245,16 @@ def _generate_itransformer_with_context(
             public interface ITransformerWithContext<C, T>
             {
                 public T Transform(IClass that, C context);
-            '''))
+            """
+        )
+    )
 
     for i, block in enumerate(blocks):
         if i > 0:
-            writer.write('\n')
+            writer.write("\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write(f'\n}}  // public interface ITransformerWithContext')
+    writer.write(f"\n}}  // public interface ITransformerWithContext")
 
     return Stripped(writer.getvalue())
 
@@ -258,8 +268,7 @@ def _generate_itransformer_with_context(
 )
 # fmt: on
 def generate(
-        symbol_table: intermediate.SymbolTable,
-        namespace: csharp_common.NamespaceIdentifier
+    symbol_table: intermediate.SymbolTable, namespace: csharp_common.NamespaceIdentifier
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the C# code of the visitors based on the intermediate representation
@@ -270,23 +279,20 @@ def generate(
 
     writer = io.StringIO()
     writer.write(f"namespace {namespace}\n{{\n")
-    writer.write(
-        f"{I}public static class Visitation\n"
-        f"{I}{{\n")
+    writer.write(f"{I}public static class Visitation\n" f"{I}{{\n")
 
     visitation_blocks = [
         _generate_ivisitor(symbol_table=symbol_table),
         _generate_ivisitor_with_context(symbol_table=symbol_table),
         _generate_itransformer(symbol_table=symbol_table),
-        _generate_itransformer_with_context(symbol_table=symbol_table)
+        _generate_itransformer_with_context(symbol_table=symbol_table),
     ]
 
     for i, visitation_block in enumerate(visitation_blocks):
         if i > 0:
-            writer.write('\n\n')
+            writer.write("\n\n")
 
-        writer.write(
-            textwrap.indent(visitation_block, II))
+        writer.write(textwrap.indent(visitation_block, II))
 
     writer.write(f"\n{I}}}  // public static class Visitation")
     writer.write(f"\n}}  // namespace {namespace}")
@@ -298,14 +304,15 @@ def generate(
     out = io.StringIO()
     for i, block in enumerate(blocks):
         if i > 0:
-            out.write('\n\n')
+            out.write("\n\n")
 
-        assert not block.startswith('\n')
-        assert not block.endswith('\n')
+        assert not block.startswith("\n")
+        assert not block.endswith("\n")
         out.write(block)
 
-    out.write('\n')
+    out.write("\n")
 
     return out.getvalue(), None
+
 
 # endregion

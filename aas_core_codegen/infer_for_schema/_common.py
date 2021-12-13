@@ -8,9 +8,7 @@ from typing import Optional
 
 from aas_core_codegen.common import Identifier
 
-from aas_core_codegen.parse import (
-    tree as parse_tree
-)
+from aas_core_codegen.parse import tree as parse_tree
 
 
 # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test this module
@@ -22,9 +20,9 @@ def match_property(node: parse_tree.Node) -> Optional[Identifier]:
     For example, ``self.something`` will be a ``Property("something")``.
     """
     if (
-            isinstance(node, parse_tree.Member)
-            and isinstance(node.instance, parse_tree.Name)
-            and node.instance.identifier == 'self'
+        isinstance(node, parse_tree.Member)
+        and isinstance(node.instance, parse_tree.Name)
+        and node.instance.identifier == "self"
     ):
         return node.name
 
@@ -41,7 +39,7 @@ class SingleArgFunctionOnProperty:
 
 
 def match_single_arg_function_on_property(
-        node: parse_tree.Node
+    node: parse_tree.Node,
 ) -> Optional[SingleArgFunctionOnProperty]:
     """
     Match a call of a function with a single argument on the property.
@@ -66,9 +64,7 @@ class ConditionalOnProp:
     """Represent an invariant conditioned on an optional property."""
 
     def __init__(
-            self,
-            prop_name: Identifier,
-            consequent: parse_tree.Expression
+        self, prop_name: Identifier, consequent: parse_tree.Expression
     ) -> None:
         """Initialize with the given values."""
         self.prop_name = prop_name

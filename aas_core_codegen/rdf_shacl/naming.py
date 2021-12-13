@@ -15,21 +15,19 @@ def class_name(identifier: Identifier) -> Identifier:
     >>> class_name(Identifier("something_to_URL"))
     'SomethingToUrl'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
     if len(parts) == 1:
         return Identifier(parts[0].capitalize())
 
     return Identifier(
         "{}{}".format(
-            parts[0].capitalize(),
-            ''.join(part.capitalize() for part in parts[1:])))
+            parts[0].capitalize(), "".join(part.capitalize() for part in parts[1:])
+        )
+    )
 
 
-_LOWERCASE_WORDS_IN_LABEL = {
-    "to",
-    "in"
-}
+_LOWERCASE_WORDS_IN_LABEL = {"to", "in"}
 
 
 def class_label(identifier: Identifier) -> Stripped:
@@ -42,7 +40,7 @@ def class_label(identifier: Identifier) -> Stripped:
     >>> class_label(Identifier("something_good_to_URL"))
     'Something Good to URL'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
     cased = []  # type: List[str]
     for part in parts:
@@ -66,15 +64,16 @@ def property_name(identifier: Identifier) -> Identifier:
     >>> property_name(Identifier("something_to_URL"))
     'somethingToUrl'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
     if len(parts) == 1:
         return Identifier(parts[0].lower())
 
     return Identifier(
         "{}{}".format(
-            parts[0].lower(),
-            ''.join(part.capitalize() for part in parts[1:])))
+            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
+        )
+    )
 
 
 def property_label(identifier: Identifier) -> Stripped:
@@ -87,7 +86,7 @@ def property_label(identifier: Identifier) -> Stripped:
     >>> property_label(Identifier("something_good_to_URL"))
     'something good to URL'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
     cased = []  # type: List[str]
     for part in parts:
@@ -109,8 +108,9 @@ def enumeration_literal(identifier: Identifier) -> Stripped:
     >>> enumeration_literal(Identifier("something_to_URL"))
     'SOMETHING_TO_URL'
     """
-    parts = identifier.split('_')
-    return Stripped('_'.join(part.upper() for part in parts))
+    parts = identifier.split("_")
+    return Stripped("_".join(part.upper() for part in parts))
+
 
 def enumeration_literal_label(identifier: Identifier) -> Stripped:
     """
@@ -122,7 +122,7 @@ def enumeration_literal_label(identifier: Identifier) -> Stripped:
     >>> enumeration_literal_label(Identifier("something_good_to_URL"))
     'Something Good to URL'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
     cased = []  # type: List[str]
     for part in parts:

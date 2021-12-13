@@ -5,12 +5,8 @@ from aas_core_codegen.common import assert_never, Error, Identifier
 from icontract import require, ensure
 
 from aas_core_codegen import intermediate
-from aas_core_codegen.parse import (
-    tree as parse_tree
-)
-from aas_core_codegen.infer_for_schema import (
-    _common as infer_for_schema_common
-)
+from aas_core_codegen.parse import tree as parse_tree
+from aas_core_codegen.infer_for_schema import _common as infer_for_schema_common
 
 
 class _Constraint:
@@ -47,34 +43,26 @@ class _ExactLength(_Constraint):
         self.value = value
 
 
-def _match_len_on_property(
-        node: parse_tree.Node
-) -> Optional[Identifier]:
+def _match_len_on_property(node: parse_tree.Node) -> Optional[Identifier]:
     """
     Match expressions like ``len(self.something)``.
 
     Return the name of the property, or None, if not matched.
     """
-    mtch = (
-        infer_for_schema_common.match_single_arg_function_on_property(node))
+    mtch = infer_for_schema_common.match_single_arg_function_on_property(node)
 
     if mtch is None:
         return None
 
-    if mtch.function == 'len':
+    if mtch.function == "len":
         return mtch.prop_name
 
     return None
 
 
-def _match_int_constant(
-        node: parse_tree.Node
-) -> Optional[int]:
+def _match_int_constant(node: parse_tree.Node) -> Optional[int]:
     """Match an integer constant."""
-    if (
-            isinstance(node, parse_tree.Constant)
-            and isinstance(node.value, int)
-    ):
+    if isinstance(node, parse_tree.Constant) and isinstance(node.value, int):
         return node.value
 
     return None
@@ -90,7 +78,7 @@ class _LenConstraintOnProperty:
 
 
 def _match_len_constraint_on_property(
-        node: parse_tree.Node
+    node: parse_tree.Node,
 ) -> Optional[_LenConstraintOnProperty]:
     """
     Match the constraint on ``len`` of a property such as ``len(self.something) < X``.
@@ -191,10 +179,10 @@ class LenConstraint:
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def infer_len_constraints(
-        symbol: Union[intermediate.Interface, intermediate.Class]
+    symbol: Union[intermediate.Interface, intermediate.Class]
 ) -> Tuple[
     Optional[MutableMapping[intermediate.Property, LenConstraint]],
-    Optional[List[Error]]
+    Optional[List[Error]],
 ]:
     """
     Infer the constraints on ``len`` for every property of the class ``cls``.
@@ -218,18 +206,18 @@ def infer_len_constraints(
         len_constraint_on_prop = None  # type: Optional[_LenConstraintOnProperty]
 
         # Match ``self.something is None or len(self.something) < X``
-        conditional_on_prop = (
-            infer_for_schema_common.match_conditional_on_prop(invariant.body))
+        conditional_on_prop = infer_for_schema_common.match_conditional_on_prop(
+            invariant.body
+        )
 
         if conditional_on_prop is not None:
-            len_constraint_on_prop = (
-                _match_len_constraint_on_property(conditional_on_prop.consequent))
+            len_constraint_on_prop = _match_len_constraint_on_property(
+                conditional_on_prop.consequent
+            )
 
         else:
             # Match ``len(self.something) < X``
-            len_constraint_on_prop = (
-                _match_len_constraint_on_property(invariant.body)
-            )
+            len_constraint_on_prop = _match_len_constraint_on_property(invariant.body)
 
         if len_constraint_on_prop is not None:
             constraints = constraint_map.get(len_constraint_on_prop.prop_name, None)
@@ -266,12 +254,15 @@ def infer_len_constraints(
 
             elif isinstance(constraint, _ExactLength):
                 if exact_len is not None:
-                    errors.append(Error(
-                        symbol.parsed.node,
-                        f"The property {prop_name} has conflicting invariants "
-                        f"on the length: "
-                        f"the exact length, {exact_len}, contradicts "
-                        f"another exactly expected length {constraint.value}."))
+                    errors.append(
+                        Error(
+                            symbol.parsed.node,
+                            f"The property {prop_name} has conflicting invariants "
+                            f"on the length: "
+                            f"the exact length, {exact_len}, contradicts "
+                            f"another exactly expected length {constraint.value}.",
+                        )
+                    )
                 exact_len = constraint.value
 
             else:
@@ -279,25 +270,34 @@ def infer_len_constraints(
 
         if exact_len is not None:
             if min_len is not None and min_len > exact_len:
-                errors.append(Error(
+                errors.append(
+                    Error(
+                        symbol.parsed.node,
+                        f"The property {prop_name} has conflicting invariants "
+                        f"on the length: the minimum length, {min_len}, "
+                        f"contradicts the exactly expected length {exact_len}.",
+                    )
+                )
+
+            if min_len is not None and exact_len > max_len:
+                errors.append(
+                    Error(
+                        symbol.parsed.node,
+                        f"The property {prop_name} has conflicting invariants "
+                        f"on the length: the maximum length, {max_len}, "
+                        f"contradicts the exactly expected length {exact_len}.",
+                    )
+                )
+
+        if min_len is not None and max_len is not None and min_len > max_len:
+            errors.append(
+                Error(
                     symbol.parsed.node,
                     f"The property {prop_name} has conflicting invariants "
                     f"on the length: the minimum length, {min_len}, "
-                    f"contradicts the exactly expected length {exact_len}."))
-
-            if min_len is not None and exact_len > max_len:
-                errors.append(Error(
-                    symbol.parsed.node,
-                    f"The property {prop_name} has conflicting invariants "
-                    f"on the length: the maximum length, {max_len}, "
-                    f"contradicts the exactly expected length {exact_len}."))
-
-        if min_len is not None and max_len is not None and min_len > max_len:
-            errors.append(Error(
-                symbol.parsed.node,
-                f"The property {prop_name} has conflicting invariants "
-                f"on the length: the minimum length, {min_len}, "
-                f"contradicts the maximum length {max_len}."))
+                    f"contradicts the maximum length {max_len}.",
+                )
+            )
 
         if len(errors) > 0:
             continue
@@ -307,7 +307,9 @@ def infer_len_constraints(
             max_len = exact_len
 
         prop = symbol.properties_by_name.get(prop_name, None)
-        assert prop is not None, f"Expected the property {prop_name} in the class {symbol}"
+        assert (
+            prop is not None
+        ), f"Expected the property {prop_name} in the class {symbol}"
 
         result[prop] = LenConstraint(min_value=min_len, max_value=max_len)
 

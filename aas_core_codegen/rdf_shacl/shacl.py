@@ -9,32 +9,30 @@ from aas_core_codegen import intermediate, specific_implementations, infer_for_s
 from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
 from aas_core_codegen.rdf_shacl import (
     naming as rdf_shacl_naming,
-    common as rdf_shacl_common
+    common as rdf_shacl_common,
 )
-from aas_core_codegen.rdf_shacl.common import (
-    INDENT as I
-)
+from aas_core_codegen.rdf_shacl.common import INDENT as I
 
 
 @require(lambda prop, symbol: id(prop) in symbol.property_id_set)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_property_shape(
-        prop: intermediate.Property,
-        symbol: Union[intermediate.Interface, intermediate.Class],
-        url_prefix: Stripped,
-        symbol_to_rdfs_range: MutableMapping[
-            Union[intermediate.Interface, intermediate.Class],
-            Stripped],
-        len_constraints_by_property: Mapping[
-            intermediate.Property, infer_for_schema.LenConstraint],
-        pattern_constraints_by_property: Mapping[
-            intermediate.Property, List[infer_for_schema.PatternConstraint]]
+    prop: intermediate.Property,
+    symbol: Union[intermediate.Interface, intermediate.Class],
+    url_prefix: Stripped,
+    symbol_to_rdfs_range: MutableMapping[
+        Union[intermediate.Interface, intermediate.Class], Stripped
+    ],
+    len_constraints_by_property: Mapping[
+        intermediate.Property, infer_for_schema.LenConstraint
+    ],
+    pattern_constraints_by_property: Mapping[
+        intermediate.Property, List[infer_for_schema.PatternConstraint]
+    ],
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the shape of a property ``prop`` of the intermediate ``symbol``."""
 
-    stmts = [
-        Stripped("a sh:PropertyShape ;")
-    ]  # type: List[Stripped]
+    stmts = [Stripped("a sh:PropertyShape ;")]  # type: List[Stripped]
 
     # Resolve the type annotation to the actual value, regardless if the property is
     # mandatory or optional
@@ -51,7 +49,8 @@ def _define_property_shape(
         prop_name = rdf_shacl_naming.property_name(prop.name)
         rdfs_range = symbol_to_rdfs_range.get(
             type_anno.symbol,
-            Stripped(f"aas:{rdf_shacl_naming.class_name(type_anno.symbol.name)}"))
+            Stripped(f"aas:{rdf_shacl_naming.class_name(type_anno.symbol.name)}"),
+        )
 
     elif isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
         prop_name = rdf_shacl_naming.property_name(prop.name)
@@ -66,7 +65,9 @@ def _define_property_shape(
             rdfs_range = symbol_to_rdfs_range.get(
                 type_anno_items.symbol,
                 Stripped(
-                    f"aas:{rdf_shacl_naming.class_name(type_anno_items.symbol.name)}"))
+                    f"aas:{rdf_shacl_naming.class_name(type_anno_items.symbol.name)}"
+                ),
+            )
 
         elif isinstance(type_anno_items, intermediate.BuiltinAtomicTypeAnnotation):
             rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno_items.a_type]
@@ -117,8 +118,7 @@ def _define_property_shape(
     elif isinstance(prop.type_annotation, intermediate.RefTypeAnnotation):
         min_count = 1
         max_count = 1
-    elif isinstance(
-            prop.type_annotation, intermediate.AtomicTypeAnnotation):
+    elif isinstance(prop.type_annotation, intermediate.AtomicTypeAnnotation):
         min_count = 1
         max_count = 1
     else:
@@ -127,7 +127,7 @@ def _define_property_shape(
             f"(mristin, 2021-11-13): "
             f"We did not implement how to determine the cardinality based on the type "
             f"{prop.type_annotation}. If you see this message, it is time to implement "
-            f"this logic."
+            f"this logic.",
         )
 
     # NOTE (mristin, 2021-12-01):
@@ -147,19 +147,21 @@ def _define_property_shape(
                 min_count = (
                     max(min_count, len_constraint.min_value)
                     if min_count is not None
-                    else len_constraint.min_value)
+                    else len_constraint.min_value
+                )
 
             if len_constraint.max_value is not None:
                 max_count = (
                     min(max_count, len_constraint.max_value)
                     if max_count is not None
-                    else len_constraint.max_value)
+                    else len_constraint.max_value
+                )
 
     if min_count is not None:
-        stmts.append(Stripped(f'sh:minCount {min_count} ;'))
+        stmts.append(Stripped(f"sh:minCount {min_count} ;"))
 
     if max_count is not None:
-        stmts.append(Stripped(f'sh:maxCount {max_count} ;'))
+        stmts.append(Stripped(f"sh:maxCount {max_count} ;"))
 
     # endregion
 
@@ -169,9 +171,10 @@ def _define_property_shape(
     if pattern_constraints is not None and len(pattern_constraints) > 0:
         for pattern_constraint in pattern_constraints:
             pattern_literal = rdf_shacl_common.string_literal(
-                pattern_constraint.pattern)
+                pattern_constraint.pattern
+            )
 
-            stmts.append(Stripped(f'sh:pattern {pattern_literal} ;'))
+            stmts.append(Stripped(f"sh:pattern {pattern_literal} ;"))
 
     # endregion
 
@@ -181,7 +184,7 @@ def _define_property_shape(
         writer.write("\n")
         writer.write(textwrap.indent(stmt, I))
 
-    writer.write('\n] ;')
+    writer.write("\n] ;")
 
     return Stripped(writer.getvalue()), None
 
@@ -194,28 +197,32 @@ def _define_property_shape(
 )
 # fmt: on
 def _define_for_class_or_interface(
-        symbol: Union[intermediate.Interface, intermediate.Class],
-        symbol_to_rdfs_range: MutableMapping[
-            Union[intermediate.Interface, intermediate.Class], Stripped],
-        url_prefix: Stripped
+    symbol: Union[intermediate.Interface, intermediate.Class],
+    symbol_to_rdfs_range: MutableMapping[
+        Union[intermediate.Interface, intermediate.Class], Stripped
+    ],
+    url_prefix: Stripped,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition for the intermediate ``symbol``."""
     prop_blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]
 
-    len_constraints_by_property, len_constraints_errors = (
-        infer_for_schema.infer_len_constraints(symbol=symbol))
+    (
+        len_constraints_by_property,
+        len_constraints_errors,
+    ) = infer_for_schema.infer_len_constraints(symbol=symbol)
 
     if len_constraints_errors is not None:
         errors.extend(len_constraints_errors)
 
     pattern_constraints_by_property = infer_for_schema.infer_pattern_constraints(
-        symbol=symbol)
+        symbol=symbol
+    )
 
     if len(errors) > 0:
         return None, Error(
-            symbol.parsed.node,
-            f"Failed to infer the constraints for {symbol.name}")
+            symbol.parsed.node, f"Failed to infer the constraints for {symbol.name}"
+        )
 
     for prop in symbol.properties:
         prop_block, error = _define_property_shape(
@@ -224,7 +231,8 @@ def _define_for_class_or_interface(
             url_prefix=url_prefix,
             symbol_to_rdfs_range=symbol_to_rdfs_range,
             len_constraints_by_property=len_constraints_by_property,
-            pattern_constraints_by_property=pattern_constraints_by_property)
+            pattern_constraints_by_property=pattern_constraints_by_property,
+        )
 
         if error is not None:
             errors.append(error)
@@ -234,17 +242,20 @@ def _define_for_class_or_interface(
 
     if len(errors) > 0:
         return None, Error(
-            None,
-            f"Failed to generate the shape definition for {symbol.name}",
-            errors)
+            None, f"Failed to generate the shape definition for {symbol.name}", errors
+        )
 
     shape_name = rdf_shacl_naming.class_name(Identifier(symbol.name + "_shape"))
     cls_name = rdf_shacl_naming.class_name(symbol.name)
 
     writer = io.StringIO()
-    writer.write(textwrap.dedent(f'''\
+    writer.write(
+        textwrap.dedent(
+            f"""\
         aas:{shape_name}  a sh:NodeShape ;
-        {I}sh:targetClass aas:{cls_name} ;'''))
+        {I}sh:targetClass aas:{cls_name} ;"""
+        )
+    )
 
     subclasses = None  # type: Optional[Sequence[Identifier]]
     if isinstance(symbol, intermediate.Interface):
@@ -256,45 +267,45 @@ def _define_for_class_or_interface(
 
     for subclass in subclasses:
         subclass_name = rdf_shacl_naming.class_name(subclass)
-        writer.write(f'\n{I}rdfs:subClassOf {subclass_name} ;')
+        writer.write(f"\n{I}rdfs:subClassOf {subclass_name} ;")
 
     for block in prop_blocks:
-        writer.write('\n')
+        writer.write("\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write('\n.')
+    writer.write("\n.")
 
     return Stripped(writer.getvalue()), None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def generate(
-        symbol_table: intermediate.SymbolTable,
-        symbol_to_rdfs_range: MutableMapping[
-            Union[intermediate.Interface, intermediate.Class], Stripped],
-        spec_impls: specific_implementations.SpecificImplementations,
-        url_prefix: Stripped
+    symbol_table: intermediate.SymbolTable,
+    symbol_to_rdfs_range: MutableMapping[
+        Union[intermediate.Interface, intermediate.Class], Stripped
+    ],
+    spec_impls: specific_implementations.SpecificImplementations,
+    url_prefix: Stripped,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the SHACL schema based on the ``symbol_table."""
     errors = []  # type: List[Error]
 
-    preamble_key = specific_implementations.ImplementationKey(
-        "shacl/preamble.ttl"
-    )
+    preamble_key = specific_implementations.ImplementationKey("shacl/preamble.ttl")
 
     preamble = spec_impls.get(preamble_key, None)
     if preamble is None:
-        errors.append(Error(
-            None,
-            f"The implementation snippet for the SHACL preamble "
-            f"is missing: {preamble_key}"))
+        errors.append(
+            Error(
+                None,
+                f"The implementation snippet for the SHACL preamble "
+                f"is missing: {preamble_key}",
+            )
+        )
 
     if len(errors) > 0:
         return None, errors
 
-    blocks = [
-        preamble
-    ]  # type: List[Stripped]
+    blocks = [preamble]  # type: List[Stripped]
 
     for symbol in symbol_table.symbols:
         # noinspection PyUnusedLocal
@@ -305,19 +316,23 @@ def generate(
 
         if isinstance(symbol, (intermediate.Interface, intermediate.Class)):
             if (
-                    isinstance(symbol, intermediate.Class)
-                    and symbol.is_implementation_specific
+                isinstance(symbol, intermediate.Class)
+                and symbol.is_implementation_specific
             ):
                 implementation_key = specific_implementations.ImplementationKey(
-                    f"shacl/{symbol.name}/shape.ttl")
+                    f"shacl/{symbol.name}/shape.ttl"
+                )
 
                 implementation = spec_impls.get(implementation_key, None)
                 if implementation is None:
-                    errors.append(Error(
-                        symbol.parsed.node,
-                        f"The implementation snippet for "
-                        f"the class {symbol.parsed.name} "
-                        f"is missing: {implementation_key}"))
+                    errors.append(
+                        Error(
+                            symbol.parsed.node,
+                            f"The implementation snippet for "
+                            f"the class {symbol.parsed.name} "
+                            f"is missing: {implementation_key}",
+                        )
+                    )
                 else:
                     blocks.append(implementation)
 
@@ -325,7 +340,8 @@ def generate(
                 block, error = _define_for_class_or_interface(
                     symbol=symbol,
                     symbol_to_rdfs_range=symbol_to_rdfs_range,
-                    url_prefix=url_prefix)
+                    url_prefix=url_prefix,
+                )
 
                 if error is not None:
                     errors.append(error)
@@ -338,4 +354,4 @@ def generate(
     if len(errors) > 0:
         return None, errors
 
-    return Stripped('\n\n'.join(blocks)), None
+    return Stripped("\n\n".join(blocks)), None

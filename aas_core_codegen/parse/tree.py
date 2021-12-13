@@ -9,7 +9,7 @@ from icontract import DBC, ensure
 from aas_core_codegen import stringify
 from aas_core_codegen.common import Identifier
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class Node(abc.ABC):
@@ -24,7 +24,7 @@ class Node(abc.ABC):
         return dump(self)
 
     @abc.abstractmethod
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         raise NotImplementedError()
 
@@ -45,17 +45,14 @@ class Member(Expression):
     """
 
     def __init__(
-            self,
-            instance: 'Expression',
-            name: Identifier,
-            original_node: ast.AST
+        self, instance: "Expression", name: Identifier, original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
         self.instance = instance
         self.name = name
 
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         return transformer.transform_member(self)
 
@@ -73,18 +70,18 @@ class Comparison(Expression):
     """Represent a comparison."""
 
     def __init__(
-            self,
-            left: 'Expression',
-            op: Comparator,
-            right: 'Expression',
-            original_node: ast.AST
+        self,
+        left: "Expression",
+        op: Comparator,
+        right: "Expression",
+        original_node: ast.AST,
     ) -> None:
         Node.__init__(self, original_node=original_node)
         self.left = left
         self.op = op
         self.right = right
 
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         return transformer.transform_comparison(self)
 
@@ -93,17 +90,14 @@ class Implication(Expression):
     """Represent an implication of the form ``A => B``."""
 
     def __init__(
-            self,
-            antecedent: 'Expression',
-            consequent: 'Expression',
-            original_node: ast.AST
+        self, antecedent: "Expression", consequent: "Expression", original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
         self.antecedent = antecedent
         self.consequent = consequent
 
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         return transformer.transform_implication(self)
 
@@ -112,17 +106,14 @@ class MethodCall(Expression):
     """Represent a method call."""
 
     def __init__(
-            self,
-            member: Member,
-            args: Sequence['Expression'],
-            original_node: ast.AST
+        self, member: Member, args: Sequence["Expression"], original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
         self.member = member
         self.args = args
 
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         return transformer.transform_method_call(self)
 
@@ -131,17 +122,14 @@ class FunctionCall(Expression):
     """Represent a function call."""
 
     def __init__(
-            self,
-            name: Identifier,
-            args: Sequence['Expression'],
-            original_node: ast.AST
+        self, name: Identifier, args: Sequence["Expression"], original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
         self.name = name
         self.args = args
 
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         return transformer.transform_function_call(self)
 
@@ -150,15 +138,13 @@ class Constant(Expression):
     """Represent a constant value."""
 
     def __init__(
-            self,
-            value: Union[bool, int, float, str],
-            original_node: ast.AST
+        self, value: Union[bool, int, float, str], original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
         self.value = value
 
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         return transformer.transform_constant(self)
 
@@ -171,7 +157,7 @@ class IsNone(Expression):
         Node.__init__(self, original_node=original_node)
         self.value = value
 
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         return transformer.transform_is_none(self)
 
@@ -184,7 +170,7 @@ class IsNotNone(Expression):
         Node.__init__(self, original_node=original_node)
         self.value = value
 
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         return transformer.transform_is_not_none(self)
 
@@ -197,7 +183,7 @@ class Name(Expression):
         Node.__init__(self, original_node=original_node)
         self.identifier = identifier
 
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         return transformer.transform_name(self)
 
@@ -209,7 +195,7 @@ class And(Expression):
         Node.__init__(self, original_node=original_node)
         self.values = values
 
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         return transformer.transform_and(self)
 
@@ -221,7 +207,7 @@ class Or(Expression):
         Node.__init__(self, original_node=original_node)
         self.values = values
 
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         return transformer.transform_or(self)
 
@@ -230,17 +216,14 @@ class Declaration(Statement):
     """Declare a variable."""
 
     def __init__(
-            self,
-            identifier: Identifier,
-            value: Expression,
-            original_node: ast.AST
+        self, identifier: Identifier, value: Expression, original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
         self.identifier = identifier
         self.value = value
 
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         return transformer.transform_declaration(self)
 
@@ -254,17 +237,17 @@ class ExpressionWithDeclarations(Expression):
     """
 
     def __init__(
-            self,
-            declarations: Sequence[Declaration],
-            expression: Expression,
-            original_node: ast.AST
+        self,
+        declarations: Sequence[Declaration],
+        expression: Expression,
+        original_node: ast.AST,
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
         self.declarations = declarations
         self.expression = expression
 
-    def transform(self, transformer: 'Transformer[T]') -> T:
+    def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""
         return transformer.transform_expression_with_declarations(self)
 
@@ -338,7 +321,7 @@ class Transformer(Generic[T], DBC):
 
     @abc.abstractmethod
     def transform_expression_with_declarations(
-            self, node: ExpressionWithDeclarations
+        self, node: ExpressionWithDeclarations
     ) -> T:
         """Transform an expression with variable declarations into something."""
         raise NotImplementedError()
@@ -359,8 +342,9 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             properties=[
                 stringify.Property("instance", self.transform(node.instance)),
                 stringify.Property("name", node.name),
-                stringify.PropertyEllipsis("original_node", node.original_node)
-            ])
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
 
     def transform_comparison(self, node: Comparison) -> stringify.Entity:
         return stringify.Entity(
@@ -369,8 +353,9 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
                 stringify.Property("left", self.transform(node.left)),
                 stringify.Property("op", str(node.op.value)),
                 stringify.Property("right", self.transform(node.right)),
-                stringify.PropertyEllipsis("original_node", node.original_node)
-            ])
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
 
     def transform_implication(self, node: Implication) -> stringify.Entity:
         return stringify.Entity(
@@ -378,8 +363,9 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             properties=[
                 stringify.Property("antecedent", self.transform(node.antecedent)),
                 stringify.Property("consequent", self.transform(node.consequent)),
-                stringify.PropertyEllipsis("original_node", node.original_node)
-            ])
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
 
     def transform_method_call(self, node: MethodCall) -> stringify.Entity:
         return stringify.Entity(
@@ -387,8 +373,9 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             properties=[
                 stringify.Property("member", self.transform(node.member)),
                 stringify.Property("args", [self.transform(arg) for arg in node.args]),
-                stringify.PropertyEllipsis("original_node", node.original_node)
-            ])
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
 
     def transform_function_call(self, node: FunctionCall) -> stringify.Entity:
         return stringify.Entity(
@@ -396,55 +383,64 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             properties=[
                 stringify.Property("name", node.name),
                 stringify.Property("args", [self.transform(arg) for arg in node.args]),
-                stringify.PropertyEllipsis("original_node", node.original_node)
-            ])
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
 
     def transform_constant(self, node: Constant) -> stringify.Entity:
         return stringify.Entity(
             name=Constant.__name__,
             properties=[
                 stringify.Property("value", node.value),
-                stringify.PropertyEllipsis("original_node", node.original_node)
-            ])
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
 
     def transform_is_none(self, node: IsNone) -> stringify.Entity:
         return stringify.Entity(
             name=IsNone.__name__,
-            properties=[stringify.Property("value", self.transform(node.value))])
+            properties=[stringify.Property("value", self.transform(node.value))],
+        )
 
     def transform_is_not_none(self, node: IsNotNone) -> stringify.Entity:
         return stringify.Entity(
             name=IsNotNone.__name__,
             properties=[
                 stringify.Property("value", self.transform(node.value)),
-                stringify.PropertyEllipsis("original_node", node.original_node)
-            ])
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
 
     def transform_name(self, node: Name) -> stringify.Entity:
         return stringify.Entity(
             name=Name.__name__,
             properties=[
                 stringify.Property("identifier", node.identifier),
-                stringify.PropertyEllipsis("original_node", node.original_node)
-            ])
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
 
     def transform_and(self, node: And) -> stringify.Entity:
         return stringify.Entity(
             name=And.__name__,
             properties=[
                 stringify.Property(
-                    "values", [self.transform(value) for value in node.values]),
-                stringify.PropertyEllipsis("original_node", node.original_node)
-            ])
+                    "values", [self.transform(value) for value in node.values]
+                ),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
 
     def transform_or(self, node: Or) -> stringify.Entity:
         return stringify.Entity(
             name=Or.__name__,
             properties=[
                 stringify.Property(
-                    "values", [self.transform(value) for value in node.values]),
-                stringify.PropertyEllipsis("original_node", node.original_node)
-            ])
+                    "values", [self.transform(value) for value in node.values]
+                ),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
 
     def transform_declaration(self, node: Declaration) -> stringify.Entity:
         return stringify.Entity(
@@ -452,23 +448,24 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             properties=[
                 stringify.Property("identifier", node.identifier),
                 stringify.Property("value", self.transform(node.value)),
-                stringify.PropertyEllipsis("original_node", node.original_node)
-            ])
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
 
     def transform_expression_with_declarations(
-            self, node: ExpressionWithDeclarations
+        self, node: ExpressionWithDeclarations
     ) -> stringify.Entity:
         return stringify.Entity(
             name=Declaration.__name__,
             properties=[
                 stringify.Property(
-                    "declarations", [
-                        self.transform(declaration)
-                        for declaration in node.declarations
-                    ]),
+                    "declarations",
+                    [self.transform(declaration) for declaration in node.declarations],
+                ),
                 stringify.Property("expression", self.transform(node.expression)),
-                stringify.PropertyEllipsis("original_node", node.original_node)
-            ])
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
 
 
 def dump(node: Node) -> str:

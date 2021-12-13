@@ -2,8 +2,20 @@
 import ast
 import itertools
 import re
-from typing import Sequence, List, Mapping, Optional, MutableMapping, Tuple, Union, \
-    Iterator, Generator, TypeVar, Generic, cast
+from typing import (
+    Sequence,
+    List,
+    Mapping,
+    Optional,
+    MutableMapping,
+    Tuple,
+    Union,
+    Iterator,
+    Generator,
+    TypeVar,
+    Generic,
+    cast,
+)
 
 import asttokens
 import docutils.nodes
@@ -12,8 +24,7 @@ import docutils.utils
 from icontract import require, ensure
 
 from aas_core_codegen import parse
-from aas_core_codegen.common import Error, Identifier, assert_never, \
-    IDENTIFIER_RE
+from aas_core_codegen.common import Error, Identifier, assert_never, IDENTIFIER_RE
 from aas_core_codegen.intermediate import _hierarchy, construction
 from aas_core_codegen.intermediate._types import (
     SymbolTable,
@@ -34,20 +45,30 @@ from aas_core_codegen.intermediate._types import (
     Method,
     Class,
     Constructor,
-    Symbol, ListTypeAnnotation,
+    Symbol,
+    ListTypeAnnotation,
     OptionalTypeAnnotation,
-    OurAtomicTypeAnnotation, STR_TO_BUILTIN_ATOMIC_TYPE, BuiltinAtomicTypeAnnotation,
-    Description, AttributeReferenceInDoc, SymbolReferenceInDoc,
-    SubscriptedTypeAnnotation, DefaultEnumerationLiteral,
-    EnumerationLiteralReferenceInDoc, PropertyReferenceInDoc, MetaModel,
-    RefTypeAnnotation, collect_ids_of_interfaces_in_properties,
+    OurAtomicTypeAnnotation,
+    STR_TO_BUILTIN_ATOMIC_TYPE,
+    BuiltinAtomicTypeAnnotation,
+    Description,
+    AttributeReferenceInDoc,
+    SymbolReferenceInDoc,
+    SubscriptedTypeAnnotation,
+    DefaultEnumerationLiteral,
+    EnumerationLiteralReferenceInDoc,
+    PropertyReferenceInDoc,
+    MetaModel,
+    RefTypeAnnotation,
+    collect_ids_of_interfaces_in_properties,
     map_interface_implementers,
 )
 
 
 # noinspection PyUnusedLocal
 def _symbol_reference_role(
-        role, rawtext, text, lineno, inliner, options=None, content=None):
+    role, rawtext, text, lineno, inliner, options=None, content=None
+):
     """Create an element of the description as a reference to a symbol."""
     # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
     if content is None:
@@ -73,7 +94,8 @@ def _symbol_reference_role(
 
 
 _ATTRIBUTE_REFERENCE_RE = re.compile(
-    r'[a-zA-Z_][a-zA-Z_0-9]*(\.[a-zA-Z_][a-zA-Z_0-9]*)?')
+    r"[a-zA-Z_][a-zA-Z_0-9]*(\.[a-zA-Z_][a-zA-Z_0-9]*)?"
+)
 
 
 class _PlaceholderAttributeReference:
@@ -93,7 +115,8 @@ class _PlaceholderAttributeReference:
 
 # noinspection PyUnusedLocal
 def _attribute_reference_role(
-        role, rawtext, text, lineno, inliner, options=None, content=None):
+    role, rawtext, text, lineno, inliner, options=None, content=None
+):
     """Create a reference in the documentation to a property or a literal."""
     # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
     if content is None:
@@ -106,7 +129,7 @@ def _attribute_reference_role(
 
     # We strip the tilde based on the convention as we ignore the appearance.
     # See: https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-syntax
-    path = text[1:] if text.startswith('~') else text
+    path = text[1:] if text.startswith("~") else text
 
     # We need to create a placeholder as the symbol table might not be fully created
     # at the point when we translate the documentation.
@@ -127,8 +150,8 @@ def _attribute_reference_role(
 # other modules, but it is the only way to register the roles.
 #
 # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
-docutils.parsers.rst.roles.register_local_role('class', _symbol_reference_role)
-docutils.parsers.rst.roles.register_local_role('attr', _attribute_reference_role)
+docutils.parsers.rst.roles.register_local_role("class", _symbol_reference_role)
+docutils.parsers.rst.roles.register_local_role("attr", _attribute_reference_role)
 
 
 def _parsed_description_to_description(parsed: parse.Description) -> Description:
@@ -150,9 +173,7 @@ class _PlaceholderSymbol:
         self.identifier = identifier
 
 
-def _parsed_enumeration_to_enumeration(
-        parsed: parse.Enumeration
-) -> Enumeration:
+def _parsed_enumeration_to_enumeration(parsed: parse.Enumeration) -> Enumeration:
     """Translate an enumeration from the meta-model to an intermediate enumeration."""
     return Enumeration(
         name=parsed.name,
@@ -163,27 +184,32 @@ def _parsed_enumeration_to_enumeration(
                 description=(
                     _parsed_description_to_description(parsed_literal.description)
                     if parsed_literal.description is not None
-                    else None),
+                    else None
+                ),
                 parsed=parsed_literal,
             )
             for parsed_literal in parsed.literals
         ],
         # Postpone the resolution to the second pass once the symbol table has been
         # completely built
-        is_superset_of=cast(List[Enumeration], [
-            _PlaceholderSymbol(identifier=identifier)
-            for identifier in parsed.is_superset_of
-        ]),
+        is_superset_of=cast(
+            List[Enumeration],
+            [
+                _PlaceholderSymbol(identifier=identifier)
+                for identifier in parsed.is_superset_of
+            ],
+        ),
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
-            else None),
+            else None
+        ),
         parsed=parsed,
     )
 
 
 def _parsed_type_annotation_to_type_annotation(
-        parsed: parse.TypeAnnotation
+    parsed: parse.TypeAnnotation,
 ) -> TypeAnnotation:
     """
     Translate parsed type annotations to possibly unresolved type annotation.
@@ -196,55 +222,64 @@ def _parsed_type_annotation_to_type_annotation(
     second pass.
     """
     if isinstance(parsed, parse.AtomicTypeAnnotation):
-        builtin_atomic_type = STR_TO_BUILTIN_ATOMIC_TYPE.get(
-            parsed.identifier, None)
+        builtin_atomic_type = STR_TO_BUILTIN_ATOMIC_TYPE.get(parsed.identifier, None)
 
         if builtin_atomic_type is not None:
             return BuiltinAtomicTypeAnnotation(
-                a_type=builtin_atomic_type, parsed=parsed)
+                a_type=builtin_atomic_type, parsed=parsed
+            )
 
         # noinspection PyTypeChecker
         return OurAtomicTypeAnnotation(
             symbol=_PlaceholderSymbol(identifier=parsed.identifier),  # type: ignore
-            parsed=parsed)
+            parsed=parsed,
+        )
 
     elif isinstance(parsed, parse.SubscriptedTypeAnnotation):
-        if parsed.identifier == 'List':
+        if parsed.identifier == "List":
             assert len(parsed.subscripts) == 1, (
                 f"Expected exactly one subscript for the List type annotation, "
-                f"but got: {parsed}; this should have been caught before!")
+                f"but got: {parsed}; this should have been caught before!"
+            )
 
             return ListTypeAnnotation(
                 items=_parsed_type_annotation_to_type_annotation(parsed.subscripts[0]),
-                parsed=parsed)
+                parsed=parsed,
+            )
 
-        elif parsed.identifier == 'Optional':
+        elif parsed.identifier == "Optional":
             assert len(parsed.subscripts) == 1, (
                 f"Expected exactly one subscript for the Optional type annotation, "
-                f"but got: {parsed}; this should have been caught before!")
+                f"but got: {parsed}; this should have been caught before!"
+            )
 
             return OptionalTypeAnnotation(
                 value=_parsed_type_annotation_to_type_annotation(parsed.subscripts[0]),
-                parsed=parsed)
+                parsed=parsed,
+            )
 
-        elif parsed.identifier == 'Ref':
+        elif parsed.identifier == "Ref":
             assert len(parsed.subscripts) == 1, (
                 f"Expected exactly one subscript for the Ref type annotation, "
-                f"but got: {parsed}; this should have been caught before!")
+                f"but got: {parsed}; this should have been caught before!"
+            )
 
             return RefTypeAnnotation(
                 value=_parsed_type_annotation_to_type_annotation(parsed.subscripts[0]),
-                parsed=parsed)
+                parsed=parsed,
+            )
 
         else:
             raise AssertionError(
                 f"Unexpected subscripted type annotation identifier: "
                 f"{parsed.identifier}. "
-                f"This should have been handled or caught before!")
+                f"This should have been handled or caught before!"
+            )
 
     elif isinstance(parsed, parse.SelfTypeAnnotation):
         raise AssertionError(
-            f"Unexpected self type annotation in the intermediate layer: {parsed}")
+            f"Unexpected self type annotation in the intermediate layer: {parsed}"
+        )
 
     else:
         assert_never(parsed)
@@ -267,15 +302,14 @@ class _DefaultPlaceholder:
         self.parsed = parsed
 
 
-def _parsed_arguments_to_arguments(
-        parsed: Sequence[parse.Argument]
-) -> List[Argument]:
+def _parsed_arguments_to_arguments(parsed: Sequence[parse.Argument]) -> List[Argument]:
     """Translate the arguments of a method in meta-model to the intermediate ones."""
     return [
         Argument(
             name=parsed_arg.name,
             type_annotation=_parsed_type_annotation_to_type_annotation(
-                parsed_arg.type_annotation),
+                parsed_arg.type_annotation
+            ),
             default=_DefaultPlaceholder(parsed=parsed_arg.default)  # type: ignore
             if parsed_arg.default is not None
             else None,
@@ -287,32 +321,33 @@ def _parsed_arguments_to_arguments(
 
 
 def _parsed_abstract_class_to_interface(
-        parsed: parse.AbstractClass,
-        serializations: Mapping[parse.Class, Serialization]
+    parsed: parse.AbstractClass, serializations: Mapping[parse.Class, Serialization]
 ) -> Interface:
     """Translate an abstract class of a meta-model to an intermediate interface."""
     # noinspection PyTypeChecker
     return Interface(
         name=parsed.name,
         inheritances=[
-            _PlaceholderSymbol(inheritance)
-            for inheritance in parsed.inheritances
+            _PlaceholderSymbol(inheritance) for inheritance in parsed.inheritances
         ],
         signatures=[
             Signature(
                 name=parsed_method.name,
                 arguments=_parsed_arguments_to_arguments(
-                    parsed=parsed_method.arguments),
+                    parsed=parsed_method.arguments
+                ),
                 returns=(
                     None
                     if parsed_method.returns is None
                     else _parsed_type_annotation_to_type_annotation(
-                        parsed_method.returns)
+                        parsed_method.returns
+                    )
                 ),
                 description=(
                     _parsed_description_to_description(parsed_method.description)
                     if parsed_method.description is not None
-                    else None),
+                    else None
+                ),
                 parsed=parsed_method,
             )
             for parsed_method in parsed.methods
@@ -326,33 +361,31 @@ def _parsed_abstract_class_to_interface(
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
-            else None),
+            else None
+        ),
         parsed=parsed,
     )
 
 
-def _parsed_property_to_property(
-        parsed: parse.Property,
-        cls: parse.Class
-) -> Property:
+def _parsed_property_to_property(parsed: parse.Property, cls: parse.Class) -> Property:
     """Translate a parsed property of a class to an intermediate one."""
     # noinspection PyTypeChecker
     return Property(
         name=parsed.name,
         type_annotation=_parsed_type_annotation_to_type_annotation(
-            parsed.type_annotation),
+            parsed.type_annotation
+        ),
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
-            else None),
+            else None
+        ),
         implemented_for=_PlaceholderSymbol(cls.name),
         parsed=parsed,
     )
 
 
-def _parsed_contracts_to_contracts(
-        parsed: parse.Contracts
-) -> Contracts:
+def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
     """Translate the parsed contracts into intermediate ones."""
     return Contracts(
         preconditions=[
@@ -392,9 +425,7 @@ def _parsed_contracts_to_contracts(
     "Constructors are expected to be handled in a special way"
 )
 # fmt: on
-def _parsed_method_to_method(
-        parsed: parse.Method
-) -> Method:
+def _parsed_method_to_method(parsed: parse.Method) -> Method:
     """Translate the parsed method into an intermediate representation."""
     return Method(
         name=parsed.name,
@@ -408,7 +439,8 @@ def _parsed_method_to_method(
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
-            else None),
+            else None
+        ),
         contracts=_parsed_contracts_to_contracts(parsed.contracts),
         body=parsed.body,
         parsed=parsed,
@@ -416,9 +448,9 @@ def _parsed_method_to_method(
 
 
 def _in_line_constructors(
-        parsed_symbol_table: parse.SymbolTable,
-        ontology: _hierarchy.Ontology,
-        constructor_table: construction.ConstructorTable,
+    parsed_symbol_table: parse.SymbolTable,
+    ontology: _hierarchy.Ontology,
+    constructor_table: construction.ConstructorTable,
 ) -> Mapping[parse.Class, Sequence[construction.AssignArgument]]:
     """In-line recursively all the constructor bodies."""
     result = (
@@ -474,7 +506,7 @@ def _stack_contracts(contracts: Contracts, other: Contracts) -> Contracts:
     )
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class _SettingWithSource(Generic[T]):
@@ -504,8 +536,7 @@ class _SettingWithSource(Generic[T]):
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def _resolve_serializations(
-        ontology: _hierarchy.Ontology,
-        parsed_symbol_table: parse.SymbolTable
+    ontology: _hierarchy.Ontology, parsed_symbol_table: parse.SymbolTable
 ) -> Tuple[Optional[MutableMapping[parse.Class, Serialization]], Optional[Error]]:
     """Resolve how general serialization settings stack through the ontology."""
     # NOTE (mristin, 2021-11-03):
@@ -517,24 +548,22 @@ def _resolve_serializations(
 
     # region ``with_model_type``
 
-    with_model_type_map = dict(
+    with_model_type_map = (
+        dict()
     )  # type: MutableMapping[Identifier, Optional[_SettingWithSource]]
 
     for cls in ontology.classes:
         assert cls.name not in with_model_type_map, (
             f"Expected the ontology to be a correctly linearized DAG, "
-            f"but the class {cls.name!r} has been already visited before")
+            f"but the class {cls.name!r} has been already visited before"
+        )
 
         settings = []  # type: List[_SettingWithSource[bool]]
 
-        if (
-                cls.serialization is not None
-                and cls.serialization.with_model_type
-        ):
+        if cls.serialization is not None and cls.serialization.with_model_type:
             settings.append(
-                _SettingWithSource(
-                    value=cls.serialization.with_model_type,
-                    source=cls))
+                _SettingWithSource(value=cls.serialization.with_model_type, source=cls)
+            )
 
         for inheritance in cls.inheritances:
             assert inheritance in with_model_type_map, (
@@ -565,17 +594,14 @@ def _resolve_serializations(
                         f"The serialization setting ``with_model_type`` "
                         f"between the class {setting.source} "
                         f"and {settings[0].source} is "
-                        f"inconsistent")
+                        f"inconsistent",
+                    )
 
-        with_model_type_map[cls.name] = (
-            None
-            if len(settings) == 0
-            else settings[0])
+        with_model_type_map[cls.name] = None if len(settings) == 0 else settings[0]
 
     # endregion
 
-    mapping = dict(
-    )  # type: MutableMapping[parse.Class, Serialization]
+    mapping = dict()  # type: MutableMapping[parse.Class, Serialization]
 
     for identifier, setting in with_model_type_map.items():
         cls = parsed_symbol_table.must_find_class(name=identifier)
@@ -591,11 +617,10 @@ def _resolve_serializations(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parsed_class_to_class(
-        parsed: parse.ConcreteClass,
-        ontology: _hierarchy.Ontology,
-        serializations: Mapping[parse.Class, Serialization],
-        in_lined_constructors: Mapping[
-            parse.Class, Sequence[construction.AssignArgument]]
+    parsed: parse.ConcreteClass,
+    ontology: _hierarchy.Ontology,
+    serializations: Mapping[parse.Class, Serialization],
+    in_lined_constructors: Mapping[parse.Class, Sequence[construction.AssignArgument]],
 ) -> Tuple[Optional[Class], Optional[Error]]:
     """Translate a concrete parsed class to an intermediate class."""
     antecedents = ontology.list_antecedents(cls=parsed)
@@ -614,8 +639,7 @@ def _parsed_class_to_class(
         )
 
     for parsed_prop in parsed.properties:
-        properties.append(
-            _parsed_property_to_property(parsed=parsed_prop, cls=parsed))
+        properties.append(_parsed_property_to_property(parsed=parsed_prop, cls=parsed))
 
     # endregion
 
@@ -674,8 +698,7 @@ def _parsed_class_to_class(
             # :py:class:`Constructors`.
             continue
 
-        methods.append(
-            _parsed_method_to_method(parsed=parsed_method))
+        methods.append(_parsed_method_to_method(parsed=parsed_method))
 
     # endregion
 
@@ -687,16 +710,16 @@ def _parsed_class_to_class(
         for parsed_invariant in antecedent.invariants:
             invariants.append(
                 Invariant(
-                    description=parsed_invariant.description,
-                    parsed=parsed_invariant))
+                    description=parsed_invariant.description, parsed=parsed_invariant
+                )
+            )
 
     errors = []  # type: List[Error]
 
     for parsed_invariant in parsed.invariants:
         invariants.append(
-            Invariant(
-                description=parsed_invariant.description,
-                parsed=parsed_invariant))
+            Invariant(description=parsed_invariant.description, parsed=parsed_invariant)
+        )
 
     # endregion
 
@@ -705,31 +728,35 @@ def _parsed_class_to_class(
             parsed.node,
             f"Failed to translate the class {parsed.name} "
             f"to the intermediate representation",
-            errors)
+            errors,
+        )
 
     # noinspection PyTypeChecker
-    return Class(
-        name=parsed.name,
-        interfaces=[
-            _PlaceholderSymbol(inheritance)
-            for inheritance in parsed.inheritances
-        ],
-        is_implementation_specific=parsed.is_implementation_specific,
-        properties=properties,
-        methods=methods,
-        constructor=ctor,
-        invariants=invariants,
-        serialization=serializations[parsed],
-        description=(
-            _parsed_description_to_description(parsed.description)
-            if parsed.description is not None
-            else None),
-        parsed=parsed,
-    ), None
+    return (
+        Class(
+            name=parsed.name,
+            interfaces=[
+                _PlaceholderSymbol(inheritance) for inheritance in parsed.inheritances
+            ],
+            is_implementation_specific=parsed.is_implementation_specific,
+            properties=properties,
+            methods=methods,
+            constructor=ctor,
+            invariants=invariants,
+            serialization=serializations[parsed],
+            description=(
+                _parsed_description_to_description(parsed.description)
+                if parsed.description is not None
+                else None
+            ),
+            parsed=parsed,
+        ),
+        None,
+    )
 
 
 def _over_our_atomic_type_annotations(
-        something: Union[Class, Interface, TypeAnnotation]
+    something: Union[Class, Interface, TypeAnnotation]
 ) -> Iterator[OurAtomicTypeAnnotation]:
     """Iterate over all the atomic type annotations in the ``something``."""
     if isinstance(something, BuiltinAtomicTypeAnnotation):
@@ -752,8 +779,7 @@ def _over_our_atomic_type_annotations(
 
         for method in something.methods:
             for argument in method.arguments:
-                yield from _over_our_atomic_type_annotations(
-                    argument.type_annotation)
+                yield from _over_our_atomic_type_annotations(argument.type_annotation)
 
             if method.returns is not None:
                 yield from _over_our_atomic_type_annotations(method.returns)
@@ -767,15 +793,14 @@ def _over_our_atomic_type_annotations(
 
         for signature in something.signatures:
             for argument in signature.arguments:
-                yield from _over_our_atomic_type_annotations(
-                    argument.type_annotation)
+                yield from _over_our_atomic_type_annotations(argument.type_annotation)
 
             if signature.returns is not None:
                 yield from _over_our_atomic_type_annotations(signature.returns)
 
 
 def _over_descriptions(
-        something: Union[Class, Interface, Enumeration]
+    something: Union[Class, Interface, Enumeration]
 ) -> Iterator[Description]:
     """Iterate over all the descriptions from the ``something``."""
     if isinstance(something, Class):
@@ -819,8 +844,7 @@ def _over_descriptions(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _fill_in_default_placeholder(
-        default: _DefaultPlaceholder,
-        symbol_table: SymbolTable
+    default: _DefaultPlaceholder, symbol_table: SymbolTable
 ) -> Tuple[Optional[Default], Optional[Error]]:
     """Resolve the default values to references using the constructed symbol table."""
     # If we do not preemptively return, signal that we do not know how to handle
@@ -828,18 +852,19 @@ def _fill_in_default_placeholder(
 
     if isinstance(default.parsed.node, ast.Constant):
         if (
-                isinstance(default.parsed.node.value, (bool, int, float, str))
-                or default.parsed.node.value is None
+            isinstance(default.parsed.node.value, (bool, int, float, str))
+            or default.parsed.node.value is None
         ):
-            return DefaultConstant(
-                value=default.parsed.node.value,
-                parsed=default.parsed), None
+            return (
+                DefaultConstant(value=default.parsed.node.value, parsed=default.parsed),
+                None,
+            )
 
     if (
-            isinstance(default.parsed.node, ast.Attribute)
-            and isinstance(default.parsed.node.ctx, ast.Load)
-            and isinstance(default.parsed.node.value, ast.Name)
-            and isinstance(default.parsed.node.value.ctx, ast.Load)
+        isinstance(default.parsed.node, ast.Attribute)
+        and isinstance(default.parsed.node.ctx, ast.Load)
+        and isinstance(default.parsed.node.value, ast.Name)
+        and isinstance(default.parsed.node.value.ctx, ast.Load)
     ):
         symbol_name = Identifier(default.parsed.node.value.id)
         attr_name = Identifier(default.parsed.node.attr)
@@ -848,15 +873,18 @@ def _fill_in_default_placeholder(
         if isinstance(symbol, Enumeration):
             literal = symbol.literals_by_name.get(attr_name, None)
             if literal is not None:
-                return DefaultEnumerationLiteral(
-                    enumeration=symbol,
-                    literal=literal,
-                    parsed=default.parsed), None
+                return (
+                    DefaultEnumerationLiteral(
+                        enumeration=symbol, literal=literal, parsed=default.parsed
+                    ),
+                    None,
+                )
 
     return None, Error(
         default.parsed.node,
         f"The translation of the default value to the intermediate layer "
-        f"has not been implemented: {ast.dump(default.parsed.node)}")
+        f"has not been implemented: {ast.dump(default.parsed.node)}",
+    )
 
 
 class _PropertyOfClass:
@@ -870,8 +898,8 @@ class _PropertyOfClass:
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def translate(
-        parsed_symbol_table: parse.SymbolTable,
-        atok: asttokens.ASTTokens,
+    parsed_symbol_table: parse.SymbolTable,
+    atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[SymbolTable], Optional[Error]]:
     """Translate the parsed symbols into intermediate symbols."""
     underlying_errors = []  # type: List[Error]
@@ -882,7 +910,8 @@ def translate(
             atok.tree,
             "Failed to translate the parsed symbol table "
             "to an intermediate symbol table",
-            underlying=underlying_errors)
+            underlying=underlying_errors,
+        )
 
     # region Infer hierarchy as ontology
 
@@ -904,7 +933,8 @@ def translate(
     # region Understand constructor stacks
 
     constructor_table, constructor_error = construction.understand_all(
-        parsed_symbol_table=parsed_symbol_table, atok=atok)
+        parsed_symbol_table=parsed_symbol_table, atok=atok
+    )
 
     if constructor_error is not None:
         underlying_errors.append(constructor_error)
@@ -914,7 +944,8 @@ def translate(
     # region Resolve settings for the JSON serialization
 
     serializations, serializations_error = _resolve_serializations(
-        ontology=ontology, parsed_symbol_table=parsed_symbol_table)
+        ontology=ontology, parsed_symbol_table=parsed_symbol_table
+    )
 
     if serializations_error is not None:
         underlying_errors.append(serializations_error)
@@ -949,15 +980,16 @@ def translate(
 
         elif isinstance(parsed_symbol, parse.AbstractClass):
             symbol = _parsed_abstract_class_to_interface(
-                parsed=parsed_symbol,
-                serializations=serializations)
+                parsed=parsed_symbol, serializations=serializations
+            )
 
         elif isinstance(parsed_symbol, parse.ConcreteClass):
             symbol, error = _parsed_class_to_class(
                 parsed=parsed_symbol,
                 ontology=ontology,
                 serializations=serializations,
-                in_lined_constructors=in_lined_constructors)
+                in_lined_constructors=in_lined_constructors,
+            )
 
             if error is not None:
                 underlying_errors.append(error)
@@ -978,7 +1010,8 @@ def translate(
             for symbol in symbols
             if symbol.name == parsed_symbol_table.ref_association.name
         ),
-        None)
+        None,
+    )
 
     if ref_association is None:
         raise AssertionError(
@@ -992,12 +1025,13 @@ def translate(
         book_url=parsed_symbol_table.meta_model.book_url,
         book_version=parsed_symbol_table.meta_model.book_version,
         description=_parsed_description_to_description(
-            parsed_symbol_table.meta_model.description))
+            parsed_symbol_table.meta_model.description
+        ),
+    )
 
     symbol_table = SymbolTable(
-        symbols=symbols,
-        ref_association=ref_association,
-        meta_model=meta_model)
+        symbols=symbols, ref_association=ref_association, meta_model=meta_model
+    )
 
     # endregion
 
@@ -1008,15 +1042,18 @@ def translate(
             continue
 
         for our_type_annotation in _over_our_atomic_type_annotations(symbol):
-            assert isinstance(our_type_annotation.symbol, _PlaceholderSymbol), \
-                "Expected only placeholder symbols to be assigned in the first pass"
+            assert isinstance(
+                our_type_annotation.symbol, _PlaceholderSymbol
+            ), "Expected only placeholder symbols to be assigned in the first pass"
 
             if not IDENTIFIER_RE.match(our_type_annotation.symbol.identifier):
                 underlying_errors.append(
                     Error(
                         our_type_annotation.parsed.node,
                         f"The symbol is invalid: "
-                        f"{our_type_annotation.symbol.identifier!r}"))
+                        f"{our_type_annotation.symbol.identifier!r}",
+                    )
+                )
                 continue
 
             identifier = Identifier(our_type_annotation.symbol.identifier)
@@ -1026,7 +1063,9 @@ def translate(
                     Error(
                         our_type_annotation.parsed.node,
                         f"The symbol with identifier {identifier!r} is not available "
-                        f"in the symbol table."))
+                        f"in the symbol table.",
+                    )
+                )
                 continue
 
             our_type_annotation.symbol = referenced_symbol
@@ -1047,7 +1086,8 @@ def translate(
 
     for _, description in symbols_descriptions:
         for symbol_ref_in_doc in description.document.traverse(
-                condition=SymbolReferenceInDoc):
+            condition=SymbolReferenceInDoc
+        ):
 
             # Symbol references can be repeated as docutils will cache them
             # so we need to skip them.
@@ -1056,20 +1096,26 @@ def translate(
 
             raw_identifier = symbol_ref_in_doc.symbol.identifier
             if not raw_identifier.startswith("."):
-                underlying_errors.append(Error(
-                    description.node,
-                    f"The identifier of the symbol reference "
-                    f"is invalid: {raw_identifier}; "
-                    f"expected an identifier starting with a dot"))
+                underlying_errors.append(
+                    Error(
+                        description.node,
+                        f"The identifier of the symbol reference "
+                        f"is invalid: {raw_identifier}; "
+                        f"expected an identifier starting with a dot",
+                    )
+                )
                 continue
 
             raw_identifier_no_dot = raw_identifier[1:]
 
             if not IDENTIFIER_RE.match(raw_identifier_no_dot):
-                underlying_errors.append(Error(
-                    description.node,
-                    f"The identifier of the symbol reference "
-                    f"is invalid: {raw_identifier_no_dot}"))
+                underlying_errors.append(
+                    Error(
+                        description.node,
+                        f"The identifier of the symbol reference "
+                        f"is invalid: {raw_identifier_no_dot}",
+                    )
+                )
                 continue
 
             # Strip the dot
@@ -1077,10 +1123,13 @@ def translate(
 
             referenced_symbol = symbol_table.find(name=identifier)
             if referenced_symbol is None:
-                underlying_errors.append(Error(
-                    description.node,
-                    f"The identifier of the symbol reference "
-                    f"could not be found in the symbol table: {identifier}"))
+                underlying_errors.append(
+                    Error(
+                        description.node,
+                        f"The identifier of the symbol reference "
+                        f"could not be found in the symbol table: {identifier}",
+                    )
+                )
                 continue
 
             symbol_ref_in_doc.symbol = referenced_symbol
@@ -1093,26 +1142,32 @@ def translate(
         # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
         #  test this, especially the failure cases
         for attr_ref_in_doc in description.document.traverse(
-                condition=AttributeReferenceInDoc):
+            condition=AttributeReferenceInDoc
+        ):
             if isinstance(attr_ref_in_doc.reference, _PlaceholderAttributeReference):
                 pth = attr_ref_in_doc.reference.path
-                parts = pth.split('.')
+                parts = pth.split(".")
 
                 if any(not IDENTIFIER_RE.match(part) for part in parts):
-                    underlying_errors.append(Error(
-                        description.node,
-                        f"Invalid reference to a property or a literal; "
-                        f"each part of the path needs to be an identifier, "
-                        f"but it is not: {pth}"))
+                    underlying_errors.append(
+                        Error(
+                            description.node,
+                            f"Invalid reference to a property or a literal; "
+                            f"each part of the path needs to be an identifier, "
+                            f"but it is not: {pth}",
+                        )
+                    )
                     continue
 
                 part_identifiers = [Identifier(part) for part in parts]
 
                 if len(part_identifiers) == 0:
-                    underlying_errors.append(Error(
-                        description.node,
-                        "Unexpected empty reference "
-                        "to a property or a literal"))
+                    underlying_errors.append(
+                        Error(
+                            description.node,
+                            "Unexpected empty reference " "to a property or a literal",
+                        )
+                    )
                     continue
 
                 # noinspection PyUnusedLocal
@@ -1123,10 +1178,13 @@ def translate(
 
                 if len(part_identifiers) == 1:
                     if symbol is None:
-                        underlying_errors.append(Error(
-                            description.node,
-                            f"The attribute reference can not be resolved as there is "
-                            f"no encompassing symbol in the given context: {pth}"))
+                        underlying_errors.append(
+                            Error(
+                                description.node,
+                                f"The attribute reference can not be resolved as there is "
+                                f"no encompassing symbol in the given context: {pth}",
+                            )
+                        )
                         continue
 
                     target_symbol = symbol
@@ -1134,55 +1192,64 @@ def translate(
                 elif len(part_identifiers) == 2:
                     target_symbol = symbol_table.find(part_identifiers[0])
                     if target_symbol is None:
-                        underlying_errors.append(Error(
-                            description.node,
-                            f"Dangling reference to a non-existing "
-                            f"symbol: {pth}"))
+                        underlying_errors.append(
+                            Error(
+                                description.node,
+                                f"Dangling reference to a non-existing "
+                                f"symbol: {pth}",
+                            )
+                        )
                         continue
 
                     attr_identifier = part_identifiers[1]
                 else:
-                    underlying_errors.append(Error(
-                        description.node,
-                        f"We did not implement the resolution of such "
-                        f"a reference to a property or a literal: {pth}"))
+                    underlying_errors.append(
+                        Error(
+                            description.node,
+                            f"We did not implement the resolution of such "
+                            f"a reference to a property or a literal: {pth}",
+                        )
+                    )
                     continue
 
                 assert target_symbol is not None
                 assert attr_identifier is not None
 
                 reference: Optional[
-                    Union[
-                        PropertyReferenceInDoc,
-                        EnumerationLiteralReferenceInDoc]] = None
+                    Union[PropertyReferenceInDoc, EnumerationLiteralReferenceInDoc]
+                ] = None
 
                 if isinstance(target_symbol, Enumeration):
-                    literal = target_symbol.literals_by_name.get(
-                        attr_identifier, None)
+                    literal = target_symbol.literals_by_name.get(attr_identifier, None)
 
                     if literal is None:
-                        underlying_errors.append(Error(
-                            description.node,
-                            f"Dangling reference to a non-existing literal "
-                            f"in the enumeration {target_symbol.name}: {pth}"))
+                        underlying_errors.append(
+                            Error(
+                                description.node,
+                                f"Dangling reference to a non-existing literal "
+                                f"in the enumeration {target_symbol.name}: {pth}",
+                            )
+                        )
                         continue
 
                     reference = EnumerationLiteralReferenceInDoc(
-                        symbol=target_symbol, literal=literal)
+                        symbol=target_symbol, literal=literal
+                    )
 
                 elif isinstance(target_symbol, (Class, Interface)):
-                    prop = target_symbol.properties_by_name.get(
-                        attr_identifier, None)
+                    prop = target_symbol.properties_by_name.get(attr_identifier, None)
 
                     if prop is None:
-                        underlying_errors.append(Error(
-                            description.node,
-                            f"Dangling reference to a non-existing property "
-                            f"of a class {target_symbol.name}: {pth}"))
+                        underlying_errors.append(
+                            Error(
+                                description.node,
+                                f"Dangling reference to a non-existing property "
+                                f"of a class {target_symbol.name}: {pth}",
+                            )
+                        )
                         continue
 
-                    reference = PropertyReferenceInDoc(
-                        symbol=target_symbol, prop=prop)
+                    reference = PropertyReferenceInDoc(symbol=target_symbol, prop=prop)
 
                 else:
                     assert_never(target_symbol)
@@ -1210,12 +1277,9 @@ def translate(
             elif isinstance(symbol, Class):
                 # noinspection PyTypeChecker
                 args_generator = itertools.chain(
-                    (
-                        arg
-                        for method in symbol.methods
-                        for arg in method.arguments
-                    ),
-                    iter(symbol.constructor.arguments))
+                    (arg for method in symbol.methods for arg in method.arguments),
+                    iter(symbol.constructor.arguments),
+                )
             else:
                 assert_never(symbol)
 
@@ -1226,11 +1290,12 @@ def translate(
                     assert isinstance(arg.default, _DefaultPlaceholder), (
                         f"Expected the argument default value to be a placeholder "
                         f"since we resolve it only in the second pass, "
-                        f"but got: {arg.default}")
+                        f"but got: {arg.default}"
+                    )
 
                     filled_default, error = _fill_in_default_placeholder(
-                        default=arg.default,
-                        symbol_table=symbol_table)
+                        default=arg.default, symbol_table=symbol_table
+                    )
 
                     if error:
                         underlying_errors.append(error)
@@ -1252,23 +1317,31 @@ def translate(
             assert isinstance(placeholder, _PlaceholderSymbol), (
                 f"Expected the subset in a ``is_superset_of`` to be resolved "
                 f"only in the second pass for enumeration {symbol.name}, "
-                f"but got: {placeholder}")
+                f"but got: {placeholder}"
+            )
 
             referenced_symbol = symbol_table.find(
-                name=Identifier(placeholder.identifier))
+                name=Identifier(placeholder.identifier)
+            )
 
             if referenced_symbol is None:
-                underlying_errors.append(Error(
-                    symbol.parsed.node,
-                    f"The subset enumeration in ``is_superset_of`` has "
-                    f"not been defined: {placeholder.identifier}"))
+                underlying_errors.append(
+                    Error(
+                        symbol.parsed.node,
+                        f"The subset enumeration in ``is_superset_of`` has "
+                        f"not been defined: {placeholder.identifier}",
+                    )
+                )
                 continue
 
             if not isinstance(referenced_symbol, Enumeration):
-                underlying_errors.append(Error(
-                    symbol.parsed.node,
-                    f"An element, {placeholder.identifier}, of ``is_superset_of`` is "
-                    f"not an Enumeration, but: {type(referenced_symbol)}"))
+                underlying_errors.append(
+                    Error(
+                        symbol.parsed.node,
+                        f"An element, {placeholder.identifier}, of ``is_superset_of`` is "
+                        f"not an Enumeration, but: {type(referenced_symbol)}",
+                    )
+                )
                 continue
 
             is_superset_of.append(referenced_symbol)
@@ -1277,22 +1350,28 @@ def translate(
             for subset_literal in subset_enum.literals:
                 literal = symbol.literals_by_name.get(subset_literal.name, None)
                 if literal is None:
-                    underlying_errors.append(Error(
-                        symbol.parsed.node,
-                        f"The literal {subset_literal.name} "
-                        f"from the subset enumeration {subset_enum.name} "
-                        f"is missing in the enumeration {symbol.name}"))
+                    underlying_errors.append(
+                        Error(
+                            symbol.parsed.node,
+                            f"The literal {subset_literal.name} "
+                            f"from the subset enumeration {subset_enum.name} "
+                            f"is missing in the enumeration {symbol.name}",
+                        )
+                    )
                     continue
 
                 if literal.value != subset_literal.value:
-                    underlying_errors.append(Error(
-                        symbol.parsed.node,
-                        f"The value {subset_literal.value!r} "
-                        f"of the literal {subset_literal.name} "
-                        f"from the subset enumeration {subset_enum.name} "
-                        f"does not equal the value {literal.value!r} "
-                        f"of the literal {literal.name} "
-                        f"in the enumeration {symbol.name}"))
+                    underlying_errors.append(
+                        Error(
+                            symbol.parsed.node,
+                            f"The value {subset_literal.value!r} "
+                            f"of the literal {subset_literal.name} "
+                            f"from the subset enumeration {subset_enum.name} "
+                            f"does not equal the value {literal.value!r} "
+                            f"of the literal {literal.name} "
+                            f"in the enumeration {symbol.name}",
+                        )
+                    )
                     continue
 
         symbol.is_superset_of = is_superset_of
@@ -1311,7 +1390,8 @@ def translate(
                 assert isinstance(inheritance, _PlaceholderSymbol)
 
                 inheritance_symbol = symbol_table.must_find(
-                    Identifier(inheritance.identifier))
+                    Identifier(inheritance.identifier)
+                )
 
                 assert isinstance(inheritance_symbol, Interface)
 
@@ -1325,7 +1405,8 @@ def translate(
                 assert isinstance(interface, _PlaceholderSymbol)
 
                 interface_symbol = symbol_table.must_find(
-                    Identifier(interface.identifier))
+                    Identifier(interface.identifier)
+                )
 
                 assert isinstance(interface_symbol, Interface)
 
@@ -1346,38 +1427,40 @@ def translate(
         for prop in symbol.properties:
             assert isinstance(prop.implemented_for, _PlaceholderSymbol), (
                 f"Expected the placeholder symbol for ``implemented_for`` in "
-                f"the property {prop} of {symbol}, but got: {prop.implemented_for}")
+                f"the property {prop} of {symbol}, but got: {prop.implemented_for}"
+            )
 
             prop.implemented_for = symbol_table.must_find(
-                Identifier(prop.implemented_for.identifier))
+                Identifier(prop.implemented_for.identifier)
+            )
 
     # endregion
 
     # region Check that all implementers of interfaces have ``with_model_type``
 
     ids_of_used_interfaces = collect_ids_of_interfaces_in_properties(
-        symbol_table=symbol_table)
+        symbol_table=symbol_table
+    )
 
     interface_implementers = map_interface_implementers(symbol_table=symbol_table)
 
     for symbol in symbol_table.symbols:
-        if (
-                isinstance(symbol, Interface)
-                and id(symbol) in ids_of_used_interfaces
-        ):
+        if isinstance(symbol, Interface) and id(symbol) in ids_of_used_interfaces:
             implementers = interface_implementers.get(symbol, None)
             if implementers is not None:
                 for implementer in implementers:
                     if not implementer.serialization.with_model_type:
-                        underlying_errors.append(Error(
-                            implementer.parsed.node,
-                            f"The class {implementer.name} needs to have "
-                            f"serialization setting ``with_model_type`` set since "
-                            f"it is among the concrete classes of "
-                            f"the abstract class {symbol.name}. Otherwise, "
-                            f"the abstract class {symbol.name} can not be "
-                            f"de/serialized properly."
-                        ))
+                        underlying_errors.append(
+                            Error(
+                                implementer.parsed.node,
+                                f"The class {implementer.name} needs to have "
+                                f"serialization setting ``with_model_type`` set since "
+                                f"it is among the concrete classes of "
+                                f"the abstract class {symbol.name}. Otherwise, "
+                                f"the abstract class {symbol.name} can not be "
+                                f"de/serialized properly.",
+                            )
+                        )
 
     # endregion
 

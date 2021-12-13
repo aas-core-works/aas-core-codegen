@@ -15,13 +15,13 @@ class Context:
     @require(lambda model_path: model_path.exists() and model_path.is_file())
     @require(lambda output_dir: output_dir.exists() and output_dir.is_dir())
     def __init__(
-            self,
-            model_path: pathlib.Path,
-            symbol_table: intermediate.SymbolTable,
-            spec_impls: specific_implementations.SpecificImplementations,
-            interface_implementers: intermediate.InterfaceImplementers,
-            lineno_columner: LinenoColumner,
-            output_dir: pathlib.Path
+        self,
+        model_path: pathlib.Path,
+        symbol_table: intermediate.SymbolTable,
+        spec_impls: specific_implementations.SpecificImplementations,
+        interface_implementers: intermediate.InterfaceImplementers,
+        lineno_columner: LinenoColumner,
+        output_dir: pathlib.Path,
     ) -> None:
         """Initialize with the given values."""
         self.model_path = model_path
@@ -33,23 +33,16 @@ class Context:
 
 
 @require(
-    lambda errors:
-    all(
-        len(error) > 0
-        and not error.startswith('\n')
+    lambda errors: all(
+        len(error) > 0 and not error.startswith("\n")
         # This is necessary so that we do not have double bullet point.
-        and not error.startswith('*')
-        and not error.endswith('\n')
+        and not error.startswith("*") and not error.endswith("\n")
         for error in errors
     )
 )
-@require(lambda message: not message.endswith(':'))
-@require(lambda message: not message.endswith('\n'))
-@require(
-    lambda message:
-    not message.startswith('\n')
-    and not message.startswith('*')
-)
+@require(lambda message: not message.endswith(":"))
+@require(lambda message: not message.endswith("\n"))
+@require(lambda message: not message.startswith("\n") and not message.startswith("*"))
 # fmt: on
 def write_error_report(message: str, errors: Sequence[str], stderr: TextIO) -> None:
     """

@@ -198,8 +198,10 @@ def _topologically_sort(
     if visited_more_than_once:
         return None, visited_more_than_once
 
-    return _UnverifiedOntology(
-        classes=result, parsed_symbol_table=parsed_symbol_table), None
+    return (
+        _UnverifiedOntology(classes=result, parsed_symbol_table=parsed_symbol_table),
+        None,
+    )
 
 
 class Ontology(_UnverifiedOntology):
@@ -216,7 +218,8 @@ def map_symbol_table_to_ontology(
 ) -> Tuple[Optional[Ontology], Optional[List[Error]]]:
     """Infer the ontology of the classes from the ``parsed_symbol_table``."""
     ontology, visited_more_than_once = _topologically_sort(
-        parsed_symbol_table=parsed_symbol_table)
+        parsed_symbol_table=parsed_symbol_table
+    )
     if visited_more_than_once is not None:
         return (
             None,

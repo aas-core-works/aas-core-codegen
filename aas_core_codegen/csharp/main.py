@@ -8,33 +8,30 @@ from aas_core_codegen.csharp import (
     visitation as csharp_visitation,
     verification as csharp_verification,
     stringification as csharp_stringification,
-    jsonization as csharp_jsonization
+    jsonization as csharp_jsonization,
 )
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     """Generate the code."""
     verified_ir_table, errors = csharp_structure.verify(
-        symbol_table=context.symbol_table)
+        symbol_table=context.symbol_table
+    )
 
     if errors is not None:
         run.write_error_report(
             message=f"Failed to verify the intermediate symbol table "
-                    f"for generation of C# code"
-                    f"based on {context.model_path}",
-            errors=[
-                context.lineno_columner.error_message(error)
-                for error in errors
-            ],
-            stderr=stderr)
+            f"for generation of C# code"
+            f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
         return 1
 
     namespace_key = specific_implementations.ImplementationKey("namespace.txt")
     namespace_text = context.spec_impls.get(namespace_key, None)
     if namespace_text is None:
-        stderr.write(
-            f"The namespace snippet is missing: {namespace_key}\n"
-        )
+        stderr.write(f"The namespace snippet is missing: {namespace_key}\n")
         return 1
 
     if not csharp_common.NAMESPACE_IDENTIFIER_RE.fullmatch(namespace_text):
@@ -51,14 +48,16 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     code, errors = csharp_structure.generate(
         symbol_table=verified_ir_table,
         namespace=namespace,
-        spec_impls=context.spec_impls)
+        spec_impls=context.spec_impls,
+    )
 
     if errors is not None:
         run.write_error_report(
             message=f"Failed to generate the structures in the C# code "
-                    f"based on {context.model_path}",
+            f"based on {context.model_path}",
             errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr)
+            stderr=stderr,
+        )
         return 1
 
     assert code is not None
@@ -70,7 +69,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         run.write_error_report(
             message=f"Failed to write the C# structures to {pth}",
             errors=[str(exception)],
-            stderr=stderr)
+            stderr=stderr,
+        )
         return 1
 
     # endregion
@@ -78,17 +78,16 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # region Visitation
 
     code, errors = csharp_visitation.generate(
-        symbol_table=context.symbol_table,
-        namespace=namespace)
+        symbol_table=context.symbol_table, namespace=namespace
+    )
 
     if errors is not None:
         run.write_error_report(
             message=f"Failed to generate the C# code for visitation "
-                    f"based on {context.model_path}",
-            errors=[
-                context.lineno_columner.error_message(error)
-                for error in errors],
-            stderr=stderr)
+            f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
         return 1
 
     assert code is not None
@@ -100,7 +99,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         run.write_error_report(
             message=f"Failed to write the visitation C# code to {pth}",
             errors=[str(exception)],
-            stderr=stderr)
+            stderr=stderr,
+        )
         return 1
 
     # endregion
@@ -112,22 +112,23 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         run.write_error_report(
             message=f"Failed to verify the C#-specific C# structures",
             errors=errors,
-            stderr=stderr)
+            stderr=stderr,
+        )
         return 1
 
     code, errors = csharp_verification.generate(
         symbol_table=verified_ir_table,
         namespace=namespace,
-        spec_impls=context.spec_impls)
+        spec_impls=context.spec_impls,
+    )
 
     if errors is not None:
         run.write_error_report(
             message=f"Failed to generate the verification C# code "
-                    f"based on {context.model_path}",
-            errors=[
-                context.lineno_columner.error_message(error)
-                for error in errors],
-            stderr=stderr)
+            f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
         return 1
 
     assert code is not None
@@ -139,7 +140,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         run.write_error_report(
             message=f"Failed to write the verification C# code to {pth}",
             errors=[str(exception)],
-            stderr=stderr)
+            stderr=stderr,
+        )
         return 1
 
     # endregion
@@ -147,16 +149,16 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # region Stringification
 
     code, errors = csharp_stringification.generate(
-        symbol_table=context.symbol_table, namespace=namespace)
+        symbol_table=context.symbol_table, namespace=namespace
+    )
 
     if errors is not None:
         run.write_error_report(
             message=f"Failed to generate the stringification C# code "
-                    f"based on {context.model_path}",
-            errors=[
-                context.lineno_columner.error_message(error)
-                for error in errors],
-            stderr=stderr)
+            f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
         return 1
 
     assert code is not None
@@ -170,13 +172,15 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         run.write_error_report(
             message=f"Failed to write the stringification C# code to {pth}",
             errors=[str(exception)],
-            stderr=stderr)
+            stderr=stderr,
+        )
         return 1
 
     # endregion
 
     interface_implementers = intermediate.map_interface_implementers(
-        symbol_table=context.symbol_table)
+        symbol_table=context.symbol_table
+    )
 
     # region Jsonization
 
@@ -184,16 +188,16 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         symbol_table=context.symbol_table,
         namespace=namespace,
         interface_implementers=interface_implementers,
-        spec_impls=context.spec_impls)
+        spec_impls=context.spec_impls,
+    )
 
     if errors is not None:
         run.write_error_report(
             message=f"Failed to generate the jsonization C# code "
-                    f"based on {context.model_path}",
-            errors=[
-                context.lineno_columner.error_message(error)
-                for error in errors],
-            stderr=stderr)
+            f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
         return 1
 
     assert code is not None
@@ -207,7 +211,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         run.write_error_report(
             message=f"Failed to write the jsonization C# code to {pth}",
             errors=[str(exception)],
-            stderr=stderr)
+            stderr=stderr,
+        )
         return 1
 
     # endregion

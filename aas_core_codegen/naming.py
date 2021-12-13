@@ -4,13 +4,7 @@ from icontract import ensure
 
 from aas_core_codegen.common import Identifier
 
-UPPERCASE_ABBREVIATION_SET = {
-    "IRI",
-    "IRDI",
-    "IEC",
-    "ID",
-    "URL"
-}
+UPPERCASE_ABBREVIATION_SET = {"IRI", "IRDI", "IEC", "ID", "URL"}
 
 
 def json_property(identifier: Identifier) -> Identifier:
@@ -23,7 +17,7 @@ def json_property(identifier: Identifier) -> Identifier:
     >>> json_property(Identifier("something_to_URL"))
     'somethingToURL'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
     if len(parts) == 1:
         return Identifier(parts[0].lower())
@@ -35,7 +29,7 @@ def json_property(identifier: Identifier) -> Identifier:
         else:
             cased_parts.append(part.capitalize())
 
-    return Identifier(''.join(cased_parts))
+    return Identifier("".join(cased_parts))
 
 
 # fmt: off
@@ -53,7 +47,7 @@ def json_model_type(identifier: Identifier) -> Identifier:
     >>> json_model_type(Identifier("Data_type_IEC_61360"))
     'DataTypeIEC61360'
     """
-    parts = identifier.split('_')
+    parts = identifier.split("_")
 
     cased_parts = []  # type: List[str]
     for part in parts:
@@ -62,7 +56,7 @@ def json_model_type(identifier: Identifier) -> Identifier:
         else:
             cased_parts.append(part.capitalize())
 
-    return Identifier(''.join(cased_parts))
+    return Identifier("".join(cased_parts))
 
 
 def xml_class_name(identifier: Identifier) -> Identifier:
@@ -75,15 +69,19 @@ def xml_class_name(identifier: Identifier) -> Identifier:
     >>> xml_class_name(Identifier("URL_to_something"))
     'urlToSomething'
     """
-    parts = identifier.split('_')
-    assert len(parts) >= 1, (
-        f"Expected at least one part for the valid identifier: {identifier}")
+    parts = identifier.split("_")
+    assert (
+        len(parts) >= 1
+    ), f"Expected at least one part for the valid identifier: {identifier}"
 
     if len(parts) == 1:
         return Identifier(parts[0].lower())
 
-    return Identifier("{}{}".format(
-        parts[0].lower(), ''.join(part.capitalize() for part in parts[1:])))
+    return Identifier(
+        "{}{}".format(
+            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
+        )
+    )
 
 
 def xml_property(identifier: Identifier) -> Identifier:
@@ -96,12 +94,16 @@ def xml_property(identifier: Identifier) -> Identifier:
     >>> xml_property(Identifier("URL_to_something"))
     'urlToSomething'
     """
-    parts = identifier.split('_')
-    assert len(parts) >= 1, (
-        f"Expected at least one part for the valid identifier: {identifier}")
+    parts = identifier.split("_")
+    assert (
+        len(parts) >= 1
+    ), f"Expected at least one part for the valid identifier: {identifier}"
 
     if len(parts) == 1:
         return Identifier(parts[0].lower())
 
-    return Identifier("{}{}".format(
-        parts[0].lower(), ''.join(part.capitalize() for part in parts[1:])))
+    return Identifier(
+        "{}{}".format(
+            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
+        )
+    )

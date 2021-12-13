@@ -5,19 +5,15 @@ from aas_core_codegen.common import Error, Identifier
 from icontract import ensure
 
 from aas_core_codegen import intermediate
-from aas_core_codegen.parse import (
-    tree as parse_tree
-)
-from aas_core_codegen.infer_for_schema import (
-    _common as infer_for_schema_common
-)
+from aas_core_codegen.parse import tree as parse_tree
+from aas_core_codegen.infer_for_schema import _common as infer_for_schema_common
 
 # TODO-BEFORE-RELEASE (mristin, 2021-12-13): double-check all the patterns
 # Please see the following link for how we construct the regular expressions:
 # https://github.com/aas-core-works/abnf-to-regexp/tree/main/test_data/nested-python
 _PATTERN_BY_FUNCTION = {
-    'is_ID_short': r'^[a-zA-Z][a-zA-Z_0-9]*$',
-    'is_MIME': r'([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+|"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*"))*'
+    "is_ID_short": r"^[a-zA-Z][a-zA-Z_0-9]*$",
+    "is_MIME": r'([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+|"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*"))*',
 }
 
 
@@ -39,7 +35,7 @@ class _ConstraintOnProperty:
 
 
 def _match_constraint_on_property(
-        node: parse_tree.Node
+    node: parse_tree.Node,
 ) -> Optional[_ConstraintOnProperty]:
     """
     Match the pattern constraints on a property.
@@ -61,11 +57,12 @@ def _match_constraint_on_property(
         return None
 
     return _ConstraintOnProperty(
-        prop_name=prop_name, constraint=PatternConstraint(pattern=pattern))
+        prop_name=prop_name, constraint=PatternConstraint(pattern=pattern)
+    )
 
 
 def infer_pattern_constraints(
-        symbol: Union[intermediate.Interface, intermediate.Class]
+    symbol: Union[intermediate.Interface, intermediate.Class]
 ) -> MutableMapping[intermediate.Property, List[PatternConstraint]]:
     """
     Infer the pattern constraints for every property of the class ``cls``.
@@ -91,8 +88,9 @@ def infer_pattern_constraints(
 
     for invariant in symbol.parsed.invariants:
         # Match something like ``self.something is None or is_ID_short(self.something)``
-        conditional_on_prop = (
-            infer_for_schema_common.match_conditional_on_prop(invariant.body))
+        conditional_on_prop = infer_for_schema_common.match_conditional_on_prop(
+            invariant.body
+        )
 
         if conditional_on_prop is not None:
             # Match something like
@@ -102,16 +100,17 @@ def infer_pattern_constraints(
                     constraint_on_prop = _match_constraint_on_property(value_node)
 
                     if (
-                            constraint_on_prop is not None
-                            and constraint_on_prop.prop_name ==
-                            conditional_on_prop.prop_name
+                        constraint_on_prop is not None
+                        and constraint_on_prop.prop_name
+                        == conditional_on_prop.prop_name
                     ):
                         constraints_on_props.append(constraint_on_prop)
 
             # Match something like ``is_ID_short(self.something)``
             elif isinstance(conditional_on_prop.consequent, parse_tree.FunctionCall):
                 constraint_on_prop = _match_constraint_on_property(
-                    node=conditional_on_prop.consequent)
+                    node=conditional_on_prop.consequent
+                )
 
                 if constraint_on_prop is not None:
                     constraints_on_props.append(constraint_on_prop)
@@ -145,7 +144,8 @@ def infer_pattern_constraints(
 
     # region Group the constraints by property
 
-    result = dict(
+    result = (
+        dict()
     )  # type: MutableMapping[intermediate.Property, List[PatternConstraint]]
 
     for constraint_on_prop in constraints_on_props:

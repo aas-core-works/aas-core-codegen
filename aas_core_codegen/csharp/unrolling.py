@@ -3,15 +3,13 @@ import io
 import textwrap
 from typing import Sequence
 
-from aas_core_codegen.csharp.common import (
-    INDENT as I
-)
+from aas_core_codegen.csharp.common import INDENT as I
 
 
 class Node:
     """Represent a node in the unrolling tree."""
 
-    def __init__(self, text: str, children: Sequence['Node']):
+    def __init__(self, text: str, children: Sequence["Node"]):
         self.text = text
         self.children = children
 
@@ -31,16 +29,16 @@ def render(node: Node) -> str:
 
     writer = io.StringIO()
     writer.write(node.text)
-    writer.write('\n{')
+    writer.write("\n{")
 
     for i, child in enumerate(node.children):
         if i == 0:
-            writer.write('\n')
+            writer.write("\n")
         else:
-            writer.write('\n\n')
+            writer.write("\n\n")
 
         writer.write(textwrap.indent(render(child), I))
 
-    writer.write('\n}')
+    writer.write("\n}")
 
     return writer.getvalue()

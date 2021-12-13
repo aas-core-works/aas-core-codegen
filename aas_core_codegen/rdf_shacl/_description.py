@@ -6,12 +6,8 @@ from icontract import ensure
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import assert_never
-from aas_core_codegen.intermediate import (
-    rendering as intermediate_rendering
-)
-from aas_core_codegen.rdf_shacl import (
-    naming as rdf_shacl_naming
-)
+from aas_core_codegen.intermediate import rendering as intermediate_rendering
+from aas_core_codegen.rdf_shacl import naming as rdf_shacl_naming
 
 
 class Token:
@@ -41,6 +37,7 @@ class TokenLineBreak(Token):
 
     def __repr__(self) -> str:
         return f"{TokenLineBreak.__name__}()"
+
 
 def without_trailing_breaks(tokens: Sequence[Token]) -> List[Token]:
     """Remove all the trailing breaks at the end of the ``tokens``."""
@@ -77,14 +74,12 @@ def without_redundant_breaks(tokens: Sequence[Token]) -> List[Token]:
     for token in tokens:
         if last_token is None:
             result.append(token)
-        elif (
-                isinstance(last_token, TokenLineBreak)
-                and isinstance(token, TokenLineBreak)
+        elif isinstance(last_token, TokenLineBreak) and isinstance(
+            token, TokenLineBreak
         ):
             pass
-        elif (
-                isinstance(last_token, TokenParagraphBreak)
-                and isinstance(token, TokenParagraphBreak)
+        elif isinstance(last_token, TokenParagraphBreak) and isinstance(
+            token, TokenParagraphBreak
         ):
             pass
         else:
@@ -99,8 +94,7 @@ def without_redundant_breaks(tokens: Sequence[Token]) -> List[Token]:
     return result
 
 
-class Renderer(
-    intermediate_rendering.DocutilsElementTransformer[List[Token]]):
+class Renderer(intermediate_rendering.DocutilsElementTransformer[List[Token]]):
     """Render descriptions as C# docstring XML."""
 
     # fmt: off
@@ -115,27 +109,29 @@ class Renderer(
                 )))
     # fmt: on
     def transform_text(
-            self, element: docutils.nodes.Text
+        self, element: docutils.nodes.Text
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
-        return [TokenText(element.astext().replace('\n', ' '))], None
+        return [TokenText(element.astext().replace("\n", " "))], None
 
     def transform_symbol_reference_in_doc(
-            self, element: intermediate.SymbolReferenceInDoc
+        self, element: intermediate.SymbolReferenceInDoc
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
         cls_name = rdf_shacl_naming.class_name(element.symbol.name)
         return [TokenText(f"'{cls_name}'")], None
 
     def transform_attribute_reference_in_doc(
-            self, element: intermediate.AttributeReferenceInDoc
+        self, element: intermediate.AttributeReferenceInDoc
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
         if isinstance(element.reference, intermediate.PropertyReferenceInDoc):
             prop_name = rdf_shacl_naming.property_name(element.reference.prop.name)
             return [TokenText(f"'{prop_name}'")], None
 
         elif isinstance(
-                element.reference, intermediate.EnumerationLiteralReferenceInDoc):
+            element.reference, intermediate.EnumerationLiteralReferenceInDoc
+        ):
             literal_name = rdf_shacl_naming.enumeration_literal(
-                element.reference.literal.name)
+                element.reference.literal.name
+            )
 
             return [TokenText(f"'{literal_name}'")], None
 
@@ -143,12 +139,12 @@ class Renderer(
             assert_never(element.reference)
 
     def transform_literal(
-            self, element: docutils.nodes.literal
+        self, element: docutils.nodes.literal
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
         return [TokenText(element.astext())], None
 
     def transform_paragraph(
-            self, element: docutils.nodes.paragraph
+        self, element: docutils.nodes.paragraph
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
         tokens = []  # type: List[Token]
         for child in element.children:
@@ -164,7 +160,7 @@ class Renderer(
         return tokens, None
 
     def transform_emphasis(
-            self, element: docutils.nodes.emphasis
+        self, element: docutils.nodes.emphasis
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
         tokens = []  # type: List[Token]
         for child in element.children:
@@ -178,11 +174,10 @@ class Renderer(
         return tokens, None
 
     def transform_list_item(
-            self, element: docutils.nodes.list_item
+        self, element: docutils.nodes.list_item
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
-        if (
-                len(element.children) != 1
-                or not isinstance(element.children[0], docutils.nodes.paragraph)
+        if len(element.children) != 1 or not isinstance(
+            element.children[0], docutils.nodes.paragraph
         ):
             return None, (
                 f"Expected the list item to contain a single child (paragraph), "
@@ -194,9 +189,7 @@ class Renderer(
         tokens = []  # type: List[Token]
 
         if len(para_element.children) == 0:
-            return (
-                [TokenText("* (empty)")], None
-            )
+            return ([TokenText("* (empty)")], None)
 
         for child in para_element.children:
             child_tokens, error = self.transform(child)
@@ -204,13 +197,13 @@ class Renderer(
                 return None, error
 
             assert child_tokens is not None
-            tokens.append(TokenText('* '))
+            tokens.append(TokenText("* "))
             tokens.extend(child_tokens)
 
         return tokens, None
 
     def transform_bullet_list(
-            self, element: docutils.nodes.bullet_list
+        self, element: docutils.nodes.bullet_list
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
         tokens = []  # type: List[Token]
         for child in element.children:
@@ -225,7 +218,7 @@ class Renderer(
         return tokens, None
 
     def transform_note(
-            self, element: docutils.nodes.note
+        self, element: docutils.nodes.note
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
         tokens = []  # type: List[Token]
 
@@ -242,7 +235,7 @@ class Renderer(
         return tokens, None
 
     def transform_reference(
-            self, element: docutils.nodes.reference
+        self, element: docutils.nodes.reference
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
         tokens = []  # type: List[Token]
         for child in element.children:
@@ -257,8 +250,7 @@ class Renderer(
         return tokens, None
 
     def transform_document(
-            self,
-            element: docutils.nodes.document
+        self, element: docutils.nodes.document
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
         tokens = []  # type: List[Token]
         for child in element:
