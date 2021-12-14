@@ -1,10 +1,10 @@
-public class LangStringSet : IEntity {
-    public IEnumerable<IEntity> DescendOnce()
+public class LangStringSet : IClass {
+    public IEnumerable<IClass> DescendOnce()
     {
         throw new System.NotImplementedException("TODO");
     }
 
-    public IEnumerable<IEntity> Descend()
+    public IEnumerable<IClass> Descend()
     {
         throw new System.NotImplementedException("TODO");
     }

@@ -60,7 +60,12 @@ def _define_type(
     len_constraint: Optional[infer_for_schema.LenConstraint],
     pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[Error]]:
-    """Generate the type definition for ``type_annotation``."""
+    """
+    Generate the type definition for ``type_annotation``.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
     if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
         type_definition = collections.OrderedDict(
             [("type", _BUILTIN_MAP[type_annotation.a_type])]
@@ -188,7 +193,12 @@ def _define_properties_and_required(
     Optional[List[Identifier]],
     Optional[List[Error]],
 ]:
-    """Define the ``properties`` and ``required`` part for the given ``symbol``."""
+    """
+    Define the ``properties`` and ``required`` part for the given ``symbol``.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
     errors = []  # type: List[Error]
 
     (
@@ -260,6 +270,9 @@ def _define_for_interface(
     Generate the definitions resulting from the ``interface``.
 
     The list of definitions is to be *extended* with the resulting mapping.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
     """
     all_of = []  # type: List[MutableMapping[str, Any]]
 
@@ -326,6 +339,9 @@ def _define_for_class(
     Generate the definition for the intermediate class ``cls``.
 
     The list of definitions is to be *extended* with the resulting mapping.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
     """
     all_of = []  # type: List[MutableMapping[str, Any]]
 

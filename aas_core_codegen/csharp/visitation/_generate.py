@@ -8,7 +8,10 @@ from typing import Tuple, Optional, List
 from icontract import ensure
 
 import aas_core_codegen.csharp.common as csharp_common
-from aas_core_codegen.csharp.common import INDENT2 as II
+from aas_core_codegen.csharp.common import (
+    INDENT as I,
+    INDENT2 as II
+)
 import aas_core_codegen.csharp.naming as csharp_naming
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Error, Stripped, Rstripped, assert_never
@@ -213,7 +216,7 @@ def _generate_itransformer(symbol_table: intermediate.SymbolTable) -> Stripped:
 
 
 def _generate_itransformer_with_context(
-    symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
     """Generate the interface for the transformer with context."""
     blocks = []  # type: List[Stripped]
@@ -268,7 +271,8 @@ def _generate_itransformer_with_context(
 )
 # fmt: on
 def generate(
-    symbol_table: intermediate.SymbolTable, namespace: csharp_common.NamespaceIdentifier
+        symbol_table: intermediate.SymbolTable,
+        namespace: csharp_common.NamespaceIdentifier
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the C# code of the visitors based on the intermediate representation
@@ -313,6 +317,5 @@ def generate(
     out.write("\n")
 
     return out.getvalue(), None
-
 
 # endregion

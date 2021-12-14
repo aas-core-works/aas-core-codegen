@@ -52,7 +52,12 @@ def _define_for_property(
     len_constraint: Optional[infer_for_schema.LenConstraint],
     pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
 ) -> ET.Element:
-    """Generate the definition of a property element."""
+    """
+    Generate the definition of a property element.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
     type_anno = prop.type_annotation
     while isinstance(type_anno, intermediate.OptionalTypeAnnotation):
         type_anno = type_anno.value
@@ -245,7 +250,12 @@ def _define_properties(
     symbol: Union[intermediate.Interface, intermediate.Class],
     ref_association: intermediate.Symbol,
 ) -> Tuple[Optional[List[ET.Element]], Optional[List[Error]]]:
-    """Define the properties of the ``symbol`` as a sequence of tags."""
+    """
+    Define the properties of the ``symbol`` as a sequence of tags.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
     (
         len_constraints_by_property,
         len_constraints_errors,
@@ -292,6 +302,9 @@ def _define_for_interface(
     Generate the definitions for the ``interface``.
 
     The root element is to be *extended* with the resulting list.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
     """
     # region Part definition
 
@@ -353,6 +366,9 @@ def _define_for_class(
     Generate the definitions for the class ``cls``.
 
     The root element is to be *extended* with the resulting list.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
     """
     sequence = ET.Element("xs:sequence")
 

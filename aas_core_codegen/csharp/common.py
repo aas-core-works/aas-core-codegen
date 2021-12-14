@@ -7,7 +7,9 @@ from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Stripped, assert_never
-from aas_core_codegen.csharp import naming
+from aas_core_codegen.csharp import (
+    naming as csharp_naming
+)
 
 
 @ensure(lambda result: result.startswith('"'))
@@ -41,15 +43,16 @@ def string_literal(text: str) -> str:
     return '"{}"'.format("".join(escaped))
 
 
-_BUILTING_ATOMIC_TYPE_MAP = {
+_BUILTIN_ATOMIC_TYPE_MAP = {
     intermediate.BuiltinAtomicType.BOOL: Stripped("bool"),
     intermediate.BuiltinAtomicType.INT: Stripped("int"),
     intermediate.BuiltinAtomicType.FLOAT: Stripped("float"),
     intermediate.BuiltinAtomicType.STR: Stripped("string"),
+    intermediate.BuiltinAtomicType.BYTEARRAY: Stripped("byte[]"),
 }
 
 # noinspection PyTypeChecker
-assert sorted(literal.value for literal in _BUILTING_ATOMIC_TYPE_MAP.keys()) == sorted(
+assert sorted(literal.value for literal in _BUILTIN_ATOMIC_TYPE_MAP.keys()) == sorted(
     literal.value for literal in intermediate.BuiltinAtomicType
 ), (
     "Expected complete mapping of built-in types to implementation-specific types"
@@ -57,26 +60,28 @@ assert sorted(literal.value for literal in _BUILTING_ATOMIC_TYPE_MAP.keys()) == 
 
 
 def generate_type(
-    type_annotation: Union[
-        intermediate.SubscriptedTypeAnnotation, intermediate.AtomicTypeAnnotation
-    ]
+        type_annotation: Union[
+            intermediate.SubscriptedTypeAnnotation, intermediate.AtomicTypeAnnotation
+        ],
+        ref_association: intermediate.Symbol
 ) -> Stripped:
     """Generate the C# type for the given type annotation."""
     # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
     #  test with general snippets, do not test in isolation
     if isinstance(type_annotation, intermediate.AtomicTypeAnnotation):
         if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
-            return _BUILTING_ATOMIC_TYPE_MAP[type_annotation.a_type]
+            return _BUILTIN_ATOMIC_TYPE_MAP[type_annotation.a_type]
 
         elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
             if isinstance(type_annotation.symbol, intermediate.Enumeration):
-                return Stripped(naming.enum_name(type_annotation.symbol.name))
+                return Stripped(csharp_naming.enum_name(type_annotation.symbol.name))
 
             elif isinstance(type_annotation.symbol, intermediate.Interface):
-                return Stripped(naming.interface_name(type_annotation.symbol.name))
+                return Stripped(
+                    csharp_naming.interface_name(type_annotation.symbol.name))
 
             elif isinstance(type_annotation.symbol, intermediate.Class):
-                return Stripped(naming.class_name(type_annotation.symbol.name))
+                return Stripped(csharp_naming.class_name(type_annotation.symbol.name))
 
             else:
                 assert_never(type_annotation.symbol)
@@ -86,11 +91,30 @@ def generate_type(
 
     elif isinstance(type_annotation, intermediate.SubscriptedTypeAnnotation):
         if isinstance(type_annotation, intermediate.ListTypeAnnotation):
-            return Stripped(f"List<{generate_type(type_annotation.items)}>")
+            item_type = generate_type(
+                type_annotation=type_annotation.items,
+                ref_association=ref_association)
+
+            return Stripped(f"List<{item_type}>")
 
         elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-            value = generate_type(type_annotation.value)
+            value = generate_type(
+                type_annotation=type_annotation.value,
+                ref_association=ref_association)
             return Stripped(f"{value}?")
+
+        elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
+            if isinstance(ref_association, intermediate.Enumeration):
+                return Stripped(csharp_naming.enum_name(ref_association.name))
+
+            elif isinstance(ref_association, intermediate.Interface):
+                return Stripped(csharp_naming.interface_name(ref_association.name))
+
+            elif isinstance(ref_association, intermediate.Class):
+                return Stripped(csharp_naming.class_name(ref_association.name))
+
+            else:
+                assert_never(ref_association)
 
         else:
             assert_never(type_annotation)

@@ -25,6 +25,35 @@ def verify(
     """Verify all the implementation snippets related to verification."""
     errors = []  # type: List[str]
 
+    # TODO: continue here; check which constraints are actually used
+    #   🠒 See what is imported!
+    #   🠒 Add verification_functions as list of identifiers in the symbol table
+    #   🠒 Make sure Error and Errors are reserved in that list!
+    #
+    #   🠒 Or think a bit more about it: what about introducing a marker @verification
+    #   for a function in the meta-model? Enforce these functions to be implementation
+    #   specific and just include them here?
+    #   And then make them part of the symbol table.
+    #
+    #   Also propagate this to inference_for_schema 🠒 we indeed need a mechanism for
+    #   translating regular expressions between languages.
+    #
+    #   Use return type to figure out where is pattern:
+    #
+    #   def compile_{pattern name}() -> Pattern[str]:
+    #       ...
+    #
+    #
+    #   🠒 Only assignments on string literals allowed.
+    #   🠒 Possible to recompute the full expression through simple substitution!
+    #   🠒 Match return re.compile(...) to identify the final pattern
+    #   🠒 Assign {pattern name}_regexp = compile_{pattern name}()
+    #       If there is an assignment between a function that takes no arguments and returns a pattern
+    #           🠒 we know that it is a pattern.
+    #
+    #   🠒 Put patterns in symbol table under ``.patterns``.
+    #   🠒 Invoke them directly in constraints with match and fullmatch (and introduce that in parse_tree!)
+
     expected_keys = [
         specific_implementations.ImplementationKey("Verification/is_IRI.cs"),
         specific_implementations.ImplementationKey("Verification/is_IRDI.cs"),

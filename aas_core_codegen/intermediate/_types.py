@@ -798,6 +798,7 @@ class AttributeReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement)
 
 def map_descendability(
     type_annotation: TypeAnnotation,
+    ref_association: Symbol
 ) -> MutableMapping[TypeAnnotation, bool]:
     """
     Map the type annotation recursively by the descendability.
@@ -808,6 +809,9 @@ def map_descendability(
 
     The mapping is a form of caching. Otherwise, the time complexity would be quadratic
     if we queried at each type annotation subscript.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
     """
     mapping = dict()  # type: MutableMapping[TypeAnnotation, bool]
 
@@ -837,6 +841,20 @@ def map_descendability(
 
         elif isinstance(a_type_annotation, OptionalTypeAnnotation):
             result = recurse(a_type_annotation=a_type_annotation.value)
+            mapping[a_type_annotation] = result
+            return result
+
+        elif isinstance(a_type_annotation, RefTypeAnnotation):
+            result = None  # type: Optional[bool]
+
+            if isinstance(ref_association, Enumeration):
+                result = False
+            elif isinstance(ref_association, (Interface, Class)):
+                result = True
+            else:
+                assert_never(ref_association)
+
+            assert result is not None
             mapping[a_type_annotation] = result
             return result
 

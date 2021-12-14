@@ -29,7 +29,7 @@ from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II
 
 
 def _verify_structure_name_collisions(
-    symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
 ) -> List[Error]:
     """Verify that the C# names of the structures do not collide."""
     observed_structure_names = {}  # type: Dict[Identifier, intermediate.Symbol]
@@ -75,7 +75,7 @@ def _verify_structure_name_collisions(
 
 
 def _verify_intra_structure_collisions(
-    intermediate_symbol: intermediate.Symbol,
+        intermediate_symbol: intermediate.Symbol,
 ) -> Optional[Error]:
     """Verify that no member names collide in the C# structure of the given symbol."""
     errors = []  # type: List[Error]
@@ -192,15 +192,16 @@ def _verify_intra_structure_collisions(
 class VerifiedIntermediateSymbolTable(intermediate.SymbolTable):
     """Represent a verified symbol table which can be used for code generation."""
 
+    # noinspection PyInitNewSignature
     def __new__(
-        cls, symbol_table: intermediate.SymbolTable
+            cls, symbol_table: intermediate.SymbolTable
     ) -> "VerifiedIntermediateSymbolTable":
         raise AssertionError("Only for type annotation")
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def verify(
-    symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[VerifiedIntermediateSymbolTable], Optional[List[Error]]]:
     """Verify that C# code can be generated from the ``symbol_table``."""
     errors = []  # type: List[Error]
@@ -233,12 +234,12 @@ class _DescriptionElementRenderer(
     """Render descriptions as C# docstring XML."""
 
     def transform_text(
-        self, element: docutils.nodes.Text
+            self, element: docutils.nodes.Text
     ) -> Tuple[Optional[str], Optional[str]]:
         return xml.sax.saxutils.escape(element.astext()), None
 
     def transform_symbol_reference_in_doc(
-        self, element: intermediate.SymbolReferenceInDoc
+            self, element: intermediate.SymbolReferenceInDoc
     ) -> Tuple[Optional[str], Optional[str]]:
         name = None  # type: Optional[str]
         if isinstance(element.symbol, intermediate.Enumeration):
@@ -254,18 +255,44 @@ class _DescriptionElementRenderer(
         return f"<see cref={xml.sax.saxutils.quoteattr(name)} />", None
 
     def transform_attribute_reference_in_doc(
-        self, element: intermediate.AttributeReferenceInDoc
+            self, element: intermediate.AttributeReferenceInDoc
     ) -> Tuple[Optional[str], Optional[str]]:
-        prop_name = csharp_naming.property_name(Identifier(element.path))
-        return f"<see cref={xml.sax.saxutils.quoteattr(prop_name)} />", None
+        cref = None  # type: Optional[str]
+
+        if isinstance(element.reference, intermediate.PropertyReferenceInDoc):
+            symbol_name = None  # type: Optional[str]
+
+            if isinstance(element.reference.symbol, intermediate.Class):
+                symbol_name = csharp_naming.class_name(element.reference.symbol.name)
+            elif isinstance(element.reference.symbol, intermediate.Interface):
+                symbol_name = csharp_naming.class_name(element.reference.symbol.name)
+            else:
+                assert_never(element.reference.symbol)
+
+            prop_name = csharp_naming.property_name(element.reference.prop.name)
+
+            assert symbol_name is not None
+            cref = f"{symbol_name}.{prop_name}"
+        elif isinstance(
+                element.reference, intermediate.EnumerationLiteralReferenceInDoc):
+            symbol_name = csharp_naming.enum_name(element.reference.symbol.name)
+            literal_name = csharp_naming.enum_literal_name(
+                element.reference.literal.name)
+
+            cref = f"{symbol_name}.{literal_name}"
+        else:
+            assert_never(element.reference)
+
+        assert cref is not None
+        return f"<see cref={xml.sax.saxutils.quoteattr(cref)} />", None
 
     def transform_literal(
-        self, element: docutils.nodes.literal
+            self, element: docutils.nodes.literal
     ) -> Tuple[Optional[str], Optional[str]]:
         return f"<c>{xml.sax.saxutils.escape(element.astext())}</c>", None
 
     def transform_paragraph(
-        self, element: docutils.nodes.paragraph
+            self, element: docutils.nodes.paragraph
     ) -> Tuple[Optional[str], Optional[str]]:
         parts = []  # type: List[str]
         for child in element.children:
@@ -279,7 +306,7 @@ class _DescriptionElementRenderer(
         return "".join(parts), None
 
     def transform_emphasis(
-        self, element: docutils.nodes.emphasis
+            self, element: docutils.nodes.emphasis
     ) -> Tuple[Optional[str], Optional[str]]:
         parts = []  # type: List[str]
         for child in element.children:
@@ -293,7 +320,7 @@ class _DescriptionElementRenderer(
         return "<em>{}</em>".format("".join(parts)), None
 
     def transform_list_item(
-        self, element: docutils.nodes.list_item
+            self, element: docutils.nodes.list_item
     ) -> Tuple[Optional[str], Optional[str]]:
         parts = []  # type: List[str]
         for child in element.children:
@@ -307,7 +334,7 @@ class _DescriptionElementRenderer(
         return "<li>{}</li>".format("".join(parts)), None
 
     def transform_bullet_list(
-        self, element: docutils.nodes.bullet_list
+            self, element: docutils.nodes.bullet_list
     ) -> Tuple[Optional[str], Optional[str]]:
         parts = ["<ul>\n"]
         for child in element.children:
@@ -321,53 +348,73 @@ class _DescriptionElementRenderer(
 
         return "".join(parts), None
 
+    def transform_note(
+            self, element: docutils.nodes.note
+    ) -> Tuple[Optional[str], Optional[str]]:
+        parts = []  # type: List[str]
+        for child in element.children:
+            text, error = self.transform(child)
+            if error is not None:
+                return None, error
+
+            assert text is not None
+            parts.append(text)
+
+        return "".join(parts), None
+
+    def transform_reference(
+            self, element: docutils.nodes.reference
+    ) -> Tuple[Optional[str], Optional[str]]:
+        parts = []  # type: List[str]
+        for child in element.children:
+            text, error = self.transform(child)
+            if error is not None:
+                return None, error
+
+            assert text is not None
+            parts.append(text)
+
+        return "".join(parts), None
+
     def transform_document(
-        self, element: docutils.nodes.document
+            self, element: docutils.nodes.document
     ) -> Tuple[Optional[str], Optional[str]]:
         if len(element.children) == 0:
             return "", None
 
         summary = None  # type: Optional[docutils.nodes.paragraph]
-        remarks = None  # type: Optional[List[docutils.nodes.paragraph]]
-        # noinspection PyUnusedLocal
-        tail = []  # type: List[docutils.nodes.General]
+        remarks = []  # type: Optional[List[docutils.nodes.Element]]
+        tail = []  # type: List[docutils.nodes.Element]
 
         # Try to match the summary and the remarks
-        if (
-            len(element.children) >= 2
-            and isinstance(element.children[0], docutils.nodes.paragraph)
-            and isinstance(
-                element.children[1],
-                (docutils.nodes.paragraph, docutils.nodes.bullet_list),
-            )
-        ):
+        if len(element.children) >= 1:
+            if not isinstance(element.children[0], docutils.nodes.paragraph):
+                return None, (
+                    f"Expected the first document element to be a summary and "
+                    f"thus a paragraph, but got: {element.children[0]}"
+                )
+
             summary = element.children[0]
 
-            remarks = [element.children[1]]
-            last_remark_index = 1
-            for child in element.children[2:]:
-                if isinstance(
-                    child, (docutils.nodes.paragraph, docutils.nodes.bullet_list)
-                ):
-                    remarks.append(child)
-                    last_remark_index += 1
-
-            tail = element.children[last_remark_index + 1 :]
-        elif len(element.children) >= 1 and isinstance(
-            element.children[0], docutils.nodes.paragraph
-        ):
-            summary = element.children[0]
-            tail = element.children[1:]
-        else:
-            tail = element.children
+        remainder = element.children[1:]
+        for i, child in enumerate(remainder):
+            if isinstance(
+                    child,
+                    (docutils.nodes.paragraph,
+                     docutils.nodes.bullet_list,
+                     docutils.nodes.note)):
+                remarks.append(child)
+            else:
+                tail = remainder[i:]
+                break
 
         # NOTE (2021-09-16, mristin):
         # We restrict ourselves here quite a lot. This function will need to evolve as
         # we add a larger variety of docstrings to the meta-model.
         #
-        # For example, we need to translate ``:paramref:``'s to ``<paramref ...>`` in C#.
-        # Additionally, we need to change the name of the argument accordingly (snake_case
-        # to camelCase).
+        # For example, we need to translate ``:paramref:``'s to ``<paramref ...>`` in
+        # C#. Additionally, we need to change the name of the argument accordingly
+        # (``snake_case`` to ``camelCase``).
 
         # Blocks to be joined by a new-line
         blocks = []  # type: List[Stripped]
@@ -515,7 +562,7 @@ class _DescriptionElementRenderer(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _description_comment(
-    description: intermediate.Description,
+        description: intermediate.Description,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate a documentation comment based on the docstring."""
     if len(description.document.children) == 0:
@@ -532,7 +579,7 @@ def _description_comment(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_enum(
-    symbol: intermediate.Enumeration,
+        symbol: intermediate.Enumeration,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the C# code for the enum."""
     writer = io.StringIO()
@@ -578,9 +625,15 @@ def _generate_enum(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_interface(
-    symbol: intermediate.Interface,
+        symbol: intermediate.Interface,
+        ref_association: intermediate.Symbol
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate C# code for the given interface."""
+    """
+    Generate C# code for the given interface.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
     writer = io.StringIO()
 
     if symbol.description is not None:
@@ -604,7 +657,7 @@ def _generate_interface(
     else:
         writer.write(f"public interface {name} :\n")
         for i, inheritance in enumerate(
-            map(csharp_naming.interface_name, inheritances)
+                map(csharp_naming.interface_name, inheritances)
         ):
             if i > 0:
                 writer.write(",\n")
@@ -619,7 +672,9 @@ def _generate_interface(
     # region Getters and setters
 
     for prop in symbol.properties:
-        prop_type = csharp_common.generate_type(prop.type_annotation)
+        prop_type = csharp_common.generate_type(
+            type_annotation=prop.type_annotation,
+            ref_association=ref_association)
         prop_name = csharp_naming.property_name(prop.name)
 
         if prop.description is not None:
@@ -651,14 +706,18 @@ def _generate_interface(
 
         # fmt: off
         returns = (
-            csharp_common.generate_type(signature.returns)
+            csharp_common.generate_type(
+                type_annotation=signature.returns,
+                ref_association=ref_association)
             if signature.returns is not None else "void"
         )
         # fmt: on
 
         arg_codes = []  # type: List[Stripped]
         for arg in signature.arguments:
-            arg_type = csharp_common.generate_type(arg.type_annotation)
+            arg_type = csharp_common.generate_type(
+                type_annotation=arg.type_annotation,
+                ref_association=ref_association)
             arg_name = csharp_naming.argument_name(arg.name)
             arg_codes.append(Stripped(f"{arg_type} {arg_name}"))
 
@@ -692,18 +751,26 @@ def _generate_interface(
     return Stripped(writer.getvalue()), None
 
 
-def _generate_descend_body(symbol: intermediate.Class, recurse: bool) -> Stripped:
+def _generate_descend_body(
+        symbol: intermediate.Class,
+        recurse: bool,
+        ref_association: intermediate.Symbol
+) -> Stripped:
     """
     Generate the body of the ``Descend`` and ``DescendOnce`` methods.
 
     With this function, we can unroll the recursion as a simple optimization
     in the recursive case.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
     """
     blocks = []  # type: List[Stripped]
 
     for prop in symbol.properties:
         descendability = intermediate.map_descendability(
-            type_annotation=prop.type_annotation
+            type_annotation=prop.type_annotation,
+            ref_association=ref_association
         )
 
         if not descendability[prop.type_annotation]:
@@ -722,20 +789,31 @@ def _generate_descend_body(symbol: intermediate.Class, recurse: bool) -> Strippe
                 return Identifier("yet" + "Yet" * (var_index - 1) + f"anotherItem")
 
         def unroll(
-            current_var_name: str,
-            item_count: int,
-            type_anno: intermediate.TypeAnnotation,
+                current_var_name: str,
+                item_count: int,
+                type_anno: intermediate.TypeAnnotation,
         ) -> List[csharp_unrolling.Node]:
             """Generate the node corresponding to the ``type_anno`` and recurse."""
             if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
                 return []
 
-            elif isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
-                if isinstance(type_anno.symbol, intermediate.Enumeration):
+            elif isinstance(
+                    type_anno,
+                    (intermediate.OurAtomicTypeAnnotation,
+                     intermediate.RefTypeAnnotation)
+            ):
+                if isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
+                    a_symbol = type_anno.symbol
+                elif isinstance(type_anno, intermediate.RefTypeAnnotation):
+                    a_symbol = ref_association
+                else:
+                    assert_never(type_anno)
+
+                if isinstance(a_symbol, intermediate.Enumeration):
                     return []
 
                 assert isinstance(
-                    type_anno.symbol, (intermediate.Class, intermediate.Interface)
+                    a_symbol, (intermediate.Class, intermediate.Interface)
                 )
 
                 result = [
@@ -828,10 +906,19 @@ def _generate_descend_body(symbol: intermediate.Class, recurse: bool) -> Strippe
     return Stripped("\n\n".join(blocks))
 
 
-def _generate_descend_once_method(symbol: intermediate.Class) -> Stripped:
-    """Generate the ``DescendOnce`` method for the class of the ``symbol``."""
+def _generate_descend_once_method(
+        symbol: intermediate.Class,
+        ref_association: intermediate.Symbol
+) -> Stripped:
+    """
+    Generate the ``DescendOnce`` method for the class of the ``symbol``.
 
-    body = _generate_descend_body(symbol=symbol, recurse=False)
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
+
+    body = _generate_descend_body(
+        symbol=symbol, recurse=False, ref_association=ref_association)
 
     indented_body = textwrap.indent(body, I)
 
@@ -848,10 +935,19 @@ public IEnumerable<IClass> DescendOnce()
     )
 
 
-def _generate_descend_method(symbol: intermediate.Class) -> Stripped:
-    """Generate the recursive ``Descend`` method for the class of the ``symbol``."""
+def _generate_descend_method(
+        symbol: intermediate.Class,
+        ref_association: intermediate.Symbol
+) -> Stripped:
+    """
+    Generate the recursive ``Descend`` method for the class of the ``symbol``.
 
-    body = _generate_descend_body(symbol=symbol, recurse=True)
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
+
+    body = _generate_descend_body(
+        symbol=symbol, recurse=True, ref_association=ref_association)
 
     indented_body = textwrap.indent(body, I)
 
@@ -903,16 +999,24 @@ def _generate_default_value(default: intermediate.Default) -> Stripped:
 @require(lambda symbol: not symbol.constructor.is_implementation_specific)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_constructor(
-    symbol: intermediate.Class,
+        symbol: intermediate.Class,
+        ref_association: intermediate.Symbol
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the constructor function for the given symbol."""
+    """
+    Generate the constructor function for the given symbol.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
     cls_name = csharp_naming.class_name(symbol.name)
 
     blocks = []  # type: List[str]
 
     arg_codes = []  # type: List[str]
     for arg in symbol.constructor.arguments:
-        arg_type = csharp_common.generate_type(arg.type_annotation)
+        arg_type = csharp_common.generate_type(
+            type_annotation=arg.type_annotation,
+            ref_association=ref_association)
         arg_name = csharp_naming.argument_name(arg.name)
 
         if arg.default is None:
@@ -953,7 +1057,9 @@ def _generate_constructor(
             else:
                 if isinstance(stmt.default, intermediate_construction.EmptyList):
                     prop = symbol.properties_by_name[stmt.name]
-                    prop_type = csharp_common.generate_type(prop.type_annotation)
+                    prop_type = csharp_common.generate_type(
+                        type_annotation=prop.type_annotation,
+                        ref_association=ref_association)
 
                     arg_name = csharp_naming.argument_name(stmt.argument)
 
@@ -966,7 +1072,7 @@ def _generate_constructor(
 
                     body.append(writer.getvalue())
                 elif isinstance(
-                    stmt.default, intermediate_construction.DefaultEnumLiteral
+                        stmt.default, intermediate_construction.DefaultEnumLiteral
                 ):
                     literal_code = ".".join(
                         [
@@ -993,9 +1099,15 @@ def _generate_constructor(
 
 
 def _generate_default_value_for_type_annotation(
-    type_annotation: intermediate.TypeAnnotation,
+        type_annotation: intermediate.TypeAnnotation,
+        ref_association: intermediate.Symbol
 ) -> Stripped:
-    """Generate the C# code representing the default value for the given type."""
+    """
+    Generate the C# code representing the default value for the given type.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
     code = None  # type: Optional[str]
     if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
         if type_annotation.a_type == intermediate.BuiltinAtomicType.BOOL:
@@ -1009,10 +1121,16 @@ def _generate_default_value_for_type_annotation(
         else:
             assert_never(type_annotation.a_type)
     elif isinstance(
-        type_annotation,
-        (intermediate.OurAtomicTypeAnnotation, intermediate.ListTypeAnnotation),
+            type_annotation,
+            (intermediate.OurAtomicTypeAnnotation,
+             intermediate.ListTypeAnnotation,
+             intermediate.RefTypeAnnotation),
     ):
-        code = f"new {csharp_common.generate_type(type_annotation)}()"
+        csharp_type = csharp_common.generate_type(
+            type_annotation=type_annotation,
+            ref_association=ref_association)
+
+        code = f"new {csharp_type}()"
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         code = "null"
     else:
@@ -1024,11 +1142,17 @@ def _generate_default_value_for_type_annotation(
 
 @require(lambda symbol: not symbol.is_implementation_specific)
 @require(lambda symbol: not symbol.constructor.is_implementation_specific)
-def _generate_default_constructor(symbol: intermediate.Class) -> Stripped:
+def _generate_default_constructor(
+        symbol: intermediate.Class,
+        ref_association: intermediate.Symbol
+) -> Stripped:
     """
     Generate the default constructor for the given symbol.
 
     The constructor sets all the properties to their default values.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
     """
     cls_name = csharp_naming.class_name(symbol.name)
 
@@ -1038,7 +1162,8 @@ def _generate_default_constructor(symbol: intermediate.Class) -> Stripped:
         if arg.default is None:
             default_values.append(
                 _generate_default_value_for_type_annotation(
-                    type_annotation=arg.type_annotation
+                    type_annotation=arg.type_annotation,
+                    ref_association=ref_association
                 )
             )
         else:
@@ -1071,10 +1196,16 @@ def _generate_default_constructor(symbol: intermediate.Class) -> Stripped:
 @require(lambda symbol: not symbol.is_implementation_specific)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
-    symbol: intermediate.Class,
-    spec_impls: specific_implementations.SpecificImplementations,
+        symbol: intermediate.Class,
+        spec_impls: specific_implementations.SpecificImplementations,
+        ref_association: intermediate.Symbol
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate C# code for the given class."""
+    """
+    Generate C# code for the given class.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
     writer = io.StringIO()
 
     if symbol.description is not None:
@@ -1098,7 +1229,7 @@ def _generate_class(
     else:
         writer.write(f"public class {name} :\n")
         for i, interface_name in enumerate(
-            map(csharp_naming.interface_name, interfaces)
+                map(csharp_naming.interface_name, interfaces)
         ):
             if i > 0:
                 writer.write(",\n")
@@ -1113,7 +1244,10 @@ def _generate_class(
     # region Getters and setters
 
     for prop in symbol.properties:
-        prop_type = csharp_common.generate_type(prop.type_annotation)
+        prop_type = csharp_common.generate_type(
+            type_annotation=prop.type_annotation,
+            ref_association=ref_association)
+
         prop_name = csharp_naming.property_name(prop.name)
 
         prop_blocks = []  # type: List[Stripped]
@@ -1168,8 +1302,14 @@ def _generate_class(
                 )
             )
 
-    blocks.append(_generate_descend_once_method(symbol=symbol))
-    blocks.append(_generate_descend_method(symbol=symbol))
+    blocks.append(
+        _generate_descend_once_method(
+            symbol=symbol, ref_association=ref_association))
+
+    blocks.append(
+        _generate_descend_method(
+            symbol=symbol,
+            ref_association=ref_association))
 
     blocks.append(
         Stripped(
@@ -1257,7 +1397,9 @@ def _generate_class(
         else:
             blocks.append(implementation)
     else:
-        constructor_block, error = _generate_constructor(symbol=symbol)
+        constructor_block, error = _generate_constructor(
+            symbol=symbol, ref_association=ref_association)
+
         if error is not None:
             errors.append(error)
         else:
@@ -1266,7 +1408,10 @@ def _generate_class(
             if any(arg.default is None for arg in symbol.constructor.arguments):
                 # We _generate_rdf the default constructor only if it has not been already
                 # defined by specifying the default values for all the arguments.
-                blocks.append(_generate_default_constructor(symbol=symbol))
+                blocks.append(
+                    _generate_default_constructor(
+                        symbol=symbol,
+                        ref_association=ref_association))
 
     # endregion
 
@@ -1297,9 +1442,9 @@ def _generate_class(
 )
 # fmt: on
 def generate(
-    symbol_table: VerifiedIntermediateSymbolTable,
-    namespace: csharp_common.NamespaceIdentifier,
-    spec_impls: specific_implementations.SpecificImplementations,
+        symbol_table: VerifiedIntermediateSymbolTable,
+        namespace: csharp_common.NamespaceIdentifier,
+        spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the C# code of the structures based on the symbol table.
@@ -1377,8 +1522,8 @@ def generate(
         error = None  # type: Optional[Error]
 
         if (
-            isinstance(intermediate_symbol, intermediate.Class)
-            and intermediate_symbol.is_implementation_specific
+                isinstance(intermediate_symbol, intermediate.Class)
+                and intermediate_symbol.is_implementation_specific
         ):
             implementation_key = specific_implementations.ImplementationKey(
                 f"{intermediate_symbol.name}.cs"
@@ -1397,11 +1542,14 @@ def generate(
                 code, error = _generate_enum(symbol=intermediate_symbol)
             elif isinstance(intermediate_symbol, intermediate.Interface):
                 # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
-                code, error = _generate_interface(symbol=intermediate_symbol)
+                code, error = _generate_interface(
+                    symbol=intermediate_symbol,
+                    ref_association=symbol_table.ref_association)
 
             elif isinstance(intermediate_symbol, intermediate.Class):
                 code, error = _generate_class(
-                    symbol=intermediate_symbol, spec_impls=spec_impls
+                    symbol=intermediate_symbol, spec_impls=spec_impls,
+                    ref_association=symbol_table.ref_association
                 )
             else:
                 assert_never(intermediate_symbol)
@@ -1430,6 +1578,5 @@ def generate(
     out.write("\n")
 
     return out.getvalue(), None
-
 
 # endregion

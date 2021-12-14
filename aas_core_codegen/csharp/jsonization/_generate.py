@@ -24,7 +24,7 @@ from aas_core_codegen.csharp.common import (
 
 
 def _generate_json_converter_for_enumeration(
-    enumeration: intermediate.Enumeration,
+        enumeration: intermediate.Enumeration,
 ) -> Stripped:
     """Generate the custom JSON converter based on the intermediate ``enumeration``."""
     enum_name = csharp_naming.enum_name(enumeration.name)
@@ -78,9 +78,15 @@ def _generate_json_converter_for_enumeration(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_read_for_interface(
-    interface: intermediate.Interface, implementers: Sequence[intermediate.Class]
+        interface: intermediate.Interface, implementers: Sequence[intermediate.Class],
+        ref_association: intermediate.Symbol
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the ``Read`` method for de-serializing the ``interface``."""
+    """
+    Generate the ``Read`` method for de-serializing the ``interface``.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
     # NOTE (mristin, 2021-11-03):
     # Since we perform an on-demand de-serialization, we do not know the discriminating
     # model type (*i.e.*, the concrete class of the object). Hence we need to
@@ -119,7 +125,9 @@ def _generate_read_for_interface(
             type_anno = property_union[prop_name]
 
             var_name = csharp_naming.variable_name(Identifier(f"the_{prop_name}"))
-            prop_type = csharp_common.generate_type(type_anno)
+            prop_type = csharp_common.generate_type(
+                type_annotation=type_anno,
+                ref_association=ref_association)
 
             if prop_type.endswith("?"):
                 initialization_lines.append(Stripped(f"{prop_type} {var_name} = null;"))
@@ -251,9 +259,13 @@ case Json.JsonTokenType.EndObject:
         var_name = csharp_naming.variable_name(Identifier(f"the_{prop_name}"))
 
         if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-            prop_type = csharp_common.generate_type(type_anno.value)
+            prop_type = csharp_common.generate_type(
+                type_annotation=type_anno.value,
+                ref_association=ref_association)
         else:
-            prop_type = csharp_common.generate_type(type_anno)
+            prop_type = csharp_common.generate_type(
+                type_annotation=type_anno,
+                ref_association=ref_association)
 
         json_prop_name = naming.json_property(prop_name)
 
@@ -374,7 +386,7 @@ case Json.JsonTokenType.PropertyName:
 
 
 def _generate_write_for_interface(
-    interface: intermediate.Interface, implementers: Sequence[intermediate.Class]
+        interface: intermediate.Interface, implementers: Sequence[intermediate.Class]
 ) -> Stripped:
     """Generate the ``Write`` method for serializing the ``interface``."""
     interface_name = csharp_naming.interface_name(interface.name)
@@ -452,7 +464,7 @@ def _generate_write_for_interface(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_json_converter_for_interface(
-    interface: intermediate.Interface, implementers: Sequence[intermediate.Class]
+        interface: intermediate.Interface, implementers: Sequence[intermediate.Class]
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the custom JSON converter based on the intermediate ``interface``."""
     read_code, error = _generate_read_for_interface(
@@ -495,8 +507,16 @@ def _generate_json_converter_for_interface(
     return Stripped(writer.getvalue()), None
 
 
-def _generate_read_for_class(cls: intermediate.Class) -> Stripped:
-    """Generate the ``Read`` method for de-serializing the class ``cls``."""
+def _generate_read_for_class(
+        cls: intermediate.Class,
+        ref_association: intermediate.Symbol
+) -> Stripped:
+    """
+    Generate the ``Read`` method for de-serializing the class ``cls``.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
     blocks = [
         Stripped(
             textwrap.dedent(
@@ -519,7 +539,9 @@ def _generate_read_for_class(cls: intermediate.Class) -> Stripped:
 
         for prop in cls.properties:
             var_name = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
-            prop_type = csharp_common.generate_type(prop.type_annotation)
+            prop_type = csharp_common.generate_type(
+                type_annotation=prop.type_annotation,
+                ref_association=ref_association)
 
             if prop_type.endswith("?"):
                 initialization_lines.append(Stripped(f"{prop_type} {var_name} = null;"))
@@ -551,7 +573,7 @@ def _generate_read_for_class(cls: intermediate.Class) -> Stripped:
             var_name = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
 
             if not isinstance(
-                prop.type_annotation, intermediate.OptionalTypeAnnotation
+                    prop.type_annotation, intermediate.OptionalTypeAnnotation
             ):
                 json_prop_name = naming.json_property(prop.name)
 
@@ -611,9 +633,13 @@ case Json.JsonTokenType.EndObject:
             var_name = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
 
             if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-                prop_type = csharp_common.generate_type(prop.type_annotation.value)
+                prop_type = csharp_common.generate_type(
+                    type_annotation=prop.type_annotation.value,
+                    ref_association=ref_association)
             else:
-                prop_type = csharp_common.generate_type(prop.type_annotation)
+                prop_type = csharp_common.generate_type(
+                    type_annotation=prop.type_annotation,
+                    ref_association=ref_association)
 
             json_prop_name = naming.json_property(prop.name)
 
@@ -819,8 +845,15 @@ def _generate_write_for_class(cls: intermediate.Class) -> Stripped:
     return Stripped(writer.getvalue())
 
 
-def _generate_json_converter_for_class(cls: intermediate.Class) -> Stripped:
-    """Generate the custom JSON converter based on the intermediate ``cls``."""
+def _generate_json_converter_for_class(
+        cls: intermediate.Class,
+        ref_association: intermediate.Symbol) -> Stripped:
+    """
+    Generate the custom JSON converter based on the intermediate ``cls``.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
 
     cls_name = csharp_naming.class_name(cls.name)
 
@@ -835,7 +868,9 @@ def _generate_json_converter_for_class(cls: intermediate.Class) -> Stripped:
         )
     )
 
-    writer.write(textwrap.indent(_generate_read_for_class(cls=cls), I))
+    writer.write(
+        textwrap.indent(
+            _generate_read_for_class(cls=cls, ref_association=ref_association), I))
 
     writer.write("\n\n")
 
@@ -855,10 +890,10 @@ def _generate_json_converter_for_class(cls: intermediate.Class) -> Stripped:
 )
 # fmt: on
 def generate(
-    symbol_table: intermediate.SymbolTable,
-    namespace: csharp_common.NamespaceIdentifier,
-    interface_implementers: intermediate.InterfaceImplementers,
-    spec_impls: specific_implementations.SpecificImplementations,
+        symbol_table: intermediate.SymbolTable,
+        namespace: csharp_common.NamespaceIdentifier,
+        interface_implementers: intermediate.InterfaceImplementers,
+        spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the C# code for the general serialization.
@@ -944,7 +979,8 @@ def generate(
 
                 jsonization_block = spec_impls[jsonization_key]
             else:
-                jsonization_block = _generate_json_converter_for_class(cls=symbol)
+                jsonization_block = _generate_json_converter_for_class(
+                    cls=symbol, ref_association=symbol_table.ref_association)
 
             converters.append(
                 Identifier(f"{csharp_naming.class_name(symbol.name)}JsonConverter")
