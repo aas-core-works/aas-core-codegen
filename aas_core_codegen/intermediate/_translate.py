@@ -14,7 +14,7 @@ from typing import (
     Generator,
     TypeVar,
     Generic,
-    cast,
+    cast, Final,
 )
 
 import asttokens
@@ -63,17 +63,19 @@ from aas_core_codegen.intermediate._types import (
     collect_ids_of_interfaces_in_properties,
     map_interface_implementers,
 )
+from aas_core_codegen.parse import (
+    tree as parse_tree
+)
+# noinspection PyUnusedLocal
+from aas_core_codegen.parse.tree import FunctionCall
 
 
 # noinspection PyUnusedLocal
 def _symbol_reference_role(
-    role, rawtext, text, lineno, inliner, options=None, content=None
+        role, rawtext, text, lineno, inliner, options=None, content=None
 ):
     """Create an element of the description as a reference to a symbol."""
     # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
-    if content is None:
-        content = []
-
     if options is None:
         options = {}
 
@@ -115,7 +117,7 @@ class _PlaceholderAttributeReference:
 
 # noinspection PyUnusedLocal
 def _attribute_reference_role(
-    role, rawtext, text, lineno, inliner, options=None, content=None
+        role, rawtext, text, lineno, inliner, options=None, content=None
 ):
     """Create a reference in the documentation to a property or a literal."""
     # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
@@ -209,7 +211,7 @@ def _parsed_enumeration_to_enumeration(parsed: parse.Enumeration) -> Enumeration
 
 
 def _parsed_type_annotation_to_type_annotation(
-    parsed: parse.TypeAnnotation,
+        parsed: parse.TypeAnnotation,
 ) -> TypeAnnotation:
     """
     Translate parsed type annotations to possibly unresolved type annotation.
@@ -321,7 +323,7 @@ def _parsed_arguments_to_arguments(parsed: Sequence[parse.Argument]) -> List[Arg
 
 
 def _parsed_abstract_class_to_interface(
-    parsed: parse.AbstractClass, serializations: Mapping[parse.Class, Serialization]
+        parsed: parse.AbstractClass, serializations: Mapping[parse.Class, Serialization]
 ) -> Interface:
     """Translate an abstract class of a meta-model to an intermediate interface."""
     # noinspection PyTypeChecker
@@ -392,7 +394,7 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
             Contract(
                 args=parsed_pre.args,
                 description=parsed_pre.description,
-                body=parsed_pre.condition.body,
+                body=parsed_pre.body,
                 parsed=parsed_pre,
             )
             for parsed_pre in parsed.preconditions
@@ -400,7 +402,7 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
         snapshots=[
             Snapshot(
                 args=parsed_snap.args,
-                body=parsed_snap.capture.body,
+                body=parsed_snap.body,
                 name=parsed_snap.name,
                 parsed=parsed_snap,
             )
@@ -410,7 +412,7 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
             Contract(
                 args=parsed_post.args,
                 description=parsed_post.description,
-                body=parsed_post.condition.body,
+                body=parsed_post.body,
                 parsed=parsed_post,
             )
             for parsed_post in parsed.postconditions
@@ -448,9 +450,9 @@ def _parsed_method_to_method(parsed: parse.Method) -> Method:
 
 
 def _in_line_constructors(
-    parsed_symbol_table: parse.SymbolTable,
-    ontology: _hierarchy.Ontology,
-    constructor_table: construction.ConstructorTable,
+        parsed_symbol_table: parse.SymbolTable,
+        ontology: _hierarchy.Ontology,
+        constructor_table: construction.ConstructorTable,
 ) -> Mapping[parse.Class, Sequence[construction.AssignArgument]]:
     """In-line recursively all the constructor bodies."""
     result = (
@@ -536,7 +538,7 @@ class _SettingWithSource(Generic[T]):
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def _resolve_serializations(
-    ontology: _hierarchy.Ontology, parsed_symbol_table: parse.SymbolTable
+        ontology: _hierarchy.Ontology, parsed_symbol_table: parse.SymbolTable
 ) -> Tuple[Optional[MutableMapping[parse.Class, Serialization]], Optional[Error]]:
     """Resolve how general serialization settings stack through the ontology."""
     # NOTE (mristin, 2021-11-03):
@@ -617,13 +619,14 @@ def _resolve_serializations(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parsed_class_to_class(
-    parsed: parse.ConcreteClass,
-    ontology: _hierarchy.Ontology,
-    serializations: Mapping[parse.Class, Serialization],
-    in_lined_constructors: Mapping[parse.Class, Sequence[construction.AssignArgument]],
+        parsed: parse.ConcreteClass,
+        ontology: _hierarchy.Ontology,
+        serializations: Mapping[parse.Class, Serialization],
+        in_lined_constructors: Mapping[
+            parse.Class, Sequence[construction.AssignArgument]],
 ) -> Tuple[Optional[Class], Optional[Error]]:
     """Translate a concrete parsed class to an intermediate class."""
-    antecedents = ontology.list_antecedents(cls=parsed)
+    ancestors = ontology.list_ancestors(cls=parsed)
 
     # region Stack properties from the antecedents
 
@@ -632,10 +635,10 @@ def _parsed_class_to_class(
     # We explicitly check that there are no property overloads at the parse stage so
     # we do not perform the same check here for the second time.
 
-    for antecedent in antecedents:
+    for ancestor in ancestors:
         properties.extend(
-            _parsed_property_to_property(parsed=parsed_prop, cls=antecedent)
-            for parsed_prop in antecedent.properties
+            _parsed_property_to_property(parsed=parsed_prop, cls=ancestor)
+            for parsed_prop in ancestor.properties
         )
 
     for parsed_prop in parsed.properties:
@@ -647,13 +650,13 @@ def _parsed_class_to_class(
 
     contracts = Contracts(preconditions=[], snapshots=[], postconditions=[])
 
-    for antecedent in antecedents:
-        parsed_antecedent_init = antecedent.method_map.get(Identifier("__init__"), None)
+    for ancestor in ancestors:
+        parsed_ancestor_init = ancestor.method_map.get(Identifier("__init__"), None)
 
-        if parsed_antecedent_init is not None:
+        if parsed_ancestor_init is not None:
             contracts = _stack_contracts(
                 contracts,
-                _parsed_contracts_to_contracts(parsed_antecedent_init.contracts),
+                _parsed_contracts_to_contracts(parsed_ancestor_init.contracts),
             )
 
     arguments = []
@@ -685,10 +688,10 @@ def _parsed_class_to_class(
     # We explicitly check that there are no method overloads at the parse stage
     # so we do not perform this check for the second time here.
 
-    for antecedent in antecedents:
+    for ancestor in ancestors:
         methods.extend(
             _parsed_method_to_method(parsed=parsed_method)
-            for parsed_method in antecedent.methods
+            for parsed_method in ancestor.methods
             if parsed_method.name != "__init__"
         )
 
@@ -702,15 +705,17 @@ def _parsed_class_to_class(
 
     # endregion
 
-    # region Stack the invariants from the antecedents
+    # region Stack the invariants from the ancestors
 
     invariants = []  # type: List[Invariant]
 
-    for antecedent in antecedents:
-        for parsed_invariant in antecedent.invariants:
+    for ancestor in ancestors:
+        for parsed_invariant in ancestor.invariants:
             invariants.append(
                 Invariant(
-                    description=parsed_invariant.description, parsed=parsed_invariant
+                    description=parsed_invariant.description,
+                    body=parsed_invariant.body,
+                    parsed=parsed_invariant
                 )
             )
 
@@ -718,7 +723,10 @@ def _parsed_class_to_class(
 
     for parsed_invariant in parsed.invariants:
         invariants.append(
-            Invariant(description=parsed_invariant.description, parsed=parsed_invariant)
+            Invariant(
+                description=parsed_invariant.description,
+                body=parsed_invariant.body,
+                parsed=parsed_invariant)
         )
 
     # endregion
@@ -756,7 +764,7 @@ def _parsed_class_to_class(
 
 
 def _over_our_atomic_type_annotations(
-    something: Union[Class, Interface, TypeAnnotation]
+        something: Union[Class, Interface, TypeAnnotation]
 ) -> Iterator[OurAtomicTypeAnnotation]:
     """Iterate over all the atomic type annotations in the ``something``."""
     if isinstance(something, BuiltinAtomicTypeAnnotation):
@@ -800,7 +808,7 @@ def _over_our_atomic_type_annotations(
 
 
 def _over_descriptions(
-    something: Union[Class, Interface, Enumeration]
+        something: Union[Class, Interface, Enumeration]
 ) -> Iterator[Description]:
     """Iterate over all the descriptions from the ``something``."""
     if isinstance(something, Class):
@@ -844,7 +852,7 @@ def _over_descriptions(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _fill_in_default_placeholder(
-    default: _DefaultPlaceholder, symbol_table: SymbolTable
+        default: _DefaultPlaceholder, symbol_table: SymbolTable
 ) -> Tuple[Optional[Default], Optional[Error]]:
     """Resolve the default values to references using the constructed symbol table."""
     # If we do not preemptively return, signal that we do not know how to handle
@@ -852,8 +860,8 @@ def _fill_in_default_placeholder(
 
     if isinstance(default.parsed.node, ast.Constant):
         if (
-            isinstance(default.parsed.node.value, (bool, int, float, str))
-            or default.parsed.node.value is None
+                isinstance(default.parsed.node.value, (bool, int, float, str))
+                or default.parsed.node.value is None
         ):
             return (
                 DefaultConstant(value=default.parsed.node.value, parsed=default.parsed),
@@ -861,10 +869,10 @@ def _fill_in_default_placeholder(
             )
 
     if (
-        isinstance(default.parsed.node, ast.Attribute)
-        and isinstance(default.parsed.node.ctx, ast.Load)
-        and isinstance(default.parsed.node.value, ast.Name)
-        and isinstance(default.parsed.node.value.ctx, ast.Load)
+            isinstance(default.parsed.node, ast.Attribute)
+            and isinstance(default.parsed.node.ctx, ast.Load)
+            and isinstance(default.parsed.node.value, ast.Name)
+            and isinstance(default.parsed.node.value.ctx, ast.Load)
     ):
         symbol_name = Identifier(default.parsed.node.value.id)
         attr_name = Identifier(default.parsed.node.attr)
@@ -896,10 +904,61 @@ class _PropertyOfClass:
         self.cls = cls
 
 
+class _ContractChecker(parse_tree.Visitor):
+    """
+    Verify that the contracts are well-formed.
+     
+    For example, check that the calls to verification functions are valid.
+    """
+    #: Symbol table to be used for de-referencing symbols, functions *etc.*
+    symbol_table: Final[SymbolTable]
+
+    #: Errors observed during the verification
+    errors: List[Error]
+
+    def __init__(self, symbol_table: SymbolTable):
+        """Initialize with the given values."""
+        self.symbol_table = symbol_table
+
+        self.errors = []
+
+    def visit_function_call(self, node: FunctionCall) -> None:
+        verification_function = self.symbol_table.verification_functions_by_name.get(
+            node.name, None)
+
+        if verification_function is not None:
+            # TODO: test failure case
+            expected_argument_count = len(verification_function.arguments)
+        elif node.name == 'len':
+            # TODO: test failure case
+            expected_argument_count = 1
+        else:
+            # TODO: test
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    f"The handling of the function is not implemented: {node.name!r}",
+                )
+            )
+            return
+
+        if len(node.args) != expected_argument_count:
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    f"Expected exactly {expected_argument_count} arguments "
+                    f"to a function call to {node.name!r}, but got: {len(node.args)}"
+                )
+            )
+
+        for arg in node.args:
+            self.visit(arg)
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def translate(
-    parsed_symbol_table: parse.SymbolTable,
-    atok: asttokens.ASTTokens,
+        parsed_symbol_table: parse.SymbolTable,
+        atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[SymbolTable], Optional[Error]]:
     """Translate the parsed symbols into intermediate symbols."""
     underlying_errors = []  # type: List[Error]
@@ -1030,7 +1089,13 @@ def translate(
     )
 
     symbol_table = SymbolTable(
-        symbols=symbols, ref_association=ref_association, meta_model=meta_model
+        symbols=symbols,
+        verification_functions=[
+            _parsed_method_to_method(func)
+            for func in parsed_symbol_table.verification_functions
+        ],
+        ref_association=ref_association,
+        meta_model=meta_model
     )
 
     # endregion
@@ -1086,7 +1151,7 @@ def translate(
 
     for _, description in symbols_descriptions:
         for symbol_ref_in_doc in description.document.traverse(
-            condition=SymbolReferenceInDoc
+                condition=SymbolReferenceInDoc
         ):
 
             # Symbol references can be repeated as docutils will cache them
@@ -1142,7 +1207,7 @@ def translate(
         # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
         #  test this, especially the failure cases
         for attr_ref_in_doc in description.document.traverse(
-            condition=AttributeReferenceInDoc
+                condition=AttributeReferenceInDoc
         ):
             if isinstance(attr_ref_in_doc.reference, _PlaceholderAttributeReference):
                 pth = attr_ref_in_doc.reference.path
@@ -1461,6 +1526,39 @@ def translate(
                                 f"de/serialized properly.",
                             )
                         )
+
+    # endregion
+
+    # region Check that all the function calls in the contracts are valid
+
+    contract_checker = _ContractChecker(symbol_table=symbol_table)
+
+    contract_bodies = []  # type: List[parse_tree.Expression]
+
+    for method_or_signature in itertools.chain(
+            symbol_table.verification_functions,
+            *(
+                    symbol.methods
+                    if isinstance(symbol, Class)
+                    else (
+                            symbol.signatures
+                            if isinstance(symbol, Interface)
+                            else []
+                    )
+                    for symbol in symbol_table.symbols
+            )
+    ):
+        for contract_or_snapshot in itertools.chain(
+                method_or_signature.contracts.preconditions,
+                method_or_signature.contracts.postconditions,
+                method_or_signature.contracts.snapshots
+        ):
+            contract_checker.visit(contract_or_snapshot.body)
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, Class):
+            for invariant in symbol.invariants:
+                contract_checker.visit(invariant.body)
 
     # endregion
 

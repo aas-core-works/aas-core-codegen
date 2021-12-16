@@ -32,9 +32,9 @@ def match_property(node: parse_tree.Node) -> Optional[Identifier]:
 class SingleArgFunctionOnProperty:
     """Represent a match of a function with a single argument on a property."""
 
-    def __init__(self, function: Identifier, prop_name: Identifier) -> None:
+    def __init__(self, function_name: Identifier, prop_name: Identifier) -> None:
         """Initialize with the given values."""
-        self.function = function
+        self.function_name = function_name
         self.prop_name = prop_name
 
 
@@ -57,7 +57,7 @@ def match_single_arg_function_on_property(
     if prop_name is None:
         return None
 
-    return SingleArgFunctionOnProperty(function=node.name, prop_name=prop_name)
+    return SingleArgFunctionOnProperty(function_name=node.name, prop_name=prop_name)
 
 
 class ConditionalOnProp:

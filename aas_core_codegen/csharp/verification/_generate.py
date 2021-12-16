@@ -1,7 +1,7 @@
 """Generate the invariant verifiers from the intermediate representation."""
 import io
 import textwrap
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Sequence
 
 from icontract import ensure, require
 
@@ -21,46 +21,21 @@ from aas_core_codegen.parse import tree as parse_tree
 
 def verify(
     spec_impls: specific_implementations.SpecificImplementations,
+    verification_functions: Sequence[intermediate.Method]
 ) -> Optional[List[str]]:
     """Verify all the implementation snippets related to verification."""
     errors = []  # type: List[str]
 
-    # TODO: continue here; check which constraints are actually used
-    #   🠒 See what is imported!
-    #   🠒 Add verification_functions as list of identifiers in the symbol table
-    #   🠒 Make sure Error and Errors are reserved in that list!
-    #
-    #   🠒 Or think a bit more about it: what about introducing a marker @verification
-    #   for a function in the meta-model? Enforce these functions to be implementation
-    #   specific and just include them here?
-    #   And then make them part of the symbol table.
-    #
-    #   Also propagate this to inference_for_schema 🠒 we indeed need a mechanism for
-    #   translating regular expressions between languages.
-    #
-    #   Use return type to figure out where is pattern:
-    #
-    #   def compile_{pattern name}() -> Pattern[str]:
-    #       ...
-    #
-    #
-    #   🠒 Only assignments on string literals allowed.
-    #   🠒 Possible to recompute the full expression through simple substitution!
-    #   🠒 Match return re.compile(...) to identify the final pattern
-    #   🠒 Assign {pattern name}_regexp = compile_{pattern name}()
-    #       If there is an assignment between a function that takes no arguments and returns a pattern
-    #           🠒 we know that it is a pattern.
-    #
-    #   🠒 Put patterns in symbol table under ``.patterns``.
-    #   🠒 Invoke them directly in constraints with match and fullmatch (and introduce that in parse_tree!)
-
     expected_keys = [
-        specific_implementations.ImplementationKey("Verification/is_IRI.cs"),
-        specific_implementations.ImplementationKey("Verification/is_IRDI.cs"),
-        specific_implementations.ImplementationKey("Verification/is_ID_short.cs"),
         specific_implementations.ImplementationKey("Verification/Error.cs"),
         specific_implementations.ImplementationKey("Verification/Errors.cs"),
     ]
+
+    for func in verification_functions:
+        expected_keys.append(
+            specific_implementations.ImplementationKey(f"Verification/{func.name}.cs"),
+        )
+
     for key in expected_keys:
         if key not in spec_impls:
             errors.append(f"The implementation snippet is missing for: {key}")
@@ -74,50 +49,6 @@ def verify(
 # endregion
 
 # region Generate
-
-
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_pattern_class(
-    spec_impls: specific_implementations.SpecificImplementations,
-) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
-    """Generate the Pattern class used for verifying different patterns.
-
-    Return the code or errors, if any.
-    """
-    blocks = []  # type: List[Stripped]
-    errors = []  # type: List[Error]
-
-    implementation_keys = [
-        specific_implementations.ImplementationKey("Verification/is_IRI.cs"),
-        specific_implementations.ImplementationKey("Verification/is_IRDI.cs"),
-        specific_implementations.ImplementationKey("Verification/is_ID_short.cs"),
-    ]
-
-    for implementation_key in implementation_keys:
-        implementation = spec_impls.get(implementation_key, None)
-        if implementation is None:
-            errors.append(
-                Error(
-                    None,
-                    f"The implementation of the pattern is missing: {implementation_key}",
-                )
-            )
-        else:
-            blocks.append(implementation)
-
-    if len(errors) > 0:
-        return None, errors
-
-    writer = io.StringIO()
-    writer.write("public static class Pattern\n{\n")
-    for i, block in enumerate(blocks):
-        if i > 0:
-            writer.write("\n\n")
-
-        writer.write(textwrap.indent(block.strip(), I))
-
-    writer.write("\n}")
-    return Stripped(writer.getvalue()), None
 
 
 def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Stripped:
@@ -251,6 +182,8 @@ def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
                 ]
             else:
                 return []
+
+            # TODO: continue here, add the case for RefTypeAnnotation
         else:
             assert_never(type_anno)
 
@@ -454,24 +387,23 @@ class _InvariantTranspiler(
         #  add heuristic for breaking the lines
         joined_args = ", ".join(args)
 
-        if node.name == "is_IRDI":
-            if len(args) != 1:
-                return None, Error(node.original_node, "Expected exactly one argument")
+        verification_function = self.symbol_table.verification_functions_by_name.get(
+            node.name, None)
 
-            return Stripped(f"Pattern.IsIrdi({joined_args})"), None
-        elif node.name == "is_IRI":
-            if len(args) != 1:
-                return None, Error(node.original_node, "Expected exactly one argument")
+        # NOTE (mristin, 2021-12-16):
+        # The validity of the arguments is checked in
+        # :py:func:`aas_core_codegen.intermediate._translate.translate`, so we do not
+        # have to test for argument arity here.
 
-            return Stripped(f"Pattern.IsIri({joined_args})"), None
-        elif node.name == "is_ID_short":
-            if len(args) != 1:
-                return None, Error(node.original_node, "Expected exactly one argument")
+        if verification_function is not None:
+            method_name = csharp_naming.method_name(verification_function.name)
+            return Stripped(f"Verification.{method_name}({joined_args})"), None
 
-            return Stripped(f"Pattern.IsIdShort({joined_args})"), None
         elif node.name == "len":
-            if len(args) != 1:
-                return None, Error(node.original_node, "Expected exactly one argument")
+            assert len(args) == 1, (
+                f"Expected exactly one argument, but got: {args}; "
+                f"this should have been caught before."
+            )
 
             collection_node = node.args[0]
             if not isinstance(
@@ -1233,15 +1165,12 @@ def generate(
     verification_blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]
 
-    pattern_class, pattern_class_errors = _generate_pattern_class(spec_impls=spec_impls)
-    if pattern_class_errors is not None:
-        errors.extend(pattern_class_errors)
-    else:
-        verification_blocks.append(pattern_class)
-
     for implementation_key in [
         specific_implementations.ImplementationKey("Verification/Error.cs"),
         specific_implementations.ImplementationKey("Verification/Errors.cs"),
+    ] + [
+        specific_implementations.ImplementationKey(f"Verification/{func.name}.cs")
+        for func in symbol_table.verification_functions
     ]:
         implementation = spec_impls.get(implementation_key, None)
         if implementation is None:

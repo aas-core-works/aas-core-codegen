@@ -159,12 +159,12 @@ class Contract:
             self,
             args: Sequence[Identifier],
             description: Optional[str],
-            condition: ast.Lambda,
+            body: tree.Expression,
             node: ast.AST,
     ) -> None:
         self.args = args
         self.description = description
-        self.condition = condition
+        self.body = body
         self.node = node
 
 
@@ -175,13 +175,13 @@ class Snapshot:
             self,
             args: Sequence[Identifier],
             name: Identifier,
-            capture: ast.Lambda,
+            body: tree.Expression,
             node: ast.AST,
     ) -> None:
         """Initialize with the given values."""
         self.args = args
         self.name = name
-        self.capture = capture
+        self.body = body
         self.node = node
 
 
@@ -221,7 +221,41 @@ def is_string_expr(expr: ast.AST) -> bool:
 
 
 class Method:
-    """Represent a method of a class."""
+    """
+    Represent a function or a method of a class.
+
+    Though we have to distinguish in Python between a function and a method, we term
+    both of them "methods" in our model.
+    """
+    #: Name of the method
+    name: Final[Identifier]
+
+    #: Set if the method is marked to be implementation-specific
+    is_implementation_specific: Final[bool]
+
+    #: Set if the method is marked to be used for verification
+    verification: Final[bool]
+
+    #: Specification of method's arguments
+    arguments: Final[Sequence[Argument]]
+
+    #: Specification of the method's return value, or None if it is a procedure
+    returns: Final[Optional[TypeAnnotation]]
+
+    #: Parsed docstring of the method, if any
+    description: Final[Optional[Description]]
+
+    #: Parsed contracts of the method
+    contracts: Final[Contracts]
+
+    #: Body as Python AST
+    body: Final[Sequence[ast.AST]]
+
+    #: Node representing the method in the meta-model's Python AST
+    node: Final[ast.AST]
+
+    #: Map arguments by their names
+    arguments_by_name: Final[Mapping[str, Argument]]
 
     # fmt: off
     @require(
@@ -257,11 +291,21 @@ class Method:
         )[1],
         "Unique arguments"
     )
+    @ensure(
+        lambda self:
+        len(self.arguments_by_name) == len(self.arguments)
+        and all(
+            id(self.arguments_by_name[argument.name]) == id(argument)
+            for argument in self.arguments
+        ),
+        "Arguments and arguments by name are consistent"
+    )
     # fmt: on
     def __init__(
             self,
             name: Identifier,
             is_implementation_specific: bool,
+            verification: bool,
             arguments: Sequence[Argument],
             returns: Optional[TypeAnnotation],
             description: Optional[Description],
@@ -272,6 +316,7 @@ class Method:
         """Initialize with the given values."""
         self.name = name
         self.is_implementation_specific = is_implementation_specific
+        self.verification = verification
         self.arguments = arguments
         self.returns = returns
         self.description = description
@@ -279,7 +324,7 @@ class Method:
         self.body = body
         self.node = node
 
-        self.argument_map = {
+        self.arguments_by_name = {
             argument.name: argument for argument in self.arguments
         }  # type: Mapping[Identifier, Argument]
 
@@ -321,6 +366,16 @@ class Class(DBC):
                 len(method_names) == len(set(method_names))
         )[1],
         "Unique methods names"
+    )
+    @require(
+        lambda methods:
+        all(
+            len(method.arguments) >= 1
+            and method.arguments[0].name == 'self'
+            and isinstance(method.arguments[0].type_annotation, SelfTypeAnnotation)
+            for method in methods
+        ),
+        "``self`` specified in all methods"
     )
     # fmt: on
     def __init__(
@@ -464,18 +519,21 @@ class UnverifiedSymbolTable(DBC):
 
     This symbol table is unverified and may contain inconsistencies.
     """
-
-    #: List of parsed symbols
+    #: List of parsed class symbols
     symbols: Final[Sequence[Symbol]]
 
     #: Type to be used to represent a ``Ref[T]``
     ref_association: Final[Symbol]
+
+    #: List of implementation-specific verification functions
+    verification_functions: Final[Sequence[Method]]
 
     #: Additional information about the source meta-model
     meta_model: Final[MetaModel]
 
     _name_to_symbol: Final[Mapping[Identifier, Symbol]]
 
+    # fmt: off
     @require(
         lambda symbols: (
                 names := [symbol.name for symbol in symbols],
@@ -483,12 +541,23 @@ class UnverifiedSymbolTable(DBC):
         )[1],
         "Symbol names unique",
     )
+    @require(
+        lambda verification_functions:
+        all(
+            'self' not in func.arguments_by_name
+            for func in verification_functions
+        ),
+        "No ``self`` in the verification functions expected as outside of a class"
+    )
+    # fmt: on
     def __init__(
             self, symbols: Sequence[Symbol], ref_association: Symbol,
+            verification_functions: Sequence[Method],
             meta_model: MetaModel
     ) -> None:
         """Initialize with the given values and map symbols to name."""
         self.symbols = symbols
+        self.verification_functions = verification_functions
         self.ref_association = ref_association
         self.meta_model = meta_model
 
@@ -536,6 +605,7 @@ class UnverifiedSymbolTable(DBC):
         return symbol
 
 
+# noinspection PyInitNewSignature
 class SymbolTable(UnverifiedSymbolTable):
     """
     Represent a symbol table that has been locally verified.
@@ -545,5 +615,36 @@ class SymbolTable(UnverifiedSymbolTable):
     been verified yet.
     """
 
-    def __new__(cls, *args: Any, **kwargs: Any) -> "SymbolTable":
+    # fmt: off
+    @require(
+        lambda symbol_table:
+        all(
+            func.verification
+            for func in symbol_table.verification_functions
+        ),
+        "All verification functions should have ``verification`` set; "
+        "this should have been caught as an Error before"
+    )
+    @require(
+        lambda symbol_table:
+        all(
+            func.is_implementation_specific
+            for func in symbol_table.verification_functions
+        ),
+        "All verification functions should be implementation-specific; "
+        "this should have been caught as an Error before"
+    )
+    @require(
+        lambda symbol_table:
+        all(
+            not method.verification
+            for symbol in symbol_table.symbols
+            for method in symbol.methods
+            if isinstance(symbol, Class)
+        ),
+        "All class methods should not have ``verification`` set; "
+        "this should have been caught as an Error before"
+    )
+    # fmt: on
+    def __new__(cls, symbol_table: UnverifiedSymbolTable) -> "SymbolTable":
         raise AssertionError("Only for type annotation")

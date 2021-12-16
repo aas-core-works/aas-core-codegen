@@ -219,7 +219,7 @@ def _stringify_method(method: Method) -> stringify.Entity:
                 "arguments",
                 [_stringify_argument(argument) for argument in method.arguments],
             ),
-            stringify.PropertyEllipsis("argument_map", method.argument_map),
+            stringify.PropertyEllipsis("arguments_by_name", method.arguments_by_name),
             stringify.Property(
                 "returns",
                 None

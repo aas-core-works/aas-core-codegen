@@ -17,12 +17,15 @@ from typing import (
 )
 
 import docutils.nodes
-from icontract import require, invariant
+from icontract import require, invariant, ensure
 
 from aas_core_codegen import parse
+from aas_core_codegen.parse import (
+    tree as parse_tree
+)
 from aas_core_codegen.common import Identifier, assert_never, Error
 from aas_core_codegen.intermediate import construction
-from aas_core_codegen.parse import BUILTIN_ATOMIC_TYPES
+
 
 _MODULE_NAME = pathlib.Path(__file__).parent.name
 
@@ -46,7 +49,7 @@ class BuiltinAtomicType(enum.Enum):
 
 
 assert sorted(literal.value for literal in BuiltinAtomicType) == sorted(
-    BUILTIN_ATOMIC_TYPES
+    parse.BUILTIN_ATOMIC_TYPES
 ), "All built-in atomic types specified in the intermediate layer"
 
 STR_TO_BUILTIN_ATOMIC_TYPE = {
@@ -167,12 +170,12 @@ class Property:
     """Represent a property of a class."""
 
     def __init__(
-        self,
-        name: Identifier,
-        type_annotation: TypeAnnotation,
-        description: Optional[Description],
-        implemented_for: Optional["Symbol"],
-        parsed: parse.Property,
+            self,
+            name: Identifier,
+            type_annotation: TypeAnnotation,
+            description: Optional[Description],
+            implemented_for: Optional["Symbol"],
+            parsed: parse.Property,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -192,7 +195,7 @@ class DefaultConstant:
     """Represent a constant value as a default for an argument."""
 
     def __init__(
-        self, value: Union[bool, int, float, str, None], parsed: parse.Default
+            self, value: Union[bool, int, float, str, None], parsed: parse.Default
     ) -> None:
         """Initialize with the given values."""
         self.value = value
@@ -210,10 +213,10 @@ class DefaultEnumerationLiteral:
     )
     # fmt: on
     def __init__(
-        self,
-        enumeration: "Enumeration",
-        literal: "EnumerationLiteral",
-        parsed: parse.Default,
+            self,
+            enumeration: "Enumeration",
+            literal: "EnumerationLiteral",
+            parsed: parse.Default,
     ) -> None:
         """Initialize with the given values."""
         self.parsed = parsed
@@ -228,11 +231,11 @@ class Argument:
     """Represent an argument of a method (both of an interface and of class)."""
 
     def __init__(
-        self,
-        name: Identifier,
-        type_annotation: TypeAnnotation,
-        default: Optional[Default],
-        parsed: parse.Argument,
+            self,
+            name: Identifier,
+            type_annotation: TypeAnnotation,
+            default: Optional[Default],
+            parsed: parse.Argument,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -245,12 +248,12 @@ class Signature:
     """Represent a method signature."""
 
     def __init__(
-        self,
-        name: Identifier,
-        arguments: Sequence[Argument],
-        returns: Optional[TypeAnnotation],
-        description: Optional[Description],
-        parsed: parse.Method,
+            self,
+            name: Identifier,
+            arguments: Sequence[Argument],
+            returns: Optional[TypeAnnotation],
+            description: Optional[Description],
+            parsed: parse.Method,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -282,14 +285,14 @@ class Interface:
     """
 
     def __init__(
-        self,
-        name: Identifier,
-        inheritances: Sequence["Interface"],
-        signatures: Sequence[Signature],
-        properties: Sequence[Property],
-        serialization: Serialization,
-        description: Optional[Description],
-        parsed: parse.Class,
+            self,
+            name: Identifier,
+            inheritances: Sequence["Interface"],
+            signatures: Sequence[Signature],
+            properties: Sequence[Property],
+            serialization: Serialization,
+            description: Optional[Description],
+            parsed: parse.Class,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -316,8 +319,13 @@ class Interface:
 class Invariant:
     """Represent an invariant of a class."""
 
-    def __init__(self, description: Optional[str], parsed: parse.Invariant) -> None:
+    def __init__(
+            self,
+            description: Optional[str],
+            body: parse_tree.Node,
+            parsed: parse.Invariant) -> None:
         self.description = description
+        self.body = body
         self.parsed = parsed
 
 
@@ -325,11 +333,11 @@ class Contract:
     """Represent a contract of a method."""
 
     def __init__(
-        self,
-        args: Sequence[Identifier],
-        description: Optional[str],
-        body: ast.AST,
-        parsed: parse.Contract,
+            self,
+            args: Sequence[Identifier],
+            description: Optional[str],
+            body: parse_tree.Node,
+            parsed: parse.Contract,
     ) -> None:
         """Initialize with the given values."""
         self.args = args
@@ -342,11 +350,11 @@ class Snapshot:
     """Represent a snapshot of an OLD value capture before the method execution."""
 
     def __init__(
-        self,
-        args: Sequence[Identifier],
-        body: ast.AST,
-        name: Identifier,
-        parsed: parse.Snapshot,
+            self,
+            args: Sequence[Identifier],
+            body: parse_tree.Node,
+            name: Identifier,
+            parsed: parse.Snapshot,
     ) -> None:
         """Initialize with the given values."""
         self.args = args
@@ -359,10 +367,10 @@ class Contracts:
     """Represent the set of contracts for a method."""
 
     def __init__(
-        self,
-        preconditions: Sequence[Contract],
-        snapshots: Sequence[Snapshot],
-        postconditions: Sequence[Contract],
+            self,
+            preconditions: Sequence[Contract],
+            snapshots: Sequence[Snapshot],
+            postconditions: Sequence[Contract],
     ) -> None:
         """Initialize with the given values."""
         self.preconditions = preconditions
@@ -425,15 +433,15 @@ class Method:
     )
     # fmt: on
     def __init__(
-        self,
-        name: Identifier,
-        is_implementation_specific: bool,
-        arguments: Sequence[Argument],
-        returns: Optional[TypeAnnotation],
-        description: Optional[Description],
-        contracts: Contracts,
-        body: Sequence[ast.AST],
-        parsed: parse.Method,
+            self,
+            name: Identifier,
+            is_implementation_specific: bool,
+            arguments: Sequence[Argument],
+            returns: Optional[TypeAnnotation],
+            description: Optional[Description],
+            contracts: Contracts,
+            body: Sequence[ast.AST],
+            parsed: parse.Method,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -463,11 +471,11 @@ class Constructor:
         lambda arguments: len(arguments) == len(set(arg.name for arg in arguments))
     )
     def __init__(
-        self,
-        arguments: Sequence[Argument],
-        contracts: Contracts,
-        is_implementation_specific: bool,
-        statements: Sequence[construction.AssignArgument],
+            self,
+            arguments: Sequence[Argument],
+            contracts: Contracts,
+            is_implementation_specific: bool,
+            statements: Sequence[construction.AssignArgument],
     ) -> None:
         self.arguments = arguments
         self.contracts = contracts
@@ -485,11 +493,11 @@ class EnumerationLiteral:
     """Represent a single enumeration literal."""
 
     def __init__(
-        self,
-        name: Identifier,
-        value: Identifier,
-        description: Optional[Description],
-        parsed: parse.EnumerationLiteral,
+            self,
+            name: Identifier,
+            value: Identifier,
+            description: Optional[Description],
+            parsed: parse.EnumerationLiteral,
     ) -> None:
         self.name = name
         self.value = value
@@ -531,12 +539,12 @@ class Enumeration:
     literal_id_set: Final[FrozenSet[int]]
 
     def __init__(
-        self,
-        name: Identifier,
-        literals: Sequence[EnumerationLiteral],
-        is_superset_of: Sequence["Enumeration"],
-        description: Optional[Description],
-        parsed: parse.Enumeration,
+            self,
+            name: Identifier,
+            literals: Sequence[EnumerationLiteral],
+            is_superset_of: Sequence["Enumeration"],
+            description: Optional[Description],
+            parsed: parse.Enumeration,
     ) -> None:
         self.name = name
         self.literals = literals
@@ -584,17 +592,17 @@ class Class:
     )
     # fmt: on
     def __init__(
-        self,
-        name: Identifier,
-        interfaces: Sequence["Interface"],
-        is_implementation_specific: bool,
-        properties: Sequence[Property],
-        methods: Sequence[Method],
-        constructor: Constructor,
-        invariants: Sequence[Invariant],
-        serialization: Serialization,
-        description: Optional[Description],
-        parsed: parse.Class,
+            self,
+            name: Identifier,
+            interfaces: Sequence["Interface"],
+            is_implementation_specific: bool,
+            properties: Sequence[Property],
+            methods: Sequence[Method],
+            constructor: Constructor,
+            invariants: Sequence[Invariant],
+            serialization: Serialization,
+            description: Optional[Description],
+            parsed: parse.Class,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -643,7 +651,7 @@ class MetaModel:
     book_version: Final[str]
 
     def __init__(
-        self, book_url: str, book_version: str, description: Optional[Description]
+            self, book_url: str, book_version: str, description: Optional[Description]
     ) -> None:
         self.book_url = book_url
         self.book_version = book_version
@@ -656,6 +664,12 @@ class SymbolTable:
     #: List of all symbols that we need for the code generation
     symbols: Final[Sequence[Symbol]]
 
+    #: List of all functions used in the verification
+    verification_functions: Final[Sequence[Method]]
+
+    #: Map verification functions by their name
+    verification_functions_by_name: Final[Mapping[Identifier, Method]]
+
     #: Type to be used to represent a ``Ref[T]``
     ref_association: Final[Symbol]
 
@@ -664,23 +678,50 @@ class SymbolTable:
 
     _name_to_symbol: Final[Mapping[Identifier, Symbol]]
 
+    # fmt: off
     @require(
         lambda symbols: (
-            names := [symbol.name for symbol in symbols],
-            len(names) == len(set(names)),
+                names := [symbol.name for symbol in symbols],
+                len(names) == len(set(names)),
         )[1],
         "Symbol names unique",
     )
+    @require(
+        lambda verification_functions:
+        all(
+            func.is_implementation_specific
+            for func in verification_functions
+        ),
+        "All verification functions are implementation-specific"
+    )
+    @ensure(
+        lambda self:
+        all(
+            id(self.verification_functions_by_name[func.name]) == id(func)
+            for func in self.verification_functions
+        )
+        and len(self.verification_functions_by_name) == len(
+            self.verification_functions),
+        "The verification functions and their mapping by name are consistent"
+    )
+    # fmt: on
     def __init__(
-        self,
-        symbols: Sequence[Symbol],
-        ref_association: Symbol,
-        meta_model: parse.MetaModel,
+            self,
+            symbols: Sequence[Symbol],
+            verification_functions: Sequence[Method],
+            ref_association: Symbol,
+            meta_model: parse.MetaModel,
     ) -> None:
         """Initialize with the given values and map symbols to name."""
         self.symbols = symbols
+        self.verification_functions = verification_functions
         self.ref_association = ref_association
         self.meta_model = meta_model
+
+        self.verification_functions_by_name = {
+            func.name: func
+            for func in self.verification_functions
+        }
 
         self._name_to_symbol = {symbol.name: symbol for symbol in symbols}
 
@@ -746,7 +787,7 @@ class SymbolReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
     """Represent a reference in the documentation to a symbol in the symbol table."""
 
     def __init__(
-        self, symbol: Symbol, rawsource="", text="", *children, **attributes
+            self, symbol: Symbol, rawsource="", text="", *children, **attributes
     ) -> None:
         """Initialize with the given symbol and propagate the rest to the parent."""
         self.symbol = symbol
@@ -782,12 +823,12 @@ class AttributeReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement)
     """
 
     def __init__(
-        self,
-        reference: Union[PropertyReferenceInDoc, EnumerationLiteralReferenceInDoc],
-        rawsource="",
-        text="",
-        *children,
-        **attributes,
+            self,
+            reference: Union[PropertyReferenceInDoc, EnumerationLiteralReferenceInDoc],
+            rawsource="",
+            text="",
+            *children,
+            **attributes,
     ) -> None:
         """Initialize with ``property_name`` and propagate the rest to the parent."""
         self.reference = reference
@@ -797,8 +838,8 @@ class AttributeReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement)
 
 
 def map_descendability(
-    type_annotation: TypeAnnotation,
-    ref_association: Symbol
+        type_annotation: TypeAnnotation,
+        ref_association: Symbol
 ) -> MutableMapping[TypeAnnotation, bool]:
     """
     Map the type annotation recursively by the descendability.
@@ -876,7 +917,7 @@ class _PropertyOfClass:
 
 
 def make_union_of_properties(
-    interface: Interface, implementers: Sequence[Class]
+        interface: Interface, implementers: Sequence[Class]
 ) -> Tuple[Optional[MutableMapping[Identifier, TypeAnnotation]], Optional[Error]]:
     """Make a union of all the properties over all the implementer classes.
 
@@ -895,7 +936,7 @@ def make_union_of_properties(
             if another_prop is None:
                 property_union[prop.name] = _PropertyOfClass(cls=implementer, prop=prop)
             elif not type_annotations_equal(
-                prop.type_annotation, another_prop.prop.type_annotation
+                    prop.type_annotation, another_prop.prop.type_annotation
             ):
                 errors.append(
                     Error(
@@ -924,9 +965,9 @@ def make_union_of_properties(
         )
 
     return {
-        prop_of_cls.prop.name: prop_of_cls.prop.type_annotation
-        for prop_of_cls in property_union.values()
-    }, None
+               prop_of_cls.prop.name: prop_of_cls.prop.type_annotation
+               for prop_of_cls in property_union.values()
+           }, None
 
 
 def collect_ids_of_interfaces_in_properties(symbol_table: SymbolTable) -> Set[int]:

@@ -3,6 +3,7 @@ import ast
 import collections
 import enum
 import io
+import itertools
 import textwrap
 from typing import List, Any, Optional, cast, Type, Tuple, Union, Mapping
 
@@ -102,11 +103,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("associate_ref_with", "aas_core_meta.marker"),
             ("is_superset_of", "aas_core_meta.marker"),
             ("serialization", "aas_core_meta.marker"),
-            ("are_unique", "aas_core_meta.verification"),
-            ("is_IRI", "aas_core_meta.verification"),
-            ("is_IRDI", "aas_core_meta.verification"),
-            ("is_ID_short", "aas_core_meta.verification"),
-            ("is_MIME_type", "aas_core_meta.verification"),
+            ("verification", "aas_core_meta.marker")
         ]
     )
 
@@ -542,41 +539,46 @@ def _args_to_arguments(
 
     # region ``self``
 
-    if node.args[0].arg != "self":
-        return None, Error(node, f"Unexpected no ``self`` in arguments")
+    found_self = False
 
-    if node.args[0].annotation is not None:
-        return (
-            None,
-            Error(
-                node.args[0],
-                f"Unexpected type annotation for the method argument ``self``",
-            ),
-        )
+    if len(node.args) >= 1 and node.args[0].arg == 'self':
+        found_self = True
 
-    if len(node.defaults) == len(node.args):
-        return (
-            None,
-            Error(
-                node.args[0],
-                f"Unexpected default value for the method argument ``self``",
-            ),
-        )
+        if node.args[0].annotation is not None:
+            return (
+                None,
+                Error(
+                    node.args[0],
+                    f"Unexpected type annotation for the method argument ``self``",
+                ),
+            )
 
-    arguments.append(
-        Argument(
-            name=Identifier("self"),
-            type_annotation=SelfTypeAnnotation(),
-            default=None,
-            node=node.args[0],
+        if len(node.defaults) == len(node.args):
+            return (
+                None,
+                Error(
+                    node.args[0],
+                    f"Unexpected default value for the method argument ``self``",
+                ),
+            )
+
+        arguments.append(
+            Argument(
+                name=Identifier("self"),
+                type_annotation=SelfTypeAnnotation(),
+                default=None,
+                node=node.args[0],
+            )
         )
-    )
 
     # endregion
 
     # region Non-self arguments
 
-    for i in range(1, len(node.args)):
+    # We skip the first argument if we found ``self`` as it has been added to
+    # ``arguments`` already.
+
+    for i in range(1 if found_self else 0, len(node.args)):
         arg_node = node.args[i]
 
         # region Type annotation
@@ -609,6 +611,23 @@ def _args_to_arguments(
 
         # region Default
         default = None  # type: Optional[Default]
+
+        # TODO-BEFORE-RELEASE (mristin, 2021-12-16):
+        #  test the defaults in verification function
+        #
+        # TODO-BEFORE-RELEASE (mristin, 2021-12-16):
+        #  test the defaults in a class method
+
+        # NOTE (mristin, 2021-12-16):
+        # A simple hypothetical test calculation:
+        # 5 args
+        # 2 defaults
+        #
+        # i = 3
+        #   i - offset = 0 🠒 index in the node.defaults
+        #   offset must be 3
+        #   offset = len(node.args) - len(node.defaults) = 5 - 2 = 3
+
         offset = len(node.args) - len(node.defaults)
         if i >= offset:
             default = Default(node=node.defaults[i - offset])
@@ -689,11 +708,24 @@ def _parse_contract_condition(
         if error is not None:
             return None, error
 
+    body, error = _rules.ast_node_to_our_node(node=condition_node.body)
+    if error is not None:
+        return None, Error(
+            condition_node.body, "Failed to parse the contract", [error]
+        )
+
+    if not isinstance(body, tree.Expression):
+        return None, Error(
+            condition_node.body,
+            f"Expected an expression in the contract condition body, "
+            f"but got: {tree.dump(body)}"
+        )
+
     return (
         Contract(
             args=[Identifier(arg.arg) for arg in condition_node.args.args],
             description=description,
-            condition=condition_node,
+            body=body,
             node=node,
         ),
         None,
@@ -774,11 +806,24 @@ def _parse_snapshot(
             ),
         )
 
+    body, error = _rules.ast_node_to_our_node(node=capture_node.body)
+    if error is not None:
+        return None, Error(
+            capture_node.body, "Failed to parse the snapshot", [error]
+        )
+
+    if not isinstance(body, tree.Expression):
+        return None, Error(
+            capture_node.body,
+            f"Expected an expression in the contract condition body, "
+            f"but got: {tree.dump(body)}"
+        )
+
     return (
         Snapshot(
             args=[Identifier(arg.arg) for arg in capture_node.args.args],
             name=Identifier(name),
-            capture=capture_node,
+            body=body,
             node=node,
         ),
         None,
@@ -792,12 +837,39 @@ def _parse_snapshot(
 # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
 #  test for unknown severity level
 
-
+# fmt: off
+@ensure(
+    lambda expect_self, result:
+    not (result[0] is not None and not expect_self)
+    or 'self' not in result[0].arguments_by_name,
+    "No ``self`` argument if not ``expect_self``"
+)
+@ensure(
+    lambda expect_self, result:
+    not (result[0] is not None and expect_self)
+    or (
+            len(result[0].arguments) >= 0
+            and result[0].arguments[0].name == 'self'
+            and isinstance(result[0].arguments[0].type_annotation, SelfTypeAnnotation)
+    ),
+    "If ``expect_self`` set, expect at least one argument and that should be ``self``"
+)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
+# fmt: on
 def _function_def_to_method(
-        node: ast.FunctionDef, atok: asttokens.ASTTokens
+        node: ast.FunctionDef,
+        expect_self: bool,
+        atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Method], Optional[Error]]:
-    """Parse the function definition into a class method."""
+    """
+    Parse the function definition into a method.
+
+    Though we have to distinguish in Python between a function and a method, we term
+    both of them "methods" in our model.
+
+    If ``expect_self`` is set, the first argument is expected to be ``self``. Otherwise,
+    no ``self`` argument is expected.
+    """
     name = node.name
 
     if name != "__init__" and name.startswith("__") and name.endswith("__"):
@@ -815,6 +887,7 @@ def _function_def_to_method(
     snapshots = []  # type: List[Snapshot]
 
     is_implementation_specific = False
+    verification = False  # Set if the function is decorated with ``@verification``
 
     # region Parse decorators
 
@@ -873,7 +946,13 @@ def _function_def_to_method(
                 )
 
         elif isinstance(decorator, ast.Name):
-            if decorator.id != "implementation_specific":
+            if decorator.id == "implementation_specific":
+                is_implementation_specific = True
+
+            elif decorator.id == "verification":
+                verification = True
+
+            else:
                 return (
                     None,
                     Error(
@@ -882,8 +961,6 @@ def _function_def_to_method(
                         f"expected at most ``implementation_specific``",
                     ),
                 )
-            else:
-                is_implementation_specific = True
         else:
             return (
                 None,
@@ -965,7 +1042,7 @@ def _function_def_to_method(
                 return (
                     None,
                     Error(
-                        contract.condition,
+                        contract.node,
                         f"The argument of the precondition is not provided "
                         f"in the method: {arg}",
                     ),
@@ -979,7 +1056,7 @@ def _function_def_to_method(
                     return (
                         None,
                         Error(
-                            contract.condition,
+                            contract.node,
                             f"The argument OLD of the postcondition is not provided "
                             f"since there were no snapshots defined "
                             f"for the method: {name}",
@@ -993,7 +1070,7 @@ def _function_def_to_method(
                 return (
                     None,
                     Error(
-                        contract.condition,
+                        contract.node,
                         f"The argument of the postcondition is not provided "
                         f"in the method: {arg}",
                     ),
@@ -1008,7 +1085,7 @@ def _function_def_to_method(
                 return (
                     None,
                     Error(
-                        snapshot.capture,
+                        snapshot.node,
                         f"The argument of the snapshot is not provided "
                         f"in the method: {arg}",
                     ),
@@ -1028,10 +1105,46 @@ def _function_def_to_method(
         )
     # endregion
 
+    # region Check that the parsed method conforms to ``expect_self``
+
+    if expect_self and len(arguments) == 0:
+        return (
+            None,
+            Error(
+                node,
+                f"A ``self`` argument is expected, but no arguments were specified "
+                f"in the method {name!r}"
+            )
+        )
+
+    if expect_self and len(arguments) >= 1:
+        if arguments[0].name != 'self':
+            return (
+                None,
+                Error(
+                    node,
+                    f"Expected the first argument to be ``self`` "
+                    f"in the method {name!r}, but got {arguments[0].name!r}"
+                )
+            )
+
+        if not isinstance(arguments[0].type_annotation, SelfTypeAnnotation):
+            return (
+                None,
+                Error(
+                    node,
+                    f"Expected the ``self`` argument to have no annotation "
+                    f"in the method {name!r}, but got {arguments[0].type_annotation!r}"
+                )
+            )
+
+    # endregion
+
     return (
         Method(
             name=Identifier(name),
             is_implementation_specific=is_implementation_specific,
+            verification=verification,
             arguments=arguments,
             returns=returns,
             description=description,
@@ -1251,7 +1364,8 @@ def _class_decorator_to_invariant(
 
     if not isinstance(body, tree.Expression):
         return None, Error(
-            condition_node.body, f"Expected an expression, but got: {tree.dump(body)}"
+            condition_node.body,
+            f"Expected an expression in an invariant, but got: {tree.dump(body)}"
         )
 
     return (
@@ -1489,7 +1603,9 @@ def _classdef_to_symbol(
             properties.append(prop)
 
         elif isinstance(expr, ast.FunctionDef):
-            method, error = _function_def_to_method(node=expr, atok=atok)
+            method, error = _function_def_to_method(
+                node=expr, expect_self=True, atok=atok)
+
             if error is not None:
                 return (
                     None,
@@ -1674,7 +1790,7 @@ def _verify_symbol_table(
 
         if isinstance(symbol, Class):
             for method in symbol.methods:
-                if method.name in reserved_member_names:
+                if method.name.lower() in reserved_member_names:
                     errors.append(
                         Error(
                             method.node,
@@ -1684,7 +1800,7 @@ def _verify_symbol_table(
                     )
 
             for prop in symbol.properties:
-                if prop.name in reserved_member_names:
+                if prop.name.lower() in reserved_member_names:
                     errors.append(
                         Error(
                             prop.node,
@@ -1692,6 +1808,54 @@ def _verify_symbol_table(
                             f"for the code generation: {prop.name!r}",
                         )
                     )
+
+    for func in symbol_table.verification_functions:
+        func_name_lower = func.name.lower()
+        if (
+                func_name_lower in reserved_member_names
+                or func_name_lower in reserved_symbol_names
+        ):
+            errors.append(
+                Error(
+                    func.node,
+                    f"The name of the verification function is reserved "
+                    f"for the code generation: {func.name!r}",
+                )
+            )
+
+    # endregion
+
+    # region Check that all verification functions are implementation-specific
+
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-16): test
+    for func in symbol_table.verification_functions:
+        if not func.is_implementation_specific:
+            errors.append(
+                Error(
+                    func.node,
+                    "Expected all verification functions to be implementation-specific"
+                )
+            )
+
+    # endregion
+
+    # region Check that no class methods are used in verification
+
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-16): test
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Class):
+            continue
+
+        for method in symbol.methods:
+            if method.verification:
+                errors.append(
+                    Error(
+                        method.node,
+                        f"Unexpected verification function "
+                        f"in a class {symbol.name!r}: {method.name!r}"
+                    )
+                )
+
     # endregion
 
     # region Check dangling inheritances
@@ -1858,6 +2022,44 @@ def _verify_symbol_table(
 
     # endregion
 
+    # region Notify that we do not support and pre- and post-conditions and snapshots
+
+    # NOTE (mristin, 2021-12-16):
+    # I added some support for the pre-conditions, post-conditions and snapshots
+    # already and keep maintaining it as it is only a matter of time when we will
+    # introduce their transpilation. Introducing them "after the fact" would have been
+    # much more difficult.
+    #
+    # At the given moment, however, we deliberately focus only on the invariants.
+
+    for method in itertools.chain(
+            symbol_table.verification_functions,
+            (
+                    method
+                    for symbol in symbol_table.symbols
+                    if isinstance(symbol, Class)
+                    for method in symbol.methods
+            )
+    ):
+        if (
+                len(method.contracts.preconditions) > 0
+                or len(method.contracts.postconditions) > 0
+                or len(method.contracts.snapshots) > 0
+        ):
+            errors.append(
+                Error(
+                    method.node,
+                    "We do not support pre and post-conditions and snapshots "
+                    "at the moment. Please notify the developers if you need "
+                    "this feature."
+                )
+            )
+
+    # endregion
+
+    if len(errors) > 0:
+        return None, errors
+
     return cast(SymbolTable, symbol_table), None
 
 
@@ -1876,9 +2078,13 @@ def _atok_to_symbol_table(
     book_url = None  # type: Optional[str]
     book_version = None  # type: Optional[str]
 
+    verification_functions = []  # type: List[Method]
+
     # region Parse
 
     for node in atok.tree.body:
+        matched = False
+
         if isinstance(node, ast.ClassDef):
             symbol, symbol_error = _classdef_to_symbol(node=node, atok=atok)
             if symbol_error:
@@ -1892,11 +2098,15 @@ def _atok_to_symbol_table(
             else:
                 assert symbol is not None
                 symbols.append(symbol)
+                matched = True
+
         elif (
                 isinstance(node, ast.Expr)
                 and isinstance(node.value, ast.Constant)
                 and isinstance(node.value.value, str)
         ):
+            matched = True
+
             # The first string literal is assumed to be the docstring of the meta-model.
             description, description_error = _string_constant_to_description(
                 constant=node.value
@@ -1907,7 +2117,30 @@ def _atok_to_symbol_table(
                 underlying_errors.append(description_error)
                 continue
 
+        elif isinstance(node, ast.FunctionDef):
+            matched = True
+
+            method, error = _function_def_to_method(
+                node=node, expect_self=False, atok=atok)
+
+            if error is not None:
+                underlying_errors.append(error)
+                continue
+
+            if not method.verification:
+                underlying_errors.append(
+                    Error(
+                        node,
+                        f"We do not know how to interpret a non-verification function "
+                        f"in the meta-model: {method.name!r}"
+                    )
+                )
+
+            verification_functions.append(method)
+
         elif isinstance(node, ast.ImportFrom):
+            matched = True
+
             # Ignore import statements
             pass
 
@@ -1918,6 +2151,8 @@ def _atok_to_symbol_table(
                 and isinstance(node.value, ast.Constant)
                 and isinstance(node.value.value, str)
         ):
+            matched = True
+
             if node.targets[0].id == "__book_url__":
                 book_url = node.targets[0].id
             elif node.targets[0].id == "__book_version__":
@@ -1936,6 +2171,8 @@ def _atok_to_symbol_table(
                 and isinstance(node.value, ast.Call)
                 and isinstance(node.value.func, ast.Name)
         ):
+            matched = True
+
             func_name = Identifier(node.value.func.id)
 
             if func_name == "associate_ref_with":
@@ -1957,6 +2194,9 @@ def _atok_to_symbol_table(
                 continue
 
         else:
+            matched = False
+
+        if not matched:
             underlying_errors.append(
                 Error(
                     node, f"We do not know how to parse the AST node: {ast.dump(node)}"
@@ -2015,6 +2255,7 @@ def _atok_to_symbol_table(
     unverified_symbol_table = UnverifiedSymbolTable(
         symbols=symbols,
         ref_association=ref_association,
+        verification_functions=verification_functions,
         meta_model=MetaModel(
             book_version=book_version, book_url=book_url, description=description
         ),

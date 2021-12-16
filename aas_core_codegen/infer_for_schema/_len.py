@@ -54,7 +54,7 @@ def _match_len_on_property(node: parse_tree.Node) -> Optional[Identifier]:
     if mtch is None:
         return None
 
-    if mtch.function == "len":
+    if mtch.function_name == "len":
         return mtch.prop_name
 
     return None

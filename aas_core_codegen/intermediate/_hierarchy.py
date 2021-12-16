@@ -117,8 +117,8 @@ class _UnverifiedOntology:
 
         self._antecedents_of = antecedents_of
 
-    def list_antecedents(self, cls: parse.Class) -> Sequence[parse.AbstractClass]:
-        """Retrieve the antecedents of the given class ``cls``."""
+    def list_ancestors(self, cls: parse.Class) -> Sequence[parse.AbstractClass]:
+        """Retrieve the ancestors of the given class ``cls``."""
         result = self._antecedents_of.get(cls, None)
         if result is None:
             raise KeyError(
@@ -243,19 +243,19 @@ def map_symbol_table_to_ontology(
         if not isinstance(symbol, parse.Class):
             continue
 
-        antecedents = ontology.list_antecedents(cls=symbol)
+        ancestors = ontology.list_ancestors(cls=symbol)
 
         observed_properties = dict()  # type: MutableMapping[str, parse.Class]
         observed_methods = dict()  # type: MutableMapping[str, parse.Class]
 
-        for antecedent in antecedents:
-            for prop in antecedent.properties:
+        for ancestor in ancestors:
+            for prop in ancestor.properties:
                 if prop.name not in observed_properties:
-                    observed_properties[prop.name] = antecedent
+                    observed_properties[prop.name] = ancestor
 
-            for method in antecedent.methods:
+            for method in ancestor.methods:
                 if method.name not in observed_properties:
-                    observed_methods[method.name] = antecedent
+                    observed_methods[method.name] = ancestor
 
         for prop in symbol.properties:
             if prop.name in observed_properties:
@@ -289,14 +289,14 @@ def map_symbol_table_to_ontology(
             continue
 
         if "__init__" not in symbol.method_map:
-            for antecedent in ontology.list_antecedents(symbol):
-                antecedent_init = antecedent.method_map.get(
+            for ancestor in ontology.list_ancestors(symbol):
+                ancestor_init = ancestor.method_map.get(
                     Identifier("__init__"), None
                 )
 
-                if antecedent_init is not None and len(antecedent_init.arguments) > 1:
+                if ancestor_init is not None and len(ancestor_init.arguments) > 1:
                     argument_names_str = ", ".join(
-                        arg.name for arg in antecedent_init.arguments
+                        arg.name for arg in ancestor_init.arguments
                     )
 
                     errors.append(
@@ -304,7 +304,7 @@ def map_symbol_table_to_ontology(
                             symbol.node,
                             f"The class {symbol.name} does not specify "
                             f"a constructor, but the antecedent class "
-                            f"{antecedent.name} specifies a constructor with "
+                            f"{ancestor.name} specifies a constructor with "
                             f"arguments: {argument_names_str}",
                         )
                     )

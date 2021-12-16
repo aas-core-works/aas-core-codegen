@@ -22,11 +22,11 @@ class Test_ontology_ok(unittest.TestCase):
         assert errors is None, f"{errors=}"
         assert ontology is not None
 
-        antecedents = ontology.list_antecedents(
+        ancestors = ontology.list_ancestors(
             cls=symbol_table.must_find_class(Identifier("Something")))
 
-        antecedent_names = [cls.name for cls in antecedents]
-        self.assertListEqual([], antecedent_names)
+        ancestor_names = [cls.name for cls in ancestors]
+        self.assertListEqual([], ancestor_names)
 
     def test_complex_graph(self) -> None:
         symbol_table, error = tests.common.parse_source(
@@ -58,15 +58,15 @@ class Test_ontology_ok(unittest.TestCase):
         assert errors is None, f"{errors=}"
         assert ontology is not None
 
-        antecedents = ontology.list_antecedents(
+        ancestors = ontology.list_ancestors(
             cls=symbol_table.must_find_class(Identifier("Something")))
 
-        antecedent_names = [cls.name for cls in antecedents]
+        ancestor_names = [cls.name for cls in ancestors]
 
         self.assertListEqual(
             ['Another_grand_parent', 'Grand_parent', 'Another_parent',
              'Another_grand_parent', 'Grand_parent', 'Parent'],
-            antecedent_names)
+            ancestor_names)
 
 
 class Test_ontology_fail(unittest.TestCase):

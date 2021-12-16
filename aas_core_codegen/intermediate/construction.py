@@ -209,7 +209,7 @@ def _call_as_call_to_super_init(
     assert len(underlying_errors) == 0
 
     for keyword in call.keywords:
-        if keyword.arg not in super_init.argument_map:
+        if keyword.arg not in super_init.arguments_by_name:
             underlying_errors.append(
                 Error(
                     keyword,
@@ -234,7 +234,7 @@ def _call_as_call_to_super_init(
 
     init = parsed_class.method_map[Identifier("__init__")]
     for key, val in resolved_kwargs.items():
-        if val not in init.argument_map:
+        if val not in init.arguments_by_name:
             underlying_errors.append(
                 Error(
                     call,
@@ -333,7 +333,7 @@ def _understand_assignment(
         )
 
     if isinstance(assign.value, ast.Name):
-        if assign.value.id not in init.argument_map:
+        if assign.value.id not in init.arguments_by_name:
             return (
                 None,
                 Error(
@@ -371,7 +371,7 @@ def _understand_assignment(
             isinstance(if_exp.test, ast.Compare)
             and isinstance(if_exp.test.left, ast.Name)
             and isinstance(if_exp.test.left.ctx, ast.Load)
-            and if_exp.test.left.id in init.argument_map
+            and if_exp.test.left.id in init.arguments_by_name
             and len(if_exp.test.ops) == 1
             and isinstance(if_exp.test.ops[0], ast.IsNot)
             and len(if_exp.test.comparators) == 1
@@ -386,7 +386,7 @@ def _understand_assignment(
         elif (
             isinstance(if_exp.test, ast.Compare)
             and isinstance(if_exp.test.left, ast.Name)
-            and if_exp.test.left.id in init.argument_map
+            and if_exp.test.left.id in init.arguments_by_name
             and len(if_exp.test.ops) == 1
             and isinstance(if_exp.test.ops[0], ast.Is)
             and len(if_exp.test.comparators) == 1
