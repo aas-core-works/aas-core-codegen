@@ -1,7 +1,12 @@
-"""Provide common functionalities for unrolling recursive calls and iterations."""
+"""Provide code generation for unrolling recursive calls and iterations."""
+import abc
 import io
 import textwrap
-from typing import Sequence
+from typing import Sequence, List
+
+from aas_core_codegen import intermediate
+from aas_core_codegen.common import Identifier, assert_never
+from icontract import DBC, require
 
 from aas_core_codegen.csharp.common import INDENT as I
 
@@ -42,3 +47,167 @@ def render(node: Node) -> str:
     writer.write("\n}")
 
     return writer.getvalue()
+
+
+class Unroller(DBC):
+    """Generate code to unroll recursion into composite types."""
+
+    @staticmethod
+    @require(lambda level: level >= 0)
+    @require(lambda suffix: suffix in ("Item", "KeyValue"))
+    def _loop_var_name(level: int, suffix: str) -> Identifier:
+        """
+        Generate the name of the loop variable.
+
+        :param level:
+            recursion level
+
+            The level 0 implies the first inner loop.
+        :param suffix:
+            suffix of the loop variable; we distinguish between items in a list and
+            key-value-pairs in a dictionary
+        :return: generated loop variable name
+        """
+        if level == 0:
+            if suffix == "Item":
+                return Identifier(f"an{suffix}")
+            else:
+                assert suffix == "KeyValue"
+                return Identifier(f"a{suffix}")
+
+        elif level == 1:
+            return Identifier(f"another{suffix}")
+        else:
+            return Identifier("yet" + "Yet" * (level - 1) + f"another{suffix}")
+
+    @require(lambda item_level: item_level >= 0)
+    @require(lambda key_value_level: key_value_level >= 0)
+    def unroll(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.TypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[Node]:
+        """
+        Dispatch the given type annotation to unrolling.
+
+        :param unrollee_expr: Expression of the element to be unrolled
+        :param type_annotation: Type annotation corresponding to the ``unrollee_expr``
+        :param path:
+            Path, as code snippets to be joined by "/"to the ``unrollee_expr``
+        :param item_level:
+            Depth level of the list loops.
+
+            Level 0 indicates the outer loop.
+        :param key_value_level:
+            Depth level of the key-value-pairs loops.
+
+            Level 0 indicates the outer loop.
+        """
+        if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
+            return self._unroll_builtin_atomic_type_annotation(
+                unrollee_expr=unrollee_expr,
+                type_annotation=type_annotation,
+                path=path,
+                item_level=item_level,
+                key_value_level=key_value_level
+            )
+
+        elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
+            return self._unroll_our_atomic_type_annotation(
+                unrollee_expr=unrollee_expr,
+                type_annotation=type_annotation,
+                path=path,
+                item_level=item_level,
+                key_value_level=key_value_level
+            )
+
+        elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
+            return self._unroll_list_type_annotation(
+                unrollee_expr=unrollee_expr,
+                type_annotation=type_annotation,
+                path=path,
+                item_level=item_level,
+                key_value_level=key_value_level
+            )
+
+        elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
+            return self._unroll_optional_type_annotation(
+                unrollee_expr=unrollee_expr,
+                type_annotation=type_annotation,
+                path=path,
+                item_level=item_level,
+                key_value_level=key_value_level
+            )
+        elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
+            return self._unroll_ref_type_annotation(
+                unrollee_expr=unrollee_expr,
+                type_annotation=type_annotation,
+                path=path,
+                item_level=item_level,
+                key_value_level=key_value_level
+            )
+        else:
+            assert_never(type_annotation)
+
+    @abc.abstractmethod
+    def _unroll_builtin_atomic_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.BuiltinAtomicTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def _unroll_our_atomic_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.OurAtomicTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def _unroll_list_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.ListTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def _unroll_optional_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.OptionalTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def _unroll_ref_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.OptionalTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        raise NotImplementedError()

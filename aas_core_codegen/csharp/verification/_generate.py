@@ -1,7 +1,7 @@
 """Generate the invariant verifiers from the intermediate representation."""
 import io
 import textwrap
-from typing import Tuple, Optional, List, Sequence
+from typing import Tuple, Optional, List, Sequence, Union, Final
 
 from icontract import ensure, require
 
@@ -20,8 +20,8 @@ from aas_core_codegen.parse import tree as parse_tree
 
 
 def verify(
-    spec_impls: specific_implementations.SpecificImplementations,
-    verification_functions: Sequence[intermediate.Method]
+        spec_impls: specific_implementations.SpecificImplementations,
+        verification_functions: Sequence[intermediate.Method]
 ) -> Optional[List[str]]:
     """Verify all the implementation snippets related to verification."""
     errors = []  # type: List[str]
@@ -90,109 +90,191 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
     return Stripped(writer.getvalue())
 
 
-def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
-    """Generate the code for unrolling the enumeration checks for the given property."""
+class _EnumerationCheckUnroller(csharp_unrolling.Unroller):
+    #: Symbol to be used to represent references within an AAS
+    _ref_association: Final[intermediate.Symbol]
 
-    @require(lambda var_index: var_index >= 0)
-    @require(lambda suffix: suffix in ("Item", "KeyValue"))
-    def var_name(var_index: int, suffix: str) -> Identifier:
-        """Generate the name of the loop variable."""
-        if var_index == 0:
-            if suffix == "Item":
-                return Identifier(f"an{suffix}")
-            else:
-                assert suffix == "KeyValue"
-                return Identifier(f"a{suffix}")
+    def __init__(
+            self,
+            ref_association: intermediate.Symbol
+    ) -> None:
+        """Initialize with the given values."""
+        self._ref_association = ref_association
 
-        elif var_index == 1:
-            return Identifier(f"another{suffix}")
-        else:
-            return Identifier("yet" + "Yet" * (var_index - 1) + f"another{suffix}")
-
-    prop_name = csharp_naming.property_name(prop.name)
-
-    def unroll(
-        current_var_name: str,
-        item_count: int,
-        key_value_count: int,
-        path: List[str],
-        type_anno: intermediate.TypeAnnotation,
+    def _unroll_builtin_atomic_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.BuiltinAtomicTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
-        """Generate the node corresponding to the ``type_anno`` and recurse."""
-        if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
+        # Built-ins are not enumerations, so nothing to check here.
+        return []
+
+    # noinspection PyUnusedLocal
+    def _unroll_our_atomic_type_or_ref_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: Union[
+                intermediate.OurAtomicTypeAnnotation,
+                intermediate.RefTypeAnnotation
+            ],
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """
+        Generate the code for both our atomic type annotations and references.
+
+        We merged :py:method:`._unroll_our_atomic_type_annotation` and
+        :py:method:`._unroll_ref_type_annotation` together since they differ in only
+        which symbol is unrolled over.
+        """
+        symbol = None  # type: Optional[intermediate.Symbol]
+        if isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
+            symbol = type_annotation.symbol
+        elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
+            symbol = self._ref_association
+        else:
+            assert_never(type_annotation)
+
+        assert symbol is not None
+
+        if not isinstance(symbol, intermediate.Enumeration):
+            # We do not descend into other types as this is generating the code
+            # only for the non-descend case.
             return []
 
-        elif isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
-            if not isinstance(type_anno.symbol, intermediate.Enumeration):
-                return []
+        enum_name = csharp_naming.enum_name(symbol.name)
+        joined_pth = "/".join(path)
 
-            enum_name = csharp_naming.enum_name(type_anno.symbol.name)
-            joined_pth = "/".join(path)
+        return [
+            csharp_unrolling.Node(
+                text=textwrap.dedent(
+                    f"""\
+                if (!Verification.Implementation.EnumValueSet.For{enum_name}.Contains(
+                {II}(int){unrollee_expr}))
+                {{
+                {I}errors.Add(
+                {II}new Verification.Error(
+                {III}$"{{path}}/{joined_pth}",
+                {III}$"Invalid {{nameof(Aas.{enum_name})}}: {{{unrollee_expr}}}"));
+                }}"""
+                ),
+                children=[],
+            )
+        ]
 
+    def _unroll_our_atomic_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.OurAtomicTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        return self._unroll_our_atomic_type_or_ref_annotation(
+            unrollee_expr=unrollee_expr,
+            type_annotation=type_annotation,
+            path=path,
+            item_level=item_level,
+            key_value_level=key_value_level
+        )
+
+    def _unroll_list_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.ListTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        # Descend into the list items
+        item_var = csharp_unrolling.Unroller._loop_var_name(
+            level=item_level, suffix="Item")
+
+        children = self.unroll(
+            unrollee_expr=item_var,
+            type_annotation=type_annotation.items,
+            path=path + [f"{{item_var}}"],
+            item_level=item_level + 1,
+            key_value_level=key_value_level
+        )
+
+        if len(children) == 0:
+            return []
+
+        node = csharp_unrolling.Node(
+            text=f"foreach (var {item_var} in {unrollee_expr}", children=children
+        )
+
+        return [node]
+
+    def _unroll_optional_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.OptionalTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        children = self.unroll(
+            unrollee_expr=unrollee_expr,
+            type_annotation=type_annotation.value,
+            path=path,
+            item_level=item_level,
+            key_value_level=key_value_level
+        )
+
+        if len(children) > 0:
             return [
                 csharp_unrolling.Node(
-                    text=textwrap.dedent(
-                        f"""\
-                    if (!Verification.Implementation.EnumValueSet.For{enum_name}.Contains(
-                    {II}(int){current_var_name}))
-                    {{
-                    {I}errors.Add(
-                    {II}new Verification.Error(
-                    {III}$"{{path}}/{joined_pth}",
-                    {III}$"Invalid {{nameof(Aas.{enum_name})}}: {{{current_var_name}}}"));
-                    }}"""
-                    ),
-                    children=[],
+                    text=f"if ({unrollee_expr} != null)", children=children
                 )
             ]
-
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            item_var = var_name(item_count, "Item")
-
-            children = unroll(
-                current_var_name=item_var,
-                item_count=item_count + 1,
-                key_value_count=key_value_count,
-                path=path + [f"{{{item_var}}}"],
-                type_anno=type_anno.items,
-            )
-
-            if len(children) == 0:
-                return []
-
-            node = csharp_unrolling.Node(
-                text=f"foreach (var {item_var} in {current_var_name}", children=children
-            )
-
-            return [node]
-
-        elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-            children = unroll(
-                current_var_name=current_var_name,
-                item_count=item_count,
-                key_value_count=key_value_count,
-                path=path,
-                type_anno=type_anno.value,
-            )
-            if len(children) > 0:
-                return [
-                    csharp_unrolling.Node(
-                        text=f"if ({current_var_name} != null)", children=children
-                    )
-                ]
-            else:
-                return []
-
-            # TODO: continue here, add the case for RefTypeAnnotation
         else:
-            assert_never(type_anno)
+            return []
 
-    roots = unroll(
-        current_var_name=f"that.{prop_name}",
-        item_count=0,
-        key_value_count=0,
+    def _unroll_ref_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.RefTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        return self._unroll_our_atomic_type_or_ref_annotation(
+            unrollee_expr=unrollee_expr,
+            type_annotation=type_annotation,
+            path=path,
+            item_level=item_level,
+            key_value_level=key_value_level
+        )
+
+
+def _unroll_enumeration_check(
+        prop: intermediate.Property,
+        ref_association: intermediate.Symbol
+) -> Stripped:
+    """
+    Generate the code for unrolling the enumeration checks for the given property.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
+    prop_name = csharp_naming.property_name(prop.name)
+
+    unroller = _EnumerationCheckUnroller(ref_association=ref_association)
+
+    roots = unroller.unroll(
+        unrollee_expr=f"that.{prop_name}",
+        type_annotation=prop.type_annotation,
         path=[prop_name],
-        type_anno=prop.type_annotation,
+        item_level=0,
+        key_value_level=0
     )
 
     if len(roots) == 0:
@@ -213,14 +295,14 @@ class _InvariantTranspiler(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform(
-        self, node: parse_tree.Node
+            self, node: parse_tree.Node
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         """Dispatch to the appropriate transformation method."""
         return node.transform(self)
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_member(
-        self, node: parse_tree.Member
+            self, node: parse_tree.Member
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         instance, error = self.transform(node.instance)
         if error is not None:
@@ -253,7 +335,7 @@ class _InvariantTranspiler(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_comparison(
-        self, node: parse_tree.Comparison
+            self, node: parse_tree.Comparison
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         comparator = _InvariantTranspiler._CSHARP_COMPARISON_MAP[node.op]
 
@@ -281,7 +363,7 @@ class _InvariantTranspiler(
         )
 
         if isinstance(node.left, no_parentheses_types) and isinstance(
-            node.right, no_parentheses_types
+                node.right, no_parentheses_types
         ):
             return Stripped(f"{left} {comparator} {right}"), None
 
@@ -289,7 +371,7 @@ class _InvariantTranspiler(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_implication(
-        self, node: parse_tree.Implication
+            self, node: parse_tree.Implication
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []
 
@@ -328,7 +410,7 @@ class _InvariantTranspiler(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_method_call(
-        self, node: parse_tree.MethodCall
+            self, node: parse_tree.MethodCall
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
@@ -365,7 +447,7 @@ class _InvariantTranspiler(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_function_call(
-        self, node: parse_tree.FunctionCall
+            self, node: parse_tree.FunctionCall
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
@@ -407,8 +489,8 @@ class _InvariantTranspiler(
 
             collection_node = node.args[0]
             if not isinstance(
-                collection_node,
-                (parse_tree.Name, parse_tree.Member, parse_tree.MethodCall),
+                    collection_node,
+                    (parse_tree.Name, parse_tree.Member, parse_tree.MethodCall),
             ):
                 collection = f"({args[0]})"
             else:
@@ -422,7 +504,7 @@ class _InvariantTranspiler(
             )
 
     def transform_constant(
-        self, node: parse_tree.Constant
+            self, node: parse_tree.Constant
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         if isinstance(node.value, bool):
             return Stripped("true" if node.value else "false"), None
@@ -434,7 +516,7 @@ class _InvariantTranspiler(
             assert_never(node.value)
 
     def transform_is_none(
-        self, node: parse_tree.IsNone
+            self, node: parse_tree.IsNone
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         value, error = self.transform(node.value)
         if error is not None:
@@ -452,7 +534,7 @@ class _InvariantTranspiler(
             return Stripped(f"({value}) == null"), None
 
     def transform_is_not_none(
-        self, node: parse_tree.IsNotNone
+            self, node: parse_tree.IsNotNone
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         value, error = self.transform(node.value)
         if error is not None:
@@ -470,7 +552,7 @@ class _InvariantTranspiler(
             return Stripped(f"({value}) != null"), None
 
     def transform_name(
-        self, node: parse_tree.Name
+            self, node: parse_tree.Name
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         if node.identifier == "self":
             # The ``that`` refers to the argument of the verification function.
@@ -479,7 +561,7 @@ class _InvariantTranspiler(
         return Stripped(csharp_naming.variable_name(node.identifier)), None
 
     def transform_and(
-        self, node: parse_tree.And
+            self, node: parse_tree.And
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
         values = []  # type: List[Stripped]
@@ -491,14 +573,14 @@ class _InvariantTranspiler(
                 continue
 
             if not isinstance(
-                value_node,
-                (
-                    parse_tree.Member,
-                    parse_tree.MethodCall,
-                    parse_tree.FunctionCall,
-                    parse_tree.Comparison,
-                    parse_tree.Name,
-                ),
+                    value_node,
+                    (
+                            parse_tree.Member,
+                            parse_tree.MethodCall,
+                            parse_tree.FunctionCall,
+                            parse_tree.Comparison,
+                            parse_tree.Name,
+                    ),
             ):
                 value = f"({value})"
 
@@ -514,7 +596,7 @@ class _InvariantTranspiler(
         return Stripped(" && ".join(values)), None
 
     def transform_or(
-        self, node: parse_tree.Or
+            self, node: parse_tree.Or
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
         values = []  # type: List[Stripped]
@@ -526,14 +608,14 @@ class _InvariantTranspiler(
                 continue
 
             if not isinstance(
-                value_node,
-                (
-                    parse_tree.Member,
-                    parse_tree.MethodCall,
-                    parse_tree.FunctionCall,
-                    parse_tree.Comparison,
-                    parse_tree.Name,
-                ),
+                    value_node,
+                    (
+                            parse_tree.Member,
+                            parse_tree.MethodCall,
+                            parse_tree.FunctionCall,
+                            parse_tree.Comparison,
+                            parse_tree.Name,
+                    ),
             ):
                 value = f"({value})"
 
@@ -549,14 +631,14 @@ class _InvariantTranspiler(
         return Stripped(" || ".join(values)), None
 
     def transform_declaration(
-        self, node: parse_tree.Declaration
+            self, node: parse_tree.Declaration
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
         #  implement once we got to end-to-end with serialization
         raise NotImplementedError()
 
     def transform_expression_with_declarations(
-        self, node: parse_tree.ExpressionWithDeclarations
+            self, node: parse_tree.ExpressionWithDeclarations
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
         #  implement once we got to end-to-end with serialization
@@ -571,7 +653,7 @@ assert all(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _transpile_invariant(
-    invariant: intermediate.Invariant, symbol_table: intermediate.SymbolTable
+        invariant: intermediate.Invariant, symbol_table: intermediate.SymbolTable
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Translate the invariant from the meta-model into C# code."""
     # NOTE (mristin, 2021-10-24):
@@ -595,13 +677,13 @@ def _transpile_invariant(
         writer.write("))\n{\n")
     else:
         if isinstance(
-            invariant.parsed.body,
-            (
-                parse_tree.Name,
-                parse_tree.Member,
-                parse_tree.MethodCall,
-                parse_tree.FunctionCall,
-            ),
+                invariant.parsed.body,
+                (
+                        parse_tree.Name,
+                        parse_tree.Member,
+                        parse_tree.MethodCall,
+                        parse_tree.FunctionCall,
+                ),
         ):
             not_expr = f"!{expr}"
         else:
@@ -643,7 +725,7 @@ def _transpile_invariant(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_implementation_verify(
-    cls: intermediate.Class, symbol_table: intermediate.SymbolTable
+        cls: intermediate.Class, symbol_table: intermediate.SymbolTable
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verify function in the ``Implementation`` class."""
     errors = []  # type: List[Error]
@@ -672,7 +754,8 @@ def _generate_implementation_verify(
         )
 
     for prop in cls.properties:
-        enum_check_block = _unroll_enumeration_check(prop=prop)
+        enum_check_block = _unroll_enumeration_check(
+            prop=prop, ref_association=symbol_table.ref_association)
         if enum_check_block != "":
             blocks.append(Stripped("if (errors.Full()) return;"))
             blocks.append(enum_check_block)
@@ -714,8 +797,8 @@ def _generate_implementation_verify(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_implementation_class(
-    symbol_table: intermediate.SymbolTable,
-    spec_impls: specific_implementations.SpecificImplementations,
+        symbol_table: intermediate.SymbolTable,
+        spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate a private static class, ``Implementation``, with verification logic."""
     errors = []  # type: List[Error]
@@ -786,7 +869,7 @@ def _generate_implementation_class(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_non_recursive_verifier(
-    symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the non-recursive verifier which visits the classes."""
     blocks = [
@@ -868,6 +951,8 @@ def _generate_non_recursive_verifier(
 def _unroll_recursion_in_recursive_verify(prop: intermediate.Property) -> Stripped:
     """Generate the code for unrolling the recursive visits  for the given property."""
 
+    # TODO: continue here, refactor this into an Unroller
+
     @require(lambda var_index: var_index >= 0)
     @require(lambda suffix: suffix in ("Item", "KeyValue"))
     def var_name(var_index: int, suffix: str) -> Identifier:
@@ -884,11 +969,11 @@ def _unroll_recursion_in_recursive_verify(prop: intermediate.Property) -> Stripp
             return Identifier("yet" + "Yet" * (var_index - 1) + f"another{suffix}")
 
     def unroll(
-        current_var_name: str,
-        item_count: int,
-        key_value_count: int,
-        path: List[str],
-        type_anno: intermediate.TypeAnnotation,
+            current_var_name: str,
+            item_count: int,
+            key_value_count: int,
+            path: List[str],
+            type_anno: intermediate.TypeAnnotation,
     ) -> List[csharp_unrolling.Node]:
         """Generate the node corresponding to the ``type_anno`` and recurse."""
         if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
@@ -1041,8 +1126,8 @@ def _generate_recursive_verifier_visit(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_recursive_verifier(
-    symbol_table: intermediate.SymbolTable,
-    spec_impls: specific_implementations.SpecificImplementations,
+        symbol_table: intermediate.SymbolTable,
+        spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the ``Verifier`` class which visits the classes and verifies them."""
     blocks = [
@@ -1137,9 +1222,9 @@ def _generate_recursive_verifier(
 )
 # fmt: on
 def generate(
-    symbol_table: intermediate.SymbolTable,
-    namespace: csharp_common.NamespaceIdentifier,
-    spec_impls: specific_implementations.SpecificImplementations,
+        symbol_table: intermediate.SymbolTable,
+        namespace: csharp_common.NamespaceIdentifier,
+        spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the C# code of the structures based on the symbol table.
@@ -1166,12 +1251,15 @@ def generate(
     errors = []  # type: List[Error]
 
     for implementation_key in [
-        specific_implementations.ImplementationKey("Verification/Error.cs"),
-        specific_implementations.ImplementationKey("Verification/Errors.cs"),
-    ] + [
-        specific_implementations.ImplementationKey(f"Verification/{func.name}.cs")
-        for func in symbol_table.verification_functions
-    ]:
+                                  specific_implementations.ImplementationKey(
+                                      "Verification/Error.cs"),
+                                  specific_implementations.ImplementationKey(
+                                      "Verification/Errors.cs"),
+                              ] + [
+                                  specific_implementations.ImplementationKey(
+                                      f"Verification/{func.name}.cs")
+                                  for func in symbol_table.verification_functions
+                              ]:
         implementation = spec_impls.get(implementation_key, None)
         if implementation is None:
             errors.append(Error(None, f"The snippet is missing: {implementation_key}"))
@@ -1236,6 +1324,5 @@ def generate(
     out.write("\n")
 
     return out.getvalue(), None
-
 
 # endregion

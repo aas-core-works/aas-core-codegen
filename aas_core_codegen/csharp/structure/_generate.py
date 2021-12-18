@@ -2,7 +2,7 @@
 import io
 import textwrap
 import xml.sax.saxutils
-from typing import Optional, Dict, List, Tuple, cast, Union, Sequence
+from typing import Optional, Dict, List, Tuple, cast, Union, Sequence, Mapping, Final
 
 import docutils.nodes
 import docutils.parsers.rst.roles
@@ -751,6 +751,200 @@ def _generate_interface(
     return Stripped(writer.getvalue()), None
 
 
+class _DescendBodyUnroller(csharp_unrolling.Unroller):
+    """Generate the code that unrolls descent into an element."""
+
+    #: If set, generates the code with unrolled yields.
+    #: Otherwise, we do not unroll recursively.
+    _recurse: Final[bool]
+
+    #: Pre-computed descendability map. A type is descendable if we should unroll it
+    #: further.
+    _descendability: Final[Mapping[intermediate.TypeAnnotation, bool]]
+
+    #: Symbol to be used to represent references within an AAS
+    _ref_association: Final[intermediate.Symbol]
+
+    def __init__(
+            self,
+            recurse: bool,
+            descendability: Mapping[intermediate.TypeAnnotation, bool],
+            ref_association: intermediate.Symbol
+    ) -> None:
+        """Initialize with the given values."""
+        self._recurse = recurse
+        self._descendability = descendability
+        self._ref_association = ref_association
+
+    def _unroll_builtin_atomic_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.BuiltinAtomicTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        # We can not descend into a built-in atomic type.
+        return []
+
+    def _unroll_our_atomic_type_or_ref_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: Union[
+                intermediate.OurAtomicTypeAnnotation,
+                intermediate.RefTypeAnnotation
+            ],
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """
+        Generate the code for both our atomic type annotations and references.
+
+        We merged :py:method:`._unroll_our_atomic_type_annotation` and
+        :py:method:`._unroll_ref_type_annotation` together since they differ in only
+        which symbol is unrolled over.
+        """
+        symbol = None  # type: Optional[intermediate.Symbol]
+        if isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
+            symbol = type_annotation.symbol
+        elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
+            symbol = self._ref_association
+        else:
+            assert_never(type_annotation)
+
+        assert symbol is not None
+
+        if isinstance(symbol, intermediate.Enumeration):
+            return []
+
+        assert isinstance(symbol, (intermediate.Class, intermediate.Interface))
+
+        result = [
+            csharp_unrolling.Node(
+                f"yield return {unrollee_expr};", children=[]
+            )
+        ]
+
+        if self._recurse:
+            if self._descendability[type_annotation]:
+                recurse_var = csharp_unrolling.Unroller._loop_var_name(
+                    level=item_level, suffix="Item")
+
+                result.append(
+                    csharp_unrolling.Node(
+                        text=textwrap.dedent(
+                            f"""\
+                        // Recurse
+                        foreach (var {recurse_var} in {unrollee_expr}.Descend())
+                        {{
+                            yield return {recurse_var};
+                        }}"""
+                        ),
+                        children=[],
+                    )
+                )
+            else:
+                result.append(
+                    csharp_unrolling.Node(
+                        text="// Recursive descent ends here.", children=[]
+                    )
+                )
+
+        return result
+
+    def _unroll_our_atomic_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.OurAtomicTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        return self._unroll_our_atomic_type_or_ref_annotation(
+            unrollee_expr=unrollee_expr,
+            type_annotation=type_annotation,
+            path=path,
+            item_level=item_level,
+            key_value_level=key_value_level
+        )
+
+    def _unroll_list_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.ListTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        item_var = csharp_unrolling.Unroller._loop_var_name(
+            level=item_level, suffix="Item")
+
+        children = self.unroll(
+            unrollee_expr=item_var,
+            type_annotation=type_annotation.items,
+            path=[],  # Path is unused in this context
+            item_level=item_level + 1,
+            key_value_level=key_value_level
+        )
+
+        if len(children) == 0:
+            return []
+
+        node = csharp_unrolling.Node(
+            text=f"foreach (var {item_var} in {unrollee_expr})",
+            children=children,
+        )
+
+        return [node]
+
+    def _unroll_optional_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.OptionalTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        children = self.unroll(
+            unrollee_expr=unrollee_expr,
+            type_annotation=type_annotation.value,
+            path=path,
+            item_level=item_level,
+            key_value_level=key_value_level
+        )
+
+        if len(children) == 0:
+            return []
+
+        return [
+            csharp_unrolling.Node(
+                text=f"if ({unrollee_expr} != null)", children=children
+            )
+        ]
+
+    def _unroll_ref_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.RefTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        return self._unroll_our_atomic_type_or_ref_annotation(
+            unrollee_expr=unrollee_expr,
+            type_annotation=type_annotation,
+            path=path,
+            item_level=item_level,
+            key_value_level=key_value_level
+        )
+
+
 def _generate_descend_body(
         symbol: intermediate.Class,
         recurse: bool,
@@ -778,117 +972,18 @@ def _generate_descend_body(
 
         # region Unroll
 
-        @require(lambda var_index: var_index >= 0)
-        def var_name(var_index: int) -> Identifier:
-            """Generate the name of the loop variable."""
-            if var_index == 0:
-                return Identifier(f"anItem")
-            elif var_index == 1:
-                return Identifier(f"anotherItem")
-            else:
-                return Identifier("yet" + "Yet" * (var_index - 1) + f"anotherItem")
+        unroller = _DescendBodyUnroller(
+            recurse=recurse,
+            descendability=descendability,
+            ref_association=ref_association
+        )
 
-        def unroll(
-                current_var_name: str,
-                item_count: int,
-                type_anno: intermediate.TypeAnnotation,
-        ) -> List[csharp_unrolling.Node]:
-            """Generate the node corresponding to the ``type_anno`` and recurse."""
-            if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
-                return []
-
-            elif isinstance(
-                    type_anno,
-                    (intermediate.OurAtomicTypeAnnotation,
-                     intermediate.RefTypeAnnotation)
-            ):
-                if isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
-                    a_symbol = type_anno.symbol
-                elif isinstance(type_anno, intermediate.RefTypeAnnotation):
-                    a_symbol = ref_association
-                else:
-                    assert_never(type_anno)
-
-                if isinstance(a_symbol, intermediate.Enumeration):
-                    return []
-
-                assert isinstance(
-                    a_symbol, (intermediate.Class, intermediate.Interface)
-                )
-
-                result = [
-                    csharp_unrolling.Node(
-                        f"yield return {current_var_name};", children=[]
-                    )
-                ]
-
-                if recurse:
-                    if descendability[type_anno]:
-                        recurse_var = var_name(var_index=item_count)
-
-                        result.append(
-                            csharp_unrolling.Node(
-                                text=textwrap.dedent(
-                                    f"""\
-                                // Recurse
-                                foreach (var {recurse_var} in {current_var_name}.Descend())
-                                {{
-                                    yield return {recurse_var};
-                                }}"""
-                                ),
-                                children=[],
-                            )
-                        )
-                    else:
-                        result.append(
-                            csharp_unrolling.Node(
-                                text="// Recursive descent ends here.", children=[]
-                            )
-                        )
-
-                return result
-
-            elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-                item_var = var_name(item_count)
-
-                children = unroll(
-                    current_var_name=var_name(item_count),
-                    item_count=item_count + 1,
-                    type_anno=type_anno.items,
-                )
-
-                if len(children) == 0:
-                    return []
-
-                node = csharp_unrolling.Node(
-                    text=f"foreach (var {item_var} in {current_var_name})",
-                    children=children,
-                )
-
-                return [node]
-
-            elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-                children = unroll(
-                    current_var_name=current_var_name,
-                    item_count=item_count,
-                    type_anno=type_anno.value,
-                )
-
-                if len(children) == 0:
-                    return []
-
-                return [
-                    csharp_unrolling.Node(
-                        text=f"if ({current_var_name} != null)", children=children
-                    )
-                ]
-            else:
-                assert_never(type_anno)
-
-        roots = unroll(
-            current_var_name=csharp_naming.property_name(prop.name),
-            item_count=0,
-            type_anno=prop.type_annotation,
+        roots = unroller.unroll(
+            unrollee_expr=csharp_naming.property_name(prop.name),
+            type_annotation=prop.type_annotation,
+            path=[],  # We do not use path in this context
+            item_level=0,
+            key_value_level=0
         )
 
         assert len(roots) > 0, (
