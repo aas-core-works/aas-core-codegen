@@ -138,6 +138,13 @@ class Renderer(intermediate_rendering.DocutilsElementTransformer[List[Token]]):
         else:
             assert_never(element.reference)
 
+    def transform_argument_reference_in_doc(
+        self, element: intermediate.ArgumentReferenceInDoc
+    ) -> Tuple[Optional[List[Token]], Optional[str]]:
+        # Argument references are not really meaningful for SHACL, so we just
+        # return them as-is.
+        return [TokenText(element.reference)], None
+
     def transform_literal(
         self, element: docutils.nodes.literal
     ) -> Tuple[Optional[List[Token]], Optional[str]]:

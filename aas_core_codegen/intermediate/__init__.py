@@ -41,6 +41,7 @@ SymbolReferenceInDoc = _types.SymbolReferenceInDoc
 PropertyReferenceInDoc = _types.PropertyReferenceInDoc
 EnumerationLiteralReferenceInDoc = _types.EnumerationLiteralReferenceInDoc
 AttributeReferenceInDoc = _types.AttributeReferenceInDoc
+ArgumentReferenceInDoc = _types.ArgumentReferenceInDoc
 
 InterfaceImplementers = _types.InterfaceImplementers
 map_interface_implementers = _types.map_interface_implementers

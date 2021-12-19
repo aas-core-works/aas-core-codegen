@@ -29,7 +29,12 @@ __book_version__ = "V3.0RC2"
 
 @verification
 def is_MIME_type(text: str) -> bool:
-    """Check that ``text`` conforms to the pattern of MIME type."""
+    """
+    Check that :paramref:`text` conforms to the pattern of MIME type.
+
+    :param text: Text to be checked
+    :returns: True if the :paramref:`text` conforms to the pattern
+    """
     tchar = "[!#$%&'*+\\-.^_`|~0-9a-zA-Z]"
     token = f'({tchar})+'
     type = f'{token}'

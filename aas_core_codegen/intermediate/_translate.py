@@ -63,6 +63,7 @@ from aas_core_codegen.intermediate._types import (
     collect_ids_of_interfaces_in_properties,
     map_interface_implementers, ImplementationSpecificMethod,
     ImplementationSpecificVerification, Verification, PatternVerification,
+    ArgumentReferenceInDoc,
 )
 from aas_core_codegen.parse import (
     tree as parse_tree
@@ -147,12 +148,35 @@ def _attribute_reference_role(
     return [node], []
 
 
+# noinspection PyUnusedLocal
+def _argument_reference_role(
+        role, rawtext, text, lineno, inliner, options=None, content=None
+):
+    """Create a reference in the documentation to a property or a literal."""
+    # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
+    if content is None:
+        content = []
+
+    if options is None:
+        options = {}
+
+    docutils.parsers.rst.roles.set_classes(options)
+
+    reference = text
+
+    node = ArgumentReferenceInDoc(
+        reference, rawtext, docutils.utils.unescape(text), refuri=text, **options
+    )
+    return [node], []
+
+
 # The global registration is unfortunate since it is unpredictable and might affect
 # other modules, but it is the only way to register the roles.
 #
 # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
 docutils.parsers.rst.roles.register_local_role("class", _symbol_reference_role)
 docutils.parsers.rst.roles.register_local_role("attr", _attribute_reference_role)
+docutils.parsers.rst.roles.register_local_role("paramref", _argument_reference_role)
 
 
 def _parsed_description_to_description(parsed: parse.Description) -> Description:
@@ -826,7 +850,7 @@ def _parsed_verification_function_to_verification_function(
         assert found is not None
         if found:
             assert pattern is not None
-            # TODO: continue here, generate code in C# for this!
+
             return PatternVerification(
                 name=name,
                 arguments=arguments,
@@ -1716,19 +1740,23 @@ def translate(
 
     contract_checker = _ContractChecker(symbol_table=symbol_table)
 
-    for method_or_signature in itertools.chain(
+    methods_or_signatures = list(
+        itertools.chain(
             symbol_table.verification_functions,
             *(
-                    symbol.methods
-                    if isinstance(symbol, Class)
-                    else (
-                            symbol.signatures
-                            if isinstance(symbol, Interface)
-                            else []
-                    )
-                    for symbol in symbol_table.symbols
+                symbol.methods
+                if isinstance(symbol, Class)
+                else (
+                    symbol.signatures
+                    if isinstance(symbol, Interface)
+                    else []
+                )
+                for symbol in symbol_table.symbols
             )
-    ):
+        )
+    )
+
+    for method_or_signature in methods_or_signatures:
         for contract_or_snapshot in itertools.chain(
                 method_or_signature.contracts.preconditions,
                 method_or_signature.contracts.postconditions,
@@ -1751,6 +1779,28 @@ def translate(
 
         underlying_errors.extend(
             _check_all_non_optional_properties_initialized(cls=symbol))
+
+    # endregion
+
+    # region Check that all argument references are valid
+
+    for method_or_signature in methods_or_signatures:
+        if method_or_signature.description is not None:
+            for arg_ref_in_doc in method_or_signature.description.document.traverse(
+                    condition=ArgumentReferenceInDoc
+            ):
+                assert isinstance(arg_ref_in_doc.reference, str)
+                arg_name = arg_ref_in_doc.reference
+
+                if arg_name not in method_or_signature.arguments_by_name:
+                    underlying_errors.append(
+                        Error(
+                            method_or_signature.description.node,
+                            f"The argument referenced in the docstring "
+                            f"is not an argument "
+                            f"of {method_or_signature.name!r}: {arg_name!r}"
+                        )
+                    )
 
     # endregion
 

@@ -1,16 +1,17 @@
 """Generate the invariant verifiers from the intermediate representation."""
 import io
 import textwrap
-from typing import Tuple, Optional, List, Sequence, Union, Final
+from typing import Tuple, Optional, List, Sequence, Union, Final, Set
 
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate, specific_implementations
-from aas_core_codegen.common import Error, Stripped, assert_never
+from aas_core_codegen.common import Error, Stripped, assert_never, Identifier
 from aas_core_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming,
     unrolling as csharp_unrolling,
+    description as csharp_description,
 )
 from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II, INDENT3 as III
 from aas_core_codegen.parse import tree as parse_tree
@@ -32,9 +33,11 @@ def verify(
     ]
 
     for func in verification_functions:
-        expected_keys.append(
-            specific_implementations.ImplementationKey(f"Verification/{func.name}.cs"),
-        )
+        if isinstance(func, intermediate.ImplementationSpecificVerification):
+            expected_keys.append(
+                specific_implementations.ImplementationKey(
+                    f"Verification/{func.name}.cs"),
+            )
 
     for key in expected_keys:
         if key not in spec_impls:
@@ -49,6 +52,206 @@ def verify(
 # endregion
 
 # region Generate
+
+class _PatternVerificationTranspiler(parse_tree.RestrictedTransformer[Stripped]):
+    """Transpile a statement of a pattern verification into C#."""
+
+    def __init__(
+            self, defined_variables: Set[Identifier]) -> None:
+        """
+        Initialize with the given values.
+
+        The ``initialized_variables`` are shared between different statement
+        transpilations. It is also mutated when assignments are transpiled. We need to
+        keep track of variables so that we know when we have to define them, and when
+        we can simply assign them a value, if they have been already defined.
+        """
+        self.defined_variables = defined_variables
+
+    def transform_constant(
+            self, node: parse_tree.Constant
+    ) -> Stripped:
+        if isinstance(node.value, str):
+            return Stripped(csharp_common.string_literal(node.value))
+        else:
+            raise AssertionError(f"Unexpected {node=}")
+
+    def transform_name(
+            self, node: parse_tree.Name
+    ) -> Stripped:
+        return Stripped(csharp_naming.variable_name(node.identifier))
+
+    def transform_joined_str(
+            self, node: parse_tree.JoinedStr
+    ) -> Stripped:
+        parts = []  # type: List[str]
+        for value in node.values:
+            if isinstance(value, str):
+                string_literal = csharp_common.string_literal(
+                    value.replace("{", "{{").replace("}", "}}")
+                )
+
+                # We need to remove double-quotes since we are joining everything
+                # ourselves later.
+
+                assert string_literal.startswith('"') and string_literal.endswith('"')
+
+                string_literal_wo_quotes = string_literal[1:-1]
+                parts.append(string_literal_wo_quotes)
+
+            elif isinstance(value, parse_tree.FormattedValue):
+                code = self.transform(value.value)
+                assert '\n' not in code, (
+                    f"New-lines are not expected in formatted values, but got: {code}"
+                )
+
+                parts.append(f"{{{code}}}")
+            else:
+                assert_never(value)
+
+        writer = io.StringIO()
+        writer.write('$"')
+        for part in parts:
+            writer.write(part)
+
+        writer.write('"')
+
+        return Stripped(writer.getvalue())
+
+    def transform_assignment(
+            self, node: parse_tree.Assignment
+    ) -> Stripped:
+        assert isinstance(node.target, parse_tree.Name)
+        variable = csharp_naming.variable_name(node.target.identifier)
+        code = self.transform(node.value)
+
+        if node.target.identifier in self.defined_variables:
+            return Stripped(f'{variable} = {code};')
+
+        else:
+            self.defined_variables.add(node.target.identifier)
+            return Stripped(f'var {variable} = {code};')
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _transpile_pattern_verification(
+        verification: intermediate.PatternVerification
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate the verification function that checks the regular expressions."""
+    # NOTE (mristin, 2021-12-19):
+    # We assume that we performed all the checks at the intermediate stage.
+
+    construct_name = csharp_naming.private_method_name(
+        Identifier(f"construct_{verification.name}"))
+
+    blocks = []  # type: List[Stripped]
+
+    # region Construct block
+
+    writer = io.StringIO()
+    writer.write(textwrap.dedent(f'''\
+        private static Regex {construct_name}()
+        {{
+        '''))
+
+    defined_variables = set()  # type: Set[Identifier]
+    transpiler = _PatternVerificationTranspiler(defined_variables=defined_variables)
+
+    for i, stmt in enumerate(verification.parsed.body):
+        if i == len(verification.parsed.body) - 1:
+            break
+
+        code = transpiler.transform(stmt)
+        writer.write(textwrap.indent(code, I))
+        writer.write('\n')
+
+    if len(verification.parsed.body) >= 2:
+        writer.write('\n')
+
+    assert len(verification.parsed.body) >= 1
+
+    assert isinstance(verification.parsed.body[-1], parse_tree.Return)
+    # noinspection PyUnresolvedReferences
+    assert isinstance(verification.parsed.body[-1].value, parse_tree.IsNotNone)
+    # noinspection PyUnresolvedReferences
+    assert isinstance(verification.parsed.body[-1].value.value, parse_tree.FunctionCall)
+    # noinspection PyUnresolvedReferences
+    assert verification.parsed.body[-1].value.value.name == "match"
+
+    # noinspection PyUnresolvedReferences
+    match_call = verification.parsed.body[-1].value.value
+
+    assert isinstance(match_call, parse_tree.FunctionCall), (
+        f"{parse_tree.dump(match_call)}")
+    assert match_call.name == "match"
+
+    assert isinstance(match_call.args[0], parse_tree.Expression)
+    pattern_expr = transpiler.transform(match_call.args[0])
+
+    # A pragmatic heuristics for breaking lines
+    if len(pattern_expr) < 50:
+        writer.write(textwrap.indent(f"return new Regex({pattern_expr});\n", I))
+    else:
+        writer.write(textwrap.indent(f"return new Regex(\n{I}{pattern_expr});\n", I))
+
+    writer.write("}")
+
+    blocks.append(Stripped(writer.getvalue()))
+
+    # endregion
+
+    # region Initialize the regex
+
+    regex_name = csharp_naming.private_property_name(
+        Identifier(f"regex_{verification.name}"))
+
+    blocks.append(Stripped(
+        f"private static readonly Regex {regex_name} = {construct_name}();"
+    ))
+
+    assert len(verification.arguments) == 1
+    assert isinstance(
+        verification.arguments[0].type_annotation,
+        intermediate.BuiltinAtomicTypeAnnotation)
+    # noinspection PyUnresolvedReferences
+    assert (
+            verification.arguments[0].type_annotation.a_type ==
+            intermediate.BuiltinAtomicType.STR
+    )
+
+    arg_name = csharp_naming.argument_name(verification.arguments[0].name)
+
+    writer = io.StringIO()
+    if verification.description is not None:
+        comment, error = csharp_description.generate_comment(verification.description)
+        if error is not None:
+            return None, error
+
+        writer.write(comment)
+        writer.write('\n')
+
+    writer.write(
+        textwrap.dedent(
+            f'''\
+            public static bool IsMimeType(string {arg_name})
+            {{
+            {I}return {regex_name}.IsMatch({arg_name});
+            }}'''
+        )
+    )
+
+    blocks.append(Stripped(writer.getvalue()))
+
+    # endregion
+
+    writer = io.StringIO()
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+
+        writer.write(block)
+
+    return Stripped(writer.getvalue()), None
 
 
 def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Stripped:
@@ -285,7 +488,7 @@ def _unroll_enumeration_check(
 
 
 class _InvariantTranspiler(
-    parse_tree.Transformer[Tuple[Optional[Stripped], Optional[Error]]]
+    parse_tree.RestrictedTransformer[Tuple[Optional[Stripped], Optional[Error]]]
 ):
     """Transpile an invariant expression into a code, or an error."""
 
@@ -643,6 +846,48 @@ class _InvariantTranspiler(
         # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
         #  implement once we got to end-to-end with serialization
         raise NotImplementedError()
+
+    def transform_joined_str(
+            self, node: parse_tree.JoinedStr
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        parts = []  # type: List[str]
+        for value in node.values:
+            if isinstance(value, str):
+                string_literal = csharp_common.string_literal(
+                    value.replace("{", "{{").replace("}", "}}")
+                )
+
+                # We need to remove double-quotes since we are joining everything
+                # ourselves later.
+
+                assert string_literal.startswith('"') and string_literal.endswith('"')
+
+                string_literal_wo_quotes = string_literal[1:-1]
+                parts.append(string_literal_wo_quotes)
+
+            elif isinstance(value, parse_tree.FormattedValue):
+                code, error = self.transform(value.value)
+                if error is not None:
+                    return None, error
+
+                assert code is not None
+
+                assert '\n' not in code, (
+                    f"New-lines are not expected in formatted values, but got: {code}"
+                )
+
+                parts.append(f"{{{code}}}")
+            else:
+                assert_never(value)
+
+        writer = io.StringIO()
+        writer.write('$"')
+        for part in parts:
+            writer.write(part)
+
+        writer.write('"')
+
+        return Stripped(writer.getvalue()), None
 
 
 # noinspection PyProtectedMember,PyProtectedMember
@@ -1061,7 +1306,7 @@ class _RecursionInRecursiveVerifyUnroller(csharp_unrolling.Unroller):
             unrollee_expr=f"{unrollee_expr}[{index_var}]",
             type_annotation=type_annotation.items,
             path=path + [f"{{{index_var}}}"],
-            item_level=item_level+1,
+            item_level=item_level + 1,
             key_value_level=key_value_level
         )
 
@@ -1352,21 +1597,50 @@ def generate(
     verification_blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]
 
-    for implementation_key in [
-                                  specific_implementations.ImplementationKey(
-                                      "Verification/Error.cs"),
-                                  specific_implementations.ImplementationKey(
-                                      "Verification/Errors.cs"),
-                              ] + [
-                                  specific_implementations.ImplementationKey(
-                                      f"Verification/{func.name}.cs")
-                                  for func in symbol_table.verification_functions
-                              ]:
+    for implementation_key in (
+            [
+                specific_implementations.ImplementationKey("Verification/Error.cs"),
+                specific_implementations.ImplementationKey("Verification/Errors.cs"),
+            ] + [
+                specific_implementations.ImplementationKey(
+                    f"Verification/{func.name}.cs")
+                for func in symbol_table.verification_functions
+                if isinstance(func, intermediate.ImplementationSpecificVerification)
+            ]
+    ):
         implementation = spec_impls.get(implementation_key, None)
         if implementation is None:
             errors.append(Error(None, f"The snippet is missing: {implementation_key}"))
         else:
             verification_blocks.append(implementation)
+
+    for verification in symbol_table.verification_functions:
+        if isinstance(verification, intermediate.ImplementationSpecificVerification):
+            implementation_key = specific_implementations.ImplementationKey(
+                f"Verification/{verification.name}.cs")
+
+            implementation = spec_impls.get(implementation_key, None)
+            if implementation is None:
+                errors.append(
+                    Error(
+                        None,
+                        f"The snippet for the verification function "
+                        f"{verification.name!r} is missing: {implementation_key}"))
+            else:
+                verification_blocks.append(implementation)
+
+        elif isinstance(verification, intermediate.PatternVerification):
+            implementation, error = _transpile_pattern_verification(
+                verification=verification)
+
+            if error is not None:
+                errors.append(error)
+            else:
+                assert implementation is not None
+                verification_blocks.append(implementation)
+
+        else:
+            assert_never(verification)
 
     implementation_class, implementation_class_errors = _generate_implementation_class(
         symbol_table=symbol_table, spec_impls=spec_impls

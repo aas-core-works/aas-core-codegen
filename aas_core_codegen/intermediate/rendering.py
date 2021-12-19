@@ -7,7 +7,7 @@ from icontract import ensure, DBC
 
 from aas_core_codegen.intermediate._types import (
     SymbolReferenceInDoc,
-    AttributeReferenceInDoc,
+    AttributeReferenceInDoc, ArgumentReferenceInDoc,
 )
 
 T = TypeVar("T")
@@ -37,6 +37,9 @@ class DocutilsElementTransformer(Generic[T], DBC):
 
         elif isinstance(element, AttributeReferenceInDoc):
             return self.transform_attribute_reference_in_doc(element)
+
+        elif isinstance(element, ArgumentReferenceInDoc):
+            return self.transform_argument_reference_in_doc(element)
 
         elif isinstance(element, docutils.nodes.literal):
             return self.transform_literal(element)
@@ -86,6 +89,13 @@ class DocutilsElementTransformer(Generic[T], DBC):
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_attribute_reference_in_doc(
         self, element: AttributeReferenceInDoc
+    ) -> Tuple[Optional[T], Optional[str]]:
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_argument_reference_in_doc(
+            self, element: ArgumentReferenceInDoc
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 

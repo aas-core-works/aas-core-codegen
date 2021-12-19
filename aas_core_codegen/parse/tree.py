@@ -491,90 +491,171 @@ class Transformer(Generic[T], DBC):
     @abc.abstractmethod
     def transform_member(self, node: Member) -> T:
         """Transform a member to something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_comparison(self, node: Comparison) -> T:
         """Transform a comparison to something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_implication(self, node: Implication) -> T:
         """Transform an implication to something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_method_call(self, node: MethodCall) -> T:
         """Transform a method call into something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_function_call(self, node: FunctionCall) -> T:
         """Transform a function call into something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_constant(self, node: Constant) -> T:
         """Transform a constant into something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_is_none(self, node: IsNone) -> T:
         """Transform an is-none check into something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_is_not_none(self, node: IsNotNone) -> T:
         """Transform an is-not-none check into something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_name(self, node: Name) -> T:
         """Transform a variable access into something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_and(self, node: And) -> T:
         """Transform a conjunction into something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_or(self, node: Or) -> T:
         """Transform a disjunction into something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_declaration(self, node: Declaration) -> T:
         """Transform a variable declaration into something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_expression_with_declarations(
             self, node: ExpressionWithDeclarations
     ) -> T:
         """Transform an expression with variable declarations into something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_joined_str(
             self, node: JoinedStr
     ) -> T:
         """Transform a string interpolation into something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_assignment(
             self, node: Assignment
     ) -> T:
         """Transform an assignment into something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
     def transform_return(
             self, node: Return
     ) -> T:
         """Transform a return statement into something."""
-        raise NotImplementedError()
+        raise NotImplementedError(f"{node=}")
+
+
+class RestrictedTransformer(Transformer[T], DBC):
+    """
+    Transform our AST into something where only a part of the tree is handled.
+    
+    This class is helpful for cases where you are sure that certain nodes *can not*
+    appear.
+    """
+
+    def transform_member(self, node: Member) -> T:
+        """Transform a member to something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_comparison(self, node: Comparison) -> T:
+        """Transform a comparison to something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_implication(self, node: Implication) -> T:
+        """Transform an implication to something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_method_call(self, node: MethodCall) -> T:
+        """Transform a method call into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_function_call(self, node: FunctionCall) -> T:
+        """Transform a function call into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_constant(self, node: Constant) -> T:
+        """Transform a constant into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_is_none(self, node: IsNone) -> T:
+        """Transform an is-none check into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_is_not_none(self, node: IsNotNone) -> T:
+        """Transform an is-not-none check into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_name(self, node: Name) -> T:
+        """Transform a variable access into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_and(self, node: And) -> T:
+        """Transform a conjunction into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_or(self, node: Or) -> T:
+        """Transform a disjunction into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_declaration(self, node: Declaration) -> T:
+        """Transform a variable declaration into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_expression_with_declarations(
+            self, node: ExpressionWithDeclarations
+    ) -> T:
+        """Transform an expression with variable declarations into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_joined_str(
+            self, node: JoinedStr
+    ) -> T:
+        """Transform a string interpolation into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_assignment(
+            self, node: Assignment
+    ) -> T:
+        """Transform an assignment into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_return(
+            self, node: Return
+    ) -> T:
+        """Transform a return statement into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
 
 
 class _StringifyTransformer(Transformer[stringify.Entity]):

@@ -105,7 +105,7 @@ namespace AasCore.Aas3
             }
         }
 
-        private static Regex _constructMimeTypeRegex()
+        private static Regex _constructIsMimeType()
         {
             var tchar = "[!#$%&'*+\\-.^_`|~0-9a-zA-Z]";
             var token = $"({tchar})+";
@@ -118,26 +118,24 @@ namespace AasCore.Aas3
             var quotedString = $"\"({qdText}|{quotedPair})*\"";
             var parameter = $"{token}=({token}|{quotedString})";
             var mediaType = $"{type}/{subtype}({ows};{ows}{parameter})*";
- 
+
             return new Regex(mediaType);
         }
 
-        private static readonly Regex _MimeTypeRegex = _constructMimeTypeRegex();
+        private static readonly Regex _regexIsMimeType = _constructIsMimeType();
 
         /// <summary>
-        /// Check that the <paramref name="text"/> is a valid MIME type.
+        /// Check that <paramref name="text" /> conforms to the pattern of MIME type.
         /// </summary>
-        /// <remarks>
-        /// Related RFCs:
-        /// <ul>
-        /// <li>https://www.rfc-editor.org/rfc/rfc7231#section-3.1.1.1,</li>
-        /// <li>https://www.rfc-editor.org/rfc/rfc7230#section-3.2.3 and</li>
-        /// <li>https://www.rfc-editor.org/rfc/rfc7230#section-3.2.6</li>
-        /// </ul>
-        /// </remarks>
+        /// <param name="text">
+        ///     Text to be checked
+        /// </param>
+        /// <returns>
+        ///     True if the <paramref name="text" /> conforms to the pattern
+        /// </returns>
         public static bool IsMimeType(string text)
         {
-            return _MimeTypeRegex.IsMatch(text);
+            return _regexIsMimeType.IsMatch(text);
         }
 
         /// <summary>

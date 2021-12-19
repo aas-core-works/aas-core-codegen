@@ -245,9 +245,46 @@ class Argument:
         self.parsed = parsed
 
 
-class Signature:
-    """Represent a method signature."""
+class Signature(DBC):
+    """Represent a method or a function signature."""
 
+    name: Final[Identifier]
+    arguments: Final[Sequence[Argument]]
+    returns: Final[Optional[TypeAnnotation]]
+    description: Final[Optional[Description]]
+    parsed: Final[parse.Method]
+
+    arguments_by_name: Final[Mapping[Identifier, Argument]]
+
+    # fmt: off
+    @require(
+        lambda arguments:
+        all(
+            arg.name != 'self'
+            for arg in arguments
+        ),
+        "No explicit ``self`` argument in the arguments"
+    )
+    @require(
+        lambda arguments: (
+                arg_names := [arg.name for arg in arguments],
+                len(arg_names) == len(set(arg_names))
+        )[1],
+        "Unique arguments"
+    )
+    @ensure(
+        lambda self:
+        len(self.arguments) == len(self.arguments_by_name)
+        and all(
+            (
+                    found_argument := self.arguments_by_name.get(argument.name, None),
+                    found_argument is not None and id(found_argument) == id(argument)
+            )[1]
+            for argument in self.arguments
+        ),
+        "Arguments and arguments-by-name consistent"
+    )
+    # fmt: on
     def __init__(
             self,
             name: Identifier,
@@ -262,6 +299,11 @@ class Signature:
         self.returns = returns
         self.description = description
         self.parsed = parsed
+
+        self.arguments_by_name = {
+            argument.name: argument
+            for argument in self.arguments
+        }
 
 
 class Serialization:
@@ -379,7 +421,7 @@ class Contracts:
         self.postconditions = postconditions
 
 
-class Method(DBC):
+class Method(Signature):
     """Represent a method of a class."""
 
     # fmt: off
@@ -387,14 +429,6 @@ class Method(DBC):
         lambda name:
         name != "__init__",
         "Expected constructors to be handled in a special way and not as a method"
-    )
-    @require(
-        lambda arguments:
-        all(
-            arg.name != 'self'
-            for arg in arguments
-        ),
-        "No explicit ``self`` argument in the arguments"
     )
     @require(
         lambda arguments, contracts:
@@ -421,13 +455,6 @@ class Method(DBC):
         )[1],
         "All arguments of contracts defined in method arguments except ``self``"
     )
-    @require(
-        lambda arguments: (
-                arg_names := [arg.name for arg in arguments],
-                len(arg_names) == len(set(arg_names))
-        )[1],
-        "Unique arguments"
-    )
     # fmt: on
     def __init__(
             self,
@@ -439,12 +466,16 @@ class Method(DBC):
             parsed: parse.Method,
     ) -> None:
         """Initialize with the given values."""
-        self.name = name
-        self.arguments = arguments
-        self.returns = returns
-        self.description = description
+        Signature.__init__(
+            self,
+            name=name,
+            arguments=arguments,
+            returns=returns,
+            description=description,
+            parsed=parsed
+        )
+
         self.contracts = contracts
-        self.parsed = parsed
 
     @abc.abstractmethod
     def __repr__(self) -> str:
@@ -676,7 +707,7 @@ class Class:
 Symbol = Union[Interface, Enumeration, Class]
 
 
-class Verification(DBC):
+class Verification(Signature):
     """Represent a verification function defined in the meta-model."""
 
     # fmt: off
@@ -703,13 +734,6 @@ class Verification(DBC):
         )[1],
         "All arguments of contracts defined in function arguments"
     )
-    @require(
-        lambda arguments: (
-                arg_names := [arg.name for arg in arguments],
-                len(arg_names) == len(set(arg_names))
-        )[1],
-        "Unique arguments"
-    )
     # fmt: on
     def __init__(
             self,
@@ -721,12 +745,16 @@ class Verification(DBC):
             parsed: parse.Method,
     ) -> None:
         """Initialize with the given values."""
-        self.name = name
-        self.arguments = arguments
-        self.returns = returns
-        self.description = description
+        Signature.__init__(
+            self,
+            name=name,
+            arguments=arguments,
+            returns=returns,
+            description=description,
+            parsed=parsed
+        )
+
         self.contracts = contracts
-        self.parsed = parsed
 
     @abc.abstractmethod
     def __repr__(self) -> str:
@@ -772,6 +800,9 @@ class PatternVerification(Verification):
     The function is expected to return a boolean.
     """
 
+    #: Method as we understood it in the parse stage
+    parsed: parse.UnderstoodMethod
+
     #: Pattern, *i.e.* the regular expression, that the function checks against
     pattern: Final[str]
 
@@ -798,7 +829,7 @@ class PatternVerification(Verification):
             description: Optional[Description],
             contracts: Contracts,
             pattern: str,
-            parsed: parse.Method,
+            parsed: parse.UnderstoodMethod,
     ) -> None:
         """Initialize with the given values."""
         Verification.__init__(
@@ -1019,6 +1050,28 @@ class AttributeReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement)
             **attributes,
     ) -> None:
         """Initialize with ``property_name`` and propagate the rest to the parent."""
+        self.reference = reference
+        docutils.nodes.TextElement.__init__(
+            self, rawsource, text, *children, **attributes
+        )
+
+
+class ArgumentReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
+    """
+    Represent a reference in the documentation to a method argument ("parameter").
+
+    The argument, in this context, refers to the role ``:paramref:``.
+    """
+
+    def __init__(
+            self,
+            reference: str,
+            rawsource="",
+            text="",
+            *children,
+            **attributes,
+    ) -> None:
+        """Initialize with ``reference`` and propagate the rest to the parent."""
         self.reference = reference
         docutils.nodes.TextElement.__init__(
             self, rawsource, text, *children, **attributes
