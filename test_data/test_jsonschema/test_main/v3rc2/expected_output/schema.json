@@ -59,7 +59,10 @@
                 "$ref": "#/definitions/Extension"
               }
             }
-          }
+          },
+          "required": [
+            "extensions"
+          ]
         }
       ]
     },
@@ -72,8 +75,7 @@
           "type": "object",
           "properties": {
             "idShort": {
-              "type": "string",
-              "pattern": "^[a-zA-Z][a-zA-Z_0-9]*$"
+              "type": "string"
             },
             "displayName": {
               "$ref": "#/definitions/LangStringSet"
@@ -194,7 +196,10 @@
                 "$ref": "#/definitions/Reference_abstract"
               }
             }
-          }
+          },
+          "required": [
+            "dataSpecifications"
+          ]
         }
       ]
     },
@@ -240,7 +245,10 @@
                 "$ref": "#/definitions/Constraint_abstract"
               }
             }
-          }
+          },
+          "required": [
+            "qualifiers"
+          ]
         }
       ]
     },
@@ -297,7 +305,10 @@
               "type": "string",
               "const": "Formula"
             }
-          }
+          },
+          "required": [
+            "dependsOn"
+          ]
         }
       ]
     },
@@ -330,7 +341,8 @@
             }
           },
           "required": [
-            "assetInformation"
+            "assetInformation",
+            "submodels"
           ]
         }
       ]
@@ -421,7 +433,10 @@
               "type": "string",
               "const": "Submodel"
             }
-          }
+          },
+          "required": [
+            "submodelElements"
+          ]
         }
       ]
     },
@@ -538,7 +553,8 @@
             }
           },
           "required": [
-            "submodelElementTypeValues"
+            "submodelElementTypeValues",
+            "values"
           ]
         }
       ]
@@ -561,7 +577,10 @@
               "type": "string",
               "const": "SubmodelElementStruct"
             }
-          }
+          },
+          "required": [
+            "values"
+          ]
         }
       ]
     },
@@ -630,7 +649,7 @@
         {
           "type": "object",
           "properties": {
-            "value": {
+            "translatable": {
               "$ref": "#/definitions/LangStringSet"
             },
             "valueID": {
@@ -680,7 +699,7 @@
         {
           "type": "object",
           "properties": {
-            "value": {
+            "reference": {
               "$ref": "#/definitions/Reference_abstract"
             },
             "modelType": {
@@ -703,7 +722,7 @@
               "type": "string",
               "pattern": "([!#$%&\\'*+\\\\-.^_`|~0-9a-zA-Z])+/([!#$%&\\'*+\\\\-.^_`|~0-9a-zA-Z])+([ \\t]*;[ \\t]*([!#$%&\\'*+\\\\-.^_`|~0-9a-zA-Z])+=(([!#$%&\\'*+\\\\-.^_`|~0-9a-zA-Z])+|\"(([\\t !#-\\\\[\\\\]-~]|[\\\\x80-\\\\xff])|\\\\\\\\([\\t !-~]|[\\\\x80-\\\\xff]))*\"))*"
             },
-            "value": {
+            "content": {
               "type": "string"
             },
             "modelType": {
@@ -761,7 +780,10 @@
               "type": "string",
               "const": "AnnotatedRelationshipElement"
             }
-          }
+          },
+          "required": [
+            "annotation"
+          ]
         }
       ]
     },
@@ -801,7 +823,8 @@
             }
           },
           "required": [
-            "entityType"
+            "entityType",
+            "statements"
           ]
         }
       ]
@@ -865,7 +888,12 @@
               "type": "string",
               "const": "Operation"
             }
-          }
+          },
+          "required": [
+            "inputVariables",
+            "outputVariables",
+            "inoutputVariables"
+          ]
         }
       ]
     },
@@ -921,7 +949,10 @@
               "type": "string",
               "const": "ConceptDescription"
             }
-          }
+          },
+          "required": [
+            "isCaseOf"
+          ]
         }
       ]
     },
@@ -949,7 +980,10 @@
               "type": "string",
               "const": "View"
             }
-          }
+          },
+          "required": [
+            "containedElements"
+          ]
         }
       ]
     },
@@ -1072,8 +1106,7 @@
         "Submodel",
         "SubmodelElement",
         "SubmodelElementList",
-        "SubmodelElementStruct",
-        "View"
+        "SubmodelElementStruct"
       ]
     },
     "KeyElements": {
@@ -1102,8 +1135,7 @@
         "Submodel",
         "SubmodelElement",
         "SubmodelElementList",
-        "SubmodelElementStruct",
-        "View"
+        "SubmodelElementStruct"
       ]
     },
     "SubmodelElements": {
@@ -1344,7 +1376,10 @@
                 "$ref": "#/definitions/ValueReferencePair"
               }
             }
-          }
+          },
+          "required": [
+            "valueReferencePairs"
+          ]
         }
       ]
     },
