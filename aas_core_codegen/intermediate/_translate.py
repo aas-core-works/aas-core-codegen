@@ -955,6 +955,79 @@ class _ContractChecker(parse_tree.Visitor):
             self.visit(arg)
 
 
+def _check_all_non_optional_properties_initialized(
+        cls: Class
+) -> List[Error]:
+    """
+    Check that all properties of the class are properly initialized in the constructor.
+
+    For example, check that there is a default value assigned if the constructor
+    argument is optional.
+    """
+    errors = []  # type: List[Error]
+
+    prop_initialized = {
+        prop.name: False
+        for prop in cls.properties
+    }
+
+    for stmt in cls.constructor.statements:
+        # NOTE (mristin, 2021-12-19):
+        # Check for type here since it is very likely that we introduce more statement
+        # types in the future. This assertion should warn us in that case.
+        assert isinstance(stmt, construction.AssignArgument)
+
+        prop = cls.properties_by_name.get(stmt.name, None)
+        assert prop is not None, "This should have been caught before: {stmt.name=}"
+
+        if isinstance(prop.type_annotation, OptionalTypeAnnotation):
+            # Since the property is optional, it is enough that we assigned it to
+            # *something*, be it a ``None`` or something else.
+            prop_initialized[prop.name] = True
+
+        else:
+            # The property is mandatory.
+
+            constructor_arg = cls.constructor.arguments_by_name.get(stmt.argument, None)
+            assert constructor_arg is not None, (
+                f"This should have been caught before. {stmt.argument=}"
+            )
+
+            if not isinstance(constructor_arg.type_annotation, OptionalTypeAnnotation):
+                # We know that the property is properly initialized since
+                # the constructor argument is not optional.
+                prop_initialized[prop.name] = True
+
+            elif stmt.default is not None:
+                if isinstance(
+                        stmt.default,
+                        (construction.EmptyList, construction.DefaultEnumLiteral)
+                ):
+                    # The property is mandatory, but a non-None default value is given
+                    # in the assign statement so we know that the property is properly
+                    # initialized.
+                    prop_initialized[prop.name] = True
+                else:
+                    assert_never(stmt.default)
+            else:
+                # The property remains improperly initialized since the default value
+                # has not been indicated, the property is not optional and
+                # the constructor argument is optional.
+                pass
+
+    for prop_name, is_initialized in prop_initialized.items():
+        if not is_initialized:
+            errors.append(
+                Error(
+                    cls.properties_by_name[prop_name].parsed.node,
+                    f"The property {prop_name!r} is not properly initialized "
+                    f"in the constructor of the class {cls.name!r}."
+                )
+            )
+
+    return errors
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def translate(
         parsed_symbol_table: parse.SymbolTable,
@@ -1533,8 +1606,6 @@ def translate(
 
     contract_checker = _ContractChecker(symbol_table=symbol_table)
 
-    contract_bodies = []  # type: List[parse_tree.Expression]
-
     for method_or_signature in itertools.chain(
             symbol_table.verification_functions,
             *(
@@ -1559,6 +1630,17 @@ def translate(
         if isinstance(symbol, Class):
             for invariant in symbol.invariants:
                 contract_checker.visit(invariant.body)
+
+    # endregion
+
+    # region Check that all non-optional properties are initialized in the constructor
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Class):
+            continue
+
+        underlying_errors.extend(
+            _check_all_non_optional_properties_initialized(cls=symbol))
 
     # endregion
 

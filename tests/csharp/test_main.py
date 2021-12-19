@@ -83,7 +83,10 @@ class Test_against_recorded(unittest.TestCase):
                     pathlib.Path('verification.cs'),
                     pathlib.Path('stringification.cs'),
                     pathlib.Path('jsonization.cs'),
-                    pathlib.Path('xmlization.cs')
+                    # TODO-BEFORE-RELEASE (mristin, 2021-12-19):
+                    #  Uncomment and make sure it is implemented once we nailed down
+                    #  how the XML de/serialization should be implemented.
+                    # pathlib.Path('xmlization.cs')
                 ]:
                     expected_pth = expected_output_dir / relevant_rel_pth
                     output_pth = output_dir / relevant_rel_pth

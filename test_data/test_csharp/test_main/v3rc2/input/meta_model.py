@@ -30,13 +30,6 @@ __book_version__ = "V3.0RC2"
 
 @verification
 @implementation_specific
-def is_ID_short(text: str) -> bool:
-    """Check that ``text`` conforms to the ID short pattern."""
-    raise NotImplementedError()
-
-
-@verification
-@implementation_specific
 def is_MIME_type(text: str) -> bool:
     """Check that ``text`` conforms to the pattern of MIME type."""
     raise NotImplementedError()
@@ -117,17 +110,16 @@ class Has_extensions(DBC):
     Note: Extensions are proprietary, i.e. they do not support global interoperability.
     """
 
-    extensions: Optional[List["Extension"]]
+    extensions: List["Extension"]
     """
     An extension of the element.
     """
 
     def __init__(self, extensions: Optional[List["Extension"]] = None) -> None:
-        self.extensions = extensions
+        self.extensions = extensions if extensions is not None else []
 
 
 @abstract
-@invariant(lambda self: is_ID_short(self.ID_short), "Constraint AASd-002")
 @reference_in_the_book(section=(6, 7, 2, 2))
 class Referable(Has_extensions):
     """
@@ -333,7 +325,7 @@ class Has_data_specification(DBC):
     with their global ID.
     """
 
-    data_specifications: Optional[List["Reference"]]
+    data_specifications: List["Reference"]
     """
     Global reference to the data specification template used by the element.
     """
@@ -412,11 +404,11 @@ class Qualifiable(DBC):
     qualifiers or complex formulas.
     """
 
-    qualifiers: Optional[List["Constraint"]]
+    qualifiers: List["Constraint"]
     """Additional qualification of a qualifiable element."""
 
     def __init__(self, qualifiers: Optional[List["Constraint"]] = None) -> None:
-        self.qualifiers = qualifiers
+        self.qualifiers = qualifiers if qualifiers is not None else []
 
 
 # fmt: off
@@ -479,7 +471,7 @@ class Formula(Constraint):
     A formula is used to describe constraints by a logical expression.
     """
 
-    depends_on: Optional[List["Reference"]]
+    depends_on: List["Reference"]
     """
     A formula may depend on referable or even external global elements that are used in
     the logical expression.
@@ -490,7 +482,7 @@ class Formula(Constraint):
     """
 
     def __init__(self, depends_on: Optional[List["Reference"]]) -> None:
-        self.depends_on = depends_on
+        self.depends_on = depends_on if depends_on is not None else []
 
 
 @reference_in_the_book(section=(6, 7, 3))
@@ -508,7 +500,7 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
     asset_information: "Asset_information"
     """Meta-information about the asset the AAS is representing."""
 
-    submodels: Optional[List[Ref["Submodel"]]]
+    submodels: List[Ref["Submodel"]]
     """
     References to submodels of the AAS.
 
@@ -550,7 +542,7 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
 
         self.derived_from = derived_from
         self.asset_information = asset_information
-        self.submodels = [] if submodels is None else submodels
+        self.submodels = submodels if submodels is not None else []
 
 
 @reference_in_the_book(section=(6, 7, 4))
@@ -686,8 +678,7 @@ class Submodel(
     refers to a well-defined domain or subject matter. Submodels can become
     standardized and, thus, become submodels templates.
     """
-
-    submodel_elements: Optional[List["Submodel_element"]]
+    submodel_elements: List["Submodel_element"]
     """A submodel consists of zero or more submodel elements."""
 
     def __init__(
@@ -729,7 +720,9 @@ class Submodel(
 
         Has_data_specification.__init__(self, data_specifications=data_specifications)
 
-        self.submodel_elements = submodel_elements
+        self.submodel_elements = (
+            submodel_elements if submodel_elements is not None else []
+        )
 
 
 @abstract
@@ -852,7 +845,7 @@ class Submodel_element_list(Submodel_element):
     SubmodelElementList/submodelElementTypeValues.
     """
 
-    values: Optional[List["Submodel_element"]]
+    values: List["Submodel_element"]
     """
     Submodel element contained in the struct.
     The list is ordered.
@@ -913,7 +906,7 @@ class Submodel_element_list(Submodel_element):
         )
 
         self.submodel_element_type_values = submodel_element_type_values
-        self.values = values
+        self.values = values if values is not None else []
         self.semantic_ID_values = semantic_ID_values
         self.value_type_values = value_type_values
 
@@ -928,7 +921,7 @@ class Submodel_element_struct(Submodel_element):
     a ConceptDescription then the ConceptDescription/category shall be ENTITY.
     """
 
-    values: Optional[List["Submodel_element"]]
+    values: List["Submodel_element"]
     """
     Submodel element contained in the struct.
     """
@@ -959,7 +952,7 @@ class Submodel_element_struct(Submodel_element):
             data_specifications=data_specifications,
         )
 
-        self.values = values
+        self.values = values if values is not None else []
 
 
 @abstract
@@ -1106,7 +1099,10 @@ class Multi_language_property(Data_element):
     See Constraint AASd-066
     """
 
-    value: Optional["Lang_string_set"]
+    # TODO (mristin, 2021-12-19): We had to rename ``value`` into ``translatable`` to
+    #  be able to generate efficient JSON de/serialization. This is pending review in
+    #  UAG Verwaltungsschale.
+    translatable: Optional["Lang_string_set"]
     """
     The value of the property instance.
     See Constraint AASd-012
@@ -1122,7 +1118,7 @@ class Multi_language_property(Data_element):
 
     def __init__(
             self,
-            ID_short: str,
+            ID_short: Optional[str] = None,
             extensions: Optional[List["Extension"]] = None,
             display_name: Optional["Lang_string_set"] = None,
             category: Optional[str] = None,
@@ -1131,7 +1127,7 @@ class Multi_language_property(Data_element):
             semantic_ID: Optional["Reference"] = None,
             qualifiers: Optional[List[Constraint]] = None,
             data_specifications: Optional[List["Reference"]] = None,
-            value: Optional["Lang_string_set"] = None,
+            translatable: Optional["Lang_string_set"] = None,
             value_ID: Optional["Reference"] = None,
     ) -> None:
         Data_element.__init__(
@@ -1147,7 +1143,7 @@ class Multi_language_property(Data_element):
             data_specifications=data_specifications,
         )
 
-        self.value = value
+        self.translatable = translatable
         self.value_ID = value_ID
 
 
@@ -1234,7 +1230,10 @@ class Reference_element(Data_element):
     IRI, IRDI.
     """
 
-    value: Optional["Reference"]
+    # TODO (mristin, 2021-12-19): We had to rename ``value`` into ``reference`` to be
+    #  able to generate efficient JSON de/serialization. This is pending review in
+    # UAG Verwaltungsschale.
+    reference: Optional["Reference"]
     """
     Reference to any other referable element of the same of any other AAS or a
     reference to an external object or entity.
@@ -1251,7 +1250,7 @@ class Reference_element(Data_element):
             semantic_ID: Optional["Reference"] = None,
             qualifiers: Optional[List[Constraint]] = None,
             data_specifications: Optional[List["Reference"]] = None,
-            value: Optional["Reference"] = None,
+            reference: Optional["Reference"] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1266,7 +1265,7 @@ class Reference_element(Data_element):
             data_specifications=data_specifications,
         )
 
-        self.value = value
+        self.reference = reference
 
 
 @reference_in_the_book(section=(5, 7, 7, 4))
@@ -1291,7 +1290,10 @@ class Blob(Data_element):
     The allowed values are defined as in RFC2046.
     """
 
-    value: Optional[bytearray]
+    # TODO (mristin, 2021-12-19): We had to rename ``value`` into ``content`` to be able
+    # to generate efficient JSON de/serialization. This is pending review in
+    # UAG Verwaltungsschale.
+    content: Optional[bytearray]
     """
     The value of the BLOB instance of a blob data element.
 
@@ -1313,7 +1315,7 @@ class Blob(Data_element):
             semantic_ID: Optional["Reference"] = None,
             qualifiers: Optional[List[Constraint]] = None,
             data_specifications: Optional[List["Reference"]] = None,
-            value: Optional[bytearray] = None,
+            content: Optional[bytearray] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1329,7 +1331,7 @@ class Blob(Data_element):
         )
 
         self.MIME_type = MIME_type
-        self.value = value
+        self.content = content
 
 
 @reference_in_the_book(section=(5, 7, 7, 8))
@@ -1397,7 +1399,7 @@ class Annotated_relationship_element(Relationship_element):
     See Constraint AASd-055
     """
 
-    annotation: Optional[List[Data_element]]
+    annotation: List[Data_element]
     """
     A reference to a data element that represents an annotation that holds for
     the relationship between the two elements.
@@ -1488,7 +1490,7 @@ class Entity(Submodel_element):
     Describes whether the entity is a co- managed entity or a self-managed entity.
     """
 
-    statements: Optional[List["Submodel_element"]]
+    statements: List["Submodel_element"]
     """
     Describes statements applicable to the entity by a set of submodel elements,
     typically with a qualified value.
@@ -1540,7 +1542,7 @@ class Entity(Submodel_element):
             data_specifications=data_specifications,
         )
 
-        self.statements = statements
+        self.statements = statements if statements is not None else []
         self.entity_type = entity_type
         self.global_asset_ID = global_asset_ID
         self.specific_asset_ID = specific_asset_ID
@@ -1634,17 +1636,17 @@ class Operation(Submodel_element):
     shall be one of the following values: FUNCTION.
     """
 
-    input_variables: Optional[List["Operation_variable"]]
+    input_variables: List["Operation_variable"]
     """
     Input parameter of the operation.
     """
 
-    output_variables: Optional[List["Operation_variable"]]
+    output_variables: List["Operation_variable"]
     """
     Output parameter of the operation.
     """
 
-    inoutput_variables: Optional[List["Operation_variable"]]
+    inoutput_variables: List["Operation_variable"]
     """
     Parameter that is input and output of the operation.
     """
@@ -1677,9 +1679,11 @@ class Operation(Submodel_element):
             data_specifications=data_specifications,
         )
 
-        self.input_variables = input_variables
-        self.output_variables = output_variables
-        self.inoutput_variables = inoutput_variables
+        self.input_variables = input_variables if input_variables is not None else []
+        self.output_variables = output_variables if output_variables is not None else []
+        self.inoutput_variables = (
+            inoutput_variables if inoutput_variables is not None else []
+        )
 
 
 @reference_in_the_book(section=(6, 7, 7, 10), index=1)
@@ -1751,7 +1755,7 @@ class Concept_description(Identifiable, Has_data_specification):
     , EVENT, ENTITY, APPLICATION_CLASS, QUALIFIER, VIEW. Default: PROPERTY.
     """
 
-    is_case_of: Optional[List["Reference"]]
+    is_case_of: List["Reference"]
     """
     Reference to an external definition the concept is compatible to or was derived from
 
@@ -1784,7 +1788,7 @@ class Concept_description(Identifiable, Has_data_specification):
 
         Has_data_specification.__init__(self, data_specifications=data_specifications)
 
-        self.is_case_of = is_case_of
+        self.is_case_of = is_case_of if is_case_of is not None else []
 
 
 @reference_in_the_book(section=(5, 7, 9))
@@ -1802,7 +1806,7 @@ class View(Referable, Has_semantics, Has_data_specification):
        They are not equivalent to submodels.
     """
 
-    contained_elements: Optional[List[Ref["Referable"]]]
+    contained_elements: List[Ref["Referable"]]
     """
     Reference to a referable element that is contained in the view.
     """
@@ -1831,7 +1835,9 @@ class View(Referable, Has_semantics, Has_data_specification):
 
         Has_data_specification.__init__(self, data_specifications=data_specifications)
 
-        self.contained_elements = contained_elements
+        self.contained_elements = (
+            contained_elements if contained_elements is not None else []
+        )
 
 
 @abstract
@@ -2473,7 +2479,7 @@ class Value_list(DBC):
     A set of value reference pairs.
     """
 
-    value_reference_pairs: Optional[List["Value_reference_pair"]]
+    value_reference_pairs: List["Value_reference_pair"]
     """
     A pair of a value together with its global unique id.
     """
@@ -2481,7 +2487,9 @@ class Value_list(DBC):
     def __init__(
             self, value_reference_pairs: Optional[List["Value_reference_pair"]] = None
     ) -> None:
-        self.value_reference_pairs = value_reference_pairs
+        self.value_reference_pairs = (
+            value_reference_pairs if value_reference_pairs is not None else []
+        )
 
 
 @template

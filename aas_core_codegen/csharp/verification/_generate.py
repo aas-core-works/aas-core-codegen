@@ -6,7 +6,7 @@ from typing import Tuple, Optional, List, Sequence, Union, Final
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate, specific_implementations
-from aas_core_codegen.common import Error, Stripped, assert_never, Identifier
+from aas_core_codegen.common import Error, Stripped, assert_never
 from aas_core_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming,
@@ -948,120 +948,210 @@ def _generate_non_recursive_verifier(
     return Stripped(writer.getvalue()), None
 
 
-def _unroll_recursion_in_recursive_verify(prop: intermediate.Property) -> Stripped:
-    """Generate the code for unrolling the recursive visits  for the given property."""
+class _RecursionInRecursiveVerifyUnroller(csharp_unrolling.Unroller):
+    """Generate the code that unrolls the recursive visits for the given property."""
 
-    # TODO: continue here, refactor this into an Unroller
+    #: Symbol to be used to represent references within an AAS
+    _ref_association: Final[intermediate.Symbol]
 
-    @require(lambda var_index: var_index >= 0)
-    @require(lambda suffix: suffix in ("Item", "KeyValue"))
-    def var_name(var_index: int, suffix: str) -> Identifier:
-        """Generate the name of the loop variable."""
-        if var_index == 0:
-            if suffix == "Item":
-                return Identifier(f"an{suffix}")
-            else:
-                return Identifier(f"a{suffix}")
+    def __init__(
+            self,
+            ref_association: intermediate.Symbol
+    ) -> None:
+        """Initialize with the given values."""
+        self._ref_association = ref_association
 
-        elif var_index == 1:
-            return Identifier(f"another{suffix}")
-        else:
-            return Identifier("yet" + "Yet" * (var_index - 1) + f"another{suffix}")
-
-    def unroll(
-            current_var_name: str,
-            item_count: int,
-            key_value_count: int,
+    def _unroll_builtin_atomic_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.BuiltinAtomicTypeAnnotation,
             path: List[str],
-            type_anno: intermediate.TypeAnnotation,
+            item_level: int,
+            key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
-        """Generate the node corresponding to the ``type_anno`` and recurse."""
-        if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
+        """Generate code for the given specific ``type_annotation``."""
+        # We can not recurse visits into an atomic built-in.
+        return []
+
+    # noinspection PyUnusedLocal
+    def _unroll_our_atomic_type_or_ref_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: Union[
+                intermediate.OurAtomicTypeAnnotation,
+                intermediate.RefTypeAnnotation
+            ],
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """
+        Generate the code for both our atomic type annotations and references.
+
+        We merged :py:method:`._unroll_our_atomic_type_annotation` and
+        :py:method:`._unroll_ref_type_annotation` together since they differ in only
+        which symbol is unrolled over.
+        """
+        symbol = None  # type: Optional[intermediate.Symbol]
+        if isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
+            symbol = type_annotation.symbol
+        elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
+            symbol = self._ref_association
+        else:
+            assert_never(type_annotation)
+
+        assert symbol is not None
+
+        if isinstance(symbol, intermediate.Enumeration):
             return []
 
-        elif isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
-            if isinstance(type_anno.symbol, intermediate.Enumeration):
-                return []
+        assert isinstance(symbol, (intermediate.Class, intermediate.Interface))
 
-            joined_pth = "/".join(path)
-            return [
-                csharp_unrolling.Node(
-                    text=textwrap.dedent(
-                        f"""\
-                    if (Errors.Full()) return;
-                    Visit(
-                        {current_var_name},
-                        ${csharp_common.string_literal(joined_pth)});"""
-                    ),
-                    children=[],
-                )
-            ]
-
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            if item_count > 15:
-                index_var = f"i{item_count}"
-            else:
-                index_var = chr(ord("i") + item_count)
-
-            children = unroll(
-                current_var_name=f"{current_var_name}[{index_var}]",
-                item_count=item_count + 1,
-                key_value_count=key_value_count,
-                path=path + [f"{{{index_var}}}"],
-                type_anno=type_anno.items,
+        joined_pth = "/".join(path)
+        return [
+            csharp_unrolling.Node(
+                text=textwrap.dedent(
+                    f"""\
+                if (Errors.Full()) return;
+                Visit(
+                    {unrollee_expr},
+                    ${csharp_common.string_literal(joined_pth)});"""
+                ),
+                children=[],
             )
+        ]
 
-            if len(children) == 0:
-                return []
+    def _unroll_our_atomic_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.OurAtomicTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        return self._unroll_our_atomic_type_or_ref_annotation(
+            unrollee_expr=unrollee_expr,
+            type_annotation=type_annotation,
+            path=path,
+            item_level=item_level,
+            key_value_level=key_value_level
+        )
 
+    def _unroll_list_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.ListTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        # NOTE (mristin, 2021-12-19):
+        # We need to iterate through the list with the index so that we can construct
+        # meaningful paths.
+
+        if item_level > 15:
+            index_var = f"i{item_level}"
+        else:
+            # Use letters i, j, k *etc.* first before we resort to i16, i17 *etc.*
+            index_var = chr(ord("i") + item_level)
+
+        children = self.unroll(
+            unrollee_expr=f"{unrollee_expr}[{index_var}]",
+            type_annotation=type_annotation.items,
+            path=path + [f"{{{index_var}}}"],
+            item_level=item_level+1,
+            key_value_level=key_value_level
+        )
+
+        if len(children) == 0:
+            return []
+
+        text = Stripped(
+            f"for(var {index_var} = 0; "
+            f"{index_var} < {unrollee_expr}.Count; "
+            f"{index_var}++)"
+        )
+
+        # Break into lines if too long.
+        # This is just a heuristics — we do not consider the actual prefix indention.
+        if len(text) > 50:
             text = Stripped(
-                f"for(var {index_var} = 0; "
-                f"{index_var} < {current_var_name}.Count; "
-                f"{index_var}++)"
-            )
-
-            # Break into lines if too long.
-            # This is just a heuristics — we do not consider the actual indention.
-            if len(text) > 50:
-                text = Stripped(
-                    textwrap.dedent(
-                        f"""\
+                textwrap.dedent(
+                    f"""\
                     for(
                     {I}var {index_var} = 0;
-                    {I}{index_var} < {current_var_name}.Count;
+                    {I}{index_var} < {unrollee_expr}.Count;
                     {I}{index_var}++)"""
-                    )
                 )
-
-            return [csharp_unrolling.Node(text=text, children=children)]
-
-        elif isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-            children = unroll(
-                current_var_name=current_var_name,
-                item_count=item_count,
-                key_value_count=key_value_count,
-                path=path,
-                type_anno=type_anno.value,
             )
-            if len(children) > 0:
-                return [
-                    csharp_unrolling.Node(
-                        text=f"if ({current_var_name} != null)", children=children
-                    )
-                ]
-            else:
-                return []
+
+        return [csharp_unrolling.Node(text=text, children=children)]
+
+    def _unroll_optional_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.OptionalTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        children = self.unroll(
+            unrollee_expr=unrollee_expr,
+            type_annotation=type_annotation.value,
+            path=path,
+            item_level=item_level,
+            key_value_level=key_value_level
+        )
+        if len(children) > 0:
+            return [
+                csharp_unrolling.Node(
+                    text=f"if ({unrollee_expr} != null)", children=children
+                )
+            ]
         else:
-            assert_never(type_anno)
+            return []
+
+    def _unroll_ref_type_annotation(
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.RefTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
+    ) -> List[csharp_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        return self._unroll_our_atomic_type_or_ref_annotation(
+            unrollee_expr=unrollee_expr,
+            type_annotation=type_annotation,
+            path=path,
+            item_level=item_level,
+            key_value_level=key_value_level
+        )
+
+
+def _unroll_recursion_in_recursive_verify(
+        prop: intermediate.Property,
+        ref_association: intermediate.Symbol
+) -> Stripped:
+    """
+    Generate the code for unrolling the recursive visits  for the given property.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
 
     prop_name = csharp_naming.property_name(prop.name)
 
-    roots = unroll(
-        current_var_name=f"that.{prop_name}",
-        item_count=0,
-        key_value_count=0,
+    unroller = _RecursionInRecursiveVerifyUnroller(ref_association=ref_association)
+    roots = unroller.unroll(
+        unrollee_expr=f"that.{prop_name}",
+        type_annotation=prop.type_annotation,
         path=["{context}", prop_name],
-        type_anno=prop.type_annotation,
+        item_level=0,
+        key_value_level=0
     )
 
     if len(roots) == 0:
@@ -1078,9 +1168,15 @@ def _unroll_recursion_in_recursive_verify(prop: intermediate.Property) -> Stripp
 )
 # fmt: off
 def _generate_recursive_verifier_visit(
-        cls: intermediate.Class
+        cls: intermediate.Class,
+        ref_association: intermediate.Symbol
 ) -> Stripped:
-    """Generate the ``Visit`` method of the ``RecursiveVerifier`` for the ``cls``."""
+    """
+    Generate the ``Visit`` method of the ``RecursiveVerifier`` for the ``cls``.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
     cls_name = csharp_naming.class_name(cls.name)
 
     writer = io.StringIO()
@@ -1104,7 +1200,10 @@ def _generate_recursive_verifier_visit(
 
     recursion_ends_here = True
     for prop in cls.properties:
-        unrolled_prop_verification = _unroll_recursion_in_recursive_verify(prop=prop)
+        unrolled_prop_verification = _unroll_recursion_in_recursive_verify(
+            prop=prop,
+            ref_association=ref_association
+        )
 
         if unrolled_prop_verification != '':
             blocks.append(unrolled_prop_verification)
@@ -1184,7 +1283,10 @@ def _generate_recursive_verifier(
 
             blocks.append(implementation)
         else:
-            blocks.append(_generate_recursive_verifier_visit(cls=symbol))
+            blocks.append(
+                _generate_recursive_verifier_visit(
+                    cls=symbol,
+                    ref_association=symbol_table.ref_association))
 
     if len(errors) > 0:
         return None, errors

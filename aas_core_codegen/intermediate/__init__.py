@@ -41,7 +41,7 @@ AttributeReferenceInDoc = _types.AttributeReferenceInDoc
 InterfaceImplementers = _types.InterfaceImplementers
 map_interface_implementers = _types.map_interface_implementers
 map_descendability = _types.map_descendability
-make_union_of_properties = _types.make_union_of_properties
+make_union_of_constructor_arguments = _types.make_union_of_constructor_arguments
 collect_ids_of_interfaces_in_properties = _types.collect_ids_of_interfaces_in_properties
 
 translate = _translate.translate

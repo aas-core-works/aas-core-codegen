@@ -1,5 +1,6 @@
 """Provide types of the intermediate representation."""
 import ast
+import collections
 import enum
 import pathlib
 from typing import (
@@ -13,7 +14,7 @@ from typing import (
     Tuple,
     Set,
     Final,
-    FrozenSet,
+    FrozenSet, OrderedDict,
 )
 
 import docutils.nodes
@@ -25,7 +26,6 @@ from aas_core_codegen.parse import (
 )
 from aas_core_codegen.common import Identifier, assert_never, Error
 from aas_core_codegen.intermediate import construction
-
 
 _MODULE_NAME = pathlib.Path(__file__).parent.name
 
@@ -467,9 +467,37 @@ class Constructor:
     The constructor is expected to be stacked from the class and all the antecedents.
     """
 
+    #: Arguments of the constructor method
+    arguments: Final[Sequence[Argument]]
+
+    #: Contracts of the constructor method
+    contracts: Final[Contracts]
+
+    #: If set, we need to provide a snippet for the constructor
+    is_implementation_specific: bool
+
+    #: Interpreted statements of the constructor, stacked over all the ancestors
+    statements: Final[Sequence[construction.AssignArgument]]
+
+    #: Map argument name 🠒 argument
+    arguments_by_name: Final[Mapping[Identifier, Argument]]
+
+    # fmt: on
     @require(
         lambda arguments: len(arguments) == len(set(arg.name for arg in arguments))
     )
+    @ensure(
+        lambda self:
+        len(self.arguments) == len(self.arguments_by_name)
+        and all(
+            (
+                    mapped_arg := self.arguments_by_name.get(argument.name, None),
+                    mapped_arg is not None and id(mapped_arg) == id(argument)
+            )[1]
+            for argument in self.arguments
+        ), "``arguments_by_name`` consistent"
+    )
+    # fmt: off
     def __init__(
             self,
             arguments: Sequence[Argument],
@@ -483,6 +511,11 @@ class Constructor:
 
         # The calls to the super constructors must be in-lined before.
         self.statements = statements
+
+        self.arguments_by_name = {
+            argument.name: argument
+            for argument in self.arguments
+        }
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -907,19 +940,20 @@ def map_descendability(
     return mapping
 
 
-class _PropertyOfClass:
-    """Represent the property with its corresponding class."""
+class _ConstructorArgumentOfClass:
+    """Represent a constructor argument with its corresponding class."""
 
-    def __init__(self, prop: Property, cls: Class):
+    def __init__(self, arg: Argument, cls: Class) -> None:
         """Initialize with the given values."""
-        self.prop = prop
+        self.arg = arg
         self.cls = cls
 
 
-def make_union_of_properties(
+def make_union_of_constructor_arguments(
         interface: Interface, implementers: Sequence[Class]
-) -> Tuple[Optional[MutableMapping[Identifier, TypeAnnotation]], Optional[Error]]:
-    """Make a union of all the properties over all the implementer classes.
+) -> Tuple[Optional[OrderedDict[Identifier, TypeAnnotation]], Optional[Error]]:
+    """
+    Make a union of all the constructor arguments over all the implementer classes.
 
     This union is necessary, for example, when you need to de-serialize an object, but
     you are not yet sure which concrete type it has. Hence you need to be prepared to
@@ -928,46 +962,119 @@ def make_union_of_properties(
     """
     errors = []  # type: List[Error]
 
-    property_union = dict()  # type: MutableMapping[Identifier, _PropertyOfClass]
-    for implementer in implementers:
-        for prop in implementer.properties:
-            another_prop = property_union.get(prop.name, None)
+    arg_union = collections.OrderedDict(
+    )  # type: OrderedDict[Identifier, List[_ConstructorArgumentOfClass]]
 
-            if another_prop is None:
-                property_union[prop.name] = _PropertyOfClass(cls=implementer, prop=prop)
-            elif not type_annotations_equal(
-                    prop.type_annotation, another_prop.prop.type_annotation
-            ):
+    # region Collect
+
+    for implementer in implementers:
+        for arg in implementer.constructor.arguments:
+            lst = arg_union.get(arg.name, None)
+            if lst is None:
+                lst = []
+                arg_union[arg.name] = lst
+
+            lst.append(_ConstructorArgumentOfClass(arg=arg, cls=implementer))
+
+            another_arg = arg_union.get(arg.name, None)
+
+    # endregion
+
+    # region Resolve
+
+    resolution = collections.OrderedDict(
+    )  # type: OrderedDict[Identifier, TypeAnnotation]
+
+    for arg_name, args_of_clses in arg_union.items():
+        # NOTE (mristin, 2021-12-19):
+        # We have to check that the arguments share the same type. We have to allow
+        # that the non-nullability constraint is strengthened since implementers can
+        # strengthen the invariants.
+
+        # This is the argument that defines the current resolved type.
+        defining_arg = None  # type: Optional[_ConstructorArgumentOfClass]
+
+        def normalize_type_annotation(type_anno: TypeAnnotation) -> TypeAnnotation:
+            """Normalize the type annotation by removing prefix ``Optional``'s."""
+            while isinstance(type_anno, OptionalTypeAnnotation):
+                type_anno = type_anno.value
+
+            return type_anno
+
+        for arg_of_cls in args_of_clses:
+            # Set if the resolution not possible for the current argument
+            inconsistent = False
+
+            if defining_arg is None:
+                defining_arg = arg_of_cls
+            else:
+                if type_annotations_equal(
+                        defining_arg.arg.type_annotation,
+                        arg_of_cls.arg.type_annotation
+                ):
+                    # Leave the previous argument the defining one
+                    continue
+                else:
+                    if type_annotations_equal(
+                            normalize_type_annotation(defining_arg.arg.type_annotation),
+                            normalize_type_annotation(arg_of_cls.arg.type_annotation)
+                    ):
+                        # NOTE (mristin, 2021-12-19):
+                        # The type with ``Optional`` will win the resolution so that
+                        # we allow for strengthening of invariants.
+
+                        if isinstance(
+                                defining_arg.arg.type_annotation,
+                                OptionalTypeAnnotation
+                        ):
+                            # The defining argument wins.
+                            continue
+                        elif isinstance(
+                                arg_of_cls.arg.type_annotation,
+                                OptionalTypeAnnotation
+                        ):
+                            # The current argument wins.
+                            defining_arg = arg_of_cls
+                        else:
+                            raise AssertionError(
+                                f"Unexpected case: "
+                                f"{arg_of_cls.arg.type_annotation=}, "
+                                f"{defining_arg.arg.type_annotation=}")
+                    else:
+                        inconsistent = True
+
+            if inconsistent:
                 errors.append(
                     Error(
-                        implementer.parsed.node,
-                        f"The property {prop.name} of the class {implementer.name} "
-                        f"has inconsistent type ({prop.type_annotation}) "
-                        f"with the property {another_prop.prop.name} "
-                        f"of the class {another_prop.cls.name} "
-                        f"({another_prop.prop.type_annotation}. "
+                        arg_of_cls.cls.parsed.node,
+                        f"The constructor argument {defining_arg.arg.name!r} "
+                        f"of the class {defining_arg.cls.name!r} "
+                        f"has inconsistent type ({defining_arg.arg.type_annotation}) "
+                        f"with the constructor argument {arg_of_cls.arg.name!r} "
+                        f"of the class {arg_of_cls.cls.name!r} "
+                        f"({arg_of_cls.arg.type_annotation}. "
                         f"This is a blocker for generating efficient code for "
-                        f"JSON de-serialization of the interface {interface.name} "
-                        f"(which both {implementer.name} and "
-                        f"{another_prop.cls.name} implement).",
+                        f"JSON de-serialization of the interface {interface.name!r} "
+                        f"(which both {defining_arg.cls.name!r} and "
+                        f"{arg_of_cls.cls.name!r} implement).",
                     )
                 )
-            else:
-                # Everything is OK, the properties share the same type.
-                pass
+
+            # endregion
+
+        assert defining_arg is not None, "Expected to be set before"
+
+        resolution[defining_arg.arg.name] = defining_arg.arg.type_annotation
 
     if len(errors) > 0:
         return None, Error(
             interface.parsed.node,
-            f"Failed to make a union of properties over all implementer classes of "
-            f"interface {interface.name}",
+            f"Failed to make a union of constructor arguments "
+            f"over all implementer classes of interface {interface.name}",
             errors,
         )
 
-    return {
-               prop_of_cls.prop.name: prop_of_cls.prop.type_annotation
-               for prop_of_cls in property_union.values()
-           }, None
+    return resolution, None
 
 
 def collect_ids_of_interfaces_in_properties(symbol_table: SymbolTable) -> Set[int]:

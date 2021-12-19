@@ -788,6 +788,7 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
         # We can not descend into a built-in atomic type.
         return []
 
+    # noinspection PyUnusedLocal
     def _unroll_our_atomic_type_or_ref_annotation(
             self,
             unrollee_expr: str,
@@ -1152,8 +1153,13 @@ def _generate_constructor(
             else:
                 if isinstance(stmt.default, intermediate_construction.EmptyList):
                     prop = symbol.properties_by_name[stmt.name]
+
+                    type_anno = prop.type_annotation
+                    while isinstance(type_anno, intermediate.OptionalTypeAnnotation):
+                        type_anno = type_anno.value
+
                     prop_type = csharp_common.generate_type(
-                        type_annotation=prop.type_annotation,
+                        type_annotation=type_anno,
                         ref_association=ref_association)
 
                     arg_name = csharp_naming.argument_name(stmt.argument)
@@ -1191,101 +1197,6 @@ def _generate_constructor(
     blocks.append("}")
 
     return Stripped("\n".join(blocks)), None
-
-
-def _generate_default_value_for_type_annotation(
-        type_annotation: intermediate.TypeAnnotation,
-        ref_association: intermediate.Symbol
-) -> Stripped:
-    """
-    Generate the C# code representing the default value for the given type.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
-    code = None  # type: Optional[str]
-    if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
-        if type_annotation.a_type == intermediate.BuiltinAtomicType.BOOL:
-            code = "false"
-        elif type_annotation.a_type == intermediate.BuiltinAtomicType.INT:
-            code = "0"
-        elif type_annotation.a_type == intermediate.BuiltinAtomicType.FLOAT:
-            code = "0d"
-        elif type_annotation.a_type == intermediate.BuiltinAtomicType.STR:
-            code = '""'
-        else:
-            assert_never(type_annotation.a_type)
-    elif isinstance(
-            type_annotation,
-            (intermediate.OurAtomicTypeAnnotation,
-             intermediate.ListTypeAnnotation,
-             intermediate.RefTypeAnnotation),
-    ):
-        csharp_type = csharp_common.generate_type(
-            type_annotation=type_annotation,
-            ref_association=ref_association)
-
-        code = f"new {csharp_type}()"
-    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        code = "null"
-    else:
-        assert_never(type_annotation)
-
-    assert code is not None
-    return Stripped(code)
-
-
-@require(lambda symbol: not symbol.is_implementation_specific)
-@require(lambda symbol: not symbol.constructor.is_implementation_specific)
-def _generate_default_constructor(
-        symbol: intermediate.Class,
-        ref_association: intermediate.Symbol
-) -> Stripped:
-    """
-    Generate the default constructor for the given symbol.
-
-    The constructor sets all the properties to their default values.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
-    cls_name = csharp_naming.class_name(symbol.name)
-
-    default_values = []  # type: List[Stripped]
-
-    for arg in symbol.constructor.arguments:
-        if arg.default is None:
-            default_values.append(
-                _generate_default_value_for_type_annotation(
-                    type_annotation=arg.type_annotation,
-                    ref_association=ref_association
-                )
-            )
-        else:
-            default_values.append(_generate_default_value(default=arg.default))
-
-    writer = io.StringIO()
-
-    assert len(default_values) >= 1, (
-        "We are constructing the default constructor "
-        "so we expected at least one default value, but got none."
-    )
-
-    if len(default_values) == 1:
-        writer.write(f"public {cls_name}() : this({default_values[0]})\n")
-    else:
-        writer.write(f"public {cls_name}() : this(\n")
-        for i, default_value in enumerate(default_values):
-            writer.write(f"{I}{default_value}")
-
-            if i < len(default_values) - 1:
-                writer.write(",\n")
-            else:
-                writer.write(")\n")
-
-    writer.write("{\n" f"{I}// Intentionally left empty.\n" "}")
-
-    return Stripped(writer.getvalue())
 
 
 @require(lambda symbol: not symbol.is_implementation_specific)
@@ -1499,14 +1410,6 @@ def _generate_class(
             errors.append(error)
         else:
             blocks.append(constructor_block)
-
-            if any(arg.default is None for arg in symbol.constructor.arguments):
-                # We _generate_rdf the default constructor only if it has not been already
-                # defined by specifying the default values for all the arguments.
-                blocks.append(
-                    _generate_default_constructor(
-                        symbol=symbol,
-                        ref_association=ref_association))
 
     # endregion
 

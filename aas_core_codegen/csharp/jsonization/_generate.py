@@ -90,16 +90,17 @@ def _generate_read_for_interface(
     # NOTE (mristin, 2021-11-03):
     # Since we perform an on-demand de-serialization, we do not know the discriminating
     # model type (*i.e.*, the concrete class of the object). Hence we need to
-    # de-serialize the union of all the possible properties. Once we are done
-    # de-serializing all the properties, we will call the appropriate constructor.
+    # de-serialize the union of all the possible constructor arguments. Once we are done
+    # de-serializing all the arguments, we will call the appropriate constructor.
 
-    property_union, error = intermediate.make_union_of_properties(
+    arg_type_map, error = intermediate.make_union_of_constructor_arguments(
         interface=interface, implementers=implementers
     )
+
     if error is not None:
         return None, error
 
-    assert property_union is not None
+    assert arg_type_map is not None
 
     blocks = [
         Stripped(
@@ -116,24 +117,22 @@ def _generate_read_for_interface(
 
     # region Initializations
 
-    if len(property_union) > 0:
+    if len(arg_type_map) > 0:
         initialization_lines = [
             Stripped('// Prefix the property variables with "the" to avoid conflicts')
         ]  # type: List[Stripped]
 
-        for prop_name in sorted(property_union.keys()):
-            type_anno = property_union[prop_name]
-
-            var_name = csharp_naming.variable_name(Identifier(f"the_{prop_name}"))
-            prop_type = csharp_common.generate_type(
+        for arg_name, type_anno in arg_type_map.items():
+            var_name = csharp_naming.variable_name(Identifier(f"the_{arg_name}"))
+            arg_type = csharp_common.generate_type(
                 type_annotation=type_anno,
                 ref_association=ref_association)
 
-            if prop_type.endswith("?"):
-                initialization_lines.append(Stripped(f"{prop_type} {var_name} = null;"))
+            if arg_type.endswith("?"):
+                initialization_lines.append(Stripped(f"{arg_type} {var_name} = null;"))
             else:
                 initialization_lines.append(
-                    Stripped(f"{prop_type}? {var_name} = null;")
+                    Stripped(f"{arg_type}? {var_name} = null;")
                 )
 
         blocks.append("\n".join(initialization_lines))
@@ -153,12 +152,10 @@ def _generate_read_for_interface(
     )
 
     for implementer in implementers:
-        constructor_arg_names = [arg.name for arg in implementer.constructor.arguments]
-
         cls_name = csharp_naming.class_name(implementer.name)
         json_model_type = naming.json_model_type(implementer.name)
 
-        if len(constructor_arg_names) == 0:
+        if len(implementer.constructor.arguments) == 0:
             return_writer.write(
                 textwrap.indent(
                     textwrap.dedent(
@@ -181,14 +178,13 @@ def _generate_read_for_interface(
                 )
             )
 
-            for i, constructor_arg_name in enumerate(constructor_arg_names):
-                prop_name = constructor_arg_name
-                var_name = csharp_naming.variable_name(Identifier(f"the_{prop_name}"))
+            for i, arg in enumerate(implementer.constructor.arguments):
+                var_name = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
 
-                prop_type = property_union[prop_name]
-
-                if not isinstance(prop_type, intermediate.OptionalTypeAnnotation):
-                    json_prop_name = naming.json_property(prop_name)
+                if not isinstance(
+                        arg.type_annotation, intermediate.OptionalTypeAnnotation
+                ):
+                    json_prop_name = naming.json_property(arg.name)
 
                     error_msg = csharp_common.string_literal(
                         f"Required property is missing: {json_prop_name}"
@@ -207,7 +203,7 @@ def _generate_read_for_interface(
                 else:
                     return_writer.write(f"{III}{var_name}")
 
-                if i < len(constructor_arg_names) - 1:
+                if i < len(implementer.constructor.arguments) - 1:
                     return_writer.write(",\n")
                 else:
                     return_writer.write(");\n")
@@ -253,32 +249,30 @@ case Json.JsonTokenType.EndObject:
         )
     )
 
-    for prop_name in sorted(property_union.keys()):
-        type_anno = property_union[prop_name]
-
-        var_name = csharp_naming.variable_name(Identifier(f"the_{prop_name}"))
+    for arg_name, type_anno in arg_type_map.items():
+        var_name = csharp_naming.variable_name(Identifier(f"the_{arg_name}"))
 
         if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-            prop_type = csharp_common.generate_type(
+            arg_type = csharp_common.generate_type(
                 type_annotation=type_anno.value,
                 ref_association=ref_association)
         else:
-            prop_type = csharp_common.generate_type(
+            arg_type = csharp_common.generate_type(
                 type_annotation=type_anno,
                 ref_association=ref_association)
 
-        json_prop_name = naming.json_property(prop_name)
+        json_prop_name = naming.json_property(arg_name)
 
         property_switch_writer.write(
             textwrap.indent(
                 textwrap.dedent(
                     f"""\
-            case {csharp_common.string_literal(json_prop_name)}: 
-            {I}{var_name} =  (
-            {II}Json.JsonSerializer.Deserialize<{prop_type}>(
-            {III}ref reader));
-            {I}break;
-            """
+                    case {csharp_common.string_literal(json_prop_name)}: 
+                    {I}{var_name} =  (
+                    {II}Json.JsonSerializer.Deserialize<{arg_type}>(
+                    {III}ref reader));
+                    {I}break;
+                    """
                 ),
                 I,
             )
@@ -288,11 +282,11 @@ case Json.JsonTokenType.EndObject:
         textwrap.indent(
             textwrap.dedent(
                 f"""\
-        case "modelType":
-        {I}modelType = Json.JsonSerializer.Deserialize<string>(
-        {II}ref reader);
-        {I}break;
-        """
+                case "modelType":
+                {I}modelType = Json.JsonSerializer.Deserialize<string>(
+                {II}ref reader);
+                {I}break;
+                """
             ),
             I,
         )
@@ -303,11 +297,11 @@ case Json.JsonTokenType.EndObject:
     property_switch_writer.write(
         textwrap.dedent(
             f"""\
-        {I}default:
-        {II}throw new Json.JsonException(
-        {III}$"Unexpected property in an implementer class " + 
-        {III}$"of {interface_name}: {{propertyName}}");
-        }}  // switch on propertyName"""
+            {I}default:
+            {II}throw new Json.JsonException(
+            {III}$"Unexpected property in an implementer class " + 
+            {III}$"of {interface_name}: {{propertyName}}");
+            }}  // switch on propertyName"""
         )
     )
 
@@ -425,10 +419,10 @@ def _generate_write_for_interface(
         textwrap.indent(
             textwrap.dedent(
                 f"""\
-        default:
-        {I}throw new System.ArgumentException(
-            $"Instance `that` of type {{that.GetType()}} is " + 
-            $"not an implementer class of {interface_name}: {{that}}");"""
+                default:
+                {I}throw new System.ArgumentException(
+                    $"Instance `that` of type {{that.GetType()}} is " + 
+                    $"not an implementer class of {interface_name}: {{that}}");"""
             ),
             I,
         )
@@ -464,18 +458,28 @@ def _generate_write_for_interface(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_json_converter_for_interface(
-        interface: intermediate.Interface, implementers: Sequence[intermediate.Class]
+        interface: intermediate.Interface,
+        implementers: Sequence[intermediate.Class],
+        ref_association: intermediate.Symbol
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the custom JSON converter based on the intermediate ``interface``."""
+    """
+    Generate the custom JSON converter based on the intermediate ``interface``.
+
+    The ``ref_association`` indicates which symbol to use for representing references
+    within an AAS.
+    """
     read_code, error = _generate_read_for_interface(
-        interface=interface, implementers=implementers
+        interface=interface,
+        implementers=implementers,
+        ref_association=ref_association
     )
 
     if error is not None:
         return None, error
 
     write_code = _generate_write_for_interface(
-        interface=interface, implementers=implementers
+        interface=interface,
+        implementers=implementers
     )
 
     interface_name = csharp_naming.interface_name(interface.name)
@@ -521,33 +525,32 @@ def _generate_read_for_class(
         Stripped(
             textwrap.dedent(
                 f"""\
-            if (reader.TokenType != Json.JsonTokenType.StartObject)
-            {{
-            {I}throw new Json.JsonException();
-            }}"""
+                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                {{
+                {I}throw new Json.JsonException();
+                }}"""
+                )
             )
-        )
-    ]
+        ]
 
     # region Initializations
 
-    if len(cls.properties) > 0:
-
+    if len(cls.constructor.arguments) > 0:
         initialization_lines = [
             Stripped('// Prefix the property variables with "the" to avoid conflicts')
         ]  # type: List[Stripped]
 
-        for prop in cls.properties:
-            var_name = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
-            prop_type = csharp_common.generate_type(
-                type_annotation=prop.type_annotation,
+        for arg in cls.constructor.arguments:
+            var_name = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
+            arg_type = csharp_common.generate_type(
+                type_annotation=arg.type_annotation,
                 ref_association=ref_association)
 
-            if prop_type.endswith("?"):
-                initialization_lines.append(Stripped(f"{prop_type} {var_name} = null;"))
+            if arg_type.endswith("?"):
+                initialization_lines.append(Stripped(f"{arg_type} {var_name} = null;"))
             else:
                 initialization_lines.append(
-                    Stripped(f"{prop_type}? {var_name} = null;")
+                    Stripped(f"{arg_type}? {var_name} = null;")
                 )
 
         blocks.append("\n".join(initialization_lines))
@@ -559,23 +562,16 @@ def _generate_read_for_class(
     # region Final successful case
 
     return_writer = io.StringIO()
-    if len(cls.properties) > 0:
+    if len(cls.constructor.arguments) > 0:
         return_writer.write(f"return new Aas.{cls_name}(\n")
 
-        constructor_arg_names = [arg.name for arg in cls.constructor.arguments]
-        assert sorted(constructor_arg_names) == sorted(
-            prop.name for prop in cls.properties
-        ), "Expected the properties to match the constructor arguments"
-
-        for i, constructor_arg_name in enumerate(constructor_arg_names):
-            prop = cls.properties_by_name[constructor_arg_name]
-
-            var_name = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
+        for i, arg in enumerate(cls.constructor.arguments):
+            var_name = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
 
             if not isinstance(
-                    prop.type_annotation, intermediate.OptionalTypeAnnotation
+                    arg.type_annotation, intermediate.OptionalTypeAnnotation
             ):
-                json_prop_name = naming.json_property(prop.name)
+                json_prop_name = naming.json_property(arg.name)
 
                 error_msg = csharp_common.string_literal(
                     f"Required property is missing: {json_prop_name}"
@@ -594,7 +590,7 @@ def _generate_read_for_class(
             else:
                 return_writer.write(f"{I}{var_name}")
 
-            if i < len(constructor_arg_names) - 1:
+            if i < len(cls.constructor.arguments) - 1:
                 return_writer.write(",\n")
             else:
                 return_writer.write(");")
@@ -619,25 +615,25 @@ case Json.JsonTokenType.EndObject:
         property_switch_writer.write(
             textwrap.dedent(
                 f"""\
-            string propertyName = reader.GetString()
-            {I}?? throw new System.InvalidOperationException(
-            {II}"Unexpected property name null");
-
-            switch (propertyName)
-            {{
-            """
+                string propertyName = reader.GetString()
+                {I}?? throw new System.InvalidOperationException(
+                {II}"Unexpected property name null");
+    
+                switch (propertyName)
+                {{
+                """
+                )
             )
-        )
 
         for prop in cls.properties:
             var_name = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
 
             if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-                prop_type = csharp_common.generate_type(
+                arg_type = csharp_common.generate_type(
                     type_annotation=prop.type_annotation.value,
                     ref_association=ref_association)
             else:
-                prop_type = csharp_common.generate_type(
+                arg_type = csharp_common.generate_type(
                     type_annotation=prop.type_annotation,
                     ref_association=ref_association)
 
@@ -647,12 +643,12 @@ case Json.JsonTokenType.EndObject:
                 textwrap.indent(
                     textwrap.dedent(
                         f"""\
-                case {csharp_common.string_literal(json_prop_name)}: 
-                {I}{var_name} =  (
-                {II}Json.JsonSerializer.Deserialize<{prop_type}>(
-                {III}ref reader));
-                {I}break;
-                """
+                        case {csharp_common.string_literal(json_prop_name)}: 
+                        {I}{var_name} =  (
+                        {II}Json.JsonSerializer.Deserialize<{arg_type}>(
+                        {III}ref reader));
+                        {I}break;
+                        """
                     ),
                     I,
                 )
@@ -706,8 +702,8 @@ case Json.JsonTokenType.PropertyName:
         Stripped(
             textwrap.dedent(
                 f"""\
-        default:
-        {I}throw new Json.JsonException();"""
+                default:
+                {I}throw new Json.JsonException();"""
             )
         )
     )
@@ -716,11 +712,11 @@ case Json.JsonTokenType.PropertyName:
     while_writer.write(
         textwrap.dedent(
             f"""\
-        while (reader.Read())
-        {{
-        {I}switch (reader.TokenType)
-        {I}{{
-        """
+            while (reader.Read())
+            {{
+            {I}switch (reader.TokenType)
+            {I}{{
+            """
         )
     )
 
@@ -948,7 +944,9 @@ def generate(
 
             implementers = interface_implementers[symbol]
             jsonization_block, error = _generate_json_converter_for_interface(
-                interface=symbol, implementers=implementers
+                interface=symbol,
+                implementers=implementers,
+                ref_association=symbol_table.ref_association
             )
 
             if error is not None:

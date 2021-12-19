@@ -11,7 +11,7 @@ import sys
 import tempfile
 import textwrap
 
-import aas_core_codegen.csharp.main
+import aas_core_codegen.main
 
 
 def main() -> int:
@@ -29,8 +29,8 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as tmp_dir:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
-        # TODO: remove
-        (repo_dir/"deleteme").mkdir(exist_ok=True,parents=True)
+        # TODO: remove once debugging done
+        (repo_dir/"deleteme").mkdir(exist_ok=True, parents=True)
         tmp_dir = str(repo_dir / "deleteme/expected_output")
 
         parent_case_dir = repo_dir / "test_data" / "test_csharp" / "test_main"
@@ -45,10 +45,6 @@ def main() -> int:
             snippets_dir = case_dir / "input/snippets"
             assert snippets_dir.exists() and snippets_dir.is_dir(), snippets_dir
 
-            namespace_pth = case_dir / "input/namespace.txt"
-            assert namespace_pth.exists() and namespace_pth.is_file(), namespace_pth
-            namespace = (case_dir / "input/namespace.txt").read_text()
-
             output_dir = pathlib.Path(tmp_dir) / case_dir.name
 
             print(
@@ -56,16 +52,17 @@ def main() -> int:
                 f"to: {output_dir} ...")
 
             output_dir.mkdir(exist_ok=True, parents=True)
-            params = aas_core_codegen.csharp.main.Parameters(
+
+            params = aas_core_codegen.main.Parameters(
                 model_path=model_pth,
+                target=aas_core_codegen.main.Target.CSHARP,
                 snippets_dir=snippets_dir,
-                namespace=namespace,
                 output_dir=output_dir)
 
             stdout = io.StringIO()
             stderr = io.StringIO()
 
-            return_code = aas_core_codegen.csharp.main.run(
+            return_code = aas_core_codegen.main.execute(
                 params=params, stdout=stdout, stderr=stderr)
 
             assert stderr.getvalue() == "", (

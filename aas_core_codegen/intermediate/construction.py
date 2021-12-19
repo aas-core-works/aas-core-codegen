@@ -1,4 +1,5 @@
 """Understand the constructors of the classes."""
+import abc
 import ast
 import collections
 import itertools
@@ -14,7 +15,7 @@ from typing import (
 )
 
 import asttokens
-from icontract import ensure, require
+from icontract import ensure, require, DBC
 
 from aas_core_codegen import parse
 from aas_core_codegen.common import Identifier, Error
@@ -35,16 +36,24 @@ class CallSuperConstructor:
         self.super_name = super_name
 
 
-class Default:
+class Default(DBC):
     """Represent a default value set to a property if an argument is unspecified."""
 
     def __init__(self, node: ast.AST) -> None:
         """Initialize with the given values."""
         self.node = node
 
+    @abc.abstractmethod
+    def _dummy_abstract_method(self) -> str:
+        """Signal that the class is purely abstract."""
+        raise NotImplementedError()
+
 
 class EmptyList(Default):
     """Represent an empty list set to a property if the argument is unspecified."""
+
+    def _dummy_abstract_method(self) -> None:
+        pass
 
 
 class DefaultEnumLiteral(Default):
@@ -52,12 +61,16 @@ class DefaultEnumLiteral(Default):
 
     @require(lambda enum, literal: literal in enum.literals)
     def __init__(
-        self, enum: parse.Enumeration, literal: parse.EnumerationLiteral, node: ast.AST
+            self, enum: parse.Enumeration, literal: parse.EnumerationLiteral,
+            node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Default.__init__(self, node=node)
         self.enum = enum
         self.literal = literal
+
+    def _dummy_abstract_method(self) -> None:
+        pass
 
 
 class AssignArgument:
@@ -68,7 +81,7 @@ class AssignArgument:
     default: Optional[Default]  #: Default value if the argument is None
 
     def __init__(
-        self, name: Identifier, argument: Identifier, default: Optional[Default]
+            self, name: Identifier, argument: Identifier, default: Optional[Default]
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -81,10 +94,10 @@ Statement = Union[CallSuperConstructor, AssignArgument]
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _call_as_call_to_super_init(
-    call: ast.Call,
-    parsed_class: parse.Class,
-    parsed_symbol_table: parse.SymbolTable,
-    atok: asttokens.ASTTokens,
+        call: ast.Call,
+        parsed_class: parse.Class,
+        parsed_symbol_table: parse.SymbolTable,
+        atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[CallSuperConstructor], Optional[Error]]:
     """Understand a call as a call to the constructor of a super-class."""
     if not isinstance(call.func, ast.Attribute):
@@ -166,7 +179,7 @@ def _call_as_call_to_super_init(
     underlying_errors = []  # type: List[Error]
 
     for arg_node in itertools.chain(
-        call.args, (keyword.value for keyword in call.keywords)
+            call.args, (keyword.value for keyword in call.keywords)
     ):
         if not isinstance(arg_node, ast.Name):
             underlying_errors.append(
@@ -290,11 +303,11 @@ def _call_as_call_to_super_init(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _understand_assignment(
-    assign: ast.Assign,
-    init: Method,
-    parsed_class: parse.Class,
-    parsed_symbol_table: parse.SymbolTable,
-    atok: asttokens.ASTTokens,
+        assign: ast.Assign,
+        init: Method,
+        parsed_class: parse.Class,
+        parsed_symbol_table: parse.SymbolTable,
+        atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[Statement], Optional[Error]]:
     if len(assign.targets) > 1:
         return (
@@ -309,9 +322,9 @@ def _understand_assignment(
     target = assign.targets[0]
 
     if not (
-        isinstance(target, ast.Attribute)
-        and isinstance(target.value, ast.Name)
-        and target.value.id == "self"
+            isinstance(target, ast.Attribute)
+            and isinstance(target.value, ast.Name)
+            and target.value.id == "self"
     ):
         return (
             None,
@@ -368,33 +381,33 @@ def _understand_assignment(
 
         if_exp = assign.value
         if (
-            isinstance(if_exp.test, ast.Compare)
-            and isinstance(if_exp.test.left, ast.Name)
-            and isinstance(if_exp.test.left.ctx, ast.Load)
-            and if_exp.test.left.id in init.arguments_by_name
-            and len(if_exp.test.ops) == 1
-            and isinstance(if_exp.test.ops[0], ast.IsNot)
-            and len(if_exp.test.comparators) == 1
-            and isinstance(if_exp.test.comparators[0], ast.Constant)
-            and if_exp.test.comparators[0].value is None
-            and isinstance(if_exp.body, ast.Name)
-            and if_exp.body.id == if_exp.test.left.id
-            and if_exp.orelse is not None
+                isinstance(if_exp.test, ast.Compare)
+                and isinstance(if_exp.test.left, ast.Name)
+                and isinstance(if_exp.test.left.ctx, ast.Load)
+                and if_exp.test.left.id in init.arguments_by_name
+                and len(if_exp.test.ops) == 1
+                and isinstance(if_exp.test.ops[0], ast.IsNot)
+                and len(if_exp.test.comparators) == 1
+                and isinstance(if_exp.test.comparators[0], ast.Constant)
+                and if_exp.test.comparators[0].value is None
+                and isinstance(if_exp.body, ast.Name)
+                and if_exp.body.id == if_exp.test.left.id
+                and if_exp.orelse is not None
         ):
             default_node = if_exp.orelse
 
         elif (
-            isinstance(if_exp.test, ast.Compare)
-            and isinstance(if_exp.test.left, ast.Name)
-            and if_exp.test.left.id in init.arguments_by_name
-            and len(if_exp.test.ops) == 1
-            and isinstance(if_exp.test.ops[0], ast.Is)
-            and len(if_exp.test.comparators) == 1
-            and isinstance(if_exp.test.comparators[0], ast.Constant)
-            and if_exp.test.comparators[0].value is None
-            and isinstance(if_exp.orelse, ast.Name)
-            and if_exp.orelse.id == if_exp.test.left.id
-            and if_exp.body is not None
+                isinstance(if_exp.test, ast.Compare)
+                and isinstance(if_exp.test.left, ast.Name)
+                and if_exp.test.left.id in init.arguments_by_name
+                and len(if_exp.test.ops) == 1
+                and isinstance(if_exp.test.ops[0], ast.Is)
+                and len(if_exp.test.comparators) == 1
+                and isinstance(if_exp.test.comparators[0], ast.Constant)
+                and if_exp.test.comparators[0].value is None
+                and isinstance(if_exp.orelse, ast.Name)
+                and if_exp.orelse.id == if_exp.test.left.id
+                and if_exp.body is not None
         ):
             default_node = if_exp.body
         else:
@@ -406,7 +419,7 @@ def _understand_assignment(
             if isinstance(default_node, ast.List) and default_node.elts == []:
                 default = EmptyList(node=default_node)
             elif isinstance(default_node, ast.Attribute) and isinstance(
-                default_node.value, ast.Name
+                    default_node.value, ast.Name
             ):
                 symbol = parsed_symbol_table.find(
                     name=Identifier(default_node.value.id)
@@ -447,9 +460,9 @@ def _understand_assignment(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _understand_body(
-    parsed_class: parse.Class,
-    parsed_symbol_table: parse.SymbolTable,
-    atok: asttokens.ASTTokens,
+        parsed_class: parse.Class,
+        parsed_symbol_table: parse.SymbolTable,
+        atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[List[Statement]], Optional[Error]]:
     """Try to understand the body of the constructor for the given ``parsed_class``."""
     init = None  # type: Optional[parse.Method]
@@ -563,7 +576,7 @@ class ConstructorTable:
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def understand_all(
-    parsed_symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
+        parsed_symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[ConstructorTable], Optional[Error]]:
     """Understand the constructors of all the classes in the symbol table."""
     errors = []  # type: List[Error]
