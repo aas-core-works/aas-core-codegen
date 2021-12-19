@@ -765,10 +765,59 @@ class ImplementationSpecificVerification(Verification):
 
 
 class PatternVerification(Verification):
-    """Represent a function that checks a string against a regular expression."""
+    """
+    Represent a function that checks a string against a regular expression.
 
-    # TODO: implement pattern.py module that interprets the verification function as a pattern
-    #  and then add the statements here
+    There is expected to be a single string argument (the text to be matched).
+    The function is expected to return a boolean.
+    """
+
+    #: Pattern, *i.e.* the regular expression, that the function checks against
+    pattern: Final[str]
+
+    # fmt: off
+    @require(
+        lambda arguments:
+        len(arguments) == 1
+        and isinstance(arguments[0].type_annotation, BuiltinAtomicTypeAnnotation)
+        and arguments[0].type_annotation.a_type == BuiltinAtomicType.STR,
+        "There is a single string argument"
+    )
+    @require(
+        lambda returns:
+        (returns is not None)
+        and isinstance(returns, BuiltinAtomicTypeAnnotation)
+        and returns.a_type == BuiltinAtomicType.BOOL
+    )
+    # fmt: on
+    def __init__(
+            self,
+            name: Identifier,
+            arguments: Sequence[Argument],
+            returns: Optional[TypeAnnotation],
+            description: Optional[Description],
+            contracts: Contracts,
+            pattern: str,
+            parsed: parse.Method,
+    ) -> None:
+        """Initialize with the given values."""
+        Verification.__init__(
+            self,
+            name=name,
+            arguments=arguments,
+            returns=returns,
+            description=description,
+            contracts=contracts,
+            parsed=parsed
+        )
+
+        self.pattern = pattern
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
 
 
 T = TypeVar("T")  # pylint: disable=invalid-name

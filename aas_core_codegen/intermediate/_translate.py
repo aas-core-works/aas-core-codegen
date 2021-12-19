@@ -62,7 +62,7 @@ from aas_core_codegen.intermediate._types import (
     RefTypeAnnotation,
     collect_ids_of_interfaces_in_properties,
     map_interface_implementers, ImplementationSpecificMethod,
-    ImplementationSpecificVerification, Verification,
+    ImplementationSpecificVerification, Verification, PatternVerification,
 )
 from aas_core_codegen.parse import (
     tree as parse_tree
@@ -792,28 +792,51 @@ def _parsed_verification_function_to_verification_function(
         parsed: parse.Method
 ) -> Tuple[Optional[Verification], Optional[Error]]:
     """Translate the verification function and try to understand it, if necessary."""
+    name = parsed.name
+    arguments = _parsed_arguments_to_arguments(parsed=parsed.arguments)
+    returns = (
+        None
+        if parsed.returns is None
+        else _parsed_type_annotation_to_type_annotation(parsed.returns)
+    )
+    description = (
+        _parsed_description_to_description(parsed.description)
+        if parsed.description is not None
+        else None
+    )
+    contracts = _parsed_contracts_to_contracts(parsed.contracts)
+
     if isinstance(parsed, parse.ImplementationSpecificMethod):
         return ImplementationSpecificVerification(
-            name=parsed.name,
-            arguments=_parsed_arguments_to_arguments(parsed=parsed.arguments),
-            returns=(
-                None
-                if parsed.returns is None
-                else _parsed_type_annotation_to_type_annotation(parsed.returns)
-            ),
-            description=(
-                _parsed_description_to_description(parsed.description)
-                if parsed.description is not None
-                else None
-            ),
-            contracts=_parsed_contracts_to_contracts(parsed.contracts),
+            name=name,
+            arguments=arguments,
+            returns=returns,
+            description=description,
+            contracts=contracts,
             parsed=parsed,
         ), None
+
     elif isinstance(parsed, parse.UnderstoodMethod):
-        pattern_verification_func = pattern_verification.try_to_understand(
+        pattern, found, error = pattern_verification.try_to_understand(
             parsed=parsed)
-        if pattern_verification_func is not None:
-            return pattern_verification_func, None
+
+        if error is not None:
+            return None, error
+
+        assert found is not None
+        if found:
+            assert pattern is not None
+            # TODO: generate code in C# for this!
+            # TODO: check XSD, JSON and RDF
+            return PatternVerification(
+                name=name,
+                arguments=arguments,
+                returns=returns,
+                description=description,
+                contracts=contracts,
+                pattern=pattern,
+                parsed=parsed,
+            ), None
 
         return (
             None,
@@ -824,6 +847,7 @@ def _parsed_verification_function_to_verification_function(
                 "Please contact the developers if you expect this function "
                 "to be understood.")
         )
+
     elif isinstance(parsed, parse.ConstructorToBeUnderstood):
         return (
             None,

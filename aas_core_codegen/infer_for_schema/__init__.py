@@ -7,3 +7,5 @@ infer_len_constraints = _len.infer_len_constraints
 
 PatternConstraint = _pattern.PatternConstraint
 infer_pattern_constraints = _pattern.infer_pattern_constraints
+PatternVerificationsByName = _pattern.PatternVerificationsByName
+map_pattern_verifications_by_name = _pattern.map_pattern_verifications_by_name

@@ -1,20 +1,48 @@
 """Infer the constraints on a property based on regular expressions."""
-from typing import Union, Tuple, Optional, List, MutableMapping
+from typing import Union, Tuple, Optional, List, MutableMapping, Sequence, Mapping, cast
 
 from aas_core_codegen.common import Error, Identifier
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.parse import tree as parse_tree
 from aas_core_codegen.infer_for_schema import _common as infer_for_schema_common
 
-# TODO-BEFORE-RELEASE (mristin, 2021-12-13): double-check all the patterns
-# Please see the following link for how we construct the regular expressions:
-# https://github.com/aas-core-works/abnf-to-regexp/tree/main/test_data/nested-python
-_PATTERN_BY_FUNCTION = {
-    "is_ID_short": r"^[a-zA-Z][a-zA-Z_0-9]*$",
-    "is_MIME_type": r'([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+|"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*"))*',
-}
+
+# fmt: off
+# noinspection PyAbstractClass
+@require(
+    lambda mapping:
+    all(
+        name == func.name
+        for name, func in mapping.items()
+    )
+)
+# fmt: on
+class PatternVerificationsByName(Mapping[Identifier, intermediate.PatternVerification]):
+    def __new__(
+            cls,
+            mapping: Mapping[Identifier, intermediate.PatternVerification]
+    ) -> 'PatternVerificationsByName':
+        return cast(PatternVerificationsByName, mapping)
+
+
+def map_pattern_verifications_by_name(
+        verifications: Sequence[intermediate.Verification]
+) -> PatternVerificationsByName:
+    """
+    Go over all verifications and map the pattern verifications by their name.
+
+    The verifications which do not perform pattern matching are ignored.
+    """
+    result = dict(
+    )  # type: MutableMapping[Identifier, intermediate.PatternVerification]
+
+    for verification in verifications:
+        if isinstance(verification, intermediate.PatternVerification):
+            result[verification.name] = verification
+
+    return PatternVerificationsByName(result)
 
 
 class PatternConstraint:
@@ -35,7 +63,8 @@ class _ConstraintOnProperty:
 
 
 def _match_constraint_on_property(
-    node: parse_tree.Node,
+        node: parse_tree.Node,
+        pattern_verifications_by_name: PatternVerificationsByName
 ) -> Optional[_ConstraintOnProperty]:
     """
     Match the pattern constraints on a property.
@@ -52,17 +81,19 @@ def _match_constraint_on_property(
     if prop_name is None:
         return None
 
-    pattern = _PATTERN_BY_FUNCTION.get(node.name, None)
-    if pattern is None:
+    pattern_verification = pattern_verifications_by_name.get(node.name, None)
+    if pattern_verification is None:
         return None
 
     return _ConstraintOnProperty(
-        prop_name=prop_name, constraint=PatternConstraint(pattern=pattern)
+        prop_name=prop_name,
+        constraint=PatternConstraint(pattern=pattern_verification.pattern)
     )
 
 
 def infer_pattern_constraints(
-    symbol: Union[intermediate.Interface, intermediate.Class]
+        symbol: Union[intermediate.Interface, intermediate.Class],
+        pattern_verifications_by_name: PatternVerificationsByName
 ) -> MutableMapping[intermediate.Property, List[PatternConstraint]]:
     """
     Infer the pattern constraints for every property of the class ``cls``.
@@ -97,19 +128,22 @@ def infer_pattern_constraints(
             # ``is_ID_short(self.something) and is_MIME(self.something)``
             if isinstance(conditional_on_prop.consequent, parse_tree.And):
                 for value_node in conditional_on_prop.consequent.values:
-                    constraint_on_prop = _match_constraint_on_property(value_node)
+                    constraint_on_prop = _match_constraint_on_property(
+                        node=value_node,
+                        pattern_verifications_by_name=pattern_verifications_by_name)
 
                     if (
-                        constraint_on_prop is not None
-                        and constraint_on_prop.prop_name
-                        == conditional_on_prop.prop_name
+                            constraint_on_prop is not None
+                            and constraint_on_prop.prop_name
+                            == conditional_on_prop.prop_name
                     ):
                         constraints_on_props.append(constraint_on_prop)
 
             # Match something like ``is_ID_short(self.something)``
             elif isinstance(conditional_on_prop.consequent, parse_tree.FunctionCall):
                 constraint_on_prop = _match_constraint_on_property(
-                    node=conditional_on_prop.consequent
+                    node=conditional_on_prop.consequent,
+                    pattern_verifications_by_name=pattern_verifications_by_name
                 )
 
                 if constraint_on_prop is not None:
@@ -124,14 +158,20 @@ def infer_pattern_constraints(
             # ``is_ID_short(self.something) and is_MIME(self.something)``
             if isinstance(invariant.body, parse_tree.And):
                 for value_node in invariant.body.values:
-                    constraint_on_prop = _match_constraint_on_property(value_node)
+                    constraint_on_prop = _match_constraint_on_property(
+                        node=value_node,
+                        pattern_verifications_by_name=pattern_verifications_by_name
+                    )
 
                     if constraint_on_prop is not None:
                         constraints_on_props.append(constraint_on_prop)
 
             # Match something like ``is_ID_short(self.something)``
             elif isinstance(invariant.body, parse_tree.FunctionCall):
-                constraint_on_prop = _match_constraint_on_property(node=invariant.body)
+                constraint_on_prop = _match_constraint_on_property(
+                    node=invariant.body,
+                    pattern_verifications_by_name=pattern_verifications_by_name
+                )
 
                 if constraint_on_prop is not None:
                     constraints_on_props.append(constraint_on_prop)

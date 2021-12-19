@@ -7,16 +7,117 @@ and :py:class:`aas_core_codegen.intermediate._types.PatternVerification` had to 
 defined in :py:mod:`aas_core_codegen.intermediate._types` to avoid circular imports.
 """
 import ast
-from typing import Optional, Tuple
+import collections
+import re
+from typing import Optional, Tuple, List, MutableMapping, Mapping
 
 from icontract import require, ensure
 
 from aas_core_codegen.intermediate._types import PatternVerification
 from aas_core_codegen import parse
-from aas_core_codegen.common import Error
+from aas_core_codegen.common import Error, Identifier
 from aas_core_codegen.parse import (
     tree as parse_tree
 )
+
+
+def _check_support(node: parse_tree.Node) -> Optional[List[Error]]:
+    """Check that we understand the ``node`` in the pattern-matching function."""
+    if isinstance(node, parse_tree.Constant):
+        if isinstance(node.value, str):
+            return None
+        else:
+            return [
+                Error(
+                    node.original_node,
+                    f"We did not implement the support for non-string constants "
+                    f"in pattern matching: {parse_tree.dump(node)}.\n"
+                    f"\n"
+                    f"Please notify the developers if you need this."
+                )
+            ]
+
+    elif isinstance(node, parse_tree.JoinedStr):
+        errors = []  # type: List[Error]
+
+        for value in node.values:
+            # noinspection PyTypeChecker
+            underlying_errors = _check_support(value)
+            if underlying_errors is not None:
+                errors.extend(underlying_errors)
+
+        if len(errors) == 0:
+            return None
+
+        return errors
+
+    elif isinstance(node, parse_tree.Name):
+        return None
+
+    elif isinstance(node, parse_tree.Assignment):
+        if not isinstance(node.target, parse_tree.Name):
+            return [
+                Error(
+                    node.target.original_node,
+                    f"We currently support only assignments to simple variables, "
+                    f"but got: {parse_tree.dump(node.target)}.\n"
+                    f"\n"
+                    f"Please notify the developers if you need this."
+                )
+            ]
+
+        return _check_support(node.value)
+
+    else:
+        return [
+            Error(
+                node.original_node,
+                f"We did not implement the support for this construct "
+                f"in pattern matching: {parse_tree.dump(node)}.\n"
+                f"\n"
+                f"Please notify the developers if you need this."
+            )
+        ]
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _evaluate(
+        expr: parse_tree.Expression,
+        state: Mapping[Identifier, str]
+) -> Tuple[Optional[str], Optional[Error]]:
+    """Evaluate the expression to a string constant."""
+    if isinstance(expr, parse_tree.Constant):
+        assert isinstance(expr.value, str)
+        return expr.value, None
+
+    elif isinstance(expr, parse_tree.Name):
+        value = state.get(expr.identifier, None)
+        if value is None:
+            return (
+                None,
+                Error(
+                    expr.original_node,
+                    f"The value of variable {expr.identifier} has not been assigned "
+                    f"before"
+                )
+            )
+
+        return value, None
+
+    elif isinstance(expr, parse_tree.JoinedStr):
+        parts = []  # type: List[str]
+        for value in expr.values:
+            part, error = _evaluate(value)
+            if error is not None:
+                return None, error
+
+            assert part is not None
+            parts.append(part)
+
+        return "".join(parts), None
+
+    else:
+        raise AssertionError(f"Unexpected expression: {parse_tree.dump(expr)}")
 
 
 # fmt: off
@@ -43,12 +144,12 @@ from aas_core_codegen.parse import (
 # fmt: on
 def try_to_understand(
         parsed: parse.UnderstoodMethod
-) -> Tuple[Optional[PatternVerification], Optional[bool], Optional[Error]]:
+) -> Tuple[Optional[str], Optional[bool], Optional[Error]]:
     """
     Try to understand the given verification function as a pattern matching function.
 
     :param parsed: Verification function as parsed in the parsing phase
-    :return: pattern verification, if understood
+    :return: tuple of (pattern, found, error)
 
     We return an error if the method looks like a pattern matching, but has a slightly
     unexpected form (*e.g.*, flags in the call to ``match(...)``).
@@ -151,15 +252,96 @@ def try_to_understand(
             None,
             Error(
                 match_call.original_node,
-                f"The second argument, the text to be matched, to ``match`` "
+                f"The second argument to ``match`` function, the text to be matched, "
                 f"needs to correspond to the single argument of "
-                f"the verification ""function, {parsed.arguments[0].name!r}. "
+                f"the verification function, {parsed.arguments[0].name!r}. "
                 "Otherwise, we can not transpile the pattern to schemas."
             )
         )
 
-    for i, stmt in enumerate(parsed.body):
+    # noinspection PyUnresolvedReferences
+    if (
+            isinstance(match_call.args[0], parse_tree.Name)
+            and match_call.args[0].identifier == parsed.arguments[0].name
+    ):
+        return (
+            None,
+            None,
+            Error(
+                match_call.original_node,
+                f"The first argument, the pattern, to the ``match`` function "
+                f"must not be the argument supplied to "
+                f"the verification function, {parsed.arguments[0].name!r}."
+            )
+        )
 
-    print(f"match_call is: {parse_tree.dump(match_call)}")  # TODO: debug
-    raise NotImplementedError()
-    # TODO: implement this till the end once we understand the pattern matching statements in _rules
+    # region Check the support of the statements
+
+    errors = []  # type: List[Error]
+    for i, stmt in enumerate(parsed.body):
+        # Skip the return statement
+        if i == len(parsed.body) - 1:
+            break
+
+        underlying_errors = _check_support(node=stmt)
+
+        if underlying_errors is not None:
+            errors.extend(underlying_errors)
+
+    underlying_errors = _check_support(match_call.args[0])
+    if underlying_errors is not None:
+        errors.extend(underlying_errors)
+
+    if len(errors) > 0:
+        return (
+            None,
+            None,
+            Error(
+                parsed.node,
+                f"We could not understand "
+                f"the pattern matching function {parsed.name!r}",
+                errors
+            )
+        )
+
+    # endregion
+
+    # region Re-execute the function to infer the pattern
+
+    state = collections.OrderedDict()  # type: MutableMapping[Identifier, str]
+
+    pattern = None  # type: Optional[str]
+    for i, stmt in enumerate(parsed.body):
+        if i < len(parsed.body) - 1:
+            assert isinstance(stmt, parse_tree.Assignment)
+            assert isinstance(stmt.target, parse_tree.Name)
+
+            value, error = _evaluate(expr=stmt.value, state=state)
+            if error is not None:
+                return None, None, error
+
+            state[stmt.target.identifier] = value
+
+        else:
+            pattern, error = _evaluate(expr=match_call.args[0], state=state)
+            if error is not None:
+                return None, None, error
+
+    # endregion
+
+    try:
+        re.compile(pattern)
+    except re.error as exception:
+        return (
+            None,
+            None,
+            Error(
+                match_call.args[0].original_node,
+                f"Failed to compile the pattern with the Python's ``re`` module.\n"
+                f"\n"
+                f"The evaluated pattern was: {pattern!r}.\n"
+                f"The error message was: {exception}"
+            )
+        )
+
+    return pattern, True, None
