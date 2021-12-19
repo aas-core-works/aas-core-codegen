@@ -105,21 +105,6 @@ namespace AasCore.Aas3
             }
         }
 
-        private static readonly Regex _idShortRe = new Regex(
-            "^[a-zA-Z][a-zA-Z_0-9]*$"
-        );
-
-        /// <summary>
-        /// Check that the <paramref name="text"/> is a valid short ID.
-        /// </summary>
-        /// <remarks>
-        /// Related: Constraint AASd-002
-        /// </remarks>
-        public static bool IsIdShort(string text)
-        {
-            return _idShortRe.IsMatch(text);
-        }
-
         private static Regex _constructMimeTypeRegex()
         {
             var tchar = "[!#$%&'*+\\-.^_`|~0-9a-zA-Z]";
@@ -318,15 +303,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for AssetAdministrationShell.
             }
 
             /// <summary>
@@ -379,15 +356,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for Submodel.
 
                 if (errors.Full()) return;
 
@@ -415,15 +384,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for SubmodelElementList.
 
                 if (errors.Full()) return;
 
@@ -476,15 +437,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for SubmodelElementStruct.
 
                 if (errors.Full()) return;
 
@@ -512,15 +465,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for Property.
 
                 if (errors.Full()) return;
 
@@ -559,15 +504,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for MultiLanguageProperty.
 
                 if (errors.Full()) return;
 
@@ -595,15 +532,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for Range.
 
                 if (errors.Full()) return;
 
@@ -642,15 +571,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for ReferenceElement.
 
                 if (errors.Full()) return;
 
@@ -678,16 +599,6 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
-
                 if (!Verification.IsMimeType(that.MimeType))
                 {
                     errors.Add(
@@ -723,16 +634,6 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
-
                 if (!Verification.IsMimeType(that.MimeType))
                 {
                     errors.Add(
@@ -768,15 +669,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for AnnotatedRelationshipElement.
 
                 if (errors.Full()) return;
 
@@ -804,15 +697,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for Entity.
 
                 if (errors.Full()) return;
 
@@ -851,15 +736,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for BasicEvent.
 
                 if (errors.Full()) return;
 
@@ -887,15 +764,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for Operation.
 
                 if (errors.Full()) return;
 
@@ -937,15 +806,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for Capability.
 
                 if (errors.Full()) return;
 
@@ -973,15 +834,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for ConceptDescription.
             }
 
             /// <summary>
@@ -995,15 +848,7 @@ namespace AasCore.Aas3
                 string path,
                 Verification.Errors errors)
             {
-                if (!Verification.IsIdShort(that.IdShort))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-002\n" +
-                            "Verification.IsIdShort(that.IdShort)"));
-                }
+                // There are no invariants defined for View.
             }
 
             /// <summary>
@@ -1635,18 +1480,15 @@ namespace AasCore.Aas3
                 Implementation.VerifyAdministrativeInformation(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
             }
 
@@ -1687,15 +1529,12 @@ namespace AasCore.Aas3
                 Implementation.VerifyFormula(
                     that, context, Errors);
 
-                if (that.DependsOn != null)
+                for(var i = 0; i < that.DependsOn.Count; i++)
                 {
-                    for(var i = 0; i < that.DependsOn.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DependsOn[i],
-                            $"{context}/DependsOn/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DependsOn[i],
+                        $"{context}/DependsOn/{i}");
                 }
             }
 
@@ -1709,29 +1548,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyAssetAdministrationShell(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -1771,15 +1604,12 @@ namespace AasCore.Aas3
                     that.AssetInformation,
                     $"{context}/AssetInformation");
 
-                if (that.Submodels != null)
+                for(var i = 0; i < that.Submodels.Count; i++)
                 {
-                    for(var i = 0; i < that.Submodels.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Submodels[i],
-                            $"{context}/Submodels/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Submodels[i],
+                        $"{context}/Submodels/{i}");
                 }
             }
 
@@ -1855,18 +1685,15 @@ namespace AasCore.Aas3
                 Implementation.VerifySubmodel(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
                 if (that.SemanticId != null)
@@ -1877,26 +1704,20 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -1923,18 +1744,15 @@ namespace AasCore.Aas3
                         $"{context}/Administration");
                 }
 
-                if (that.SubmodelElements != null)
+                for(
+                    var i = 0;
+                    i < that.SubmodelElements.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.SubmodelElements.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.SubmodelElements[i],
-                            $"{context}/SubmodelElements/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.SubmodelElements[i],
+                        $"{context}/SubmodelElements/{i}");
                 }
             }
 
@@ -1948,29 +1766,23 @@ namespace AasCore.Aas3
                 Implementation.VerifySubmodelElementList(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -1997,26 +1809,20 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
 
-                if (that.Values != null)
+                for(var i = 0; i < that.Values.Count; i++)
                 {
-                    for(var i = 0; i < that.Values.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Values[i],
-                            $"{context}/Values/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Values[i],
+                        $"{context}/Values/{i}");
                 }
 
                 if (that.SemanticIdValues != null)
@@ -2038,29 +1844,23 @@ namespace AasCore.Aas3
                 Implementation.VerifySubmodelElementStruct(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -2087,26 +1887,20 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
 
-                if (that.Values != null)
+                for(var i = 0; i < that.Values.Count; i++)
                 {
-                    for(var i = 0; i < that.Values.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Values[i],
-                            $"{context}/Values/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Values[i],
+                        $"{context}/Values/{i}");
                 }
             }
 
@@ -2120,29 +1914,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyProperty(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -2169,15 +1957,12 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
 
                 if (that.ValueId != null)
@@ -2199,29 +1984,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyMultiLanguageProperty(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -2248,15 +2027,12 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
 
                 if (that.Translatable != null)
@@ -2286,29 +2062,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyRange(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -2335,15 +2105,12 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
             }
 
@@ -2357,29 +2124,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyReferenceElement(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -2406,15 +2167,12 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
 
                 if (that.Reference != null)
@@ -2436,29 +2194,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyBlob(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -2485,15 +2237,12 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
             }
 
@@ -2507,29 +2256,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyFile(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -2556,15 +2299,12 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
             }
 
@@ -2578,29 +2318,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyAnnotatedRelationshipElement(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -2627,15 +2361,12 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
 
                 if (Errors.Full()) return;
@@ -2648,15 +2379,12 @@ namespace AasCore.Aas3
                     that.Second,
                     $"{context}/Second");
 
-                if (that.Annotation != null)
+                for(var i = 0; i < that.Annotation.Count; i++)
                 {
-                    for(var i = 0; i < that.Annotation.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Annotation[i],
-                            $"{context}/Annotation/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Annotation[i],
+                        $"{context}/Annotation/{i}");
                 }
             }
 
@@ -2670,29 +2398,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyEntity(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -2719,26 +2441,20 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
 
-                if (that.Statements != null)
+                for(var i = 0; i < that.Statements.Count; i++)
                 {
-                    for(var i = 0; i < that.Statements.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Statements[i],
-                            $"{context}/Statements/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Statements[i],
+                        $"{context}/Statements/{i}");
                 }
 
                 if (that.GlobalAssetId != null)
@@ -2768,29 +2484,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyBasicEvent(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -2817,15 +2527,12 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
 
                 if (Errors.Full()) return;
@@ -2844,29 +2551,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyOperation(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -2893,54 +2594,42 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
 
-                if (that.InputVariables != null)
+                for(var i = 0; i < that.InputVariables.Count; i++)
                 {
-                    for(var i = 0; i < that.InputVariables.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.InputVariables[i],
-                            $"{context}/InputVariables/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.InputVariables[i],
+                        $"{context}/InputVariables/{i}");
                 }
 
-                if (that.OutputVariables != null)
+                for(
+                    var i = 0;
+                    i < that.OutputVariables.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.OutputVariables.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.OutputVariables[i],
-                            $"{context}/OutputVariables/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.OutputVariables[i],
+                        $"{context}/OutputVariables/{i}");
                 }
 
-                if (that.InoutputVariables != null)
+                for(
+                    var i = 0;
+                    i < that.InoutputVariables.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.InoutputVariables.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.InoutputVariables[i],
-                            $"{context}/InoutputVariables/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.InoutputVariables[i],
+                        $"{context}/InoutputVariables/{i}");
                 }
             }
 
@@ -2970,29 +2659,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyCapability(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -3019,15 +2702,12 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.Qualifiers != null)
+                for(var i = 0; i < that.Qualifiers.Count; i++)
                 {
-                    for(var i = 0; i < that.Qualifiers.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Qualifiers[i],
-                            $"{context}/Qualifiers/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Qualifiers[i],
+                        $"{context}/Qualifiers/{i}");
                 }
             }
 
@@ -3041,29 +2721,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyConceptDescription(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -3090,15 +2764,12 @@ namespace AasCore.Aas3
                         $"{context}/Administration");
                 }
 
-                if (that.IsCaseOf != null)
+                for(var i = 0; i < that.IsCaseOf.Count; i++)
                 {
-                    for(var i = 0; i < that.IsCaseOf.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.IsCaseOf[i],
-                            $"{context}/IsCaseOf/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.IsCaseOf[i],
+                        $"{context}/IsCaseOf/{i}");
                 }
             }
 
@@ -3112,29 +2783,23 @@ namespace AasCore.Aas3
                 Implementation.VerifyView(
                     that, context, Errors);
 
-                if (that.DataSpecifications != null)
+                for(
+                    var i = 0;
+                    i < that.DataSpecifications.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.DataSpecifications[i],
+                        $"{context}/DataSpecifications/{i}");
                 }
 
-                if (that.Extensions != null)
+                for(var i = 0; i < that.Extensions.Count; i++)
                 {
-                    for(var i = 0; i < that.Extensions.Count; i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Extensions[i],
-                            $"{context}/Extensions/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.Extensions[i],
+                        $"{context}/Extensions/{i}");
                 }
 
                 if (that.DisplayName != null)
@@ -3161,18 +2826,15 @@ namespace AasCore.Aas3
                         $"{context}/SemanticId");
                 }
 
-                if (that.ContainedElements != null)
+                for(
+                    var i = 0;
+                    i < that.ContainedElements.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.ContainedElements.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.ContainedElements[i],
-                            $"{context}/ContainedElements/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.ContainedElements[i],
+                        $"{context}/ContainedElements/{i}");
                 }
             }
 
@@ -3265,18 +2927,15 @@ namespace AasCore.Aas3
                 Implementation.VerifyValueList(
                     that, context, Errors);
 
-                if (that.ValueReferencePairs != null)
+                for(
+                    var i = 0;
+                    i < that.ValueReferencePairs.Count;
+                    i++)
                 {
-                    for(
-                        var i = 0;
-                        i < that.ValueReferencePairs.Count;
-                        i++)
-                    {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.ValueReferencePairs[i],
-                            $"{context}/ValueReferencePairs/{i}");
-                    }
+                    if (Errors.Full()) return;
+                    Visit(
+                        that.ValueReferencePairs[i],
+                        $"{context}/ValueReferencePairs/{i}");
                 }
             }
 

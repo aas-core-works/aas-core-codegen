@@ -34,8 +34,8 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                IReference? theSemanticId = null;
                 string? theName = null;
+                IReference? theSemanticId = null;
                 DataTypeDef? theValueType = null;
                 string? theValue = null;
                 IReference? theRefersTo = null;
@@ -208,9 +208,9 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
                 string? theVersion = null;
                 string? theRevision = null;
+                List<IReference>? theDataSpecifications = null;
 
                 while (reader.Read())
                 {
@@ -276,12 +276,9 @@ namespace AasCore.Aas3
             {
                 writer.WriteStartObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
                 if (that.Version != null)
                 {
@@ -322,12 +319,12 @@ namespace AasCore.Aas3
                 string? modelType = null;
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDependsOn = null;
-                IReference? theSemanticId = null;
                 string? theType = null;
+                DataTypeDef? theValueType = null;
                 string? theValue = null;
                 IReference? theValueId = null;
-                DataTypeDef? theValueType = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theDependsOn = null;
 
                 while (reader.Read())
                 {
@@ -361,34 +358,34 @@ namespace AasCore.Aas3
     
                             switch (propertyName)
                             {
-                                case "dependsOn": 
-                                    theDependsOn =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "semanticID": 
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "type": 
+                                case "type":
                                     theType =  (
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "value": 
+                                case "valueType":
+                                    theValueType =  (
+                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
+                                            ref reader));
+                                    break;
+                                case "value":
                                     theValue =  (
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "valueID": 
+                                case "valueID":
                                     theValueId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
                                     break;
-                                case "valueType": 
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
+                                case "semanticID":
+                                    theSemanticId =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "dependsOn":
+                                    theDependsOn =  (
+                                        Json.JsonSerializer.Deserialize<List<IReference>>(
                                             ref reader));
                                     break;
                                 case "modelType":
@@ -456,40 +453,40 @@ namespace AasCore.Aas3
                 // Prefix the property variables with "the" to avoid conflicts
                 string? theId = null;
                 string? theIdShort = null;
-                string? theMimeType = null;
-                AdministrativeInformation? theAdministration = null;
-                List<IDataElement>? theAnnotation = null;
-                string? theCategory = null;
-                byte[]? theContent = null;
-                List<IReference>? theDataSpecifications = null;
-                LangStringSet? theDescription = null;
-                LangStringSet? theDisplayName = null;
-                EntityType? theEntityType = null;
-                List<Extension>? theExtensions = null;
-                IReference? theFirst = null;
-                IReference? theGlobalAssetId = null;
-                List<OperationVariable>? theInoutputVariables = null;
-                List<OperationVariable>? theInputVariables = null;
-                ModelingKind? theKind = null;
-                string? theMax = null;
-                string? theMin = null;
-                IReference? theObserved = null;
-                List<OperationVariable>? theOutputVariables = null;
-                List<IConstraint>? theQualifiers = null;
-                IReference? theReference = null;
-                IReference? theSecond = null;
-                IReference? theSemanticId = null;
-                IReference? theSemanticIdValues = null;
-                IdentifierKeyValuePair? theSpecificAssetId = null;
-                List<ISubmodelElement>? theStatements = null;
-                SubmodelElements? theSubmodelElementTypeValues = null;
                 List<ISubmodelElement>? theSubmodelElements = null;
-                LangStringSet? theTranslatable = null;
+                List<Extension>? theExtensions = null;
+                LangStringSet? theDisplayName = null;
+                string? theCategory = null;
+                LangStringSet? theDescription = null;
+                AdministrativeInformation? theAdministration = null;
+                ModelingKind? theKind = null;
+                IReference? theSemanticId = null;
+                List<IConstraint>? theQualifiers = null;
+                List<IReference>? theDataSpecifications = null;
+                SubmodelElements? theSubmodelElementTypeValues = null;
+                List<ISubmodelElement>? theValues = null;
+                IReference? theSemanticIdValues = null;
+                DataTypeDef? theValueTypeValues = null;
+                DataTypeDef? theValueType = null;
                 string? theValue = null;
                 IReference? theValueId = null;
-                DataTypeDef? theValueType = null;
-                DataTypeDef? theValueTypeValues = null;
-                List<ISubmodelElement>? theValues = null;
+                LangStringSet? theTranslatable = null;
+                string? theMin = null;
+                string? theMax = null;
+                IReference? theReference = null;
+                string? theMimeType = null;
+                byte[]? theContent = null;
+                IReference? theFirst = null;
+                IReference? theSecond = null;
+                List<IDataElement>? theAnnotation = null;
+                EntityType? theEntityType = null;
+                List<ISubmodelElement>? theStatements = null;
+                IReference? theGlobalAssetId = null;
+                IdentifierKeyValuePair? theSpecificAssetId = null;
+                IReference? theObserved = null;
+                List<OperationVariable>? theInputVariables = null;
+                List<OperationVariable>? theOutputVariables = null;
+                List<OperationVariable>? theInoutputVariables = null;
 
                 while (reader.Read())
                 {
@@ -502,7 +499,8 @@ namespace AasCore.Aas3
                                     return new Aas.Submodel(
                                         theId ?? throw new Json.JsonException(
                                             "Required property is missing: id"),
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theSubmodelElements,
                                         theExtensions,
                                         theDisplayName,
@@ -543,7 +541,8 @@ namespace AasCore.Aas3
                                         theValues);
                                 case "Property":
                                     return new Aas.Property(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theValueType ?? throw new Json.JsonException(
                                             "Required property is missing: valueType"),
                                         theExtensions,
@@ -571,7 +570,8 @@ namespace AasCore.Aas3
                                         theValueId);
                                 case "Range":
                                     return new Aas.Range(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theValueType ?? throw new Json.JsonException(
                                             "Required property is missing: valueType"),
                                         theExtensions,
@@ -586,7 +586,8 @@ namespace AasCore.Aas3
                                         theMax);
                                 case "ReferenceElement":
                                     return new Aas.ReferenceElement(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theExtensions,
                                         theDisplayName,
                                         theCategory,
@@ -598,7 +599,8 @@ namespace AasCore.Aas3
                                         theReference);
                                 case "Blob":
                                     return new Aas.Blob(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theMimeType ?? throw new Json.JsonException(
                                             "Required property is missing: mimeType"),
                                         theExtensions,
@@ -612,7 +614,8 @@ namespace AasCore.Aas3
                                         theContent);
                                 case "File":
                                     return new Aas.File(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theMimeType ?? throw new Json.JsonException(
                                             "Required property is missing: mimeType"),
                                         theExtensions,
@@ -660,7 +663,8 @@ namespace AasCore.Aas3
                                     return new Aas.BasicEvent(
                                         theObserved ?? throw new Json.JsonException(
                                             "Required property is missing: observed"),
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theExtensions,
                                         theDisplayName,
                                         theCategory,
@@ -707,184 +711,184 @@ namespace AasCore.Aas3
     
                             switch (propertyName)
                             {
-                                case "id": 
+                                case "id":
                                     theId =  (
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "idShort": 
+                                case "idShort":
                                     theIdShort =  (
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "mimeType": 
-                                    theMimeType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "administration": 
-                                    theAdministration =  (
-                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
-                                            ref reader));
-                                    break;
-                                case "annotation": 
-                                    theAnnotation =  (
-                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
-                                            ref reader));
-                                    break;
-                                case "category": 
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "content": 
-                                    theContent =  (
-                                        Json.JsonSerializer.Deserialize<byte[]>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications": 
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "description": 
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "displayName": 
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "entityType": 
-                                    theEntityType =  (
-                                        Json.JsonSerializer.Deserialize<EntityType>(
-                                            ref reader));
-                                    break;
-                                case "extensions": 
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "first": 
-                                    theFirst =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "globalAssetID": 
-                                    theGlobalAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "inoutputVariables": 
-                                    theInoutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "inputVariables": 
-                                    theInputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "kind": 
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "max": 
-                                    theMax =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "min": 
-                                    theMin =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "observed": 
-                                    theObserved =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "outputVariables": 
-                                    theOutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers": 
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "reference": 
-                                    theReference =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "second": 
-                                    theSecond =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "semanticID": 
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "semanticIDValues": 
-                                    theSemanticIdValues =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "specificAssetID": 
-                                    theSpecificAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
-                                            ref reader));
-                                    break;
-                                case "statements": 
-                                    theStatements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "submodelElementTypeValues": 
-                                    theSubmodelElementTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<SubmodelElements>(
-                                            ref reader));
-                                    break;
-                                case "submodelElements": 
+                                case "submodelElements":
                                     theSubmodelElements =  (
                                         Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
                                             ref reader));
                                     break;
-                                case "translatable": 
-                                    theTranslatable =  (
+                                case "extensions":
+                                    theExtensions =  (
+                                        Json.JsonSerializer.Deserialize<List<Extension>>(
+                                            ref reader));
+                                    break;
+                                case "displayName":
+                                    theDisplayName =  (
                                         Json.JsonSerializer.Deserialize<LangStringSet>(
                                             ref reader));
                                     break;
-                                case "value": 
-                                    theValue =  (
+                                case "category":
+                                    theCategory =  (
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "valueID": 
-                                    theValueId =  (
+                                case "description":
+                                    theDescription =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "administration":
+                                    theAdministration =  (
+                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
+                                            ref reader));
+                                    break;
+                                case "kind":
+                                    theKind =  (
+                                        Json.JsonSerializer.Deserialize<ModelingKind>(
+                                            ref reader));
+                                    break;
+                                case "semanticID":
+                                    theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
                                     break;
-                                case "valueType": 
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
+                                case "qualifiers":
+                                    theQualifiers =  (
+                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
                                             ref reader));
                                     break;
-                                case "valueTypeValues": 
+                                case "dataSpecifications":
+                                    theDataSpecifications =  (
+                                        Json.JsonSerializer.Deserialize<List<IReference>>(
+                                            ref reader));
+                                    break;
+                                case "submodelElementTypeValues":
+                                    theSubmodelElementTypeValues =  (
+                                        Json.JsonSerializer.Deserialize<SubmodelElements>(
+                                            ref reader));
+                                    break;
+                                case "values":
+                                    theValues =  (
+                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
+                                            ref reader));
+                                    break;
+                                case "semanticIDValues":
+                                    theSemanticIdValues =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "valueTypeValues":
                                     theValueTypeValues =  (
                                         Json.JsonSerializer.Deserialize<DataTypeDef>(
                                             ref reader));
                                     break;
-                                case "values": 
-                                    theValues =  (
+                                case "valueType":
+                                    theValueType =  (
+                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
+                                            ref reader));
+                                    break;
+                                case "value":
+                                    theValue =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "valueID":
+                                    theValueId =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "translatable":
+                                    theTranslatable =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "min":
+                                    theMin =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "max":
+                                    theMax =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "reference":
+                                    theReference =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "mimeType":
+                                    theMimeType =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "content":
+                                    theContent =  (
+                                        Json.JsonSerializer.Deserialize<byte[]>(
+                                            ref reader));
+                                    break;
+                                case "first":
+                                    theFirst =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "second":
+                                    theSecond =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "annotation":
+                                    theAnnotation =  (
+                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
+                                            ref reader));
+                                    break;
+                                case "entityType":
+                                    theEntityType =  (
+                                        Json.JsonSerializer.Deserialize<EntityType>(
+                                            ref reader));
+                                    break;
+                                case "statements":
+                                    theStatements =  (
                                         Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
+                                            ref reader));
+                                    break;
+                                case "globalAssetID":
+                                    theGlobalAssetId =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "specificAssetID":
+                                    theSpecificAssetId =  (
+                                        Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
+                                            ref reader));
+                                    break;
+                                case "observed":
+                                    theObserved =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "inputVariables":
+                                    theInputVariables =  (
+                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
+                                            ref reader));
+                                    break;
+                                case "outputVariables":
+                                    theOutputVariables =  (
+                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
+                                            ref reader));
+                                    break;
+                                case "inoutputVariables":
+                                    theInoutputVariables =  (
+                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
                                             ref reader));
                                     break;
                                 case "modelType":
@@ -991,11 +995,11 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                IReference? theSemanticId = null;
                 string? theType = null;
                 DataTypeDef? theValueType = null;
                 string? theValue = null;
                 IReference? theValueId = null;
+                IReference? theSemanticId = null;
 
                 while (reader.Read())
                 {
@@ -1190,12 +1194,9 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "Formula");
 
-                if (that.DependsOn != null)
-                {
-                    writer.WritePropertyName("dependsOn");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DependsOn);
-                }
+                writer.WritePropertyName("dependsOn");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DependsOn);
 
                 writer.WriteEndObject();
             }
@@ -1215,16 +1216,16 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
-                List<Extension>? theExtensions = null;
+                string? theId = null;
                 string? theIdShort = null;
+                AssetInformation? theAssetInformation = null;
+                List<Extension>? theExtensions = null;
                 LangStringSet? theDisplayName = null;
                 string? theCategory = null;
                 LangStringSet? theDescription = null;
-                string? theId = null;
                 AdministrativeInformation? theAdministration = null;
+                List<IReference>? theDataSpecifications = null;
                 IReference? theDerivedFrom = null;
-                AssetInformation? theAssetInformation = null;
                 List<IReference>? theSubmodels = null;
 
                 while (reader.Read())
@@ -1235,7 +1236,8 @@ namespace AasCore.Aas3
                             return new Aas.AssetAdministrationShell(
                                 theId ?? throw new Json.JsonException(
                                     "Required property is missing: id"),
-                                theIdShort,
+                                theIdShort ?? throw new Json.JsonException(
+                                    "Required property is missing: idShort"),
                                 theAssetInformation ?? throw new Json.JsonException(
                                     "Required property is missing: assetInformation"),
                                 theExtensions,
@@ -1348,19 +1350,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "AssetAdministrationShell");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -1412,12 +1408,9 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, that.AssetInformation);
 
-                if (that.Submodels != null)
-                {
-                    writer.WritePropertyName("submodels");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Submodels);
-                }
+                writer.WritePropertyName("submodels");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Submodels);
 
                 writer.WriteEndObject();
             }
@@ -1597,10 +1590,10 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                IReference? theSemanticId = null;
                 string? theKey = null;
                 string? theValue = null;
                 IReference? theExternalSubjectId = null;
+                IReference? theSemanticId = null;
 
                 while (reader.Read())
                 {
@@ -1714,18 +1707,18 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<Extension>? theExtensions = null;
+                string? theId = null;
                 string? theIdShort = null;
+                List<ISubmodelElement>? theSubmodelElements = null;
+                List<Extension>? theExtensions = null;
                 LangStringSet? theDisplayName = null;
                 string? theCategory = null;
                 LangStringSet? theDescription = null;
-                string? theId = null;
                 AdministrativeInformation? theAdministration = null;
-                List<ISubmodelElement>? theSubmodelElements = null;
+                ModelingKind? theKind = null;
+                IReference? theSemanticId = null;
+                List<IConstraint>? theQualifiers = null;
+                List<IReference>? theDataSpecifications = null;
 
                 while (reader.Read())
                 {
@@ -1735,7 +1728,8 @@ namespace AasCore.Aas3
                             return new Aas.Submodel(
                                 theId ?? throw new Json.JsonException(
                                     "Required property is missing: id"),
-                                theIdShort,
+                                theIdShort ?? throw new Json.JsonException(
+                                    "Required property is missing: idShort"),
                                 theSubmodelElements,
                                 theExtensions,
                                 theDisplayName,
@@ -1853,12 +1847,9 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "Submodel");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
                 if (that.Kind != null)
                 {
@@ -1874,19 +1865,13 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -1927,12 +1912,9 @@ namespace AasCore.Aas3
                         writer, that.Administration);
                 }
 
-                if (that.SubmodelElements != null)
-                {
-                    writer.WritePropertyName("submodelElements");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SubmodelElements);
-                }
+                writer.WritePropertyName("submodelElements");
+                Json.JsonSerializer.Serialize(
+                    writer, that.SubmodelElements);
 
                 writer.WriteEndObject();
             }
@@ -1959,39 +1941,39 @@ namespace AasCore.Aas3
                 string? modelType = null;
 
                 // Prefix the property variables with "the" to avoid conflicts
-                string? theIdShort = null;
-                string? theMimeType = null;
-                List<IDataElement>? theAnnotation = null;
-                string? theCategory = null;
-                byte[]? theContent = null;
-                List<IReference>? theDataSpecifications = null;
-                LangStringSet? theDescription = null;
-                LangStringSet? theDisplayName = null;
-                EntityType? theEntityType = null;
-                List<Extension>? theExtensions = null;
-                IReference? theFirst = null;
-                IReference? theGlobalAssetId = null;
-                List<OperationVariable>? theInoutputVariables = null;
-                List<OperationVariable>? theInputVariables = null;
-                ModelingKind? theKind = null;
-                string? theMax = null;
-                string? theMin = null;
-                IReference? theObserved = null;
-                List<OperationVariable>? theOutputVariables = null;
-                List<IConstraint>? theQualifiers = null;
-                IReference? theReference = null;
-                IReference? theSecond = null;
-                IReference? theSemanticId = null;
-                IReference? theSemanticIdValues = null;
-                IdentifierKeyValuePair? theSpecificAssetId = null;
-                List<ISubmodelElement>? theStatements = null;
                 SubmodelElements? theSubmodelElementTypeValues = null;
-                LangStringSet? theTranslatable = null;
+                List<Extension>? theExtensions = null;
+                string? theIdShort = null;
+                LangStringSet? theDisplayName = null;
+                string? theCategory = null;
+                LangStringSet? theDescription = null;
+                ModelingKind? theKind = null;
+                IReference? theSemanticId = null;
+                List<IConstraint>? theQualifiers = null;
+                List<IReference>? theDataSpecifications = null;
+                List<ISubmodelElement>? theValues = null;
+                IReference? theSemanticIdValues = null;
+                DataTypeDef? theValueTypeValues = null;
+                DataTypeDef? theValueType = null;
                 string? theValue = null;
                 IReference? theValueId = null;
-                DataTypeDef? theValueType = null;
-                DataTypeDef? theValueTypeValues = null;
-                List<ISubmodelElement>? theValues = null;
+                LangStringSet? theTranslatable = null;
+                string? theMin = null;
+                string? theMax = null;
+                IReference? theReference = null;
+                string? theMimeType = null;
+                byte[]? theContent = null;
+                IReference? theFirst = null;
+                IReference? theSecond = null;
+                List<IDataElement>? theAnnotation = null;
+                EntityType? theEntityType = null;
+                List<ISubmodelElement>? theStatements = null;
+                IReference? theGlobalAssetId = null;
+                IdentifierKeyValuePair? theSpecificAssetId = null;
+                IReference? theObserved = null;
+                List<OperationVariable>? theInputVariables = null;
+                List<OperationVariable>? theOutputVariables = null;
+                List<OperationVariable>? theInoutputVariables = null;
 
                 while (reader.Read())
                 {
@@ -2030,7 +2012,8 @@ namespace AasCore.Aas3
                                         theValues);
                                 case "Property":
                                     return new Aas.Property(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theValueType ?? throw new Json.JsonException(
                                             "Required property is missing: valueType"),
                                         theExtensions,
@@ -2058,7 +2041,8 @@ namespace AasCore.Aas3
                                         theValueId);
                                 case "Range":
                                     return new Aas.Range(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theValueType ?? throw new Json.JsonException(
                                             "Required property is missing: valueType"),
                                         theExtensions,
@@ -2073,7 +2057,8 @@ namespace AasCore.Aas3
                                         theMax);
                                 case "ReferenceElement":
                                     return new Aas.ReferenceElement(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theExtensions,
                                         theDisplayName,
                                         theCategory,
@@ -2085,7 +2070,8 @@ namespace AasCore.Aas3
                                         theReference);
                                 case "Blob":
                                     return new Aas.Blob(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theMimeType ?? throw new Json.JsonException(
                                             "Required property is missing: mimeType"),
                                         theExtensions,
@@ -2099,7 +2085,8 @@ namespace AasCore.Aas3
                                         theContent);
                                 case "File":
                                     return new Aas.File(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theMimeType ?? throw new Json.JsonException(
                                             "Required property is missing: mimeType"),
                                         theExtensions,
@@ -2147,7 +2134,8 @@ namespace AasCore.Aas3
                                     return new Aas.BasicEvent(
                                         theObserved ?? throw new Json.JsonException(
                                             "Required property is missing: observed"),
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theExtensions,
                                         theDisplayName,
                                         theCategory,
@@ -2194,169 +2182,169 @@ namespace AasCore.Aas3
     
                             switch (propertyName)
                             {
-                                case "idShort": 
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "mimeType": 
-                                    theMimeType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "annotation": 
-                                    theAnnotation =  (
-                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
-                                            ref reader));
-                                    break;
-                                case "category": 
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "content": 
-                                    theContent =  (
-                                        Json.JsonSerializer.Deserialize<byte[]>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications": 
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "description": 
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "displayName": 
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "entityType": 
-                                    theEntityType =  (
-                                        Json.JsonSerializer.Deserialize<EntityType>(
-                                            ref reader));
-                                    break;
-                                case "extensions": 
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "first": 
-                                    theFirst =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "globalAssetID": 
-                                    theGlobalAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "inoutputVariables": 
-                                    theInoutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "inputVariables": 
-                                    theInputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "kind": 
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "max": 
-                                    theMax =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "min": 
-                                    theMin =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "observed": 
-                                    theObserved =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "outputVariables": 
-                                    theOutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers": 
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "reference": 
-                                    theReference =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "second": 
-                                    theSecond =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "semanticID": 
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "semanticIDValues": 
-                                    theSemanticIdValues =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "specificAssetID": 
-                                    theSpecificAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
-                                            ref reader));
-                                    break;
-                                case "statements": 
-                                    theStatements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "submodelElementTypeValues": 
+                                case "submodelElementTypeValues":
                                     theSubmodelElementTypeValues =  (
                                         Json.JsonSerializer.Deserialize<SubmodelElements>(
                                             ref reader));
                                     break;
-                                case "translatable": 
-                                    theTranslatable =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                case "extensions":
+                                    theExtensions =  (
+                                        Json.JsonSerializer.Deserialize<List<Extension>>(
                                             ref reader));
                                     break;
-                                case "value": 
-                                    theValue =  (
+                                case "idShort":
+                                    theIdShort =  (
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "valueID": 
-                                    theValueId =  (
+                                case "displayName":
+                                    theDisplayName =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "category":
+                                    theCategory =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "description":
+                                    theDescription =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "kind":
+                                    theKind =  (
+                                        Json.JsonSerializer.Deserialize<ModelingKind>(
+                                            ref reader));
+                                    break;
+                                case "semanticID":
+                                    theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
                                     break;
-                                case "valueType": 
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
+                                case "qualifiers":
+                                    theQualifiers =  (
+                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
                                             ref reader));
                                     break;
-                                case "valueTypeValues": 
+                                case "dataSpecifications":
+                                    theDataSpecifications =  (
+                                        Json.JsonSerializer.Deserialize<List<IReference>>(
+                                            ref reader));
+                                    break;
+                                case "values":
+                                    theValues =  (
+                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
+                                            ref reader));
+                                    break;
+                                case "semanticIDValues":
+                                    theSemanticIdValues =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "valueTypeValues":
                                     theValueTypeValues =  (
                                         Json.JsonSerializer.Deserialize<DataTypeDef>(
                                             ref reader));
                                     break;
-                                case "values": 
-                                    theValues =  (
+                                case "valueType":
+                                    theValueType =  (
+                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
+                                            ref reader));
+                                    break;
+                                case "value":
+                                    theValue =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "valueID":
+                                    theValueId =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "translatable":
+                                    theTranslatable =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "min":
+                                    theMin =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "max":
+                                    theMax =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "reference":
+                                    theReference =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "mimeType":
+                                    theMimeType =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "content":
+                                    theContent =  (
+                                        Json.JsonSerializer.Deserialize<byte[]>(
+                                            ref reader));
+                                    break;
+                                case "first":
+                                    theFirst =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "second":
+                                    theSecond =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "annotation":
+                                    theAnnotation =  (
+                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
+                                            ref reader));
+                                    break;
+                                case "entityType":
+                                    theEntityType =  (
+                                        Json.JsonSerializer.Deserialize<EntityType>(
+                                            ref reader));
+                                    break;
+                                case "statements":
+                                    theStatements =  (
                                         Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
+                                            ref reader));
+                                    break;
+                                case "globalAssetID":
+                                    theGlobalAssetId =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "specificAssetID":
+                                    theSpecificAssetId =  (
+                                        Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
+                                            ref reader));
+                                    break;
+                                case "observed":
+                                    theObserved =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "inputVariables":
+                                    theInputVariables =  (
+                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
+                                            ref reader));
+                                    break;
+                                case "outputVariables":
+                                    theOutputVariables =  (
+                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
+                                            ref reader));
+                                    break;
+                                case "inoutputVariables":
+                                    theInoutputVariables =  (
+                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
                                             ref reader));
                                     break;
                                 case "modelType":
@@ -2466,18 +2454,18 @@ namespace AasCore.Aas3
                 string? modelType = null;
 
                 // Prefix the property variables with "the" to avoid conflicts
-                string? theIdShort = null;
-                List<IDataElement>? theAnnotation = null;
-                string? theCategory = null;
-                List<IReference>? theDataSpecifications = null;
-                LangStringSet? theDescription = null;
-                LangStringSet? theDisplayName = null;
-                List<Extension>? theExtensions = null;
                 IReference? theFirst = null;
-                ModelingKind? theKind = null;
-                List<IConstraint>? theQualifiers = null;
                 IReference? theSecond = null;
+                List<Extension>? theExtensions = null;
+                string? theIdShort = null;
+                LangStringSet? theDisplayName = null;
+                string? theCategory = null;
+                LangStringSet? theDescription = null;
+                ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
+                List<IConstraint>? theQualifiers = null;
+                List<IReference>? theDataSpecifications = null;
+                List<IDataElement>? theAnnotation = null;
 
                 while (reader.Read())
                 {
@@ -2515,64 +2503,64 @@ namespace AasCore.Aas3
     
                             switch (propertyName)
                             {
-                                case "idShort": 
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "annotation": 
-                                    theAnnotation =  (
-                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
-                                            ref reader));
-                                    break;
-                                case "category": 
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications": 
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "description": 
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "displayName": 
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "extensions": 
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "first": 
+                                case "first":
                                     theFirst =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
                                     break;
-                                case "kind": 
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers": 
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "second": 
+                                case "second":
                                     theSecond =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
                                     break;
-                                case "semanticID": 
+                                case "extensions":
+                                    theExtensions =  (
+                                        Json.JsonSerializer.Deserialize<List<Extension>>(
+                                            ref reader));
+                                    break;
+                                case "idShort":
+                                    theIdShort =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "displayName":
+                                    theDisplayName =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "category":
+                                    theCategory =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "description":
+                                    theDescription =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "kind":
+                                    theKind =  (
+                                        Json.JsonSerializer.Deserialize<ModelingKind>(
+                                            ref reader));
+                                    break;
+                                case "semanticID":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "qualifiers":
+                                    theQualifiers =  (
+                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
+                                            ref reader));
+                                    break;
+                                case "dataSpecifications":
+                                    theDataSpecifications =  (
+                                        Json.JsonSerializer.Deserialize<List<IReference>>(
+                                            ref reader));
+                                    break;
+                                case "annotation":
+                                    theAnnotation =  (
+                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
                                             ref reader));
                                     break;
                                 case "modelType":
@@ -2627,7 +2615,7 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
+                SubmodelElements? theSubmodelElementTypeValues = null;
                 List<Extension>? theExtensions = null;
                 string? theIdShort = null;
                 LangStringSet? theDisplayName = null;
@@ -2636,7 +2624,7 @@ namespace AasCore.Aas3
                 ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
-                SubmodelElements? theSubmodelElementTypeValues = null;
+                List<IReference>? theDataSpecifications = null;
                 List<ISubmodelElement>? theValues = null;
                 IReference? theSemanticIdValues = null;
                 DataTypeDef? theValueTypeValues = null;
@@ -2773,19 +2761,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "SubmodelElementList");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -2829,23 +2811,17 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
                 writer.WritePropertyName("submodelElementTypeValues");
                 Json.JsonSerializer.Serialize(
                     writer, that.SubmodelElementTypeValues);
 
-                if (that.Values != null)
-                {
-                    writer.WritePropertyName("values");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Values);
-                }
+                writer.WritePropertyName("values");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Values);
 
                 if (that.SemanticIdValues != null)
                 {
@@ -2879,7 +2855,6 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
                 List<Extension>? theExtensions = null;
                 string? theIdShort = null;
                 LangStringSet? theDisplayName = null;
@@ -2888,6 +2863,7 @@ namespace AasCore.Aas3
                 ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
+                List<IReference>? theDataSpecifications = null;
                 List<ISubmodelElement>? theValues = null;
 
                 while (reader.Read())
@@ -3003,19 +2979,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "SubmodelElementStruct");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -3059,19 +3029,13 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
-                if (that.Values != null)
-                {
-                    writer.WritePropertyName("values");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Values);
-                }
+                writer.WritePropertyName("values");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Values);
 
                 writer.WriteEndObject();
             }
@@ -3099,23 +3063,23 @@ namespace AasCore.Aas3
 
                 // Prefix the property variables with "the" to avoid conflicts
                 string? theIdShort = null;
-                string? theMimeType = null;
-                string? theCategory = null;
-                byte[]? theContent = null;
-                List<IReference>? theDataSpecifications = null;
-                LangStringSet? theDescription = null;
-                LangStringSet? theDisplayName = null;
+                DataTypeDef? theValueType = null;
                 List<Extension>? theExtensions = null;
+                LangStringSet? theDisplayName = null;
+                string? theCategory = null;
+                LangStringSet? theDescription = null;
                 ModelingKind? theKind = null;
-                string? theMax = null;
-                string? theMin = null;
-                List<IConstraint>? theQualifiers = null;
-                IReference? theReference = null;
                 IReference? theSemanticId = null;
-                LangStringSet? theTranslatable = null;
+                List<IConstraint>? theQualifiers = null;
+                List<IReference>? theDataSpecifications = null;
                 string? theValue = null;
                 IReference? theValueId = null;
-                DataTypeDef? theValueType = null;
+                LangStringSet? theTranslatable = null;
+                string? theMin = null;
+                string? theMax = null;
+                IReference? theReference = null;
+                string? theMimeType = null;
+                byte[]? theContent = null;
 
                 while (reader.Read())
                 {
@@ -3126,7 +3090,8 @@ namespace AasCore.Aas3
                             {
                                 case "Property":
                                     return new Aas.Property(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theValueType ?? throw new Json.JsonException(
                                             "Required property is missing: valueType"),
                                         theExtensions,
@@ -3154,7 +3119,8 @@ namespace AasCore.Aas3
                                         theValueId);
                                 case "Range":
                                     return new Aas.Range(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theValueType ?? throw new Json.JsonException(
                                             "Required property is missing: valueType"),
                                         theExtensions,
@@ -3169,7 +3135,8 @@ namespace AasCore.Aas3
                                         theMax);
                                 case "ReferenceElement":
                                     return new Aas.ReferenceElement(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theExtensions,
                                         theDisplayName,
                                         theCategory,
@@ -3181,7 +3148,8 @@ namespace AasCore.Aas3
                                         theReference);
                                 case "Blob":
                                     return new Aas.Blob(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theMimeType ?? throw new Json.JsonException(
                                             "Required property is missing: mimeType"),
                                         theExtensions,
@@ -3195,7 +3163,8 @@ namespace AasCore.Aas3
                                         theContent);
                                 case "File":
                                     return new Aas.File(
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theMimeType ?? throw new Json.JsonException(
                                             "Required property is missing: mimeType"),
                                         theExtensions,
@@ -3220,94 +3189,94 @@ namespace AasCore.Aas3
     
                             switch (propertyName)
                             {
-                                case "idShort": 
+                                case "idShort":
                                     theIdShort =  (
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "mimeType": 
-                                    theMimeType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
+                                case "valueType":
+                                    theValueType =  (
+                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
                                             ref reader));
                                     break;
-                                case "category": 
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "content": 
-                                    theContent =  (
-                                        Json.JsonSerializer.Deserialize<byte[]>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications": 
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "description": 
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "displayName": 
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "extensions": 
+                                case "extensions":
                                     theExtensions =  (
                                         Json.JsonSerializer.Deserialize<List<Extension>>(
                                             ref reader));
                                     break;
-                                case "kind": 
+                                case "displayName":
+                                    theDisplayName =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "category":
+                                    theCategory =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "description":
+                                    theDescription =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "kind":
                                     theKind =  (
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "max": 
-                                    theMax =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "min": 
-                                    theMin =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers": 
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "reference": 
-                                    theReference =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "semanticID": 
+                                case "semanticID":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
                                     break;
-                                case "translatable": 
-                                    theTranslatable =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                case "qualifiers":
+                                    theQualifiers =  (
+                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
                                             ref reader));
                                     break;
-                                case "value": 
+                                case "dataSpecifications":
+                                    theDataSpecifications =  (
+                                        Json.JsonSerializer.Deserialize<List<IReference>>(
+                                            ref reader));
+                                    break;
+                                case "value":
                                     theValue =  (
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "valueID": 
+                                case "valueID":
                                     theValueId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
                                     break;
-                                case "valueType": 
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
+                                case "translatable":
+                                    theTranslatable =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "min":
+                                    theMin =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "max":
+                                    theMax =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "reference":
+                                    theReference =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "mimeType":
+                                    theMimeType =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "content":
+                                    theContent =  (
+                                        Json.JsonSerializer.Deserialize<byte[]>(
                                             ref reader));
                                     break;
                                 case "modelType":
@@ -3382,16 +3351,16 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
-                List<Extension>? theExtensions = null;
                 string? theIdShort = null;
+                DataTypeDef? theValueType = null;
+                List<Extension>? theExtensions = null;
                 LangStringSet? theDisplayName = null;
                 string? theCategory = null;
                 LangStringSet? theDescription = null;
                 ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
-                DataTypeDef? theValueType = null;
+                List<IReference>? theDataSpecifications = null;
                 string? theValue = null;
                 IReference? theValueId = null;
 
@@ -3401,7 +3370,8 @@ namespace AasCore.Aas3
                     {
                         case Json.JsonTokenType.EndObject:
                             return new Aas.Property(
-                                theIdShort,
+                                theIdShort ?? throw new Json.JsonException(
+                                    "Required property is missing: idShort"),
                                 theValueType ?? throw new Json.JsonException(
                                     "Required property is missing: valueType"),
                                 theExtensions,
@@ -3521,19 +3491,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "Property");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -3577,12 +3541,9 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
                 writer.WritePropertyName("valueType");
                 Json.JsonSerializer.Serialize(
@@ -3620,15 +3581,15 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
-                List<Extension>? theExtensions = null;
                 string? theIdShort = null;
+                List<Extension>? theExtensions = null;
                 LangStringSet? theDisplayName = null;
                 string? theCategory = null;
                 LangStringSet? theDescription = null;
                 ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
+                List<IReference>? theDataSpecifications = null;
                 LangStringSet? theTranslatable = null;
                 IReference? theValueId = null;
 
@@ -3751,19 +3712,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "MultiLanguageProperty");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -3807,12 +3762,9 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
                 if (that.Translatable != null)
                 {
@@ -3846,16 +3798,16 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
-                List<Extension>? theExtensions = null;
                 string? theIdShort = null;
+                DataTypeDef? theValueType = null;
+                List<Extension>? theExtensions = null;
                 LangStringSet? theDisplayName = null;
                 string? theCategory = null;
                 LangStringSet? theDescription = null;
                 ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
-                DataTypeDef? theValueType = null;
+                List<IReference>? theDataSpecifications = null;
                 string? theMin = null;
                 string? theMax = null;
 
@@ -3865,7 +3817,8 @@ namespace AasCore.Aas3
                     {
                         case Json.JsonTokenType.EndObject:
                             return new Aas.Range(
-                                theIdShort,
+                                theIdShort ?? throw new Json.JsonException(
+                                    "Required property is missing: idShort"),
                                 theValueType ?? throw new Json.JsonException(
                                     "Required property is missing: valueType"),
                                 theExtensions,
@@ -3985,19 +3938,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "Range");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -4041,12 +3988,9 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
                 writer.WritePropertyName("valueType");
                 Json.JsonSerializer.Serialize(
@@ -4084,15 +4028,15 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
-                List<Extension>? theExtensions = null;
                 string? theIdShort = null;
+                List<Extension>? theExtensions = null;
                 LangStringSet? theDisplayName = null;
                 string? theCategory = null;
                 LangStringSet? theDescription = null;
                 ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
+                List<IReference>? theDataSpecifications = null;
                 IReference? theReference = null;
 
                 while (reader.Read())
@@ -4101,7 +4045,8 @@ namespace AasCore.Aas3
                     {
                         case Json.JsonTokenType.EndObject:
                             return new Aas.ReferenceElement(
-                                theIdShort,
+                                theIdShort ?? throw new Json.JsonException(
+                                    "Required property is missing: idShort"),
                                 theExtensions,
                                 theDisplayName,
                                 theCategory,
@@ -4208,19 +4153,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "ReferenceElement");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -4264,12 +4203,9 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
                 if (that.Reference != null)
                 {
@@ -4296,16 +4232,16 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
-                List<Extension>? theExtensions = null;
                 string? theIdShort = null;
+                string? theMimeType = null;
+                List<Extension>? theExtensions = null;
                 LangStringSet? theDisplayName = null;
                 string? theCategory = null;
                 LangStringSet? theDescription = null;
                 ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
-                string? theMimeType = null;
+                List<IReference>? theDataSpecifications = null;
                 byte[]? theContent = null;
 
                 while (reader.Read())
@@ -4314,7 +4250,8 @@ namespace AasCore.Aas3
                     {
                         case Json.JsonTokenType.EndObject:
                             return new Aas.Blob(
-                                theIdShort,
+                                theIdShort ?? throw new Json.JsonException(
+                                    "Required property is missing: idShort"),
                                 theMimeType ?? throw new Json.JsonException(
                                     "Required property is missing: mimeType"),
                                 theExtensions,
@@ -4428,19 +4365,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "Blob");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -4484,12 +4415,9 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
                 writer.WritePropertyName("mimeType");
                 Json.JsonSerializer.Serialize(
@@ -4520,16 +4448,16 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
-                List<Extension>? theExtensions = null;
                 string? theIdShort = null;
+                string? theMimeType = null;
+                List<Extension>? theExtensions = null;
                 LangStringSet? theDisplayName = null;
                 string? theCategory = null;
                 LangStringSet? theDescription = null;
                 ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
-                string? theMimeType = null;
+                List<IReference>? theDataSpecifications = null;
                 string? theValue = null;
 
                 while (reader.Read())
@@ -4538,7 +4466,8 @@ namespace AasCore.Aas3
                     {
                         case Json.JsonTokenType.EndObject:
                             return new Aas.File(
-                                theIdShort,
+                                theIdShort ?? throw new Json.JsonException(
+                                    "Required property is missing: idShort"),
                                 theMimeType ?? throw new Json.JsonException(
                                     "Required property is missing: mimeType"),
                                 theExtensions,
@@ -4652,19 +4581,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "File");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -4708,12 +4631,9 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
                 writer.WritePropertyName("mimeType");
                 Json.JsonSerializer.Serialize(
@@ -4744,7 +4664,8 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
+                IReference? theFirst = null;
+                IReference? theSecond = null;
                 List<Extension>? theExtensions = null;
                 string? theIdShort = null;
                 LangStringSet? theDisplayName = null;
@@ -4753,8 +4674,7 @@ namespace AasCore.Aas3
                 ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
-                IReference? theFirst = null;
-                IReference? theSecond = null;
+                List<IReference>? theDataSpecifications = null;
                 List<IDataElement>? theAnnotation = null;
 
                 while (reader.Read())
@@ -4884,19 +4804,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "AnnotatedRelationshipElement");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -4940,12 +4854,9 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
                 writer.WritePropertyName("first");
                 Json.JsonSerializer.Serialize(
@@ -4955,12 +4866,9 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, that.Second);
 
-                if (that.Annotation != null)
-                {
-                    writer.WritePropertyName("annotation");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Annotation);
-                }
+                writer.WritePropertyName("annotation");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Annotation);
 
                 writer.WriteEndObject();
             }
@@ -5021,7 +4929,7 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
+                EntityType? theEntityType = null;
                 List<Extension>? theExtensions = null;
                 string? theIdShort = null;
                 LangStringSet? theDisplayName = null;
@@ -5030,7 +4938,7 @@ namespace AasCore.Aas3
                 ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
-                EntityType? theEntityType = null;
+                List<IReference>? theDataSpecifications = null;
                 List<ISubmodelElement>? theStatements = null;
                 IReference? theGlobalAssetId = null;
                 IdentifierKeyValuePair? theSpecificAssetId = null;
@@ -5167,19 +5075,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "Entity");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -5223,23 +5125,17 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
                 writer.WritePropertyName("entityType");
                 Json.JsonSerializer.Serialize(
                     writer, that.EntityType);
 
-                if (that.Statements != null)
-                {
-                    writer.WritePropertyName("statements");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Statements);
-                }
+                writer.WritePropertyName("statements");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Statements);
 
                 if (that.GlobalAssetId != null)
                 {
@@ -5280,16 +5176,16 @@ namespace AasCore.Aas3
                 string? modelType = null;
 
                 // Prefix the property variables with "the" to avoid conflicts
-                string? theIdShort = null;
-                string? theCategory = null;
-                List<IReference>? theDataSpecifications = null;
-                LangStringSet? theDescription = null;
-                LangStringSet? theDisplayName = null;
-                List<Extension>? theExtensions = null;
-                ModelingKind? theKind = null;
                 IReference? theObserved = null;
-                List<IConstraint>? theQualifiers = null;
+                string? theIdShort = null;
+                List<Extension>? theExtensions = null;
+                LangStringSet? theDisplayName = null;
+                string? theCategory = null;
+                LangStringSet? theDescription = null;
+                ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
+                List<IConstraint>? theQualifiers = null;
+                List<IReference>? theDataSpecifications = null;
 
                 while (reader.Read())
                 {
@@ -5302,7 +5198,8 @@ namespace AasCore.Aas3
                                     return new Aas.BasicEvent(
                                         theObserved ?? throw new Json.JsonException(
                                             "Required property is missing: observed"),
-                                        theIdShort,
+                                        theIdShort ?? throw new Json.JsonException(
+                                            "Required property is missing: idShort"),
                                         theExtensions,
                                         theDisplayName,
                                         theCategory,
@@ -5324,54 +5221,54 @@ namespace AasCore.Aas3
     
                             switch (propertyName)
                             {
-                                case "idShort": 
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "category": 
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications": 
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "description": 
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "displayName": 
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "extensions": 
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "kind": 
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "observed": 
+                                case "observed":
                                     theObserved =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
                                     break;
-                                case "qualifiers": 
+                                case "idShort":
+                                    theIdShort =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "extensions":
+                                    theExtensions =  (
+                                        Json.JsonSerializer.Deserialize<List<Extension>>(
+                                            ref reader));
+                                    break;
+                                case "displayName":
+                                    theDisplayName =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "category":
+                                    theCategory =  (
+                                        Json.JsonSerializer.Deserialize<string>(
+                                            ref reader));
+                                    break;
+                                case "description":
+                                    theDescription =  (
+                                        Json.JsonSerializer.Deserialize<LangStringSet>(
+                                            ref reader));
+                                    break;
+                                case "kind":
+                                    theKind =  (
+                                        Json.JsonSerializer.Deserialize<ModelingKind>(
+                                            ref reader));
+                                    break;
+                                case "semanticID":
+                                    theSemanticId =  (
+                                        Json.JsonSerializer.Deserialize<IReference>(
+                                            ref reader));
+                                    break;
+                                case "qualifiers":
                                     theQualifiers =  (
                                         Json.JsonSerializer.Deserialize<List<IConstraint>>(
                                             ref reader));
                                     break;
-                                case "semanticID": 
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
+                                case "dataSpecifications":
+                                    theDataSpecifications =  (
+                                        Json.JsonSerializer.Deserialize<List<IReference>>(
                                             ref reader));
                                     break;
                                 case "modelType":
@@ -5426,16 +5323,16 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
-                List<Extension>? theExtensions = null;
+                IReference? theObserved = null;
                 string? theIdShort = null;
+                List<Extension>? theExtensions = null;
                 LangStringSet? theDisplayName = null;
                 string? theCategory = null;
                 LangStringSet? theDescription = null;
                 ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
-                IReference? theObserved = null;
+                List<IReference>? theDataSpecifications = null;
 
                 while (reader.Read())
                 {
@@ -5445,7 +5342,8 @@ namespace AasCore.Aas3
                             return new Aas.BasicEvent(
                                 theObserved ?? throw new Json.JsonException(
                                     "Required property is missing: observed"),
-                                theIdShort,
+                                theIdShort ?? throw new Json.JsonException(
+                                    "Required property is missing: idShort"),
                                 theExtensions,
                                 theDisplayName,
                                 theCategory,
@@ -5551,19 +5449,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "BasicEvent");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -5607,12 +5499,9 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
                 writer.WritePropertyName("observed");
                 Json.JsonSerializer.Serialize(
@@ -5636,7 +5525,6 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
                 List<Extension>? theExtensions = null;
                 string? theIdShort = null;
                 LangStringSet? theDisplayName = null;
@@ -5645,6 +5533,7 @@ namespace AasCore.Aas3
                 ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
+                List<IReference>? theDataSpecifications = null;
                 List<OperationVariable>? theInputVariables = null;
                 List<OperationVariable>? theOutputVariables = null;
                 List<OperationVariable>? theInoutputVariables = null;
@@ -5774,19 +5663,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "Operation");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -5830,33 +5713,21 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
-                if (that.InputVariables != null)
-                {
-                    writer.WritePropertyName("inputVariables");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.InputVariables);
-                }
+                writer.WritePropertyName("inputVariables");
+                Json.JsonSerializer.Serialize(
+                    writer, that.InputVariables);
 
-                if (that.OutputVariables != null)
-                {
-                    writer.WritePropertyName("outputVariables");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.OutputVariables);
-                }
+                writer.WritePropertyName("outputVariables");
+                Json.JsonSerializer.Serialize(
+                    writer, that.OutputVariables);
 
-                if (that.InoutputVariables != null)
-                {
-                    writer.WritePropertyName("inoutputVariables");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.InoutputVariables);
-                }
+                writer.WritePropertyName("inoutputVariables");
+                Json.JsonSerializer.Serialize(
+                    writer, that.InoutputVariables);
 
                 writer.WriteEndObject();
             }
@@ -5953,7 +5824,6 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
                 List<Extension>? theExtensions = null;
                 string? theIdShort = null;
                 LangStringSet? theDisplayName = null;
@@ -5962,6 +5832,7 @@ namespace AasCore.Aas3
                 ModelingKind? theKind = null;
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
+                List<IReference>? theDataSpecifications = null;
 
                 while (reader.Read())
                 {
@@ -6070,19 +5941,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "Capability");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -6126,12 +5991,9 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.Qualifiers != null)
-                {
-                    writer.WritePropertyName("qualifiers");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Qualifiers);
-                }
+                writer.WritePropertyName("qualifiers");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Qualifiers);
 
                 writer.WriteEndObject();
             }
@@ -6151,15 +6013,15 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
-                List<Extension>? theExtensions = null;
+                string? theId = null;
                 string? theIdShort = null;
+                List<Extension>? theExtensions = null;
                 LangStringSet? theDisplayName = null;
                 string? theCategory = null;
                 LangStringSet? theDescription = null;
-                string? theId = null;
                 AdministrativeInformation? theAdministration = null;
                 List<IReference>? theIsCaseOf = null;
+                List<IReference>? theDataSpecifications = null;
 
                 while (reader.Read())
                 {
@@ -6169,7 +6031,8 @@ namespace AasCore.Aas3
                             return new Aas.ConceptDescription(
                                 theId ?? throw new Json.JsonException(
                                     "Required property is missing: id"),
-                                theIdShort,
+                                theIdShort ?? throw new Json.JsonException(
+                                    "Required property is missing: idShort"),
                                 theExtensions,
                                 theDisplayName,
                                 theCategory,
@@ -6269,19 +6132,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "ConceptDescription");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -6322,12 +6179,9 @@ namespace AasCore.Aas3
                         writer, that.Administration);
                 }
 
-                if (that.IsCaseOf != null)
-                {
-                    writer.WritePropertyName("isCaseOf");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IsCaseOf);
-                }
+                writer.WritePropertyName("isCaseOf");
+                Json.JsonSerializer.Serialize(
+                    writer, that.IsCaseOf);
 
                 writer.WriteEndObject();
             }
@@ -6347,13 +6201,13 @@ namespace AasCore.Aas3
                 }
 
                 // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDataSpecifications = null;
                 List<Extension>? theExtensions = null;
                 string? theIdShort = null;
                 LangStringSet? theDisplayName = null;
                 string? theCategory = null;
                 LangStringSet? theDescription = null;
                 IReference? theSemanticId = null;
+                List<IReference>? theDataSpecifications = null;
                 List<IReference>? theContainedElements = null;
 
                 while (reader.Read())
@@ -6457,19 +6311,13 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, "View");
 
-                if (that.DataSpecifications != null)
-                {
-                    writer.WritePropertyName("dataSpecifications");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataSpecifications);
-                }
+                writer.WritePropertyName("dataSpecifications");
+                Json.JsonSerializer.Serialize(
+                    writer, that.DataSpecifications);
 
-                if (that.Extensions != null)
-                {
-                    writer.WritePropertyName("extensions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Extensions);
-                }
+                writer.WritePropertyName("extensions");
+                Json.JsonSerializer.Serialize(
+                    writer, that.Extensions);
 
                 if (that.IdShort != null)
                 {
@@ -6506,12 +6354,9 @@ namespace AasCore.Aas3
                         writer, that.SemanticId);
                 }
 
-                if (that.ContainedElements != null)
-                {
-                    writer.WritePropertyName("containedElements");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ContainedElements);
-                }
+                writer.WritePropertyName("containedElements");
+                Json.JsonSerializer.Serialize(
+                    writer, that.ContainedElements);
 
                 writer.WriteEndObject();
             }
@@ -7457,12 +7302,9 @@ namespace AasCore.Aas3
             {
                 writer.WriteStartObject();
 
-                if (that.ValueReferencePairs != null)
-                {
-                    writer.WritePropertyName("valueReferencePairs");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ValueReferencePairs);
-                }
+                writer.WritePropertyName("valueReferencePairs");
+                Json.JsonSerializer.Serialize(
+                    writer, that.ValueReferencePairs);
 
                 writer.WriteEndObject();
             }
@@ -7972,12 +7814,9 @@ namespace AasCore.Aas3
                     {
                         case Json.JsonTokenType.EndObject:
                             return new Aas.Environment(
-                                theAssetAdministrationShells ?? throw new Json.JsonException(
-                                    "Required property is missing: assetAdministrationShells"),
-                                theSubmodels ?? throw new Json.JsonException(
-                                    "Required property is missing: submodels"),
-                                theConceptDescriptions ?? throw new Json.JsonException(
-                                    "Required property is missing: conceptDescriptions"));
+                                theAssetAdministrationShells,
+                                theSubmodels,
+                                theConceptDescriptions);
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()

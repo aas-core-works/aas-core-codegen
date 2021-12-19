@@ -198,16 +198,6 @@ namespace AasCore.Aas3
             Value = value;
             RefersTo = refersTo;
         }
-
-        public Extension() : this(
-            "",
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
-        }
     }
 
     /// <summary>
@@ -221,7 +211,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
     }
 
     /// <summary>
@@ -388,7 +378,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
     }
 
     /// <summary>
@@ -401,7 +391,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// Version of the element.
@@ -419,12 +409,9 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -433,17 +420,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -492,7 +476,7 @@ namespace AasCore.Aas3
         {
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
+                : new List<IReference>();
             Version = version;
             Revision = revision;
         }
@@ -515,7 +499,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
     }
 
     /// <summary>
@@ -649,16 +633,6 @@ namespace AasCore.Aas3
             Value = value;
             ValueId = valueId;
         }
-
-        public Qualifier() : this(
-            "",
-            new DataTypeDef(),
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
-        }
     }
 
     /// <summary>
@@ -677,7 +651,7 @@ namespace AasCore.Aas3
         /// evaluated in the formula to true or false in the corresponding logical expression
         /// it is used in.
         /// </remarks>
-        public List<IReference>? DependsOn { get; set; }
+        public List<IReference> DependsOn { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance 
@@ -685,12 +659,9 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DependsOn != null)
+            foreach (var anItem in DependsOn)
             {
-                foreach (var anItem in DependsOn)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -699,17 +670,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DependsOn != null)
+            foreach (var anItem in DependsOn)
             {
-                foreach (var anItem in DependsOn)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -753,12 +721,9 @@ namespace AasCore.Aas3
 
         public Formula(List<IReference>? dependsOn)
         {
-            DependsOn = dependsOn;
-        }
-
-        public Formula() : this(null)
-        {
-            // Intentionally left empty.
+            DependsOn = (dependsOn != null)
+                ? dependsOn
+                : new List<IReference>();
         }
     }
 
@@ -773,12 +738,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -882,7 +847,7 @@ namespace AasCore.Aas3
         /// The asset of an AAS is typically described by one or more submodels. Temporarily
         /// no submodel might be assigned to the AAS.
         /// </remarks>
-        public List<IReference>? Submodels { get; set; }
+        public List<IReference> Submodels { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance 
@@ -890,20 +855,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -928,12 +887,9 @@ namespace AasCore.Aas3
 
             yield return AssetInformation;
 
-            if (Submodels != null)
+            foreach (var anItem in Submodels)
             {
-                foreach (var anItem in Submodels)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -942,31 +898,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -1022,17 +972,14 @@ namespace AasCore.Aas3
                 yield return anItem;
             }
 
-            if (Submodels != null)
+            foreach (var anItem in Submodels)
             {
-                foreach (var anItem in Submodels)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -1087,7 +1034,9 @@ namespace AasCore.Aas3
             IReference? derivedFrom = null,
             List<IReference>? submodels = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -1096,28 +1045,12 @@ namespace AasCore.Aas3
             Administration = administration;
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
+                : new List<IReference>();
             DerivedFrom = derivedFrom;
             AssetInformation = assetInformation;
             Submodels = (submodels != null)
                 ? submodels
-                : new List<IReference>?();
-        }
-
-        public AssetAdministrationShell() : this(
-            "",
-            "",
-            new AssetInformation(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
+                : new List<IReference>();
         }
     }
 
@@ -1274,15 +1207,6 @@ namespace AasCore.Aas3
             GlobalAssetId = globalAssetId;
             SpecificAssetId = specificAssetId;
             DefaultThumbnail = defaultThumbnail;
-        }
-
-        public AssetInformation() : this(
-            new AssetKind(),
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
         }
     }
 
@@ -1441,15 +1365,6 @@ namespace AasCore.Aas3
             Value = value;
             ExternalSubjectId = externalSubjectId;
         }
-
-        public IdentifierKeyValuePair() : this(
-            "",
-            "",
-            null,
-            null)
-        {
-            // Intentionally left empty.
-        }
     }
 
     /// <summary>
@@ -1472,7 +1387,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// Kind of the element: either type or instance.
@@ -1491,12 +1406,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -1585,7 +1500,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// A submodel consists of zero or more submodel elements.
         /// </summary>
-        public List<ISubmodelElement>? SubmodelElements { get; set; }
+        public List<ISubmodelElement> SubmodelElements { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance 
@@ -1593,12 +1508,9 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (SemanticId != null)
@@ -1606,20 +1518,14 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -1637,12 +1543,9 @@ namespace AasCore.Aas3
                 yield return Administration;
             }
 
-            if (SubmodelElements != null)
+            foreach (var anItem in SubmodelElements)
             {
-                foreach (var anItem in SubmodelElements)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -1651,17 +1554,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -1676,31 +1576,25 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -1737,17 +1631,14 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (SubmodelElements != null)
+            foreach (var anItem in SubmodelElements)
             {
-                foreach (var anItem in SubmodelElements)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -1803,7 +1694,9 @@ namespace AasCore.Aas3
             List<IConstraint>? qualifiers = null,
             List<IReference>? dataSpecifications = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -1812,28 +1705,15 @@ namespace AasCore.Aas3
             Administration = administration;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
-            SubmodelElements = submodelElements;
-        }
-
-        public Submodel() : this(
-            "",
-            "",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
+                : new List<IReference>();
+            SubmodelElements = (submodelElements != null)
+                ? submodelElements
+                : new List<ISubmodelElement>();
         }
     }
 
@@ -1893,12 +1773,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -1987,7 +1867,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// The submodel element type of the submodel elements contained in the list.
@@ -2003,7 +1883,7 @@ namespace AasCore.Aas3
         /// Submodel element contained in the struct.
         /// The list is ordered.
         /// </summary>
-        public List<ISubmodelElement>? Values { get; set; }
+        public List<ISubmodelElement> Values { get; set; }
 
         /// <summary>
         /// Semantic Id the submodel elements contained in the list match to.
@@ -2036,20 +1916,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -2067,20 +1941,14 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Values != null)
+            foreach (var anItem in Values)
             {
-                foreach (var anItem in Values)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (SemanticIdValues != null)
@@ -2094,31 +1962,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -2155,31 +2017,25 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Values != null)
+            foreach (var anItem in Values)
             {
-                foreach (var anItem in Values)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -2247,39 +2103,27 @@ namespace AasCore.Aas3
             IReference? semanticIdValues = null,
             DataTypeDef? valueTypeValues = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
+                : new List<IReference>();
             SubmodelElementTypeValues = submodelElementTypeValues;
-            Values = values;
+            Values = (values != null)
+                ? values
+                : new List<ISubmodelElement>();
             SemanticIdValues = semanticIdValues;
             ValueTypeValues = valueTypeValues;
-        }
-
-        public SubmodelElementList() : this(
-            new SubmodelElements(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
         }
     }
 
@@ -2298,12 +2142,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -2392,12 +2236,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// Submodel element contained in the struct.
         /// </summary>
-        public List<ISubmodelElement>? Values { get; set; }
+        public List<ISubmodelElement> Values { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance 
@@ -2405,20 +2249,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -2436,20 +2274,14 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Values != null)
+            foreach (var anItem in Values)
             {
-                foreach (var anItem in Values)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -2458,31 +2290,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -2519,31 +2345,25 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Values != null)
+            foreach (var anItem in Values)
             {
-                foreach (var anItem in Values)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -2597,18 +2417,24 @@ namespace AasCore.Aas3
             List<IReference>? dataSpecifications = null,
             List<ISubmodelElement>? values = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
-            Values = values;
+                : new List<IReference>();
+            Values = (values != null)
+                ? values
+                : new List<ISubmodelElement>();
         }
     }
 
@@ -2658,12 +2484,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -2752,7 +2578,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// Data type of the value
@@ -2783,20 +2609,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -2814,12 +2634,9 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (ValueId != null)
@@ -2833,31 +2650,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -2894,17 +2705,14 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -2971,37 +2779,24 @@ namespace AasCore.Aas3
             string? value = null,
             IReference? valueId = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
+                : new List<IReference>();
             ValueType = valueType;
             Value = value;
             ValueId = valueId;
-        }
-
-        public Property() : this(
-            "",
-            new DataTypeDef(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
         }
     }
 
@@ -3029,12 +2824,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -3123,7 +2918,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// The value of the property instance.
@@ -3145,20 +2940,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -3176,12 +2965,9 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (Translatable != null)
@@ -3200,31 +2986,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -3261,17 +3041,14 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -3336,7 +3113,7 @@ namespace AasCore.Aas3
         }
 
         public MultiLanguageProperty(
-            string idShort,
+            string? idShort = null,
             List<Extension>? extensions = null,
             LangStringSet? displayName = null,
             string? category = null,
@@ -3348,35 +3125,23 @@ namespace AasCore.Aas3
             LangStringSet? translatable = null,
             IReference? valueId = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
+                : new List<IReference>();
             Translatable = translatable;
             ValueId = valueId;
-        }
-
-        public MultiLanguageProperty() : this(
-            "",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
         }
     }
 
@@ -3400,12 +3165,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -3494,7 +3259,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// Data type of the min und max
@@ -3519,20 +3284,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -3550,12 +3309,9 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -3564,31 +3320,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -3625,17 +3375,14 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -3691,37 +3438,24 @@ namespace AasCore.Aas3
             string? min = null,
             string? max = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
+                : new List<IReference>();
             ValueType = valueType;
             Min = min;
             Max = max;
-        }
-
-        public Range() : this(
-            "",
-            new DataTypeDef(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
         }
     }
 
@@ -3745,12 +3479,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -3839,7 +3573,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// Reference to any other referable element of the same of any other AAS or a
@@ -3853,20 +3587,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -3884,12 +3612,9 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (Reference != null)
@@ -3903,31 +3628,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -3964,17 +3683,14 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -4039,33 +3755,22 @@ namespace AasCore.Aas3
             List<IReference>? dataSpecifications = null,
             IReference? reference = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
+                : new List<IReference>();
             Reference = reference;
-        }
-
-        public ReferenceElement() : this(
-            "",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
         }
     }
 
@@ -4086,12 +3791,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -4180,7 +3885,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// Mime type of the content of the BLOB.
@@ -4205,20 +3910,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -4236,12 +3935,9 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -4250,31 +3946,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -4311,17 +4001,14 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -4376,35 +4063,23 @@ namespace AasCore.Aas3
             List<IReference>? dataSpecifications = null,
             byte[]? content = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
+                : new List<IReference>();
             MimeType = mimeType;
             Content = content;
-        }
-
-        public Blob() : this(
-            "",
-            "",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
         }
     }
 
@@ -4424,12 +4099,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -4518,7 +4193,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// MIME type of the content of the BLOB.
@@ -4538,20 +4213,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -4569,12 +4238,9 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -4583,31 +4249,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -4644,17 +4304,14 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -4709,35 +4366,23 @@ namespace AasCore.Aas3
             List<IReference>? dataSpecifications = null,
             string? value = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
+                : new List<IReference>();
             MimeType = mimeType;
             Value = value;
-        }
-
-        public File() : this(
-            "",
-            "",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
         }
     }
 
@@ -4755,12 +4400,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -4849,7 +4494,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// Reference to the first element in the relationship taking the role of the subject.
@@ -4865,7 +4510,7 @@ namespace AasCore.Aas3
         /// A reference to a data element that represents an annotation that holds for
         /// the relationship between the two elements.
         /// </summary>
-        public List<IDataElement>? Annotation { get; set; }
+        public List<IDataElement> Annotation { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance 
@@ -4873,20 +4518,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -4904,24 +4543,18 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             yield return First;
 
             yield return Second;
 
-            if (Annotation != null)
+            foreach (var anItem in Annotation)
             {
-                foreach (var anItem in Annotation)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -4930,31 +4563,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -4991,17 +4618,14 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -5021,17 +4645,14 @@ namespace AasCore.Aas3
                 yield return anItem;
             }
 
-            if (Annotation != null)
+            foreach (var anItem in Annotation)
             {
-                foreach (var anItem in Annotation)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -5087,39 +4708,26 @@ namespace AasCore.Aas3
             List<IReference>? dataSpecifications = null,
             List<IDataElement>? annotation = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
+                : new List<IReference>();
             First = first;
             Second = second;
             Annotation = (annotation != null)
                 ? annotation
-                : new List<IDataElement>?();
-        }
-
-        public AnnotatedRelationshipElement() : this(
-            new IReference(),
-            new IReference(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
+                : new List<IDataElement>();
         }
     }
 
@@ -5161,12 +4769,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -5255,7 +4863,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// Describes whether the entity is a co- managed entity or a self-managed entity.
@@ -5266,7 +4874,7 @@ namespace AasCore.Aas3
         /// Describes statements applicable to the entity by a set of submodel elements,
         /// typically with a qualified value.
         /// </summary>
-        public List<ISubmodelElement>? Statements { get; set; }
+        public List<ISubmodelElement> Statements { get; set; }
 
         /// <summary>
         /// Reference to the asset the entity is representing.
@@ -5293,20 +4901,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -5324,20 +4926,14 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Statements != null)
+            foreach (var anItem in Statements)
             {
-                foreach (var anItem in Statements)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (GlobalAssetId != null)
@@ -5356,31 +4952,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -5417,31 +5007,25 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Statements != null)
+            foreach (var anItem in Statements)
             {
-                foreach (var anItem in Statements)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -5520,39 +5104,27 @@ namespace AasCore.Aas3
             IReference? globalAssetId = null,
             IdentifierKeyValuePair? specificAssetId = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
-            Statements = statements;
+                : new List<IReference>();
+            Statements = (statements != null)
+                ? statements
+                : new List<ISubmodelElement>();
             EntityType = entityType;
             GlobalAssetId = globalAssetId;
             SpecificAssetId = specificAssetId;
-        }
-
-        public Entity() : this(
-            new EntityType(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
         }
     }
 
@@ -5581,12 +5153,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -5675,7 +5247,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// Reference to a referable, e.g. a data element or a submodel, that is being
@@ -5689,20 +5261,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -5720,12 +5286,9 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             yield return Observed;
@@ -5736,31 +5299,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -5797,17 +5354,14 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -5869,33 +5423,22 @@ namespace AasCore.Aas3
             List<IConstraint>? qualifiers = null,
             List<IReference>? dataSpecifications = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
+                : new List<IReference>();
             Observed = observed;
-        }
-
-        public BasicEvent() : this(
-            new IReference(),
-            "",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
         }
     }
 
@@ -5914,12 +5457,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -6008,22 +5551,22 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// Input parameter of the operation.
         /// </summary>
-        public List<OperationVariable>? InputVariables { get; set; }
+        public List<OperationVariable> InputVariables { get; set; }
 
         /// <summary>
         /// Output parameter of the operation.
         /// </summary>
-        public List<OperationVariable>? OutputVariables { get; set; }
+        public List<OperationVariable> OutputVariables { get; set; }
 
         /// <summary>
         /// Parameter that is input and output of the operation.
         /// </summary>
-        public List<OperationVariable>? InoutputVariables { get; set; }
+        public List<OperationVariable> InoutputVariables { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance 
@@ -6031,20 +5574,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -6062,36 +5599,24 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (InputVariables != null)
+            foreach (var anItem in InputVariables)
             {
-                foreach (var anItem in InputVariables)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (OutputVariables != null)
+            foreach (var anItem in OutputVariables)
             {
-                foreach (var anItem in OutputVariables)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (InoutputVariables != null)
+            foreach (var anItem in InoutputVariables)
             {
-                foreach (var anItem in InoutputVariables)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -6100,31 +5625,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -6161,59 +5680,47 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (InputVariables != null)
+            foreach (var anItem in InputVariables)
             {
-                foreach (var anItem in InputVariables)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (OutputVariables != null)
+            foreach (var anItem in OutputVariables)
             {
-                foreach (var anItem in OutputVariables)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (InoutputVariables != null)
+            foreach (var anItem in InoutputVariables)
             {
-                foreach (var anItem in InoutputVariables)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -6269,20 +5776,30 @@ namespace AasCore.Aas3
             List<OperationVariable>? outputVariables = null,
             List<OperationVariable>? inoutputVariables = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
-            InputVariables = inputVariables;
-            OutputVariables = outputVariables;
-            InoutputVariables = inoutputVariables;
+                : new List<IReference>();
+            InputVariables = (inputVariables != null)
+                ? inputVariables
+                : new List<OperationVariable>();
+            OutputVariables = (outputVariables != null)
+                ? outputVariables
+                : new List<OperationVariable>();
+            InoutputVariables = (inoutputVariables != null)
+                ? inoutputVariables
+                : new List<OperationVariable>();
         }
     }
 
@@ -6361,11 +5878,6 @@ namespace AasCore.Aas3
         {
             Value = value;
         }
-
-        public OperationVariable() : this(new ISubmodelElement())
-        {
-            // Intentionally left empty.
-        }
     }
 
     /// <summary>
@@ -6385,12 +5897,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -6479,7 +5991,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Additional qualification of a qualifiable element.
         /// </summary>
-        public List<IConstraint>? Qualifiers { get; set; }
+        public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance 
@@ -6487,20 +5999,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -6518,12 +6024,9 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -6532,31 +6035,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -6593,17 +6090,14 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Qualifiers != null)
+            foreach (var anItem in Qualifiers)
             {
-                foreach (var anItem in Qualifiers)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -6656,17 +6150,21 @@ namespace AasCore.Aas3
             List<IConstraint>? qualifiers = null,
             List<IReference>? dataSpecifications = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = qualifiers;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
+                : new List<IReference>();
         }
     }
 
@@ -6688,12 +6186,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -6785,7 +6283,7 @@ namespace AasCore.Aas3
         /// <remarks>
         /// Compare to is-case-of relationship in ISO 13584-32 &amp; IEC EN 61360"
         /// </remarks>
-        public List<IReference>? IsCaseOf { get; set; }
+        public List<IReference> IsCaseOf { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance 
@@ -6793,20 +6291,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -6824,12 +6316,9 @@ namespace AasCore.Aas3
                 yield return Administration;
             }
 
-            if (IsCaseOf != null)
+            foreach (var anItem in IsCaseOf)
             {
-                foreach (var anItem in IsCaseOf)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -6838,31 +6327,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -6899,17 +6382,14 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (IsCaseOf != null)
+            foreach (var anItem in IsCaseOf)
             {
-                foreach (var anItem in IsCaseOf)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -6962,7 +6442,9 @@ namespace AasCore.Aas3
             List<IReference>? isCaseOf = null,
             List<IReference>? dataSpecifications = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -6971,22 +6453,10 @@ namespace AasCore.Aas3
             Administration = administration;
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
-            IsCaseOf = isCaseOf;
-        }
-
-        public ConceptDescription() : this(
-            "",
-            "",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null)
-        {
-            // Intentionally left empty.
+                : new List<IReference>();
+            IsCaseOf = (isCaseOf != null)
+                ? isCaseOf
+                : new List<IReference>();
         }
     }
 
@@ -7009,12 +6479,12 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
+        public List<IReference> DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<Extension> Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -7095,7 +6565,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Reference to a referable element that is contained in the view.
         /// </summary>
-        public List<IReference>? ContainedElements { get; set; }
+        public List<IReference> ContainedElements { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance 
@@ -7103,20 +6573,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
 
             if (DisplayName != null)
@@ -7134,12 +6598,9 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (ContainedElements != null)
+            foreach (var anItem in ContainedElements)
             {
-                foreach (var anItem in ContainedElements)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -7148,31 +6609,25 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            foreach (var anItem in DataSpecifications)
             {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
-            if (Extensions != null)
+            foreach (var anItem in Extensions)
             {
-                foreach (var anItem in Extensions)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
 
@@ -7209,17 +6664,14 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (ContainedElements != null)
+            foreach (var anItem in ContainedElements)
             {
-                foreach (var anItem in ContainedElements)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -7271,7 +6723,9 @@ namespace AasCore.Aas3
             List<IReference>? dataSpecifications = null,
             List<IReference>? containedElements = null)
         {
-            Extensions = extensions;
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -7279,8 +6733,10 @@ namespace AasCore.Aas3
             SemanticId = semanticId;
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
-                : new List<IReference>?();
-            ContainedElements = containedElements;
+                : new List<IReference>();
+            ContainedElements = (containedElements != null)
+                ? containedElements
+                : new List<IReference>();
         }
     }
 
@@ -7365,11 +6821,6 @@ namespace AasCore.Aas3
         public GlobalReference(List<string> values)
         {
             Values = values;
-        }
-
-        public GlobalReference() : this(new List<string>())
-        {
-            // Intentionally left empty.
         }
     }
 
@@ -7482,13 +6933,6 @@ namespace AasCore.Aas3
             Keys = keys;
             ReferredSemanticId = referredSemanticId;
         }
-
-        public ModelReference() : this(
-            new List<Key>(),
-            null)
-        {
-            // Intentionally left empty.
-        }
     }
 
     /// <summary>
@@ -7562,13 +7006,6 @@ namespace AasCore.Aas3
         {
             Type = type;
             Value = value;
-        }
-
-        public Key() : this(
-            new KeyElements(),
-            "")
-        {
-            // Intentionally left empty.
         }
     }
 
@@ -8520,13 +7957,6 @@ namespace AasCore.Aas3
             Value = value;
             ValueId = valueId;
         }
-
-        public ValueReferencePair() : this(
-            "",
-            new IReference())
-        {
-            // Intentionally left empty.
-        }
     }
 
     /// <summary>
@@ -8537,7 +7967,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// A pair of a value together with its global unique id.
         /// </summary>
-        public List<ValueReferencePair>? ValueReferencePairs { get; set; }
+        public List<ValueReferencePair> ValueReferencePairs { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance 
@@ -8545,12 +7975,9 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (ValueReferencePairs != null)
+            foreach (var anItem in ValueReferencePairs)
             {
-                foreach (var anItem in ValueReferencePairs)
-                {
-                    yield return anItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -8559,17 +7986,14 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (ValueReferencePairs != null)
+            foreach (var anItem in ValueReferencePairs)
             {
-                foreach (var anItem in ValueReferencePairs)
-                {
-                    yield return anItem;
+                yield return anItem;
 
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
                 }
             }
         }
@@ -8613,7 +8037,9 @@ namespace AasCore.Aas3
 
         public ValueList(List<ValueReferencePair>? valueReferencePairs = null)
         {
-            ValueReferencePairs = valueReferencePairs;
+            ValueReferencePairs = (valueReferencePairs != null)
+                ? valueReferencePairs
+                : new List<ValueReferencePair>();
         }
     }
 

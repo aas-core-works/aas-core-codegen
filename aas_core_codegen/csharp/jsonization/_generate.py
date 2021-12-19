@@ -267,7 +267,7 @@ case Json.JsonTokenType.EndObject:
             textwrap.indent(
                 textwrap.dedent(
                     f"""\
-                    case {csharp_common.string_literal(json_prop_name)}: 
+                    case {csharp_common.string_literal(json_prop_name)}:
                     {I}{var_name} =  (
                     {II}Json.JsonSerializer.Deserialize<{arg_type}>(
                     {III}ref reader));
