@@ -389,10 +389,6 @@ class Method(DBC):
         "Expected constructors to be handled in a special way and not as a method"
     )
     @require(
-        lambda body: not (len(body) > 0) or not parse.is_string_expr(expr=body[0]),
-        "Docstring is excluded from the body"
-    )
-    @require(
         lambda arguments:
         all(
             arg.name != 'self'
@@ -680,23 +676,86 @@ class Class:
 Symbol = Union[Interface, Enumeration, Class]
 
 
-class ImplementationSpecificVerification:
-    """Represent an implementation-specific verification."""
+class Verification(DBC):
+    """Represent a verification function defined in the meta-model."""
 
-    #: Name of the verification function
-    name: Final[Identifier]
-
-    #: Related method in the parsing phase
-    parsed: Final[parse.Method]
-
+    # fmt: off
+    @require(
+        lambda arguments, contracts:
+        (
+                arg_set := {arg.name for arg in arguments},
+                all(
+                    arg in arg_set  # pylint: disable=used-before-assignment
+                    for precondition in contracts.preconditions
+                    for arg in precondition.args
+                )
+                and all(
+                    arg in arg_set
+                    for postcondition in contracts.postconditions
+                    for arg in postcondition.args
+                    if arg not in ('OLD', 'result')
+                )
+                and all(
+                    arg in arg_set
+                    for snapshot in contracts.snapshots
+                    for arg in snapshot.args
+                )
+        )[1],
+        "All arguments of contracts defined in function arguments"
+    )
+    @require(
+        lambda arguments: (
+                arg_names := [arg.name for arg in arguments],
+                len(arg_names) == len(set(arg_names))
+        )[1],
+        "Unique arguments"
+    )
+    # fmt: on
     def __init__(
             self,
             name: Identifier,
+            arguments: Sequence[Argument],
+            returns: Optional[TypeAnnotation],
+            description: Optional[Description],
+            contracts: Contracts,
             parsed: parse.Method,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
+        self.arguments = arguments
+        self.returns = returns
+        self.description = description
+        self.contracts = contracts
         self.parsed = parsed
+
+    @abc.abstractmethod
+    def __repr__(self) -> str:
+        # Signal that this is a pure abstract class.
+        raise NotImplementedError()
+
+
+class ImplementationSpecificVerification(Verification):
+    """Represent an implementation-specific verification function."""
+
+    def __init__(
+            self,
+            name: Identifier,
+            arguments: Sequence[Argument],
+            returns: Optional[TypeAnnotation],
+            description: Optional[Description],
+            contracts: Contracts,
+            parsed: parse.Method,
+    ) -> None:
+        """Initialize with the given values."""
+        Verification.__init__(
+            self,
+            name=name,
+            arguments=arguments,
+            returns=returns,
+            description=description,
+            contracts=contracts,
+            parsed=parsed
+        )
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -705,17 +764,12 @@ class ImplementationSpecificVerification:
         )
 
 
-class PatternVerification:
+class PatternVerification(Verification):
     """Represent a function that checks a string against a regular expression."""
 
     # TODO: implement pattern.py module that interprets the verification function as a pattern
     #  and then add the statements here
 
-
-VerificationFunction = Union[
-    ImplementationSpecificVerification,
-    PatternVerification
-]
 
 T = TypeVar("T")  # pylint: disable=invalid-name
 
@@ -747,10 +801,10 @@ class SymbolTable:
     symbols: Final[Sequence[Symbol]]
 
     #: List of all functions used in the verification
-    verification_functions: Final[Sequence[VerificationFunction]]
+    verification_functions: Final[Sequence[Verification]]
 
     #: Map verification functions by their name
-    verification_functions_by_name: Final[Mapping[Identifier, VerificationFunction]]
+    verification_functions_by_name: Final[Mapping[Identifier, Verification]]
 
     #: Type to be used to represent a ``Ref[T]``
     ref_association: Final[Symbol]
@@ -782,7 +836,7 @@ class SymbolTable:
         lambda self:
         all(
             (
-                    found_symbol := self.find_symbol(symbol.name),
+                    found_symbol := self.find(symbol.name),
                     found_symbol is not None and id(found_symbol) == id(symbol)
             )[1]
             for symbol in self.symbols
@@ -793,7 +847,7 @@ class SymbolTable:
     def __init__(
             self,
             symbols: Sequence[Symbol],
-            verification_functions: Sequence[VerificationFunction],
+            verification_functions: Sequence[Verification],
             ref_association: Symbol,
             meta_model: parse.MetaModel,
     ) -> None:

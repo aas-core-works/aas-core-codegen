@@ -49,6 +49,7 @@ from aas_core_codegen.parse._types import (
     BUILTIN_COMPOSITE_TYPES,
     Description,
     MetaModel, ImplementationSpecificMethod, UnderstoodMethod,
+    ConstructorToBeUnderstood,
 )
 
 
@@ -78,6 +79,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
         self.errors = []  # type: List[Error]
 
     def visit_Import(self, node: ast.Import) -> Any:
+        print(f"ast.dump(node) is {ast.dump(node)!r}")  # TODO: debug
         self.errors.append(
             Error(
                 node,
@@ -88,6 +90,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
 
     _EXPECTED_NAME_FROM_MODULE = collections.OrderedDict(
         [
+            ("match", "re"),
             ("Enum", "enum"),
             ("List", "typing"),
             ("Optional", "typing"),
@@ -98,7 +101,6 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("abstract", "aas_core_meta.marker"),
             ("implementation_specific", "aas_core_meta.marker"),
             ("reference_in_the_book", "aas_core_meta.marker"),
-            ("template", "aas_core_meta.marker"),
             ("Ref", "aas_core_meta.marker"),
             ("associate_ref_with", "aas_core_meta.marker"),
             ("is_superset_of", "aas_core_meta.marker"),
@@ -1093,16 +1095,29 @@ def _function_def_to_method(
 
     # endregion
 
-    # region __init__ must return None
-    if name == "__init__" and returns is not None:
-        return (
-            None,
-            Error(
-                node,
-                f"Expected __init__ to return None, "
-                f"but got: {atok.get_text(node.returns)}",
-            ),
-        )
+    # region Check __init__ constraints
+    if name == "__init__":
+        # Must return None
+        if returns is not None:
+            return (
+                None,
+                Error(
+                    node,
+                    f"Expected __init__ to return None, "
+                    f"but got: {atok.get_text(node.returns)}",
+                ),
+            )
+
+        # Must not be a verification
+        if verification:
+            return (
+                None,
+                Error(
+                    node,
+                    f"Expected __init__ not to be a verification function",
+                ),
+            )
+
     # endregion
 
     # region Check that the parsed method conforms to ``expect_self``
@@ -1158,42 +1173,61 @@ def _function_def_to_method(
             None
         )
     else:
-        understanding_errors = []  # type: List[Error]
-
-        understood_body = []  # type: List[tree.Node]
-        for body_node in body:
-            understood_node, understanding_error = _rules.ast_node_to_our_node(
-                body_node)
-
-            if understanding_error is not None:
-                understanding_errors.append(understanding_error)
-
-            assert understood_node is not None
-            understood_body.append(understood_node)
-
-        if len(understanding_errors) > 0:
-            return None, Error(
-                node,
-                f"Failed to understand the body of the function {name!r}",
-                understanding_errors)
-
-        return (
-            UnderstoodMethod(
-                name=Identifier(name),
-                verification=verification,
-                arguments=arguments,
-                returns=returns,
-                description=description,
-                contracts=Contracts(
-                    preconditions=preconditions,
-                    snapshots=snapshots,
-                    postconditions=postconditions,
+        if name == "__init__":
+            assert not verification
+            assert returns is None
+            return (
+                ConstructorToBeUnderstood(
+                    arguments=arguments,
+                    description=description,
+                    contracts=Contracts(
+                        preconditions=preconditions,
+                        snapshots=snapshots,
+                        postconditions=postconditions,
+                    ),
+                    body=body,
+                    node=node,
                 ),
-                body=body,
-                node=node,
-            ),
-            None
-        )
+                None
+            )
+        else:
+            understanding_errors = []  # type: List[Error]
+
+            understood_body = []  # type: List[tree.Node]
+            for body_child in body:
+                understood_node, understanding_error = _rules.ast_node_to_our_node(
+                    body_child)
+
+                if understanding_error is not None:
+                    understanding_errors.append(understanding_error)
+                    continue
+
+                assert understood_node is not None
+                understood_body.append(understood_node)
+
+            if len(understanding_errors) > 0:
+                return None, Error(
+                    node,
+                    f"Failed to understand the body of the function {name!r}",
+                    understanding_errors)
+
+            return (
+                UnderstoodMethod(
+                    name=Identifier(name),
+                    verification=verification,
+                    arguments=arguments,
+                    returns=returns,
+                    description=description,
+                    contracts=Contracts(
+                        preconditions=preconditions,
+                        snapshots=snapshots,
+                        postconditions=postconditions,
+                    ),
+                    body=understood_body,
+                    node=node,
+                ),
+                None
+            )
 
 
 @require(lambda constant: isinstance(constant.value, str))
@@ -1795,6 +1829,7 @@ def _verify_symbol_table(
         "visitation",
         "visitor",
         "visitor_with_context",
+        "match"
     }
     reserved_member_names = {
         "descend",
@@ -1803,6 +1838,7 @@ def _verify_symbol_table(
         "transform",
         "model_type",
         "property_name",
+        "match"
     }
 
     for symbol in symbol_table.symbols:
@@ -1858,6 +1894,41 @@ def _verify_symbol_table(
                     f"for the code generation: {func.name!r}",
                 )
             )
+
+    # endregion
+
+    # region Check that imported symbols are not re-assigned in an understood method
+
+    for understood_method in itertools.chain(
+            (
+                    method
+                    for method in symbol_table.verification_functions
+                    if isinstance(method, UnderstoodMethod)
+            ),
+            (
+                    method
+                    for symbol in symbol_table.symbols
+                    if isinstance(symbol, Class)
+                    for method in symbol.methods
+                    if isinstance(method, UnderstoodMethod)
+            )
+    ):
+        # TODO: test
+        for stmt in understood_method.body:
+            if (
+                    isinstance(stmt, tree.Assignment)
+                    and isinstance(stmt.target, tree.Name)
+                    and stmt.target.identifier == 'match'
+            ):
+                errors.append(
+                    Error(
+                        stmt.original_node,
+                        f"The name ``match`` is reserved "
+                        f"for the function ``match`` "
+                        f"imported from the ``re`` module of "
+                        f"the standard Python library",
+                    )
+                )
 
     # endregion
 

@@ -25,7 +25,7 @@ from icontract import require, ensure
 
 from aas_core_codegen import parse
 from aas_core_codegen.common import Error, Identifier, assert_never, IDENTIFIER_RE
-from aas_core_codegen.intermediate import _hierarchy, construction
+from aas_core_codegen.intermediate import _hierarchy, construction, pattern_verification
 from aas_core_codegen.intermediate._types import (
     SymbolTable,
     Enumeration,
@@ -61,14 +61,12 @@ from aas_core_codegen.intermediate._types import (
     MetaModel,
     RefTypeAnnotation,
     collect_ids_of_interfaces_in_properties,
-    map_interface_implementers, ImplementationSpecificMethod, VerificationFunction,
-    ImplementationSpecificVerification,
+    map_interface_implementers, ImplementationSpecificMethod,
+    ImplementationSpecificVerification, Verification,
 )
 from aas_core_codegen.parse import (
     tree as parse_tree
 )
-# noinspection PyUnusedLocal
-from aas_core_codegen.parse.tree import FunctionCall
 
 
 # noinspection PyUnusedLocal
@@ -792,15 +790,49 @@ def _parsed_class_to_class(
 # fmt: on
 def _parsed_verification_function_to_verification_function(
         parsed: parse.Method
-) -> Tuple[Optional[VerificationFunction], Optional[Error]]:
+) -> Tuple[Optional[Verification], Optional[Error]]:
     """Translate the verification function and try to understand it, if necessary."""
     if isinstance(parsed, parse.ImplementationSpecificMethod):
         return ImplementationSpecificVerification(
             name=parsed.name,
+            arguments=_parsed_arguments_to_arguments(parsed=parsed.arguments),
+            returns=(
+                None
+                if parsed.returns is None
+                else _parsed_type_annotation_to_type_annotation(parsed.returns)
+            ),
+            description=(
+                _parsed_description_to_description(parsed.description)
+                if parsed.description is not None
+                else None
+            ),
+            contracts=_parsed_contracts_to_contracts(parsed.contracts),
             parsed=parsed,
         ), None
+    elif isinstance(parsed, parse.UnderstoodMethod):
+        pattern_verification_func = pattern_verification.try_to_understand(
+            parsed=parsed)
+        if pattern_verification_func is not None:
+            return pattern_verification_func, None
 
-    # TODO: continue here, implement understanding of the verification function
+        return (
+            None,
+            Error(
+                parsed.node,
+                "We do not know how to interpret the verification function as it does "
+                "not match our pre-defined interpretation rules. "
+                "Please contact the developers if you expect this function "
+                "to be understood.")
+        )
+    elif isinstance(parsed, parse.ConstructorToBeUnderstood):
+        return (
+            None,
+            Error(
+                parsed.node,
+                "Unexpected constructor as a verification function")
+        )
+    else:
+        assert_never(parsed)
 
 
 def _over_our_atomic_type_annotations(
@@ -962,7 +994,7 @@ class _ContractChecker(parse_tree.Visitor):
 
         self.errors = []
 
-    def visit_function_call(self, node: FunctionCall) -> None:
+    def visit_function_call(self, node: parse_tree.FunctionCall) -> None:
         verification_function = self.symbol_table.verification_functions_by_name.get(
             node.name, None)
 
@@ -1201,12 +1233,24 @@ def translate(
         ),
     )
 
+    verification_functions = []  # type: List[Verification]
+    for func in parsed_symbol_table.verification_functions:
+        verification, error = _parsed_verification_function_to_verification_function(
+            func)
+
+        if error is not None:
+            underlying_errors.append(error)
+            continue
+
+        assert verification is not None
+        verification_functions.append(verification)
+
+    if len(underlying_errors) > 0:
+        return None, bundle_underlying_errors()
+
     symbol_table = SymbolTable(
         symbols=symbols,
-        verification_functions=[
-            _parsed_method_to_method(func)
-            for func in parsed_symbol_table.verification_functions
-        ],
+        verification_functions=verification_functions,
         ref_association=ref_association,
         meta_model=meta_model
     )

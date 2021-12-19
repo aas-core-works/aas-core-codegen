@@ -22,6 +22,7 @@ Contracts = _types.Contracts
 is_string_expr = _types.is_string_expr
 ImplementationSpecificMethod = _types.ImplementationSpecificMethod
 UnderstoodMethod = _types.UnderstoodMethod
+ConstructorToBeUnderstood = _types.ConstructorToBeUnderstood
 Method = _types.Method
 Symbol = _types.Symbol
 Serialization = _types.Serialization

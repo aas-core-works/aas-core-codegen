@@ -12,11 +12,11 @@ import abc
 import ast
 import os
 import pathlib
-from typing import Tuple, Optional, List, Mapping, Type, Sequence
+from typing import Tuple, Optional, List, Mapping, Type, Sequence, Union
 
 from icontract import ensure
 
-from aas_core_codegen.common import Identifier, Error
+from aas_core_codegen.common import Identifier, Error, assert_never
 from aas_core_codegen.parse import tree
 
 _AST_COMPARATOR_TO_OURS = {
@@ -47,10 +47,10 @@ class _Parse(abc.ABC):
 class _ParseComparison(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return (
-            isinstance(node, ast.Compare)
-            and len(node.ops) == 1
-            and type(node.ops[0]) in _AST_COMPARATOR_TO_OURS
-            and len(node.comparators) == 1
+                isinstance(node, ast.Compare)
+                and len(node.ops) == 1
+                and type(node.ops[0]) in _AST_COMPARATOR_TO_OURS
+                and len(node.comparators) == 1
         )
 
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
@@ -130,11 +130,11 @@ class _ParseConstant(_Parse):
 class _ParseImplication(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return (
-            isinstance(node, ast.BoolOp)
-            and isinstance(node.op, ast.Or)
-            and len(node.values) == 2
-            and isinstance(node.values[0], ast.UnaryOp)
-            and isinstance(node.values[0].op, ast.Not)
+                isinstance(node, ast.BoolOp)
+                and isinstance(node.op, ast.Or)
+                and len(node.values) == 2
+                and isinstance(node.values[0], ast.UnaryOp)
+                and isinstance(node.values[0].op, ast.Not)
         )
 
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
@@ -188,12 +188,12 @@ class _ParseName(_Parse):
 class _ParseIsNoneOrIsNotNone(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return (
-            isinstance(node, ast.Compare)
-            and len(node.ops) == 1
-            and isinstance(node.ops[0], (ast.Is, ast.IsNot))
-            and len(node.comparators) == 1
-            and isinstance(node.comparators[0], ast.Constant)
-            and node.comparators[0].value is None
+                isinstance(node, ast.Compare)
+                and len(node.ops) == 1
+                and isinstance(node.ops[0], (ast.Is, ast.IsNot))
+                and len(node.comparators) == 1
+                and isinstance(node.comparators[0], ast.Constant)
+                and node.comparators[0].value is None
         )
 
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
@@ -239,13 +239,13 @@ class _ParseAndOrOr(_Parse):
 class _ParseExpressionWithDeclaration(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return (
-            isinstance(node, ast.Subscript)
-            and isinstance(node.value, ast.Tuple)
-            and len(node.value.elts) == 2
-            and isinstance(node.value.elts[0], ast.NamedExpr)
-            and isinstance(node.slice, ast.Index)
-            and isinstance(node.slice.value, ast.Constant)
-            and node.slice.value.value == 1
+                isinstance(node, ast.Subscript)
+                and isinstance(node.value, ast.Tuple)
+                and len(node.value.elts) == 2
+                and isinstance(node.value.elts[0], ast.NamedExpr)
+                and isinstance(node.slice, ast.Index)
+                and isinstance(node.slice.value, ast.Constant)
+                and node.slice.value.value == 1
         )
 
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
@@ -289,7 +289,110 @@ class _ParseDeclaration(_Parse):
         )
 
 
-# TODO-BEFORE-RELEASE (mristin, 2021-12-13): implement generators and other constructs
+class _ParseExpression(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.Expr)
+
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        value, error = ast_node_to_our_node(node.value)
+        if error is not None:
+            return None, error
+
+        assert value is not None
+
+        return value, None
+
+
+class _ParseJoinedStr(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.JoinedStr)
+
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        values = []  # type: List[Union[str, tree.FormattedValue]]
+
+        assert isinstance(node, ast.JoinedStr)
+        for value_node in node.values:
+            if isinstance(value_node, ast.Constant):
+                if not isinstance(value_node.value, str):
+                    return None, Error(
+                        value_node,
+                        "Unexpected non-string constant in the joined string")
+
+                values.append(value_node.value)
+
+            elif isinstance(value_node, ast.FormattedValue):
+                if value_node.conversion != -1:
+                    return None, Error(
+                        value_node,
+                        f"We do not support any conversions at the moment. "
+                        f"Expected -1, but got conversion: {value_node.conversion}")
+
+                if value_node.format_spec is not None:
+                    return None, Error(
+                        value_node,
+                        f"We do not support any format spec at the moment. "
+                        f"Expected None, but got format spec: {value_node.format_spec}")
+
+                # noinspection PyTypeChecker
+                value, error = ast_node_to_our_node(node=value_node.value)
+                if error is not None:
+                    return None, error
+
+                assert isinstance(value, tree.Expression)
+                values.append(tree.FormattedValue(value=value))
+            else:
+                assert_never(value_node)
+
+        return tree.JoinedStr(values=values, original_node=node), None
+
+
+class _ParseAssignment(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return (
+                isinstance(node, ast.Assign)
+                and len(node.targets) == 1
+        )
+
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        assert len(node.targets) == 1
+
+        target, error = ast_node_to_our_node(node.targets[0])
+        if error is not None:
+            return None, error
+
+        assert target is not None
+        assert isinstance(target, tree.Expression), f"{target=}"
+
+        value, error = ast_node_to_our_node(node.value)
+        if error is not None:
+            return None, error
+
+        assert value is not None
+        assert isinstance(value, tree.Expression), f"{value=}"
+
+        return (
+            tree.Assignment(
+                target=target, value=value, original_node=node
+            ),
+            None,
+        )
+
+
+class _ParseReturn(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.Return)
+
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        assert isinstance(node, ast.Return)
+
+        value, error = ast_node_to_our_node(node.value)
+        if error is not None:
+            return None, error
+
+        assert value is not None
+        assert isinstance(value, tree.Expression), f"{value=}"
+
+        return tree.Return(value=value, original_node=node), None
 
 
 _CHAIN_OF_RULES = [
@@ -303,11 +406,11 @@ _CHAIN_OF_RULES = [
     _ParseAndOrOr(),
     _ParseExpressionWithDeclaration(),
     _ParseDeclaration(),
+    _ParseExpression(),
+    _ParseJoinedStr(),
+    _ParseAssignment(),
+    _ParseReturn()
 ]  # type: Sequence[_Parse]
-
-
-# TODO-BEFORE-RELEASE (mristin, 2021-12-13):
-#  implement _Simplify(node) -> node so that we can already optimize a bit
 
 
 def _assert_chains_follow_file_structure() -> None:
@@ -326,16 +429,16 @@ def _assert_chains_follow_file_structure() -> None:
         stmt.name
         for stmt in root.body
         if (
-            isinstance(stmt, ast.ClassDef)
-            and stmt.name.startswith("_Parse")
-            and stmt.name != "_Parse"
+                isinstance(stmt, ast.ClassDef)
+                and stmt.name.startswith("_Parse")
+                and stmt.name != "_Parse"
         )
     ]  # type: List[str]
 
     parse_names_in_chain = [parse.__class__.__name__ for parse in _CHAIN_OF_RULES]
 
     assert (
-        expected_parse_names == parse_names_in_chain
+            expected_parse_names == parse_names_in_chain
     ), f"{expected_parse_names=} != {parse_names_in_chain=}"
 
 

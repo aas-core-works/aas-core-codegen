@@ -1,13 +1,12 @@
 """Provide the meta model for Asset Administration Shell V3 Release Candidate 1."""
-
 from enum import Enum
+from re import match
 from typing import List, Optional
 
 from icontract import invariant, DBC
 
 from aas_core_meta.marker import (
     abstract,
-    template,
     Ref,
     serialization,
     implementation_specific,
@@ -29,10 +28,21 @@ __book_version__ = "V3.0RC2"
 # region Verification
 
 @verification
-@implementation_specific
 def is_MIME_type(text: str) -> bool:
     """Check that ``text`` conforms to the pattern of MIME type."""
-    raise NotImplementedError()
+    tchar = "[!#$%&'*+\\-.^_`|~0-9a-zA-Z]"
+    token = f'({tchar})+'
+    type = f'{token}'
+    subtype = f'{token}'
+    ows = '[ \t]*'
+    obs_text = '[\\x80-\\xff]'
+    qd_text = f'([\t !#-\\[\\]-~]|{obs_text})'
+    quoted_pair = f'\\\\([\t !-~]|{obs_text})'
+    quoted_string = f'"({qd_text}|{quoted_pair})*"'
+    parameter = f'{token}=({token}|{quoted_string})'
+    media_type = f'{type}/{subtype}({ows};{ows}{parameter})*'
+
+    return match(media_type, text) is not None
 
 
 # endregion
@@ -2492,7 +2502,6 @@ class Value_list(DBC):
         )
 
 
-@template
 @reference_in_the_book(section=(6, 8, 2, 3))
 class Data_specification_IEC61360(Data_specification_content):
     """
@@ -2642,7 +2651,6 @@ class Data_specification_IEC61360(Data_specification_content):
         self.level_type = level_type
 
 
-@template
 @reference_in_the_book(section=(6, 8, 3, 2))
 class Data_specification_physical_unit(Data_specification_content):
     """TODO"""

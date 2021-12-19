@@ -253,10 +253,6 @@ class Method(DBC):
 
     # fmt: off
     @require(
-        lambda body: not (len(body) > 0) or not is_string_expr(expr=body[0]),
-        "Docstring is excluded from the body"
-    )
-    @require(
         lambda arguments, contracts:
         (
                 arg_set := {arg.name for arg in arguments},
@@ -367,6 +363,53 @@ class UnderstoodMethod(Method):
             verification=verification,
             arguments=arguments,
             returns=returns,
+            description=description,
+            contracts=contracts,
+            node=node
+        )
+
+        self.body = body
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+
+class ConstructorToBeUnderstood(Method):
+    """
+    Represent a constructor of a class.
+
+    We will use :py:mod:`aas_core_codegen.intermediate.construction` to later
+    understand it.
+    """
+    #: Body of the constructor as Python AST. We will understand it in the intermediate
+    #: phase using :py:mod:`aas_core_codegen.intermediate.construction`.
+    body: Final[Sequence[ast.AST]]
+
+    # fmt: off
+    @require(
+        lambda body:
+        not (len(body) > 0)
+        or not is_string_expr(expr=body[0]),
+        "Docstring is excluded from the body"
+    )
+    def __init__(
+            self,
+            arguments: Sequence[Argument],
+            description: Optional[Description],
+            contracts: Contracts,
+            body: Sequence[ast.AST],
+            node: ast.AST,
+    ) -> None:
+        """Initialize with the given values."""
+        Method.__init__(
+            self,
+            name=Identifier("__init__"),
+            verification=False,
+            arguments=arguments,
+            returns=None,
             description=description,
             contracts=contracts,
             node=node

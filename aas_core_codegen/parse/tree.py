@@ -2,12 +2,12 @@
 import abc
 import ast
 import enum
-from typing import Sequence, Union, Generic, TypeVar
+from typing import Sequence, Union, Generic, TypeVar, List
 
 from icontract import DBC
 
 from aas_core_codegen import stringify
-from aas_core_codegen.common import Identifier
+from aas_core_codegen.common import Identifier, assert_never
 
 T = TypeVar("T")
 
@@ -173,7 +173,7 @@ class Constant(Expression):
     def transform(self, transformer: "Transformer[T]") -> None:
         """Accept the transformer."""
         return transformer.transform_constant(self)
-    
+
     def visit(self, visitor: "Visitor") -> None:
         """Accept the visitor."""
         visitor.visit_constant(self)
@@ -244,8 +244,8 @@ class And(Expression):
     def visit(self, visitor: "Visitor") -> None:
         """Accept the visitor."""
         visitor.visit_and(self)
-        
-        
+
+
 class Or(Expression):
     """Represent a disjunction."""
 
@@ -263,7 +263,7 @@ class Or(Expression):
 
 
 class Declaration(Statement):
-    """Declare a variable."""
+    """Represent a variable declaration with a walrus operator, ``:=``."""
 
     def __init__(
             self, identifier: Identifier, value: Expression, original_node: ast.AST
@@ -280,14 +280,14 @@ class Declaration(Statement):
     def visit(self, visitor: "Visitor") -> None:
         """Accept the visitor."""
         visitor.visit_declaration(self)
-        
+
 
 class ExpressionWithDeclarations(Expression):
     """
     Represent a declaration of a local variable followed by the expression.
 
     This abstract the code patterns such as ``(x := ..., len(x) > 0)[1]``, similar to,
-    *e.g.*, short ``If`` statements in Golang.
+    *e.g.*, short ``if`` statements in Golang.
     """
 
     def __init__(
@@ -310,6 +310,79 @@ class ExpressionWithDeclarations(Expression):
         visitor.visit_expression_with_declarations(self)
 
 
+class FormattedValue:
+    """Represent a formatted value in a :py:class`JoinedStr`."""
+
+    def __init__(self, value: Expression) -> None:
+        """Initialize with the given values."""
+        self.value = value
+
+
+class JoinedStr(Expression):
+    """Represent a string interpolation."""
+
+    def __init__(
+            self,
+            values: Sequence[Union[str, FormattedValue]],
+            original_node: ast.AST
+    ) -> None:
+        """Initialize with the given values."""
+        Expression.__init__(self, original_node=original_node)
+
+        self.values = values
+
+    def transform(self, transformer: "Transformer[T]") -> None:
+        """Accept the transformer."""
+        return transformer.transform_joined_str(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_joined_str(self)
+
+
+class Assignment(Statement):
+    """Represent an assignment of a single value to a single target."""
+
+    def __init__(
+            self, target: Expression, value: Expression, original_node: ast.AST
+    ) -> None:
+        """Initialize with the given values."""
+        Node.__init__(self, original_node=original_node)
+        self.target = target
+        self.value = value
+
+    def transform(self, transformer: "Transformer[T]") -> None:
+        """Accept the transformer."""
+        # TODO: extend the transformer
+        return transformer.transform_assignment(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        # TODO: extend the visitor
+        visitor.visit_assignment(self)
+
+
+class Return(Statement):
+    """Represent a return statement with a single return value."""
+
+    def __init__(
+            self, value: Expression, original_node: ast.AST
+    ) -> None:
+        """Initialize with the given values."""
+        Node.__init__(self, original_node=original_node)
+        self.value = value
+
+    def transform(self, transformer: "Transformer[T]") -> None:
+        """Accept the transformer."""
+        # TODO: extend the transformer
+        return transformer.transform_return(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        # TODO: extend the visitor
+        visitor.visit_return(self)
+
+
 class Visitor(DBC):
     """
     Visit all the nodes in the AST.
@@ -323,142 +396,188 @@ class Visitor(DBC):
         node.visit(self)
 
     def visit_member(self, node: Member) -> None:
-        """Visit a member to something."""
+        """Visit a member."""
         self.visit(node.instance)
 
     def visit_comparison(self, node: Comparison) -> None:
-        """Visit a comparison to something."""
+        """Visit a comparison."""
         self.visit(node.left)
         self.visit(node.right)
 
     def visit_implication(self, node: Implication) -> None:
-        """Visit an implication to something."""
+        """Visit an implication."""
         self.visit(node.antecedent)
         self.visit(node.consequent)
 
     def visit_method_call(self, node: MethodCall) -> None:
-        """Visit a method call into something."""
+        """Visit a method call."""
         self.visit(node.member)
         for arg in node.args:
             self.visit(arg)
 
     def visit_function_call(self, node: FunctionCall) -> None:
-        """Visit a function call into something."""
+        """Visit a function call."""
         for arg in node.args:
             self.visit(arg)
 
     def visit_constant(self, node: Constant) -> None:
-        """Visit a constant into something."""
+        """Visit a constant."""
         pass
 
     def visit_is_none(self, node: IsNone) -> None:
-        """Visit an is-none check into something."""
+        """Visit an is-none check."""
         self.visit(node.value)
 
     def visit_is_not_none(self, node: IsNotNone) -> None:
-        """Visit an is-not-none check into something."""
+        """Visit an is-not-none check."""
         self.visit(node.value)
 
     def visit_name(self, node: Name) -> None:
-        """Visit a variable access into something."""
+        """Visit a variable access."""
         pass
 
     def visit_and(self, node: And) -> None:
-        """Visit a conjunction into something."""
+        """Visit a conjunction."""
         for value in node.values:
             self.visit(value)
 
     def visit_or(self, node: Or) -> None:
-        """Visit a disjunction into something."""
+        """Visit a disjunction."""
         for value in node.values:
             self.visit(value)
 
     def visit_declaration(self, node: Declaration) -> None:
-        """Visit a variable declaration into something."""
+        """Visit a variable declaration."""
         self.visit(node.value)
 
     def visit_expression_with_declarations(
             self, node: ExpressionWithDeclarations
     ) -> None:
-        """Visit an expression with variable declarations into something."""
+        """Visit an expression with variable declarations."""
         for declaration in node.declarations:
             self.visit(declaration)
 
         self.visit(node.expression)
 
+    def visit_joined_str(
+            self, node: JoinedStr
+    ) -> None:
+        """Visit a string interpolation."""
+        for value in node.values:
+            if isinstance(value, str):
+                pass
+            elif isinstance(value, FormattedValue):
+                self.visit(value.value)
+            else:
+                assert_never(value)
+
+    def visit_assignment(
+            self, node: Assignment
+    ) -> None:
+        """Visit an assignment statement."""
+        self.visit(node.target)
+        self.visit(node.value)
+
+    def visit_return(
+            self, node: Return
+    ) -> None:
+        """Visit a return statement."""
+        self.visit(node.value)
+
 
 class Transformer(Generic[T], DBC):
     """Transform our AST into something."""
 
-    def transform(self, node: Node) -> None:
+    def transform(self, node: Node) -> T:
         """Dispatch to the appropriate transformation method."""
         return node.transform(self)
 
     @abc.abstractmethod
-    def transform_member(self, node: Member) -> None:
+    def transform_member(self, node: Member) -> T:
         """Transform a member to something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_comparison(self, node: Comparison) -> None:
+    def transform_comparison(self, node: Comparison) -> T:
         """Transform a comparison to something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_implication(self, node: Implication) -> None:
+    def transform_implication(self, node: Implication) -> T:
         """Transform an implication to something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_method_call(self, node: MethodCall) -> None:
+    def transform_method_call(self, node: MethodCall) -> T:
         """Transform a method call into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_function_call(self, node: FunctionCall) -> None:
+    def transform_function_call(self, node: FunctionCall) -> T:
         """Transform a function call into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_constant(self, node: Constant) -> None:
+    def transform_constant(self, node: Constant) -> T:
         """Transform a constant into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_is_none(self, node: IsNone) -> None:
+    def transform_is_none(self, node: IsNone) -> T:
         """Transform an is-none check into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_is_not_none(self, node: IsNotNone) -> None:
+    def transform_is_not_none(self, node: IsNotNone) -> T:
         """Transform an is-not-none check into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_name(self, node: Name) -> None:
+    def transform_name(self, node: Name) -> T:
         """Transform a variable access into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_and(self, node: And) -> None:
+    def transform_and(self, node: And) -> T:
         """Transform a conjunction into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_or(self, node: Or) -> None:
+    def transform_or(self, node: Or) -> T:
         """Transform a disjunction into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_declaration(self, node: Declaration) -> None:
+    def transform_declaration(self, node: Declaration) -> T:
         """Transform a variable declaration into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_expression_with_declarations(
             self, node: ExpressionWithDeclarations
-    ) -> None:
+    ) -> T:
         """Transform an expression with variable declarations into something."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def transform_joined_str(
+            self, node: JoinedStr
+    ) -> T:
+        """Transform a string interpolation into something."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def transform_assignment(
+            self, node: Assignment
+    ) -> T:
+        """Transform an assignment into something."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def transform_return(
+            self, node: Return
+    ) -> T:
+        """Transform a return statement into something."""
         raise NotImplementedError()
 
 
@@ -598,6 +717,55 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
                     [self.transform(declaration) for declaration in node.declarations],
                 ),
                 stringify.Property("expression", self.transform(node.expression)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
+    def transform_joined_str(
+            self, node: JoinedStr
+    ) -> stringify.Entity:
+        values = []  # type: List[Union[stringify.Entity, str]]
+        for value in node.values:
+            if isinstance(value, str):
+                values.append(value)
+            elif isinstance(value, FormattedValue):
+                values.append(
+                    stringify.Entity(
+                        name=FormattedValue.__name__,
+                        properties=[
+                            stringify.Property("value", self.transform(value.value))
+                        ]
+                    ))
+            else:
+                assert_never(value)
+
+        return stringify.Entity(
+            name=JoinedStr.__name__,
+            properties=[
+                stringify.Property("values", values, ),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
+    def transform_assignment(
+            self, node: Assignment
+    ) -> stringify.Entity:
+        return stringify.Entity(
+            name=Assignment.__name__,
+            properties=[
+                stringify.Property("target", self.transform(node.target)),
+                stringify.Property("value", self.transform(node.value)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
+    def transform_return(
+            self, node: Assignment
+    ) -> stringify.Entity:
+        return stringify.Entity(
+            name=Return.__name__,
+            properties=[
+                stringify.Property("value", self.transform(node.value)),
                 stringify.PropertyEllipsis("original_node", node.original_node),
             ],
         )
