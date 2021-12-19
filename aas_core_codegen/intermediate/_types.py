@@ -1,4 +1,5 @@
 """Provide types of the intermediate representation."""
+import abc
 import ast
 import collections
 import enum
@@ -18,7 +19,7 @@ from typing import (
 )
 
 import docutils.nodes
-from icontract import require, invariant, ensure
+from icontract import require, invariant, ensure, DBC
 
 from aas_core_codegen import parse
 from aas_core_codegen.parse import (
@@ -378,7 +379,7 @@ class Contracts:
         self.postconditions = postconditions
 
 
-class Method:
+class Method(DBC):
     """Represent a method of a class."""
 
     # fmt: off
@@ -435,23 +436,33 @@ class Method:
     def __init__(
             self,
             name: Identifier,
-            is_implementation_specific: bool,
             arguments: Sequence[Argument],
             returns: Optional[TypeAnnotation],
             description: Optional[Description],
             contracts: Contracts,
-            body: Sequence[ast.AST],
             parsed: parse.Method,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
-        self.is_implementation_specific = is_implementation_specific
         self.arguments = arguments
         self.returns = returns
         self.description = description
         self.contracts = contracts
-        self.body = body
         self.parsed = parsed
+
+    @abc.abstractmethod
+    def __repr__(self) -> str:
+        # Signal that this is a pure abstract class.
+        raise NotImplementedError()
+
+
+# NOTE (mristin, 2021-12-19):
+# At the moment, we support only implementation-specific methods. However, we anticipate
+# that we will try to understand the methods in the very near future so we already
+# prepare the class hierarchy for it.
+
+class ImplementationSpecificMethod(Method):
+    """Represent an implementation-specific method of a class."""
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -668,6 +679,44 @@ class Class:
 
 Symbol = Union[Interface, Enumeration, Class]
 
+
+class ImplementationSpecificVerification:
+    """Represent an implementation-specific verification."""
+
+    #: Name of the verification function
+    name: Final[Identifier]
+
+    #: Related method in the parsing phase
+    parsed: Final[parse.Method]
+
+    def __init__(
+            self,
+            name: Identifier,
+            parsed: parse.Method,
+    ) -> None:
+        """Initialize with the given values."""
+        self.name = name
+        self.parsed = parsed
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+
+class PatternVerification:
+    """Represent a function that checks a string against a regular expression."""
+
+    # TODO: implement pattern.py module that interprets the verification function as a pattern
+    #  and then add the statements here
+
+
+VerificationFunction = Union[
+    ImplementationSpecificVerification,
+    PatternVerification
+]
+
 T = TypeVar("T")  # pylint: disable=invalid-name
 
 
@@ -698,10 +747,10 @@ class SymbolTable:
     symbols: Final[Sequence[Symbol]]
 
     #: List of all functions used in the verification
-    verification_functions: Final[Sequence[Method]]
+    verification_functions: Final[Sequence[VerificationFunction]]
 
     #: Map verification functions by their name
-    verification_functions_by_name: Final[Mapping[Identifier, Method]]
+    verification_functions_by_name: Final[Mapping[Identifier, VerificationFunction]]
 
     #: Type to be used to represent a ``Ref[T]``
     ref_association: Final[Symbol]
@@ -719,14 +768,6 @@ class SymbolTable:
         )[1],
         "Symbol names unique",
     )
-    @require(
-        lambda verification_functions:
-        all(
-            func.is_implementation_specific
-            for func in verification_functions
-        ),
-        "All verification functions are implementation-specific"
-    )
     @ensure(
         lambda self:
         all(
@@ -737,11 +778,22 @@ class SymbolTable:
             self.verification_functions),
         "The verification functions and their mapping by name are consistent"
     )
+    @ensure(
+        lambda self:
+        all(
+            (
+                    found_symbol := self.find_symbol(symbol.name),
+                    found_symbol is not None and id(found_symbol) == id(symbol)
+            )[1]
+            for symbol in self.symbols
+        ),
+        "Finding symbols is consistent with ``symbols``"
+    )
     # fmt: on
     def __init__(
             self,
             symbols: Sequence[Symbol],
-            verification_functions: Sequence[Method],
+            verification_functions: Sequence[VerificationFunction],
             ref_association: Symbol,
             meta_model: parse.MetaModel,
     ) -> None:

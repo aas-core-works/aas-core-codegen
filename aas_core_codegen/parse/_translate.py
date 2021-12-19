@@ -48,7 +48,7 @@ from aas_core_codegen.parse._types import (
     BUILTIN_ATOMIC_TYPES,
     BUILTIN_COMPOSITE_TYPES,
     Description,
-    MetaModel,
+    MetaModel, ImplementationSpecificMethod, UnderstoodMethod,
 )
 
 
@@ -1140,24 +1140,60 @@ def _function_def_to_method(
 
     # endregion
 
-    return (
-        Method(
-            name=Identifier(name),
-            is_implementation_specific=is_implementation_specific,
-            verification=verification,
-            arguments=arguments,
-            returns=returns,
-            description=description,
-            contracts=Contracts(
-                preconditions=preconditions,
-                snapshots=snapshots,
-                postconditions=postconditions,
+    if is_implementation_specific:
+        return (
+            ImplementationSpecificMethod(
+                name=Identifier(name),
+                verification=verification,
+                arguments=arguments,
+                returns=returns,
+                description=description,
+                contracts=Contracts(
+                    preconditions=preconditions,
+                    snapshots=snapshots,
+                    postconditions=postconditions,
+                ),
+                node=node,
             ),
-            body=body,
-            node=node,
-        ),
-        None,
-    )
+            None
+        )
+    else:
+        understanding_errors = []  # type: List[Error]
+
+        understood_body = []  # type: List[tree.Node]
+        for body_node in body:
+            understood_node, understanding_error = _rules.ast_node_to_our_node(
+                body_node)
+
+            if understanding_error is not None:
+                understanding_errors.append(understanding_error)
+
+            assert understood_node is not None
+            understood_body.append(understood_node)
+
+        if len(understanding_errors) > 0:
+            return None, Error(
+                node,
+                f"Failed to understand the body of the function {name!r}",
+                understanding_errors)
+
+        return (
+            UnderstoodMethod(
+                name=Identifier(name),
+                verification=verification,
+                arguments=arguments,
+                returns=returns,
+                description=description,
+                contracts=Contracts(
+                    preconditions=preconditions,
+                    snapshots=snapshots,
+                    postconditions=postconditions,
+                ),
+                body=body,
+                node=node,
+            ),
+            None
+        )
 
 
 @require(lambda constant: isinstance(constant.value, str))
@@ -1820,20 +1856,6 @@ def _verify_symbol_table(
                     func.node,
                     f"The name of the verification function is reserved "
                     f"for the code generation: {func.name!r}",
-                )
-            )
-
-    # endregion
-
-    # region Check that all verification functions are implementation-specific
-
-    # TODO-BEFORE-RELEASE (mristin, 2021-12-16): test
-    for func in symbol_table.verification_functions:
-        if not func.is_implementation_specific:
-            errors.append(
-                Error(
-                    func.node,
-                    "Expected all verification functions to be implementation-specific"
                 )
             )
 

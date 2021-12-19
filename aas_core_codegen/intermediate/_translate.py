@@ -61,7 +61,8 @@ from aas_core_codegen.intermediate._types import (
     MetaModel,
     RefTypeAnnotation,
     collect_ids_of_interfaces_in_properties,
-    map_interface_implementers,
+    map_interface_implementers, ImplementationSpecificMethod, VerificationFunction,
+    ImplementationSpecificVerification,
 )
 from aas_core_codegen.parse import (
     tree as parse_tree
@@ -426,12 +427,25 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
     parsed.name != "__init__",
     "Constructors are expected to be handled in a special way"
 )
+@require(
+    lambda parsed:
+    'self' in parsed.arguments_by_name,
+    "Expected ``self`` argument in the ``parsed`` since it is a genuine class method"
+)
+@require(
+    lambda parsed:
+    not parsed.verification,
+    "Expected only non-verification methods"
+)
 # fmt: on
 def _parsed_method_to_method(parsed: parse.Method) -> Method:
     """Translate the parsed method into an intermediate representation."""
-    return Method(
+    assert isinstance(parsed, parse.ImplementationSpecificMethod), (
+        "Only implementation-specific class methods are supported at the moment."
+    )
+
+    return ImplementationSpecificMethod(
         name=parsed.name,
-        is_implementation_specific=parsed.is_implementation_specific,
         arguments=_parsed_arguments_to_arguments(parsed=parsed.arguments),
         returns=(
             None
@@ -444,7 +458,6 @@ def _parsed_method_to_method(parsed: parse.Method) -> Method:
             else None
         ),
         contracts=_parsed_contracts_to_contracts(parsed.contracts),
-        body=parsed.body,
         parsed=parsed,
     )
 
@@ -666,7 +679,8 @@ def _parsed_class_to_class(
     if parsed_class_init is not None:
         arguments = _parsed_arguments_to_arguments(parsed=parsed_class_init.arguments)
 
-        init_is_implementation_specific = parsed_class_init.is_implementation_specific
+        init_is_implementation_specific = isinstance(
+            parsed_class_init, parse.ImplementationSpecificMethod)
 
         contracts = _stack_contracts(
             contracts, _parsed_contracts_to_contracts(parsed_class_init.contracts)
@@ -761,6 +775,32 @@ def _parsed_class_to_class(
         ),
         None,
     )
+
+
+# fmt: off
+@require(
+    lambda parsed:
+    parsed.verification, "Expected a verification function"
+)
+@require(
+    lambda parsed:
+    'self' not in parsed.arguments_by_name,
+    "Expected no ``self`` in the arguments since a verification function should not be "
+    "a method of a class"
+)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+# fmt: on
+def _parsed_verification_function_to_verification_function(
+        parsed: parse.Method
+) -> Tuple[Optional[VerificationFunction], Optional[Error]]:
+    """Translate the verification function and try to understand it, if necessary."""
+    if isinstance(parsed, parse.ImplementationSpecificMethod):
+        return ImplementationSpecificVerification(
+            name=parsed.name,
+            parsed=parsed,
+        ), None
+
+    # TODO: continue here, implement understanding of the verification function
 
 
 def _over_our_atomic_type_annotations(

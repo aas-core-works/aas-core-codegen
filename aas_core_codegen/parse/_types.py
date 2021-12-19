@@ -2,7 +2,7 @@
 import abc
 import ast
 import pathlib
-from typing import Sequence, Optional, Union, Final, Mapping, Any
+from typing import Sequence, Optional, Union, Final, Mapping
 
 import docutils.nodes
 from icontract import require, DBC, ensure, invariant
@@ -220,18 +220,15 @@ def is_string_expr(expr: ast.AST) -> bool:
     )
 
 
-class Method:
+class Method(DBC):
     """
-    Represent a function or a method of a class.
+    Represent a function or a class method.
 
     Though we have to distinguish in Python between a function and a method, we term
     both of them "methods" in our model.
     """
     #: Name of the method
     name: Final[Identifier]
-
-    #: Set if the method is marked to be implementation-specific
-    is_implementation_specific: Final[bool]
 
     #: Set if the method is marked to be used for verification
     verification: Final[bool]
@@ -247,9 +244,6 @@ class Method:
 
     #: Parsed contracts of the method
     contracts: Final[Contracts]
-
-    #: Body as Python AST
-    body: Final[Sequence[ast.AST]]
 
     #: Node representing the method in the meta-model's Python AST
     node: Final[ast.AST]
@@ -304,29 +298,81 @@ class Method:
     def __init__(
             self,
             name: Identifier,
-            is_implementation_specific: bool,
             verification: bool,
             arguments: Sequence[Argument],
             returns: Optional[TypeAnnotation],
             description: Optional[Description],
             contracts: Contracts,
-            body: Sequence[ast.AST],
             node: ast.AST,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
-        self.is_implementation_specific = is_implementation_specific
         self.verification = verification
         self.arguments = arguments
         self.returns = returns
         self.description = description
         self.contracts = contracts
-        self.body = body
         self.node = node
 
         self.arguments_by_name = {
             argument.name: argument for argument in self.arguments
         }  # type: Mapping[Identifier, Argument]
+
+    @abc.abstractmethod
+    def __repr__(self) -> str:
+        # Make abstract to signal that this is a pure abstract class
+        raise NotImplementedError()
+
+
+class ImplementationSpecificMethod(Method):
+    """
+    Represent an implementation-specific function or a class method.
+
+    Implementation-specific means that we have to provide a snippet for each
+    target implementation.
+    """
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+
+class UnderstoodMethod(Method):
+    """
+    Represent a function or a class method that we could understand.
+
+    We use :py:mod:`aas_core_codegen.parse._rules` to understand it.
+    """
+    #: Body as a our AST that we could understand with
+    #: :py:mod:`aas_core_codegen.parse._rules`
+    body: Final[Sequence[tree.Node]]
+
+    def __init__(
+            self,
+            name: Identifier,
+            verification: bool,
+            arguments: Sequence[Argument],
+            returns: Optional[TypeAnnotation],
+            description: Optional[Description],
+            contracts: Contracts,
+            body: Sequence[tree.Node],
+            node: ast.AST,
+    ) -> None:
+        """Initialize with the given values."""
+        Method.__init__(
+            self,
+            name=name,
+            verification=verification,
+            arguments=arguments,
+            returns=returns,
+            description=description,
+            contracts=contracts,
+            node=node
+        )
+
+        self.body = body
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -546,6 +592,7 @@ class UnverifiedSymbolTable(DBC):
         all(
             'self' not in func.arguments_by_name
             for func in verification_functions
+            if isinstance(func, UnderstoodMethod)
         ),
         "No ``self`` in the verification functions expected as outside of a class"
     )
