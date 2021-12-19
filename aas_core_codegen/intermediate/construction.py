@@ -21,7 +21,6 @@ from aas_core_codegen import parse
 from aas_core_codegen.common import Identifier, Error
 from aas_core_codegen.parse import Method
 
-# TODO: refactor this once we have better rules in the parse stage
 
 class CallSuperConstructor:
     """

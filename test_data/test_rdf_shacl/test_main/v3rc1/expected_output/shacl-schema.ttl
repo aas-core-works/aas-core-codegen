@@ -84,7 +84,7 @@ aas:ReferableShape  a sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
-        sh:pattern "^[a-zA-Z][a-zA-Z_0-9]*$" ;
+        sh:pattern "^[a-zA-Z_][a-zA-Z_0-9]*$" ;
     ] ;
     sh:property [
         a sh:PropertyShape ;

@@ -79,7 +79,6 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
         self.errors = []  # type: List[Error]
 
     def visit_Import(self, node: ast.Import) -> Any:
-        print(f"ast.dump(node) is {ast.dump(node)!r}")  # TODO: debug
         self.errors.append(
             Error(
                 node,
@@ -872,6 +871,10 @@ def _function_def_to_method(
     If ``expect_self`` is set, the first argument is expected to be ``self``. Otherwise,
     no ``self`` argument is expected.
     """
+    # NOTE (mristin, 2021-12-19):
+    # This run-time check is necessary as we already burned our fingers with it.
+    assert isinstance(node, ast.FunctionDef)
+
     name = node.name
 
     if name != "__init__" and name.startswith("__") and name.endswith("__"):
@@ -1194,6 +1197,7 @@ def _function_def_to_method(
             understanding_errors = []  # type: List[Error]
 
             understood_body = []  # type: List[tree.Node]
+
             for body_child in body:
                 understood_node, understanding_error = _rules.ast_node_to_our_node(
                     body_child)
@@ -1913,7 +1917,7 @@ def _verify_symbol_table(
                     if isinstance(method, UnderstoodMethod)
             )
     ):
-        # TODO: test
+        # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test
         for stmt in understood_method.body:
             if (
                     isinstance(stmt, tree.Assignment)

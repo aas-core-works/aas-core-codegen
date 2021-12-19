@@ -353,12 +353,10 @@ class Assignment(Statement):
 
     def transform(self, transformer: "Transformer[T]") -> None:
         """Accept the transformer."""
-        # TODO: extend the transformer
         return transformer.transform_assignment(self)
 
     def visit(self, visitor: "Visitor") -> None:
         """Accept the visitor."""
-        # TODO: extend the visitor
         visitor.visit_assignment(self)
 
 
@@ -374,12 +372,10 @@ class Return(Statement):
 
     def transform(self, transformer: "Transformer[T]") -> None:
         """Accept the transformer."""
-        # TODO: extend the transformer
         return transformer.transform_return(self)
 
     def visit(self, visitor: "Visitor") -> None:
         """Accept the visitor."""
-        # TODO: extend the visitor
         visitor.visit_return(self)
 
 

@@ -826,8 +826,7 @@ def _parsed_verification_function_to_verification_function(
         assert found is not None
         if found:
             assert pattern is not None
-            # TODO: generate code in C# for this!
-            # TODO: check XSD, JSON and RDF
+            # TODO: continue here, generate code in C# for this!
             return PatternVerification(
                 name=name,
                 arguments=arguments,
@@ -1023,13 +1022,15 @@ class _ContractChecker(parse_tree.Visitor):
             node.name, None)
 
         if verification_function is not None:
-            # TODO: test failure case
+            # TODO-BEFORE-RELEASE (mristin, 2021-12-19):
+            #  test failure case
             expected_argument_count = len(verification_function.arguments)
         elif node.name == 'len':
-            # TODO: test failure case
+            # TODO-BEFORE-RELEASE (mristin, 2021-12-19):
+            #  test failure case
             expected_argument_count = 1
         else:
-            # TODO: test
+            # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test this
             self.errors.append(
                 Error(
                     node.original_node,
@@ -1039,6 +1040,7 @@ class _ContractChecker(parse_tree.Visitor):
             return
 
         if len(node.args) != expected_argument_count:
+            # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test this
             self.errors.append(
                 Error(
                     node.original_node,

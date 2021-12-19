@@ -15,14 +15,26 @@ from icontract import require, ensure
 
 from aas_core_codegen.intermediate._types import PatternVerification
 from aas_core_codegen import parse
-from aas_core_codegen.common import Error, Identifier
+from aas_core_codegen.common import Error, Identifier, assert_never
 from aas_core_codegen.parse import (
     tree as parse_tree
 )
 
 
-def _check_support(node: parse_tree.Node) -> Optional[List[Error]]:
-    """Check that we understand the ``node`` in the pattern-matching function."""
+def _check_support(
+        node: parse_tree.Node,
+        argument: Identifier
+) -> Optional[List[Error]]:
+    """
+    Check that we understand the ``node`` in the pattern-matching function.
+
+    The ``argument`` specifies the argument to the verification function, which should
+    not be used.
+    """
+    # NOTE (mristin, 2021-12-19):
+    # This run-time check is necessary as we already burned our fingers with it.
+    assert isinstance(node, parse_tree.Node), f"{node=}"
+
     if isinstance(node, parse_tree.Constant):
         if isinstance(node.value, str):
             return None
@@ -42,9 +54,14 @@ def _check_support(node: parse_tree.Node) -> Optional[List[Error]]:
 
         for value in node.values:
             # noinspection PyTypeChecker
-            underlying_errors = _check_support(value)
-            if underlying_errors is not None:
-                errors.extend(underlying_errors)
+            if isinstance(value, str):
+                continue
+            elif isinstance(value, parse_tree.FormattedValue):
+                underlying_errors = _check_support(node=value.value, argument=argument)
+                if underlying_errors is not None:
+                    errors.extend(underlying_errors)
+            else:
+                assert_never(value)
 
         if len(errors) == 0:
             return None
@@ -52,7 +69,16 @@ def _check_support(node: parse_tree.Node) -> Optional[List[Error]]:
         return errors
 
     elif isinstance(node, parse_tree.Name):
-        return None
+        if node.identifier == argument:
+            return [
+                Error(
+                    node.original_node,
+                    f"The verification arguments, {argument!r}, is not expected "
+                    f"to be accessed neither for reading nor for writing."
+                )
+            ]
+        else:
+            return None
 
     elif isinstance(node, parse_tree.Assignment):
         if not isinstance(node.target, parse_tree.Name):
@@ -66,7 +92,7 @@ def _check_support(node: parse_tree.Node) -> Optional[List[Error]]:
                 )
             ]
 
-        return _check_support(node.value)
+        return _check_support(node=node.value, argument=argument)
 
     else:
         return [
@@ -107,12 +133,18 @@ def _evaluate(
     elif isinstance(expr, parse_tree.JoinedStr):
         parts = []  # type: List[str]
         for value in expr.values:
-            part, error = _evaluate(value)
-            if error is not None:
-                return None, error
+            if isinstance(value, str):
+                parts.append(value)
+            elif isinstance(value, parse_tree.FormattedValue):
 
-            assert part is not None
-            parts.append(part)
+                part, error = _evaluate(value.value, state=state)
+                if error is not None:
+                    return None, error
+
+                assert part is not None
+                parts.append(part)
+            else:
+                assert_never(value)
 
         return "".join(parts), None
 
@@ -131,7 +163,10 @@ def _evaluate(
     not (result[2] is None)
     or (
             (result[1] is not None)
-            and ((result[0] is not None) ^ result[1])
+            and (
+                    (result[0] is not None) and result[1]
+                    or ((result[0] is None) and not result[1])
+            )
     ),
     "Valid match and found if no error"
 )
@@ -171,8 +206,6 @@ def try_to_understand(
             and parsed.returns.identifier == 'bool'
     ):
         return None, False, None
-
-    print(f"parsed.body is {parsed.body!r}")  # TODO: debug
 
     if len(parsed.body) == 0:
         return None, False, None
@@ -245,7 +278,7 @@ def try_to_understand(
     # noinspection PyUnresolvedReferences
     if not (
             isinstance(match_call.args[1], parse_tree.Name)
-            and match_call.args[1].identifier != parsed.arguments[0].name
+            and match_call.args[1].identifier == parsed.arguments[0].name
     ):
         return (
             None,
@@ -255,7 +288,9 @@ def try_to_understand(
                 f"The second argument to ``match`` function, the text to be matched, "
                 f"needs to correspond to the single argument of "
                 f"the verification function, {parsed.arguments[0].name!r}. "
-                "Otherwise, we can not transpile the pattern to schemas."
+                f"Otherwise, we can not transpile the pattern to schemas.\n"
+                f"\n"
+                f"However, we got: {parse_tree.dump(match_call.args[1])}"
             )
         )
 
@@ -283,12 +318,14 @@ def try_to_understand(
         if i == len(parsed.body) - 1:
             break
 
-        underlying_errors = _check_support(node=stmt)
+        underlying_errors = _check_support(node=stmt, argument=parsed.arguments[0].name)
 
         if underlying_errors is not None:
             errors.extend(underlying_errors)
 
-    underlying_errors = _check_support(match_call.args[0])
+    underlying_errors = _check_support(
+        node=match_call.args[0], argument=parsed.arguments[0].name)
+
     if underlying_errors is not None:
         errors.extend(underlying_errors)
 

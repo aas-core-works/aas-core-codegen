@@ -1,5 +1,5 @@
 """Provide the meta model for Asset Administration Shell V3 Release Candidate 1."""
-
+from re import match
 from enum import Enum
 from typing import List, Optional
 
@@ -24,22 +24,20 @@ __book_version__ = "V3.0RC1"
 @verification
 @implementation_specific
 def is_IRI(text: str) -> bool:
-    """Check that ``text`` conforms to the pattern of MIME type."""
+    """Check that ``text`` conforms to the IRI pattern."""
     raise NotImplementedError()
-
 
 @verification
 @implementation_specific
 def is_IRDI(text: str) -> bool:
-    """Check that ``text`` conforms to the pattern of MIME type."""
+    """Check that ``text`` conforms to the IRDI pattern."""
     raise NotImplementedError()
 
 
 @verification
-@implementation_specific
 def is_ID_short(text: str) -> bool:
-    """Check that ``text`` conforms to the pattern of MIME type."""
-    raise NotImplementedError()
+    """Check that ``text`` conforms to the pattern of ID short."""
+    return match(r'^[a-zA-Z_][a-zA-Z_0-9]*$', text) is not None
 
 
 # endregion
