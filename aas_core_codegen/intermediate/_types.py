@@ -245,9 +245,13 @@ class Argument:
         self.parsed = parsed
 
 
-class Signature(DBC):
-    """Represent a method or a function signature."""
+class SignatureLike(DBC):
+    """
+    Represent a signature-like "something".
 
+    This can be either a method signature in an interface, a class method or
+    a function.
+    """
     name: Final[Identifier]
     arguments: Final[Sequence[Argument]]
     returns: Final[Optional[TypeAnnotation]]
@@ -304,6 +308,21 @@ class Signature(DBC):
             argument.name: argument
             for argument in self.arguments
         }
+
+    @abc.abstractmethod
+    def __repr__(self) -> str:
+        # Signal that this is a pure abstract class
+        raise NotImplementedError()
+
+
+class Signature(SignatureLike):
+    """Represent a method signature in an interface."""
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
 
 
 class Serialization:
@@ -421,7 +440,7 @@ class Contracts:
         self.postconditions = postconditions
 
 
-class Method(Signature):
+class Method(SignatureLike):
     """Represent a method of a class."""
 
     # fmt: off
@@ -466,7 +485,7 @@ class Method(Signature):
             parsed: parse.Method,
     ) -> None:
         """Initialize with the given values."""
-        Signature.__init__(
+        SignatureLike.__init__(
             self,
             name=name,
             arguments=arguments,
@@ -633,6 +652,37 @@ class Enumeration:
 class Class:
     """Represent a class implementing zero, one or more interfaces."""
 
+    #: Name of the class
+    name: Final[Identifier]
+    
+    #: Interfaces that this class implements
+    interfaces: Final[Sequence["Interface"]]
+
+    #: If set, this class is implementation-specific and we need to provide a snippet
+    #: for each implementation target
+    is_implementation_specific: Final[bool]
+
+    #: List of properties of the class
+    properties: Final[Sequence[Property]]
+
+    #: List of methods of the class. The methods are strictly non-static and non-class.
+    methods: Final[Sequence[Method]]
+
+    #: Constructor specification of the class
+    constructor: Final[Constructor]
+
+    #: List of class invariants
+    invariants: Final[Sequence[Invariant]]
+
+    #: Particular serialization settings for this class
+    serialization: Final[Serialization]
+
+    #: Description of the class
+    description: Final[Optional[Description]]
+
+    #: Relation to the class from the parse stage
+    parsed: parse.Class
+
     #: Map all properties by their identifiers to the corresponding objects
     properties_by_name: Final[Mapping[Identifier, Property]]
 
@@ -707,7 +757,7 @@ class Class:
 Symbol = Union[Interface, Enumeration, Class]
 
 
-class Verification(Signature):
+class Verification(SignatureLike):
     """Represent a verification function defined in the meta-model."""
 
     # fmt: off
@@ -745,7 +795,7 @@ class Verification(Signature):
             parsed: parse.Method,
     ) -> None:
         """Initialize with the given values."""
-        Signature.__init__(
+        SignatureLike.__init__(
             self,
             name=name,
             arguments=arguments,

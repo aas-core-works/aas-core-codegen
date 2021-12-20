@@ -29,7 +29,8 @@ from aas_core_codegen.intermediate._types import (
     Description,
     Invariant,
     DefaultConstant,
-    DefaultEnumerationLiteral,
+    DefaultEnumerationLiteral, Serialization, MetaModel,
+    ImplementationSpecificVerification,
 )
 
 
@@ -47,7 +48,7 @@ def _stringify_default_constant(default: DefaultConstant) -> stringify.Entity:
 
 
 def _stringify_default_enumeration_literal(
-    default: DefaultEnumerationLiteral,
+        default: DefaultEnumerationLiteral,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=Default.__name__,
@@ -63,9 +64,9 @@ def _stringify_default_enumeration_literal(
 
 
 def _stringify_atomic_type_annotation(
-    type_annotation: AtomicTypeAnnotation,
+        type_annotation: AtomicTypeAnnotation,
 ) -> stringify.Entity:
-    result = None  # type: Optional[stringify.Class]
+    result = None  # type: Optional[stringify.Entity]
 
     if isinstance(type_annotation, BuiltinAtomicTypeAnnotation):
         result = stringify.Entity(
@@ -92,9 +93,9 @@ def _stringify_atomic_type_annotation(
 
 
 def _stringify_subscripted_type_annotation(
-    type_annotation: SubscriptedTypeAnnotation,
+        type_annotation: SubscriptedTypeAnnotation,
 ) -> stringify.Entity:
-    result = None  # type: Optional[stringify.Class]
+    result = None  # type: Optional[stringify.Entity]
 
     if isinstance(type_annotation, ListTypeAnnotation):
         result = stringify.Entity(
@@ -146,6 +147,18 @@ def _stringify_description(description: Description) -> stringify.Entity:
             stringify.PropertyEllipsis("node", description.node),
         ],
     )
+
+
+def _stringify_serialization(serialization: Serialization) -> stringify.Entity:
+    result = stringify.Entity(
+        name=Serialization.__name__,
+        properties=[
+            stringify.Property("with_model_type", serialization.with_model_type),
+        ],
+    )
+
+    stringify.assert_compares_against_dict(result, serialization)
+    return result
 
 
 def _stringify_signature(signature: Signature) -> stringify.Entity:
@@ -216,7 +229,7 @@ def _stringify_interface(interface: Interface) -> stringify.Entity:
 
 
 def _stringify_enumeration_literal(
-    enumeration_literal: EnumerationLiteral,
+        enumeration_literal: EnumerationLiteral,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=EnumerationLiteral.__name__,
@@ -370,6 +383,7 @@ def _stringify_constructor(constructor: Constructor) -> stringify.Entity:
                 "is_implementation_specific", constructor.is_implementation_specific
             ),
             stringify.PropertyEllipsis("statements", constructor.statements),
+            stringify.PropertyEllipsis("arguments_by_name", constructor.statements),
         ],
     )
 
@@ -396,8 +410,26 @@ def _stringify_class(cls: Class) -> stringify.Entity:
                 "methods", [_stringify_method(method) for method in cls.methods]
             ),
             stringify.Property("constructor", _stringify_constructor(cls.constructor)),
-            stringify.Property("description", _stringify_description(cls.description)),
+            stringify.Property(
+                "invariants",
+                [
+                    _stringify_invariant(invariant)
+                    for invariant in cls.invariants
+                ]
+            ),
+            stringify.Property(
+                "serialization", _stringify(cls.serialization)
+            ),
+            stringify.Property(
+                "description",
+                _stringify_description(cls.description)
+                if cls.description is not None
+                else None),
             stringify.PropertyEllipsis("parsed", cls.parsed),
+            stringify.PropertyEllipsis("properties_by_name", cls.properties_by_name),
+            stringify.PropertyEllipsis("property_id_set", cls.property_id_set),
+            stringify.PropertyEllipsis("invariant_id_set", cls.invariant_id_set),
+            stringify.PropertyEllipsis("interface_id_set", cls.interface_id_set),
         ],
     )
 
@@ -405,15 +437,49 @@ def _stringify_class(cls: Class) -> stringify.Entity:
     return result
 
 
+def _stringify_meta_model(meta_model: MetaModel) -> stringify.Entity:
+    result = stringify.Entity(
+        name=MetaModel.__name__,
+        properties=[
+            stringify.Property(
+              "description",
+                _stringify_description(meta_model.description)
+                if meta_model is not None
+                else None
+            ),
+            stringify.Property("book_url", meta_model.book_url),
+            stringify.Property("book_version", meta_model.book_version),
+        ],
+    )
+
+    stringify.assert_compares_against_dict(result, meta_model)
+    return result
+
+
 def _stringify_symbol_table(symbol_table: SymbolTable) -> stringify.Entity:
-    """Represent the symbol table as a string for testing or debugging."""
     result = stringify.Entity(
         name=SymbolTable.__name__,
         properties=[
             stringify.Property(
-                name="symbols",
-                value=[_stringify(symbol) for symbol in symbol_table.symbols],
-            )
+                "symbols",
+                [_stringify(symbol) for symbol in symbol_table.symbols],
+            ),
+            stringify.Property(
+                "verification_functions",
+                [
+                    _stringify(verification)
+                    for verification in symbol_table.verification_functions
+                ],
+            ),
+            stringify.PropertyEllipsis(
+                "verification_functions_by_name",
+                symbol_table.verification_functions_by_name
+            ),
+            stringify.Property(
+                "ref_association",
+                f"reference to {symbol_table.ref_association.name}"
+            ),
+            stringify.Property("meta_model", _stringify(symbol_table.meta_model))
         ],
     )
 
@@ -431,10 +497,13 @@ Dumpable = Union[
     Default,
     Enumeration,
     EnumerationLiteral,
+    ImplementationSpecificVerification,
     Interface,
     Invariant,
+    MetaModel,
     Method,
     Property,
+    Serialization,
     Signature,
     Snapshot,
     SubscriptedTypeAnnotation,
@@ -443,10 +512,11 @@ Dumpable = Union[
     TypeAnnotation,
 ]
 
+# TODO: continue here, implement stringify_implementation_specific_verification at the correct location
 
 def _stringify(dumpable: Dumpable) -> stringify.Entity:
     """Translate the ``dumpable`` into a stringified entity."""
-    stringified = None  # type: Optional[stringify.Class]
+    stringified = None  # type: Optional[stringify.Entity]
 
     if isinstance(dumpable, Argument):
         stringified = _stringify_argument(dumpable)
@@ -476,6 +546,8 @@ def _stringify(dumpable: Dumpable) -> stringify.Entity:
         stringified = _stringify_property(dumpable)
     elif isinstance(dumpable, Signature):
         stringified = _stringify_signature(dumpable)
+    elif isinstance(dumpable, Serialization):
+        stringified = _stringify_serialization(dumpable)
     elif isinstance(dumpable, Snapshot):
         stringified = _stringify_snapshot(dumpable)
     elif isinstance(dumpable, Interface):

@@ -115,21 +115,7 @@ def translate_source_to_intermediate(
     assert error is None, f"{error=}"
     assert parsed_symbol_table is not None
 
-    ontology, errors = intermediate_hierarchy.map_symbol_table_to_ontology(
-        symbol_table=parsed_symbol_table)
-    assert errors is None, f"{errors=}"
-    assert ontology is not None
-
-    constructor_table, error = intermediate_construction.understand_all(
-        symbol_table=parsed_symbol_table,
-        atok=atok)
-
-    assert error is None, f"{error=}"
-    assert constructor_table is not None
-
     return intermediate.translate(
         parsed_symbol_table=parsed_symbol_table,
-        ontology=ontology,
-        constructor_table=constructor_table,
         atok=atok
     )

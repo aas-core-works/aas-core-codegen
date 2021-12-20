@@ -181,12 +181,17 @@ docutils.parsers.rst.roles.register_local_role("paramref", _argument_reference_r
 
 def _parsed_description_to_description(parsed: parse.Description) -> Description:
     """Translate the parsed description to an intermediate form."""
+    # NOTE (mristin, 2021-09-16):
     # This function makes a simple copy at the moment, which might seem pointless.
     #
     # However, we want to explicitly delineate layers (the parse and the intermediate
     # layer, respectively). This simple copying thus helps the understanding
     # of the general system and allows the reader to ignore, to a certain degree, the
     # parse layer when examining the output of the intermediate layer.
+
+    # This run-time check is necessary, we already burned our fingers.
+    assert parsed is not None
+
     return Description(document=parsed.document, node=parsed.node)
 
 
@@ -1278,8 +1283,12 @@ def translate(
     meta_model = MetaModel(
         book_url=parsed_symbol_table.meta_model.book_url,
         book_version=parsed_symbol_table.meta_model.book_version,
-        description=_parsed_description_to_description(
-            parsed_symbol_table.meta_model.description
+        description=(
+            _parsed_description_to_description(
+                parsed_symbol_table.meta_model.description
+            )
+            if parsed_symbol_table.meta_model.description is not None
+            else None
         ),
     )
 

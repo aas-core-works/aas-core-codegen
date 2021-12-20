@@ -96,7 +96,8 @@ class Test_against_recorded(unittest.TestCase):
 
     def test_cases(self) -> None:
         this_dir = pathlib.Path(os.path.realpath(__file__)).parent
-        test_cases_dir = this_dir.parent / "test_data/test_intermediate"
+        repo_root = this_dir.parent.parent
+        test_cases_dir = repo_root / "test_data/test_intermediate"
 
         assert test_cases_dir.exists(), f"{test_cases_dir=}"
         assert test_cases_dir.is_dir(), f"{test_cases_dir=}"
@@ -108,8 +109,14 @@ class Test_against_recorded(unittest.TestCase):
             expected_error_pth = case_dir / "expected_error.txt"
 
             source = source_pth.read_text()
-            symbol_table, error = tests.common.translate_source_to_intermediate(
-                source=source)
+
+            try:
+                symbol_table, error = tests.common.translate_source_to_intermediate(
+                    source=source)
+            except Exception as exception:
+                raise AssertionError(
+                    f"Unexpected exception in source-to-intermediate translation "
+                    f"for source {source_pth.relative_to(repo_root)}") from exception
 
             symbol_table_str = (
                 "" if symbol_table is None
