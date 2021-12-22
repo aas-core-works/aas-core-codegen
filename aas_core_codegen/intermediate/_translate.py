@@ -660,7 +660,7 @@ def _resolve_serializations(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _determine_constrained_built_in_atomic_types(
         parsed_symbol_table: parse.SymbolTable,
-    ontology: _hierarchy.Ontology,
+        ontology: _hierarchy.Ontology,
 ) -> Tuple[Optional[Set[Identifier]], Optional[List[Error]]]:
     """
     Determine which classes are constraining a built-in atomic type.
@@ -679,12 +679,46 @@ def _determine_constrained_built_in_atomic_types(
     # Then, in the second pass, we propagate the "is-constrained-built-in-atomic-type"
     # through the ontology.
 
+    errors = []  # type: List[Error]
+
+    initial_set = set()  # type: Set[Identifier]
+
     for parsed_symbol in parsed_symbol_table.symbols:
-        if not isinstance(parsed_symbol, Class):
+        if not isinstance(parsed_symbol, parse.Class):
             continue
 
-        # TODO: continue here, implement
+        if any(
+                parent in parse.BUILTIN_ATOMIC_TYPES
+                for parent in parsed_symbol.inheritances
+        ):
+            if len(parsed_symbol.inheritances) > 1:
+                errors.append(
+                    Error(
+                        parsed_symbol.node,
+                        f"The class {parsed_symbol.name!r} constrains a built-in "
+                        f"atomic type, but also inherits from other classes: "
+                        f"{parsed_symbol.inheritances}. We do not know how to generate "
+                        f"an implementation for that."
+                    )
+                )
+                continue
 
+            if len(parsed_symbol.methods) > 0 or len(parsed_symbol.properties) > 0:
+                errors.append(
+                    Error(
+                        parsed_symbol.node,
+                        f"The class {parsed_symbol.name!r} constrains a built-in "
+                        f"atomic type, but contains properties and/or methods. "
+                        f"We do not know how to generate an implementation for that."
+                    )
+                )
+
+            initial_set.add(parsed_symbol.name)
+
+    if len(errors) > 0:
+        return None, errors
+
+    # TODO: continue here, propagate through bucket fill the is-constrained-built-in-atomic-type
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parsed_class_to_class(

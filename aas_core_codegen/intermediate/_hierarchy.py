@@ -179,6 +179,11 @@ def _topologically_sort(
         temporary_marks.add(cls)
 
         for an_identifier in cls.inheritances:
+            # We ignore the built-in atomic types from which constrained built-in
+            # atomic types inherit.
+            if an_identifier in parse.BUILTIN_ATOMIC_TYPES:
+                continue
+
             a_symbol = parsed_symbol_table.must_find(an_identifier)
             assert isinstance(a_symbol, parse.AbstractClass)
 
