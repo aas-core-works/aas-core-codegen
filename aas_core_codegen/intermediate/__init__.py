@@ -32,6 +32,7 @@ Constructor = _types.Constructor
 Serialization = _types.Serialization
 EnumerationLiteral = _types.EnumerationLiteral
 Enumeration = _types.Enumeration
+ConstrainedBuiltinAtomicType = _types.ConstrainedBuiltinAtomicType
 Class = _types.Class
 Verification = _types.Verification
 ImplementationSpecificVerification = _types.ImplementationSpecificVerification

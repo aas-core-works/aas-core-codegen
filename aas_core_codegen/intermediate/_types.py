@@ -649,12 +649,77 @@ class Enumeration:
         self.literal_id_set = frozenset(id(literal) for literal in literals)
 
 
+class ConstrainedBuiltinAtomicType:
+    """Represent a built-in atomic type constrained by one or more invariants."""
+
+    #: Name of the class
+    name: Final[Identifier]
+
+    #: Parent constrained built-in atomic types
+    inheritances: Final[Sequence["ConstrainedBuiltinAtomicType"]]
+
+    #: Which built-in atomic type is constrained
+    constrainee: BuiltinAtomicType
+
+    #: If set, this class is implementation-specific and we need to provide a snippet
+    #: for each implementation target
+    is_implementation_specific: Final[bool]
+
+    #: List of class invariants
+    invariants: Final[Sequence[Invariant]]
+
+    #: Description of the class
+    description: Final[Optional[Description]]
+
+    #: Relation to the class from the parse stage
+    parsed: parse.Class
+
+    # fmt: off
+    @require(
+        lambda parsed: len(parsed.methods) == 0,
+        "No methods expected in the constrained built-in atomic type"
+    )
+    @require(
+        lambda parsed: len(parsed.properties) == 0,
+        "No properties expected in the constrained built-in atomic type"
+    )
+    # fmt: on
+    def __init__(
+            self,
+            name: Identifier,
+            inheritances: Sequence['ConstrainedBuiltinAtomicType'],
+            constrainee: BuiltinAtomicType,
+            is_implementation_specific: bool,
+            invariants: Sequence[Invariant],
+            description: Optional[Description],
+            parsed: parse.Class,
+    ) -> None:
+        self.name = name
+        self.inheritances = inheritances
+        self.constrainee = constrainee
+        self.is_implementation_specific = is_implementation_specific
+        self.invariants = invariants
+        self.description = description
+        self.parsed = parsed
+
+        self.invariant_id_set = frozenset(id(inv) for inv in self.invariants)
+        self.inheritance_id_set = frozenset(
+            id(inheritance) for inheritance in self.inheritances
+        )
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+
 class Class:
     """Represent a class implementing zero, one or more interfaces."""
 
     #: Name of the class
     name: Final[Identifier]
-    
+
     #: Interfaces that this class implements
     interfaces: Final[Sequence["Interface"]]
 
@@ -754,7 +819,7 @@ class Class:
         )
 
 
-Symbol = Union[Interface, Enumeration, Class]
+Symbol = Union[Interface, Enumeration, ConstrainedBuiltinAtomicType, Class]
 
 
 class Verification(SignatureLike):

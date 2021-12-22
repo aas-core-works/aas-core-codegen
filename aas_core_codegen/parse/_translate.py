@@ -5,7 +5,7 @@ import enum
 import io
 import itertools
 import textwrap
-from typing import List, Any, Optional, cast, Type, Tuple, Union, Mapping
+from typing import List, Any, Optional, cast, Type, Tuple, Union, Mapping, Set
 
 import asttokens
 import docutils.io
@@ -1461,14 +1461,6 @@ def _classdef_to_symbol(
     """Interpret the class definition as a symbol."""
     underlying_errors = []  # type: List[Error]
 
-    if node.name.lower() in ["verification"]:
-        underlying_errors.append(
-            Error(
-                node,
-                f"The name of the class is reserved for " f"aas-core: {node.name!r}",
-            )
-        )
-
     base_names = []  # type: List[str]
     for base in node.bases:
         if not isinstance(base, ast.Name):
@@ -1812,7 +1804,24 @@ def _verify_symbol_table(
 
     # region Check reserved names
 
-    reserved_symbol_names = {
+    builtin_types_in_many_implementations = {
+        "str",
+        "string",
+        "int",
+        "integer",
+        "float",
+        "real",
+        "decimal",
+        "number",
+        "bool",
+        "boolean",
+        "translatable",
+        "bytes",
+        "bytearray",
+    }
+
+    reserved_symbol_names = builtin_types_in_many_implementations.union({
+        # General aas-core classes
         "aas",
         "accept",
         "context",
@@ -1834,8 +1843,9 @@ def _verify_symbol_table(
         "visitor",
         "visitor_with_context",
         "match"
-    }
-    reserved_member_names = {
+    })
+
+    reserved_member_names = builtin_types_in_many_implementations.union({
         "descend",
         "descend_once",
         "accept",
@@ -1843,7 +1853,7 @@ def _verify_symbol_table(
         "model_type",
         "property_name",
         "match"
-    }
+    })
 
     for symbol in symbol_table.symbols:
         if symbol.name.startswith("I_"):
@@ -1962,6 +1972,12 @@ def _verify_symbol_table(
             continue
 
         for inheritance in symbol.inheritances:
+            # NOTE (mristin, 2021-12-22):
+            # Inheritance from built-in atomic types allows us to constrain
+            # a built-in atomic type.
+            if inheritance in BUILTIN_ATOMIC_TYPES:
+                continue
+
             parent_symbol = symbol_table.find(name=inheritance)
 
             if parent_symbol is None:

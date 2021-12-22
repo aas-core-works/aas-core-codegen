@@ -14,7 +14,7 @@ from typing import (
     Generator,
     TypeVar,
     Generic,
-    cast, Final,
+    cast, Final, Set,
 )
 
 import asttokens
@@ -658,6 +658,35 @@ def _resolve_serializations(
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _determine_constrained_built_in_atomic_types(
+        parsed_symbol_table: parse.SymbolTable,
+    ontology: _hierarchy.Ontology,
+) -> Tuple[Optional[Set[Identifier]], Optional[List[Error]]]:
+    """
+    Determine which classes are constraining a built-in atomic type.
+
+    We also catch errors in case one or more definitions are incorrect.
+    For example, if a class that inherits from a built-in atomic type also specifies
+    properties or methods.
+    """
+    # NOTE (mristin, 2021-12-22):
+    # We consider two sets of  constrained built-in atomics. The first set is
+    # the initial set that constraints the built-in type. The second set, the extended
+    # set, is a set of constrained built-in atomics types which inherit from one or
+    # more initial ones.
+    #
+    # We collect the sets in two passes. We collect the initial set in the first pass.
+    # Then, in the second pass, we propagate the "is-constrained-built-in-atomic-type"
+    # through the ontology.
+
+    for parsed_symbol in parsed_symbol_table.symbols:
+        if not isinstance(parsed_symbol, Class):
+            continue
+
+        # TODO: continue here, implement
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parsed_class_to_class(
         parsed: parse.ConcreteClass,
         ontology: _hierarchy.Ontology,
@@ -1216,7 +1245,7 @@ def translate(
         # dependencies of the further analysis.
         return None, bundle_underlying_errors()
 
-    # region First pass of translation
+    # region In-line constructors
 
     assert constructor_table is not None
 
@@ -1226,6 +1255,29 @@ def translate(
         constructor_table=constructor_table,
     )
 
+    # endregion
+
+    # region Figure out the sub-hierarchy of the constrained built-in atomic types
+
+    is_constrained_builtin_atomic_type, determination_errors = (
+        _determine_constrained_built_in_atomic_types(
+            parsed_symbol_table=parsed_symbol_table,
+            ontology=ontology
+        )
+    )
+
+    if determination_errors is not None:
+        underlying_errors.extend(determination_errors)
+
+    if len(underlying_errors) > 0:
+        # We can not proceed and recover from these errors as they concern critical
+        # dependencies of the further analysis.
+        return None, bundle_underlying_errors()
+
+    # endregion
+
+    # region First pass of translation
+
     assert serializations is not None
 
     # Type annotations reference placeholder symbols at this point.
@@ -1233,6 +1285,8 @@ def translate(
     symbols = []  # type: List[Symbol]
     for parsed_symbol in parsed_symbol_table.symbols:
         symbol = None  # type: Optional[Symbol]
+
+        # TODO: check if the class is a constrained built-in atomic 🠒 use the corresponding method
 
         if isinstance(parsed_symbol, parse.Enumeration):
             symbol = _parsed_enumeration_to_enumeration(parsed=parsed_symbol)
