@@ -63,7 +63,7 @@ from aas_core_codegen.intermediate._types import (
     collect_ids_of_interfaces_in_properties,
     map_interface_implementers, ImplementationSpecificMethod,
     ImplementationSpecificVerification, Verification, PatternVerification,
-    ArgumentReferenceInDoc,
+    ArgumentReferenceInDoc, ConstrainedBuiltinAtomicType,
 )
 from aas_core_codegen.parse import (
     tree as parse_tree
@@ -508,19 +508,19 @@ def _in_line_constructors(
         in_lined = []  # type: List[construction.AssignArgument]
         for statement in constructor_body:
             if isinstance(statement, construction.CallSuperConstructor):
-                antecedent = parsed_symbol_table.must_find_class(statement.super_name)
+                ancestor = parsed_symbol_table.must_find_class(statement.super_name)
 
-                in_lined_of_antecedent = result.get(antecedent, None)
+                in_lined_of_ancestor = result.get(ancestor, None)
 
-                assert in_lined_of_antecedent is not None, (
-                    f"Expected all the constructors of the antecedents "
+                assert in_lined_of_ancestor is not None, (
+                    f"Expected all the constructors of the ancestors "
                     f"of the class {cls.name} to have been in-lined before "
                     f"due to the topological order of classes in the ontology, "
-                    f"but the antecedent {antecedent.name} has not had its "
+                    f"but the ancestor {ancestor.name} has not had its "
                     f"constructor in-lined yet"
                 )
 
-                in_lined.extend(in_lined_of_antecedent)
+                in_lined.extend(in_lined_of_ancestor)
             else:
                 in_lined.append(statement)
 
@@ -648,7 +648,7 @@ def _resolve_serializations(
     for identifier, setting in with_model_type_map.items():
         cls = parsed_symbol_table.must_find_class(name=identifier)
         if setting is None:
-            # Neither the current class nor its antecedents specified the setting
+            # Neither the current class nor its ancestors specified the setting
             # so we assume the default value.
             mapping[cls] = Serialization(with_model_type=False)
         else:
@@ -657,7 +657,22 @@ def _resolve_serializations(
     return mapping, None
 
 
+# fmt: off
+@ensure(
+    lambda parsed_symbol_table, result:
+    not (result[1] is not None)
+    or (
+            all(
+                isinstance(
+                    parsed_symbol_table.must_find_class(identifier),
+                    parse.ConcreteClass)
+                for identifier in result[1]
+            )
+    ),
+    "Constrained built-in atomic types must be concrete classes"
+)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+# fmt: on
 def _determine_constrained_built_in_atomic_types(
         parsed_symbol_table: parse.SymbolTable,
         ontology: _hierarchy.Ontology,
@@ -683,6 +698,8 @@ def _determine_constrained_built_in_atomic_types(
 
     initial_set = set()  # type: Set[Identifier]
 
+    # region First pass to determine the initial set
+
     for parsed_symbol in parsed_symbol_table.symbols:
         if not isinstance(parsed_symbol, parse.Class):
             continue
@@ -703,22 +720,141 @@ def _determine_constrained_built_in_atomic_types(
                 )
                 continue
 
-            if len(parsed_symbol.methods) > 0 or len(parsed_symbol.properties) > 0:
-                errors.append(
-                    Error(
-                        parsed_symbol.node,
-                        f"The class {parsed_symbol.name!r} constrains a built-in "
-                        f"atomic type, but contains properties and/or methods. "
-                        f"We do not know how to generate an implementation for that."
-                    )
-                )
-
             initial_set.add(parsed_symbol.name)
 
     if len(errors) > 0:
         return None, errors
 
-    # TODO: continue here, propagate through bucket fill the is-constrained-built-in-atomic-type
+    # endregion
+
+    # region Second pass to propagate from the initial set
+
+    # NOTE (mristin, 2021-12-23):
+    # Find the connected component from all the classes of the initial set.
+    # See https://en.wikipedia.org/wiki/Component_(graph_theory)
+
+    stack = sorted(initial_set)  # type: List[Identifier]
+
+    constrained_built_in_atomic_types = initial_set.copy()  # type: Set[Identifier]
+
+    while len(stack) > 0:
+        # NOTE (mristin, 2021-12-23):
+        # Since we operate on the ontology, we know that the cycles in the inheritance
+        # graph would have been already reported as errors and we would not get
+        # thus far.
+
+        identifier = stack.pop()
+        parsed_cls = parsed_symbol_table.must_find_class(name=identifier)
+
+        constrained_built_in_atomic_types.add(identifier)
+
+        for descendant in ontology.list_descendants(parsed_cls):
+            stack.append(descendant.name)
+
+    # endregion
+
+    # region Check the inheritances of all the constrained built-in atomic types
+
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-23): test this
+    for identifier in constrained_built_in_atomic_types:
+        parsed_cls = parsed_symbol_table.must_find_class(name=identifier)
+
+        # We know for sure that the initial set is valid so we can skip it in the check.
+        if identifier in initial_set:
+            continue
+
+        # Make sure that the constrained built-in atomic types only inherit from other
+        # constrained built-in atomic types
+
+        constrained_inheritances = []  # type: List[Identifier]
+        unexpected_inheritances = []  # type: List[Identifier]
+
+        for inheritance in parsed_cls.inheritances:
+            if inheritance not in constrained_built_in_atomic_types:
+                unexpected_inheritances.append(inheritance)
+            else:
+                constrained_inheritances.append(inheritance)
+
+        if len(unexpected_inheritances) > 0:
+            constrained_inheritances_str = ", ".join(
+                repr(identifier)
+                for identifier in constrained_inheritances
+            )
+
+            unexpected_inheritances_str = ", ".join(
+                repr(identifier)
+                for identifier in unexpected_inheritances
+            )
+            errors.append(
+                Error(
+                    parsed_cls.node,
+                    f"The class {parsed_cls.name} inherits both from one or more "
+                    f"constrained built-in atomic types "
+                    f"({constrained_inheritances_str}), but also other classes which "
+                    f"are not constraining built-in atomic types "
+                    f"({unexpected_inheritances_str})."
+                )
+            )
+
+    if len(errors) > 0:
+        return None, errors
+
+    # endregion
+
+    # region Check that built-in atomic types do not have unexpected specification
+
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-23): test this
+    for identifier in constrained_built_in_atomic_types:
+        parsed_cls = parsed_symbol_table.must_find_class(identifier)
+        if len(parsed_cls.methods) > 0 or len(parsed_cls.properties) > 0:
+            errors.append(
+                Error(
+                    parsed_cls.node,
+                    f"The class {parsed_cls.name!r} constrains a built-in "
+                    f"atomic type, but contains properties and/or methods. "
+                    f"We do not know how to generate an implementation for that."
+                )
+            )
+
+        if parsed_cls.serialization is not None:
+            errors.append(
+                Error(
+                    parsed_cls.node,
+                    f"The class {parsed_cls.name!r} constrains a built-in "
+                    f"atomic type, but the serialization settings are set. We must "
+                    f"serialize it as a built-in type and no custom serialization "
+                    f"settings are possible."
+                )
+            )
+
+        if isinstance(parsed_cls, parse.AbstractClass):
+            errors.append(
+                Error(
+                    parsed_cls.node,
+                    f"The class {parsed_cls.name!r} constrains a built-in "
+                    f"atomic type, but it is denoted abstract. Every value that "
+                    f"fulfills the constraints can be instantiated, so it can not be "
+                    f"made abstract."
+                )
+            )
+
+    # endregion
+
+    return constrained_built_in_atomic_types, None
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _parsed_class_to_constrained_builtin_atomic_type(
+        parsed: parse.ConcreteClass
+) -> Tuple[Optional[ConstrainedBuiltinAtomicType], Optional[Error]]:
+    """
+    Translate a concrete class to a constrained built-in atomic type.
+
+    The ``parsed`` is expected to be tested for being a valid constrained built-in
+    atomic type before.
+    """
+    # TODO: continue here
+
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parsed_class_to_class(
@@ -731,7 +867,7 @@ def _parsed_class_to_class(
     """Translate a concrete parsed class to an intermediate class."""
     ancestors = ontology.list_ancestors(cls=parsed)
 
-    # region Stack properties from the antecedents
+    # region Stack properties from the ancestors
 
     properties = []  # type: List[Property]
 
@@ -749,7 +885,7 @@ def _parsed_class_to_class(
 
     # endregion
 
-    # region Stack constructors from the antecedents
+    # region Stack constructors from the ancestors
 
     contracts = Contracts(preconditions=[], snapshots=[], postconditions=[])
 
@@ -785,7 +921,7 @@ def _parsed_class_to_class(
 
     # endregion
 
-    # region Stack methods from the antecedents
+    # region Stack methods from the ancestors
 
     methods = []  # type: List[Method]
 
@@ -1293,7 +1429,7 @@ def translate(
 
     # region Figure out the sub-hierarchy of the constrained built-in atomic types
 
-    is_constrained_builtin_atomic_type, determination_errors = (
+    constrained_builtin_atomic_types, determination_errors = (
         _determine_constrained_built_in_atomic_types(
             parsed_symbol_table=parsed_symbol_table,
             ontology=ontology
@@ -1320,9 +1456,22 @@ def translate(
     for parsed_symbol in parsed_symbol_table.symbols:
         symbol = None  # type: Optional[Symbol]
 
-        # TODO: check if the class is a constrained built-in atomic 🠒 use the corresponding method
+        if parsed_symbol.name in constrained_builtin_atomic_types:
+            assert isinstance(parsed_symbol, parse.ConcreteClass), (
+                "All constrained built-in atomic types must be concrete."
+            )
 
-        if isinstance(parsed_symbol, parse.Enumeration):
+            symbol, error = _parsed_class_to_constrained_builtin_atomic_type(
+                parsed=parsed_symbol
+            )
+
+            if error is not None:
+                underlying_errors.append(error)
+                continue
+
+            # TODO: continue here, check the code below
+
+        elif isinstance(parsed_symbol, parse.Enumeration):
             symbol = _parsed_enumeration_to_enumeration(parsed=parsed_symbol)
 
         elif isinstance(parsed_symbol, parse.AbstractClass):

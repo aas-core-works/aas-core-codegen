@@ -521,7 +521,7 @@ class Constructor:
     """
     Represent an understood constructor of a class stacked.
 
-    The constructor is expected to be stacked from the class and all the antecedents.
+    The constructor is expected to be stacked from the class and all the ancestors.
     """
 
     #: Arguments of the constructor method

@@ -8,7 +8,7 @@ from typing import (
     MutableMapping,
     List,
     cast,
-    Tuple,
+    Tuple, Callable, Any,
 )
 
 import sortedcontainers
@@ -19,7 +19,7 @@ from aas_core_codegen.common import Error, Identifier
 
 
 def first_not_in_topological_order(
-    classes: Sequence[parse.Class], parsed_symbol_table: parse.SymbolTable
+        classes: Sequence[parse.Class], parsed_symbol_table: parse.SymbolTable
 ) -> Optional[parse.Class]:
     """
     Verify that ``classes`` are topologically sorted.
@@ -38,20 +38,36 @@ def first_not_in_topological_order(
     return None
 
 
+def expect_no_key_error(callable: Callable[[], Any]) -> Optional[KeyError]:
+    """
+    Execute the ``callable`` and return the key error, if any.
+
+    This function is meant to be used for the post-conditions.
+    """
+    try:
+        callable()
+    except KeyError as key_error:
+        return key_error
+
+    return None
+
+
 class _UnverifiedOntology:
     """
     Provide an ontology computed from a symbol table.
 
     This private is explicitly made protected to signal that it has not been vetted
     yet and might be inconsistent. For example, there might be classes which have
-    conflicting properties or methods with their antecedents.
+    conflicting properties or methods with their ancestors.
     """
 
     #: Topologically sorted classes
     classes: Final[Sequence[parse.Class]]
 
-    #: Map class 🠒 topologically sorted antecedents
-    _antecedents_of: Final[Mapping[parse.Class, Sequence[parse.AbstractClass]]]
+    #: Map class 🠒 topologically sorted ancestors
+    _ancestors_of: Final[Mapping[parse.Class, Sequence[parse.AbstractClass]]]
+
+    _descendants_of: Final[Mapping[parse.Class, Sequence[parse.Class]]]
 
     # fmt: off
     @require(
@@ -67,20 +83,38 @@ class _UnverifiedOntology:
         "Unique classes in the topological sort",
     )
     @ensure(
+        lambda self:
+        all(
+            expect_no_key_error(lambda: self.list_descendants_of(cls))
+            for cls in self.classes
+        ),
+        "The ``descendants_of`` defined for all classes"
+    )
+    @ensure(
+        lambda self:
+        all(
+            expect_no_key_error(lambda: self.list_ancestors_of(cls))
+            for cls in self.classes
+        ),
+        "The ``ancestors_of`` defined for all classes"
+    )
+    @ensure(
         lambda self, parsed_symbol_table: all(
             first_not_in_topological_order(
-                class_antecedents, parsed_symbol_table) is None
-            for class_antecedents in self._antecedents_of.values()
+                class_ancestors, parsed_symbol_table) is None
+            for class_ancestors in self._ancestors_of.values()
         )
     )
     # fmt: on
     def __init__(
-        self, classes: Sequence[parse.Class], parsed_symbol_table: parse.SymbolTable
+            self, classes: Sequence[parse.Class], parsed_symbol_table: parse.SymbolTable
     ) -> None:
-        """Initialize with the given values and pre-compute the antecedents."""
+        """Initialize with the given values and pre-compute the ancestors."""
         self.classes = classes
 
-        antecedents_of = (
+        # region Determine ancestors
+
+        ancestors_of = (
             dict()
         )  # type: MutableMapping[parse.Class, List[parse.AbstractClass]]
 
@@ -96,33 +130,65 @@ class _UnverifiedOntology:
 
             sorted_parents = sorted(parents_with_order, key=lambda item: item[0])
 
-            class_antecedents = []  # type: List[parse.AbstractClass]
+            class_ancestors = []  # type: List[parse.AbstractClass]
             for _, parent in sorted_parents:
-                assert parent in antecedents_of, (
+                assert parent in ancestors_of, (
                     f"Expected to process all the parent's of the class {cls.name} "
                     f"before (due to topological sort), "
                     f"but the parent class {parent.name} has not been processed"
                 )
 
-                class_antecedents.extend(antecedents_of[parent])
+                class_ancestors.extend(ancestors_of[parent])
 
                 assert isinstance(parent, parse.AbstractClass), (
                     f"Expected the parent of {cls.name} to be "
                     f"an abstract class, but got: {parent}"
                 )
 
-                class_antecedents.append(parent)
+                class_ancestors.append(parent)
 
-            antecedents_of[cls] = class_antecedents
+            ancestors_of[cls] = class_ancestors
 
-        self._antecedents_of = antecedents_of
+        self._ancestors_of = ancestors_of
+
+        # endregion
+
+        # region Determine descendants
+
+        descendants_of = (
+            dict()
+        )  # type: MutableMapping[parse.Class, List[parse.Class]]
+
+        # Simply inverse
+
+        for cls in self.classes:
+            descendants_of[cls] = []  # type: List[parse.Class]
+
+        for cls, ancestors in ancestors_of.items():
+            for ancestor in ancestors:
+                descendants_of[ancestor].append(cls)
+
+        self._descendants_of = descendants_of
+
+        # endregion
 
     def list_ancestors(self, cls: parse.Class) -> Sequence[parse.AbstractClass]:
         """Retrieve the ancestors of the given class ``cls``."""
-        result = self._antecedents_of.get(cls, None)
+        result = self._ancestors_of.get(cls, None)
         if result is None:
             raise KeyError(
-                f"The antecedents for the class {cls} have not been precomputed."
+                f"The ancestors of the class {cls} have not been precomputed."
+            )
+
+        return result
+
+    def list_descendants(self, cls: parse.Class) -> Sequence[parse.Class]:
+        """Retrieve the descendants of the given class ``cls``."""
+
+        result = self._descendants_of.get(cls, None)
+        if result is None:
+            raise KeyError(
+                f"The descendants of the class {cls} have not been precomputed."
             )
 
         return result
@@ -130,7 +196,7 @@ class _UnverifiedOntology:
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _topologically_sort(
-    parsed_symbol_table: parse.SymbolTable,
+        parsed_symbol_table: parse.SymbolTable,
 ) -> Tuple[Optional[_UnverifiedOntology], Optional[parse.Class]]:
     """
     Sort topologically all the classes in the ``parsed_symbol_table``.
@@ -219,7 +285,7 @@ class Ontology(_UnverifiedOntology):
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def map_symbol_table_to_ontology(
-    parsed_symbol_table: parse.SymbolTable,
+        parsed_symbol_table: parse.SymbolTable,
 ) -> Tuple[Optional[Ontology], Optional[List[Error]]]:
     """Infer the ontology of the classes from the ``parsed_symbol_table``."""
     ontology, visited_more_than_once = _topologically_sort(
@@ -242,7 +308,7 @@ def map_symbol_table_to_ontology(
 
     errors = []  # type: List[Error]
 
-    # region Check that properties and methods do not conflict among antecedents
+    # region Check that properties and methods do not conflict among ancestors
 
     for symbol in parsed_symbol_table.symbols:
         if not isinstance(symbol, parse.Class):
@@ -267,7 +333,7 @@ def map_symbol_table_to_ontology(
                 errors.append(
                     Error(
                         prop.node,
-                        f"The property has already been defined in the antecedent "
+                        f"The property has already been defined in the ancestor "
                         f"class {observed_properties[prop.name].name}: {prop.name}",
                     )
                 )
@@ -287,7 +353,7 @@ def map_symbol_table_to_ontology(
 
     # endregion
 
-    # region Check that antecedents do not have constructors if the class lacks one
+    # region Check that ancestors do not have constructors if the class lacks one
 
     for symbol in parsed_symbol_table.symbols:
         if not isinstance(symbol, parse.Class):
@@ -308,7 +374,7 @@ def map_symbol_table_to_ontology(
                         Error(
                             symbol.node,
                             f"The class {symbol.name} does not specify "
-                            f"a constructor, but the antecedent class "
+                            f"a constructor, but the ancestor class "
                             f"{ancestor.name} specifies a constructor with "
                             f"arguments: {argument_names_str}",
                         )

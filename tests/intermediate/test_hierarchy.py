@@ -7,7 +7,7 @@ from aas_core_codegen.common import Identifier
 
 
 class Test_ontology_ok(unittest.TestCase):
-    def test_no_antecedents(self) -> None:
+    def test_no_ancestors(self) -> None:
         symbol_table, error = tests.common.parse_source(
             textwrap.dedent(
                 '''\
@@ -70,7 +70,7 @@ class Test_ontology_ok(unittest.TestCase):
 
 
 class Test_ontology_fail(unittest.TestCase):
-    def test_duplicate_properties_in_antecedents(self) -> None:
+    def test_duplicate_properties_in_ancestors(self) -> None:
         symbol_table, error = tests.common.parse_source(
             textwrap.dedent(
                 '''\
@@ -90,10 +90,10 @@ class Test_ontology_fail(unittest.TestCase):
 
         self.assertEqual(
             "The property has already been defined "
-            "in the antecedent class Abstract: x",
+            "in the ancestor class Abstract: x",
             tests.common.most_underlying_message(errors[0]))
 
-    def test_duplicate_methods_in_antecedents(self) -> None:
+    def test_duplicate_methods_in_ancestors(self) -> None:
         symbol_table, error = tests.common.parse_source(
             textwrap.dedent(
                 '''\
@@ -115,7 +115,7 @@ class Test_ontology_fail(unittest.TestCase):
 
         self.assertEqual(
             "The method has already been defined "
-            "in the antecedent class Abstract: do_something",
+            "in the ancestor class Abstract: do_something",
             tests.common.most_underlying_message(errors[0]))
 
     def test_missing_constructor_when_the_parent_has_one(self) -> None:
@@ -138,7 +138,7 @@ class Test_ontology_fail(unittest.TestCase):
 
         self.assertEqual(
             "The class Something does not specify a constructor, "
-            "but the antecedent class Abstract specifies a constructor "
+            "but the ancestor class Abstract specifies a constructor "
             "with arguments: self, x",
             tests.common.most_underlying_message(errors[0]))
 
