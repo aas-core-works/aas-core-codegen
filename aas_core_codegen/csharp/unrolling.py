@@ -50,7 +50,7 @@ def render(node: Node) -> str:
 
 
 class Unroller(DBC):
-    """Generate code to unroll recursion into composite types."""
+    """Generate code to unroll recursion into generic types."""
 
     @staticmethod
     @require(lambda level: level >= 0)
@@ -106,8 +106,8 @@ class Unroller(DBC):
 
             Level 0 indicates the outer loop.
         """
-        if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
-            return self._unroll_builtin_atomic_type_annotation(
+        if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
+            return self._unroll_primitive_type_annotation(
                 unrollee_expr=unrollee_expr,
                 type_annotation=type_annotation,
                 path=path,
@@ -115,8 +115,8 @@ class Unroller(DBC):
                 key_value_level=key_value_level
             )
 
-        elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
-            return self._unroll_our_atomic_type_annotation(
+        elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
+            return self._unroll_our_type_annotation(
                 unrollee_expr=unrollee_expr,
                 type_annotation=type_annotation,
                 path=path,
@@ -153,10 +153,10 @@ class Unroller(DBC):
             assert_never(type_annotation)
 
     @abc.abstractmethod
-    def _unroll_builtin_atomic_type_annotation(
+    def _unroll_primitive_type_annotation(
             self,
             unrollee_expr: str,
-            type_annotation: intermediate.BuiltinAtomicTypeAnnotation,
+            type_annotation: intermediate.PrimitiveTypeAnnotation,
             path: List[str],
             item_level: int,
             key_value_level: int,
@@ -165,10 +165,10 @@ class Unroller(DBC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def _unroll_our_atomic_type_annotation(
+    def _unroll_our_type_annotation(
             self,
             unrollee_expr: str,
-            type_annotation: intermediate.OurAtomicTypeAnnotation,
+            type_annotation: intermediate.OurTypeAnnotation,
             path: List[str],
             item_level: int,
             key_value_level: int,

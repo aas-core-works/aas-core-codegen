@@ -43,19 +43,19 @@ def string_literal(text: str) -> str:
     return '"{}"'.format("".join(escaped))
 
 
-_BUILTIN_ATOMIC_TYPE_MAP = {
-    intermediate.BuiltinAtomicType.BOOL: Stripped("bool"),
-    intermediate.BuiltinAtomicType.INT: Stripped("int"),
-    intermediate.BuiltinAtomicType.FLOAT: Stripped("float"),
-    intermediate.BuiltinAtomicType.STR: Stripped("string"),
-    intermediate.BuiltinAtomicType.BYTEARRAY: Stripped("byte[]"),
+_PRIMITIVE_TYPE_MAP = {
+    intermediate.PrimitiveType.BOOL: Stripped("bool"),
+    intermediate.PrimitiveType.INT: Stripped("int"),
+    intermediate.PrimitiveType.FLOAT: Stripped("float"),
+    intermediate.PrimitiveType.STR: Stripped("string"),
+    intermediate.PrimitiveType.BYTEARRAY: Stripped("byte[]"),
 }
 
 # noinspection PyTypeChecker
-assert sorted(literal.value for literal in _BUILTIN_ATOMIC_TYPE_MAP.keys()) == sorted(
-    literal.value for literal in intermediate.BuiltinAtomicType
+assert sorted(literal.value for literal in _PRIMITIVE_TYPE_MAP.keys()) == sorted(
+    literal.value for literal in intermediate.PrimitiveType
 ), (
-    "Expected complete mapping of built-in types to implementation-specific types"
+    "Expected complete mapping of primitive to implementation-specific types"
 )  # type: ignore
 
 
@@ -69,10 +69,10 @@ def generate_type(
     # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
     #  test with general snippets, do not test in isolation
     if isinstance(type_annotation, intermediate.AtomicTypeAnnotation):
-        if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
-            return _BUILTIN_ATOMIC_TYPE_MAP[type_annotation.a_type]
+        if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
+            return _PRIMITIVE_TYPE_MAP[type_annotation.a_type]
 
-        elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
+        elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
             if isinstance(type_annotation.symbol, intermediate.Enumeration):
                 return Stripped(csharp_naming.enum_name(type_annotation.symbol.name))
 

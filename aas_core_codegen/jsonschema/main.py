@@ -43,14 +43,14 @@ def _define_for_enumeration(
     return collections.OrderedDict([(model_type, definition)])
 
 
-_BUILTIN_MAP = {
-    intermediate.BuiltinAtomicType.BOOL: "boolean",
-    intermediate.BuiltinAtomicType.INT: "integer",
-    intermediate.BuiltinAtomicType.FLOAT: "number",
-    intermediate.BuiltinAtomicType.STR: "string",
-    intermediate.BuiltinAtomicType.BYTEARRAY: "string",
+_PRIMITIVE_MAP = {
+    intermediate.PrimitiveType.BOOL: "boolean",
+    intermediate.PrimitiveType.INT: "integer",
+    intermediate.PrimitiveType.FLOAT: "number",
+    intermediate.PrimitiveType.STR: "string",
+    intermediate.PrimitiveType.BYTEARRAY: "string",
 }
-assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType)
+assert all(literal in _PRIMITIVE_MAP for literal in intermediate.PrimitiveType)
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -66,13 +66,13 @@ def _define_type(
     The ``ref_association`` indicates which symbol to use for representing references
     within an AAS.
     """
-    if isinstance(type_annotation, intermediate.BuiltinAtomicTypeAnnotation):
+    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
         type_definition = collections.OrderedDict(
-            [("type", _BUILTIN_MAP[type_annotation.a_type])]
+            [("type", _PRIMITIVE_MAP[type_annotation.a_type])]
         )
 
         if (
-            type_annotation.a_type == intermediate.BuiltinAtomicType.STR
+            type_annotation.a_type == intermediate.PrimitiveType.STR
             and pattern_constraints is not None
             and len(pattern_constraints) > 0
         ):
@@ -91,7 +91,7 @@ def _define_type(
 
         return type_definition, None
 
-    elif isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
+    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
         model_type = naming.json_model_type(type_annotation.symbol.name)
 
         if isinstance(

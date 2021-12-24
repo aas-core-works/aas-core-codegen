@@ -34,8 +34,8 @@ Enumeration = _types.Enumeration
 MetaModel = _types.MetaModel
 SymbolTable = _types.SymbolTable
 
-BUILTIN_ATOMIC_TYPES = _types.BUILTIN_ATOMIC_TYPES
-BUILTIN_COMPOSITE_TYPES = _types.BUILTIN_COMPOSITE_TYPES
+PRIMITIVE_TYPES = _types.PRIMITIVE_TYPES
+GENERIC_TYPES = _types.GENERIC_TYPES
 
 source_to_atok = _translate.source_to_atok
 check_expected_imports = _translate.check_expected_imports

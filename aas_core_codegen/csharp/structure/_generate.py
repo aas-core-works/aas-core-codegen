@@ -427,24 +427,24 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
         self._descendability = descendability
         self._ref_association = ref_association
 
-    def _unroll_builtin_atomic_type_annotation(
+    def _unroll_primitive_type_annotation(
             self,
             unrollee_expr: str,
-            type_annotation: intermediate.BuiltinAtomicTypeAnnotation,
+            type_annotation: intermediate.PrimitiveTypeAnnotation,
             path: List[str],
             item_level: int,
             key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
-        # We can not descend into a built-in atomic type.
+        # We can not descend into a primitive type.
         return []
 
     # noinspection PyUnusedLocal
-    def _unroll_our_atomic_type_or_ref_annotation(
+    def _unroll_our_type_or_ref_annotation(
             self,
             unrollee_expr: str,
             type_annotation: Union[
-                intermediate.OurAtomicTypeAnnotation,
+                intermediate.OurTypeAnnotation,
                 intermediate.RefTypeAnnotation
             ],
             path: List[str],
@@ -454,12 +454,12 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
         """
         Generate the code for both our atomic type annotations and references.
 
-        We merged :py:method:`._unroll_our_atomic_type_annotation` and
+        We merged :py:method:`._unroll_our_type_annotation` and
         :py:method:`._unroll_ref_type_annotation` together since they differ in only
         which symbol is unrolled over.
         """
         symbol = None  # type: Optional[intermediate.Symbol]
-        if isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
+        if isinstance(type_annotation, intermediate.OurTypeAnnotation):
             symbol = type_annotation.symbol
         elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
             symbol = self._ref_association
@@ -506,16 +506,16 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
 
         return result
 
-    def _unroll_our_atomic_type_annotation(
+    def _unroll_our_type_annotation(
             self,
             unrollee_expr: str,
-            type_annotation: intermediate.OurAtomicTypeAnnotation,
+            type_annotation: intermediate.OurTypeAnnotation,
             path: List[str],
             item_level: int,
             key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
-        return self._unroll_our_atomic_type_or_ref_annotation(
+        return self._unroll_our_type_or_ref_annotation(
             unrollee_expr=unrollee_expr,
             type_annotation=type_annotation,
             path=path,
@@ -588,7 +588,7 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
             key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
-        return self._unroll_our_atomic_type_or_ref_annotation(
+        return self._unroll_our_type_or_ref_annotation(
             unrollee_expr=unrollee_expr,
             type_annotation=type_annotation,
             path=path,

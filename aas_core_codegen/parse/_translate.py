@@ -45,8 +45,8 @@ from aas_core_codegen.parse._types import (
     SymbolTable,
     TypeAnnotation,
     UnverifiedSymbolTable,
-    BUILTIN_ATOMIC_TYPES,
-    BUILTIN_COMPOSITE_TYPES,
+    PRIMITIVE_TYPES,
+    GENERIC_TYPES,
     Description,
     MetaModel, ImplementationSpecificMethod, UnderstoodMethod,
     ConstructorToBeUnderstood,
@@ -1815,7 +1815,6 @@ def _verify_symbol_table(
         "number",
         "bool",
         "boolean",
-        "translatable",
         "bytes",
         "bytearray",
     }
@@ -1973,9 +1972,8 @@ def _verify_symbol_table(
 
         for inheritance in symbol.inheritances:
             # NOTE (mristin, 2021-12-22):
-            # Inheritance from built-in atomic types allows us to constrain
-            # a built-in atomic type.
-            if inheritance in BUILTIN_ATOMIC_TYPES:
+            # Inheritance from primitive types allows us to constrain a primitive type.
+            if inheritance in PRIMITIVE_TYPES:
                 continue
 
             parent_symbol = symbol_table.find(name=inheritance)
@@ -2017,11 +2015,11 @@ def _verify_symbol_table(
 
     # region Check type annotations in properties and method signatures
 
-    expected_subscripted_types = BUILTIN_COMPOSITE_TYPES
+    expected_subscripted_types = GENERIC_TYPES
 
     # NOTE (mristin, 2021-11-19):
     # If you expect type qualifiers such as ``Final``, make a copy of
-    # the ``BUILTIN_COMPOSITE_TYPES`` and add them to the copy.
+    # the ``GENERIC_TYPES`` and add them to the copy.
 
     def verify_no_dangling_references_in_type_annotation(
             type_annotation: TypeAnnotation,
@@ -2032,7 +2030,7 @@ def _verify_symbol_table(
         :return: error message, if any
         """
         if isinstance(type_annotation, AtomicTypeAnnotation):
-            if type_annotation.identifier in BUILTIN_ATOMIC_TYPES:
+            if type_annotation.identifier in PRIMITIVE_TYPES:
                 return None
 
             if type_annotation.identifier in expected_subscripted_types:

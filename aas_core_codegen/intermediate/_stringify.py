@@ -24,8 +24,8 @@ from aas_core_codegen.intermediate._types import (
     TypeAnnotation,
     ListTypeAnnotation,
     OptionalTypeAnnotation,
-    BuiltinAtomicTypeAnnotation,
-    OurAtomicTypeAnnotation,
+    PrimitiveTypeAnnotation,
+    OurTypeAnnotation,
     Description,
     Invariant,
     DefaultConstant,
@@ -68,7 +68,7 @@ def _stringify_atomic_type_annotation(
 ) -> stringify.Entity:
     result = None  # type: Optional[stringify.Entity]
 
-    if isinstance(type_annotation, BuiltinAtomicTypeAnnotation):
+    if isinstance(type_annotation, PrimitiveTypeAnnotation):
         result = stringify.Entity(
             name=AtomicTypeAnnotation.__name__,
             properties=[
@@ -76,7 +76,7 @@ def _stringify_atomic_type_annotation(
                 stringify.PropertyEllipsis("parsed", type_annotation.parsed),
             ],
         )
-    elif isinstance(type_annotation, OurAtomicTypeAnnotation):
+    elif isinstance(type_annotation, OurTypeAnnotation):
         result = stringify.Entity(
             name=AtomicTypeAnnotation.__name__,
             properties=[
@@ -512,7 +512,6 @@ Dumpable = Union[
     TypeAnnotation,
 ]
 
-# TODO: continue here, implement stringify_implementation_specific_verification at the correct location
 
 def _stringify(dumpable: Dumpable) -> stringify.Entity:
     """Translate the ``dumpable`` into a stringified entity."""

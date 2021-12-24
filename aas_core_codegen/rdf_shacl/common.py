@@ -72,14 +72,14 @@ def determine_symbol_to_rdfs_range(
     return symbol_to_rdfs_range, None
 
 
-BUILTIN_MAP = {
-    intermediate.BuiltinAtomicType.BOOL: "xsd:boolean",
-    intermediate.BuiltinAtomicType.INT: "xsd:integer",
-    intermediate.BuiltinAtomicType.FLOAT: "xsd:double",
-    intermediate.BuiltinAtomicType.STR: "xsd:string",
-    intermediate.BuiltinAtomicType.BYTEARRAY: "xsd:byte",
+PRIMITIVE_MAP = {
+    intermediate.PrimitiveType.BOOL: "xsd:boolean",
+    intermediate.PrimitiveType.INT: "xsd:integer",
+    intermediate.PrimitiveType.FLOAT: "xsd:double",
+    intermediate.PrimitiveType.STR: "xsd:string",
+    intermediate.PrimitiveType.BYTEARRAY: "xsd:byte",
 }
-assert all(literal in BUILTIN_MAP for literal in intermediate.BuiltinAtomicType)
+assert all(literal in PRIMITIVE_MAP for literal in intermediate.PrimitiveType)
 
 
 def beneath_optional_and_ref(

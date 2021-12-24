@@ -45,23 +45,23 @@ def _define_property_shape(
 
     missing_implementation = False
 
-    if isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
         prop_name = rdf_shacl_naming.property_name(prop.name)
         rdfs_range = symbol_to_rdfs_range.get(
             type_anno.symbol,
             Stripped(f"aas:{rdf_shacl_naming.class_name(type_anno.symbol.name)}"),
         )
 
-    elif isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
+    elif isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
         prop_name = rdf_shacl_naming.property_name(prop.name)
-        rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno.a_type]
+        rdfs_range = rdf_shacl_common.PRIMITIVE_MAP[type_anno.a_type]
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         prop_name = rdf_shacl_naming.property_name(prop.name)
 
         type_anno_items = rdf_shacl_common.beneath_optional_and_ref(type_anno.items)
 
-        if isinstance(type_anno_items, intermediate.OurAtomicTypeAnnotation):
+        if isinstance(type_anno_items, intermediate.OurTypeAnnotation):
             rdfs_range = symbol_to_rdfs_range.get(
                 type_anno_items.symbol,
                 Stripped(
@@ -69,8 +69,8 @@ def _define_property_shape(
                 ),
             )
 
-        elif isinstance(type_anno_items, intermediate.BuiltinAtomicTypeAnnotation):
-            rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno_items.a_type]
+        elif isinstance(type_anno_items, intermediate.PrimitiveTypeAnnotation):
+            rdfs_range = rdf_shacl_common.PRIMITIVE_MAP[type_anno_items.a_type]
 
         else:
             missing_implementation = True

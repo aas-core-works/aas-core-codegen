@@ -203,7 +203,7 @@ def _define_property(
 
     missing_implementation = False
 
-    if isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
         prop_name = rdf_shacl_naming.property_name(prop.name)
         prop_label = rdf_shacl_naming.property_label(prop.name)
         rdf_type = "owl:ObjectProperty"
@@ -212,11 +212,11 @@ def _define_property(
             Stripped(f"aas:{rdf_shacl_naming.class_name(type_anno.symbol.name)}"),
         )
 
-    elif isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
+    elif isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
         prop_name = rdf_shacl_naming.property_name(prop.name)
         prop_label = rdf_shacl_naming.property_label(prop.name)
         rdf_type = "owl:DatatypeProperty"
-        rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno.a_type]
+        rdfs_range = rdf_shacl_common.PRIMITIVE_MAP[type_anno.a_type]
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         prop_name = rdf_shacl_naming.property_name(prop.name)
@@ -224,7 +224,7 @@ def _define_property(
 
         type_anno_items = rdf_shacl_common.beneath_optional_and_ref(type_anno.items)
 
-        if isinstance(type_anno_items, intermediate.OurAtomicTypeAnnotation):
+        if isinstance(type_anno_items, intermediate.OurTypeAnnotation):
             rdf_type = "owl:ObjectProperty"
             rdfs_range = symbol_to_rdfs_range.get(
                 type_anno_items.symbol,
@@ -233,9 +233,9 @@ def _define_property(
                 ),
             )
 
-        elif isinstance(type_anno_items, intermediate.BuiltinAtomicTypeAnnotation):
+        elif isinstance(type_anno_items, intermediate.PrimitiveTypeAnnotation):
             rdf_type = "owl:DatatypeProperty"
-            rdfs_range = rdf_shacl_common.BUILTIN_MAP[type_anno_items.a_type]
+            rdfs_range = rdf_shacl_common.PRIMITIVE_MAP[type_anno_items.a_type]
 
         else:
             missing_implementation = True

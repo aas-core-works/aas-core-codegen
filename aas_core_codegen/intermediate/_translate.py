@@ -1,5 +1,6 @@
 """Translate the parsed representation into the intermediate representation."""
 import ast
+import collections
 import itertools
 import re
 from typing import (
@@ -14,8 +15,7 @@ from typing import (
     Generator,
     TypeVar,
     Generic,
-    cast, Final, Set,
-)
+    cast, Final, )
 
 import asttokens
 import docutils.nodes
@@ -25,11 +25,13 @@ from icontract import require, ensure
 
 from aas_core_codegen import parse
 from aas_core_codegen.common import Error, Identifier, assert_never, IDENTIFIER_RE
-from aas_core_codegen.intermediate import _hierarchy, construction, pattern_verification
+from aas_core_codegen.intermediate import _hierarchy, construction, \
+    pattern_verification
 from aas_core_codegen.intermediate._types import (
     SymbolTable,
     Enumeration,
     EnumerationLiteral,
+    PrimitiveType,
     TypeAnnotation,
     Argument,
     Default,
@@ -48,9 +50,9 @@ from aas_core_codegen.intermediate._types import (
     Symbol,
     ListTypeAnnotation,
     OptionalTypeAnnotation,
-    OurAtomicTypeAnnotation,
-    STR_TO_BUILTIN_ATOMIC_TYPE,
-    BuiltinAtomicTypeAnnotation,
+    OurTypeAnnotation,
+    STR_TO_PRIMITIVE_TYPE,
+    PrimitiveTypeAnnotation,
     Description,
     AttributeReferenceInDoc,
     SymbolReferenceInDoc,
@@ -63,7 +65,7 @@ from aas_core_codegen.intermediate._types import (
     collect_ids_of_interfaces_in_properties,
     map_interface_implementers, ImplementationSpecificMethod,
     ImplementationSpecificVerification, Verification, PatternVerification,
-    ArgumentReferenceInDoc, ConstrainedBuiltinAtomicType,
+    ArgumentReferenceInDoc, ConstrainedPrimitive,
 )
 from aas_core_codegen.parse import (
     tree as parse_tree
@@ -196,7 +198,7 @@ def _parsed_description_to_description(parsed: parse.Description) -> Description
 
 
 class _PlaceholderSymbol:
-    """Reference a symbol which will be resolved once the table is built."""
+    """Reference something which will be resolved once the table is built."""
 
     def __init__(self, identifier: str) -> None:
         """Initialize with the given values."""
@@ -252,15 +254,15 @@ def _parsed_type_annotation_to_type_annotation(
     second pass.
     """
     if isinstance(parsed, parse.AtomicTypeAnnotation):
-        builtin_atomic_type = STR_TO_BUILTIN_ATOMIC_TYPE.get(parsed.identifier, None)
+        primitive_type = STR_TO_PRIMITIVE_TYPE.get(parsed.identifier, None)
 
-        if builtin_atomic_type is not None:
-            return BuiltinAtomicTypeAnnotation(
-                a_type=builtin_atomic_type, parsed=parsed
+        if primitive_type is not None:
+            return PrimitiveTypeAnnotation(
+                a_type=primitive_type, parsed=parsed
             )
 
         # noinspection PyTypeChecker
-        return OurAtomicTypeAnnotation(
+        return OurTypeAnnotation(
             symbol=_PlaceholderSymbol(identifier=parsed.identifier),  # type: ignore
             parsed=parsed,
         )
@@ -350,10 +352,10 @@ def _parsed_arguments_to_arguments(parsed: Sequence[parse.Argument]) -> List[Arg
     ]
 
 
-def _parsed_abstract_class_to_interface(
-        parsed: parse.AbstractClass, serializations: Mapping[parse.Class, Serialization]
+def _parsed_class_to_interface(
+        parsed: parse.Class, serializations: Mapping[parse.Class, Serialization]
 ) -> Interface:
-    """Translate an abstract class of a meta-model to an intermediate interface."""
+    """Translate a class of a meta-model to an intermediate interface."""
     # noinspection PyTypeChecker
     return Interface(
         name=parsed.name,
@@ -669,34 +671,35 @@ def _resolve_serializations(
                 for identifier in result[1]
             )
     ),
-    "Constrained built-in atomic types must be concrete classes"
+    "Constrained primitive types must be concrete classes"
 )
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
-def _determine_constrained_built_in_atomic_types(
+def _determine_constrained_primitives_by_name(
         parsed_symbol_table: parse.SymbolTable,
         ontology: _hierarchy.Ontology,
-) -> Tuple[Optional[Set[Identifier]], Optional[List[Error]]]:
+) -> Tuple[Optional[MutableMapping[Identifier, PrimitiveType]], Optional[List[Error]]]:
     """
-    Determine which classes are constraining a built-in atomic type.
+    Determine which classes are constraining a primitive type.
 
     We also catch errors in case one or more definitions are incorrect.
-    For example, if a class that inherits from a built-in atomic type also specifies
+    For example, if a class that inherits from a primitive type also specifies
     properties or methods.
     """
     # NOTE (mristin, 2021-12-22):
-    # We consider two sets of  constrained built-in atomics. The first set is
-    # the initial set that constraints the built-in type. The second set, the extended
-    # set, is a set of constrained built-in atomics types which inherit from one or
+    # We consider two sets of constrained primitives. The first set is
+    # the initial set that constraints the primitive. The second set, the extended
+    # set, is a set of constrained primitive types which inherit from one or
     # more initial ones.
     #
     # We collect the sets in two passes. We collect the initial set in the first pass.
-    # Then, in the second pass, we propagate the "is-constrained-built-in-atomic-type"
-    # through the ontology.
+    # Then, in the second pass, we propagate the "is-constrained-primitive-type"
+    # through the class hierarchy.
 
     errors = []  # type: List[Error]
 
-    initial_set = set()  # type: Set[Identifier]
+    initial_map = collections.OrderedDict(
+    )  # type: MutableMapping[Identifier, PrimitiveType]
 
     # region First pass to determine the initial set
 
@@ -705,22 +708,25 @@ def _determine_constrained_built_in_atomic_types(
             continue
 
         if any(
-                parent in parse.BUILTIN_ATOMIC_TYPES
+                parent in parse.PRIMITIVE_TYPES
                 for parent in parsed_symbol.inheritances
         ):
             if len(parsed_symbol.inheritances) > 1:
                 errors.append(
                     Error(
                         parsed_symbol.node,
-                        f"The class {parsed_symbol.name!r} constrains a built-in "
-                        f"atomic type, but also inherits from other classes: "
+                        f"The class {parsed_symbol.name!r} constrains "
+                        f"a primitive type, but also inherits from other classes: "
                         f"{parsed_symbol.inheritances}. We do not know how to generate "
                         f"an implementation for that."
                     )
                 )
                 continue
 
-            initial_set.add(parsed_symbol.name)
+            assert parsed_symbol.name not in initial_map
+            initial_map[parsed_symbol.name] = (
+                STR_TO_PRIMITIVE_TYPE[parsed_symbol.inheritances[0]]
+            )
 
     if len(errors) > 0:
         return None, errors
@@ -733,44 +739,101 @@ def _determine_constrained_built_in_atomic_types(
     # Find the connected component from all the classes of the initial set.
     # See https://en.wikipedia.org/wiki/Component_(graph_theory)
 
-    stack = sorted(initial_set)  # type: List[Identifier]
+    # Put all the descendants of the initial set on the stack
+    stack = []  # type: List[Tuple[Identifier, PrimitiveType, Identifier]]
 
-    constrained_built_in_atomic_types = initial_set.copy()  # type: Set[Identifier]
+    for identifier_of_the_initial, constrainee_of_the_initial in initial_map.items():
+        parsed_cls = parsed_symbol_table.must_find_class(name=identifier_of_the_initial)
 
-    while len(stack) > 0:
+        for descendant in ontology.list_descendants(parsed_cls):
+            stack.append(
+                (
+                    descendant.name,
+                    constrainee_of_the_initial,
+                    identifier_of_the_initial
+                )
+            )
+
+    # Propagate the constrainees through the ontology
+
+    # Map: identifier 🠒 determined primitive type, the ancestor which determined it
+    extended_map = collections.OrderedDict(
+    )  # type: MutableMapping[Identifier, Tuple[PrimitiveType, Identifier]]
+
+    while len(stack) > 0 and len(errors) == 0:
         # NOTE (mristin, 2021-12-23):
         # Since we operate on the ontology, we know that the cycles in the inheritance
         # graph would have been already reported as errors and we would not get
         # thus far.
 
-        identifier = stack.pop()
+        identifier, constrainee, ancestor = stack.pop()
         parsed_cls = parsed_symbol_table.must_find_class(name=identifier)
 
-        constrained_built_in_atomic_types.add(identifier)
+        already_determined_constrainee_and_another_ancestor = extended_map.get(
+            identifier, None)
+
+        if already_determined_constrainee_and_another_ancestor is not None:
+            already_determined_constrainee, another_ancestor = (
+                already_determined_constrainee_and_another_ancestor
+            )
+
+            if (
+                    already_determined_constrainee is not None
+                    and already_determined_constrainee != constrainee
+            ):
+                errors.append(
+                    Error(
+                        parsed_cls.node,
+                        f"The primitive type of the constrained primitive type "
+                        f"{identifier!r} can not be resolved. The ancestor "
+                        f"{ancestor!r} specifies {constrainee.value!r}, while "
+                        f"another ancestor, {another_ancestor!r}, specifies "
+                        f"{already_determined_constrainee.value!r}"
+                    )
+                )
+
+        else:
+            extended_map[identifier] = (constrainee, ancestor)
 
         for descendant in ontology.list_descendants(parsed_cls):
-            stack.append(descendant.name)
+            stack.append((descendant.name, constrainee, identifier))
+
+    if len(errors) > 0:
+        return None, errors
 
     # endregion
 
-    # region Check the inheritances of all the constrained built-in atomic types
+    # region Convert the initial and extended map into one
+
+    result = collections.OrderedDict(
+    )  # type: MutableMapping[Identifier, PrimitiveType]
+
+    for identifier, constrainee in initial_map.items():
+        result[identifier] = constrainee
+
+    for identifier, constrainee, _ in extended_map.items():
+        result[identifier] = constrainee
+
+    # endregion
+
+    # region Check the inheritances of all the constrained primitive types
 
     # TODO-BEFORE-RELEASE (mristin, 2021-12-23): test this
-    for identifier in constrained_built_in_atomic_types:
-        parsed_cls = parsed_symbol_table.must_find_class(name=identifier)
-
+    for identifier in extended_map.keys():
         # We know for sure that the initial set is valid so we can skip it in the check.
-        if identifier in initial_set:
+        if identifier in initial_map:
             continue
 
-        # Make sure that the constrained built-in atomic types only inherit from other
-        # constrained built-in atomic types
+        parsed_cls = parsed_symbol_table.must_find_class(name=identifier)
+
+        # Make sure that the constrained primitive types only inherit from other
+        # constrained primitive types
 
         constrained_inheritances = []  # type: List[Identifier]
         unexpected_inheritances = []  # type: List[Identifier]
 
         for inheritance in parsed_cls.inheritances:
-            if inheritance not in constrained_built_in_atomic_types:
+            if inheritance not in result:
                 unexpected_inheritances.append(inheritance)
             else:
                 constrained_inheritances.append(inheritance)
@@ -789,10 +852,9 @@ def _determine_constrained_built_in_atomic_types(
                 Error(
                     parsed_cls.node,
                     f"The class {parsed_cls.name} inherits both from one or more "
-                    f"constrained built-in atomic types "
-                    f"({constrained_inheritances_str}), but also other classes which "
-                    f"are not constraining built-in atomic types "
-                    f"({unexpected_inheritances_str})."
+                    f"constrained primitive types ({constrained_inheritances_str}), "
+                    f"but also other classes which are not constraining primitive "
+                    f"types ({unexpected_inheritances_str})."
                 )
             )
 
@@ -801,17 +863,17 @@ def _determine_constrained_built_in_atomic_types(
 
     # endregion
 
-    # region Check that built-in atomic types do not have unexpected specification
+    # region Check that primitive types do not have unexpected specification
 
     # TODO-BEFORE-RELEASE (mristin, 2021-12-23): test this
-    for identifier in constrained_built_in_atomic_types:
+    for identifier in result:
         parsed_cls = parsed_symbol_table.must_find_class(identifier)
         if len(parsed_cls.methods) > 0 or len(parsed_cls.properties) > 0:
             errors.append(
                 Error(
                     parsed_cls.node,
-                    f"The class {parsed_cls.name!r} constrains a built-in "
-                    f"atomic type, but contains properties and/or methods. "
+                    f"The class {parsed_cls.name!r} constrains a primitive type, "
+                    f"but also specifies properties and/or methods. "
                     f"We do not know how to generate an implementation for that."
                 )
             )
@@ -820,9 +882,9 @@ def _determine_constrained_built_in_atomic_types(
             errors.append(
                 Error(
                     parsed_cls.node,
-                    f"The class {parsed_cls.name!r} constrains a built-in "
-                    f"atomic type, but the serialization settings are set. We must "
-                    f"serialize it as a built-in type and no custom serialization "
+                    f"The class {parsed_cls.name!r} constrains a primitive type, "
+                    f"but the serialization settings are set. We must "
+                    f"serialize it as a primitive type and no custom serialization "
                     f"settings are possible."
                 )
             )
@@ -831,8 +893,8 @@ def _determine_constrained_built_in_atomic_types(
             errors.append(
                 Error(
                     parsed_cls.node,
-                    f"The class {parsed_cls.name!r} constrains a built-in "
-                    f"atomic type, but it is denoted abstract. Every value that "
+                    f"The class {parsed_cls.name!r} constrains a primitive type, "
+                    f"but it is denoted abstract. Every value that "
                     f"fulfills the constraints can be instantiated, so it can not be "
                     f"made abstract."
                 )
@@ -840,34 +902,120 @@ def _determine_constrained_built_in_atomic_types(
 
     # endregion
 
-    return constrained_built_in_atomic_types, None
+    return result, None
 
 
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _parsed_class_to_constrained_builtin_atomic_type(
-        parsed: parse.ConcreteClass
-) -> Tuple[Optional[ConstrainedBuiltinAtomicType], Optional[Error]]:
+def _stack_invariants(
+        parsed_symbol_table: parse.SymbolTable,
+        ontology: _hierarchy.Ontology,
+) -> MutableMapping[Identifier, List[Invariant]]:
+    """Determine invariants for all the classes by stacking them from the ancestors."""
+    invariants_map = collections.OrderedDict(
+    )  # type: MutableMapping[Identifier, List[Invariant]]
+
+    for cls_identifier in ontology.classes:
+        # NOTE (mristin, 2021-12-14):
+        # We assume here that classes in the ontology are sorted
+        # in the topological order.
+
+        assert isinstance(cls_identifier, Identifier)
+
+        invariants = invariants_map.get(cls_identifier, None)
+        if invariants is None:
+            invariants = []
+            invariants_map[cls_identifier] = invariants
+
+        parsed_cls = parsed_symbol_table.must_find_class(cls_identifier)
+
+        invariants.extend(
+            Invariant(
+                description=parsed_invariant.description,
+                body=parsed_invariant.body,
+                parsed=parsed_invariant)
+            for parsed_invariant in parsed_cls.invariants
+        )
+
+        # Propagate all the invariants to the descendants
+
+        for descendant in ontology.list_descendants(parsed_cls):
+            descendant_invariants = invariants_map.get(descendant.name, None)
+
+            if descendant_invariants is None:
+                descendant_invariants = []
+                invariants_map[descendant.name] = descendant_invariants
+
+            descendant_invariants.extend(invariants)
+
+    return invariants_map
+
+
+def _parsed_class_to_constrained_primitive(
+        parsed: parse.ConcreteClass,
+        constrainee: PrimitiveType,
+        invariants: Sequence[Invariant],
+) -> ConstrainedPrimitive:
     """
-    Translate a concrete class to a constrained built-in atomic type.
+    Translate a concrete class to a constrained primitive.
 
-    The ``parsed`` is expected to be tested for being a valid constrained built-in
-    atomic type before.
+    The ``parsed`` is expected to be tested for being a valid constrained primitive
+    before calling this function.
+
+    The ``constrainee`` is determined by propagation in
+    :py:function:`_determine_constrained_primitives_by_name`.
+
+    The ``invariants`` are determined by stacking in
+    :py:function:`_stack_invariants`.
     """
-    # TODO: continue here
+    # noinspection PyTypeChecker
+    return (
+        ConstrainedPrimitive(
+            name=parsed.name,
+            inheritances=[
+                _PlaceholderSymbol(inheritance) for inheritance in parsed.inheritances
+            ],
+            constrainee=constrainee,
+            is_implementation_specific=parsed.is_implementation_specific,
+            invariants=invariants,
+            description=(
+                _parsed_description_to_description(parsed.description)
+                if parsed.description is not None
+                else None
+            ),
+            parsed=parsed,
+        ),
+        None,
+    )
 
 
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parsed_class_to_class(
         parsed: parse.ConcreteClass,
         ontology: _hierarchy.Ontology,
         serializations: Mapping[parse.Class, Serialization],
+        invariants: Sequence[Invariant],
         in_lined_constructors: Mapping[
             parse.Class, Sequence[construction.AssignArgument]],
-) -> Tuple[Optional[Class], Optional[Error]]:
-    """Translate a concrete parsed class to an intermediate class."""
+        implements_its_own_interface: bool
+) -> Class:
+    """
+    Translate a concrete parsed class to an intermediate class.
+
+    The ``invariants`` are determined by stacking in
+    :py:function:`_stack_invariants`.
+
+    If ``implements_its_own_interface`` is set then the class has one or more
+    descendants in the ontology. To avoid problems with the multiple inheritance in
+    different implementations, we introduced an interface of this class as well
+    which it also needs to implement.
+    """
     ancestors = ontology.list_ancestors(cls=parsed)
 
     # region Stack properties from the ancestors
+
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-14):
+    #  We need to refactor this function since it is now running in quadratic time
+    #  for properties, methods and constructors. We just have to follow the same trick
+    #  as with ``_stack_invariants``, but we have to be careful not to miss one or the
+    #  other important detail.
 
     properties = []  # type: List[Property]
 
@@ -945,47 +1093,18 @@ def _parsed_class_to_class(
 
     # endregion
 
-    # region Stack the invariants from the ancestors
+    interfaces = [
+        _PlaceholderSymbol(inheritance) for inheritance in parsed.inheritances
+    ]
 
-    invariants = []  # type: List[Invariant]
-
-    for ancestor in ancestors:
-        for parsed_invariant in ancestor.invariants:
-            invariants.append(
-                Invariant(
-                    description=parsed_invariant.description,
-                    body=parsed_invariant.body,
-                    parsed=parsed_invariant
-                )
-            )
-
-    errors = []  # type: List[Error]
-
-    for parsed_invariant in parsed.invariants:
-        invariants.append(
-            Invariant(
-                description=parsed_invariant.description,
-                body=parsed_invariant.body,
-                parsed=parsed_invariant)
-        )
-
-    # endregion
-
-    if len(errors) > 0:
-        return None, Error(
-            parsed.node,
-            f"Failed to translate the class {parsed.name} "
-            f"to the intermediate representation",
-            errors,
-        )
+    if implements_its_own_interface:
+        interfaces.append(_PlaceholderSymbol(parsed.name))
 
     # noinspection PyTypeChecker
     return (
         Class(
             name=parsed.name,
-            interfaces=[
-                _PlaceholderSymbol(inheritance) for inheritance in parsed.inheritances
-            ],
+            interfaces=interfaces,
             is_implementation_specific=parsed.is_implementation_specific,
             properties=properties,
             methods=methods,
@@ -1086,48 +1205,48 @@ def _parsed_verification_function_to_verification_function(
         assert_never(parsed)
 
 
-def _over_our_atomic_type_annotations(
+def _over_our_type_annotations(
         something: Union[Class, Interface, TypeAnnotation]
-) -> Iterator[OurAtomicTypeAnnotation]:
+) -> Iterator[OurTypeAnnotation]:
     """Iterate over all the atomic type annotations in the ``something``."""
-    if isinstance(something, BuiltinAtomicTypeAnnotation):
+    if isinstance(something, PrimitiveTypeAnnotation):
         pass
-    elif isinstance(something, OurAtomicTypeAnnotation):
+    elif isinstance(something, OurTypeAnnotation):
         yield something
     elif isinstance(something, SubscriptedTypeAnnotation):
         if isinstance(something, ListTypeAnnotation):
-            yield from _over_our_atomic_type_annotations(something.items)
+            yield from _over_our_type_annotations(something.items)
         elif isinstance(something, OptionalTypeAnnotation):
-            yield from _over_our_atomic_type_annotations(something.value)
+            yield from _over_our_type_annotations(something.value)
         elif isinstance(something, RefTypeAnnotation):
-            yield from _over_our_atomic_type_annotations(something.value)
+            yield from _over_our_type_annotations(something.value)
         else:
             assert_never(something)
 
     elif isinstance(something, Class):
         for prop in something.properties:
-            yield from _over_our_atomic_type_annotations(prop.type_annotation)
+            yield from _over_our_type_annotations(prop.type_annotation)
 
         for method in something.methods:
             for argument in method.arguments:
-                yield from _over_our_atomic_type_annotations(argument.type_annotation)
+                yield from _over_our_type_annotations(argument.type_annotation)
 
             if method.returns is not None:
-                yield from _over_our_atomic_type_annotations(method.returns)
+                yield from _over_our_type_annotations(method.returns)
 
         for argument in something.constructor.arguments:
-            yield from _over_our_atomic_type_annotations(argument.type_annotation)
+            yield from _over_our_type_annotations(argument.type_annotation)
 
     elif isinstance(something, Interface):
         for prop in something.properties:
-            yield from _over_our_atomic_type_annotations(prop.type_annotation)
+            yield from _over_our_type_annotations(prop.type_annotation)
 
         for signature in something.signatures:
             for argument in signature.arguments:
-                yield from _over_our_atomic_type_annotations(argument.type_annotation)
+                yield from _over_our_type_annotations(argument.type_annotation)
 
             if signature.returns is not None:
-                yield from _over_our_atomic_type_annotations(signature.returns)
+                yield from _over_our_type_annotations(signature.returns)
 
 
 def _over_descriptions(
@@ -1427,10 +1546,10 @@ def translate(
 
     # endregion
 
-    # region Figure out the sub-hierarchy of the constrained built-in atomic types
+    # region Figure out the sub-hierarchy of the constrained primitive types
 
-    constrained_builtin_atomic_types, determination_errors = (
-        _determine_constrained_built_in_atomic_types(
+    constrained_primitives_by_name, determination_errors = (
+        _determine_constrained_primitives_by_name(
             parsed_symbol_table=parsed_symbol_table,
             ontology=ontology
         )
@@ -1446,50 +1565,66 @@ def translate(
 
     # endregion
 
+    invariants_map = _stack_invariants(
+        parsed_symbol_table=parsed_symbol_table,
+        ontology=ontology
+    )
+
     # region First pass of translation
 
     assert serializations is not None
 
-    # Type annotations reference placeholder symbols at this point.
+    # Type annotations reference symbol placeholders at this point.
 
     symbols = []  # type: List[Symbol]
     for parsed_symbol in parsed_symbol_table.symbols:
         symbol = None  # type: Optional[Symbol]
 
-        if parsed_symbol.name in constrained_builtin_atomic_types:
+        constrainee = constrained_primitives_by_name.get(parsed_symbol.name, None)
+        if constrainee is not None:
             assert isinstance(parsed_symbol, parse.ConcreteClass), (
-                "All constrained built-in atomic types must be concrete."
+                "All constrained primitive types must be concrete."
             )
 
-            symbol, error = _parsed_class_to_constrained_builtin_atomic_type(
-                parsed=parsed_symbol
+            symbol = _parsed_class_to_constrained_primitive(
+                parsed=parsed_symbol,
+                constrainee=constrainee,
+                invariants=invariants_map[parsed_symbol.name]
             )
-
-            if error is not None:
-                underlying_errors.append(error)
-                continue
-
-            # TODO: continue here, check the code below
 
         elif isinstance(parsed_symbol, parse.Enumeration):
             symbol = _parsed_enumeration_to_enumeration(parsed=parsed_symbol)
 
         elif isinstance(parsed_symbol, parse.AbstractClass):
-            symbol = _parsed_abstract_class_to_interface(
+            symbol = _parsed_class_to_interface(
                 parsed=parsed_symbol, serializations=serializations
             )
 
         elif isinstance(parsed_symbol, parse.ConcreteClass):
-            symbol, error = _parsed_class_to_class(
+            implements_its_own_interface = False
+
+            if len(ontology.list_descendants(parsed_symbol)) > 0:
+                # NOTE (mristin, 2021-12-14):
+                # This class has one or more descendants. Since many target
+                # implementations do not support multiple inheritance, we introduce
+                # an interface based on this class in the meta-model and then also a
+                # concrete class that implements that interface.
+
+                implements_its_own_interface = True
+                interface_symbol = _parsed_class_to_interface(
+                    parsed=parsed_symbol, serializations=serializations
+                )
+
+                symbols.append(interface_symbol)
+
+            symbol = _parsed_class_to_class(
                 parsed=parsed_symbol,
                 ontology=ontology,
                 serializations=serializations,
+                invariants=invariants_map[parsed_symbol.name],
                 in_lined_constructors=in_lined_constructors,
+                implements_its_own_interface=implements_its_own_interface
             )
-
-            if error is not None:
-                underlying_errors.append(error)
-                continue
 
         else:
             assert_never(parsed_symbol)
@@ -1559,7 +1694,7 @@ def translate(
         if isinstance(symbol, Enumeration):
             continue
 
-        for our_type_annotation in _over_our_atomic_type_annotations(symbol):
+        for our_type_annotation in _over_our_type_annotations(symbol):
             assert isinstance(
                 our_type_annotation.symbol, _PlaceholderSymbol
             ), "Expected only placeholder symbols to be assigned in the first pass"
@@ -1930,7 +2065,7 @@ def translate(
 
                 resolved_interfaces.append(interface_symbol)
 
-            symbol.interfaces = resolved_interfaces
+            symbol.set_interfaces(resolved_interfaces)
         else:
             assert_never(symbol)
 

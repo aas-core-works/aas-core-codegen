@@ -212,11 +212,11 @@ def _transpile_pattern_verification(
     assert len(verification.arguments) == 1
     assert isinstance(
         verification.arguments[0].type_annotation,
-        intermediate.BuiltinAtomicTypeAnnotation)
+        intermediate.PrimitiveTypeAnnotation)
     # noinspection PyUnresolvedReferences
     assert (
             verification.arguments[0].type_annotation.a_type ==
-            intermediate.BuiltinAtomicType.STR
+            intermediate.PrimitiveType.STR
     )
 
     arg_name = csharp_naming.argument_name(verification.arguments[0].name)
@@ -304,23 +304,23 @@ class _EnumerationCheckUnroller(csharp_unrolling.Unroller):
         """Initialize with the given values."""
         self._ref_association = ref_association
 
-    def _unroll_builtin_atomic_type_annotation(
+    def _unroll_primitive_type_annotation(
             self,
             unrollee_expr: str,
-            type_annotation: intermediate.BuiltinAtomicTypeAnnotation,
+            type_annotation: intermediate.PrimitiveTypeAnnotation,
             path: List[str],
             item_level: int,
             key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
-        # Built-ins are not enumerations, so nothing to check here.
+        # Primitives are not enumerations, so nothing to check here.
         return []
 
     # noinspection PyUnusedLocal
-    def _unroll_our_atomic_type_or_ref_annotation(
+    def _unroll_our_type_or_ref_annotation(
             self,
             unrollee_expr: str,
             type_annotation: Union[
-                intermediate.OurAtomicTypeAnnotation,
+                intermediate.OurTypeAnnotation,
                 intermediate.RefTypeAnnotation
             ],
             path: List[str],
@@ -330,12 +330,12 @@ class _EnumerationCheckUnroller(csharp_unrolling.Unroller):
         """
         Generate the code for both our atomic type annotations and references.
 
-        We merged :py:method:`._unroll_our_atomic_type_annotation` and
+        We merged :py:method:`._unroll_our_type_annotation` and
         :py:method:`._unroll_ref_type_annotation` together since they differ in only
         which symbol is unrolled over.
         """
         symbol = None  # type: Optional[intermediate.Symbol]
-        if isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
+        if isinstance(type_annotation, intermediate.OurTypeAnnotation):
             symbol = type_annotation.symbol
         elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
             symbol = self._ref_association
@@ -369,16 +369,16 @@ class _EnumerationCheckUnroller(csharp_unrolling.Unroller):
             )
         ]
 
-    def _unroll_our_atomic_type_annotation(
+    def _unroll_our_type_annotation(
             self,
             unrollee_expr: str,
-            type_annotation: intermediate.OurAtomicTypeAnnotation,
+            type_annotation: intermediate.OurTypeAnnotation,
             path: List[str],
             item_level: int,
             key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
-        return self._unroll_our_atomic_type_or_ref_annotation(
+        return self._unroll_our_type_or_ref_annotation(
             unrollee_expr=unrollee_expr,
             type_annotation=type_annotation,
             path=path,
@@ -449,7 +449,7 @@ class _EnumerationCheckUnroller(csharp_unrolling.Unroller):
             key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
-        return self._unroll_our_atomic_type_or_ref_annotation(
+        return self._unroll_our_type_or_ref_annotation(
             unrollee_expr=unrollee_expr,
             type_annotation=type_annotation,
             path=path,
@@ -1206,24 +1206,24 @@ class _RecursionInRecursiveVerifyUnroller(csharp_unrolling.Unroller):
         """Initialize with the given values."""
         self._ref_association = ref_association
 
-    def _unroll_builtin_atomic_type_annotation(
+    def _unroll_primitive_type_annotation(
             self,
             unrollee_expr: str,
-            type_annotation: intermediate.BuiltinAtomicTypeAnnotation,
+            type_annotation: intermediate.PrimitiveTypeAnnotation,
             path: List[str],
             item_level: int,
             key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
-        # We can not recurse visits into an atomic built-in.
+        # We can not recurse visits into a primitive.
         return []
 
     # noinspection PyUnusedLocal
-    def _unroll_our_atomic_type_or_ref_annotation(
+    def _unroll_our_type_or_ref_annotation(
             self,
             unrollee_expr: str,
             type_annotation: Union[
-                intermediate.OurAtomicTypeAnnotation,
+                intermediate.OurTypeAnnotation,
                 intermediate.RefTypeAnnotation
             ],
             path: List[str],
@@ -1233,12 +1233,12 @@ class _RecursionInRecursiveVerifyUnroller(csharp_unrolling.Unroller):
         """
         Generate the code for both our atomic type annotations and references.
 
-        We merged :py:method:`._unroll_our_atomic_type_annotation` and
+        We merged :py:method:`._unroll_our_type_annotation` and
         :py:method:`._unroll_ref_type_annotation` together since they differ in only
         which symbol is unrolled over.
         """
         symbol = None  # type: Optional[intermediate.Symbol]
-        if isinstance(type_annotation, intermediate.OurAtomicTypeAnnotation):
+        if isinstance(type_annotation, intermediate.OurTypeAnnotation):
             symbol = type_annotation.symbol
         elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
             symbol = self._ref_association
@@ -1266,16 +1266,16 @@ class _RecursionInRecursiveVerifyUnroller(csharp_unrolling.Unroller):
             )
         ]
 
-    def _unroll_our_atomic_type_annotation(
+    def _unroll_our_type_annotation(
             self,
             unrollee_expr: str,
-            type_annotation: intermediate.OurAtomicTypeAnnotation,
+            type_annotation: intermediate.OurTypeAnnotation,
             path: List[str],
             item_level: int,
             key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
-        return self._unroll_our_atomic_type_or_ref_annotation(
+        return self._unroll_our_type_or_ref_annotation(
             unrollee_expr=unrollee_expr,
             type_annotation=type_annotation,
             path=path,
@@ -1368,7 +1368,7 @@ class _RecursionInRecursiveVerifyUnroller(csharp_unrolling.Unroller):
             key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
-        return self._unroll_our_atomic_type_or_ref_annotation(
+        return self._unroll_our_type_or_ref_annotation(
             unrollee_expr=unrollee_expr,
             type_annotation=type_annotation,
             path=path,

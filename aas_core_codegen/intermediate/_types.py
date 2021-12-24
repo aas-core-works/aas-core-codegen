@@ -33,14 +33,16 @@ _MODULE_NAME = pathlib.Path(__file__).parent.name
 
 class AtomicTypeAnnotation:
     """
-    Represent an atomic non-composite type annotation.
+    Represent an atomic type annotation.
+
+    Atomic, in this context, means a non-generic type annotation.
 
     For example, ``Asset`` or ``int``.
     """
 
 
-class BuiltinAtomicType(enum.Enum):
-    """List primitive built-in types."""
+class PrimitiveType(enum.Enum):
+    """List primitive types."""
 
     BOOL = "bool"
     INT = "int"
@@ -49,19 +51,19 @@ class BuiltinAtomicType(enum.Enum):
     BYTEARRAY = "bytearray"
 
 
-assert sorted(literal.value for literal in BuiltinAtomicType) == sorted(
-    parse.BUILTIN_ATOMIC_TYPES
-), "All built-in atomic types specified in the intermediate layer"
+assert sorted(literal.value for literal in PrimitiveType) == sorted(
+    parse.PRIMITIVE_TYPES
+), "All primitive types specified in the intermediate layer"
 
-STR_TO_BUILTIN_ATOMIC_TYPE = {
-    literal.value: literal for literal in BuiltinAtomicType
-}  # type: Mapping[str, BuiltinAtomicType]
+STR_TO_PRIMITIVE_TYPE = {
+    literal.value: literal for literal in PrimitiveType
+}  # type: Mapping[str, PrimitiveType]
 
 
-class BuiltinAtomicTypeAnnotation(AtomicTypeAnnotation):
-    """Represent a built-in atomic type such as ``int``."""
+class PrimitiveTypeAnnotation(AtomicTypeAnnotation):
+    """Represent a primitive type such as ``int``."""
 
-    def __init__(self, a_type: BuiltinAtomicType, parsed: parse.TypeAnnotation) -> None:
+    def __init__(self, a_type: PrimitiveType, parsed: parse.TypeAnnotation) -> None:
         """Initialize with the given values."""
         self.a_type = a_type
         self.parsed = parsed
@@ -70,7 +72,7 @@ class BuiltinAtomicTypeAnnotation(AtomicTypeAnnotation):
         return str(self.a_type.value)
 
 
-class OurAtomicTypeAnnotation(AtomicTypeAnnotation):
+class OurTypeAnnotation(AtomicTypeAnnotation):
     """
     Represent an atomic annotation defined by a symbol in the meta-model.
 
@@ -87,9 +89,9 @@ class OurAtomicTypeAnnotation(AtomicTypeAnnotation):
 
 
 class SubscriptedTypeAnnotation:
-    """Represent a subscripted (i.e. composite) type annotation.
+    """Represent a subscripted (i.e. generic) type annotation.
 
-    The composite type annotations are, for example, ``List[...]`` (or
+    The subscripted type annotations are, for example, ``List[...]`` (or
     ``Mapping[..., ...]``, *etc.*).
     """
 
@@ -106,7 +108,7 @@ class ListTypeAnnotation(SubscriptedTypeAnnotation):
 
 
 # NOTE (mristin, 2021-11-19):
-# We do not support other composite types except for ``List``. In the future we might
+# We do not support other generic types except for ``List``. In the future we might
 # add support for ``Set``, ``MutableMapping`` *etc.*
 
 
@@ -141,11 +143,11 @@ def type_annotations_equal(that: TypeAnnotation, other: TypeAnnotation) -> bool:
     if type(that) is not type(other):
         return False
 
-    if isinstance(that, BuiltinAtomicTypeAnnotation):
-        assert isinstance(other, BuiltinAtomicTypeAnnotation)
+    if isinstance(that, PrimitiveTypeAnnotation):
+        assert isinstance(other, PrimitiveTypeAnnotation)
         return that.a_type == other.a_type
-    elif isinstance(that, OurAtomicTypeAnnotation):
-        assert isinstance(other, OurAtomicTypeAnnotation)
+    elif isinstance(that, OurTypeAnnotation):
+        assert isinstance(other, OurTypeAnnotation)
         return that.symbol == other.symbol
     elif isinstance(that, ListTypeAnnotation):
         assert isinstance(other, ListTypeAnnotation)
@@ -649,17 +651,17 @@ class Enumeration:
         self.literal_id_set = frozenset(id(literal) for literal in literals)
 
 
-class ConstrainedBuiltinAtomicType:
-    """Represent a built-in atomic type constrained by one or more invariants."""
+class ConstrainedPrimitive:
+    """Represent a primitive type constrained by one or more invariants."""
 
     #: Name of the class
     name: Final[Identifier]
 
-    #: Parent constrained built-in atomic types
-    inheritances: Final[Sequence["ConstrainedBuiltinAtomicType"]]
+    #: Parent constrained primitive types
+    inheritances: Final[Sequence["ConstrainedPrimitive"]]
 
-    #: Which built-in atomic type is constrained
-    constrainee: BuiltinAtomicType
+    #: Which primitive type is constrained
+    constrainee: PrimitiveType
 
     #: If set, this class is implementation-specific and we need to provide a snippet
     #: for each implementation target
@@ -677,18 +679,25 @@ class ConstrainedBuiltinAtomicType:
     # fmt: off
     @require(
         lambda parsed: len(parsed.methods) == 0,
-        "No methods expected in the constrained built-in atomic type"
+        "No methods expected in the constrained primitive type"
     )
     @require(
         lambda parsed: len(parsed.properties) == 0,
-        "No properties expected in the constrained built-in atomic type"
+        "No properties expected in the constrained primitive type"
+    )
+    @require(
+        lambda constrainee, inheritances:
+        all(
+            constrainee == inheritance.constrainee
+            for inheritance in inheritances
+        )
     )
     # fmt: on
     def __init__(
             self,
             name: Identifier,
-            inheritances: Sequence['ConstrainedBuiltinAtomicType'],
-            constrainee: BuiltinAtomicType,
+            inheritances: Sequence['ConstrainedPrimitive'],
+            constrainee: PrimitiveType,
             is_implementation_specific: bool,
             invariants: Sequence[Invariant],
             description: Optional[Description],
@@ -720,8 +729,27 @@ class Class:
     #: Name of the class
     name: Final[Identifier]
 
-    #: Interfaces that this class implements
-    interfaces: Final[Sequence["Interface"]]
+    # region Interfaces
+
+    # NOTE (mristin, 2021-12-24):
+    # We have to decorate interfaces with ``@property`` so that the client code is
+    # forced to use ``set_interfaces``.
+
+    _interfaces: Sequence["Interface"]
+
+    @property
+    def interfaces(self) -> Sequence["Interface"]:
+        """Return interfaces that this class implements."""
+        return self._interfaces
+
+    _interface_id_set: FrozenSet[int]
+
+    @property
+    def interface_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the interface objects in a set."""
+        return self._interface_id_set
+
+    # endregion
 
     #: If set, this class is implementation-specific and we need to provide a snippet
     #: for each implementation target
@@ -746,7 +774,7 @@ class Class:
     description: Final[Optional[Description]]
 
     #: Relation to the class from the parse stage
-    parsed: parse.Class
+    parsed: Final[parse.Class]
 
     #: Map all properties by their identifiers to the corresponding objects
     properties_by_name: Final[Mapping[Identifier, Property]]
@@ -757,15 +785,7 @@ class Class:
     #: Collect IDs (with :py:func:`id`) of the invariant objects in a set
     invariant_id_set: Final[FrozenSet[int]]
 
-    #: Collect IDs (with :py:func:`id`) of the interface objects in a set
-    interface_id_set: Final[FrozenSet[int]]
-
     # fmt: off
-    @require(
-        lambda interfaces:
-        len(interfaces) == len(set(identifier for identifier in interfaces)),
-        "No duplicate interfaces"
-    )
     @require(
         lambda properties:
         len(properties) == len(set(prop.name for prop in properties)),
@@ -792,7 +812,8 @@ class Class:
     ) -> None:
         """Initialize with the given values."""
         self.name = name
-        self.interfaces = interfaces
+        self.set_interfaces(interfaces)
+
         self.is_implementation_specific = is_implementation_specific
         self.properties = properties
         self.methods = methods
@@ -808,7 +829,19 @@ class Class:
 
         self.property_id_set = frozenset(id(prop) for prop in self.properties)
         self.invariant_id_set = frozenset(id(inv) for inv in self.invariants)
-        self.interface_id_set = frozenset(
+
+    # fmt: off
+    @require(
+        lambda interfaces:
+        len(interfaces) == len(set(identifier for identifier in interfaces)),
+        "No duplicate interfaces"
+    )
+    # fmt: on
+    def set_interfaces(self, interfaces: Sequence[Interface]) -> None:
+        """Set the interfaces in the class."""
+        self._interfaces = interfaces
+
+        self._interface_id_set = frozenset(
             id(interface) for interface in self.interfaces
         )
 
@@ -819,7 +852,7 @@ class Class:
         )
 
 
-Symbol = Union[Interface, Enumeration, ConstrainedBuiltinAtomicType, Class]
+Symbol = Union[Interface, Enumeration, ConstrainedPrimitive, Class]
 
 
 class Verification(SignatureLike):
@@ -925,15 +958,15 @@ class PatternVerification(Verification):
     @require(
         lambda arguments:
         len(arguments) == 1
-        and isinstance(arguments[0].type_annotation, BuiltinAtomicTypeAnnotation)
-        and arguments[0].type_annotation.a_type == BuiltinAtomicType.STR,
+        and isinstance(arguments[0].type_annotation, PrimitiveTypeAnnotation)
+        and arguments[0].type_annotation.a_type == PrimitiveType.STR,
         "There is a single string argument"
     )
     @require(
         lambda returns:
         (returns is not None)
-        and isinstance(returns, BuiltinAtomicTypeAnnotation)
-        and returns.a_type == BuiltinAtomicType.BOOL
+        and isinstance(returns, PrimitiveTypeAnnotation)
+        and returns.a_type == PrimitiveType.BOOL
     )
     # fmt: on
     def __init__(
@@ -1214,11 +1247,11 @@ def map_descendability(
 
     def recurse(a_type_annotation: TypeAnnotation) -> bool:
         """Recursively iterate over subscripted type annotations."""
-        if isinstance(a_type_annotation, BuiltinAtomicTypeAnnotation):
+        if isinstance(a_type_annotation, PrimitiveTypeAnnotation):
             mapping[a_type_annotation] = False
             return False
 
-        elif isinstance(a_type_annotation, OurAtomicTypeAnnotation):
+        elif isinstance(a_type_annotation, OurTypeAnnotation):
             result = None  # type: Optional[bool]
             if isinstance(a_type_annotation.symbol, Enumeration):
                 result = False
@@ -1424,9 +1457,9 @@ def collect_ids_of_interfaces_in_properties(symbol_table: SymbolTable) -> Set[in
                         type_anno = type_anno.items
                     elif isinstance(type_anno, RefTypeAnnotation):
                         type_anno = type_anno.value
-                    elif isinstance(type_anno, BuiltinAtomicTypeAnnotation):
+                    elif isinstance(type_anno, PrimitiveTypeAnnotation):
                         break
-                    elif isinstance(type_anno, OurAtomicTypeAnnotation):
+                    elif isinstance(type_anno, OurTypeAnnotation):
                         if isinstance(type_anno.symbol, Interface):
                             result.add(id(type_anno.symbol))
 

@@ -12,9 +12,11 @@ from aas_core_codegen.parse import tree
 
 _MODULE_NAME = pathlib.Path(__file__).parent.name
 
-BUILTIN_ATOMIC_TYPES = {"bool", "int", "float", "str", "bytearray"}
+#: Built-in primitive types
+PRIMITIVE_TYPES = {"bool", "int", "float", "str", "bytearray"}
 
-BUILTIN_COMPOSITE_TYPES = {
+#: Built-in generic types
+GENERIC_TYPES = {
     Identifier("List"),
     Identifier("Optional"),
     Identifier("Ref"),
@@ -22,7 +24,11 @@ BUILTIN_COMPOSITE_TYPES = {
 
 
 class AtomicTypeAnnotation:
-    """Represent an atomic type annotation, such as ``Asset`` or ``int``."""
+    """
+    Represent an atomic type annotation, such as ``Asset`` or ``int``.
+
+    Atomic, in this context, means a non-generic type such as ``List``.
+    """
 
     def __init__(self, identifier: Identifier, node: ast.AST) -> None:
         """Initialize with the given values."""
@@ -99,7 +105,7 @@ class Property:
     Represent a property of a class.
 
     If a property is optional (non-required), the :py:attr:`type_annotation` needs to
-    be set with the appropriate ``Optional`` composite type.
+    be set with the appropriate ``Optional`` type.
     """
 
     def __init__(

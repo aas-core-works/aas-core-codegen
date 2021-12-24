@@ -6,9 +6,9 @@ from aas_core_codegen.intermediate import _types, _translate, _stringify
 
 TypeAnnotation = _types.TypeAnnotation
 AtomicTypeAnnotation = _types.AtomicTypeAnnotation
-BuiltinAtomicType = _types.BuiltinAtomicType
-BuiltinAtomicTypeAnnotation = _types.BuiltinAtomicTypeAnnotation
-OurAtomicTypeAnnotation = _types.OurAtomicTypeAnnotation
+PrimitiveType = _types.PrimitiveType
+PrimitiveTypeAnnotation = _types.PrimitiveTypeAnnotation
+OurTypeAnnotation = _types.OurTypeAnnotation
 SubscriptedTypeAnnotation = _types.SubscriptedTypeAnnotation
 ListTypeAnnotation = _types.ListTypeAnnotation
 OptionalTypeAnnotation = _types.OptionalTypeAnnotation
@@ -32,7 +32,7 @@ Constructor = _types.Constructor
 Serialization = _types.Serialization
 EnumerationLiteral = _types.EnumerationLiteral
 Enumeration = _types.Enumeration
-ConstrainedBuiltinAtomicType = _types.ConstrainedBuiltinAtomicType
+ConstrainedPrimitive = _types.ConstrainedPrimitive
 Class = _types.Class
 Verification = _types.Verification
 ImplementationSpecificVerification = _types.ImplementationSpecificVerification

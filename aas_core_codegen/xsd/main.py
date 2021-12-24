@@ -36,14 +36,14 @@ def _define_for_enumeration(enumeration: intermediate.Enumeration) -> List[ET.El
     return [element]
 
 
-_BUILTIN_MAP = {
-    intermediate.BuiltinAtomicType.BOOL: "xs:boolean",
-    intermediate.BuiltinAtomicType.INT: "xs:integer",
-    intermediate.BuiltinAtomicType.FLOAT: "xs:double",
-    intermediate.BuiltinAtomicType.STR: "xs:string",
-    intermediate.BuiltinAtomicType.BYTEARRAY: "xs:base64Binary",
+_PRIMITIVE_MAP = {
+    intermediate.PrimitiveType.BOOL: "xs:boolean",
+    intermediate.PrimitiveType.INT: "xs:integer",
+    intermediate.PrimitiveType.FLOAT: "xs:double",
+    intermediate.PrimitiveType.STR: "xs:string",
+    intermediate.PrimitiveType.BYTEARRAY: "xs:base64Binary",
 }
-assert all(literal in _BUILTIN_MAP for literal in intermediate.BuiltinAtomicType)
+assert all(literal in _PRIMITIVE_MAP for literal in intermediate.PrimitiveType)
 
 
 def _define_for_property(
@@ -63,14 +63,14 @@ def _define_for_property(
         type_anno = type_anno.value
 
     prop_element = None  # type: Optional[ET.Element]
-    if isinstance(type_anno, intermediate.BuiltinAtomicTypeAnnotation):
+    if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
         if pattern_constraints is not None and len(pattern_constraints) > 0:
             prop_element = ET.Element(
                 "xs:element", {"name": naming.xml_property(prop.name)}
             )
 
             restriction = ET.Element(
-                "xs:restriction", {"base": _BUILTIN_MAP[type_anno.a_type]}
+                "xs:restriction", {"base": _PRIMITIVE_MAP[type_anno.a_type]}
             )
 
             simple_type = ET.Element("xs:simpleType")
@@ -102,11 +102,11 @@ def _define_for_property(
                 "xs:element",
                 {
                     "name": naming.xml_property(prop.name),
-                    "type": _BUILTIN_MAP[type_anno.a_type],
+                    "type": _PRIMITIVE_MAP[type_anno.a_type],
                 },
             )
 
-    elif isinstance(type_anno, intermediate.OurAtomicTypeAnnotation):
+    elif isinstance(type_anno, intermediate.OurTypeAnnotation):
         if isinstance(type_anno.symbol, (intermediate.Enumeration, intermediate.Class)):
             prop_element = ET.Element(
                 "xs:element",
@@ -137,7 +137,7 @@ def _define_for_property(
             assert_never(type_anno.symbol)
 
     elif isinstance(type_anno, intermediate.RefTypeAnnotation):
-        if isinstance(type_anno.value, intermediate.OurAtomicTypeAnnotation):
+        if isinstance(type_anno.value, intermediate.OurTypeAnnotation):
             prop_element = ET.Element(
                 "xs:element",
                 {
@@ -158,7 +158,7 @@ def _define_for_property(
             if len_constraint.max_value is not None:
                 max_occurs = str(len_constraint.max_value)
 
-        if isinstance(type_anno.items, intermediate.OurAtomicTypeAnnotation):
+        if isinstance(type_anno.items, intermediate.OurTypeAnnotation):
             # NOTE (mristin, 2021-11-13):
             # We need to nest the enumerations and concrete classes in the tag
             # element to delineate them in the sequence. On the other hand,
