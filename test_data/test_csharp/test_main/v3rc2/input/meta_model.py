@@ -151,6 +151,7 @@ class Has_extensions(DBC):
 
 @abstract
 @reference_in_the_book(section=(6, 7, 2, 2))
+@serialization(with_model_type=True)
 class Referable(Has_extensions):
     """
     An element that is referable by its :attr:`~ID_short`.
@@ -1872,6 +1873,7 @@ class View(Referable, Has_semantics, Has_data_specification):
 
 @abstract
 @reference_in_the_book(section=(6, 7, 10))
+@serialization(with_model_type=True)
 class Reference(DBC):
     """
     Reference to either a model element of the same or another AAs or to an external

@@ -51,6 +51,7 @@ class _ElementRenderer(
         cref = None  # type: Optional[str]
 
         if isinstance(element.reference, intermediate.PropertyReferenceInDoc):
+            # TODO: this needs to be fixed; think about how we deal with interfaces and classes
             symbol_name = None  # type: Optional[str]
 
             if isinstance(element.reference.symbol, intermediate.Class):

@@ -3,6 +3,7 @@ import abc
 import ast
 import collections
 import enum
+import itertools
 import pathlib
 from typing import (
     Sequence,
@@ -247,75 +248,6 @@ class Argument:
         self.parsed = parsed
 
 
-class SignatureLike(DBC):
-    """
-    Represent a signature-like "something".
-
-    This can be either a class method or a function.
-    """
-    name: Final[Identifier]
-    arguments: Final[Sequence[Argument]]
-    returns: Final[Optional[TypeAnnotation]]
-    description: Final[Optional[Description]]
-    parsed: Final[parse.Method]
-
-    arguments_by_name: Final[Mapping[Identifier, Argument]]
-
-    # fmt: off
-    @require(
-        lambda arguments:
-        all(
-            arg.name != 'self'
-            for arg in arguments
-        ),
-        "No explicit ``self`` argument in the arguments"
-    )
-    @require(
-        lambda arguments: (
-                arg_names := [arg.name for arg in arguments],
-                len(arg_names) == len(set(arg_names))
-        )[1],
-        "Unique arguments"
-    )
-    @ensure(
-        lambda self:
-        len(self.arguments) == len(self.arguments_by_name)
-        and all(
-            (
-                    found_argument := self.arguments_by_name.get(argument.name, None),
-                    found_argument is not None and id(found_argument) == id(argument)
-            )[1]
-            for argument in self.arguments
-        ),
-        "Arguments and arguments-by-name consistent"
-    )
-    # fmt: on
-    def __init__(
-            self,
-            name: Identifier,
-            arguments: Sequence[Argument],
-            returns: Optional[TypeAnnotation],
-            description: Optional[Description],
-            parsed: parse.Method,
-    ) -> None:
-        """Initialize with the given values."""
-        self.name = name
-        self.arguments = arguments
-        self.returns = returns
-        self.description = description
-        self.parsed = parsed
-
-        self.arguments_by_name = {
-            argument.name: argument
-            for argument in self.arguments
-        }
-
-    @abc.abstractmethod
-    def __repr__(self) -> str:
-        # Signal that this is a pure abstract class
-        raise NotImplementedError()
-
-
 class Serialization:
     """Specify the general settings for serialization of an interface or a class."""
 
@@ -377,7 +309,7 @@ class Snapshot:
 
 
 class Contracts:
-    """Represent the set of contracts for a method."""
+    """Represent the set of contracts for a method or a function."""
 
     def __init__(
             self,
@@ -391,8 +323,85 @@ class Contracts:
         self.postconditions = postconditions
 
 
+class SignatureLike(DBC):
+    """
+    Represent a signature-like "something".
+
+    This can be either a class method or a function.
+    """
+    name: Final[Identifier]
+    arguments: Final[Sequence[Argument]]
+    returns: Final[Optional[TypeAnnotation]]
+    description: Final[Optional[Description]]
+    contracts: Final[Contracts]
+
+    # The ``parsed`` must be optional since constructors can be synthesized without
+    # being defined in the original meta-model.
+    parsed: Final[Optional[parse.Method]]
+
+    arguments_by_name: Final[Mapping[Identifier, Argument]]
+
+    # fmt: off
+    @require(
+        lambda arguments:
+        all(
+            arg.name != 'self'
+            for arg in arguments
+        ),
+        "No explicit ``self`` argument in the arguments"
+    )
+    @require(
+        lambda arguments: (
+                arg_names := [arg.name for arg in arguments],
+                len(arg_names) == len(set(arg_names))
+        )[1],
+        "Unique arguments"
+    )
+    @ensure(
+        lambda self:
+        len(self.arguments) == len(self.arguments_by_name)
+        and all(
+            (
+                    found_argument := self.arguments_by_name.get(argument.name, None),
+                    found_argument is not None and id(found_argument) == id(argument)
+            )[1]
+            for argument in self.arguments
+        ),
+        "Arguments and arguments-by-name consistent"
+    )
+    # fmt: on
+    def __init__(
+            self,
+            name: Identifier,
+            arguments: Sequence[Argument],
+            returns: Optional[TypeAnnotation],
+            description: Optional[Description],
+            contracts: Contracts,
+            parsed: parse.Method,
+    ) -> None:
+        """Initialize with the given values."""
+        self.name = name
+        self.arguments = arguments
+        self.returns = returns
+        self.description = description
+        self.contracts = contracts
+        self.parsed = parsed
+
+        self.arguments_by_name = {
+            argument.name: argument
+            for argument in self.arguments
+        }
+
+    @abc.abstractmethod
+    def __repr__(self) -> str:
+        # Signal that this is a pure abstract class
+        raise NotImplementedError()
+
+
 class Method(SignatureLike):
     """Represent a method of a class."""
+
+    parsed: parse.Method
 
     # fmt: off
     @require(
@@ -442,10 +451,9 @@ class Method(SignatureLike):
             arguments=arguments,
             returns=returns,
             description=description,
+            contracts=contracts,
             parsed=parsed
         )
-
-        self.contracts = contracts
 
     @abc.abstractmethod
     def __repr__(self) -> str:
@@ -468,27 +476,15 @@ class ImplementationSpecificMethod(Method):
         )
 
 
-class Constructor:
+class Constructor(SignatureLike):
     """
     Represent an understood constructor of a class stacked.
 
     The constructor is expected to be stacked from the class and all the ancestors.
     """
 
-    #: Arguments of the constructor method
-    arguments: Final[Sequence[Argument]]
-
-    #: Contracts of the constructor method
-    contracts: Final[Contracts]
-
-    #: If set, we need to provide a snippet for the constructor
-    is_implementation_specific: bool
-
     #: Interpreted statements of the constructor, stacked over all the ancestors
     statements: Final[Sequence[construction.AssignArgument]]
-
-    #: Map argument name 🠒 argument
-    arguments_by_name: Final[Mapping[Identifier, Argument]]
 
     # fmt: on
     @require(
@@ -508,22 +504,27 @@ class Constructor:
     # fmt: off
     def __init__(
             self,
+            is_implementation_specific: bool,
             arguments: Sequence[Argument],
             contracts: Contracts,
-            is_implementation_specific: bool,
+            description: Optional[Description],
             statements: Sequence[construction.AssignArgument],
+            parsed: Optional[parse.Method]
     ) -> None:
-        self.arguments = arguments
-        self.contracts = contracts
+        SignatureLike.__init__(
+            self,
+            name=Identifier("__init__"),
+            arguments=arguments,
+            returns=None,
+            description=description,
+            contracts=contracts,
+            parsed=parsed
+        )
+
         self.is_implementation_specific = is_implementation_specific
 
         # The calls to the super constructors must be in-lined before.
         self.statements = statements
-
-        self.arguments_by_name = {
-            argument.name: argument
-            for argument in self.arguments
-        }
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -606,8 +607,27 @@ class ConstrainedPrimitive:
     #: Name of the class
     name: Final[Identifier]
 
-    #: Parent constrained primitive types
-    inheritances: Final[Sequence["ConstrainedPrimitive"]]
+    # region Inheritances
+
+    # NOTE (mristin, 2021-12-24):
+    # We have to decorate inheritances with ``@property`` so that the client code is
+    # forced to use ``set_inheritances``.
+
+    _inheritances: Sequence["Class"]
+
+    @property
+    def inheritances(self) -> Sequence["Class"]:
+        """Return direct parents that this class inherits from."""
+        return self._inheritances
+
+    _inheritance_id_set: FrozenSet[int]
+
+    @property
+    def inheritance_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the inheritance objects in a set."""
+        return self._inheritance_id_set
+
+    # endregion
 
     #: Which primitive type is constrained
     constrainee: PrimitiveType
@@ -634,13 +654,6 @@ class ConstrainedPrimitive:
         lambda parsed: len(parsed.properties) == 0,
         "No properties expected in the constrained primitive type"
     )
-    @require(
-        lambda constrainee, inheritances:
-        all(
-            constrainee == inheritance.constrainee
-            for inheritance in inheritances
-        )
-    )
     # fmt: on
     def __init__(
             self,
@@ -653,7 +666,7 @@ class ConstrainedPrimitive:
             parsed: parse.Class,
     ) -> None:
         self.name = name
-        self.inheritances = inheritances
+        self.set_inheritances(inheritances)
         self.constrainee = constrainee
         self.is_implementation_specific = is_implementation_specific
         self.invariants = invariants
@@ -661,14 +674,26 @@ class ConstrainedPrimitive:
         self.parsed = parsed
 
         self.invariant_id_set = frozenset(id(inv) for inv in self.invariants)
-        self.inheritance_id_set = frozenset(
-            id(inheritance) for inheritance in self.inheritances
-        )
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
         return (
             f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+    # fmt: off
+    @require(
+        lambda inheritances:
+        len(inheritances) == len(set(inheritance.name for inheritance in inheritances)),
+        "No duplicate inheritances"
+    )
+    # fmt: on
+    def set_inheritances(self, inheritances: Sequence["Class"]) -> None:
+        """Set the interfaces in the class."""
+        self._inheritances = inheritances
+
+        self._inheritance_id_set = frozenset(
+            id(inheritance) for inheritance in self._inheritances
         )
 
 
@@ -782,7 +807,7 @@ class Class:
     # fmt: off
     @require(
         lambda inheritances:
-        len(inheritances) == len(set(identifier for identifier in inheritances)),
+        len(inheritances) == len(set(inheritance.name for inheritance in inheritances)),
         "No duplicate inheritances"
     )
     # fmt: on
@@ -826,6 +851,8 @@ Symbol = Union[Enumeration, ConstrainedPrimitive, Class]
 class Verification(SignatureLike):
     """Represent a verification function defined in the meta-model."""
 
+    parsed: parse.Method
+
     # fmt: off
     @require(
         lambda arguments, contracts:
@@ -867,10 +894,9 @@ class Verification(SignatureLike):
             arguments=arguments,
             returns=returns,
             description=description,
+            contracts=contracts,
             parsed=parsed
         )
-
-        self.contracts = contracts
 
     @abc.abstractmethod
     def __repr__(self) -> str:
@@ -1133,9 +1159,9 @@ class SymbolReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
 class PropertyReferenceInDoc:
     """Model a reference to a property, usually used in the docstrings."""
 
-    @require(lambda symbol, prop: id(prop) in symbol.property_id_set)
-    def __init__(self, symbol: Union[Class, Interface], prop: Property) -> None:
-        self.symbol = symbol
+    @require(lambda cls, prop: id(prop) in cls.property_id_set)
+    def __init__(self, cls: Class, prop: Property) -> None:
+        self.cls = cls
         self.prop = prop
 
 
@@ -1273,15 +1299,15 @@ class _ConstructorArgumentOfClass:
 
 
 def make_union_of_constructor_arguments(
-        interface: Interface, implementers: Sequence[Class]
+        cls: Class, concrete_descendants: Sequence[ConcreteClass]
 ) -> Tuple[Optional[OrderedDict[Identifier, TypeAnnotation]], Optional[Error]]:
     """
-    Make a union of all the constructor arguments over all the implementer classes.
+    Make a union of all the constructor arguments over all the concrete classes.
 
     This union is necessary, for example, when you need to de-serialize an object, but
     you are not yet sure which concrete type it has. Hence you need to be prepared to
     de-serialize a yet-unknown *subset* of the properties of *this* union when you start
-    de-serializing an object of type ``interface``.
+    de-serializing an object of type ``cls``.
     """
     errors = []  # type: List[Error]
 
@@ -1290,16 +1316,23 @@ def make_union_of_constructor_arguments(
 
     # region Collect
 
-    for implementer in implementers:
-        for arg in implementer.constructor.arguments:
-            lst = arg_union.get(arg.name, None)
-            if lst is None:
-                lst = []
-                arg_union[arg.name] = lst
+    for cls_arg, arg in itertools.chain(
+            (
+                    (cls, arg)
+                    for arg in cls.constructor.arguments
+            ),
+            (
+                    (descendant, arg)
+                    for descendant in concrete_descendants
+                    for arg in descendant.constructor.arguments
+            )
+    ):
+        lst = arg_union.get(arg.name, None)
+        if lst is None:
+            lst = []
+            arg_union[arg.name] = lst
 
-            lst.append(_ConstructorArgumentOfClass(arg=arg, cls=implementer))
-
-            another_arg = arg_union.get(arg.name, None)
+        lst.append(_ConstructorArgumentOfClass(arg=arg, cls=cls_arg))
 
     # endregion
 
@@ -1377,7 +1410,7 @@ def make_union_of_constructor_arguments(
                         f"of the class {arg_of_cls.cls.name!r} "
                         f"({arg_of_cls.arg.type_annotation}. "
                         f"This is a blocker for generating efficient code for "
-                        f"JSON de-serialization of the interface {interface.name!r} "
+                        f"JSON de-serialization of the interface {cls.name!r} "
                         f"(which both {defining_arg.cls.name!r} and "
                         f"{arg_of_cls.cls.name!r} implement).",
                     )
@@ -1391,9 +1424,9 @@ def make_union_of_constructor_arguments(
 
     if len(errors) > 0:
         return None, Error(
-            interface.parsed.node,
+            cls.parsed.node,
             f"Failed to make a union of constructor arguments "
-            f"over all implementer classes of interface {interface.name}",
+            f"over all the concrete classes of the class {cls.name!r}",
             errors,
         )
 

@@ -19,7 +19,6 @@ class Context:
         model_path: pathlib.Path,
         symbol_table: intermediate.SymbolTable,
         spec_impls: specific_implementations.SpecificImplementations,
-        interface_implementers: intermediate.InterfaceImplementers,
         lineno_columner: LinenoColumner,
         output_dir: pathlib.Path,
     ) -> None:
@@ -27,7 +26,6 @@ class Context:
         self.model_path = model_path
         self.symbol_table = symbol_table
         self.spec_impls = spec_impls
-        self.interface_implementers = interface_implementers
         self.lineno_columner = lineno_columner
         self.output_dir = output_dir
 

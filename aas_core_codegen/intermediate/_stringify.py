@@ -1,4 +1,8 @@
 """Stringify the intermediate representation."""
+
+# TODO-BEFORE-RELEASE (mristin, 2021-12-24):
+# This needs to be completely updated once the implementation is not in that much flux.
+
 from typing import Union, Optional
 
 from aas_core_codegen import stringify
@@ -13,10 +17,8 @@ from aas_core_codegen.intermediate._types import (
     Default,
     Enumeration,
     EnumerationLiteral,
-    Interface,
     Method,
     Property,
-    Signature,
     Snapshot,
     SubscriptedTypeAnnotation,
     Symbol,
@@ -161,30 +163,6 @@ def _stringify_serialization(serialization: Serialization) -> stringify.Entity:
     return result
 
 
-def _stringify_signature(signature: Signature) -> stringify.Entity:
-    result = stringify.Entity(
-        name=Signature.__name__,
-        properties=[
-            stringify.Property("name", signature.name),
-            stringify.Property(
-                "arguments",
-                [_stringify_argument(argument) for argument in signature.arguments],
-            ),
-            stringify.Property(
-                "returns",
-                None if signature.returns is None else _stringify(signature.returns),
-            ),
-            stringify.Property(
-                "description", _stringify_description(signature.description)
-            ),
-            stringify.PropertyEllipsis("parsed", signature.parsed),
-        ],
-    )
-
-    stringify.assert_compares_against_dict(result, signature)
-    return result
-
-
 def _stringify_property(prop: Property) -> stringify.Entity:
     result = stringify.Entity(
         name=Property.__name__,
@@ -197,34 +175,6 @@ def _stringify_property(prop: Property) -> stringify.Entity:
     )
 
     stringify.assert_compares_against_dict(result, prop)
-    return result
-
-
-def _stringify_interface(interface: Interface) -> stringify.Entity:
-    result = stringify.Entity(
-        name=Interface.__name__,
-        properties=[
-            stringify.Property("name", interface.name),
-            stringify.Property(
-                "inheritances",
-                [
-                    f"reference to {inheritance}"
-                    for inheritance in interface.inheritances
-                ],
-            ),
-            stringify.Property(
-                "signatures",
-                [_stringify_signature(signature) for signature in interface.signatures],
-            ),
-            stringify.Property(
-                "properties",
-                [_stringify_property(prop) for prop in interface.properties],
-            ),
-            stringify.PropertyEllipsis("parsed", interface.parsed),
-        ],
-    )
-
-    stringify.assert_compares_against_dict(result, interface)
     return result
 
 
@@ -498,13 +448,11 @@ Dumpable = Union[
     Enumeration,
     EnumerationLiteral,
     ImplementationSpecificVerification,
-    Interface,
     Invariant,
     MetaModel,
     Method,
     Property,
     Serialization,
-    Signature,
     Snapshot,
     SubscriptedTypeAnnotation,
     Symbol,
@@ -535,22 +483,16 @@ def _stringify(dumpable: Dumpable) -> stringify.Entity:
         stringified = _stringify_enumeration(dumpable)
     elif isinstance(dumpable, EnumerationLiteral):
         stringified = _stringify_enumeration_literal(dumpable)
-    elif isinstance(dumpable, Interface):
-        stringified = _stringify_interface(dumpable)
     elif isinstance(dumpable, Invariant):
         stringified = _stringify_invariant(dumpable)
     elif isinstance(dumpable, Method):
         stringified = _stringify_method(dumpable)
     elif isinstance(dumpable, Property):
         stringified = _stringify_property(dumpable)
-    elif isinstance(dumpable, Signature):
-        stringified = _stringify_signature(dumpable)
     elif isinstance(dumpable, Serialization):
         stringified = _stringify_serialization(dumpable)
     elif isinstance(dumpable, Snapshot):
         stringified = _stringify_snapshot(dumpable)
-    elif isinstance(dumpable, Interface):
-        stringified = _stringify_interface(interface=dumpable)
     elif isinstance(dumpable, Enumeration):
         stringified = _stringify_enumeration(enumeration=dumpable)
     elif isinstance(dumpable, Class):

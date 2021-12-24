@@ -29,25 +29,19 @@ def first_not_in_topological_order(
     observed = set()  # type: Set[parse.Class]
     for cls in classes:
         for parent_name in cls.inheritances:
+            # We ignore here the initial set of the constrained primitives.
+            if parent_name in parse.PRIMITIVE_TYPES:
+                assert len(cls.inheritances) == 1, (
+                    f"A constrained primitive type in the initial set should only "
+                    f"inherit from the primitive type. {cls.name=}"
+                )
+                continue
+
             parent = parsed_symbol_table.must_find_class(parent_name)
             if parent not in observed:
                 return cls
 
         observed.add(cls)
-
-    return None
-
-
-def expect_no_key_error(callable: Callable[[], Any]) -> Optional[KeyError]:
-    """
-    Execute the ``callable`` and return the key error, if any.
-
-    This function is meant to be used for the post-conditions.
-    """
-    try:
-        callable()
-    except KeyError as key_error:
-        return key_error
 
     return None
 
@@ -65,7 +59,7 @@ class _UnverifiedOntology:
     classes: Final[Sequence[parse.Class]]
 
     #: Map class 🠒 topologically sorted ancestors
-    _ancestors_of: Final[Mapping[parse.Class, Sequence[parse.AbstractClass]]]
+    _ancestors_of: Final[Mapping[parse.Class, Sequence[parse.Class]]]
 
     _descendants_of: Final[Mapping[parse.Class, Sequence[parse.Class]]]
 
@@ -85,18 +79,18 @@ class _UnverifiedOntology:
     @ensure(
         lambda self:
         all(
-            expect_no_key_error(lambda: self.list_descendants_of(cls))
+            self.can_list_descendants(cls)
             for cls in self.classes
         ),
-        "The ``descendants_of`` defined for all classes"
+        "The descendants` defined for all classes"
     )
     @ensure(
         lambda self:
         all(
-            expect_no_key_error(lambda: self.list_ancestors_of(cls))
+            self.can_list_ancestors(cls)
             for cls in self.classes
         ),
-        "The ``ancestors_of`` defined for all classes"
+        "The ancestors defined for all classes"
     )
     @ensure(
         lambda self, parsed_symbol_table: all(
@@ -116,11 +110,23 @@ class _UnverifiedOntology:
 
         ancestors_of = (
             dict()
-        )  # type: MutableMapping[parse.Class, List[parse.AbstractClass]]
+        )  # type: MutableMapping[parse.Class, List[parse.Class]]
 
         order_of = {cls: i for i, cls in enumerate(classes)}
 
         for cls in classes:
+            if any(
+                parent_name in parse.PRIMITIVE_TYPES
+                for parent_name in cls.inheritances
+            ):
+                assert len(cls.inheritances) == 1, (
+                    f"A constrained primitive type in the initial set should only "
+                    f"inherit from the primitive type. {cls.name=}"
+                )
+                ancestors_of[cls] = []
+
+                continue
+
             parents = [
                 parsed_symbol_table.must_find_class(parent_name)
                 for parent_name in cls.inheritances
@@ -130,7 +136,7 @@ class _UnverifiedOntology:
 
             sorted_parents = sorted(parents_with_order, key=lambda item: item[0])
 
-            class_ancestors = []  # type: List[parse.AbstractClass]
+            class_ancestors = []  # type: List[parse.Class]
             for _, parent in sorted_parents:
                 assert parent in ancestors_of, (
                     f"Expected to process all the parent's of the class {cls.name} "
@@ -139,11 +145,6 @@ class _UnverifiedOntology:
                 )
 
                 class_ancestors.extend(ancestors_of[parent])
-
-                assert isinstance(parent, parse.AbstractClass), (
-                    f"Expected the parent of {cls.name} to be "
-                    f"an abstract class, but got: {parent}"
-                )
 
                 class_ancestors.append(parent)
 
@@ -172,7 +173,11 @@ class _UnverifiedOntology:
 
         # endregion
 
-    def list_ancestors(self, cls: parse.Class) -> Sequence[parse.AbstractClass]:
+    def can_list_ancestors(self, cls: parse.Class) -> bool:
+        """Return ``True`` if there is a record of the ``cls``'s ancestors."""
+        return cls in self._ancestors_of
+
+    def list_ancestors(self, cls: parse.Class) -> Sequence[parse.Class]:
         """Retrieve the ancestors of the given class ``cls``."""
         result = self._ancestors_of.get(cls, None)
         if result is None:
@@ -181,6 +186,11 @@ class _UnverifiedOntology:
             )
 
         return result
+
+    def can_list_descendants(self, cls: parse.Class) -> bool:
+        """Return ``True`` if there is a record of the ``cls``'s descendants."""
+        return cls in self._descendants_of
+
 
     def list_descendants(self, cls: parse.Class) -> Sequence[parse.Class]:
         """Retrieve the descendants of the given class ``cls``."""
@@ -251,7 +261,7 @@ def _topologically_sort(
                 continue
 
             a_symbol = parsed_symbol_table.must_find(an_identifier)
-            assert isinstance(a_symbol, parse.AbstractClass)
+            assert isinstance(a_symbol, parse.Class)
 
             visit(cls=a_symbol)
 

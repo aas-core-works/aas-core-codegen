@@ -152,10 +152,6 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
         return 1
 
-    interface_implementers = intermediate.map_interface_implementers(
-        symbol_table=ir_symbol_table
-    )
-
     # endregion
 
     # region Dispatch
@@ -164,7 +160,6 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         model_path=params.model_path,
         symbol_table=ir_symbol_table,
         spec_impls=spec_impls,
-        interface_implementers=interface_implementers,
         lineno_columner=lineno_columner,
         output_dir=params.output_dir,
     )

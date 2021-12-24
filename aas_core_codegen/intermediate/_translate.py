@@ -14,7 +14,7 @@ from typing import (
     Iterator,
     TypeVar,
     Generic,
-    cast, Final, Set, )
+    cast, Final, Set, Any, Type, )
 
 import asttokens
 import docutils.nodes
@@ -61,7 +61,8 @@ from aas_core_codegen.intermediate._types import (
     RefTypeAnnotation,
     ImplementationSpecificMethod,
     ImplementationSpecificVerification, Verification, PatternVerification,
-    ArgumentReferenceInDoc, ConstrainedPrimitive, ConcreteClass,
+    ArgumentReferenceInDoc, ConstrainedPrimitive, ConcreteClass, AbstractClass,
+    SignatureLike,
 )
 from aas_core_codegen.parse import (
     tree as parse_tree
@@ -84,7 +85,7 @@ def _symbol_reference_role(
     #
     # We have to resolve the placeholders in the second pass of the translation with
     # the actual references to the symbol table.
-    symbol = _PlaceholderSymbol(identifier=text)
+    symbol = _PlaceholderSymbol(name=text)
 
     # noinspection PyTypeChecker
     node = SymbolReferenceInDoc(
@@ -196,9 +197,9 @@ def _parsed_description_to_description(parsed: parse.Description) -> Description
 class _PlaceholderSymbol:
     """Reference something which will be resolved once the table is built."""
 
-    def __init__(self, identifier: str) -> None:
+    def __init__(self, name: str) -> None:
         """Initialize with the given values."""
-        self.identifier = identifier
+        self.name = name
 
 
 def _parsed_enumeration_to_enumeration(parsed: parse.Enumeration) -> Enumeration:
@@ -223,7 +224,7 @@ def _parsed_enumeration_to_enumeration(parsed: parse.Enumeration) -> Enumeration
         is_superset_of=cast(
             List[Enumeration],
             [
-                _PlaceholderSymbol(identifier=identifier)
+                _PlaceholderSymbol(name=identifier)
                 for identifier in parsed.is_superset_of
             ],
         ),
@@ -259,7 +260,7 @@ def _parsed_type_annotation_to_type_annotation(
 
         # noinspection PyTypeChecker
         return OurTypeAnnotation(
-            symbol=_PlaceholderSymbol(identifier=parsed.identifier),  # type: ignore
+            symbol=_PlaceholderSymbol(name=parsed.identifier),  # type: ignore
             parsed=parsed,
         )
 
@@ -514,6 +515,9 @@ class _SettingWithSource(Generic[T]):
         self.value = value
         self.source = source
 
+    def __repr__(self) -> str:
+        return f"_SettingWithSource(value={self.value!r}, source={self.source.name!r})"
+
 
 # fmt: off
 @ensure(
@@ -545,23 +549,44 @@ def _resolve_serializations(
         dict()
     )  # type: MutableMapping[Identifier, Optional[_SettingWithSource]]
 
-    for cls in ontology.classes:
-        assert cls.name not in with_model_type_map, (
+    for parsed_cls in ontology.classes:
+        if any(
+                parent_name in parse.PRIMITIVE_TYPES
+                for parent_name in parsed_cls.inheritances
+        ):
+            assert len(parsed_cls.inheritances) == 1, (
+                f"A constrained primitive type in the initial set should only "
+                f"inherit from the primitive type. {parsed_cls.name=}"
+            )
+
+            # We can not steer how constrained primitives are serialized as they will be
+            # serialized according to their underlying primitive type.
+
+            with_model_type_map[parsed_cls.name] = None
+            continue
+
+        assert parsed_cls.name not in with_model_type_map, (
             f"Expected the ontology to be a correctly linearized DAG, "
-            f"but the class {cls.name!r} has been already visited before"
+            f"but the class {parsed_cls.name!r} has been already visited before"
         )
 
         settings = []  # type: List[_SettingWithSource[bool]]
 
-        if cls.serialization is not None and cls.serialization.with_model_type:
+        if (
+                parsed_cls.serialization is not None
+                and parsed_cls.serialization.with_model_type
+        ):
             settings.append(
-                _SettingWithSource(value=cls.serialization.with_model_type, source=cls)
+                _SettingWithSource(
+                    value=parsed_cls.serialization.with_model_type,
+                    source=parsed_cls
+                )
             )
 
-        for inheritance in cls.inheritances:
+        for inheritance in parsed_cls.inheritances:
             assert inheritance in with_model_type_map, (
                 f"Expected the ontology to be a correctly linearized DAG, "
-                f"but the inheritance {inheritance!r} of the class {cls.name!r} "
+                f"but the inheritance {inheritance!r} of the class {parsed_cls.name!r} "
                 f"has not been visited before."
             )
 
@@ -583,14 +608,16 @@ def _resolve_serializations(
                     # points for a viable error recovery.
 
                     return None, Error(
-                        cls.node,
+                        parsed_cls.node,
                         f"The serialization setting ``with_model_type`` "
                         f"between the class {setting.source} "
                         f"and {settings[0].source} is "
                         f"inconsistent",
                     )
 
-        with_model_type_map[cls.name] = None if len(settings) == 0 else settings[0]
+        with_model_type_map[parsed_cls.name] = (
+            None if len(settings) == 0 else settings[0]
+        )
 
     # endregion
 
@@ -760,7 +787,7 @@ def _determine_constrained_primitives_by_name(
     for identifier, constrainee in initial_map.items():
         result[identifier] = constrainee
 
-    for identifier, constrainee, _ in extended_map.items():
+    for identifier, (constrainee, _) in extended_map.items():
         result[identifier] = constrainee
 
     # endregion
@@ -855,26 +882,21 @@ def _determine_constrained_primitives_by_name(
 
 
 def _stack_invariants(
-        parsed_symbol_table: parse.SymbolTable,
         ontology: _hierarchy.Ontology,
 ) -> MutableMapping[Identifier, List[Invariant]]:
     """Determine invariants for all the classes by stacking them from the ancestors."""
     invariants_map = collections.OrderedDict(
     )  # type: MutableMapping[Identifier, List[Invariant]]
 
-    for cls_identifier in ontology.classes:
+    for parsed_cls in ontology.classes:
         # NOTE (mristin, 2021-12-14):
         # We assume here that classes in the ontology are sorted
         # in the topological order.
 
-        assert isinstance(cls_identifier, Identifier)
-
-        invariants = invariants_map.get(cls_identifier, None)
+        invariants = invariants_map.get(parsed_cls.name, None)
         if invariants is None:
             invariants = []
-            invariants_map[cls_identifier] = invariants
-
-        parsed_cls = parsed_symbol_table.must_find_class(cls_identifier)
+            invariants_map[parsed_cls.name] = invariants
 
         invariants.extend(
             Invariant(
@@ -916,23 +938,22 @@ def _parsed_class_to_constrained_primitive(
     :py:function:`_stack_invariants`.
     """
     # noinspection PyTypeChecker
-    return (
-        ConstrainedPrimitive(
-            name=parsed.name,
-            inheritances=[
-                _PlaceholderSymbol(inheritance) for inheritance in parsed.inheritances
-            ],
-            constrainee=constrainee,
-            is_implementation_specific=parsed.is_implementation_specific,
-            invariants=invariants,
-            description=(
-                _parsed_description_to_description(parsed.description)
-                if parsed.description is not None
-                else None
-            ),
-            parsed=parsed,
+    return ConstrainedPrimitive(
+        name=parsed.name,
+        inheritances=[
+            _PlaceholderSymbol(inheritance)
+            for inheritance in parsed.inheritances
+            if inheritance not in parse.PRIMITIVE_TYPES
+        ],
+        constrainee=constrainee,
+        is_implementation_specific=parsed.is_implementation_specific,
+        invariants=invariants,
+        description=(
+            _parsed_description_to_description(parsed.description)
+            if parsed.description is not None
+            else None
         ),
-        None,
+        parsed=parsed,
     )
 
 
@@ -1004,10 +1025,20 @@ def _parsed_class_to_class(
         )
 
     ctor = Constructor(
+        is_implementation_specific=init_is_implementation_specific,
         arguments=arguments,
         contracts=contracts,
-        is_implementation_specific=init_is_implementation_specific,
+        description=(
+            parsed_class_init.description
+            if parsed_class_init is not None
+            else None
+        ),
         statements=in_lined_constructors[parsed],
+        parsed=(
+            parsed_class_init
+            if parsed_class_init is not None
+            else None
+        )
     )
 
     # endregion
@@ -1040,27 +1071,33 @@ def _parsed_class_to_class(
         _PlaceholderSymbol(inheritance) for inheritance in parsed.inheritances
     ]
 
-    # TODO: change the constructor depending on the type in parse stage
+    factory_to_use = None  # type: Optional[Type[Class]]
+
+    if isinstance(parsed, parse.ConcreteClass):
+        factory_to_use = ConcreteClass
+    elif isinstance(parsed, parse.AbstractClass):
+        factory_to_use = AbstractClass
+    else:
+        assert_never(parsed)
+
+    assert factory_to_use is not None
 
     # noinspection PyTypeChecker
-    return (
-        Class(
-            name=parsed.name,
-            inheritances=inheritances,
-            is_implementation_specific=parsed.is_implementation_specific,
-            properties=properties,
-            methods=methods,
-            constructor=ctor,
-            invariants=invariants,
-            serialization=serializations[parsed],
-            description=(
-                _parsed_description_to_description(parsed.description)
-                if parsed.description is not None
-                else None
-            ),
-            parsed=parsed,
+    return factory_to_use(
+        name=parsed.name,
+        inheritances=inheritances,
+        is_implementation_specific=parsed.is_implementation_specific,
+        properties=properties,
+        methods=methods,
+        constructor=ctor,
+        invariants=invariants,
+        serialization=serializations[parsed],
+        description=(
+            _parsed_description_to_description(parsed.description)
+            if parsed.description is not None
+            else None
         ),
-        None,
+        parsed=parsed,
     )
 
 
@@ -1153,8 +1190,10 @@ def _over_our_type_annotations(
     """Iterate over all the atomic type annotations in the ``something``."""
     if isinstance(something, PrimitiveTypeAnnotation):
         pass
+
     elif isinstance(something, OurTypeAnnotation):
         yield something
+
     elif isinstance(something, SubscriptedTypeAnnotation):
         if isinstance(something, ListTypeAnnotation):
             yield from _over_our_type_annotations(something.items)
@@ -1164,6 +1203,9 @@ def _over_our_type_annotations(
             yield from _over_our_type_annotations(something.value)
         else:
             assert_never(something)
+
+    elif isinstance(something, ConstrainedPrimitive):
+        pass
 
     elif isinstance(something, Class):
         for prop in something.properties:
@@ -1288,17 +1330,17 @@ def _second_pass_to_resolve_symbols_in_atomic_types_in_place(
                 our_type_annotation.symbol, _PlaceholderSymbol
             ), "Expected only placeholder symbols to be assigned in the first pass"
 
-            if not IDENTIFIER_RE.match(our_type_annotation.symbol.identifier):
+            if not IDENTIFIER_RE.match(our_type_annotation.symbol.name):
                 errors.append(
                     Error(
                         our_type_annotation.parsed.node,
                         f"The symbol is invalid: "
-                        f"{our_type_annotation.symbol.identifier!r}",
+                        f"{our_type_annotation.symbol.name!r}",
                     )
                 )
                 continue
 
-            identifier = Identifier(our_type_annotation.symbol.identifier)
+            identifier = Identifier(our_type_annotation.symbol.name)
             referenced_symbol = symbol_table.find(
                 identifier)
             if referenced_symbol is None:
@@ -1320,7 +1362,19 @@ def _over_descriptions_in_symbol(
         symbol: Symbol
 ) -> Iterator[Description]:
     """Iterate over all the descriptions from the ``something``."""
-    if isinstance(symbol, Class):
+    if isinstance(symbol, Enumeration):
+        if symbol.description is not None:
+            yield symbol.description
+
+        for literal in symbol.literals:
+            if literal.description is not None:
+                yield literal.description
+
+    elif isinstance(symbol, ConstrainedPrimitive):
+        if symbol.description is not None:
+            yield symbol.description
+
+    elif isinstance(symbol, Class):
         if symbol.description is not None:
             yield symbol.description
 
@@ -1331,14 +1385,6 @@ def _over_descriptions_in_symbol(
         for method in symbol.methods:
             if method.description is not None:
                 yield method.description
-
-    elif isinstance(symbol, Enumeration):
-        if symbol.description is not None:
-            yield symbol.description
-
-        for literal in symbol.literals:
-            if literal.description is not None:
-                yield literal.description
 
     elif isinstance(symbol, Description):
         for node in symbol.document.traverse(condition=SymbolReferenceInDoc):
@@ -1385,7 +1431,7 @@ def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
             if not isinstance(symbol_ref_in_doc.symbol, _PlaceholderSymbol):
                 continue
 
-            raw_identifier = symbol_ref_in_doc.symbol.identifier
+            raw_identifier = symbol_ref_in_doc.symbol.name
             if not raw_identifier.startswith("."):
                 errors.append(
                     Error(
@@ -1549,7 +1595,7 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
                         )
                         continue
 
-                    reference = PropertyReferenceInDoc(symbol=target_symbol, prop=prop)
+                    reference = PropertyReferenceInDoc(cls=target_symbol, prop=prop)
 
                 else:
                     assert_never(target_symbol)
@@ -1614,6 +1660,9 @@ def _over_arguments(
         if isinstance(symbol, Enumeration):
             continue
 
+        elif isinstance(symbol, ConstrainedPrimitive):
+            continue
+
         elif isinstance(symbol, Class):
             for method in symbol.methods:
                 yield from method.arguments
@@ -1674,7 +1723,7 @@ def _second_pass_to_resolve_supersets_of_enumerations_in_place(
             )
 
             referenced_symbol = symbol_table.find(
-                name=Identifier(placeholder.identifier)
+                name=Identifier(placeholder.name)
             )
 
             if referenced_symbol is None:
@@ -1682,7 +1731,7 @@ def _second_pass_to_resolve_supersets_of_enumerations_in_place(
                     Error(
                         symbol.parsed.node,
                         f"The subset enumeration in ``is_superset_of`` has "
-                        f"not been defined: {placeholder.identifier}",
+                        f"not been defined: {placeholder.name}",
                     )
                 )
                 continue
@@ -1691,7 +1740,7 @@ def _second_pass_to_resolve_supersets_of_enumerations_in_place(
                 errors.append(
                     Error(
                         symbol.parsed.node,
-                        f"An element, {placeholder.identifier}, of ``is_superset_of`` is "
+                        f"An element, {placeholder.name}, of ``is_superset_of`` is "
                         f"not an Enumeration, but: {type(referenced_symbol)}",
                     )
                 )
@@ -1740,26 +1789,46 @@ def _second_pass_to_resolve_resulting_class_of_implemented_for(
         if isinstance(symbol, Enumeration):
             continue
 
-        for prop in symbol.properties:
-            assert isinstance(prop.implemented_for, _PlaceholderSymbol), (
-                f"Expected the placeholder symbol for ``implemented_for`` in "
-                f"the property {prop} of {symbol}, but got: {prop.implemented_for}"
-            )
+        elif isinstance(symbol, ConstrainedPrimitive):
+            continue
 
-            prop.implemented_for = symbol_table.must_find(
-                Identifier(prop.implemented_for.identifier)
-            )
+        elif isinstance(symbol, Class):
+            for prop in symbol.properties:
+                assert isinstance(prop.implemented_for, _PlaceholderSymbol), (
+                    f"Expected the placeholder symbol for ``implemented_for`` in "
+                    f"the property {prop} of {symbol}, but got: {prop.implemented_for}"
+                )
+
+                prop.implemented_for = symbol_table.must_find(
+                    Identifier(prop.implemented_for.name)
+                )
+        else:
+            assert_never(symbol)
 
 
 def _second_pass_to_resolve_inheritances_in_place(
         symbol_table: _SymbolTableBeforeMappingConcreteDescendants
 ) -> None:
     """Resolve the class references in the class inheritances in-place."""
-    errors = []  # type: List[Error]
-
     for symbol in symbol_table.symbols:
         if isinstance(symbol, Enumeration):
             continue
+
+        elif isinstance(symbol, ConstrainedPrimitive):
+            resolved_inheritances = []  # type: List[ConstrainedPrimitive]
+            for inheritance in symbol.inheritances:
+                assert isinstance(inheritance, _PlaceholderSymbol)
+
+                inheritance_symbol = symbol_table.must_find(
+                    Identifier(inheritance.name)
+                )
+
+                assert isinstance(inheritance_symbol, ConstrainedPrimitive)
+
+                resolved_inheritances.append(inheritance_symbol)
+
+            symbol.set_inheritances(resolved_inheritances)
+
 
         elif isinstance(symbol, Class):
             resolved_inheritances = []  # type: List[Class]
@@ -1767,7 +1836,7 @@ def _second_pass_to_resolve_inheritances_in_place(
                 assert isinstance(inheritance, _PlaceholderSymbol)
 
                 inheritance_symbol = symbol_table.must_find(
-                    Identifier(inheritance.identifier)
+                    Identifier(inheritance.name)
                 )
 
                 resolved_inheritances.append(inheritance_symbol)
@@ -1814,6 +1883,9 @@ def _collect_ids_of_classes_in_properties(symbol_table: SymbolTable) -> Set[int]
     result = set()  # type: Set[int]
     for symbol in symbol_table.symbols:
         if isinstance(symbol, Enumeration):
+            continue
+
+        elif isinstance(symbol, ConstrainedPrimitive):
             continue
 
         elif isinstance(symbol, Class):
@@ -1981,6 +2053,23 @@ def _check_all_non_optional_properties_initialized(
     return errors
 
 
+def _over_signature_likes(symbol_table: SymbolTable) -> Iterator[SignatureLike]:
+    """Iterate over all signature-like instances in the symbol table."""
+    yield from symbol_table.verification_functions
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, Enumeration):
+            pass
+        elif isinstance(symbol, ConstrainedPrimitive):
+            pass
+        elif isinstance(symbol, Class):
+            yield from symbol.methods
+
+            yield symbol.constructor
+        else:
+            assert_never(symbol)
+
+
 def _verify(
         symbol_table: SymbolTable
 ) -> List[Error]:
@@ -2018,7 +2107,7 @@ def _verify(
                     )
 
                 for descendant in concrete_descendants:
-                    if descendant.serialization.with_model_type is not None:
+                    if not descendant.serialization.with_model_type:
                         errors.append(
                             Error(
                                 descendant.parsed.node,
@@ -2037,21 +2126,11 @@ def _verify(
     contract_checker = _ContractChecker(
         symbol_table=symbol_table)
 
-    all_methods = list(
-        itertools.chain(
-            symbol_table.verification_functions,
-            (
-                symbol.methods
-                for symbol in symbol_table.symbols
-            )
-        )
-    )
-
-    for method in all_methods:
+    for signature_like in _over_signature_likes(symbol_table):
         for contract_or_snapshot in itertools.chain(
-                method.contracts.preconditions,
-                method.contracts.postconditions,
-                method.contracts.snapshots
+                signature_like.contracts.preconditions,
+                signature_like.contracts.postconditions,
+                signature_like.contracts.snapshots
         ):
             contract_checker.visit(contract_or_snapshot.body)
 
@@ -2075,23 +2154,37 @@ def _verify(
 
     # region Check that all argument references are valid
 
-    for method in all_methods:
-        if method.description is not None:
-            for arg_ref_in_doc in method.description.document.traverse(
+    for signature_like in _over_signature_likes(symbol_table):
+        if signature_like.description is not None:
+            for arg_ref_in_doc in signature_like.description.document.traverse(
                     condition=ArgumentReferenceInDoc
             ):
                 assert isinstance(arg_ref_in_doc.reference, str)
                 arg_name = arg_ref_in_doc.reference
 
-                if arg_name not in method.arguments_by_name:
+                if arg_name not in signature_like.arguments_by_name:
                     errors.append(
                         Error(
-                            method.description.node,
+                            signature_like.description.node,
                             f"The argument referenced in the docstring "
                             f"is not an argument "
-                            f"of {method.name!r}: {arg_name!r}"
+                            f"of {signature_like.name!r}: {arg_name!r}"
                         )
                     )
+
+    # endregion
+
+    # region Assert that constrainees are consistent among ancestors
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, ConstrainedPrimitive):
+            continue
+
+        for inheritance in symbol.inheritances:
+            assert inheritance.constrainee == symbol.constrainee, (
+                f"{inheritance=}, {inheritance.constrainee=}, "
+                f"{symbol=}, {symbol.constrainee=}"
+            )
 
     # endregion
 
@@ -2191,7 +2284,6 @@ def translate(
     # endregion
 
     invariants_map = _stack_invariants(
-        parsed_symbol_table=parsed_symbol_table,
         ontology=ontology
     )
 
