@@ -12,10 +12,9 @@ from typing import (
     Tuple,
     Union,
     Iterator,
-    Generator,
     TypeVar,
     Generic,
-    cast, Final, )
+    cast, Final, Set, )
 
 import asttokens
 import docutils.nodes
@@ -36,8 +35,6 @@ from aas_core_codegen.intermediate._types import (
     Argument,
     Default,
     DefaultConstant,
-    Interface,
-    Signature,
     Property,
     Invariant,
     Contracts,
@@ -62,10 +59,9 @@ from aas_core_codegen.intermediate._types import (
     PropertyReferenceInDoc,
     MetaModel,
     RefTypeAnnotation,
-    collect_ids_of_interfaces_in_properties,
-    map_interface_implementers, ImplementationSpecificMethod,
+    ImplementationSpecificMethod,
     ImplementationSpecificVerification, Verification, PatternVerification,
-    ArgumentReferenceInDoc, ConstrainedPrimitive,
+    ArgumentReferenceInDoc, ConstrainedPrimitive, ConcreteClass,
 )
 from aas_core_codegen.parse import (
     tree as parse_tree
@@ -350,53 +346,6 @@ def _parsed_arguments_to_arguments(parsed: Sequence[parse.Argument]) -> List[Arg
         for parsed_arg in parsed
         if not isinstance(parsed_arg.type_annotation, parse.SelfTypeAnnotation)
     ]
-
-
-def _parsed_class_to_interface(
-        parsed: parse.Class, serializations: Mapping[parse.Class, Serialization]
-) -> Interface:
-    """Translate a class of a meta-model to an intermediate interface."""
-    # noinspection PyTypeChecker
-    return Interface(
-        name=parsed.name,
-        inheritances=[
-            _PlaceholderSymbol(inheritance) for inheritance in parsed.inheritances
-        ],
-        signatures=[
-            Signature(
-                name=parsed_method.name,
-                arguments=_parsed_arguments_to_arguments(
-                    parsed=parsed_method.arguments
-                ),
-                returns=(
-                    None
-                    if parsed_method.returns is None
-                    else _parsed_type_annotation_to_type_annotation(
-                        parsed_method.returns
-                    )
-                ),
-                description=(
-                    _parsed_description_to_description(parsed_method.description)
-                    if parsed_method.description is not None
-                    else None
-                ),
-                parsed=parsed_method,
-            )
-            for parsed_method in parsed.methods
-            if parsed_method.name != "__init__"
-        ],
-        properties=[
-            _parsed_property_to_property(parsed=parsed_prop, cls=parsed)
-            for parsed_prop in parsed.properties
-        ],
-        serialization=serializations[parsed],
-        description=(
-            _parsed_description_to_description(parsed.description)
-            if parsed.description is not None
-            else None
-        ),
-        parsed=parsed,
-    )
 
 
 def _parsed_property_to_property(parsed: parse.Property, cls: parse.Class) -> Property:
@@ -988,24 +937,18 @@ def _parsed_class_to_constrained_primitive(
 
 
 def _parsed_class_to_class(
-        parsed: parse.ConcreteClass,
+        parsed: parse.Class,
         ontology: _hierarchy.Ontology,
         serializations: Mapping[parse.Class, Serialization],
         invariants: Sequence[Invariant],
         in_lined_constructors: Mapping[
             parse.Class, Sequence[construction.AssignArgument]],
-        implements_its_own_interface: bool
 ) -> Class:
     """
     Translate a concrete parsed class to an intermediate class.
 
     The ``invariants`` are determined by stacking in
     :py:function:`_stack_invariants`.
-
-    If ``implements_its_own_interface`` is set then the class has one or more
-    descendants in the ontology. To avoid problems with the multiple inheritance in
-    different implementations, we introduced an interface of this class as well
-    which it also needs to implement.
     """
     ancestors = ontology.list_ancestors(cls=parsed)
 
@@ -1093,18 +1036,17 @@ def _parsed_class_to_class(
 
     # endregion
 
-    interfaces = [
+    inheritances = [
         _PlaceholderSymbol(inheritance) for inheritance in parsed.inheritances
     ]
 
-    if implements_its_own_interface:
-        interfaces.append(_PlaceholderSymbol(parsed.name))
+    # TODO: change the constructor depending on the type in parse stage
 
     # noinspection PyTypeChecker
     return (
         Class(
             name=parsed.name,
-            interfaces=interfaces,
+            inheritances=inheritances,
             is_implementation_specific=parsed.is_implementation_specific,
             properties=properties,
             methods=methods,
@@ -1206,7 +1148,7 @@ def _parsed_verification_function_to_verification_function(
 
 
 def _over_our_type_annotations(
-        something: Union[Class, Interface, TypeAnnotation]
+        something: Union[Class, TypeAnnotation]
 ) -> Iterator[OurTypeAnnotation]:
     """Iterate over all the atomic type annotations in the ``something``."""
     if isinstance(something, PrimitiveTypeAnnotation):
@@ -1237,64 +1179,391 @@ def _over_our_type_annotations(
         for argument in something.constructor.arguments:
             yield from _over_our_type_annotations(argument.type_annotation)
 
-    elif isinstance(something, Interface):
-        for prop in something.properties:
-            yield from _over_our_type_annotations(prop.type_annotation)
-
-        for signature in something.signatures:
-            for argument in signature.arguments:
-                yield from _over_our_type_annotations(argument.type_annotation)
-
-            if signature.returns is not None:
-                yield from _over_our_type_annotations(signature.returns)
-
-
-def _over_descriptions(
-        something: Union[Class, Interface, Enumeration]
-) -> Iterator[Description]:
-    """Iterate over all the descriptions from the ``something``."""
-    if isinstance(something, Class):
-        if something.description is not None:
-            yield something.description
-
-        for prop in something.properties:
-            if prop.description is not None:
-                yield prop.description
-
-        for method in something.methods:
-            if method.description is not None:
-                yield method.description
-
-    elif isinstance(something, Interface):
-        if something.description is not None:
-            yield something.description
-
-        for prop in something.properties:
-            if prop.description is not None:
-                yield prop.description
-
-        for signature in something.signatures:
-            if signature.description is not None:
-                yield signature.description
-
-    elif isinstance(something, Enumeration):
-        if something.description is not None:
-            yield something.description
-
-        for literal in something.literals:
-            if literal.description is not None:
-                yield literal.description
-
-    elif isinstance(something, Description):
-        for node in something.document.traverse(condition=SymbolReferenceInDoc):
-            yield something, node
     else:
         assert_never(something)
 
 
+class _SymbolTableBeforeMappingConcreteDescendants:
+    """Represent all the symbols just before we resolved the inheritances."""
+
+    #: List of all symbols that we need for the code generation
+    symbols: Final[Sequence[Symbol]]
+
+    #: List of all functions used in the verification
+    verification_functions: Final[Sequence[Verification]]
+
+    #: Map verification functions by their name
+    verification_functions_by_name: Final[Mapping[Identifier, Verification]]
+
+    #: Type to be used to represent a ``Ref[T]``
+    ref_association: Final[Symbol]
+
+    #: Additional information about the source meta-model
+    meta_model: Final[MetaModel]
+
+    _name_to_symbol: Final[Mapping[Identifier, Symbol]]
+
+    # fmt: off
+    @require(
+        lambda symbols: (
+                names := [symbol.name for symbol in symbols],
+                len(names) == len(set(names)),
+        )[1],
+        "Symbol names unique",
+    )
+    @ensure(
+        lambda self:
+        all(
+            id(self.verification_functions_by_name[func.name]) == id(func)
+            for func in self.verification_functions
+        )
+        and len(self.verification_functions_by_name) == len(
+            self.verification_functions),
+        "The verification functions and their mapping by name are consistent"
+    )
+    @ensure(
+        lambda self:
+        all(
+            (
+                    found_symbol := self.find(symbol.name),
+                    found_symbol is not None and id(found_symbol) == id(symbol)
+            )[1]
+            for symbol in self.symbols
+        ),
+        "Finding symbols is consistent with ``symbols``"
+    )
+    # fmt: on
+    def __init__(
+            self,
+            symbols: Sequence[Symbol],
+            verification_functions: Sequence[Verification],
+            ref_association: Symbol,
+            meta_model: parse.MetaModel,
+    ) -> None:
+        """Initialize with the given values and map symbols to name."""
+        self.symbols = symbols
+        self.verification_functions = verification_functions
+        self.ref_association = ref_association
+        self.meta_model = meta_model
+
+        self.verification_functions_by_name = {
+            func.name: func
+            for func in self.verification_functions
+        }
+
+        self._name_to_symbol = {symbol.name: symbol for symbol in symbols}
+
+    def find(self, name: Identifier) -> Optional[Symbol]:
+        """Find the symbol with the given ``name``."""
+        return self._name_to_symbol.get(name, None)
+
+    def must_find(self, name: Identifier) -> Symbol:
+        """
+        Find the symbol with the given ``name``.
+
+        :raise: :py:class:`KeyError` if the ``name`` is not in the table.
+        """
+        result = self.find(name)
+        if result is None:
+            raise KeyError(
+                f"Could not find the symbol with the name {name} "
+                f"in the symbol table"
+            )
+
+        return result
+
+
+def _second_pass_to_resolve_symbols_in_atomic_types_in_place(
+        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+) -> List[Error]:
+    """Resolve the symbol references in the atomic types in-place."""
+    errors = []  # type: List[Error]
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, Enumeration):
+            continue
+
+        for our_type_annotation in _over_our_type_annotations(symbol):
+            assert isinstance(
+                our_type_annotation.symbol, _PlaceholderSymbol
+            ), "Expected only placeholder symbols to be assigned in the first pass"
+
+            if not IDENTIFIER_RE.match(our_type_annotation.symbol.identifier):
+                errors.append(
+                    Error(
+                        our_type_annotation.parsed.node,
+                        f"The symbol is invalid: "
+                        f"{our_type_annotation.symbol.identifier!r}",
+                    )
+                )
+                continue
+
+            identifier = Identifier(our_type_annotation.symbol.identifier)
+            referenced_symbol = symbol_table.find(
+                identifier)
+            if referenced_symbol is None:
+                errors.append(
+                    Error(
+                        our_type_annotation.parsed.node,
+                        f"The symbol with identifier {identifier!r} is not available "
+                        f"in the symbol table.",
+                    )
+                )
+                continue
+
+            our_type_annotation.symbol = referenced_symbol
+
+    return errors
+
+
+def _over_descriptions_in_symbol(
+        symbol: Symbol
+) -> Iterator[Description]:
+    """Iterate over all the descriptions from the ``something``."""
+    if isinstance(symbol, Class):
+        if symbol.description is not None:
+            yield symbol.description
+
+        for prop in symbol.properties:
+            if prop.description is not None:
+                yield prop.description
+
+        for method in symbol.methods:
+            if method.description is not None:
+                yield method.description
+
+    elif isinstance(symbol, Enumeration):
+        if symbol.description is not None:
+            yield symbol.description
+
+        for literal in symbol.literals:
+            if literal.description is not None:
+                yield literal.description
+
+    elif isinstance(symbol, Description):
+        for node in symbol.document.traverse(condition=SymbolReferenceInDoc):
+            yield node
+    else:
+        assert_never(symbol)
+
+
+def _over_descriptions(
+        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+) -> Iterator[Tuple[Optional[Symbol], Description]]:
+    """
+    Iterate over all the descriptions in the meta-model.
+    
+    The symbol indicates the symbol that encompasses the description (*e.g.*
+    a class if the description is related to a member or a property). This gives,
+    for example, the context when we have to resolve references in the downstream code.
+    """
+    for symbol in symbol_table.symbols:
+        for description in _over_descriptions_in_symbol(symbol):
+            yield symbol, description
+
+    for verification in symbol_table.verification_functions:
+        if verification.description is not None:
+            yield None, verification.description
+
+    if symbol_table.meta_model.description is not None:
+        yield None, symbol_table.meta_model.description
+
+
+def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
+        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+) -> List[Error]:
+    """Resolve the symbol references in the descriptions in-place."""
+    errors = []  # type: List[Error]
+
+    for _, description in _over_descriptions(symbol_table):
+        for symbol_ref_in_doc in description.document.traverse(
+                condition=SymbolReferenceInDoc
+        ):
+
+            # Symbol references can be repeated as docutils will cache them
+            # so we need to skip them.
+            if not isinstance(symbol_ref_in_doc.symbol, _PlaceholderSymbol):
+                continue
+
+            raw_identifier = symbol_ref_in_doc.symbol.identifier
+            if not raw_identifier.startswith("."):
+                errors.append(
+                    Error(
+                        description.node,
+                        f"The identifier of the symbol reference "
+                        f"is invalid: {raw_identifier}; "
+                        f"expected an identifier starting with a dot",
+                    )
+                )
+                continue
+
+            raw_identifier_no_dot = raw_identifier[1:]
+
+            if not IDENTIFIER_RE.match(raw_identifier_no_dot):
+                errors.append(
+                    Error(
+                        description.node,
+                        f"The identifier of the symbol reference "
+                        f"is invalid: {raw_identifier_no_dot}",
+                    )
+                )
+                continue
+
+            # Strip the dot
+            identifier = Identifier(raw_identifier_no_dot)
+
+            referenced_symbol = symbol_table.find(
+                name=identifier)
+            if referenced_symbol is None:
+                errors.append(
+                    Error(
+                        description.node,
+                        f"The identifier of the symbol reference "
+                        f"could not be found in the symbol table: {identifier}",
+                    )
+                )
+                continue
+
+            symbol_ref_in_doc.symbol = referenced_symbol
+
+    return errors
+
+
+def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
+        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+) -> List[Error]:
+    """Resolve the attribute references in the descriptions in-place."""
+    errors = []  # type: List[Error]
+
+    # The ``symbol`` is None if the description is in the context outside of a symbol.
+    for symbol, description in _over_descriptions(symbol_table):
+        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        #  test this, especially the failure cases
+        for attr_ref_in_doc in description.document.traverse(
+                condition=AttributeReferenceInDoc
+        ):
+            if isinstance(attr_ref_in_doc.reference, _PlaceholderAttributeReference):
+                pth = attr_ref_in_doc.reference.path
+                parts = pth.split(".")
+
+                if any(not IDENTIFIER_RE.match(part) for part in parts):
+                    errors.append(
+                        Error(
+                            description.node,
+                            f"Invalid reference to a property or a literal; "
+                            f"each part of the path needs to be an identifier, "
+                            f"but it is not: {pth}",
+                        )
+                    )
+                    continue
+
+                part_identifiers = [Identifier(part) for part in parts]
+
+                if len(part_identifiers) == 0:
+                    errors.append(
+                        Error(
+                            description.node,
+                            "Unexpected empty reference " "to a property or a literal",
+                        )
+                    )
+                    continue
+
+                # noinspection PyUnusedLocal
+                target_symbol = None  # type: Optional[Symbol]
+
+                # noinspection PyUnusedLocal
+                attr_identifier = None  # type: Optional[Identifier]
+
+                if len(part_identifiers) == 1:
+                    if symbol is None:
+                        errors.append(
+                            Error(
+                                description.node,
+                                f"The attribute reference can not be resolved as there "
+                                f"is no encompassing symbol in the given "
+                                f"context: {pth}",
+                            )
+                        )
+                        continue
+
+                    target_symbol = symbol
+                    attr_identifier = part_identifiers[0]
+                elif len(part_identifiers) == 2:
+                    target_symbol = symbol_table.find(
+                        part_identifiers[0])
+                    if target_symbol is None:
+                        errors.append(
+                            Error(
+                                description.node,
+                                f"Dangling reference to a non-existing "
+                                f"symbol: {pth}",
+                            )
+                        )
+                        continue
+
+                    attr_identifier = part_identifiers[1]
+                else:
+                    errors.append(
+                        Error(
+                            description.node,
+                            f"We did not implement the resolution of such "
+                            f"a reference to a property or a literal: {pth}",
+                        )
+                    )
+                    continue
+
+                assert target_symbol is not None
+                assert attr_identifier is not None
+
+                reference: Optional[
+                    Union[PropertyReferenceInDoc, EnumerationLiteralReferenceInDoc]
+                ] = None
+
+                if isinstance(target_symbol, Enumeration):
+                    literal = target_symbol.literals_by_name.get(attr_identifier, None)
+
+                    if literal is None:
+                        errors.append(
+                            Error(
+                                description.node,
+                                f"Dangling reference to a non-existing literal "
+                                f"in the enumeration {target_symbol.name}: {pth}",
+                            )
+                        )
+                        continue
+
+                    reference = EnumerationLiteralReferenceInDoc(
+                        symbol=target_symbol, literal=literal
+                    )
+
+                elif isinstance(target_symbol, Class):
+                    prop = target_symbol.properties_by_name.get(attr_identifier, None)
+
+                    if prop is None:
+                        errors.append(
+                            Error(
+                                description.node,
+                                f"Dangling reference to a non-existing property "
+                                f"of a class {target_symbol.name}: {pth}",
+                            )
+                        )
+                        continue
+
+                    reference = PropertyReferenceInDoc(symbol=target_symbol, prop=prop)
+
+                else:
+                    assert_never(target_symbol)
+
+                assert reference is not None
+                attr_ref_in_doc.reference = reference
+
+    return errors
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _fill_in_default_placeholder(
-        default: _DefaultPlaceholder, symbol_table: SymbolTable
+        default: _DefaultPlaceholder,
+        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
 ) -> Tuple[Optional[Default], Optional[Error]]:
     """Resolve the default values to references using the constructed symbol table."""
     # If we do not preemptively return, signal that we do not know how to handle
@@ -1335,6 +1604,245 @@ def _fill_in_default_placeholder(
         f"The translation of the default value to the intermediate layer "
         f"has not been implemented: {ast.dump(default.parsed.node)}",
     )
+
+
+def _over_arguments(
+        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+) -> Iterator[Argument]:
+    """Iterate over all the instances of ``Argument`` from the ``symbol_table``."""
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, Enumeration):
+            continue
+
+        elif isinstance(symbol, Class):
+            for method in symbol.methods:
+                yield from method.arguments
+
+            yield from symbol.constructor.arguments
+        else:
+            assert_never(symbol)
+
+    for verification in symbol_table.verification_functions:
+        yield from verification.arguments
+
+
+def _second_pass_to_resolve_default_argument_values_in_place(
+        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+) -> List[Error]:
+    """Resolve the default values of the method and function arguments in-place."""
+    errors = []  # type: List[Error]
+
+    for arg in _over_arguments(symbol_table):
+        if arg.default is None:
+            continue
+
+        assert isinstance(arg.default, _DefaultPlaceholder), (
+            f"Expected the argument default value to be a placeholder "
+            f"since we resolve it only in the second pass, "
+            f"but got: {arg.default}"
+        )
+
+        filled_default, error = _fill_in_default_placeholder(
+            default=arg.default,
+            symbol_table=symbol_table
+        )
+
+        if error:
+            errors.append(error)
+        else:
+            arg.default = filled_default
+
+    return errors
+
+
+def _second_pass_to_resolve_supersets_of_enumerations_in_place(
+        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+) -> List[Error]:
+    """Resolve the enumeration references in the supersets in-place."""
+    errors = []  # type: List[Error]
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Enumeration):
+            continue
+
+        is_superset_of = []  # type: List[Enumeration]
+        for placeholder in symbol.is_superset_of:
+            assert isinstance(placeholder, _PlaceholderSymbol), (
+                f"Expected the subset in a ``is_superset_of`` to be resolved "
+                f"only in the second pass for enumeration {symbol.name}, "
+                f"but got: {placeholder}"
+            )
+
+            referenced_symbol = symbol_table.find(
+                name=Identifier(placeholder.identifier)
+            )
+
+            if referenced_symbol is None:
+                errors.append(
+                    Error(
+                        symbol.parsed.node,
+                        f"The subset enumeration in ``is_superset_of`` has "
+                        f"not been defined: {placeholder.identifier}",
+                    )
+                )
+                continue
+
+            if not isinstance(referenced_symbol, Enumeration):
+                errors.append(
+                    Error(
+                        symbol.parsed.node,
+                        f"An element, {placeholder.identifier}, of ``is_superset_of`` is "
+                        f"not an Enumeration, but: {type(referenced_symbol)}",
+                    )
+                )
+                continue
+
+            is_superset_of.append(referenced_symbol)
+
+        for subset_enum in is_superset_of:
+            for subset_literal in subset_enum.literals:
+                literal = symbol.literals_by_name.get(subset_literal.name, None)
+                if literal is None:
+                    errors.append(
+                        Error(
+                            symbol.parsed.node,
+                            f"The literal {subset_literal.name} "
+                            f"from the subset enumeration {subset_enum.name} "
+                            f"is missing in the enumeration {symbol.name}",
+                        )
+                    )
+                    continue
+
+                if literal.value != subset_literal.value:
+                    errors.append(
+                        Error(
+                            symbol.parsed.node,
+                            f"The value {subset_literal.value!r} "
+                            f"of the literal {subset_literal.name} "
+                            f"from the subset enumeration {subset_enum.name} "
+                            f"does not equal the value {literal.value!r} "
+                            f"of the literal {literal.name} "
+                            f"in the enumeration {symbol.name}",
+                        )
+                    )
+                    continue
+
+        symbol.is_superset_of = is_superset_of
+
+    return errors
+
+
+def _second_pass_to_resolve_resulting_class_of_implemented_for(
+        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+) -> None:
+    """Resolve the resulting class of the ``implemented_for`` in a property in-place."""
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, Enumeration):
+            continue
+
+        for prop in symbol.properties:
+            assert isinstance(prop.implemented_for, _PlaceholderSymbol), (
+                f"Expected the placeholder symbol for ``implemented_for`` in "
+                f"the property {prop} of {symbol}, but got: {prop.implemented_for}"
+            )
+
+            prop.implemented_for = symbol_table.must_find(
+                Identifier(prop.implemented_for.identifier)
+            )
+
+
+def _second_pass_to_resolve_inheritances_in_place(
+        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+) -> None:
+    """Resolve the class references in the class inheritances in-place."""
+    errors = []  # type: List[Error]
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, Enumeration):
+            continue
+
+        elif isinstance(symbol, Class):
+            resolved_inheritances = []  # type: List[Class]
+            for inheritance in symbol.inheritances:
+                assert isinstance(inheritance, _PlaceholderSymbol)
+
+                inheritance_symbol = symbol_table.must_find(
+                    Identifier(inheritance.identifier)
+                )
+
+                resolved_inheritances.append(inheritance_symbol)
+
+            symbol.set_inheritances(resolved_inheritances)
+
+        else:
+            assert_never(symbol)
+
+
+def _map_concrete_descendants(
+        symbol_table: _SymbolTableBeforeMappingConcreteDescendants,
+        ontology: _hierarchy.Ontology
+) -> Mapping[Class, Sequence[ConcreteClass]]:
+    """Map for each class its descendants which are concrete classes."""
+    result = dict()  # type: MutableMapping[Class, List[ConcreteClass]]
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Class):
+            continue
+
+        concrete_descendants = result.get(symbol, None)
+        if concrete_descendants is None:
+            concrete_descendants = []
+            result[symbol] = concrete_descendants
+
+        for descendant in ontology.list_descendants(symbol.parsed):
+            descendant_symbol = symbol_table.must_find(descendant.name)
+
+            assert isinstance(descendant_symbol, Class)
+
+            if isinstance(descendant_symbol, ConcreteClass):
+                concrete_descendants.append(descendant_symbol)
+
+    return result
+
+
+def _collect_ids_of_classes_in_properties(symbol_table: SymbolTable) -> Set[int]:
+    """
+    Collect the IDs of the classes occurring in type annotations of the properties.
+
+    The IDs refer to IDs of the Python objects in this context.
+    """
+    result = set()  # type: Set[int]
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, Enumeration):
+            continue
+
+        elif isinstance(symbol, Class):
+            for prop in symbol.properties:
+                type_anno = prop.type_annotation
+
+                old_type_anno = None  # type: Optional[TypeAnnotation]
+                while True:
+                    if isinstance(type_anno, OptionalTypeAnnotation):
+                        # noinspection PyUnresolvedReferences
+                        type_anno = type_anno.value
+                    elif isinstance(type_anno, ListTypeAnnotation):
+                        type_anno = type_anno.items
+                    elif isinstance(type_anno, RefTypeAnnotation):
+                        type_anno = type_anno.value
+                    elif isinstance(type_anno, PrimitiveTypeAnnotation):
+                        break
+                    elif isinstance(type_anno, OurTypeAnnotation):
+                        result.add(id(type_anno.symbol))
+                        break
+                    else:
+                        assert_never(type_anno)
+
+                    assert old_type_anno is not type_anno, "Loop invariant"
+                    old_type_anno = type_anno
+        else:
+            assert_never(symbol)
+
+    return result
 
 
 class _PropertyOfClass:
@@ -1473,6 +1981,123 @@ def _check_all_non_optional_properties_initialized(
     return errors
 
 
+def _verify(
+        symbol_table: SymbolTable
+) -> List[Error]:
+    """Perform a battery of checks on the consistency of ``symbol_table``."""
+    errors = []  # type: List[Error]
+
+    # region Check ``with_model_type`` for classes with at least one concrete descendant
+
+    classes_in_properties = _collect_ids_of_classes_in_properties(
+        symbol_table=symbol_table
+    )
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Class):
+            continue
+
+        if id(symbol) in classes_in_properties:
+            concrete_descendants = symbol_table.concrete_descendants_of[symbol]
+
+            if len(concrete_descendants) >= 1:
+                if not symbol.serialization.with_model_type:
+                    descendants_str = ', '.join(
+                        repr(descendant.name)
+                        for descendant in concrete_descendants
+                    )
+
+                    errors.append(
+                        Error(
+                            symbol.parsed.node,
+                            f"The class {symbol.name!r} has one or more concrete "
+                            f"descendants ({descendants_str}), but its serialization "
+                            f"setting ``with_model_type`` has not been set. We need "
+                            f"to discriminate on model type at the de-serialization."
+                        )
+                    )
+
+                for descendant in concrete_descendants:
+                    if descendant.serialization.with_model_type is not None:
+                        errors.append(
+                            Error(
+                                descendant.parsed.node,
+                                f"The class {descendant.name!r} needs to have "
+                                f"serialization setting ``with_model_type`` set since "
+                                f"it is among the concrete descendant classes of "
+                                f"the class {symbol.name!r}. We need to discriminate "
+                                f"on model type at the de-serialization",
+                            )
+                        )
+
+    # endregion
+
+    # region Check that all the function calls in the contracts are valid
+
+    contract_checker = _ContractChecker(
+        symbol_table=symbol_table)
+
+    all_methods = list(
+        itertools.chain(
+            symbol_table.verification_functions,
+            (
+                symbol.methods
+                for symbol in symbol_table.symbols
+            )
+        )
+    )
+
+    for method in all_methods:
+        for contract_or_snapshot in itertools.chain(
+                method.contracts.preconditions,
+                method.contracts.postconditions,
+                method.contracts.snapshots
+        ):
+            contract_checker.visit(contract_or_snapshot.body)
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, Class):
+            for invariant in symbol.invariants:
+                contract_checker.visit(invariant.body)
+
+    # endregion
+
+    # region Check that all non-optional properties are initialized in the constructor
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Class):
+            continue
+
+        errors.extend(
+            _check_all_non_optional_properties_initialized(cls=symbol))
+
+    # endregion
+
+    # region Check that all argument references are valid
+
+    for method in all_methods:
+        if method.description is not None:
+            for arg_ref_in_doc in method.description.document.traverse(
+                    condition=ArgumentReferenceInDoc
+            ):
+                assert isinstance(arg_ref_in_doc.reference, str)
+                arg_name = arg_ref_in_doc.reference
+
+                if arg_name not in method.arguments_by_name:
+                    errors.append(
+                        Error(
+                            method.description.node,
+                            f"The argument referenced in the docstring "
+                            f"is not an argument "
+                            f"of {method.name!r}: {arg_name!r}"
+                        )
+                    )
+
+    # endregion
+
+    return errors
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def translate(
         parsed_symbol_table: parse.SymbolTable,
@@ -1595,35 +2220,13 @@ def translate(
         elif isinstance(parsed_symbol, parse.Enumeration):
             symbol = _parsed_enumeration_to_enumeration(parsed=parsed_symbol)
 
-        elif isinstance(parsed_symbol, parse.AbstractClass):
-            symbol = _parsed_class_to_interface(
-                parsed=parsed_symbol, serializations=serializations
-            )
-
-        elif isinstance(parsed_symbol, parse.ConcreteClass):
-            implements_its_own_interface = False
-
-            if len(ontology.list_descendants(parsed_symbol)) > 0:
-                # NOTE (mristin, 2021-12-14):
-                # This class has one or more descendants. Since many target
-                # implementations do not support multiple inheritance, we introduce
-                # an interface based on this class in the meta-model and then also a
-                # concrete class that implements that interface.
-
-                implements_its_own_interface = True
-                interface_symbol = _parsed_class_to_interface(
-                    parsed=parsed_symbol, serializations=serializations
-                )
-
-                symbols.append(interface_symbol)
-
+        elif isinstance(parsed_symbol, parse.Class):
             symbol = _parsed_class_to_class(
                 parsed=parsed_symbol,
                 ontology=ontology,
                 serializations=serializations,
                 invariants=invariants_map[parsed_symbol.name],
-                in_lined_constructors=in_lined_constructors,
-                implements_its_own_interface=implements_its_own_interface
+                in_lined_constructors=in_lined_constructors
             )
 
         else:
@@ -1679,511 +2282,81 @@ def translate(
     if len(underlying_errors) > 0:
         return None, bundle_underlying_errors()
 
-    symbol_table = SymbolTable(
-        symbols=symbols,
-        verification_functions=verification_functions,
-        ref_association=ref_association,
-        meta_model=meta_model
-    )
-
-    # endregion
-
-    # region Second pass to resolve the symbols in the atomic types
-
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, Enumeration):
-            continue
-
-        for our_type_annotation in _over_our_type_annotations(symbol):
-            assert isinstance(
-                our_type_annotation.symbol, _PlaceholderSymbol
-            ), "Expected only placeholder symbols to be assigned in the first pass"
-
-            if not IDENTIFIER_RE.match(our_type_annotation.symbol.identifier):
-                underlying_errors.append(
-                    Error(
-                        our_type_annotation.parsed.node,
-                        f"The symbol is invalid: "
-                        f"{our_type_annotation.symbol.identifier!r}",
-                    )
-                )
-                continue
-
-            identifier = Identifier(our_type_annotation.symbol.identifier)
-            referenced_symbol = symbol_table.find(identifier)
-            if referenced_symbol is None:
-                underlying_errors.append(
-                    Error(
-                        our_type_annotation.parsed.node,
-                        f"The symbol with identifier {identifier!r} is not available "
-                        f"in the symbol table.",
-                    )
-                )
-                continue
-
-            our_type_annotation.symbol = referenced_symbol
-
-    # endregion
-
-    # region Second pass to resolve the symbols in the descriptions
-
-    # If there is no symbol associated with the description, it is set to None.
-    symbols_descriptions = [
-        (symbol, description)
-        for symbol in symbol_table.symbols
-        for description in _over_descriptions(symbol)
-    ]
-
-    if symbol_table.meta_model.description is not None:
-        symbols_descriptions.append((None, symbol_table.meta_model.description))
-
-    for _, description in symbols_descriptions:
-        for symbol_ref_in_doc in description.document.traverse(
-                condition=SymbolReferenceInDoc
-        ):
-
-            # Symbol references can be repeated as docutils will cache them
-            # so we need to skip them.
-            if not isinstance(symbol_ref_in_doc.symbol, _PlaceholderSymbol):
-                continue
-
-            raw_identifier = symbol_ref_in_doc.symbol.identifier
-            if not raw_identifier.startswith("."):
-                underlying_errors.append(
-                    Error(
-                        description.node,
-                        f"The identifier of the symbol reference "
-                        f"is invalid: {raw_identifier}; "
-                        f"expected an identifier starting with a dot",
-                    )
-                )
-                continue
-
-            raw_identifier_no_dot = raw_identifier[1:]
-
-            if not IDENTIFIER_RE.match(raw_identifier_no_dot):
-                underlying_errors.append(
-                    Error(
-                        description.node,
-                        f"The identifier of the symbol reference "
-                        f"is invalid: {raw_identifier_no_dot}",
-                    )
-                )
-                continue
-
-            # Strip the dot
-            identifier = Identifier(raw_identifier_no_dot)
-
-            referenced_symbol = symbol_table.find(name=identifier)
-            if referenced_symbol is None:
-                underlying_errors.append(
-                    Error(
-                        description.node,
-                        f"The identifier of the symbol reference "
-                        f"could not be found in the symbol table: {identifier}",
-                    )
-                )
-                continue
-
-            symbol_ref_in_doc.symbol = referenced_symbol
-
-    # endregion
-
-    # region Second pass to resolve the attribute references in the descriptions
-
-    for symbol, description in symbols_descriptions:
-        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
-        #  test this, especially the failure cases
-        for attr_ref_in_doc in description.document.traverse(
-                condition=AttributeReferenceInDoc
-        ):
-            if isinstance(attr_ref_in_doc.reference, _PlaceholderAttributeReference):
-                pth = attr_ref_in_doc.reference.path
-                parts = pth.split(".")
-
-                if any(not IDENTIFIER_RE.match(part) for part in parts):
-                    underlying_errors.append(
-                        Error(
-                            description.node,
-                            f"Invalid reference to a property or a literal; "
-                            f"each part of the path needs to be an identifier, "
-                            f"but it is not: {pth}",
-                        )
-                    )
-                    continue
-
-                part_identifiers = [Identifier(part) for part in parts]
-
-                if len(part_identifiers) == 0:
-                    underlying_errors.append(
-                        Error(
-                            description.node,
-                            "Unexpected empty reference " "to a property or a literal",
-                        )
-                    )
-                    continue
-
-                # noinspection PyUnusedLocal
-                target_symbol = None  # type: Optional[Symbol]
-
-                # noinspection PyUnusedLocal
-                attr_identifier = None  # type: Optional[Identifier]
-
-                if len(part_identifiers) == 1:
-                    if symbol is None:
-                        underlying_errors.append(
-                            Error(
-                                description.node,
-                                f"The attribute reference can not be resolved as there is "
-                                f"no encompassing symbol in the given context: {pth}",
-                            )
-                        )
-                        continue
-
-                    target_symbol = symbol
-                    attr_identifier = part_identifiers[0]
-                elif len(part_identifiers) == 2:
-                    target_symbol = symbol_table.find(part_identifiers[0])
-                    if target_symbol is None:
-                        underlying_errors.append(
-                            Error(
-                                description.node,
-                                f"Dangling reference to a non-existing "
-                                f"symbol: {pth}",
-                            )
-                        )
-                        continue
-
-                    attr_identifier = part_identifiers[1]
-                else:
-                    underlying_errors.append(
-                        Error(
-                            description.node,
-                            f"We did not implement the resolution of such "
-                            f"a reference to a property or a literal: {pth}",
-                        )
-                    )
-                    continue
-
-                assert target_symbol is not None
-                assert attr_identifier is not None
-
-                reference: Optional[
-                    Union[PropertyReferenceInDoc, EnumerationLiteralReferenceInDoc]
-                ] = None
-
-                if isinstance(target_symbol, Enumeration):
-                    literal = target_symbol.literals_by_name.get(attr_identifier, None)
-
-                    if literal is None:
-                        underlying_errors.append(
-                            Error(
-                                description.node,
-                                f"Dangling reference to a non-existing literal "
-                                f"in the enumeration {target_symbol.name}: {pth}",
-                            )
-                        )
-                        continue
-
-                    reference = EnumerationLiteralReferenceInDoc(
-                        symbol=target_symbol, literal=literal
-                    )
-
-                elif isinstance(target_symbol, (Class, Interface)):
-                    prop = target_symbol.properties_by_name.get(attr_identifier, None)
-
-                    if prop is None:
-                        underlying_errors.append(
-                            Error(
-                                description.node,
-                                f"Dangling reference to a non-existing property "
-                                f"of a class {target_symbol.name}: {pth}",
-                            )
-                        )
-                        continue
-
-                    reference = PropertyReferenceInDoc(symbol=target_symbol, prop=prop)
-
-                else:
-                    assert_never(target_symbol)
-
-                assert reference is not None
-                attr_ref_in_doc.reference = reference
-
-    # endregion
-
-    # region Second pass to resolve the default argument values
-
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, Enumeration):
-            continue
-
-        elif isinstance(symbol, (Interface, Class)):
-            args_generator = None  # type: Optional[Generator[Argument]]
-
-            if isinstance(symbol, Interface):
-                args_generator = (
-                    arg
-                    for signature in symbol.signatures
-                    for arg in signature.arguments
-                )
-            elif isinstance(symbol, Class):
-                # noinspection PyTypeChecker
-                args_generator = itertools.chain(
-                    (arg for method in symbol.methods for arg in method.arguments),
-                    iter(symbol.constructor.arguments),
-                )
-            else:
-                assert_never(symbol)
-
-            assert args_generator is not None
-
-            for arg in args_generator:
-                if arg.default is not None:
-                    assert isinstance(arg.default, _DefaultPlaceholder), (
-                        f"Expected the argument default value to be a placeholder "
-                        f"since we resolve it only in the second pass, "
-                        f"but got: {arg.default}"
-                    )
-
-                    filled_default, error = _fill_in_default_placeholder(
-                        default=arg.default, symbol_table=symbol_table
-                    )
-
-                    if error:
-                        underlying_errors.append(error)
-                    else:
-                        arg.default = filled_default
-        else:
-            assert_never(symbol)
-
-    # endregion
-
-    # region Second pass to resolve the supersets of the enumerations
-
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, Enumeration):
-            continue
-
-        is_superset_of = []  # type: List[Enumeration]
-        for placeholder in symbol.is_superset_of:
-            assert isinstance(placeholder, _PlaceholderSymbol), (
-                f"Expected the subset in a ``is_superset_of`` to be resolved "
-                f"only in the second pass for enumeration {symbol.name}, "
-                f"but got: {placeholder}"
-            )
-
-            referenced_symbol = symbol_table.find(
-                name=Identifier(placeholder.identifier)
-            )
-
-            if referenced_symbol is None:
-                underlying_errors.append(
-                    Error(
-                        symbol.parsed.node,
-                        f"The subset enumeration in ``is_superset_of`` has "
-                        f"not been defined: {placeholder.identifier}",
-                    )
-                )
-                continue
-
-            if not isinstance(referenced_symbol, Enumeration):
-                underlying_errors.append(
-                    Error(
-                        symbol.parsed.node,
-                        f"An element, {placeholder.identifier}, of ``is_superset_of`` is "
-                        f"not an Enumeration, but: {type(referenced_symbol)}",
-                    )
-                )
-                continue
-
-            is_superset_of.append(referenced_symbol)
-
-        for subset_enum in is_superset_of:
-            for subset_literal in subset_enum.literals:
-                literal = symbol.literals_by_name.get(subset_literal.name, None)
-                if literal is None:
-                    underlying_errors.append(
-                        Error(
-                            symbol.parsed.node,
-                            f"The literal {subset_literal.name} "
-                            f"from the subset enumeration {subset_enum.name} "
-                            f"is missing in the enumeration {symbol.name}",
-                        )
-                    )
-                    continue
-
-                if literal.value != subset_literal.value:
-                    underlying_errors.append(
-                        Error(
-                            symbol.parsed.node,
-                            f"The value {subset_literal.value!r} "
-                            f"of the literal {subset_literal.name} "
-                            f"from the subset enumeration {subset_enum.name} "
-                            f"does not equal the value {literal.value!r} "
-                            f"of the literal {literal.name} "
-                            f"in the enumeration {symbol.name}",
-                        )
-                    )
-                    continue
-
-        symbol.is_superset_of = is_superset_of
-
-    # endregion
-
-    # region Second pass to resolve the interfaces and inheritances
-
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, Enumeration):
-            continue
-
-        elif isinstance(symbol, Interface):
-            resolved_inheritances = []  # type: List[Interface]
-            for inheritance in symbol.inheritances:
-                assert isinstance(inheritance, _PlaceholderSymbol)
-
-                inheritance_symbol = symbol_table.must_find(
-                    Identifier(inheritance.identifier)
-                )
-
-                assert isinstance(inheritance_symbol, Interface)
-
-                resolved_inheritances.append(inheritance_symbol)
-
-            symbol.inheritances = resolved_inheritances
-
-        elif isinstance(symbol, Class):
-            resolved_interfaces = []  # type: List[Interface]
-            for interface in symbol.interfaces:
-                assert isinstance(interface, _PlaceholderSymbol)
-
-                interface_symbol = symbol_table.must_find(
-                    Identifier(interface.identifier)
-                )
-
-                assert isinstance(interface_symbol, Interface)
-
-                resolved_interfaces.append(interface_symbol)
-
-            symbol.set_interfaces(resolved_interfaces)
-        else:
-            assert_never(symbol)
-
-    # endregion
-
-    # region Second pass to resolve the resulting class of the ``implemented_for``
-
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, Enumeration):
-            continue
-
-        for prop in symbol.properties:
-            assert isinstance(prop.implemented_for, _PlaceholderSymbol), (
-                f"Expected the placeholder symbol for ``implemented_for`` in "
-                f"the property {prop} of {symbol}, but got: {prop.implemented_for}"
-            )
-
-            prop.implemented_for = symbol_table.must_find(
-                Identifier(prop.implemented_for.identifier)
-            )
-
-    # endregion
-
-    # region Check that all implementers of interfaces have ``with_model_type``
-
-    ids_of_used_interfaces = collect_ids_of_interfaces_in_properties(
-        symbol_table=symbol_table
-    )
-
-    interface_implementers = map_interface_implementers(symbol_table=symbol_table)
-
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, Interface) and id(symbol) in ids_of_used_interfaces:
-            implementers = interface_implementers.get(symbol, None)
-            if implementers is not None:
-                for implementer in implementers:
-                    if not implementer.serialization.with_model_type:
-                        underlying_errors.append(
-                            Error(
-                                implementer.parsed.node,
-                                f"The class {implementer.name} needs to have "
-                                f"serialization setting ``with_model_type`` set since "
-                                f"it is among the concrete classes of "
-                                f"the abstract class {symbol.name}. Otherwise, "
-                                f"the abstract class {symbol.name} can not be "
-                                f"de/serialized properly.",
-                            )
-                        )
-
-    # endregion
-
-    # region Check that all the function calls in the contracts are valid
-
-    contract_checker = _ContractChecker(symbol_table=symbol_table)
-
-    methods_or_signatures = list(
-        itertools.chain(
-            symbol_table.verification_functions,
-            *(
-                symbol.methods
-                if isinstance(symbol, Class)
-                else (
-                    symbol.signatures
-                    if isinstance(symbol, Interface)
-                    else []
-                )
-                for symbol in symbol_table.symbols
-            )
+    symbol_table_pre_descendants_map = (
+        _SymbolTableBeforeMappingConcreteDescendants(
+            symbols=symbols,
+            verification_functions=verification_functions,
+            ref_association=ref_association,
+            meta_model=meta_model
         )
     )
 
-    for method_or_signature in methods_or_signatures:
-        for contract_or_snapshot in itertools.chain(
-                method_or_signature.contracts.preconditions,
-                method_or_signature.contracts.postconditions,
-                method_or_signature.contracts.snapshots
-        ):
-            contract_checker.visit(contract_or_snapshot.body)
-
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, Class):
-            for invariant in symbol.invariants:
-                contract_checker.visit(invariant.body)
-
     # endregion
 
-    # region Check that all non-optional properties are initialized in the constructor
+    # NOTE (mristin, 2021-12-14):
+    # At first we in-lined all these second-pass code. However, since Python keeps
+    # all the variables in the function scope, the code became quite unreadable and
+    # we were never sure which variables are re-used between the passes.
+    #
+    # Hence we refactored the second passes in the separate functions. Please keep the
+    # order of the functions with their call order here, and do not call them elsewhere
+    # in code.
 
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, Class):
-            continue
+    underlying_errors.extend(
+        _second_pass_to_resolve_symbols_in_atomic_types_in_place(
+            symbol_table=symbol_table_pre_descendants_map
+        )
+    )
 
-        underlying_errors.extend(
-            _check_all_non_optional_properties_initialized(cls=symbol))
+    underlying_errors.extend(
+        _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
+            symbol_table=symbol_table_pre_descendants_map
+        )
+    )
 
-    # endregion
+    underlying_errors.extend(
+        _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
+            symbol_table=symbol_table_pre_descendants_map
+        )
+    )
 
-    # region Check that all argument references are valid
+    underlying_errors.extend(
+        _second_pass_to_resolve_default_argument_values_in_place(
+            symbol_table=symbol_table_pre_descendants_map
+        )
+    )
 
-    for method_or_signature in methods_or_signatures:
-        if method_or_signature.description is not None:
-            for arg_ref_in_doc in method_or_signature.description.document.traverse(
-                    condition=ArgumentReferenceInDoc
-            ):
-                assert isinstance(arg_ref_in_doc.reference, str)
-                arg_name = arg_ref_in_doc.reference
+    underlying_errors.extend(
+        _second_pass_to_resolve_supersets_of_enumerations_in_place(
+            symbol_table=symbol_table_pre_descendants_map
+        )
+    )
 
-                if arg_name not in method_or_signature.arguments_by_name:
-                    underlying_errors.append(
-                        Error(
-                            method_or_signature.description.node,
-                            f"The argument referenced in the docstring "
-                            f"is not an argument "
-                            f"of {method_or_signature.name!r}: {arg_name!r}"
-                        )
-                    )
+    if len(underlying_errors) > 0:
+        return None, bundle_underlying_errors()
 
-    # endregion
+    _second_pass_to_resolve_inheritances_in_place(
+        symbol_table=symbol_table_pre_descendants_map
+    )
+
+    _second_pass_to_resolve_resulting_class_of_implemented_for(
+        symbol_table=symbol_table_pre_descendants_map,
+    )
+
+    concrete_descendants_of = _map_concrete_descendants(
+        symbol_table=symbol_table_pre_descendants_map,
+        ontology=ontology
+    )
+
+    symbol_table = SymbolTable(
+        symbols=symbol_table_pre_descendants_map.symbols,
+        concrete_descendants_of=concrete_descendants_of,
+        verification_functions=symbol_table_pre_descendants_map.verification_functions,
+        ref_association=symbol_table_pre_descendants_map.ref_association,
+        meta_model=symbol_table_pre_descendants_map.meta_model
+    )
+
+    underlying_errors.extend(_verify(symbol_table))
 
     if len(underlying_errors) > 0:
         return None, bundle_underlying_errors()

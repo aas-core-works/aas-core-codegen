@@ -1982,29 +1982,22 @@ def _verify_symbol_table(
                 errors.append(
                     Error(
                         symbol.node,
-                        f"The inheritance for class {symbol.name} "
-                        f"is dangling: {inheritance}",
+                        f"A parent of the class {symbol.name!r} "
+                        f"is dangling: {inheritance!r}",
                     )
                 )
 
-            elif not isinstance(parent_symbol, Class):
+            elif isinstance(parent_symbol, Class):
+                # A class can inherit from a class.
+                pass
+            else:
                 errors.append(
                     Error(
                         symbol.node,
-                        f"Expected the class {symbol.name} to inherit "
-                        f"from an abstract class, "
-                        f"but it inherits from a symbol of type "
-                        f"{parent_symbol.__class__.__name__}: {parent_symbol.name}",
-                    )
-                )
-
-            elif not isinstance(parent_symbol, AbstractClass):
-                errors.append(
-                    Error(
-                        symbol.node,
-                        f"Expected the class {symbol.name} to inherit from "
-                        f"an abstract class, but it inherits "
-                        f"from a non-abstract one: {parent_symbol.name}",
+                        f"Expected the class {symbol.name!r} to inherit "
+                        f"from another class, "
+                        f"but it inherits from a symbol {parent_symbol.name!r} of type "
+                        f"{parent_symbol.__class__.__name__!r}",
                     )
                 )
 

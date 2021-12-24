@@ -251,8 +251,7 @@ class SignatureLike(DBC):
     """
     Represent a signature-like "something".
 
-    This can be either a method signature in an interface, a class method or
-    a function.
+    This can be either a class method or a function.
     """
     name: Final[Identifier]
     arguments: Final[Sequence[Argument]]
@@ -317,16 +316,6 @@ class SignatureLike(DBC):
         raise NotImplementedError()
 
 
-class Signature(SignatureLike):
-    """Represent a method signature in an interface."""
-
-    def __repr__(self) -> str:
-        """Represent the instance as a string for easier debugging."""
-        return (
-            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
-        )
-
-
 class Serialization:
     """Specify the general settings for serialization of an interface or a class."""
 
@@ -338,46 +327,6 @@ class Serialization:
             if set, the serialization needs to include a discriminator.
         """
         self.with_model_type = with_model_type
-
-
-class Interface:
-    """
-    Represent an interface with methods mapped to signatures.
-
-    We also include the properties so that we can generate the getters and setters at
-    a later stage.
-    """
-
-    def __init__(
-            self,
-            name: Identifier,
-            inheritances: Sequence["Interface"],
-            signatures: Sequence[Signature],
-            properties: Sequence[Property],
-            serialization: Serialization,
-            description: Optional[Description],
-            parsed: parse.Class,
-    ) -> None:
-        """Initialize with the given values."""
-        self.name = name
-        self.inheritances = inheritances
-        self.signatures = signatures
-        self.properties = properties
-        self.serialization = serialization
-        self.description = description
-        self.parsed = parsed
-
-        self.properties_by_name: Mapping[Identifier, Property] = {
-            prop.name: prop for prop in self.properties
-        }
-
-        self.property_id_set = frozenset(id(prop) for prop in self.properties)
-
-    def __repr__(self) -> str:
-        """Represent the instance as a string for easier debugging."""
-        return (
-            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
-        )
 
 
 class Invariant:
@@ -724,30 +673,30 @@ class ConstrainedPrimitive:
 
 
 class Class:
-    """Represent a class implementing zero, one or more interfaces."""
+    """Represent an abstract or a concrete class."""
 
     #: Name of the class
     name: Final[Identifier]
 
-    # region Interfaces
+    # region Inheritances
 
     # NOTE (mristin, 2021-12-24):
-    # We have to decorate interfaces with ``@property`` so that the client code is
-    # forced to use ``set_interfaces``.
+    # We have to decorate inheritances with ``@property`` so that the client code is
+    # forced to use ``set_inheritances``.
 
-    _interfaces: Sequence["Interface"]
-
-    @property
-    def interfaces(self) -> Sequence["Interface"]:
-        """Return interfaces that this class implements."""
-        return self._interfaces
-
-    _interface_id_set: FrozenSet[int]
+    _inheritances: Sequence["Class"]
 
     @property
-    def interface_id_set(self) -> FrozenSet[int]:
-        """Collect IDs (with :py:func:`id`) of the interface objects in a set."""
-        return self._interface_id_set
+    def inheritances(self) -> Sequence["Class"]:
+        """Return direct parents that this class inherits from."""
+        return self._inheritances
+
+    _inheritance_id_set: FrozenSet[int]
+
+    @property
+    def inheritance_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the inheritance objects in a set."""
+        return self._inheritance_id_set
 
     # endregion
 
@@ -800,7 +749,7 @@ class Class:
     def __init__(
             self,
             name: Identifier,
-            interfaces: Sequence["Interface"],
+            inheritances: Sequence["Class"],
             is_implementation_specific: bool,
             properties: Sequence[Property],
             methods: Sequence[Method],
@@ -812,7 +761,7 @@ class Class:
     ) -> None:
         """Initialize with the given values."""
         self.name = name
-        self.set_interfaces(interfaces)
+        self.set_inheritances(inheritances)
 
         self.is_implementation_specific = is_implementation_specific
         self.properties = properties
@@ -832,18 +781,27 @@ class Class:
 
     # fmt: off
     @require(
-        lambda interfaces:
-        len(interfaces) == len(set(identifier for identifier in interfaces)),
-        "No duplicate interfaces"
+        lambda inheritances:
+        len(inheritances) == len(set(identifier for identifier in inheritances)),
+        "No duplicate inheritances"
     )
     # fmt: on
-    def set_interfaces(self, interfaces: Sequence[Interface]) -> None:
+    def set_inheritances(self, inheritances: Sequence["Class"]) -> None:
         """Set the interfaces in the class."""
-        self._interfaces = interfaces
+        self._inheritances = inheritances
 
-        self._interface_id_set = frozenset(
-            id(interface) for interface in self.interfaces
+        self._inheritance_id_set = frozenset(
+            id(inheritance) for inheritance in self._inheritances
         )
+
+    @abc.abstractmethod
+    def __repr__(self) -> str:
+        # Signal that this is a purely abstract class.
+        raise NotImplementedError()
+
+
+class ConcreteClass(Class):
+    """Represent a class that can be instantiated."""
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -852,7 +810,17 @@ class Class:
         )
 
 
-Symbol = Union[Interface, Enumeration, ConstrainedPrimitive, Class]
+class AbstractClass(Class):
+    """Represent a class that is purely abstract and can not be instantiated."""
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+
+Symbol = Union[Enumeration, ConstrainedPrimitive, Class]
 
 
 class Verification(SignatureLike):
@@ -1028,6 +996,21 @@ class SymbolTable:
     #: List of all symbols that we need for the code generation
     symbols: Final[Sequence[Symbol]]
 
+    # region Concrete descendants of
+
+    # NOTE (mristin, 2021-12-24):
+    # We decorate ``concrete_descendants_of`` with ``@property`` to force the client
+    # code to use ``set_concrete_descendants_of``.
+
+    _concrete_descendants_of: Mapping[Class, Sequence[ConcreteClass]]
+
+    @property
+    def concrete_descendants_of(self) -> Mapping[Class, Sequence[ConcreteClass]]:
+        """Provide a map of all the concrete descendants of a class."""
+        return self._concrete_descendants_of
+
+    # endregion
+
     #: List of all functions used in the verification
     verification_functions: Final[Sequence[Verification]]
 
@@ -1075,12 +1058,14 @@ class SymbolTable:
     def __init__(
             self,
             symbols: Sequence[Symbol],
+            concrete_descendants_of: Mapping[Class, Sequence[ConcreteClass]],
             verification_functions: Sequence[Verification],
             ref_association: Symbol,
             meta_model: parse.MetaModel,
     ) -> None:
         """Initialize with the given values and map symbols to name."""
         self.symbols = symbols
+        self.set_concrete_descendants_of(concrete_descendants_of)
         self.verification_functions = verification_functions
         self.ref_association = ref_association
         self.meta_model = meta_model
@@ -1091,6 +1076,26 @@ class SymbolTable:
         }
 
         self._name_to_symbol = {symbol.name: symbol for symbol in symbols}
+
+    @require(
+        lambda self, concrete_descendants_of:
+        all(
+            (
+                    descendants := concrete_descendants_of.get(symbol, None),
+                    descendants is not None
+                    and symbol not in descendants
+            )[1]
+            for symbol in self.symbols
+            if isinstance(symbol, Class)
+        ),
+        "``concrete_descendants_of`` defined for all the symbols"
+    )
+    def set_concrete_descendants_of(
+            self,
+            concrete_descendants_of: Mapping[Class, Sequence[ConcreteClass]]
+    ) -> None:
+        """Set a map of all the concrete descendants of a class."""
+        self._concrete_descendants_of = concrete_descendants_of
 
     def find(self, name: Identifier) -> Optional[Symbol]:
         """Find the symbol with the given ``name``."""
@@ -1110,44 +1115,6 @@ class SymbolTable:
             )
 
         return result
-
-
-InterfaceImplementers = MutableMapping[Interface, List[Class]]
-
-
-def map_interface_implementers(symbol_table: SymbolTable) -> InterfaceImplementers:
-    """
-    Produce an inverted index from interfaces to implementing classes.
-
-    The tracing is transitive over interfaces. For example, assume interfaces ``A``
-    and ``B``, ``B extends A`` and a class ``C``, ``C implements B``. Then the class
-    ``C`` will both appear as an implementer of ``B`` as well as of ``A``.
-    """
-    mapping = dict()  # type: MutableMapping[Interface, List[Class]]
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, Class):
-            continue
-
-        assert isinstance(symbol, Class)
-
-        stack = []  # type: List[Interface]
-        for interface in symbol.interfaces:
-            stack.append(interface)
-
-        while len(stack) > 0:
-            interface = stack.pop()
-
-            lst = mapping.get(interface, None)
-            if lst is None:
-                lst = []
-                mapping[interface] = lst
-
-            lst.append(symbol)
-
-            for parent_id in interface.inheritances:
-                stack.append(parent_id)
-
-    return mapping
 
 
 class SymbolReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
@@ -1431,45 +1398,3 @@ def make_union_of_constructor_arguments(
         )
 
     return resolution, None
-
-
-def collect_ids_of_interfaces_in_properties(symbol_table: SymbolTable) -> Set[int]:
-    """
-    Collect the IDs of the interfaces occurring in type annotations of the properties.
-
-    The IDs refer to IDs of the Python objects in this context.
-    """
-    result = set()  # type: Set[int]
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, Enumeration):
-            continue
-
-        elif isinstance(symbol, (Interface, Class)):
-            for prop in symbol.properties:
-                type_anno = prop.type_annotation
-
-                old_type_anno = None  # type: Optional[TypeAnnotation]
-                while True:
-                    if isinstance(type_anno, OptionalTypeAnnotation):
-                        # noinspection PyUnresolvedReferences
-                        type_anno = type_anno.value
-                    elif isinstance(type_anno, ListTypeAnnotation):
-                        type_anno = type_anno.items
-                    elif isinstance(type_anno, RefTypeAnnotation):
-                        type_anno = type_anno.value
-                    elif isinstance(type_anno, PrimitiveTypeAnnotation):
-                        break
-                    elif isinstance(type_anno, OurTypeAnnotation):
-                        if isinstance(type_anno.symbol, Interface):
-                            result.add(id(type_anno.symbol))
-
-                        break
-                    else:
-                        assert_never(type_anno)
-
-                    assert old_type_anno is not type_anno, "Loop invariant"
-                    old_type_anno = type_anno
-        else:
-            assert_never(symbol)
-
-    return result
