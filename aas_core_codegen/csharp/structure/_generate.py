@@ -21,6 +21,10 @@ from aas_core_codegen.csharp import (
 from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II
 
 
+# TODO: continue here.
+#  Revisit the whole module and see how abstract/concrete classes fit and
+#  how we should deal with the constrained primitives
+
 # region Checks
 
 
