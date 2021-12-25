@@ -16,7 +16,7 @@ from typing import (
     Tuple,
     Set,
     Final,
-    FrozenSet, OrderedDict,
+    FrozenSet, OrderedDict, Iterable,
 )
 
 import docutils.nodes
@@ -42,7 +42,7 @@ class AtomicTypeAnnotation(DBC):
     """
 
     @abc.abstractmethod
-    def __str__(self)->str:
+    def __str__(self) -> str:
         # Signal that this is a purely abstract class
         raise NotImplementedError()
 
@@ -637,6 +637,22 @@ class ConstrainedPrimitive:
 
     # endregion
 
+    # region Descendants
+
+    # NOTE (mristin, 2021-12-24):
+    # We have to decorate ``descendant_id_set`` with
+    # ``@property`` so that the translation code is forced to use
+    # ``_set_descendants``.
+
+    _descendant_id_set: FrozenSet[int]
+
+    @property
+    def descendant_id_set(self) -> FrozenSet[int]:
+        """List the IDs (as in Python's ``id`` built-in) of the descendants."""
+        return self._descendant_id_set
+
+    # endregion
+
     #: Which primitive type is constrained
     constrainee: PrimitiveType
 
@@ -662,11 +678,28 @@ class ConstrainedPrimitive:
         lambda parsed: len(parsed.properties) == 0,
         "No properties expected in the constrained primitive type"
     )
+    @require(
+        lambda constrainee, inheritances:
+        all(
+            inheritance.constrainee == constrainee
+            for inheritance in inheritances
+        ),
+        "Constrainee consistent with ancestors"
+    )
+    @require(
+        lambda constrainee, descendants:
+        all(
+            descendant.constrainee == constrainee
+            for descendant in descendants
+        ),
+        "Constrainee consistent with descendants"
+    )
     # fmt: on
     def __init__(
             self,
             name: Identifier,
             inheritances: Sequence['ConstrainedPrimitive'],
+            descendants: Sequence['ConstrainedPrimitive'],
             constrainee: PrimitiveType,
             is_implementation_specific: bool,
             invariants: Sequence[Invariant],
@@ -675,6 +708,7 @@ class ConstrainedPrimitive:
     ) -> None:
         self.name = name
         self._set_inheritances(inheritances)
+        self._set_descendants(descendants)
         self.constrainee = constrainee
         self.is_implementation_specific = is_implementation_specific
         self.invariants = invariants
@@ -682,6 +716,20 @@ class ConstrainedPrimitive:
         self.parsed = parsed
 
         self.invariant_id_set = frozenset(id(inv) for inv in self.invariants)
+
+    def _set_descendants(
+            self,
+            descendants: Sequence["ConstrainedPrimitive"]
+    ) -> None:
+        """
+        Set the descendants in the constrained primitive.
+
+        This method is expected to be called only during the translation phase.
+        """
+        self._descendant_id_set = frozenset(
+            id(descendant)
+            for descendant in descendants
+        )
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -745,19 +793,28 @@ class Class:
     #: no interface available.
     interface: Optional["Interface"]
 
-    # region Concrete descendants
+    # region Descendants
 
     # NOTE (mristin, 2021-12-24):
-    # We have to decorate ``concrete_descendants`` with ``@property`` so that
-    # the translation code is forced to use ``_set_concrete_descendants``.
+    # We have to decorate ``descendant_id_set`` and ``concrete_descendants`` with
+    # ``@property`` so that the translation code is forced to use
+    # ``_set_descendants``.
+
+    _descendant_id_set: FrozenSet[int]
+
     _concrete_descendants: Sequence["ConcreteClass"]
+
+    @property
+    def descendant_id_set(self) -> FrozenSet[int]:
+        """List the IDs (as in Python's ``id`` built-in) of the descendants."""
+        return self._descendant_id_set
 
     @property
     def concrete_descendants(self) -> Sequence["ConcreteClass"]:
         """List descendants of this class which are concrete classes."""
         return self._concrete_descendants
 
-        # endregion
+    # endregion
 
     #: List of properties of the class
     properties: Final[Sequence[Property]]
@@ -810,7 +867,7 @@ class Class:
             name: Identifier,
             inheritances: Sequence["Class"],
             interface: Optional["Interface"],
-            concrete_descendants: Sequence["ConcreteClass"],
+            descendants: Sequence["Class"],
             is_implementation_specific: bool,
             properties: Sequence[Property],
             methods: Sequence[Method],
@@ -823,7 +880,7 @@ class Class:
         """Initialize with the given values."""
         self.name = name
         self._set_inheritances(inheritances)
-        self._set_concrete_descendants(concrete_descendants)
+        self._set_descendants(descendants)
 
         self.interface = interface
         self.is_implementation_specific = is_implementation_specific
@@ -866,16 +923,25 @@ class Class:
             id(inheritance) for inheritance in self._inheritances
         )
 
-    def _set_concrete_descendants(
+    def _set_descendants(
             self,
-            concrete_descendants: Sequence["ConcreteClass"]
+            descendants: Sequence["Class"]
     ) -> None:
         """
-        Set the concrete descendants in the class.
+        Set the descendants and the concrete descendants in the class.
 
         This method is expected to be called only during the translation phase.
         """
-        self._concrete_descendants = concrete_descendants
+        self._descendant_id_set = frozenset(
+            id(descendant)
+            for descendant in descendants
+        )
+
+        self._concrete_descendants = [
+            descendant
+            for descendant in descendants
+            if isinstance(descendant, ConcreteClass)
+        ]
 
     @abc.abstractmethod
     def __repr__(self) -> str:

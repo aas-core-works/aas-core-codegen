@@ -2,11 +2,14 @@
 import io
 import textwrap
 from typing import Tuple, Optional, List, Sequence, Union, Final, Set, MutableMapping, \
-    NewType
+    NewType, Mapping
 
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate, specific_implementations
+from aas_core_codegen.intermediate import (
+type_inference as intermediate_type_inference
+)
 from aas_core_codegen.common import Error, Stripped, assert_never, Identifier
 from aas_core_codegen.csharp import (
     common as csharp_common,
@@ -679,33 +682,23 @@ class _InvariantTranspiler(
 
     def __init__(
             self,
-            symbol_table: intermediate.SymbolTable,
-            that: Union[intermediate.ConstrainedPrimitive, intermediate.ConcreteClass]
+            type_map: Mapping[
+                parse_tree.Node, intermediate_type_inference.TypeAnnotation]
     ) -> None:
         """Initialize with the given values."""
-        self.symbol_table = symbol_table
-
-        # Note the type of that so that we can infer the type information
-        self.that = that
-
-        # Infer types of the individual nodes
-        self.inferred_type = dict(
-        )  # type: MutableMapping[parse_tree.Node, intermediate.TypeAnnotation]
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform(
-            self, node: parse_tree.Node
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        """Dispatch to the appropriate transformation method."""
-        result = node.transform(self)
-        assert node in self.inferred_type, "Type inferred"
-        return result
+        self.type_map = type_map
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_member(
             self, node: parse_tree.Member
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        # Special case: enumeration literal
+        member_type = self.type_map[node]
+
+        # TODO: switch on member_type 🠒 now we can properly implement it!
+
+        if isinstance(member_type, intermediate_type_inference)
+
+
         if isinstance(node.instance, parse_tree.Name):
             symbol = self.symbol_table.find(name=node.instance.identifier)
             if symbol is not None and isinstance(symbol, intermediate.Enumeration):

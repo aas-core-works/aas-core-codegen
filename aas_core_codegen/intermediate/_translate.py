@@ -941,11 +941,11 @@ def _parsed_class_to_constrained_primitive(
     # noinspection PyTypeChecker
     return ConstrainedPrimitive(
         name=parsed.name,
-        inheritances=[
-            _PlaceholderSymbol(inheritance)
-            for inheritance in parsed.inheritances
-            if inheritance not in parse.PRIMITIVE_TYPES
-        ],
+        # Use placeholders for inheritances and descendants as we are still in
+        # the first pass and building up the symbol table. They will be resolved in
+        # a second pass.
+        inheritances=[],
+        descendants=[],
         constrainee=constrainee,
         is_implementation_specific=parsed.is_implementation_specific,
         invariants=invariants,
@@ -965,31 +965,6 @@ class _MaybeInterfacePlaceholder:
     We do not know in the first pass whether a class will have an interface defined
     or not.
     """
-
-
-class _ConcreteDescendantsPlaceholder(Sequence[ConcreteClass]):
-    """
-    Represent a placeholder for the list of concrete descendants of a class.
-    
-    We do not know in the first pass how many concrete descendants a class has.
-    """
-
-    @overload
-    @abstractmethod
-    def __getitem__(self, i: int) -> ConcreteClass: ...
-
-    @overload
-    @abstractmethod
-    def __getitem__(self, s: slice) -> Sequence[ConcreteClass]: ...
-
-    def __getitem__(
-            self,
-            i: Union[int, slice]
-    ) -> Union[ConcreteClass, Sequence[ConcreteClass]]:
-        raise AssertionError("This is only a placeholder.")
-
-    def __len__(self) -> int:
-        raise AssertionError("This is only a placeholder.")
 
 
 def _parsed_class_to_class(
@@ -1122,7 +1097,9 @@ def _parsed_class_to_class(
         name=parsed.name,
         inheritances=inheritances,
         interface=_MaybeInterfacePlaceholder(),
-        concrete_descendants=_ConcreteDescendantsPlaceholder(),
+        # Use a placeholder for descendants as we can not resolve inheritances
+        # at this stage
+        descendants=[],
         is_implementation_specific=parsed.is_implementation_specific,
         properties=properties,
         methods=methods,
@@ -1753,6 +1730,20 @@ def _second_pass_to_resolve_resulting_class_of_implemented_for(
             assert_never(symbol)
 
 
+# fmt: off
+@require(
+    lambda symbol_table:
+    # These are not tight pre-conditions, but they should catch the most obvious
+    # bugs, such as if we re-enter this function.
+    all(
+        isinstance(symbol.inheritances, list)
+        and len(symbol.inheritances) == 0
+        for symbol in symbol_table
+        if isinstance(symbol, (ConstrainedPrimitive, Class))
+    ),
+    "No inheritances previously resolved"
+)
+# fmt: on
 def _second_pass_to_resolve_inheritances_in_place(
         symbol_table: SymbolTable
 ) -> None:
@@ -1763,11 +1754,9 @@ def _second_pass_to_resolve_inheritances_in_place(
 
         elif isinstance(symbol, ConstrainedPrimitive):
             resolved_inheritances = []  # type: List[ConstrainedPrimitive]
-            for inheritance in symbol.inheritances:
-                assert isinstance(inheritance, _PlaceholderSymbol)
-
+            for inheritance_name in symbol.parsed.inheritances:
                 inheritance_symbol = symbol_table.must_find(
-                    Identifier(inheritance.name)
+                    Identifier(inheritance_name)
                 )
 
                 assert isinstance(inheritance_symbol, ConstrainedPrimitive)
@@ -1778,13 +1767,13 @@ def _second_pass_to_resolve_inheritances_in_place(
 
         elif isinstance(symbol, Class):
             resolved_inheritances = []  # type: List[Class]
-            for inheritance in symbol.inheritances:
-                assert isinstance(inheritance, _PlaceholderSymbol)
 
+            for inheritance_name in symbol.parsed.inheritances:
                 inheritance_symbol = symbol_table.must_find(
-                    Identifier(inheritance.name)
+                    Identifier(inheritance_name)
                 )
 
+                assert isinstance(inheritance_symbol, Class)
                 resolved_inheritances.append(inheritance_symbol)
 
             symbol._set_inheritances(resolved_inheritances)
@@ -1797,21 +1786,16 @@ def _second_pass_to_resolve_inheritances_in_place(
 @require(
     lambda symbol_table:
     all(
-        isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
-        for symbol in symbol_table.symbols
-        if isinstance(symbol, Class)
-    )
-)
-@ensure(
-    lambda symbol_table:
-    all(
-        not isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
+        # These are not tight pre-conditions, but they should catch the most obvious
+        # bugs, such as if we re-enter this function.
+        isinstance(symbol.concrete_descendants, list) and
+        len(symbol.concrete_descendants) == 0
         for symbol in symbol_table.symbols
         if isinstance(symbol, Class)
     )
 )
 # fmt: on
-def _second_pass_to_resolve_concrete_descendants_in_place(
+def _second_pass_to_resolve_descendants_in_place(
         symbol_table: SymbolTable,
         ontology: _hierarchy.Ontology
 ) -> None:
@@ -1828,19 +1812,12 @@ def _second_pass_to_resolve_concrete_descendants_in_place(
         if not isinstance(symbol, Class):
             continue
 
-        concrete_descendants = []  # type: List[ConcreteClass]
+        descendants = [
+            symbol_table.must_find(descendant.name)
+            for descendant in ontology.list_descendants(symbol.parsed)
+        ]
 
-        for descendant in ontology.list_descendants(symbol.parsed):
-            descendant_symbol = symbol_table.must_find(descendant.name)
-
-            assert isinstance(descendant_symbol, Class)
-
-            if isinstance(descendant_symbol, ConcreteClass):
-                concrete_descendants.append(descendant_symbol)
-
-        assert isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
-
-        symbol._set_concrete_descendants(concrete_descendants)
+        symbol._set_descendants(descendants)
 
 
 # fmt: off
@@ -1852,15 +1829,6 @@ def _second_pass_to_resolve_concrete_descendants_in_place(
         if isinstance(symbol, Class)
     ),
     "None of the interfaces resolved"
-)
-@require(
-    lambda symbol_table:
-    all(
-        not isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
-        for symbol in symbol_table.symbols
-        if isinstance(symbol, Class)
-    ),
-    "All concrete descendants resolved"
 )
 @ensure(
     lambda symbol_table:
@@ -2253,20 +2221,6 @@ def _verify(
 
     # endregion
 
-    # region Assert that constrainees are consistent among ancestors
-
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, ConstrainedPrimitive):
-            continue
-
-        for inheritance in symbol.inheritances:
-            assert inheritance.constrainee == symbol.constrainee, (
-                f"{inheritance=}, {inheritance.constrainee=}, "
-                f"{symbol=}, {symbol.constrainee=}"
-            )
-
-    # endregion
-
     # region Assert that interfaces defined correctly
 
     # NOTE (mristin, 2021-12-15):
@@ -2574,7 +2528,7 @@ def translate(
         symbol_table=symbol_table,
     )
 
-    _second_pass_to_resolve_concrete_descendants_in_place(
+    _second_pass_to_resolve_descendants_in_place(
         symbol_table=symbol_table,
         ontology=ontology
     )
