@@ -888,7 +888,6 @@ def _generate_json_converter_for_class(
 def generate(
         symbol_table: intermediate.SymbolTable,
         namespace: csharp_common.NamespaceIdentifier,
-        interface_implementers: intermediate.InterfaceImplementers,
         spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """

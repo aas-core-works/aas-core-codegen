@@ -204,7 +204,7 @@ class Unroller(DBC):
     def _unroll_ref_type_annotation(
             self,
             unrollee_expr: str,
-            type_annotation: intermediate.OptionalTypeAnnotation,
+            type_annotation: intermediate.RefTypeAnnotation,
             path: List[str],
             item_level: int,
             key_value_level: int,

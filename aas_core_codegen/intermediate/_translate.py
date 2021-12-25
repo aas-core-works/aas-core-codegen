@@ -1797,10 +1797,70 @@ def _second_pass_to_resolve_inheritances_in_place(
 @require(
     lambda symbol_table:
     all(
-        isinstance(symbol.interface, _MaybeInterfacePlaceholder)
+        isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
         for symbol in symbol_table.symbols
         if isinstance(symbol, Class)
     )
+)
+@ensure(
+    lambda symbol_table:
+    all(
+        not isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
+        for symbol in symbol_table.symbols
+        if isinstance(symbol, Class)
+    )
+)
+# fmt: on
+def _second_pass_to_resolve_concrete_descendants_in_place(
+        symbol_table: SymbolTable,
+        ontology: _hierarchy.Ontology
+) -> None:
+    """
+    Resolve placeholders for concrete descendants in the classes in-place.
+
+    All abstract classes as well as concrete classes with at least one descendant
+    are mapped to an interface.
+
+    Mind that the concept of the interface is not used in the meta-model and we
+    introduce it only as a convenience for the code generation.
+    """
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Class):
+            continue
+
+        concrete_descendants = []  # type: List[ConcreteClass]
+
+        for descendant in ontology.list_descendants(symbol.parsed):
+            descendant_symbol = symbol_table.must_find(descendant.name)
+
+            assert isinstance(descendant_symbol, Class)
+
+            if isinstance(descendant_symbol, ConcreteClass):
+                concrete_descendants.append(descendant_symbol)
+
+        assert isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
+
+        symbol._set_concrete_descendants(concrete_descendants)
+
+
+# fmt: off
+@require(
+    lambda symbol_table:
+    all(
+        isinstance(symbol.interface, _MaybeInterfacePlaceholder)
+        for symbol in symbol_table.symbols
+        if isinstance(symbol, Class)
+    ),
+    "None of the interfaces resolved"
+)
+@require(
+    lambda symbol_table:
+    all(
+        not isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
+        for symbol in symbol_table.symbols
+        if isinstance(symbol, Class)
+    ),
+    "All concrete descendants resolved"
 )
 @ensure(
     lambda symbol_table:
@@ -1884,56 +1944,6 @@ def _second_pass_to_resolve_interfaces_in_place(
         else:
             assert isinstance(cls, ConcreteClass)
             cls.interface = None
-
-
-# fmt: off
-@require(
-    lambda symbol_table:
-    all(
-        isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
-        for symbol in symbol_table.symbols
-        if isinstance(symbol, Class)
-    )
-)
-@ensure(
-    lambda symbol_table:
-    all(
-        not isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
-        for symbol in symbol_table.symbols
-        if isinstance(symbol, Class)
-    )
-)
-# fmt: on
-def _second_pass_to_resolve_concrete_descendants_in_place(
-        symbol_table: SymbolTable,
-        ontology: _hierarchy.Ontology
-) -> None:
-    """
-    Resolve placeholders for concrete descendants in the classes in-place.
-
-    All abstract classes as well as concrete classes with at least one descendant
-    are mapped to an interface.
-
-    Mind that the concept of the interface is not used in the meta-model and we
-    introduce it only as a convenience for the code generation.
-    """
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, Class):
-            continue
-
-        concrete_descendants = []  # type: List[ConcreteClass]
-
-        for descendant in ontology.list_descendants(symbol.parsed):
-            descendant_symbol = symbol_table.must_find(descendant.name)
-
-            assert isinstance(descendant_symbol, Class)
-
-            if isinstance(descendant_symbol, ConcreteClass):
-                concrete_descendants.append(descendant_symbol)
-
-        assert isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
-
-        symbol._set_concrete_descendants(concrete_descendants)
 
 
 def _collect_ids_of_classes_in_properties(symbol_table: SymbolTable) -> Set[int]:
@@ -2451,6 +2461,31 @@ def translate(
             f"in the intermediate list of symbols."
         )
 
+    # Check that ref association is associated with a class
+    if isinstance(ref_association, Class):
+        pass
+    else:
+        human_readable_type = None  # type: Optional[str]
+        if isinstance(ref_association, Enumeration):
+            human_readable_type = "enumeration"
+        elif isinstance(ref_association, ConstrainedPrimitive):
+            human_readable_type = "constrained primitive"
+        else:
+            assert_never(ref_association)
+
+        underlying_errors.append(
+            Error(
+                ref_association.parsed.node,
+                f"Expected the ``Ref[.]`` to be associated with a class, "
+                f"but it was associated with a {human_readable_type}."
+            )
+        )
+
+    if len(underlying_errors) > 0:
+        return None, bundle_underlying_errors()
+
+    assert isinstance(ref_association, Class), "Ref[.] associated with a class"
+
     meta_model = MetaModel(
         book_url=parsed_symbol_table.meta_model.book_url,
         book_version=parsed_symbol_table.meta_model.book_version,
@@ -2539,12 +2574,12 @@ def translate(
         symbol_table=symbol_table,
     )
 
-    _second_pass_to_resolve_interfaces_in_place(
+    _second_pass_to_resolve_concrete_descendants_in_place(
         symbol_table=symbol_table,
         ontology=ontology
     )
 
-    _second_pass_to_resolve_concrete_descendants_in_place(
+    _second_pass_to_resolve_interfaces_in_place(
         symbol_table=symbol_table,
         ontology=ontology
     )

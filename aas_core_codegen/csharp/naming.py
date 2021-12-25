@@ -1,6 +1,8 @@
 """Generate C# identifiers based on the identifiers from the meta-model."""
+from typing import Union
 
-from aas_core_codegen.common import Identifier
+from aas_core_codegen import intermediate
+from aas_core_codegen.common import Identifier, assert_never
 
 
 def interface_name(identifier: Identifier) -> Identifier:
@@ -61,6 +63,26 @@ def class_name(identifier: Identifier) -> Identifier:
     parts = identifier.split("_")
 
     return Identifier("{}".format("".join(part.capitalize() for part in parts)))
+
+
+def name_of(
+        something: Union[
+            intermediate.Enumeration,
+            intermediate.ConcreteClass,
+            intermediate.Interface]
+) -> Identifier:
+    """Dispatch to the appropriate naming function."""
+    if isinstance(something, intermediate.Enumeration):
+        return enum_name(something.name)
+
+    elif isinstance(something, intermediate.ConcreteClass):
+        return class_name(something.name)
+
+    elif isinstance(something, intermediate.Interface):
+        return interface_name(something.name)
+
+    else:
+        assert_never(something)
 
 
 def property_name(identifier: Identifier) -> Identifier:

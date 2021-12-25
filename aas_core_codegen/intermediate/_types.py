@@ -32,7 +32,7 @@ from aas_core_codegen.intermediate import construction
 _MODULE_NAME = pathlib.Path(__file__).parent.name
 
 
-class AtomicTypeAnnotation:
+class AtomicTypeAnnotation(DBC):
     """
     Represent an atomic type annotation.
 
@@ -40,6 +40,11 @@ class AtomicTypeAnnotation:
 
     For example, ``Asset`` or ``int``.
     """
+
+    @abc.abstractmethod
+    def __str__(self)->str:
+        # Signal that this is a purely abstract class
+        raise NotImplementedError()
 
 
 class PrimitiveType(enum.Enum):
@@ -130,6 +135,9 @@ class RefTypeAnnotation(SubscriptedTypeAnnotation):
     def __init__(self, value: "TypeAnnotation", parsed: parse.TypeAnnotation):
         self.value = value
         self.parsed = parsed
+
+    def __str__(self) -> str:
+        return f"Ref[{self.value}]"
 
 
 TypeAnnotation = Union[AtomicTypeAnnotation, SubscriptedTypeAnnotation]
@@ -779,6 +787,9 @@ class Class:
     #: Collect IDs (with :py:func:`id`) of the property objects in a set
     property_id_set: Final[FrozenSet[int]]
 
+    #: Map all methods by their identifiers to the corresponding objects
+    methods_by_name: Final[Mapping[Identifier, Method]]
+
     #: Collect IDs (with :py:func:`id`) of the invariant objects in a set
     invariant_id_set: Final[FrozenSet[int]]
 
@@ -824,11 +835,16 @@ class Class:
         self.description = description
         self.parsed = parsed
 
-        self.properties_by_name: Mapping[Identifier, Property] = {
+        self.properties_by_name = {
             prop.name: prop for prop in self.properties
         }
 
         self.property_id_set = frozenset(id(prop) for prop in self.properties)
+
+        self.methods_by_name = {
+            method.name: method for method in self.methods
+        }
+
         self.invariant_id_set = frozenset(id(inv) for inv in self.invariants)
 
     # fmt: off
@@ -1124,6 +1140,9 @@ class Interface:
 
     inheritances: Final[Sequence["Interface"]]
 
+    #: List of concrete classes that implement this interface
+    implementers: Sequence["ConcreteClass"]
+
     #: List of properties assumed by the interface
     properties: Final[Sequence[Property]]
 
@@ -1145,13 +1164,24 @@ class Interface:
     def __init__(
             self,
             base: Class,
-            inheritances: Sequence["Interface"]
+            inheritances: Sequence["Interface"],
     ) -> None:
         """Initialize with the given values."""
         self.base = base
 
         self.name = base.name
         self.inheritances = inheritances
+
+        implementers = [
+            concrete_descendant
+            for concrete_descendant in base.concrete_descendants
+        ]
+
+        if isinstance(base, ConcreteClass):
+            implementers.append(base)
+
+        self.implementers = implementers
+
         self.properties = base.properties
 
         self.signatures = [
@@ -1217,13 +1247,8 @@ class SymbolTable:
     #: Map verification functions by their name
     verification_functions_by_name: Final[Mapping[Identifier, Verification]]
 
-    #: Map abstract classes or concrete classes which have descendants to their
-    #: respective interface. If a concrete class has no descendants, it will not be
-    #: assigned an interface.
-    interface_map: Final[Mapping[Class, Interface]]
-
     #: Type to be used to represent a ``Ref[T]``
-    ref_association: Final[Symbol]
+    ref_association: Final[Class]
 
     #: Additional information about the source meta-model
     meta_model: Final[MetaModel]
@@ -1264,7 +1289,7 @@ class SymbolTable:
             self,
             symbols: Sequence[Symbol],
             verification_functions: Sequence[Verification],
-            ref_association: Symbol,
+            ref_association: Class,
             meta_model: parse.MetaModel,
     ) -> None:
         """Initialize with the given values and map symbols to name."""
@@ -1378,7 +1403,7 @@ class ArgumentReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
 
 def map_descendability(
         type_annotation: TypeAnnotation,
-        ref_association: Symbol
+        ref_association: Class
 ) -> MutableMapping[TypeAnnotation, bool]:
     """
     Map the type annotation recursively by the descendability.
@@ -1386,6 +1411,8 @@ def map_descendability(
     The descendability means that the type annotation references an interface
     or a class *or* that it is a subscripted type annotation which subscribes one or
     more classes of the meta-model.
+
+    Constrained primitives are considered primitives and thus non-descendable.
 
     The mapping is a form of caching. Otherwise, the time complexity would be quadratic
     if we queried at each type annotation subscript.
@@ -1405,7 +1432,9 @@ def map_descendability(
             result = None  # type: Optional[bool]
             if isinstance(a_type_annotation.symbol, Enumeration):
                 result = False
-            elif isinstance(a_type_annotation.symbol, (Interface, Class)):
+            elif isinstance(a_type_annotation.symbol, ConstrainedPrimitive):
+                result = False
+            elif isinstance(a_type_annotation.symbol, Class):
                 result = True
             else:
                 assert_never(a_type_annotation.symbol)
@@ -1425,18 +1454,10 @@ def map_descendability(
             return result
 
         elif isinstance(a_type_annotation, RefTypeAnnotation):
-            result = None  # type: Optional[bool]
-
-            if isinstance(ref_association, Enumeration):
-                result = False
-            elif isinstance(ref_association, (Interface, Class)):
-                result = True
-            else:
-                assert_never(ref_association)
-
-            assert result is not None
-            mapping[a_type_annotation] = result
-            return result
+            assert isinstance(ref_association, Class), (
+                "Explicit assumption for descendability")
+            mapping[a_type_annotation] = True
+            return True
 
         else:
             assert_never(a_type_annotation)
@@ -1456,15 +1477,15 @@ class _ConstructorArgumentOfClass:
 
 
 def make_union_of_constructor_arguments(
-        cls: Class, concrete_descendants: Sequence[ConcreteClass]
+        interface: Interface
 ) -> Tuple[Optional[OrderedDict[Identifier, TypeAnnotation]], Optional[Error]]:
     """
-    Make a union of all the constructor arguments over all the concrete classes.
+    Make a union of all the constructor arguments over all the implementing classes.
 
     This union is necessary, for example, when you need to de-serialize an object, but
     you are not yet sure which concrete type it has. Hence you need to be prepared to
     de-serialize a yet-unknown *subset* of the properties of *this* union when you start
-    de-serializing an object of type ``cls``.
+    de-serializing an object of type ``interface``.
     """
     errors = []  # type: List[Error]
 
@@ -1473,16 +1494,10 @@ def make_union_of_constructor_arguments(
 
     # region Collect
 
-    for cls_arg, arg in itertools.chain(
-            (
-                    (cls, arg)
-                    for arg in cls.constructor.arguments
-            ),
-            (
-                    (descendant, arg)
-                    for descendant in concrete_descendants
-                    for arg in descendant.constructor.arguments
-            )
+    for cls_arg, arg in (
+            (implementer, arg)
+            for implementer in interface.implementers
+            for arg in implementer.constructor.arguments
     ):
         lst = arg_union.get(arg.name, None)
         if lst is None:
@@ -1567,7 +1582,7 @@ def make_union_of_constructor_arguments(
                         f"of the class {arg_of_cls.cls.name!r} "
                         f"({arg_of_cls.arg.type_annotation}. "
                         f"This is a blocker for generating efficient code for "
-                        f"JSON de-serialization of the interface {cls.name!r} "
+                        f"JSON de-serialization of the interface {interface.name!r} "
                         f"(which both {defining_arg.cls.name!r} and "
                         f"{arg_of_cls.cls.name!r} implement).",
                     )
@@ -1581,9 +1596,9 @@ def make_union_of_constructor_arguments(
 
     if len(errors) > 0:
         return None, Error(
-            cls.parsed.node,
+            interface.parsed.node,
             f"Failed to make a union of constructor arguments "
-            f"over all the concrete classes of the class {cls.name!r}",
+            f"over all the concrete classes of the class {interface.name!r}",
             errors,
         )
 

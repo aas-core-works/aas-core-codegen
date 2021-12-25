@@ -25,13 +25,19 @@ def _generate_ivisitor(symbol_table: intermediate.SymbolTable) -> Stripped:
     blocks = []  # type: List[Stripped]
 
     for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+        if not isinstance(symbol, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.Interface):
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            # Constrained primitives are modeled as their constrainees in C#,
+            # so we do not visit them.
             continue
 
-        elif isinstance(symbol, intermediate.Class):
+        elif isinstance(symbol, intermediate.AbstractClass):
+            # Abstract classes are modeled as interfaces in C#, so we do not visit them.
+            continue
+
+        elif isinstance(symbol, intermediate.ConcreteClass):
             cls_name = csharp_naming.class_name(symbol.name)
             blocks.append(Stripped(f"public void Visit({cls_name} that);"))
 
@@ -135,10 +141,16 @@ def _generate_ivisitor_with_context(symbol_table: intermediate.SymbolTable) -> S
         if isinstance(symbol, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.Interface):
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            # Constrained primitives are modeled as their constrainees in C#,
+            # so we do not visit them.
             continue
 
-        elif isinstance(symbol, intermediate.Class):
+        elif isinstance(symbol, intermediate.AbstractClass):
+            # Abstract classes are modeled as interfaces in C#, so we do not visit them.
+            continue
+
+        elif isinstance(symbol, intermediate.ConcreteClass):
             cls_name = csharp_naming.class_name(symbol.name)
             blocks.append(Stripped(f"public void Visit({cls_name} that, C context);"))
 
@@ -178,12 +190,18 @@ def _generate_itransformer(symbol_table: intermediate.SymbolTable) -> Stripped:
         if isinstance(symbol, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.Interface):
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            # Constrained primitives are modeled as their constrainees in C#,
+            # so we do not transform them.
             continue
 
-        elif isinstance(symbol, intermediate.Class):
+        elif isinstance(symbol, intermediate.AbstractClass):
+            # Abstract classes are modeled as interfaces in C#, so we do not transform
+            # them.
+            continue
+
+        elif isinstance(symbol, intermediate.ConcreteClass):
             cls_name = csharp_naming.class_name(symbol.name)
-            var_name = csharp_naming.argument_name(symbol.name)
             blocks.append(Stripped(f"public T Transform({cls_name} that);"))
 
         else:
@@ -225,10 +243,17 @@ def _generate_itransformer_with_context(
         if isinstance(symbol, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.Interface):
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            # Constrained primitives are modeled as their constrainees in C#,
+            # so we do not transform them.
             continue
 
-        elif isinstance(symbol, intermediate.Class):
+        elif isinstance(symbol, intermediate.AbstractClass):
+            # Abstract classes are modeled as interfaces in C#, so we do not transform
+            # them.
+            continue
+
+        elif isinstance(symbol, intermediate.ConcreteClass):
             cls_name = csharp_naming.class_name(symbol.name)
             blocks.append(Stripped(f"public T Transform({cls_name} that, C context);"))
 

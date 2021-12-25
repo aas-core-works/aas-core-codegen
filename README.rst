@@ -1,8 +1,8 @@
-***********************
-aas-core-csharp-codegen
-***********************
+****************
+aas-core-codegen
+****************
 
-Aas-core-csharp-codegen generates C# code to handle asset administration shells based on the meta-model.
+Aas-core-codegen generates code to handle asset administration shells based on the meta-model.
 
 ``--help``
 ==========
@@ -10,7 +10,7 @@ Aas-core-csharp-codegen generates C# code to handle asset administration shells 
 .. Help starts: aas-core-csharp-codegen --help
 .. code-block::
 
-    usage: aas-core-csharp-codegen [-h] --model_path MODEL_PATH --output_dir
+    usage: aas-core-codegen [-h] --model_path MODEL_PATH --output_dir
                                    OUTPUT_DIR
 
     Generate C# code to handle asset administration shells based on the meta-

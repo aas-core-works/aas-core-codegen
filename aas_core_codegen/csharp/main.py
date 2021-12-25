@@ -113,7 +113,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     if errors is not None:
         run.write_error_report(
-            message=f"Failed to verify the C#-specific C# structures",
+            message=f"Failed to verify the C#-specific structures",
             errors=errors,
             stderr=stderr,
         )
@@ -181,16 +181,11 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # endregion
 
-    interface_implementers = intermediate.map_interface_implementers(
-        symbol_table=context.symbol_table
-    )
-
     # region Jsonization
 
     code, errors = csharp_jsonization.generate(
         symbol_table=context.symbol_table,
         namespace=namespace,
-        interface_implementers=interface_implementers,
         spec_impls=context.spec_impls,
     )
 

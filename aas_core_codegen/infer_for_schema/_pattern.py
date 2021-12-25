@@ -9,6 +9,8 @@ from aas_core_codegen.parse import tree as parse_tree
 from aas_core_codegen.infer_for_schema import _common as infer_for_schema_common
 
 
+# TODO: refactor this to match ``is_MIME_type(self)`` 🠒 similar to _len module, abstract!
+
 # fmt: off
 # noinspection PyAbstractClass
 @require(

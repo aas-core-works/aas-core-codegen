@@ -211,7 +211,7 @@ def _define_for_class_or_interface(
     (
         len_constraints_by_property,
         len_constraints_errors,
-    ) = infer_for_schema.infer_len_constraints(symbol=symbol)
+    ) = infer_for_schema.infer_len_constraints_by_class_properties(symbol=symbol)
 
     if len_constraints_errors is not None:
         errors.extend(len_constraints_errors)

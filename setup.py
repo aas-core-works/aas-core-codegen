@@ -19,11 +19,11 @@ with open(os.path.join(here, "requirements.txt"), encoding="utf-8") as fid:
     install_requires = [line for line in fid.read().splitlines() if line.strip()]
 
 setup(
-    name="aas-core-csharp-codegen",
+    name="aas-core-codegen",
     version="0.0.1rc1",
-    description="Generate C# code to handle asset administration shells based on the meta-model.",
+    description="Generate code to handle asset administration shells based on the meta-model.",
     long_description=long_description,
-    url="https://github.com/aas-core-works/aas-core-csharp-codegen",
+    url="https://github.com/aas-core-works/aas-core-codegen",
     author="Marko Ristin, Nico Braunisch, Robert Lehmann",
     author_email="marko@ristin.ch",
     classifiers=[
@@ -53,7 +53,7 @@ setup(
     data_files=[(".", ["LICENSE", "README.rst", "requirements.txt"])],
     entry_points={
         "console_scripts": [
-            "aas-core-csharp-codegen = aas_core_codegen.csharp.main:entry_point"
+            "aas-core-codegen = aas_core_codegen.csharp.main:entry_point"
         ]
     },
 )

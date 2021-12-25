@@ -33,12 +33,25 @@ class _ElementRenderer(
             self, element: intermediate.SymbolReferenceInDoc
     ) -> Tuple[Optional[str], Optional[str]]:
         name = None  # type: Optional[str]
+
         if isinstance(element.symbol, intermediate.Enumeration):
             name = csharp_naming.enum_name(element.symbol.name)
-        elif isinstance(element.symbol, intermediate.Interface):
-            name = csharp_naming.interface_name(element.symbol.name)
+
         elif isinstance(element.symbol, intermediate.Class):
-            name = csharp_naming.class_name(element.symbol.name)
+            if isinstance(element.symbol, intermediate.AbstractClass):
+                # We do not generate C# code for abstract classes, so we have to refer
+                # to the interface.
+                name = csharp_naming.interface_name(element.symbol.name)
+            elif isinstance(element.symbol, intermediate.ConcreteClass):
+                # NOTE (mristin, 2021-12-25):
+                # Though a concrete class can have multiple descendants and the writer
+                # might actually want to refer to the *interface* instead of
+                # the concrete class, we do the best effort here and resolve it to the
+                # name of the concrete class.
+                name = csharp_naming.class_name(element.symbol.name)
+            else:
+                assert_never(element.symbol)
+
         else:
             assert_never(element.symbol)
 
@@ -51,15 +64,22 @@ class _ElementRenderer(
         cref = None  # type: Optional[str]
 
         if isinstance(element.reference, intermediate.PropertyReferenceInDoc):
-            # TODO: this needs to be fixed; think about how we deal with interfaces and classes
             symbol_name = None  # type: Optional[str]
 
-            if isinstance(element.reference.symbol, intermediate.Class):
-                symbol_name = csharp_naming.class_name(element.reference.symbol.name)
-            elif isinstance(element.reference.symbol, intermediate.Interface):
-                symbol_name = csharp_naming.class_name(element.reference.symbol.name)
+            if isinstance(element.reference.cls, intermediate.AbstractClass):
+                # We do not generate C# code for abstract classes, so we have to refer
+                # to the interface.
+                symbol_name = csharp_naming.interface_name(element.reference.cls.name)
+            elif isinstance(element.reference.cls, intermediate.ConcreteClass):
+                # NOTE (mristin, 2021-12-25):
+                # Though a concrete class can have multiple descendants and the writer
+                # might actually want to refer to the *interface* instead of
+                # the concrete class, we do the best effort here and resolve it to the
+                # name of the concrete class.
+
+                symbol_name = csharp_naming.class_name(element.reference.cls.name)
             else:
-                assert_never(element.reference.symbol)
+                assert_never(element.reference.cls)
 
             prop_name = csharp_naming.property_name(element.reference.prop.name)
 

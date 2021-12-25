@@ -4,7 +4,7 @@ Provide common functions for different algorithms for inference of the constrain
 The constraints are inferred based on the invariants, so the properties in this context
 refer to member access in form of ``self.some_property``.
 """
-from typing import Optional
+from typing import Optional, Union
 
 from aas_core_codegen.common import Identifier
 
@@ -15,34 +15,46 @@ from aas_core_codegen.parse import tree as parse_tree
 
 
 def match_property(node: parse_tree.Node) -> Optional[Identifier]:
-    """Match an access to a property.
+    """
+    Match an access to a property.
 
-    For example, ``self.something`` will be a ``Property("something")``.
+    For example, matching ``self.something`` will be a ``"something"``.
     """
     if (
-        isinstance(node, parse_tree.Member)
-        and isinstance(node.instance, parse_tree.Name)
-        and node.instance.identifier == "self"
+            isinstance(node, parse_tree.Member)
+            and isinstance(node.instance, parse_tree.Name)
+            and node.instance.identifier == "self"
     ):
         return node.name
 
     return None
 
 
-class SingleArgFunctionOnProperty:
-    """Represent a match of a function with a single argument on a property."""
+class SingleArgFunctionOnMemberOrName:
+    """
+    Match a call of a function with a single argument on a member or a variable.
 
-    def __init__(self, function_name: Identifier, prop_name: Identifier) -> None:
+    Mind that we only match arguments, but ignore keyword arguments. This is due to
+    simplicity of the implementation and this behavior might change in the future.
+    """
+
+    def __init__(
+            self,
+            function_name: Identifier,
+            member_or_name: Union[parse_tree.Member, parse_tree.Name]
+    ) -> None:
         """Initialize with the given values."""
         self.function_name = function_name
-        self.prop_name = prop_name
+        self.member_or_name = member_or_name
 
 
-def match_single_arg_function_on_property(
-    node: parse_tree.Node,
-) -> Optional[SingleArgFunctionOnProperty]:
+def match_single_arg_function_on_member_or_name(
+        node: parse_tree.Node,
+) -> Optional[SingleArgFunctionOnMemberOrName]:
     """
-    Match a call of a function with a single argument on the property.
+    Match a call of a function with a single argument on a member or a variable.
+
+    For example, something like ``len(self.some_property)`` or ``is_MIME_type(self)``.
 
     Mind that we only match arguments, but ignore keyword arguments. This is due to
     simplicity of the implementation and this behavior might change in the future.
@@ -53,18 +65,21 @@ def match_single_arg_function_on_property(
     if len(node.args) != 1:
         return None
 
-    prop_name = match_property(node.args[0])
-    if prop_name is None:
+    if not isinstance(node.args[0], (parse_tree.Name, parse_tree.Member)):
         return None
 
-    return SingleArgFunctionOnProperty(function_name=node.name, prop_name=prop_name)
+    # noinspection PyTypeChecker
+    return SingleArgFunctionOnMemberOrName(
+        function_name=node.name,
+        member_or_name=node.args[0]
+    )
 
 
 class ConditionalOnProp:
     """Represent an invariant conditioned on an optional property."""
 
     def __init__(
-        self, prop_name: Identifier, consequent: parse_tree.Expression
+            self, prop_name: Identifier, consequent: parse_tree.Expression
     ) -> None:
         """Initialize with the given values."""
         self.prop_name = prop_name

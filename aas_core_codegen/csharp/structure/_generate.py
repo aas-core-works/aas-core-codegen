@@ -1,7 +1,8 @@
 """Generate the C# data structures from the intermediate representation."""
 import io
 import textwrap
-from typing import Optional, Dict, List, Tuple, cast, Union, Sequence, Mapping, Final
+from typing import Optional, Dict, List, Tuple, cast, Union, Sequence, Mapping, Final, \
+    Iterator
 
 from icontract import ensure, require
 
@@ -21,47 +22,64 @@ from aas_core_codegen.csharp import (
 from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II
 
 
-# TODO: continue here.
-#  Revisit the whole module and see how abstract/concrete classes fit and
-#  how we should deal with the constrained primitives
-
 # region Checks
+
+def _human_readable_identifier(
+        something: Union[
+            intermediate.Enumeration, intermediate.ConcreteClass,
+            intermediate.Interface]
+) -> str:
+    """
+    Represent ``something`` in a human-readable text.
+
+    The reader should be able to trace ``something`` back to the meta-model.\
+    """
+    result = None  # type: Optional[str]
+
+    if isinstance(something, intermediate.Enumeration):
+        result = f"meta-model enumeration {something.name!r}"
+    elif isinstance(something, intermediate.ConcreteClass):
+        result = f"meta-model class {something.name!r}"
+    elif isinstance(something, intermediate.Interface):
+        result = f"interface based on the meta-model class {something.name!r}"
+    else:
+        assert_never(something)
+
+    assert result is not None
+    return result
 
 
 def _verify_structure_name_collisions(
         symbol_table: intermediate.SymbolTable,
 ) -> List[Error]:
     """Verify that the C# names of the structures do not collide."""
-    observed_structure_names = {}  # type: Dict[Identifier, intermediate.Symbol]
+    observed_structure_names = {
+    }  # type: Dict[Identifier, Union[intermediate.Symbol, intermediate.Interface]]
 
     errors = []  # type: List[Error]
 
-    for symbol in symbol_table.symbols:
-        name = None  # type: Optional[Identifier]
+    # region Inter-structure collisions
 
-        if isinstance(symbol, intermediate.Class):
-            name = csharp_naming.class_name(symbol.name)
-        elif isinstance(symbol, intermediate.Enumeration):
-            name = csharp_naming.enum_name(symbol.name)
-        elif isinstance(symbol, intermediate.Interface):
-            name = csharp_naming.interface_name(symbol.name)
-        else:
-            assert_never(symbol)
+    for something in csharp_common.over_enumerations_classes_and_interfaces(
+            symbol_table):
+        name = csharp_naming.name_of(something)
 
-        assert name is not None
-        if name in observed_structure_names:
-            # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+        other = observed_structure_names.get(name, None)
+
+        if other is not None:
             errors.append(
                 Error(
-                    symbol.parsed.node,
+                    something.parsed.node,
                     f"The C# name {name!r} "
-                    f"of the meta-model symbol {symbol.name!r} collides "
-                    f"with another meta-model symbol "
-                    f"{observed_structure_names[name].name!r}",
+                    f"of the {_human_readable_identifier(something)} "
+                    f"collides with the C# name "
+                    f"of the {_human_readable_identifier(other)}"
                 )
             )
         else:
-            observed_structure_names[name] = symbol
+            observed_structure_names[name] = something
+
+    # endregion
 
     # region Intra-structure collisions
 
@@ -70,6 +88,8 @@ def _verify_structure_name_collisions(
 
         if collision_error is not None:
             errors.append(collision_error)
+
+    # endregion
 
     return errors
 
@@ -80,45 +100,11 @@ def _verify_intra_structure_collisions(
     """Verify that no member names collide in the C# structure of the given symbol."""
     errors = []  # type: List[Error]
 
-    if isinstance(intermediate_symbol, intermediate.Interface):
-        observed_member_names = {}  # type: Dict[Identifier, str]
+    if isinstance(intermediate_symbol, intermediate.Enumeration):
+        pass
 
-        for prop in intermediate_symbol.properties:
-            prop_name = csharp_naming.property_name(prop.name)
-            if prop_name in observed_member_names:
-                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
-                errors.append(
-                    Error(
-                        prop.parsed.node,
-                        f"C# property {prop_name!r} corresponding "
-                        f"to the meta-model property {prop.name!r} collides with "
-                        f"the {observed_member_names[prop_name]}",
-                    )
-                )
-            else:
-                observed_member_names[prop_name] = (
-                    f"C# property {prop_name!r} corresponding to "
-                    f"the meta-model property {prop.name!r}"
-                )
-
-        for signature in intermediate_symbol.signatures:
-            method_name = csharp_naming.method_name(signature.name)
-
-            if method_name in observed_member_names:
-                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
-                errors.append(
-                    Error(
-                        signature.parsed.node,
-                        f"C# method {method_name!r} corresponding "
-                        f"to the meta-model method {signature.name!r} collides with "
-                        f"the {observed_member_names[method_name]}",
-                    )
-                )
-            else:
-                observed_member_names[method_name] = (
-                    f"C# method {method_name!r} corresponding to "
-                    f"the meta-model method {signature.name!r}"
-                )
+    elif isinstance(intermediate_symbol, intermediate.ConstrainedPrimitive):
+        pass
 
     elif isinstance(intermediate_symbol, intermediate.Class):
         observed_member_names = {}  # type: Dict[Identifier, str]
@@ -141,38 +127,25 @@ def _verify_intra_structure_collisions(
                     f"the meta-model property {prop.name!r}"
                 )
 
-        methods_or_signatures = (
-            []
-        )  # type: Sequence[Union[intermediate.Method, intermediate.Signature]]
-
-        if isinstance(intermediate_symbol, intermediate.Class):
-            methods_or_signatures = intermediate_symbol.methods
-        elif isinstance(intermediate_symbol, intermediate.Interface):
-            methods_or_signatures = intermediate_symbol.signatures
-        else:
-            assert_never(intermediate_symbol)
-
-        for signature in methods_or_signatures:
-            method_name = csharp_naming.method_name(signature.name)
+        for method in intermediate_symbol.methods:
+            method_name = csharp_naming.method_name(method.name)
 
             if method_name in observed_member_names:
                 # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
                 errors.append(
                     Error(
-                        signature.parsed.node,
+                        method.parsed.node,
                         f"C# method {method_name!r} corresponding "
-                        f"to the meta-model method {signature.name!r} collides with "
+                        f"to the meta-model method {method.name!r} collides with "
                         f"the {observed_member_names[method_name]}",
                     )
                 )
             else:
                 observed_member_names[method_name] = (
                     f"C# method {method_name!r} corresponding to "
-                    f"the meta-model method {signature.name!r}"
+                    f"the meta-model method {method.name!r}"
                 )
 
-    elif isinstance(intermediate_symbol, intermediate.Enumeration):
-        pass
     else:
         assert_never(intermediate_symbol)
 
@@ -212,11 +185,6 @@ def verify(
 
     errors.extend(structure_name_collisions)
 
-    for symbol in symbol_table.symbols:
-        error = _verify_intra_structure_collisions(intermediate_symbol=symbol)
-        if error is not None:
-            errors.append(error)
-
     if len(errors) > 0:
         return None, errors
 
@@ -230,26 +198,26 @@ def verify(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_enum(
-        symbol: intermediate.Enumeration,
+        enum: intermediate.Enumeration,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the C# code for the enum."""
     writer = io.StringIO()
 
-    if symbol.description is not None:
-        comment, error = csharp_description.generate_comment(symbol.description)
+    if enum.description is not None:
+        comment, error = csharp_description.generate_comment(enum.description)
         if error:
             return None, error
 
         writer.write(comment)
         writer.write("\n")
 
-    name = csharp_naming.enum_name(symbol.name)
-    if len(symbol.literals) == 0:
+    name = csharp_naming.enum_name(enum.name)
+    if len(enum.literals) == 0:
         writer.write(f"public enum {name}\n{{\n}}")
         return Stripped(writer.getvalue()), None
 
     writer.write(f"public enum {name}\n{{\n")
-    for i, literal in enumerate(symbol.literals):
+    for i, literal in enumerate(enum.literals):
         if i > 0:
             writer.write(",\n\n")
 
@@ -278,8 +246,8 @@ def _generate_enum(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_interface(
-        symbol: intermediate.Interface,
-        ref_association: intermediate.Symbol
+        interface: intermediate.Interface,
+        ref_association: intermediate.Class
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate C# code for the given interface.
@@ -289,33 +257,32 @@ def _generate_interface(
     """
     writer = io.StringIO()
 
-    if symbol.description is not None:
-        comment, error = csharp_description.generate_comment(symbol.description)
+    if interface.description is not None:
+        comment, error = csharp_description.generate_comment(interface.description)
         if error:
             return None, error
 
         writer.write(comment)
         writer.write("\n")
 
-    name = csharp_naming.interface_name(symbol.name)
+    name = csharp_naming.interface_name(interface.name)
 
-    inheritances = [inheritance.name for inheritance in symbol.inheritances] + [
+    inheritances = [inheritance.name for inheritance in interface.inheritances] + [
         Identifier("Class")
     ]
 
+    inheritance_names = list(map(csharp_naming.interface_name, inheritances))
+
     assert len(inheritances) > 0
     if len(inheritances) == 1:
-        inheritance = csharp_naming.interface_name(inheritances[0])
-        writer.write(f"public interface {name} : {inheritance}\n{{\n")
+        writer.write(f"public interface {name} : {inheritance_names[0]}\n{{\n")
     else:
         writer.write(f"public interface {name} :\n")
-        for i, inheritance in enumerate(
-                map(csharp_naming.interface_name, inheritances)
-        ):
+        for i, inheritance_name in enumerate(inheritance_names):
             if i > 0:
                 writer.write(",\n")
 
-            writer.write(textwrap.indent(inheritance, II))
+            writer.write(textwrap.indent(inheritance_name, II))
 
         writer.write("\n{\n")
 
@@ -324,7 +291,7 @@ def _generate_interface(
 
     # region Getters and setters
 
-    for prop in symbol.properties:
+    for prop in interface.properties:
         prop_type = csharp_common.generate_type(
             type_annotation=prop.type_annotation,
             ref_association=ref_association)
@@ -347,7 +314,7 @@ def _generate_interface(
 
     # region Methods
 
-    for signature in symbol.signatures:
+    for signature in interface.signatures:
         signature_blocks = []  # type: List[Stripped]
 
         if signature.description is not None:
@@ -418,13 +385,13 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
     _descendability: Final[Mapping[intermediate.TypeAnnotation, bool]]
 
     #: Symbol to be used to represent references within an AAS
-    _ref_association: Final[intermediate.Symbol]
+    _ref_association: Final[intermediate.Class]
 
     def __init__(
             self,
             recurse: bool,
             descendability: Mapping[intermediate.TypeAnnotation, bool],
-            ref_association: intermediate.Symbol
+            ref_association: intermediate.Class
     ) -> None:
         """Initialize with the given values."""
         self._recurse = recurse
@@ -475,7 +442,11 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
         if isinstance(symbol, intermediate.Enumeration):
             return []
 
-        assert isinstance(symbol, (intermediate.Class, intermediate.Interface))
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            # We can not descend into a primitive type.
+            return []
+
+        assert isinstance(symbol, intermediate.Class)  # Exhaustively match
 
         result = [
             csharp_unrolling.Node(
@@ -602,9 +573,9 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
 
 
 def _generate_descend_body(
-        symbol: intermediate.Class,
+        cls: intermediate.ConcreteClass,
         recurse: bool,
-        ref_association: intermediate.Symbol
+        ref_association: intermediate.Class
 ) -> Stripped:
     """
     Generate the body of the ``Descend`` and ``DescendOnce`` methods.
@@ -617,7 +588,7 @@ def _generate_descend_body(
     """
     blocks = []  # type: List[Stripped]
 
-    for prop in symbol.properties:
+    for prop in cls.properties:
         descendability = intermediate.map_descendability(
             type_annotation=prop.type_annotation,
             ref_association=ref_association
@@ -658,18 +629,18 @@ def _generate_descend_body(
 
 
 def _generate_descend_once_method(
-        symbol: intermediate.Class,
-        ref_association: intermediate.Symbol
+        cls: intermediate.ConcreteClass,
+        ref_association: intermediate.Class
 ) -> Stripped:
     """
-    Generate the ``DescendOnce`` method for the class of the ``symbol``.
+    Generate the ``DescendOnce`` method for the concrete class ``cls``.
 
     The ``ref_association`` indicates which symbol to use for representing references
     within an AAS.
     """
 
     body = _generate_descend_body(
-        symbol=symbol, recurse=False, ref_association=ref_association)
+        cls=cls, recurse=False, ref_association=ref_association)
 
     indented_body = textwrap.indent(body, I)
 
@@ -687,18 +658,18 @@ public IEnumerable<IClass> DescendOnce()
 
 
 def _generate_descend_method(
-        symbol: intermediate.Class,
+        cls: intermediate.ConcreteClass,
         ref_association: intermediate.Symbol
 ) -> Stripped:
     """
-    Generate the recursive ``Descend`` method for the class of the ``symbol``.
+    Generate the recursive ``Descend`` method for the concrete class ``cls``.
 
     The ``ref_association`` indicates which symbol to use for representing references
     within an AAS.
     """
 
     body = _generate_descend_body(
-        symbol=symbol, recurse=True, ref_association=ref_association)
+        cls=cls, recurse=True, ref_association=ref_association)
 
     indented_body = textwrap.indent(body, I)
 
@@ -750,21 +721,21 @@ def _generate_default_value(default: intermediate.Default) -> Stripped:
 @require(lambda symbol: not symbol.constructor.is_implementation_specific)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_constructor(
-        symbol: intermediate.Class,
-        ref_association: intermediate.Symbol
+        cls: intermediate.ConcreteClass,
+        ref_association: intermediate.Class
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
-    Generate the constructor function for the given symbol.
+    Generate the constructor function for the given concrete class ``cls``.
 
     The ``ref_association`` indicates which symbol to use for representing references
     within an AAS.
     """
-    cls_name = csharp_naming.class_name(symbol.name)
+    cls_name = csharp_naming.class_name(cls.name)
 
     blocks = []  # type: List[str]
 
     arg_codes = []  # type: List[str]
-    for arg in symbol.constructor.arguments:
+    for arg in cls.constructor.arguments:
         arg_type = csharp_common.generate_type(
             type_annotation=arg.type_annotation,
             ref_association=ref_association)
@@ -783,7 +754,7 @@ def _generate_constructor(
         return (
             None,
             Error(
-                symbol.parsed.node,
+                cls.parsed.node,
                 "An empty constructor is automatically generated, "
                 "which conflicts with the empty constructor "
                 "specified in the meta-model",
@@ -798,7 +769,7 @@ def _generate_constructor(
         blocks.append(Stripped(f"public {cls_name}(\n{arg_block_indented})\n{{"))
 
     body = []  # type: List[str]
-    for stmt in symbol.constructor.statements:
+    for stmt in cls.constructor.statements:
         if isinstance(stmt, intermediate_construction.AssignArgument):
             if stmt.default is None:
                 body.append(
@@ -807,7 +778,7 @@ def _generate_constructor(
                 )
             else:
                 if isinstance(stmt.default, intermediate_construction.EmptyList):
-                    prop = symbol.properties_by_name[stmt.name]
+                    prop = cls.properties_by_name[stmt.name]
 
                     type_anno = prop.type_annotation
                     while isinstance(type_anno, intermediate.OptionalTypeAnnotation):
@@ -857,41 +828,57 @@ def _generate_constructor(
 @require(lambda symbol: not symbol.is_implementation_specific)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
-        symbol: intermediate.Class,
+        cls: intermediate.ConcreteClass,
         spec_impls: specific_implementations.SpecificImplementations,
-        ref_association: intermediate.Symbol
+        ref_association: intermediate.Class
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
-    Generate C# code for the given class.
+    Generate C# code for the given concrete class ``cls``.
 
     The ``ref_association`` indicates which symbol to use for representing references
     within an AAS.
     """
     writer = io.StringIO()
 
-    if symbol.description is not None:
-        comment, error = csharp_description.generate_comment(symbol.description)
+    if cls.description is not None:
+        comment, error = csharp_description.generate_comment(cls.description)
         if error:
             return None, error
 
         writer.write(comment)
         writer.write("\n")
 
-    name = csharp_naming.class_name(symbol.name)
+    name = csharp_naming.class_name(cls.name)
 
-    interfaces = [interface.name for interface in symbol.interfaces] + [
-        Identifier("Class")
-    ]
+    # NOTE (mristin, 2021-12-15):
+    # Since C# does not support multiple inheritance, we model all the abstract classes
+    # as interfaces. Hence a class only implements interfaces and does not extend
+    # any abstract class.
+    #
+    # Moreover, if a concrete class has descendants (which we allow in the meta-model),
+    # we will additionally generate an interface for that class and that class then also
+    # implements the interface which was based on it.
+    #
+    # Finally, every class of the meta-model also implements the general
+    # ``IClass`` interface.
 
-    assert len(interfaces) > 0
-    if len(interfaces) == 1:
-        interface_name = csharp_naming.interface_name(interfaces[0])
-        writer.write(f"public class {name} : {interface_name}\n{{\n")
+    interface_names = []  # type: List[Identifier]
+    for inheritance in cls.inheritances:
+        assert inheritance.interface is not None, (
+            f"Expected interface in the parent class {inheritance.name!r} "
+            f"of class {cls.name!r}"
+        )
+
+        interface_names.append(csharp_naming.name_of(inheritance.interface))
+
+    interface_names.append(csharp_naming.interface_name(Identifier("Class")))
+
+    assert len(interface_names) > 0
+    if len(interface_names) == 1:
+        writer.write(f"public class {name} : {interface_names[0]}\n{{\n")
     else:
         writer.write(f"public class {name} :\n")
-        for i, interface_name in enumerate(
-                map(csharp_naming.interface_name, interfaces)
-        ):
+        for i, interface_name in enumerate(interface_names):
             if i > 0:
                 writer.write(",\n")
 
@@ -904,7 +891,7 @@ def _generate_class(
 
     # region Getters and setters
 
-    for prop in symbol.properties:
+    for prop in cls.properties:
         prop_type = csharp_common.generate_type(
             type_annotation=prop.type_annotation,
             ref_association=ref_association)
@@ -930,10 +917,10 @@ def _generate_class(
 
     errors = []  # type: List[Error]
 
-    for method in symbol.methods:
+    for method in cls.methods:
         if isinstance(method, intermediate.ImplementationSpecificMethod):
             implementation_key = specific_implementations.ImplementationKey(
-                f"{symbol.name}/{method.name}.cs"
+                f"{cls.name}/{method.name}.cs"
             )
 
             implementation = spec_impls.get(implementation_key, None)
@@ -942,8 +929,8 @@ def _generate_class(
                 errors.append(
                     Error(
                         method.parsed.node,
-                        f"The implementation is missing for the implementation-specific "
-                        f"method: {implementation_key}",
+                        f"The implementation is missing for "
+                        f"the implementation-specific method: {implementation_key}",
                     )
                 )
                 continue
@@ -957,19 +944,20 @@ def _generate_class(
 
             errors.append(
                 Error(
-                    symbol.parsed.node,
+                    cls.parsed.node,
                     "At the moment, we do not transpile the method body and "
-                    "its contracts.",
+                    "its contracts. We want to finish the meta-model for the V3 and "
+                    "fix de/serialization before taking on this rather hard task.",
                 )
             )
 
     blocks.append(
         _generate_descend_once_method(
-            symbol=symbol, ref_association=ref_association))
+            cls=cls, ref_association=ref_association))
 
     blocks.append(
         _generate_descend_method(
-            symbol=symbol,
+            cls=cls,
             ref_association=ref_association))
 
     blocks.append(
@@ -1041,16 +1029,16 @@ def _generate_class(
 
     # region Constructor
 
-    if symbol.constructor.is_implementation_specific:
+    if cls.constructor.is_implementation_specific:
         implementation_key = specific_implementations.ImplementationKey(
-            f"{symbol.name}/{symbol.name}.cs"
+            f"{cls.name}/{cls.name}.cs"
         )
         implementation = spec_impls.get(implementation_key, None)
 
         if implementation is None:
             errors.append(
                 Error(
-                    symbol.parsed.node,
+                    cls.parsed.node,
                     f"The implementation of the implementation-specific constructor "
                     f"is missing: {implementation_key}",
                 )
@@ -1059,7 +1047,7 @@ def _generate_class(
             blocks.append(implementation)
     else:
         constructor_block, error = _generate_constructor(
-            symbol=symbol, ref_association=ref_association)
+            cls=cls, ref_association=ref_association)
 
         if error is not None:
             errors.append(error)
@@ -1070,8 +1058,8 @@ def _generate_class(
 
     if len(errors) > 0:
         return None, Error(
-            symbol.parsed.node,
-            f"Failed to generate the code for the class {symbol.name}",
+            cls.parsed.node,
+            f"Failed to generate the code for the class {cls.name}",
             errors,
         )
 
@@ -1170,42 +1158,44 @@ def generate(
 
     errors = []  # type: List[Error]
 
-    for intermediate_symbol in symbol_table.symbols:
+    for something in csharp_common.over_enumerations_classes_and_interfaces(
+            symbol_table):
         code = None  # type: Optional[Stripped]
         error = None  # type: Optional[Error]
 
         if (
-                isinstance(intermediate_symbol, intermediate.Class)
-                and intermediate_symbol.is_implementation_specific
+                isinstance(something, intermediate.Class)
+                and something.is_implementation_specific
         ):
             implementation_key = specific_implementations.ImplementationKey(
-                f"{intermediate_symbol.name}.cs"
+                f"{something.name}.cs"
             )
 
             code = spec_impls.get(implementation_key, None)
             if code is None:
                 error = Error(
-                    intermediate_symbol.parsed.node,
+                    something.parsed.node,
                     f"The implementation is missing "
                     f"for the implementation-specific class: {implementation_key}",
                 )
         else:
-            if isinstance(intermediate_symbol, intermediate.Enumeration):
-                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
-                code, error = _generate_enum(symbol=intermediate_symbol)
-            elif isinstance(intermediate_symbol, intermediate.Interface):
-                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+            if isinstance(something, intermediate.Enumeration):
+                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
+                code, error = _generate_enum(enum=something)
+            elif isinstance(something, intermediate.Interface):
+                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
                 code, error = _generate_interface(
-                    symbol=intermediate_symbol,
+                    interface=something,
                     ref_association=symbol_table.ref_association)
 
-            elif isinstance(intermediate_symbol, intermediate.Class):
+            elif isinstance(something, intermediate.ConcreteClass):
+                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
                 code, error = _generate_class(
-                    symbol=intermediate_symbol, spec_impls=spec_impls,
+                    cls=something, spec_impls=spec_impls,
                     ref_association=symbol_table.ref_association
                 )
             else:
-                assert_never(intermediate_symbol)
+                assert_never(something)
 
         assert (code is None) ^ (error is None)
         if error is not None:
