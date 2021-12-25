@@ -63,11 +63,15 @@ def generate_type(
         type_annotation: Union[
             intermediate.SubscriptedTypeAnnotation, intermediate.AtomicTypeAnnotation
         ],
-        ref_association: intermediate.Symbol
+        ref_association: intermediate.Interface,
 ) -> Stripped:
-    """Generate the C# type for the given type annotation."""
-    # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
-    #  test with general snippets, do not test in isolation
+    """
+    Generate the C# type for the given type annotation.
+
+    The ``ref_association`` describes how the references should be represented.
+    It is either a concrete class (with no descendants) or an interface.
+    """
+    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
     if isinstance(type_annotation, intermediate.AtomicTypeAnnotation):
         if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
             return _PRIMITIVE_TYPE_MAP[type_annotation.a_type]

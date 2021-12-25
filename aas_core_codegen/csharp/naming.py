@@ -106,6 +106,7 @@ def private_property_name(identifier: Identifier) -> Identifier:
         )
     )
 
+
 def private_method_name(identifier: Identifier) -> Identifier:
     """
     Generate a C# name for a private method based on the ``identifier``.

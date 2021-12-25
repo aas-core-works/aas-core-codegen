@@ -191,7 +191,6 @@ class _UnverifiedOntology:
         """Return ``True`` if there is a record of the ``cls``'s descendants."""
         return cls in self._descendants_of
 
-
     def list_descendants(self, cls: parse.Class) -> Sequence[parse.Class]:
         """Retrieve the descendants of the given class ``cls``."""
 

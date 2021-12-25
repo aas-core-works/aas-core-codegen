@@ -3,6 +3,7 @@ import ast
 import collections
 import itertools
 import re
+from abc import abstractmethod
 from typing import (
     Sequence,
     List,
@@ -14,7 +15,7 @@ from typing import (
     Iterator,
     TypeVar,
     Generic,
-    cast, Final, Set, Any, Type, )
+    cast, Final, Set, Type, overload, )
 
 import asttokens
 import docutils.nodes
@@ -62,7 +63,7 @@ from aas_core_codegen.intermediate._types import (
     ImplementationSpecificMethod,
     ImplementationSpecificVerification, Verification, PatternVerification,
     ArgumentReferenceInDoc, ConstrainedPrimitive, ConcreteClass, AbstractClass,
-    SignatureLike,
+    SignatureLike, Interface,
 )
 from aas_core_codegen.parse import (
     tree as parse_tree
@@ -957,6 +958,40 @@ def _parsed_class_to_constrained_primitive(
     )
 
 
+class _MaybeInterfacePlaceholder:
+    """
+    Represent a placeholder for the interfaces.
+    
+    We do not know in the first pass whether a class will have an interface defined
+    or not.
+    """
+
+
+class _ConcreteDescendantsPlaceholder(Sequence[ConcreteClass]):
+    """
+    Represent a placeholder for the list of concrete descendants of a class.
+    
+    We do not know in the first pass how many concrete descendants a class has.
+    """
+
+    @overload
+    @abstractmethod
+    def __getitem__(self, i: int) -> ConcreteClass: ...
+
+    @overload
+    @abstractmethod
+    def __getitem__(self, s: slice) -> Sequence[ConcreteClass]: ...
+
+    def __getitem__(
+            self,
+            i: Union[int, slice]
+    ) -> Union[ConcreteClass, Sequence[ConcreteClass]]:
+        raise AssertionError("This is only a placeholder.")
+
+    def __len__(self) -> int:
+        raise AssertionError("This is only a placeholder.")
+
+
 def _parsed_class_to_class(
         parsed: parse.Class,
         ontology: _hierarchy.Ontology,
@@ -1086,6 +1121,8 @@ def _parsed_class_to_class(
     return factory_to_use(
         name=parsed.name,
         inheritances=inheritances,
+        interface=_MaybeInterfacePlaceholder(),
+        concrete_descendants=_ConcreteDescendantsPlaceholder(),
         is_implementation_specific=parsed.is_implementation_specific,
         properties=properties,
         methods=methods,
@@ -1225,98 +1262,8 @@ def _over_our_type_annotations(
         assert_never(something)
 
 
-class _SymbolTableBeforeMappingConcreteDescendants:
-    """Represent all the symbols just before we resolved the inheritances."""
-
-    #: List of all symbols that we need for the code generation
-    symbols: Final[Sequence[Symbol]]
-
-    #: List of all functions used in the verification
-    verification_functions: Final[Sequence[Verification]]
-
-    #: Map verification functions by their name
-    verification_functions_by_name: Final[Mapping[Identifier, Verification]]
-
-    #: Type to be used to represent a ``Ref[T]``
-    ref_association: Final[Symbol]
-
-    #: Additional information about the source meta-model
-    meta_model: Final[MetaModel]
-
-    _name_to_symbol: Final[Mapping[Identifier, Symbol]]
-
-    # fmt: off
-    @require(
-        lambda symbols: (
-                names := [symbol.name for symbol in symbols],
-                len(names) == len(set(names)),
-        )[1],
-        "Symbol names unique",
-    )
-    @ensure(
-        lambda self:
-        all(
-            id(self.verification_functions_by_name[func.name]) == id(func)
-            for func in self.verification_functions
-        )
-        and len(self.verification_functions_by_name) == len(
-            self.verification_functions),
-        "The verification functions and their mapping by name are consistent"
-    )
-    @ensure(
-        lambda self:
-        all(
-            (
-                    found_symbol := self.find(symbol.name),
-                    found_symbol is not None and id(found_symbol) == id(symbol)
-            )[1]
-            for symbol in self.symbols
-        ),
-        "Finding symbols is consistent with ``symbols``"
-    )
-    # fmt: on
-    def __init__(
-            self,
-            symbols: Sequence[Symbol],
-            verification_functions: Sequence[Verification],
-            ref_association: Symbol,
-            meta_model: parse.MetaModel,
-    ) -> None:
-        """Initialize with the given values and map symbols to name."""
-        self.symbols = symbols
-        self.verification_functions = verification_functions
-        self.ref_association = ref_association
-        self.meta_model = meta_model
-
-        self.verification_functions_by_name = {
-            func.name: func
-            for func in self.verification_functions
-        }
-
-        self._name_to_symbol = {symbol.name: symbol for symbol in symbols}
-
-    def find(self, name: Identifier) -> Optional[Symbol]:
-        """Find the symbol with the given ``name``."""
-        return self._name_to_symbol.get(name, None)
-
-    def must_find(self, name: Identifier) -> Symbol:
-        """
-        Find the symbol with the given ``name``.
-
-        :raise: :py:class:`KeyError` if the ``name`` is not in the table.
-        """
-        result = self.find(name)
-        if result is None:
-            raise KeyError(
-                f"Could not find the symbol with the name {name} "
-                f"in the symbol table"
-            )
-
-        return result
-
-
 def _second_pass_to_resolve_symbols_in_atomic_types_in_place(
-        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+        symbol_table: SymbolTable
 ) -> List[Error]:
     """Resolve the symbol references in the atomic types in-place."""
     errors = []  # type: List[Error]
@@ -1394,7 +1341,7 @@ def _over_descriptions_in_symbol(
 
 
 def _over_descriptions(
-        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+        symbol_table: SymbolTable
 ) -> Iterator[Tuple[Optional[Symbol], Description]]:
     """
     Iterate over all the descriptions in the meta-model.
@@ -1416,7 +1363,7 @@ def _over_descriptions(
 
 
 def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
-        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+        symbol_table: SymbolTable
 ) -> List[Error]:
     """Resolve the symbol references in the descriptions in-place."""
     errors = []  # type: List[Error]
@@ -1476,7 +1423,7 @@ def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
 
 
 def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
-        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+        symbol_table: SymbolTable
 ) -> List[Error]:
     """Resolve the attribute references in the descriptions in-place."""
     errors = []  # type: List[Error]
@@ -1609,7 +1556,7 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _fill_in_default_placeholder(
         default: _DefaultPlaceholder,
-        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+        symbol_table: SymbolTable
 ) -> Tuple[Optional[Default], Optional[Error]]:
     """Resolve the default values to references using the constructed symbol table."""
     # If we do not preemptively return, signal that we do not know how to handle
@@ -1653,7 +1600,7 @@ def _fill_in_default_placeholder(
 
 
 def _over_arguments(
-        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+        symbol_table: SymbolTable
 ) -> Iterator[Argument]:
     """Iterate over all the instances of ``Argument`` from the ``symbol_table``."""
     for symbol in symbol_table.symbols:
@@ -1676,7 +1623,7 @@ def _over_arguments(
 
 
 def _second_pass_to_resolve_default_argument_values_in_place(
-        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+        symbol_table: SymbolTable
 ) -> List[Error]:
     """Resolve the default values of the method and function arguments in-place."""
     errors = []  # type: List[Error]
@@ -1705,7 +1652,7 @@ def _second_pass_to_resolve_default_argument_values_in_place(
 
 
 def _second_pass_to_resolve_supersets_of_enumerations_in_place(
-        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+        symbol_table: SymbolTable
 ) -> List[Error]:
     """Resolve the enumeration references in the supersets in-place."""
     errors = []  # type: List[Error]
@@ -1782,7 +1729,7 @@ def _second_pass_to_resolve_supersets_of_enumerations_in_place(
 
 
 def _second_pass_to_resolve_resulting_class_of_implemented_for(
-        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+        symbol_table: SymbolTable
 ) -> None:
     """Resolve the resulting class of the ``implemented_for`` in a property in-place."""
     for symbol in symbol_table.symbols:
@@ -1807,7 +1754,7 @@ def _second_pass_to_resolve_resulting_class_of_implemented_for(
 
 
 def _second_pass_to_resolve_inheritances_in_place(
-        symbol_table: _SymbolTableBeforeMappingConcreteDescendants
+        symbol_table: SymbolTable
 ) -> None:
     """Resolve the class references in the class inheritances in-place."""
     for symbol in symbol_table.symbols:
@@ -1827,8 +1774,7 @@ def _second_pass_to_resolve_inheritances_in_place(
 
                 resolved_inheritances.append(inheritance_symbol)
 
-            symbol.set_inheritances(resolved_inheritances)
-
+            symbol._set_inheritances(resolved_inheritances)
 
         elif isinstance(symbol, Class):
             resolved_inheritances = []  # type: List[Class]
@@ -1841,27 +1787,141 @@ def _second_pass_to_resolve_inheritances_in_place(
 
                 resolved_inheritances.append(inheritance_symbol)
 
-            symbol.set_inheritances(resolved_inheritances)
+            symbol._set_inheritances(resolved_inheritances)
 
         else:
             assert_never(symbol)
 
 
-def _map_concrete_descendants(
-        symbol_table: _SymbolTableBeforeMappingConcreteDescendants,
+# fmt: off
+@require(
+    lambda symbol_table:
+    all(
+        isinstance(symbol.interface, _MaybeInterfacePlaceholder)
+        for symbol in symbol_table.symbols
+        if isinstance(symbol, Class)
+    )
+)
+@ensure(
+    lambda symbol_table:
+    all(
+        # Exhaustive pattern matching
+        isinstance(symbol, (AbstractClass, ConcreteClass))
+        and (
+                not isinstance(symbol, AbstractClass)
+                or isinstance(symbol.interface, Interface)
+        )
+        and (
+                not isinstance(symbol, ConcreteClass)
+                or (
+                        symbol.interface is None
+                        or isinstance(symbol.interface, Interface)
+                )
+        )
+        for symbol in symbol_table.symbols
+        if isinstance(symbol, Class)
+    ),
+    "All interfaces resolved"
+)
+# fmt: on
+def _second_pass_to_resolve_interfaces_in_place(
+        symbol_table: SymbolTable,
         ontology: _hierarchy.Ontology
-) -> Mapping[Class, Sequence[ConcreteClass]]:
-    """Map for each class its descendants which are concrete classes."""
-    result = dict()  # type: MutableMapping[Class, List[ConcreteClass]]
+) -> None:
+    """
+    Resolve interface placeholders in the classes in-place.
 
+    All abstract classes as well as concrete classes with at least one descendant
+    are mapped to an interface.
+
+    Mind that the concept of the interface is not used in the meta-model and we
+    introduce it only as a convenience for the code generation.
+    """
+    for parsed_cls in ontology.classes:
+        cls = symbol_table.must_find(parsed_cls.name)
+
+        assert id(cls.parsed) == id(parsed_cls)
+        assert isinstance(cls, (ConstrainedPrimitive, Class))
+
+        if isinstance(cls, ConstrainedPrimitive):
+            # Constrained primitives do not provide an interface as their interface
+            # is the interface of their constrainee.
+            continue
+
+        # Make sure we covered all the cases in the if-statement below
+        assert isinstance(cls, (AbstractClass, ConcreteClass))
+
+        assert isinstance(cls.interface, _MaybeInterfacePlaceholder), (
+            f"Expected the class {cls.name!r} to have a placeholder as an interface, "
+            f"but got: {cls.interface!r}"
+        )
+
+        if (
+                isinstance(cls, AbstractClass)
+                or len(ontology.list_descendants(parsed_cls)) > 0
+        ):
+            parent_interfaces = []  # type: List[Interface]
+
+            for inheritance_name in parsed_cls.inheritances:
+                parent_cls = symbol_table.must_find(inheritance_name)
+
+                parent_interface = parent_cls.interface
+                assert isinstance(parent_interface, Interface), (
+                    f"We expect the classes in the ontology to be topologically "
+                    f"sorted. Hence the interface for the parent {inheritance_name!r} "
+                    f"of the class {parsed_cls.name!r} must have been defined, but "
+                    f"it was not: {parent_interface=}."
+                )
+
+                parent_interfaces.append(parent_interface)
+
+            interface = Interface(
+                base=cls,
+                inheritances=parent_interfaces
+            )
+
+            cls.interface = interface
+        else:
+            assert isinstance(cls, ConcreteClass)
+            cls.interface = None
+
+
+# fmt: off
+@require(
+    lambda symbol_table:
+    all(
+        isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
+        for symbol in symbol_table.symbols
+        if isinstance(symbol, Class)
+    )
+)
+@ensure(
+    lambda symbol_table:
+    all(
+        not isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
+        for symbol in symbol_table.symbols
+        if isinstance(symbol, Class)
+    )
+)
+# fmt: on
+def _second_pass_to_resolve_concrete_descendants_in_place(
+        symbol_table: SymbolTable,
+        ontology: _hierarchy.Ontology
+) -> None:
+    """
+    Resolve placeholders for concrete descendants in the classes in-place.
+
+    All abstract classes as well as concrete classes with at least one descendant
+    are mapped to an interface.
+
+    Mind that the concept of the interface is not used in the meta-model and we
+    introduce it only as a convenience for the code generation.
+    """
     for symbol in symbol_table.symbols:
         if not isinstance(symbol, Class):
             continue
 
-        concrete_descendants = result.get(symbol, None)
-        if concrete_descendants is None:
-            concrete_descendants = []
-            result[symbol] = concrete_descendants
+        concrete_descendants = []  # type: List[ConcreteClass]
 
         for descendant in ontology.list_descendants(symbol.parsed):
             descendant_symbol = symbol_table.must_find(descendant.name)
@@ -1871,7 +1931,9 @@ def _map_concrete_descendants(
             if isinstance(descendant_symbol, ConcreteClass):
                 concrete_descendants.append(descendant_symbol)
 
-    return result
+        assert isinstance(symbol.concrete_descendants, _ConcreteDescendantsPlaceholder)
+
+        symbol._set_concrete_descendants(concrete_descendants)
 
 
 def _collect_ids_of_classes_in_properties(symbol_table: SymbolTable) -> Set[int]:
@@ -2054,7 +2116,12 @@ def _check_all_non_optional_properties_initialized(
 
 
 def _over_signature_likes(symbol_table: SymbolTable) -> Iterator[SignatureLike]:
-    """Iterate over all signature-like instances in the symbol table."""
+    """
+    Iterate over all signature-like instances in the symbol table.
+
+    Since interfaces are constructed on top of abstract classes and concrete classes
+    with descendants, we do not iterate here over the signatures in the interfaces.
+    """
     yield from symbol_table.verification_functions
 
     for symbol in symbol_table.symbols:
@@ -2066,12 +2133,16 @@ def _over_signature_likes(symbol_table: SymbolTable) -> Iterator[SignatureLike]:
             yield from symbol.methods
 
             yield symbol.constructor
+
+            # We do not recurse here into signatures of interfaces since they are based
+            # on the methods of the corresponding class.
         else:
             assert_never(symbol)
 
 
 def _verify(
-        symbol_table: SymbolTable
+        symbol_table: SymbolTable,
+        ontology: _hierarchy.Ontology
 ) -> List[Error]:
     """Perform a battery of checks on the consistency of ``symbol_table``."""
     errors = []  # type: List[Error]
@@ -2087,13 +2158,11 @@ def _verify(
             continue
 
         if id(symbol) in classes_in_properties:
-            concrete_descendants = symbol_table.concrete_descendants_of[symbol]
-
-            if len(concrete_descendants) >= 1:
+            if len(symbol.concrete_descendants) >= 1:
                 if not symbol.serialization.with_model_type:
                     descendants_str = ', '.join(
                         repr(descendant.name)
-                        for descendant in concrete_descendants
+                        for descendant in symbol.concrete_descendants
                     )
 
                     errors.append(
@@ -2106,7 +2175,7 @@ def _verify(
                         )
                     )
 
-                for descendant in concrete_descendants:
+                for descendant in symbol.concrete_descendants:
                     if not descendant.serialization.with_model_type:
                         errors.append(
                             Error(
@@ -2184,6 +2253,41 @@ def _verify(
             assert inheritance.constrainee == symbol.constrainee, (
                 f"{inheritance=}, {inheritance.constrainee=}, "
                 f"{symbol=}, {symbol.constrainee=}"
+            )
+
+    # endregion
+
+    # region Assert that interfaces defined correctly
+
+    # NOTE (mristin, 2021-12-15):
+    # We expect the interfaces of the classes to be defined only for abstract classes
+    # and for the concrete classes with at least one descendant.
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Class):
+            continue
+
+        if (
+                isinstance(symbol, AbstractClass)
+                or len(ontology.list_descendants(symbol.parsed)) > 0
+        ):
+            assert isinstance(symbol.interface, Interface)
+        else:
+            assert symbol.interface is None
+
+    # endregion
+
+    # region Assert that all class inheritances defined an interface
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Class):
+            continue
+
+        for inheritance in symbol.inheritances:
+            assert isinstance(inheritance.interface, Interface), (
+                f"Since the class {symbol.name!r} inherits from {inheritance.name!r}, "
+                f"we expect that the class {inheritance.name!r} also has an interface "
+                f"defined for it, but it does not."
             )
 
     # endregion
@@ -2374,8 +2478,8 @@ def translate(
     if len(underlying_errors) > 0:
         return None, bundle_underlying_errors()
 
-    symbol_table_pre_descendants_map = (
-        _SymbolTableBeforeMappingConcreteDescendants(
+    symbol_table = (
+        SymbolTable(
             symbols=symbols,
             verification_functions=verification_functions,
             ref_association=ref_association,
@@ -2396,31 +2500,31 @@ def translate(
 
     underlying_errors.extend(
         _second_pass_to_resolve_symbols_in_atomic_types_in_place(
-            symbol_table=symbol_table_pre_descendants_map
+            symbol_table=symbol_table
         )
     )
 
     underlying_errors.extend(
         _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
-            symbol_table=symbol_table_pre_descendants_map
+            symbol_table=symbol_table
         )
     )
 
     underlying_errors.extend(
         _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
-            symbol_table=symbol_table_pre_descendants_map
+            symbol_table=symbol_table
         )
     )
 
     underlying_errors.extend(
         _second_pass_to_resolve_default_argument_values_in_place(
-            symbol_table=symbol_table_pre_descendants_map
+            symbol_table=symbol_table
         )
     )
 
     underlying_errors.extend(
         _second_pass_to_resolve_supersets_of_enumerations_in_place(
-            symbol_table=symbol_table_pre_descendants_map
+            symbol_table=symbol_table
         )
     )
 
@@ -2428,27 +2532,26 @@ def translate(
         return None, bundle_underlying_errors()
 
     _second_pass_to_resolve_inheritances_in_place(
-        symbol_table=symbol_table_pre_descendants_map
+        symbol_table=symbol_table
     )
 
     _second_pass_to_resolve_resulting_class_of_implemented_for(
-        symbol_table=symbol_table_pre_descendants_map,
+        symbol_table=symbol_table,
     )
 
-    concrete_descendants_of = _map_concrete_descendants(
-        symbol_table=symbol_table_pre_descendants_map,
+    _second_pass_to_resolve_interfaces_in_place(
+        symbol_table=symbol_table,
         ontology=ontology
     )
 
-    symbol_table = SymbolTable(
-        symbols=symbol_table_pre_descendants_map.symbols,
-        concrete_descendants_of=concrete_descendants_of,
-        verification_functions=symbol_table_pre_descendants_map.verification_functions,
-        ref_association=symbol_table_pre_descendants_map.ref_association,
-        meta_model=symbol_table_pre_descendants_map.meta_model
+    _second_pass_to_resolve_concrete_descendants_in_place(
+        symbol_table=symbol_table,
+        ontology=ontology
     )
 
-    underlying_errors.extend(_verify(symbol_table))
+    underlying_errors.extend(_verify(
+        symbol_table=symbol_table,
+        ontology=ontology))
 
     if len(underlying_errors) > 0:
         return None, bundle_underlying_errors()

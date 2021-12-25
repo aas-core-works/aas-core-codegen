@@ -611,12 +611,12 @@ class ConstrainedPrimitive:
 
     # NOTE (mristin, 2021-12-24):
     # We have to decorate inheritances with ``@property`` so that the client code is
-    # forced to use ``set_inheritances``.
+    # forced to use ``_set_inheritances``.
 
-    _inheritances: Sequence["Class"]
+    _inheritances: Sequence["ConstrainedPrimitive"]
 
     @property
-    def inheritances(self) -> Sequence["Class"]:
+    def inheritances(self) -> Sequence["ConstrainedPrimitive"]:
         """Return direct parents that this class inherits from."""
         return self._inheritances
 
@@ -666,7 +666,7 @@ class ConstrainedPrimitive:
             parsed: parse.Class,
     ) -> None:
         self.name = name
-        self.set_inheritances(inheritances)
+        self._set_inheritances(inheritances)
         self.constrainee = constrainee
         self.is_implementation_specific = is_implementation_specific
         self.invariants = invariants
@@ -688,8 +688,12 @@ class ConstrainedPrimitive:
         "No duplicate inheritances"
     )
     # fmt: on
-    def set_inheritances(self, inheritances: Sequence["Class"]) -> None:
-        """Set the interfaces in the class."""
+    def _set_inheritances(self, inheritances: Sequence["ConstrainedPrimitive"]) -> None:
+        """
+        Set the inheritances in the class.
+
+        This method is expected to be called only during the translation phase.
+        """
         self._inheritances = inheritances
 
         self._inheritance_id_set = frozenset(
@@ -706,8 +710,8 @@ class Class:
     # region Inheritances
 
     # NOTE (mristin, 2021-12-24):
-    # We have to decorate inheritances with ``@property`` so that the client code is
-    # forced to use ``set_inheritances``.
+    # We have to decorate inheritances with ``@property`` so that the translation code
+    # is forced to use ``_set_inheritances``.
 
     _inheritances: Sequence["Class"]
 
@@ -729,10 +733,29 @@ class Class:
     #: for each implementation target
     is_implementation_specific: Final[bool]
 
+    #: Interface of the class. If it is a concrete class with no descendants, there is
+    #: no interface available.
+    interface: Optional["Interface"]
+
+    # region Concrete descendants
+
+    # NOTE (mristin, 2021-12-24):
+    # We have to decorate ``concrete_descendants`` with ``@property`` so that
+    # the translation code is forced to use ``_set_concrete_descendants``.
+    _concrete_descendants: Sequence["ConcreteClass"]
+
+    @property
+    def concrete_descendants(self) -> Sequence["ConcreteClass"]:
+        """List descendants of this class which are concrete classes."""
+        return self._concrete_descendants
+
+        # endregion
+
     #: List of properties of the class
     properties: Final[Sequence[Property]]
 
-    #: List of methods of the class. The methods are strictly non-static and non-class.
+    #: List of methods of the class. The methods are strictly non-static and non-class
+    #: (in the Python sense of the terms).
     methods: Final[Sequence[Method]]
 
     #: Constructor specification of the class
@@ -775,6 +798,8 @@ class Class:
             self,
             name: Identifier,
             inheritances: Sequence["Class"],
+            interface: Optional["Interface"],
+            concrete_descendants: Sequence["ConcreteClass"],
             is_implementation_specific: bool,
             properties: Sequence[Property],
             methods: Sequence[Method],
@@ -786,8 +811,10 @@ class Class:
     ) -> None:
         """Initialize with the given values."""
         self.name = name
-        self.set_inheritances(inheritances)
+        self._set_inheritances(inheritances)
+        self._set_concrete_descendants(concrete_descendants)
 
+        self.interface = interface
         self.is_implementation_specific = is_implementation_specific
         self.properties = properties
         self.methods = methods
@@ -811,13 +838,28 @@ class Class:
         "No duplicate inheritances"
     )
     # fmt: on
-    def set_inheritances(self, inheritances: Sequence["Class"]) -> None:
-        """Set the interfaces in the class."""
+    def _set_inheritances(self, inheritances: Sequence["Class"]) -> None:
+        """
+        Set the inheritances in the class.
+
+        This method is expected to be called only during the translation phase.
+        """
         self._inheritances = inheritances
 
         self._inheritance_id_set = frozenset(
             id(inheritance) for inheritance in self._inheritances
         )
+
+    def _set_concrete_descendants(
+            self,
+            concrete_descendants: Sequence["ConcreteClass"]
+    ) -> None:
+        """
+        Set the concrete descendants in the class.
+
+        This method is expected to be called only during the translation phase.
+        """
+        self._concrete_descendants = concrete_descendants
 
     @abc.abstractmethod
     def __repr__(self) -> str:
@@ -837,6 +879,43 @@ class ConcreteClass(Class):
 
 class AbstractClass(Class):
     """Represent a class that is purely abstract and can not be instantiated."""
+
+    #: Interface of the class. All abstract classes have an interface as opposed to
+    #: concrete classes, which only have an interface if there are descendants.
+    interface: "Interface"
+
+    # We need to override the constructor because the ``interface`` is required.
+    def __init__(
+            self,
+            name: Identifier,
+            inheritances: Sequence["Class"],
+            interface: "Interface",
+            concrete_descendants: Sequence["ConcreteClass"],
+            is_implementation_specific: bool,
+            properties: Sequence[Property],
+            methods: Sequence[Method],
+            constructor: Constructor,
+            invariants: Sequence[Invariant],
+            serialization: Serialization,
+            description: Optional[Description],
+            parsed: parse.Class,
+    ) -> None:
+        """Initialize with the given values."""
+        Class.__init__(
+            self,
+            name=name,
+            inheritances=inheritances,
+            interface=interface,
+            concrete_descendants=concrete_descendants,
+            is_implementation_specific=is_implementation_specific,
+            properties=properties,
+            methods=methods,
+            constructor=constructor,
+            invariants=invariants,
+            serialization=serialization,
+            description=description,
+            parsed=parsed
+        )
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -993,6 +1072,116 @@ class PatternVerification(Verification):
         )
 
 
+class Signature(SignatureLike):
+    """Represent a signature of a method in an interface."""
+
+    def __init__(
+            self,
+            name: Identifier,
+            arguments: Sequence[Argument],
+            returns: Optional[TypeAnnotation],
+            description: Optional[Description],
+            contracts: Contracts,
+            parsed: parse.Method,
+    ) -> None:
+        """
+        Initialize with the given values.
+
+        The ``parsed`` refers to the method of the abstract or concrete class that
+        defines the interface. Mind that we do not introduce interfaces as a concept
+        in the meta-model.
+        """
+        SignatureLike.__init__(
+            self,
+            name=name,
+            arguments=arguments,
+            returns=returns,
+            description=description,
+            contracts=contracts,
+            parsed=parsed
+        )
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+
+class Interface:
+    """
+    Represent an interface of some of the abstract and/or concrete classes.
+
+    Mind that the concept of interfaces is *not* used in the meta-model. We introduce
+    it at the intermediate stage to facilitate generation of the code, especially for
+    targets where multiple inheritance is not supported.
+    """
+    #: Class which this interface is based on
+    base: Final[Class]
+
+    #: Name of the interface
+    name: Final[Identifier]
+
+    inheritances: Final[Sequence["Interface"]]
+
+    #: List of properties assumed by the interface
+    properties: Final[Sequence[Property]]
+
+    #: List of method signatures assumed by the interface
+    signatures: Final[Sequence[Signature]]
+
+    #: Description of the interface, taken from class
+    description: Final[Optional[Description]]
+
+    #: Relation to the class from the parse stage
+    parsed: Final[parse.Class]
+
+    #: Map all properties by their identifiers to the corresponding objects
+    properties_by_name: Final[Mapping[Identifier, Property]]
+
+    #: Collect IDs (with :py:func:`id`) of the property objects in a set
+    property_id_set: Final[FrozenSet[int]]
+
+    def __init__(
+            self,
+            base: Class,
+            inheritances: Sequence["Interface"]
+    ) -> None:
+        """Initialize with the given values."""
+        self.base = base
+
+        self.name = base.name
+        self.inheritances = inheritances
+        self.properties = base.properties
+
+        self.signatures = [
+            Signature(
+                name=method.name,
+                arguments=method.arguments,
+                returns=method.returns,
+                description=method.description,
+                contracts=method.contracts,
+                parsed=method.parsed
+            )
+            for method in base.methods
+        ]
+
+        self.description = base.description
+        self.parsed = base.parsed
+
+        self.properties_by_name: Mapping[Identifier, Property] = {
+            prop.name: prop for prop in self.properties
+        }
+
+        self.property_id_set = frozenset(id(prop) for prop in self.properties)
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+
 T = TypeVar("T")  # pylint: disable=invalid-name
 
 
@@ -1022,26 +1211,16 @@ class SymbolTable:
     #: List of all symbols that we need for the code generation
     symbols: Final[Sequence[Symbol]]
 
-    # region Concrete descendants of
-
-    # NOTE (mristin, 2021-12-24):
-    # We decorate ``concrete_descendants_of`` with ``@property`` to force the client
-    # code to use ``set_concrete_descendants_of``.
-
-    _concrete_descendants_of: Mapping[Class, Sequence[ConcreteClass]]
-
-    @property
-    def concrete_descendants_of(self) -> Mapping[Class, Sequence[ConcreteClass]]:
-        """Provide a map of all the concrete descendants of a class."""
-        return self._concrete_descendants_of
-
-    # endregion
-
     #: List of all functions used in the verification
     verification_functions: Final[Sequence[Verification]]
 
     #: Map verification functions by their name
     verification_functions_by_name: Final[Mapping[Identifier, Verification]]
+
+    #: Map abstract classes or concrete classes which have descendants to their
+    #: respective interface. If a concrete class has no descendants, it will not be
+    #: assigned an interface.
+    interface_map: Final[Mapping[Class, Interface]]
 
     #: Type to be used to represent a ``Ref[T]``
     ref_association: Final[Symbol]
@@ -1084,14 +1263,12 @@ class SymbolTable:
     def __init__(
             self,
             symbols: Sequence[Symbol],
-            concrete_descendants_of: Mapping[Class, Sequence[ConcreteClass]],
             verification_functions: Sequence[Verification],
             ref_association: Symbol,
             meta_model: parse.MetaModel,
     ) -> None:
         """Initialize with the given values and map symbols to name."""
         self.symbols = symbols
-        self.set_concrete_descendants_of(concrete_descendants_of)
         self.verification_functions = verification_functions
         self.ref_association = ref_association
         self.meta_model = meta_model
@@ -1102,26 +1279,6 @@ class SymbolTable:
         }
 
         self._name_to_symbol = {symbol.name: symbol for symbol in symbols}
-
-    @require(
-        lambda self, concrete_descendants_of:
-        all(
-            (
-                    descendants := concrete_descendants_of.get(symbol, None),
-                    descendants is not None
-                    and symbol not in descendants
-            )[1]
-            for symbol in self.symbols
-            if isinstance(symbol, Class)
-        ),
-        "``concrete_descendants_of`` defined for all the symbols"
-    )
-    def set_concrete_descendants_of(
-            self,
-            concrete_descendants_of: Mapping[Class, Sequence[ConcreteClass]]
-    ) -> None:
-        """Set a map of all the concrete descendants of a class."""
-        self._concrete_descendants_of = concrete_descendants_of
 
     def find(self, name: Identifier) -> Optional[Symbol]:
         """Find the symbol with the given ``name``."""
