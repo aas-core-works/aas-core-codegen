@@ -140,11 +140,28 @@ class MethodCall(Expression):
         visitor.visit_method_call(self)
 
 
+class Name(Expression):
+    """Represent an access to a variable with the given name."""
+
+    def __init__(self, identifier: Identifier, original_node: ast.AST) -> None:
+        """Initialize with the given values."""
+        Node.__init__(self, original_node=original_node)
+        self.identifier = identifier
+
+    def transform(self, transformer: "Transformer[T]") -> None:
+        """Accept the transformer."""
+        return transformer.transform_name(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_name(self)
+
+
 class FunctionCall(Expression):
     """Represent a function call."""
 
     def __init__(
-            self, name: Identifier, args: Sequence["Expression"], original_node: ast.AST
+            self, name: Name, args: Sequence["Expression"], original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
@@ -211,23 +228,6 @@ class IsNotNone(Expression):
     def visit(self, visitor: "Visitor") -> None:
         """Accept the visitor."""
         visitor.visit_is_not_none(self)
-
-
-class Name(Expression):
-    """Represent an access to a variable with the given name."""
-
-    def __init__(self, identifier: Identifier, original_node: ast.AST) -> None:
-        """Initialize with the given values."""
-        Node.__init__(self, original_node=original_node)
-        self.identifier = identifier
-
-    def transform(self, transformer: "Transformer[T]") -> None:
-        """Accept the transformer."""
-        return transformer.transform_name(self)
-
-    def visit(self, visitor: "Visitor") -> None:
-        """Accept the visitor."""
-        visitor.visit_name(self)
 
 
 class And(Expression):

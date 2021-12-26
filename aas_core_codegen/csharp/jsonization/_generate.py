@@ -78,8 +78,8 @@ def _generate_json_converter_for_enumeration(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_read_for_interface(
-        interface: intermediate.Interface, implementers: Sequence[intermediate.Class],
-        ref_association: intermediate.Symbol
+        interface: intermediate.Interface,
+        ref_association: intermediate.Class
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the ``Read`` method for de-serializing the ``interface``.
@@ -88,13 +88,14 @@ def _generate_read_for_interface(
     within an AAS.
     """
     # NOTE (mristin, 2021-11-03):
-    # Since we perform an on-demand de-serialization, we do not know the discriminating
+    # Since we perform an one-pass de-serialization, we do not know the discriminating
     # model type (*i.e.*, the concrete class of the object). Hence we need to
     # de-serialize the union of all the possible constructor arguments. Once we are done
-    # de-serializing all the arguments, we will call the appropriate constructor.
+    # de-serializing all the arguments and encountering the model type, we will call
+    # the appropriate constructor.
 
     arg_type_map, error = intermediate.make_union_of_constructor_arguments(
-        interface=interface, implementers=implementers
+        interface=interface
     )
 
     if error is not None:
@@ -151,7 +152,7 @@ def _generate_read_for_interface(
         )
     )
 
-    for implementer in implementers:
+    for implementer in interface.implementers:
         cls_name = csharp_naming.class_name(implementer.name)
         json_model_type = naming.json_model_type(implementer.name)
 
@@ -380,7 +381,7 @@ case Json.JsonTokenType.PropertyName:
 
 
 def _generate_write_for_interface(
-        interface: intermediate.Interface, implementers: Sequence[intermediate.Class]
+        interface: intermediate.Interface
 ) -> Stripped:
     """Generate the ``Write`` method for serializing the ``interface``."""
     interface_name = csharp_naming.interface_name(interface.name)
@@ -397,7 +398,7 @@ def _generate_write_for_interface(
         )
     )
 
-    for implementer in implementers:
+    for implementer in interface.implementers:
         cls_name = csharp_naming.class_name(implementer.name)
         var_name = csharp_naming.variable_name(Identifier(f"the_{implementer.name}"))
 
@@ -459,8 +460,7 @@ def _generate_write_for_interface(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_json_converter_for_interface(
         interface: intermediate.Interface,
-        implementers: Sequence[intermediate.Class],
-        ref_association: intermediate.Symbol
+        ref_association: intermediate.Class
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the custom JSON converter based on the intermediate ``interface``.
@@ -470,7 +470,6 @@ def _generate_json_converter_for_interface(
     """
     read_code, error = _generate_read_for_interface(
         interface=interface,
-        implementers=implementers,
         ref_association=ref_association
     )
 
@@ -478,8 +477,7 @@ def _generate_json_converter_for_interface(
         return None, error
 
     write_code = _generate_write_for_interface(
-        interface=interface,
-        implementers=implementers
+        interface=interface
     )
 
     interface_name = csharp_naming.interface_name(interface.name)
@@ -512,8 +510,8 @@ def _generate_json_converter_for_interface(
 
 
 def _generate_read_for_class(
-        cls: intermediate.Class,
-        ref_association: intermediate.Symbol
+        cls: intermediate.ConcreteClass,
+        ref_association: intermediate.Class
 ) -> Stripped:
     """
     Generate the ``Read`` method for de-serializing the class ``cls``.
@@ -763,7 +761,7 @@ case Json.JsonTokenType.PropertyName:
     return Stripped(writer.getvalue())
 
 
-def _generate_write_for_class(cls: intermediate.Class) -> Stripped:
+def _generate_write_for_class(cls: intermediate.ConcreteClass) -> Stripped:
     """Generate the ``Write`` method for serializing the class ``cls``."""
     blocks = [Stripped("writer.WriteStartObject();")]
 
@@ -842,8 +840,9 @@ def _generate_write_for_class(cls: intermediate.Class) -> Stripped:
 
 
 def _generate_json_converter_for_class(
-        cls: intermediate.Class,
-        ref_association: intermediate.Symbol) -> Stripped:
+        cls: intermediate.ConcreteClass,
+        ref_association: intermediate.Class
+) -> Stripped:
     """
     Generate the custom JSON converter based on the intermediate ``cls``.
 
@@ -927,6 +926,7 @@ def generate(
 
     for symbol in symbol_table.symbols:
         jsonization_block = None  # type: Optional[Stripped]
+
         if isinstance(symbol, intermediate.Enumeration):
             jsonization_block = _generate_json_converter_for_enumeration(
                 enumeration=symbol
@@ -935,53 +935,57 @@ def generate(
             converters.append(
                 Identifier(f"{csharp_naming.enum_name(symbol.name)}JsonConverter")
             )
-        elif isinstance(symbol, intermediate.Interface):
-            # Only interfaces with ``modelType`` property can be deserialized as
-            # otherwise we would lack the discriminating property.
-            if not symbol.serialization.with_model_type:
-                continue
 
-            implementers = interface_implementers[symbol]
-            jsonization_block, error = _generate_json_converter_for_interface(
-                interface=symbol,
-                implementers=implementers,
-                ref_association=symbol_table.ref_association
-            )
-
-            if error is not None:
-                errors.append(error)
-                continue
-
-            converters.append(
-                Identifier(f"{csharp_naming.interface_name(symbol.name)}JsonConverter")
-            )
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            # We do not de/serialize constrained primitives in any special way.
+            continue
 
         elif isinstance(symbol, intermediate.Class):
-            if symbol.is_implementation_specific:
-                jsonization_key = specific_implementations.ImplementationKey(
-                    f"Jsonization/{symbol.name}_json_converter.cs"
+            # If it is an abstract class or a concrete class with descendants, provide
+            # a de/serialization of the corresponding interface first.
+
+            if symbol.interface is not None:
+                jsonization_block, error = _generate_json_converter_for_interface(
+                    interface=symbol.interface,
+                    ref_association=symbol_table.ref_association
                 )
 
-                implementation = spec_impls.get(jsonization_key, None)
-                if implementation is None:
-                    errors.append(
-                        Error(
-                            symbol.parsed.node,
-                            f"The jsonization snippet is missing "
-                            f"for the implementation-specific "
-                            f"class {symbol.name}: {jsonization_key}",
-                        )
-                    )
+                if error is not None:
+                    errors.append(error)
                     continue
 
-                jsonization_block = spec_impls[jsonization_key]
-            else:
-                jsonization_block = _generate_json_converter_for_class(
-                    cls=symbol, ref_association=symbol_table.ref_association)
+                converters.append(
+                    Identifier(
+                        f"{csharp_naming.interface_name(symbol.name)}JsonConverter")
+                )
 
-            converters.append(
-                Identifier(f"{csharp_naming.class_name(symbol.name)}JsonConverter")
-            )
+            if isinstance(symbol, intermediate.ConcreteClass):
+                if symbol.is_implementation_specific:
+                    jsonization_key = specific_implementations.ImplementationKey(
+                        f"Jsonization/{symbol.name}_json_converter.cs"
+                    )
+
+                    implementation = spec_impls.get(jsonization_key, None)
+                    if implementation is None:
+                        errors.append(
+                            Error(
+                                symbol.parsed.node,
+                                f"The jsonization snippet is missing "
+                                f"for the implementation-specific "
+                                f"class {symbol.name}: {jsonization_key}",
+                            )
+                        )
+                        continue
+
+                    jsonization_block = spec_impls[jsonization_key]
+                else:
+                    jsonization_block = _generate_json_converter_for_class(
+                        cls=symbol, ref_association=symbol_table.ref_association)
+
+                converters.append(
+                    Identifier(f"{csharp_naming.class_name(symbol.name)}JsonConverter")
+                )
+
         else:
             assert_never(symbol)
 

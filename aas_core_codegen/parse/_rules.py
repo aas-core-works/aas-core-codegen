@@ -99,9 +99,16 @@ class _ParseCall(_Parse):
             )
 
         if isinstance(node.func, ast.Name):
+            name, error = ast_node_to_our_node(node.func)
+            if error is not None:
+                return None, error
+
+            assert name is not None
+            assert isinstance(name, tree.Name)
+
             return (
                 tree.FunctionCall(
-                    name=Identifier(node.func.id), args=args, original_node=node
+                    name=name, args=args, original_node=node
                 ),
                 None,
             )

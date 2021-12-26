@@ -85,6 +85,11 @@ def generate_type(
                 return PRIMITIVE_TYPE_MAP.get(symbol.constrainee)
 
             elif isinstance(symbol, intermediate.Class):
+                # NOTE (mristin, 2021-12-26):
+                # Always prefer an interface to allow for discrimination. If there is
+                # an interface based on the class, it means that there are one or more
+                # descendants.
+
                 if symbol.interface:
                     return Stripped(csharp_naming.interface_name(symbol.name))
                 else:

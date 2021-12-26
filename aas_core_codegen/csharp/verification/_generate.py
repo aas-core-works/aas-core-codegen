@@ -8,7 +8,7 @@ from icontract import ensure, require
 
 from aas_core_codegen import intermediate, specific_implementations
 from aas_core_codegen.intermediate import (
-type_inference as intermediate_type_inference
+    type_inference as intermediate_type_inference
 )
 from aas_core_codegen.common import Error, Stripped, assert_never, Identifier
 from aas_core_codegen.csharp import (
@@ -683,44 +683,70 @@ class _InvariantTranspiler(
     def __init__(
             self,
             type_map: Mapping[
-                parse_tree.Node, intermediate_type_inference.TypeAnnotation]
+                parse_tree.Node, intermediate_type_inference.TypeAnnotation],
+            environment: Mapping[Identifier, intermediate_type_inference.TypeAnnotation]
     ) -> None:
         """Initialize with the given values."""
         self.type_map = type_map
+        self.environment = environment
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_member(
             self, node: parse_tree.Member
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        member_type = self.type_map[node]
-
-        # TODO: switch on member_type 🠒 now we can properly implement it!
-
-        if isinstance(member_type, intermediate_type_inference)
-
-
-        if isinstance(node.instance, parse_tree.Name):
-            symbol = self.symbol_table.find(name=node.instance.identifier)
-            if symbol is not None and isinstance(symbol, intermediate.Enumeration):
-                enumeration_name = csharp_naming.enum_name(symbol.name)
-                enum_literal_name = csharp_naming.enum_literal_name(node.name)
-
-                self.inferred_type[node] = intermediate.OurTypeAnnotation(
-
-                )
-
-                return Stripped(f"{enumeration_name}.{enum_literal_name}"), None
-
         instance, error = self.transform(node.instance)
         if error is not None:
             return None, error
 
-        prop_name = csharp_naming.property_name(node.name)
+        instance_type = self.type_map[node.instance]
+        # Ignore optionals as they need to be checked before in the code
+        while isinstance(
+                instance_type, intermediate_type_inference.OptionalTypeAnnotation):
+            instance_type = instance_type.value
 
-        if isinstance(node.instance, (parse_tree.Name, parse_tree.Member)):
-            return Stripped(f"{instance}.{prop_name}"), None
+        member_type = self.type_map[node]
+        while isinstance(
+                member_type, intermediate_type_inference.OptionalTypeAnnotation):
+            member_type = member_type.value
 
-        return Stripped(f"({instance}).{prop_name}"), None
+        member_name = None  # type: Optional[str]
+
+        if (
+                isinstance(instance_type, intermediate_type_inference.OurTypeAnnotation)
+                and isinstance(instance_type.symbol, intermediate.Enumeration)
+        ):
+            # The member denotes a literal of an enumeration.
+            member_name = csharp_naming.enum_literal_name(node.name)
+
+        elif isinstance(member_type, intermediate_type_inference.MethodTypeAnnotation):
+            member_name = csharp_naming.method_name(node.name)
+
+        elif (
+                isinstance(
+                    instance_type, intermediate_type_inference.OurTypeAnnotation)
+                and isinstance(instance_type.symbol, intermediate.Class)
+        ):
+            if node.name in instance_type.symbol.properties_by_name:
+                member_name = csharp_naming.property_name(node.name)
+            else:
+                return None, Error(
+                    node.original_node,
+                    f"The property {node.name!r} has not been defined "
+                    f"in the class {instance_type.symbol.name!r}"
+                )
+
+        else:
+            return None, Error(
+                node.original_node,
+                f"We do not know how to generate the member access. The inferred type "
+                f"of the instance was {instance_type}, while the member type "
+                f"was {member_type}. However, we do not know how to resolve "
+                f"the member {node.name!r} in {instance_type}."
+            )
+
+        assert member_name is not None
+
+        return Stripped(f"{instance}.{member_name}"), None
 
     _CSHARP_COMPARISON_MAP = {
         parse_tree.Comparator.LT: "<",
@@ -876,16 +902,15 @@ class _InvariantTranspiler(
                 node.original_node, "Failed to transpile the function call", errors
             )
 
-        verification_function = self.symbol_table.verification_functions_by_name.get(
-            node.name, None)
-
         # NOTE (mristin, 2021-12-16):
         # The validity of the arguments is checked in
         # :py:func:`aas_core_codegen.intermediate._translate.translate`, so we do not
         # have to test for argument arity here.
 
-        if verification_function is not None:
-            method_name = csharp_naming.method_name(verification_function.name)
+        func_type = self.type_map.get(node.name)
+        if isinstance(
+                func_type, intermediate_type_inference.VerificationTypeAnnotation):
+            method_name = csharp_naming.method_name(func_type.func.name)
 
             joined_args = ", ".join(args)
 
@@ -906,27 +931,59 @@ class _InvariantTranspiler(
             else:
                 return Stripped(f"Verification.{method_name}({joined_args})"), None
 
-        elif node.name == "len":
-            assert len(args) == 1, (
-                f"Expected exactly one argument, but got: {args}; "
-                f"this should have been caught before."
-            )
+        elif isinstance(
+                func_type, intermediate_type_inference.BuiltinFunctionTypeAnnotation
+        ):
+            if func_type.func.name == 'len':
+                assert len(args) == 1, (
+                    f"Expected exactly one argument, but got: {args}; "
+                    f"this should have been caught before."
+                )
 
-            collection_node = node.args[0]
-            if not isinstance(
-                    collection_node,
-                    (parse_tree.Name, parse_tree.Member, parse_tree.MethodCall),
-            ):
-                collection = f"({args[0]})"
+                collection_node = node.args[0]
+                if not isinstance(
+                        collection_node,
+                        (parse_tree.Name, parse_tree.Member, parse_tree.MethodCall),
+                ):
+                    collection = f"({args[0]})"
+                else:
+                    collection = args[0]
+
+                arg_type = self.type_map[node.args[0]]
+                while isinstance(
+                        arg_type, intermediate_type_inference.OptionalTypeAnnotation):
+                    arg_type = arg_type.value
+
+                if (
+                        isinstance(
+                            arg_type,
+                            intermediate_type_inference.PrimitiveTypeAnnotation
+                        )
+                        and arg_type.a_type ==
+                        intermediate_type_inference.PrimitiveType.STR
+                ):
+                    return Stripped(f"{collection}.Length"), None
+
+                elif (
+                        isinstance(arg_type,
+                                   intermediate_type_inference.ListTypeAnnotation)
+                ):
+                    return Stripped(f"{collection}.Count"), None
+
+                else:
+                    return None, Error(
+                        node.original_node,
+                        f"We do not know how to compute the length on type {arg_type}",
+                        errors
+                    )
             else:
-                collection = args[0]
-
-            return Stripped(f"{collection}.Count"), None
+                return None, Error(
+                    node.original_node,
+                    f"The handling of the built-in function {node.name!r} has not "
+                    f"been implemented",
+                )
         else:
-            return None, Error(
-                node.original_node,
-                f"The handling of the function is not implemented: {node.name}",
-            )
+            assert_never(func_type)
 
     def transform_constant(
             self, node: parse_tree.Constant
@@ -1118,7 +1175,9 @@ assert all(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _transpile_invariant(
-        invariant: intermediate.Invariant, symbol_table: intermediate.SymbolTable
+        invariant: intermediate.Invariant,
+        symbol_table: intermediate.SymbolTable,
+        environment: Mapping[Identifier, intermediate_type_inference.TypeAnnotation]
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Translate the invariant from the meta-model into C# code."""
     # NOTE (mristin, 2021-10-24):
@@ -1130,10 +1189,27 @@ def _transpile_invariant(
     # of languages, we hope to have a much better understanding about the necessary
     # abstractions.
 
-    transformer = _InvariantTranspiler(symbol_table=symbol_table)
+    type_inferrer = intermediate_type_inference.Inferrer(
+        symbol_table=symbol_table,
+        environment=environment
+    )
+    _ = type_inferrer.transform(invariant.body)
+    if len(type_inferrer.errors):
+        return None, Error(
+            invariant.parsed.node,
+            "Failed to infer the types in the invariant",
+            type_inferrer.errors
+        )
+
+    transformer = _InvariantTranspiler(
+        type_map=type_inferrer.type_map,
+        environment=environment
+    )
     expr, error = transformer.transform(invariant.parsed.body)
     if error is not None:
         return None, error
+
+    assert expr is not None
 
     writer = io.StringIO()
     if len(expr) > 50 or "\n" in expr:
@@ -1196,9 +1272,41 @@ def _generate_implementation_verify(
     errors = []  # type: List[Error]
     blocks = []  # type: List[Stripped]
 
+    # Build up the environment;
+    # see https://craftinginterpreters.com/resolving-and-binding.html
+    environment = {
+        "len": intermediate_type_inference.BuiltinFunctionTypeAnnotation(
+            func=intermediate_type_inference.BuiltinFunction(
+                name=Identifier("len"),
+                returns=intermediate_type_inference.PrimitiveTypeAnnotation(
+                    intermediate_type_inference.PrimitiveType.LENGTH))
+        )
+    }
+
+    for verification in symbol_table.verification_functions:
+        assert verification.name not in environment
+        environment[verification.name] = (
+            intermediate_type_inference.VerificationTypeAnnotation(
+                func=verification
+            )
+        )
+
+    assert 'self' not in environment
+    if isinstance(something, intermediate.ConstrainedPrimitive):
+        environment['self'] = intermediate_type_inference.PrimitiveTypeAnnotation(
+            a_type=intermediate_type_inference.PRIMITIVE_TYPE_MAP.get(
+                intermediate.ConstrainedPrimitive.constrainee)
+        )
+    elif isinstance(something, intermediate.ConcreteClass):
+        environment['self'] = intermediate_type_inference.OurTypeAnnotation(
+            symbol=something
+        )
+    else:
+        assert_never(something)
+
     for invariant in something.invariants:
         invariant_code, error = _transpile_invariant(
-            invariant=invariant, symbol_table=symbol_table
+            invariant=invariant, symbol_table=symbol_table, environment=environment
         )
         if error is not None:
             errors.append(error)

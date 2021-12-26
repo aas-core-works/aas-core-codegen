@@ -12,7 +12,7 @@ import enum
 from typing import Mapping, MutableMapping, Dict, Optional, List, Final, Union
 
 from aas_core_codegen.common import Identifier, Error, assert_never
-from icontract import DBC, ensure
+from icontract import DBC, ensure, require
 
 from aas_core_codegen.intermediate import _types
 from aas_core_codegen.parse import tree as parse_tree
@@ -89,6 +89,26 @@ class VerificationTypeAnnotation(AtomicTypeAnnotation):
     """Represent a type of a verification function."""
 
     def __init__(self, func: _types.Verification):
+        """Initialize with the given values."""
+        self.func = func
+
+    def __str__(self) -> str:
+        return self.func.name
+
+
+class BuiltinFunction:
+    """Represent a built-in function."""
+
+    def __init__(self, name: Identifier, returns: Optional[TypeAnnotation]):
+        """Initialize with the given values."""
+        self.name = name
+        self.returns = returns
+
+
+class BuiltinFunctionTypeAnnotation(AtomicTypeAnnotation):
+    """Represent a type of a built-in function."""
+
+    def __init__(self, func: BuiltinFunction):
         """Initialize with the given values."""
         self.func = func
 
@@ -218,7 +238,7 @@ def _assignable(
                 isinstance(value_type, OurTypeAnnotation)
                 and isinstance(value_type.symbol, _types.ConstrainedPrimitive)
         ):
-            return target_type.a_type == _PRIMITIVE_TYPE_MAP.get(
+            return target_type.a_type == PRIMITIVE_TYPE_MAP.get(
                 value_type.symbol.constrainee)
 
         else:
@@ -229,9 +249,9 @@ def _assignable(
             # NOTE (mristin, 2021-12-25):
             # The enumerations are invariant.
             return (
-                isinstance(value_type, OurTypeAnnotation)
-                and isinstance(value_type.symbol, _types.Enumeration)
-                and id(target_type.symbol) == id(value_type.symbol)
+                    isinstance(value_type, OurTypeAnnotation)
+                    and isinstance(value_type.symbol, _types.Enumeration)
+                    and id(target_type.symbol) == id(value_type.symbol)
             )
 
         elif isinstance(target_type.symbol, _types.ConstrainedPrimitive):
@@ -242,7 +262,7 @@ def _assignable(
                     len(target_type.symbol.invariants) == 0
                     and isinstance(value_type, PrimitiveTypeAnnotation)
             ):
-                return _PRIMITIVE_TYPE_MAP.get(
+                return PRIMITIVE_TYPE_MAP.get(
                     target_type.symbol.constrainee) == value_type.a_type
             else:
                 # NOTE (mristin, 2021-12-25):
@@ -254,8 +274,8 @@ def _assignable(
                         value_type.symbol.constrainee
                 ):
                     return (
-                        id(target_type.symbol) == id(value_type.symbol)
-                        or value_type.symbol in target_type.symbol.descendant_id_set
+                            id(target_type.symbol) == id(value_type.symbol)
+                            or value_type.symbol in target_type.symbol.descendant_id_set
                     )
 
             return False
@@ -275,7 +295,8 @@ def _assignable(
             return (
                     id(target_type.symbol) == id(value_type.symbol)
                     or (
-                        id(value_type.symbol) in target_type.symbol.descendant_id_set
+                            id(
+                                value_type.symbol) in target_type.symbol.descendant_id_set
                     )
             )
 
@@ -324,7 +345,7 @@ def _assignable(
         assert_never(target_type)
 
 
-_PRIMITIVE_TYPE_MAP = {
+PRIMITIVE_TYPE_MAP = {
     _types.PrimitiveType.BOOL: PrimitiveType.BOOL,
     _types.PrimitiveType.INT: PrimitiveType.INT,
     _types.PrimitiveType.FLOAT: PrimitiveType.FLOAT,
@@ -333,7 +354,7 @@ _PRIMITIVE_TYPE_MAP = {
 }
 
 for _types_primitive_type in _types.PrimitiveType:
-    assert _types_primitive_type in _PRIMITIVE_TYPE_MAP, (
+    assert _types_primitive_type in PRIMITIVE_TYPE_MAP, (
         f"All primitive types from _types covered, but: {_types_primitive_type=}"
     )
 
@@ -344,7 +365,7 @@ def _type_annotation_to_inferred_type_annotation(
     """Convert from the :py:mod:`aas_core_codegen.intermediate._types`."""
     if isinstance(type_annotation, _types.PrimitiveTypeAnnotation):
         return PrimitiveTypeAnnotation(
-            a_type=_PRIMITIVE_TYPE_MAP.get(type_annotation.a_type))
+            a_type=PRIMITIVE_TYPE_MAP.get(type_annotation.a_type))
 
     elif isinstance(type_annotation, _types.OurTypeAnnotation):
         return OurTypeAnnotation(symbol=type_annotation.symbol)
@@ -375,11 +396,15 @@ class Inferrer(
     def __init__(
             self,
             symbol_table: _types.SymbolTable,
-            environment: Dict[Identifier, TypeAnnotation]
+            environment: Mapping[Identifier, TypeAnnotation]
     ) -> None:
         """Initialize with the given values."""
         self._symbol_table = symbol_table
-        self._environment = environment.copy()
+
+        self._environment = {
+            key: value
+            for key, value in environment.items()
+        }
 
         self.type_map = dict()
         self.errors = []
@@ -517,44 +542,32 @@ class Inferrer(
         result = None  # type: Optional[TypeAnnotation]
         failed = False
 
-        # Allow the environment to override the built-ins
-        type_in_env = self._environment.get(node.name, None)
-        if type_in_env is not None:
-            if not isinstance(type_in_env, VerificationTypeAnnotation):
-                self.errors.append(
-                    Error(
-                        node.original_node,
-                        f"Expected the name {node.name!r} to denote "
-                        f"a verification function, but got: {type_in_env}"
-                    )
-                )
-                failed = True
-            else:
-                if type_in_env.func.returns is not None:
+        func_type = self.transform(node.name)
+        if func_type is None:
+            failed = True
+        else:
+            if isinstance(
+                    func_type,
+                    (VerificationTypeAnnotation, BuiltinFunctionTypeAnnotation)
+            ):
+                if func_type.func.returns is not None:
                     result = _type_annotation_to_inferred_type_annotation(
-                        type_in_env.func.returns
+                        func_type.func.returns
                     )
                 else:
                     result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
-        else:
-            # Try to match a built-in function
-            if node.name == 'len':
-                result = PrimitiveTypeAnnotation(PrimitiveType.LENGTH)
             else:
-                self.errors.append(
-                    Error(
-                        node.original_node,
-                        f"We do not know how to infer the type of "
-                        f"the function {node.name!r}. Mind that we do not consider "
-                        f"the outer scope due to simplicity! If you believe this needs "
-                        f"to work, please notify the developers."
-                    )
-                )
-                failed = True
+                assert_never(func_type)
 
-        # Simply recurse to track the type, but we don't care about the arguments.
-        # Even if we failed before, we want to catch the errors in the arguments for
-        # better developer experience.
+        # NOTE (mristin, 2021-12-26):
+        # Recurse to track the type of arguments. Even if we failed before, we want to
+        # catch the errors in the arguments for better developer experience.
+        #
+        # Mind that we are sloppy here. Theoretically, we could check that arguments in
+        # the call are assignable to the arguments in the function definition and catch
+        # errors in the meta-model at this point. However, we prioritize other features
+        # and leave this check unimplemented for now.
+
         for arg in node.args:
             arg_type = self.transform(arg)
             if arg_type is None:
@@ -617,7 +630,10 @@ class Inferrer(
                 Error(
                     node.original_node,
                     f"We do not know how to infer the type of "
-                    f"the variable {node.identifier!r}."
+                    f"the variable with the identifier {node.identifier!r} from the "
+                    f"given environment. Mind that we do not consider the module "
+                    f"scope nor handle all built-in functions due to simplicity! If "
+                    f"you believe this needs to work, please notify the developers."
                 )
             )
             return None
@@ -714,6 +730,10 @@ class Inferrer(
                 )
             )
             return None
+
+        if is_new_variable:
+            assert isinstance(node.target, parse_tree.Name)
+            self._environment[node.target.identifier] = value_type
 
         result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
         self.type_map[node] = result

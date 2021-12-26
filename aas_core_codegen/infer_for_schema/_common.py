@@ -70,7 +70,7 @@ def match_single_arg_function_on_member_or_name(
 
     # noinspection PyTypeChecker
     return SingleArgFunctionOnMemberOrName(
-        function_name=node.name,
+        function_name=node.name.identifier,
         member_or_name=node.args[0]
     )
 
