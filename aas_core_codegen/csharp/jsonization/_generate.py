@@ -44,19 +44,19 @@ def _generate_json_converter_for_enumeration(
         {II}{{
         {III}throw new Json.JsonException();
         {II}}}
-        
+
         {II}string? text = reader.GetString();
         {II}if (text == null)
         {II}{{
         {III}throw new Json.JsonException();
         {II}}}
-        
+
         {II}Aas.{enum_name}? value = Stringification.{enum_name}FromString(
         {III}text);
         {II}return value ?? throw new Json.JsonException(
         {III}$"Invalid {enum_name}: {{text}}");
         {I}}}
-        
+
         {I}public override void Write(
         {II}Json.Utf8JsonWriter writer,
         {II}Aas.{enum_name} value,
@@ -68,7 +68,7 @@ def _generate_json_converter_for_enumeration(
         {III}throw new System.ArgumentException(
         {IIII}$"Invalid {enum_name}: {{value}}");
         {II}}}
-        
+
         {II}writer.WriteStringValue(text);
         {I}}}
         }}"""
@@ -616,7 +616,7 @@ case Json.JsonTokenType.EndObject:
                 string propertyName = reader.GetString()
                 {I}?? throw new System.InvalidOperationException(
                 {II}"Unexpected property name null");
-    
+
                 switch (propertyName)
                 {{
                 """

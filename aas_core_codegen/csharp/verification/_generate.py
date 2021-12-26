@@ -180,14 +180,14 @@ def _transpile_pattern_verification(
     # noinspection PyUnresolvedReferences
     assert isinstance(verification.parsed.body[-1].value.value, parse_tree.FunctionCall)
     # noinspection PyUnresolvedReferences
-    assert verification.parsed.body[-1].value.value.name == "match"
+    assert verification.parsed.body[-1].value.value.name.identifier == "match"
 
     # noinspection PyUnresolvedReferences
     match_call = verification.parsed.body[-1].value.value
 
     assert isinstance(match_call, parse_tree.FunctionCall), (
         f"{parse_tree.dump(match_call)}")
-    assert match_call.name == "match"
+    assert match_call.name.identifier == "match"
 
     assert isinstance(match_call.args[0], parse_tree.Expression)
     pattern_expr = transpiler.transform(match_call.args[0])
@@ -277,17 +277,17 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
         else:
             hash_set_writer = io.StringIO()
             hash_set_writer.write(
-                f"public static HashSet<int> For{enum_name} = new HashSet<int>\n{{")
+                f"public static HashSet<int> For{enum_name} = new HashSet<int>\n{{\n")
 
             for i, literal in enumerate(symbol.literals):
                 literal_name = csharp_naming.enum_literal_name(literal.name)
-                hash_set_writer.write(f"{I}(int){literal_name}")
+                hash_set_writer.write(f"{I}(int)Aas.{enum_name}.{literal_name}")
                 if i < len(symbol.literals) - 1:
                     hash_set_writer.write(",\n")
                 else:
                     hash_set_writer.write("\n")
 
-            hash_set_writer.write("}")
+            hash_set_writer.write("};")
 
             blocks.append(Stripped(hash_set_writer.getvalue()))
 
@@ -423,7 +423,7 @@ class _EnumerationCheckUnroller(csharp_unrolling.Unroller):
         children = self.unroll(
             unrollee_expr=item_var,
             type_annotation=type_annotation.items,
-            path=path + [f"{{item_var}}"],
+            path=path + [f"{{{item_var}}}"],
             item_level=item_level + 1,
             key_value_level=key_value_level
         )
@@ -432,7 +432,7 @@ class _EnumerationCheckUnroller(csharp_unrolling.Unroller):
             return []
 
         node = csharp_unrolling.Node(
-            text=f"foreach (var {item_var} in {unrollee_expr}", children=children
+            text=f"foreach (var {item_var} in {unrollee_expr})", children=children
         )
 
         return [node]
@@ -590,7 +590,7 @@ class _ConstrainedPrimitiveCheckUnroller(csharp_unrolling.Unroller):
         children = self.unroll(
             unrollee_expr=item_var,
             type_annotation=type_annotation.items,
-            path=path + [f"{{item_var}}"],
+            path=path + [f"{{{item_var}}}"],
             item_level=item_level + 1,
             key_value_level=key_value_level
         )
@@ -599,7 +599,7 @@ class _ConstrainedPrimitiveCheckUnroller(csharp_unrolling.Unroller):
             return []
 
         node = csharp_unrolling.Node(
-            text=f"foreach (var {item_var} in {unrollee_expr}", children=children
+            text=f"foreach (var {item_var} in {unrollee_expr})", children=children
         )
 
         return [node]
@@ -965,6 +965,17 @@ class _InvariantTranspiler(
                     return Stripped(f"{collection}.Length"), None
 
                 elif (
+                    isinstance(
+                        arg_type,
+                        intermediate_type_inference.OurTypeAnnotation
+                    )
+                    and isinstance(arg_type.symbol, intermediate.ConstrainedPrimitive)
+                    and arg_type.symbol.constrainee ==
+                    intermediate.PrimitiveType.STR
+                ):
+                    return Stripped(f"{collection}.Length"), None
+
+                elif (
                         isinstance(arg_type,
                                    intermediate_type_inference.ListTypeAnnotation)
                 ):
@@ -1292,17 +1303,9 @@ def _generate_implementation_verify(
         )
 
     assert 'self' not in environment
-    if isinstance(something, intermediate.ConstrainedPrimitive):
-        environment['self'] = intermediate_type_inference.PrimitiveTypeAnnotation(
-            a_type=intermediate_type_inference.PRIMITIVE_TYPE_MAP.get(
-                intermediate.ConstrainedPrimitive.constrainee)
-        )
-    elif isinstance(something, intermediate.ConcreteClass):
-        environment['self'] = intermediate_type_inference.OurTypeAnnotation(
-            symbol=something
-        )
-    else:
-        assert_never(something)
+    environment['self'] = intermediate_type_inference.OurTypeAnnotation(
+        symbol=something
+    )
 
     for invariant in something.invariants:
         invariant_code, error = _transpile_invariant(

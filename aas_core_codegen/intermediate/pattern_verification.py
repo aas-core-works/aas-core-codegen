@@ -197,6 +197,7 @@ def try_to_understand(
         parse.AtomicTypeAnnotation)
             and parsed.arguments[0].type_annotation.identifier == 'str'
     ):
+        print("exit here")  # TODO: debug
         return None, False, None
 
     # We need to return something,
@@ -205,12 +206,15 @@ def try_to_understand(
             and isinstance(parsed.returns, parse.AtomicTypeAnnotation)
             and parsed.returns.identifier == 'bool'
     ):
+        print("exit here 1")  # TODO: debug
         return None, False, None
 
     if len(parsed.body) == 0:
+        print("exit here 2")  # TODO: debug
         return None, False, None
 
     if not isinstance(parsed.body[-1], parse_tree.Return):
+        print("exit here 3")  # TODO: debug
         return None, False, None
 
     return_node = parsed.body[-1]
@@ -235,7 +239,7 @@ def try_to_understand(
     if not (
             isinstance(return_node.value, parse_tree.IsNotNone)
             and isinstance(return_node.value.value, parse_tree.FunctionCall)
-            and return_node.value.value.name == 'match'
+            and return_node.value.value.name.identifier == 'match'
     ):
         return None, False, None
 
@@ -246,7 +250,7 @@ def try_to_understand(
 
     match_call = return_node.value.value
     assert isinstance(match_call, parse_tree.FunctionCall)
-    assert match_call.name == 'match'
+    assert match_call.name.identifier == 'match'
 
     # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test this
     if len(match_call.args) < 2:

@@ -25,7 +25,7 @@ def _generate_ivisitor(symbol_table: intermediate.SymbolTable) -> Stripped:
     blocks = []  # type: List[Stripped]
 
     for symbol in symbol_table.symbols:
-        if not isinstance(symbol, intermediate.Enumeration):
+        if isinstance(symbol, intermediate.Enumeration):
             continue
 
         elif isinstance(symbol, intermediate.ConstrainedPrimitive):

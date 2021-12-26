@@ -292,23 +292,28 @@ def _generate_interface(
     # region Getters and setters
 
     for prop in interface.properties:
-        prop_type = csharp_common.generate_type(
-            type_annotation=prop.type_annotation,
-            ref_association=ref_association)
-        prop_name = csharp_naming.property_name(prop.name)
+        if id(prop.implemented_for) == id(interface.base):
+            prop_type = csharp_common.generate_type(
+                type_annotation=prop.type_annotation,
+                ref_association=ref_association)
+            prop_name = csharp_naming.property_name(prop.name)
 
-        if prop.description is not None:
-            prop_comment, error = csharp_description.generate_comment(prop.description)
-            if error:
-                return None, error
+            if prop.description is not None:
+                prop_comment, error = csharp_description.generate_comment(
+                    prop.description)
 
-            blocks.append(
-                Stripped(
-                    f"{prop_comment}\npublic {prop_type} {prop_name} {{ get; set; }}"
+                if error:
+                    return None, error
+
+                blocks.append(
+                    Stripped(
+                        f"{prop_comment}\n"
+                        f"public {prop_type} {prop_name} {{ get; set; }}"
+                    )
                 )
-            )
-        else:
-            blocks.append(Stripped(f"public {prop_type} {prop_name} {{ get; set; }}"))
+            else:
+                blocks.append(Stripped(
+                    f"public {prop_type} {prop_name} {{ get; set; }}"))
 
     # endregion
 
@@ -717,8 +722,8 @@ def _generate_default_value(default: intermediate.Default) -> Stripped:
     return Stripped(code)
 
 
-@require(lambda symbol: not symbol.is_implementation_specific)
-@require(lambda symbol: not symbol.constructor.is_implementation_specific)
+@require(lambda cls: not cls.is_implementation_specific)
+@require(lambda cls: not cls.constructor.is_implementation_specific)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_constructor(
         cls: intermediate.ConcreteClass,
@@ -825,7 +830,7 @@ def _generate_constructor(
     return Stripped("\n".join(blocks)), None
 
 
-@require(lambda symbol: not symbol.is_implementation_specific)
+@require(lambda cls: not cls.is_implementation_specific)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
         cls: intermediate.ConcreteClass,

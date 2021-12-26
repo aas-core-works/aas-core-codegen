@@ -1077,10 +1077,6 @@ def _parsed_class_to_class(
 
     # endregion
 
-    inheritances = [
-        _PlaceholderSymbol(inheritance) for inheritance in parsed.inheritances
-    ]
-
     factory_to_use = None  # type: Optional[Type[Class]]
 
     if isinstance(parsed, parse.ConcreteClass):
@@ -1095,10 +1091,10 @@ def _parsed_class_to_class(
     # noinspection PyTypeChecker
     return factory_to_use(
         name=parsed.name,
-        inheritances=inheritances,
+        # Use a placeholder for inheritances and descendants as we can not resolve
+        # inheritances at this stage
+        inheritances=[],
         interface=_MaybeInterfacePlaceholder(),
-        # Use a placeholder for descendants as we can not resolve inheritances
-        # at this stage
         descendants=[],
         is_implementation_specific=parsed.is_implementation_specific,
         properties=properties,
@@ -1181,10 +1177,10 @@ def _parsed_verification_function_to_verification_function(
             None,
             Error(
                 parsed.node,
-                "We do not know how to interpret the verification function as it does "
-                "not match our pre-defined interpretation rules. "
-                "Please contact the developers if you expect this function "
-                "to be understood.")
+                f"We do not know how to interpret the verification function {name!r} "
+                f"as it does not match our pre-defined interpretation rules. "
+                f"Please contact the developers if you expect this function "
+                f"to be understood.")
         )
 
     elif isinstance(parsed, parse.ConstructorToBeUnderstood):
@@ -1738,7 +1734,7 @@ def _second_pass_to_resolve_resulting_class_of_implemented_for(
     all(
         isinstance(symbol.inheritances, list)
         and len(symbol.inheritances) == 0
-        for symbol in symbol_table
+        for symbol in symbol_table.symbols
         if isinstance(symbol, (ConstrainedPrimitive, Class))
     ),
     "No inheritances previously resolved"
@@ -1755,6 +1751,13 @@ def _second_pass_to_resolve_inheritances_in_place(
         elif isinstance(symbol, ConstrainedPrimitive):
             resolved_inheritances = []  # type: List[ConstrainedPrimitive]
             for inheritance_name in symbol.parsed.inheritances:
+                # NOTE (mristin, 2021-12-26):
+                # The constrainee is stored at a different property and is not included
+                # in the inheritances. The inheritances refer only to ancestor
+                # constrained primitives.
+                if inheritance_name in parse.PRIMITIVE_TYPES:
+                    continue
+
                 inheritance_symbol = symbol_table.must_find(
                     Identifier(inheritance_name)
                 )
@@ -2519,6 +2522,10 @@ def translate(
 
     if len(underlying_errors) > 0:
         return None, bundle_underlying_errors()
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, (ConstrainedPrimitive, Class)):
+            continue
 
     _second_pass_to_resolve_inheritances_in_place(
         symbol_table=symbol_table

@@ -411,7 +411,7 @@ class Inferrer(
 
     @ensure(lambda self, result: not (result is None) or len(self.errors) > 0)
     def transform(self, node: parse_tree.Node) -> Optional[TypeAnnotation]:
-        return super(self).transform(node)
+        return super().transform(node)
 
     def transform_member(self, node: parse_tree.Member) -> Optional[TypeAnnotation]:
         instance_type = self.transform(node.instance)
@@ -546,16 +546,26 @@ class Inferrer(
         if func_type is None:
             failed = True
         else:
-            if isinstance(
-                    func_type,
-                    (VerificationTypeAnnotation, BuiltinFunctionTypeAnnotation)
-            ):
+            # NOTE (mristin, 2021-12-26):
+            # The verification functions use
+            # :py:mod:`aas_core_codegen.intermediate._types` while the built-in
+            # functions are a construct of
+            # :py:mod:`aas_core_codegen.intermediate.type_inference`.
+
+            if isinstance(func_type, VerificationTypeAnnotation):
                 if func_type.func.returns is not None:
                     result = _type_annotation_to_inferred_type_annotation(
                         func_type.func.returns
                     )
                 else:
                     result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
+
+            elif isinstance(func_type, BuiltinFunctionTypeAnnotation):
+                if func_type.func.returns is not None:
+                    result = func_type.func.returns
+                else:
+                    result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
+
             else:
                 assert_never(func_type)
 
