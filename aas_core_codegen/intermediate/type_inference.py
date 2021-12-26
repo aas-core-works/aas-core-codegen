@@ -9,11 +9,12 @@ be traced back to the parse stage.
 """
 import abc
 import enum
-from typing import Mapping, MutableMapping, Dict, Optional, List, Final, Union
+from typing import Mapping, MutableMapping, Optional, List, Final, Union
 
-from aas_core_codegen.common import Identifier, Error, assert_never
-from icontract import DBC, ensure, require
+from icontract import DBC, ensure
 
+from aas_core_codegen.common import Identifier, Error, assert_never, \
+    assert_union_of_descendants_exhaustive
 from aas_core_codegen.intermediate import _types
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -99,7 +100,7 @@ class VerificationTypeAnnotation(AtomicTypeAnnotation):
 class BuiltinFunction:
     """Represent a built-in function."""
 
-    def __init__(self, name: Identifier, returns: Optional[TypeAnnotation]):
+    def __init__(self, name: Identifier, returns: Optional["TypeAnnotationUnion"]):
         """Initialize with the given values."""
         self.name = name
         self.returns = returns
@@ -143,7 +144,7 @@ class SubscriptedTypeAnnotation(TypeAnnotation):
 class ListTypeAnnotation(SubscriptedTypeAnnotation):
     """Represent a type annotation involving a ``List[...]``."""
 
-    def __init__(self, items: "TypeAnnotation"):
+    def __init__(self, items: "TypeAnnotationUnion"):
         self.items = items
 
     def __str__(self) -> str:
@@ -153,7 +154,7 @@ class ListTypeAnnotation(SubscriptedTypeAnnotation):
 class OptionalTypeAnnotation(SubscriptedTypeAnnotation):
     """Represent a type annotation involving an ``Optional[...]``."""
 
-    def __init__(self, value: "TypeAnnotation"):
+    def __init__(self, value: "TypeAnnotationUnion"):
         self.value = value
 
     def __str__(self) -> str:
@@ -163,14 +164,14 @@ class OptionalTypeAnnotation(SubscriptedTypeAnnotation):
 class RefTypeAnnotation(SubscriptedTypeAnnotation):
     """Represent a type annotation involving a reference ``Ref[...]``."""
 
-    def __init__(self, value: "TypeAnnotation"):
+    def __init__(self, value: "TypeAnnotationUnion"):
         self.value = value
 
     def __str__(self) -> str:
         return f"Ref[{self.value}]"
 
 
-def _type_annotations_equal(that: TypeAnnotation, other: TypeAnnotation):
+def _type_annotations_equal(that: "TypeAnnotationUnion", other: "TypeAnnotationUnion"):
     """Check whether the ``that`` and ``other`` type annotations are identical."""
     if isinstance(that, PrimitiveTypeAnnotation):
         if not isinstance(other, PrimitiveTypeAnnotation):
@@ -186,6 +187,12 @@ def _type_annotations_equal(that: TypeAnnotation, other: TypeAnnotation):
 
     elif isinstance(that, VerificationTypeAnnotation):
         if not isinstance(other, VerificationTypeAnnotation):
+            return False
+        else:
+            return id(that.func) == id(other.func)
+
+    elif isinstance(that, BuiltinFunctionTypeAnnotation):
+        if not isinstance(other, BuiltinFunctionTypeAnnotation):
             return False
         else:
             return id(that.func) == id(other.func)
@@ -218,7 +225,7 @@ def _type_annotations_equal(that: TypeAnnotation, other: TypeAnnotation):
         assert_never(that)
 
 
-def _assignable(target_type: TypeAnnotation, value_type: TypeAnnotation):
+def _assignable(target_type: "TypeAnnotationUnion", value_type: "TypeAnnotationUnion"):
     """Check whether the value can be assigned to the target."""
     if isinstance(target_type, PrimitiveTypeAnnotation):
         if isinstance(value_type, PrimitiveTypeAnnotation):
@@ -229,7 +236,7 @@ def _assignable(target_type: TypeAnnotation, value_type: TypeAnnotation):
         # since we can always assign a constrained primitive to a primitive, if they
         # primitive types match.
         elif isinstance(value_type, OurTypeAnnotation) and isinstance(
-            value_type.symbol, _types.ConstrainedPrimitive
+                value_type.symbol, _types.ConstrainedPrimitive
         ):
             return target_type.a_type == PRIMITIVE_TYPE_MAP.get(
                 value_type.symbol.constrainee
@@ -243,9 +250,9 @@ def _assignable(target_type: TypeAnnotation, value_type: TypeAnnotation):
             # NOTE (mristin, 2021-12-25):
             # The enumerations are invariant.
             return (
-                isinstance(value_type, OurTypeAnnotation)
-                and isinstance(value_type.symbol, _types.Enumeration)
-                and id(target_type.symbol) == id(value_type.symbol)
+                    isinstance(value_type, OurTypeAnnotation)
+                    and isinstance(value_type.symbol, _types.Enumeration)
+                    and id(target_type.symbol) == id(value_type.symbol)
             )
 
         elif isinstance(target_type.symbol, _types.ConstrainedPrimitive):
@@ -253,31 +260,31 @@ def _assignable(target_type: TypeAnnotation, value_type: TypeAnnotation):
             # If it is a constrained primitive with no constraints, allow the assignment
             # if the target and the value match on the primitive type.
             if len(target_type.symbol.invariants) == 0 and isinstance(
-                value_type, PrimitiveTypeAnnotation
+                    value_type, PrimitiveTypeAnnotation
             ):
                 return (
-                    PRIMITIVE_TYPE_MAP.get(target_type.symbol.constrainee)
-                    == value_type.a_type
+                        PRIMITIVE_TYPE_MAP.get(target_type.symbol.constrainee)
+                        == value_type.a_type
                 )
             else:
                 # NOTE (mristin, 2021-12-25):
                 # We assume the assignments of constrained primitives to be co-variant.
                 if (
-                    isinstance(value_type, OurTypeAnnotation)
-                    and isinstance(value_type.symbol, _types.ConstrainedPrimitive)
-                    and target_type.symbol.constrainee == value_type.symbol.constrainee
+                        isinstance(value_type, OurTypeAnnotation)
+                        and isinstance(value_type.symbol, _types.ConstrainedPrimitive)
+                        and target_type.symbol.constrainee == value_type.symbol.constrainee
                 ):
                     return (
-                        id(target_type.symbol) == id(value_type.symbol)
-                        or value_type.symbol in target_type.symbol.descendant_id_set
+                            id(target_type.symbol) == id(value_type.symbol)
+                            or value_type.symbol in target_type.symbol.descendant_id_set
                     )
 
             return False
 
         elif isinstance(target_type.symbol, _types.Class):
             if not (
-                isinstance(value_type, OurTypeAnnotation)
-                and isinstance(value_type.symbol, _types.Class)
+                    isinstance(value_type, OurTypeAnnotation)
+                    and isinstance(value_type.symbol, _types.Class)
             ):
                 return False
 
@@ -287,11 +294,17 @@ def _assignable(target_type: TypeAnnotation, value_type: TypeAnnotation):
             # target symbol.
 
             return id(target_type.symbol) == id(value_type.symbol) or (
-                id(value_type.symbol) in target_type.symbol.descendant_id_set
+                    id(value_type.symbol) in target_type.symbol.descendant_id_set
             )
 
     elif isinstance(target_type, VerificationTypeAnnotation):
         if not isinstance(value_type, VerificationTypeAnnotation):
+            return False
+        else:
+            return id(target_type.func) == id(value_type.func)
+
+    elif isinstance(target_type, BuiltinFunctionTypeAnnotation):
+        if not isinstance(value_type, BuiltinFunctionTypeAnnotation):
             return False
         else:
             return id(target_type.func) == id(value_type.func)
@@ -347,17 +360,17 @@ PRIMITIVE_TYPE_MAP = {
 
 for _types_primitive_type in _types.PrimitiveType:
     assert (
-        _types_primitive_type in PRIMITIVE_TYPE_MAP
+            _types_primitive_type in PRIMITIVE_TYPE_MAP
     ), f"All primitive types from _types covered, but: {_types_primitive_type=}"
 
 
 def _type_annotation_to_inferred_type_annotation(
-    type_annotation: _types.TypeAnnotation,
-) -> TypeAnnotation:
+        type_annotation: _types.TypeAnnotationUnion,
+) -> "TypeAnnotationUnion":
     """Convert from the :py:mod:`aas_core_codegen.intermediate._types`."""
     if isinstance(type_annotation, _types.PrimitiveTypeAnnotation):
         return PrimitiveTypeAnnotation(
-            a_type=PRIMITIVE_TYPE_MAP.get(type_annotation.a_type)
+            a_type=PRIMITIVE_TYPE_MAP[type_annotation.a_type]
         )
 
     elif isinstance(type_annotation, _types.OurTypeAnnotation):
@@ -373,17 +386,22 @@ def _type_annotation_to_inferred_type_annotation(
             value=_type_annotation_to_inferred_type_annotation(type_annotation.value)
         )
 
+    elif isinstance(type_annotation, _types.RefTypeAnnotation):
+        return RefTypeAnnotation(
+            value=_type_annotation_to_inferred_type_annotation(type_annotation.value)
+        )
+
     else:
         assert_never(type_annotation)
 
 
-class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
+class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]):
     """Infer the types of the given parse tree."""
 
     #: Track of the inferred types
     type_map: Final[
         MutableMapping[
-            Union[parse_tree.Node, parse_tree.FormattedValue], TypeAnnotation
+            Union[parse_tree.Node, parse_tree.FormattedValue], "TypeAnnotationUnion"
         ]
     ]
 
@@ -391,9 +409,9 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
     errors: Final[List[Error]]
 
     def __init__(
-        self,
-        symbol_table: _types.SymbolTable,
-        environment: Mapping[Identifier, TypeAnnotation],
+            self,
+            symbol_table: _types.SymbolTable,
+            environment: Mapping[Identifier, "TypeAnnotationUnion"],
     ) -> None:
         """Initialize with the given values."""
         self._symbol_table = symbol_table
@@ -404,18 +422,21 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         self.errors = []
 
     @ensure(lambda self, result: not (result is None) or len(self.errors) > 0)
-    def transform(self, node: parse_tree.Node) -> Optional[TypeAnnotation]:
+    def transform(self, node: parse_tree.Node) -> Optional["TypeAnnotationUnion"]:
         return super().transform(node)
 
-    def transform_member(self, node: parse_tree.Member) -> Optional[TypeAnnotation]:
+    def transform_member(
+            self,
+            node: parse_tree.Member
+    ) -> Optional["TypeAnnotationUnion"]:
         instance_type = self.transform(node.instance)
 
         if instance_type is None:
             return None
 
         if not (
-            isinstance(instance_type, OurTypeAnnotation)
-            and isinstance(instance_type.symbol, _types.Class)
+                isinstance(instance_type, OurTypeAnnotation)
+                and isinstance(instance_type.symbol, _types.Class)
         ):
             self.errors.append(
                 Error(
@@ -451,12 +472,12 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         return None
 
     def transform_comparison(
-        self, node: parse_tree.Comparison
-    ) -> Optional[TypeAnnotation]:
+            self, node: parse_tree.Comparison
+    ) -> Optional["TypeAnnotationUnion"]:
         # Just recurse to fill ``type_map`` on ``left`` and ``right`` even though we
         # know the type in advance
         success = (self.transform(node.left) is not None) and (
-            self.transform(node.right) is not None
+                self.transform(node.right) is not None
         )
 
         if not success:
@@ -467,12 +488,12 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         return result
 
     def transform_implication(
-        self, node: parse_tree.Implication
-    ) -> Optional[TypeAnnotation]:
+            self, node: parse_tree.Implication
+    ) -> Optional["TypeAnnotationUnion"]:
         # Just recurse to fill ``type_map`` on ``antecedent`` and ``consequent`` even
         # though we know the type in advance
         success = (self.transform(node.antecedent) is not None) and (
-            self.transform(node.consequent) is not None
+                self.transform(node.consequent) is not None
         )
 
         if not success:
@@ -483,8 +504,8 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         return result
 
     def transform_method_call(
-        self, node: parse_tree.MethodCall
-    ) -> Optional[TypeAnnotation]:
+            self, node: parse_tree.MethodCall
+    ) -> Optional["TypeAnnotationUnion"]:
         # Simply recurse to track the type, but we don't care about the arguments
         failed = False
         for arg in node.args:
@@ -510,7 +531,8 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
             )
             return None
 
-        result = None  # type: Optional[TypeAnnotation]
+        # noinspection PyUnusedLocal
+        result = None  # type: Optional[TypeAnnotationUnion]
 
         if member_type.method.returns is None:
             result = PrimitiveTypeAnnotation(a_type=PrimitiveType.NONE)
@@ -524,9 +546,9 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         return result
 
     def transform_function_call(
-        self, node: parse_tree.FunctionCall
-    ) -> Optional[TypeAnnotation]:
-        result = None  # type: Optional[TypeAnnotation]
+            self, node: parse_tree.FunctionCall
+    ) -> Optional["TypeAnnotationUnion"]:
+        result = None  # type: Optional[TypeAnnotationUnion]
         failed = False
 
         func_type = self.transform(node.name)
@@ -553,6 +575,21 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
                 else:
                     result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
 
+            elif isinstance(
+                    func_type,
+                    (
+                            PrimitiveTypeAnnotation, OurTypeAnnotation,
+                            MethodTypeAnnotation, ListTypeAnnotation,
+                            OptionalTypeAnnotation, RefTypeAnnotation)
+            ):
+                self.errors.append(
+                    Error(
+                        node.name.original_node,
+                        f"Expected the variable {node.name.identifier!r} to be "
+                        f"a function, but got {func_type}"
+                    )
+                )
+
             else:
                 assert_never(func_type)
 
@@ -573,11 +610,15 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         if failed:
             return None
 
+        assert result is not None
         self.type_map[node] = result
         return result
 
-    def transform_constant(self, node: parse_tree.Constant) -> Optional[TypeAnnotation]:
-        result = None  # type: Optional[TypeAnnotation]
+    def transform_constant(
+            self,
+            node: parse_tree.Constant
+    ) -> Optional["TypeAnnotationUnion"]:
+        result = None  # type: Optional[TypeAnnotationUnion]
 
         if isinstance(node.value, bool):
             result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
@@ -595,7 +636,9 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         self.type_map[node] = result
         return result
 
-    def transform_is_none(self, node: parse_tree.IsNone) -> Optional[TypeAnnotation]:
+    def transform_is_none(
+            self, node: parse_tree.IsNone
+    ) -> Optional["TypeAnnotationUnion"]:
         # Just recurse to fill ``type_map`` on ``value`` even though we know the type in
         # advance
         success = self.transform(node.value) is not None
@@ -608,8 +651,8 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         return result
 
     def transform_is_not_none(
-        self, node: parse_tree.IsNotNone
-    ) -> Optional[TypeAnnotation]:
+            self, node: parse_tree.IsNotNone
+    ) -> Optional["TypeAnnotationUnion"]:
         # Just recurse to fill ``type_map`` on ``value`` even though we know the type in
         # advance
         success = self.transform(node.value) is not None
@@ -621,7 +664,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         self.type_map[node] = result
         return result
 
-    def transform_name(self, node: parse_tree.Name) -> Optional[TypeAnnotation]:
+    def transform_name(self, node: parse_tree.Name) -> Optional["TypeAnnotationUnion"]:
         type_in_env = self._environment.get(node.identifier, None)
         if type_in_env is None:
             self.errors.append(
@@ -639,7 +682,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         self.type_map[node] = type_in_env
         return type_in_env
 
-    def transform_and(self, node: parse_tree.And) -> Optional[TypeAnnotation]:
+    def transform_and(self, node: parse_tree.And) -> Optional["TypeAnnotationUnion"]:
         # Just recurse to fill ``type_map`` on ``values`` even though we know the type
         # in advance
         success = all(
@@ -653,7 +696,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         self.type_map[node] = result
         return result
 
-    def transform_or(self, node: parse_tree.Or) -> Optional[TypeAnnotation]:
+    def transform_or(self, node: parse_tree.Or) -> Optional["TypeAnnotationUnion"]:
         # Just recurse to fill ``type_map`` on ``values`` even though we know the type
         # in advance
         success = all(
@@ -668,8 +711,8 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         return result
 
     def transform_joined_str(
-        self, node: parse_tree.JoinedStr
-    ) -> Optional[TypeAnnotation]:
+            self, node: parse_tree.JoinedStr
+    ) -> Optional["TypeAnnotationUnion"]:
         # Just recurse to fill ``type_map`` on ``values`` even though we know the type
         # in advance
         success = True
@@ -696,11 +739,13 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         return result
 
     def transform_assignment(
-        self, node: parse_tree.Assignment
-    ) -> Optional[TypeAnnotation]:
+            self, node: parse_tree.Assignment
+    ) -> Optional["TypeAnnotationUnion"]:
         is_new_variable = False
 
-        target_type = None  # type: Optional[TypeAnnotation]
+        # noinspection PyUnusedLocal
+        target_type = None  # type: Optional[TypeAnnotationUnion]
+
         if isinstance(node.target, parse_tree.Name):
             target_type = self._environment.get(node.target.identifier, None)
             if target_type is None:
@@ -714,7 +759,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
             return None
 
         if target_type is not None and not _assignable(
-            target_type=target_type, value_type=value_type
+                target_type=target_type, value_type=value_type
         ):
             self.errors.append(
                 Error(
@@ -734,14 +779,31 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
         self.type_map[node] = result
         return result
 
-    def transform_return(self, node: parse_tree.Return) -> Optional[TypeAnnotation]:
+    def transform_return(
+            self, node: parse_tree.Return
+    ) -> Optional["TypeAnnotationUnion"]:
         # Just recurse to fill ``type_map`` on ``value`` even though we know the type
         # in advance
-        success = self.transform(node.value) is not None
-        if not success:
-            return None
+        if node.value is not None:
+            success = self.transform(node.value) is not None
+            if not success:
+                return None
 
         # Treat ``return`` as a statement
         result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
         self.type_map[node] = result
         return result
+
+
+TypeAnnotationUnion = Union[
+    PrimitiveTypeAnnotation,
+    OurTypeAnnotation,
+    VerificationTypeAnnotation,
+    BuiltinFunctionTypeAnnotation,
+    MethodTypeAnnotation,
+    ListTypeAnnotation,
+    OptionalTypeAnnotation,
+    RefTypeAnnotation
+]
+assert_union_of_descendants_exhaustive(
+    union=TypeAnnotationUnion, base_class=TypeAnnotation)
