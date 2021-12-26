@@ -1,518 +1,653 @@
 """Stringify the intermediate representation."""
 
-# TODO-BEFORE-RELEASE (mristin, 2021-12-24):
-# This needs to be completely updated once the implementation is not in that much flux.
-
 from typing import Union, Optional
 
 from aas_core_codegen import stringify
-from aas_core_codegen.common import assert_never
+from aas_core_codegen.intermediate import _types, construction
 from aas_core_codegen.intermediate._types import (
+    AbstractClass,
     Argument,
-    AtomicTypeAnnotation,
     Class,
+    ConcreteClass,
+    ConstrainedPrimitive,
     Constructor,
     Contract,
     Contracts,
     Default,
+    DefaultConstant,
+    DefaultEnumerationLiteral,
+    Description,
     Enumeration,
     EnumerationLiteral,
+    ImplementationSpecificMethod,
+    ImplementationSpecificVerification,
+    Interface,
+    Invariant,
+    ListTypeAnnotation,
+    MetaModel,
     Method,
+    OptionalTypeAnnotation,
+    OurTypeAnnotation,
+    PatternVerification,
+    PrimitiveTypeAnnotation,
     Property,
+    RefTypeAnnotation,
+    Serialization,
+    Signature,
+    SignatureLike,
     Snapshot,
-    SubscriptedTypeAnnotation,
     Symbol,
     SymbolTable,
-    TypeAnnotation,
-    ListTypeAnnotation,
-    OptionalTypeAnnotation,
-    PrimitiveTypeAnnotation,
-    OurTypeAnnotation,
-    Description,
-    Invariant,
-    DefaultConstant,
-    DefaultEnumerationLiteral, Serialization, MetaModel,
-    ImplementationSpecificVerification,
+    TypeAnnotation, Verification,
+)
+from aas_core_codegen.parse import (
+    tree as parse_tree
 )
 
 
-def _stringify_default_constant(default: DefaultConstant) -> stringify.Entity:
+def _stringify_primitive_type_annotation(
+        that: PrimitiveTypeAnnotation,
+) -> stringify.Entity:
     result = stringify.Entity(
-        name=Default.__name__,
+        name=that.__class__.__name__,
         properties=[
-            stringify.Property("value", default.value),
-            stringify.PropertyEllipsis("parsed", default.parsed),
+            stringify.Property("a_type", that.a_type.name),
+            stringify.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
-    stringify.assert_compares_against_dict(result, default)
+    return result
+
+
+def _stringify_our_type_annotation(
+        that: OurTypeAnnotation,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("symbol", f"Reference to symbol {that.symbol.name}"),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_list_type_annotation(
+        that: ListTypeAnnotation,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("items", _stringify(that.items)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+
+        ],
+    )
+
+    return result
+
+
+def _stringify_optional_type_annotation(
+        that: OptionalTypeAnnotation,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("value", _stringify(that.value)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_ref_type_annotation(
+        that: RefTypeAnnotation,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("value", _stringify(that.value)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_description(
+        that: Description,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.PropertyEllipsis("document", that.document),
+            stringify.PropertyEllipsis("node", that.node),
+        ],
+    )
+
+    return result
+
+
+def _stringify_property(
+        that: Property,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("name", that.name),
+            stringify.Property("type_annotation", _stringify(that.type_annotation)),
+            stringify.Property("description", _stringify(that.description)),
+            stringify.Property(
+                "implemented_for",
+                f"Reference to {that.implemented_for.__class__.__name__} "
+                f"{that.implemented_for.name}"),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_default_constant(
+        that: DefaultConstant,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("value", that.value),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
     return result
 
 
 def _stringify_default_enumeration_literal(
-        default: DefaultEnumerationLiteral,
+        that: DefaultEnumerationLiteral,
 ) -> stringify.Entity:
     result = stringify.Entity(
-        name=Default.__name__,
+        name=that.__class__.__name__,
         properties=[
-            stringify.Property("enumeration", default.enumeration.name),
-            stringify.Property("literal", default.literal.name),
-            stringify.PropertyEllipsis("parsed", default.parsed),
-        ],
-    )
-
-    stringify.assert_compares_against_dict(result, default)
-    return result
-
-
-def _stringify_atomic_type_annotation(
-        type_annotation: AtomicTypeAnnotation,
-) -> stringify.Entity:
-    result = None  # type: Optional[stringify.Entity]
-
-    if isinstance(type_annotation, PrimitiveTypeAnnotation):
-        result = stringify.Entity(
-            name=AtomicTypeAnnotation.__name__,
-            properties=[
-                stringify.Property("a_type", type_annotation.a_type.value),
-                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-            ],
-        )
-    elif isinstance(type_annotation, OurTypeAnnotation):
-        result = stringify.Entity(
-            name=AtomicTypeAnnotation.__name__,
-            properties=[
-                stringify.Property("symbol", type_annotation.symbol.name),
-                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-            ],
-        )
-    else:
-        assert_never(type_annotation)
-
-    assert result is not None
-    stringify.assert_compares_against_dict(result, type_annotation)
-    return result
-
-
-def _stringify_subscripted_type_annotation(
-        type_annotation: SubscriptedTypeAnnotation,
-) -> stringify.Entity:
-    result = None  # type: Optional[stringify.Entity]
-
-    if isinstance(type_annotation, ListTypeAnnotation):
-        result = stringify.Entity(
-            name=ListTypeAnnotation.__name__,
-            properties=[
-                stringify.Property("items", _stringify(type_annotation.items)),
-                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-            ],
-        )
-    elif isinstance(type_annotation, OptionalTypeAnnotation):
-        result = stringify.Entity(
-            name=OptionalTypeAnnotation.__name__,
-            properties=[
-                stringify.Property("value", _stringify(type_annotation.value)),
-                stringify.PropertyEllipsis("parsed", type_annotation.parsed),
-            ],
-        )
-    else:
-        assert_never(type_annotation)
-
-    assert result is not None
-    stringify.assert_compares_against_dict(result, type_annotation)
-    return result
-
-
-def _stringify_argument(argument: Argument) -> stringify.Entity:
-    result = stringify.Entity(
-        name=Argument.__name__,
-        properties=[
-            stringify.Property("name", argument.name),
-            stringify.Property("type_annotation", _stringify(argument.type_annotation)),
             stringify.Property(
-                "default",
-                None if argument.default is None else _stringify(argument.default),
+                "enumeration",
+                f"Reference to {that.enumeration.__class__.__name__} "
+                f"{that.enumeration.name}"),
+            stringify.Property(
+                "literal",
+                f"Reference to {that.literal.__class__.__name__} "
+                f"{that.literal.name}"),
+        ],
+    )
+
+    return result
+
+
+def _stringify_argument(
+        that: Argument,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("name", that.name),
+            stringify.Property("type_annotation", _stringify(that.type_annotation)),
+            stringify.Property("default", _stringify(that.default)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_serialization(
+        that: Serialization,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("with_model_type", that.with_model_type),
+        ],
+    )
+
+    return result
+
+
+def _stringify_invariant(
+        that: Invariant,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("description", that.description),
+            stringify.Property("body", parse_tree.dump(that.body)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_contract(
+        that: Contract,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("args", that.args),
+            stringify.Property("description", that.description),
+            stringify.Property("body", parse_tree.dump(that.body)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_snapshot(
+        that: Snapshot,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("args", that.args),
+            stringify.Property("body", parse_tree.dump(that.body)),
+            stringify.Property("name", that.name),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_contracts(that: Contracts) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property(
+                "preconditions", list(map(_stringify, that.preconditions))
             ),
-            stringify.PropertyEllipsis("parsed", argument.parsed),
+            stringify.Property(
+                "snapshots",
+                list(map(_stringify, that.snapshots))
+            ),
+            stringify.Property(
+                "postconditions",
+                list(map(_stringify, that.postconditions)),
+            ),
         ],
     )
 
-    stringify.assert_compares_against_dict(result, argument)
     return result
 
 
-def _stringify_description(description: Description) -> stringify.Entity:
-    return stringify.Entity(
-        name=Description.__name__,
-        properties=[
-            stringify.PropertyEllipsis("document", description.document),
-            stringify.PropertyEllipsis("node", description.node),
-        ],
-    )
-
-
-def _stringify_serialization(serialization: Serialization) -> stringify.Entity:
+def _stringify_a_signature_like(that: SignatureLike) -> stringify.Entity:
     result = stringify.Entity(
-        name=Serialization.__name__,
+        name=that.__class__.__name__,
         properties=[
-            stringify.Property("with_model_type", serialization.with_model_type),
+            stringify.Property("name", that.name),
+            stringify.Property("arguments", list(map(_stringify, that.arguments))),
+            stringify.Property("returns", _stringify(that.returns)),
+            stringify.Property("description", _stringify(that.description)),
+            stringify.Property("contracts", _stringify(that.contracts)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
         ],
     )
 
-    stringify.assert_compares_against_dict(result, serialization)
     return result
 
 
-def _stringify_property(prop: Property) -> stringify.Entity:
+def _stringify_method(that: Method) -> stringify.Entity:
+    return _stringify_a_signature_like(that)
+
+
+def _stringify_implementation_specific_method(
+        that: ImplementationSpecificMethod,
+) -> stringify.Entity:
     result = stringify.Entity(
-        name=Property.__name__,
+        name=that.__class__.__name__,
         properties=[
-            stringify.Property("name", prop.name),
-            stringify.Property("type_annotation", _stringify(prop.type_annotation)),
-            stringify.Property("description", _stringify_description(prop.description)),
-            stringify.PropertyEllipsis("parsed", prop.parsed),
+            stringify.Property("name", that.name),
+            stringify.Property("arguments", list(map(_stringify, that.arguments))),
+            stringify.Property("returns", _stringify(that.returns)),
+            stringify.Property("description", _stringify(that.description)),
+            stringify.Property("contracts", _stringify(that.contracts)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
         ],
     )
 
-    stringify.assert_compares_against_dict(result, prop)
+    return result
+
+
+def _stringify_constructor(
+        that: Constructor,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("name", that.name),
+            stringify.Property("arguments", list(map(_stringify, that.arguments))),
+            stringify.Property("returns", _stringify(that.returns)),
+            stringify.Property("description", _stringify(that.description)),
+            stringify.Property("contracts", _stringify(that.contracts)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
+            stringify.Property("is_implementation_specific",
+                               that.is_implementation_specific),
+            stringify.Property(
+                "statements", list(map(construction.dump, that.statements)))
+        ],
+    )
+
     return result
 
 
 def _stringify_enumeration_literal(
-        enumeration_literal: EnumerationLiteral,
+        that: EnumerationLiteral,
 ) -> stringify.Entity:
     result = stringify.Entity(
-        name=EnumerationLiteral.__name__,
+        name=that.__class__.__name__,
         properties=[
-            stringify.Property("name", enumeration_literal.name),
-            stringify.Property("value", enumeration_literal.value),
-            stringify.Property(
-                "description", _stringify_description(enumeration_literal.description)
-            ),
-            stringify.PropertyEllipsis("parsed", enumeration_literal.parsed),
+            stringify.Property("name", that.name),
+            stringify.Property("value", that.value),
+            stringify.Property("description", _stringify(that.description)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
-    stringify.assert_compares_against_dict(result, enumeration_literal)
     return result
 
 
-def _stringify_enumeration(enumeration: Enumeration) -> stringify.Entity:
+def _stringify_enumeration(
+        that: Enumeration,
+) -> stringify.Entity:
     result = stringify.Entity(
-        name=Enumeration.__name__,
+        name=that.__class__.__name__,
         properties=[
-            stringify.Property("name", enumeration.name),
+            stringify.Property("name", that.name),
+            stringify.Property("literals", list(map(_stringify, that.literals))),
+            stringify.PropertyEllipsis("literals_by_name", that.literals_by_name),
+            stringify.PropertyEllipsis("literal_id_set", that.literal_id_set),
+        ],
+    )
+
+    return result
+
+
+def _stringify_constrained_primitive(
+        that: ConstrainedPrimitive,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("name", that.name),
             stringify.Property(
-                "literals",
+                "inheritances",
                 [
-                    _stringify_enumeration_literal(literal)
-                    for literal in enumeration.literals
-                ],
+                    f"Reference to {inheritance.__class__.__name__} {inheritance.name}"
+                    for inheritance in that.inheritances
+                ]
             ),
-            stringify.Property(
-                "description", _stringify_description(enumeration.description)
-            ),
-            stringify.PropertyEllipsis("parsed", enumeration.parsed),
+            stringify.PropertyEllipsis("inheritance_id_set", that.inheritance_id_set),
+            stringify.PropertyEllipsis("descendant_id_set", that.descendant_id_set),
+            stringify.Property("constrainee", that.constrainee.name),
+            stringify.Property("is_implementation_specific",
+                               that.is_implementation_specific),
+            stringify.Property("invariants", list(map(_stringify, that.invariants))),
+            stringify.Property("description", _stringify(that.description)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
-    stringify.assert_compares_against_dict(result, enumeration)
     return result
 
 
-def _stringify_invariant(invariant: Invariant) -> stringify.Entity:
+def _stringify_a_class(that: Class) -> stringify.Entity:
+    # NOTE (mristin, 2021-12-26):
+    # Concrete and abstract class share all the attributes, so we provide a single
+    # stringification function.
+
     result = stringify.Entity(
-        name=Invariant.__name__,
+        name=that.__class__.__name__,
         properties=[
-            stringify.Property("description", invariant.description),
-            stringify.PropertyEllipsis("parsed", invariant.parsed),
-        ],
-    )
-
-    stringify.assert_compares_against_dict(result, invariant)
-    return result
-
-
-def _stringify_contract(contract: Contract) -> stringify.Entity:
-    result = stringify.Entity(
-        name=Contract.__name__,
-        properties=[
-            stringify.Property("args", contract.args),
-            stringify.Property("description", contract.description),
-            stringify.PropertyEllipsis("body", contract.body),
-            stringify.PropertyEllipsis("parsed", contract.parsed),
-        ],
-    )
-
-    stringify.assert_compares_against_dict(result, contract)
-    return result
-
-
-def _stringify_snapshot(snapshot: Snapshot) -> stringify.Entity:
-    result = stringify.Entity(
-        name=Snapshot.__name__,
-        properties=[
-            stringify.Property("args", snapshot.args),
-            stringify.PropertyEllipsis("body", snapshot.body),
-            stringify.Property("name", snapshot.name),
-            stringify.PropertyEllipsis("parsed", snapshot.parsed),
-        ],
-    )
-
-    stringify.assert_compares_against_dict(result, snapshot)
-    return result
-
-
-def _stringify_contracts(contracts: Contracts) -> stringify.Entity:
-    result = stringify.Entity(
-        name=Contracts.__name__,
-        properties=[
+            stringify.Property("name", that.name),
             stringify.Property(
-                "preconditions",
-                [_stringify_contract(contract) for contract in contracts.preconditions],
-            ),
-            stringify.Property(
-                "snapshots",
-                [_stringify_snapshot(snapshot) for snapshot in contracts.snapshots],
-            ),
-            stringify.Property(
-                "postconditions",
+                "inheritances",
                 [
-                    _stringify_contract(contract)
-                    for contract in contracts.postconditions
-                ],
+                    f"Reference to {inheritance.__class__.__name__} {inheritance.name}"
+                    for inheritance in that.inheritances
+                ]
             ),
-        ],
-    )
-
-    stringify.assert_compares_against_dict(result, contracts)
-    return result
-
-
-def _stringify_method(method: Method) -> stringify.Entity:
-    result = stringify.Entity(
-        name=Method.__name__,
-        properties=[
-            stringify.Property("name", method.name),
+            stringify.PropertyEllipsis("inheritance_id_set", that.inheritance_id_set),
+            stringify.Property("is_implementation_specific",
+                               that.is_implementation_specific),
+            stringify.Property("interface", _stringify(that.interface)),
+            stringify.PropertyEllipsis("descendant_id_set", that.descendant_id_set),
             stringify.Property(
-                "is_implementation_specific", method.is_implementation_specific
-            ),
-            stringify.Property(
-                "arguments",
-                [_stringify_argument(argument) for argument in method.arguments],
-            ),
-            stringify.Property(
-                "returns",
-                None if method.returns is None else _stringify(method.returns),
-            ),
-            stringify.Property(
-                "description", _stringify_description(method.description)
-            ),
-            stringify.Property("contracts", _stringify_contracts(method.contracts)),
-            stringify.PropertyEllipsis("body", method.body),
-            stringify.PropertyEllipsis("parsed", method.parsed),
-        ],
-    )
-
-    stringify.assert_compares_against_dict(result, method)
-    return result
-
-
-def _stringify_constructor(constructor: Constructor) -> stringify.Entity:
-    result = stringify.Entity(
-        name=Constructor.__name__,
-        properties=[
-            stringify.Property(
-                "arguments",
-                [_stringify_argument(argument) for argument in constructor.arguments],
-            ),
-            stringify.Property(
-                "contracts", _stringify_contracts(constructor.contracts)
-            ),
-            stringify.Property(
-                "is_implementation_specific", constructor.is_implementation_specific
-            ),
-            stringify.PropertyEllipsis("statements", constructor.statements),
-            stringify.PropertyEllipsis("arguments_by_name", constructor.statements),
-        ],
-    )
-
-    stringify.assert_compares_against_dict(result, constructor)
-    return result
-
-
-def _stringify_class(cls: Class) -> stringify.Entity:
-    result = stringify.Entity(
-        name=Class.__name__,
-        properties=[
-            stringify.Property("name", cls.name),
-            stringify.Property(
-                "interfaces",
-                [f"reference to {interface.name}" for interface in cls.interfaces],
-            ),
-            stringify.Property(
-                "is_implementation_specific", cls.is_implementation_specific
-            ),
-            stringify.Property(
-                "properties", [_stringify_property(prop) for prop in cls.properties]
-            ),
-            stringify.Property(
-                "methods", [_stringify_method(method) for method in cls.methods]
-            ),
-            stringify.Property("constructor", _stringify_constructor(cls.constructor)),
-            stringify.Property(
-                "invariants",
+                "concrete_descendants",
                 [
-                    _stringify_invariant(invariant)
-                    for invariant in cls.invariants
+                    f"Reference to {descendant.__class__.__name__} {descendant.name}"
+                    for descendant in that.concrete_descendants
+                ]
+            ),
+            stringify.Property("properties", list(map(_stringify, that.properties))),
+            stringify.Property("methods", list(map(_stringify, that.methods))),
+            stringify.Property("constructor", _stringify(that.constructor)),
+            stringify.Property("invariants", list(map(_stringify, that.invariants))),
+            stringify.Property("serialization", _stringify(that.serialization)),
+            stringify.Property("description", _stringify(that.description)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify.PropertyEllipsis("properties_by_name", that.properties_by_name),
+            stringify.PropertyEllipsis("property_id_set", that.property_id_set),
+            stringify.PropertyEllipsis("methods_by_name", that.methods_by_name),
+            stringify.PropertyEllipsis("invariant_id_set", that.invariant_id_set),
+        ],
+    )
+
+    return result
+
+
+def _stringify_concrete_class(that: ConcreteClass) -> stringify.Entity:
+    return _stringify_a_class(that)
+
+
+def _stringify_abstract_class(that: AbstractClass) -> stringify.Entity:
+    return _stringify_a_class(that)
+
+
+def _stringify_implementation_specific_verification(
+        that: ImplementationSpecificVerification,
+) -> stringify.Entity:
+    return _stringify_a_signature_like(that)
+
+
+def _stringify_pattern_verification(
+        that: PatternVerification,
+) -> stringify.Entity:
+    signature_like = _stringify_a_signature_like(that)
+
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=list(signature_like.properties) + [
+            stringify.Property("pattern", that.pattern)],
+    )
+
+    return result
+
+
+def _stringify_signature(that: Signature, ) -> stringify.Entity:
+    return _stringify_a_signature_like(that)
+
+
+def _stringify_interface(
+        that: Interface,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property(
+                "base",
+                f"Reference to {that.base.__class__.__name__} "
+                f"{that.base.name}"),
+            stringify.Property("name", that.name),
+            stringify.Property(
+                "inheritances",
+                [
+                    f"Reference to {inheritance.__class__.__name__} {inheritance.name}"
+                    for inheritance in that.inheritances
                 ]
             ),
             stringify.Property(
-                "serialization", _stringify(cls.serialization)
-            ),
-            stringify.Property(
-                "description",
-                _stringify_description(cls.description)
-                if cls.description is not None
-                else None),
-            stringify.PropertyEllipsis("parsed", cls.parsed),
-            stringify.PropertyEllipsis("properties_by_name", cls.properties_by_name),
-            stringify.PropertyEllipsis("property_id_set", cls.property_id_set),
-            stringify.PropertyEllipsis("invariant_id_set", cls.invariant_id_set),
-            stringify.PropertyEllipsis("interface_id_set", cls.interface_id_set),
-        ],
-    )
-
-    stringify.assert_compares_against_dict(result, cls)
-    return result
-
-
-def _stringify_meta_model(meta_model: MetaModel) -> stringify.Entity:
-    result = stringify.Entity(
-        name=MetaModel.__name__,
-        properties=[
-            stringify.Property(
-              "description",
-                _stringify_description(meta_model.description)
-                if meta_model is not None
-                else None
-            ),
-            stringify.Property("book_url", meta_model.book_url),
-            stringify.Property("book_version", meta_model.book_version),
-        ],
-    )
-
-    stringify.assert_compares_against_dict(result, meta_model)
-    return result
-
-
-def _stringify_symbol_table(symbol_table: SymbolTable) -> stringify.Entity:
-    result = stringify.Entity(
-        name=SymbolTable.__name__,
-        properties=[
-            stringify.Property(
-                "symbols",
-                [_stringify(symbol) for symbol in symbol_table.symbols],
-            ),
-            stringify.Property(
-                "verification_functions",
+                "implementers",
                 [
-                    _stringify(verification)
-                    for verification in symbol_table.verification_functions
-                ],
+                    f"Reference to {implementer.__class__.__name__} {implementer.name}"
+                    for implementer in that.implementers
+                ]
             ),
-            stringify.PropertyEllipsis(
-                "verification_functions_by_name",
-                symbol_table.verification_functions_by_name
-            ),
+            stringify.Property("properties", list(map(_stringify, that.properties))),
+            stringify.Property("signatures", list(map(_stringify, that.signatures))),
+            stringify.Property("description", _stringify(that.description)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify.PropertyEllipsis("properties_by_name", that.properties_by_name),
+            stringify.PropertyEllipsis("property_id_set", that.property_id_set),
+        ],
+    )
+
+    return result
+
+
+def _stringify_meta_model(
+        that: MetaModel,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("description", _stringify(that.description)),
+            stringify.Property("book_url", that.book_url),
+            stringify.Property("book_version", that.book_version),
+        ],
+    )
+
+    return result
+
+
+def _stringify_symbol_table(
+        that: SymbolTable,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("symbols", list(map(_stringify, that.symbols))),
+            stringify.Property("verification_functions",
+                               list(map(_stringify, that.verification_functions))),
+            stringify.PropertyEllipsis("verification_functions_by_name",
+                                       that.verification_functions_by_name),
             stringify.Property(
                 "ref_association",
-                f"reference to {symbol_table.ref_association.name}"
-            ),
-            stringify.Property("meta_model", _stringify(symbol_table.meta_model))
+                f"Reference to {that.ref_association.__class__.__name__} "
+                f"{that.ref_association.name}"),
+            stringify.Property("meta_model", _stringify(that.meta_model)),
         ],
     )
 
-    stringify.assert_compares_against_dict(result, symbol_table)
     return result
 
 
 Dumpable = Union[
+    AbstractClass,
     Argument,
-    AtomicTypeAnnotation,
     Class,
+    ConcreteClass,
     Constructor,
     Contract,
     Contracts,
     Default,
+    Description,
     Enumeration,
     EnumerationLiteral,
+    ImplementationSpecificMethod,
     ImplementationSpecificVerification,
+    Interface,
     Invariant,
+    ListTypeAnnotation,
     MetaModel,
     Method,
+    OptionalTypeAnnotation,
+    OurTypeAnnotation,
+    PatternVerification,
+    PrimitiveTypeAnnotation,
     Property,
+    RefTypeAnnotation,
     Serialization,
+    Signature,
+    SignatureLike,
     Snapshot,
-    SubscriptedTypeAnnotation,
     Symbol,
     SymbolTable,
     TypeAnnotation,
+    Verification
 ]
 
+stringify.assert_all_public_types_listed_as_dumpables(
+    dumpable=Dumpable, types_module=_types)
 
-def _stringify(dumpable: Dumpable) -> stringify.Entity:
-    """Translate the ``dumpable`` into a stringified entity."""
-    stringified = None  # type: Optional[stringify.Entity]
+_DISPATCH = {
+    AbstractClass: _stringify_abstract_class,
+    Argument: _stringify_argument,
+    ConcreteClass: _stringify_concrete_class,
+    ConstrainedPrimitive: _stringify_constrained_primitive,
+    Constructor: _stringify_constructor,
+    Contract: _stringify_contract,
+    Contracts: _stringify_contracts,
+    DefaultConstant: _stringify_default_constant,
+    DefaultEnumerationLiteral: _stringify_default_enumeration_literal,
+    Description: _stringify_description,
+    Enumeration: _stringify_enumeration,
+    EnumerationLiteral: _stringify_enumeration_literal,
+    ImplementationSpecificMethod: _stringify_implementation_specific_method,
+    ImplementationSpecificVerification: _stringify_implementation_specific_verification,
+    Interface: _stringify_interface,
+    Invariant: _stringify_invariant,
+    ListTypeAnnotation: _stringify_list_type_annotation,
+    MetaModel: _stringify_meta_model,
+    OptionalTypeAnnotation: _stringify_optional_type_annotation,
+    OurTypeAnnotation: _stringify_our_type_annotation,
+    PatternVerification: _stringify_pattern_verification,
+    PrimitiveTypeAnnotation: _stringify_primitive_type_annotation,
+    Property: _stringify_property,
+    RefTypeAnnotation: _stringify_ref_type_annotation,
+    Serialization: _stringify_serialization,
+    Signature: _stringify_signature,
+    Snapshot: _stringify_snapshot,
+    SymbolTable: _stringify_symbol_table,
+}
 
-    if isinstance(dumpable, Argument):
-        stringified = _stringify_argument(dumpable)
-    elif isinstance(dumpable, Class):
-        stringified = _stringify_class(dumpable)
-    elif isinstance(dumpable, Constructor):
-        stringified = _stringify_constructor(dumpable)
-    elif isinstance(dumpable, Contract):
-        stringified = _stringify_contract(dumpable)
-    elif isinstance(dumpable, Contracts):
-        stringified = _stringify_contracts(dumpable)
-    elif isinstance(dumpable, DefaultConstant):
-        stringified = _stringify_default_constant(dumpable)
-    elif isinstance(dumpable, DefaultEnumerationLiteral):
-        stringified = _stringify_default_enumeration_literal(dumpable)
-    elif isinstance(dumpable, Enumeration):
-        stringified = _stringify_enumeration(dumpable)
-    elif isinstance(dumpable, EnumerationLiteral):
-        stringified = _stringify_enumeration_literal(dumpable)
-    elif isinstance(dumpable, Invariant):
-        stringified = _stringify_invariant(dumpable)
-    elif isinstance(dumpable, Method):
-        stringified = _stringify_method(dumpable)
-    elif isinstance(dumpable, Property):
-        stringified = _stringify_property(dumpable)
-    elif isinstance(dumpable, Serialization):
-        stringified = _stringify_serialization(dumpable)
-    elif isinstance(dumpable, Snapshot):
-        stringified = _stringify_snapshot(dumpable)
-    elif isinstance(dumpable, Enumeration):
-        stringified = _stringify_enumeration(enumeration=dumpable)
-    elif isinstance(dumpable, Class):
-        stringified = _stringify_class(cls=dumpable)
-    elif isinstance(dumpable, SymbolTable):
-        stringified = _stringify_symbol_table(dumpable)
-    elif isinstance(dumpable, AtomicTypeAnnotation):
-        stringified = _stringify_atomic_type_annotation(type_annotation=dumpable)
-    elif isinstance(dumpable, SubscriptedTypeAnnotation):
-        stringified = _stringify_subscripted_type_annotation(type_annotation=dumpable)
-    else:
-        assert_never(dumpable)
+stringify.assert_dispatch_exhaustive(dispatch=_DISPATCH, dumpable=Dumpable)
 
-    assert stringified is not None
 
-    assert isinstance(stringified, stringify.Entity)  # Prevent regressions
+def _stringify(that: Optional[Dumpable]) -> Optional[stringify.Entity]:
+    """Dispatch to the correct ``_stringify_*`` method."""
+    if that is None:
+        return None
+
+    stringify_func = _DISPATCH.get(that.__class__, None)
+    if stringify_func is None:
+        raise AssertionError(
+            f"No stringify function could be found for the class {that.__class__}")
+
+    stringified = stringify_func(that)  # type: ignore
+    assert isinstance(stringified, stringify.Entity)
+    stringify.assert_compares_against_dict(stringified, that)
 
     return stringified
 
 
-def dump(dumpable: Dumpable) -> str:
+def dump(that: Optional[Dumpable]) -> str:
     """Produce a string representation of the ``dumpable`` for testing or debugging."""
-    return stringify.dump(_stringify(dumpable=dumpable))
+    if that is None:
+        return repr(None)
+
+    stringified = _stringify(that)
+    return stringify.dump(stringified)

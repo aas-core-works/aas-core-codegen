@@ -1,16 +1,18 @@
 """Provide the types into which we parse the original meta-model."""
 import abc
 import ast
+import inspect
+import os
 import pathlib
-from typing import Sequence, Optional, Union, Final, Mapping
+from typing import Sequence, Optional, Union, Final, Mapping, Any, Type, TypeVar
 
 import docutils.nodes
 from icontract import require, DBC, ensure, invariant
 
-from aas_core_codegen.common import Identifier
+from aas_core_codegen.common import Identifier, assert_union_of_descendants_exhaustive
 from aas_core_codegen.parse import tree
 
-_MODULE_NAME = pathlib.Path(__file__).parent.name
+_MODULE_NAME = pathlib.Path(os.path.realpath(__file__)).parent.name
 
 #: Built-in primitive types
 PRIMITIVE_TYPES = {"bool", "int", "float", "str", "bytearray"}
@@ -233,6 +235,7 @@ class Method(DBC):
     Though we have to distinguish in Python between a function and a method, we term
     both of them "methods" in our model.
     """
+
     #: Name of the method
     name: Final[Identifier]
 
@@ -347,6 +350,7 @@ class UnderstoodMethod(Method):
 
     We use :py:mod:`aas_core_codegen.parse._rules` to understand it.
     """
+
     #: Body as a our AST that we could understand with
     #: :py:mod:`aas_core_codegen.parse._rules`
     body: Final[Sequence[tree.Node]]
@@ -371,7 +375,7 @@ class UnderstoodMethod(Method):
             returns=returns,
             description=description,
             contracts=contracts,
-            node=node
+            node=node,
         )
 
         self.body = body
@@ -390,6 +394,7 @@ class ConstructorToBeUnderstood(Method):
     We will use :py:mod:`aas_core_codegen.intermediate.construction` to later
     understand it.
     """
+
     #: Body of the constructor as Python AST. We will understand it in the intermediate
     #: phase using :py:mod:`aas_core_codegen.intermediate.construction`.
     body: Final[Sequence[ast.AST]]
@@ -401,6 +406,7 @@ class ConstructorToBeUnderstood(Method):
         or not is_string_expr(expr=body[0]),
         "Docstring is excluded from the body"
     )
+    # fmt: on
     def __init__(
             self,
             arguments: Sequence[Argument],
@@ -418,7 +424,7 @@ class ConstructorToBeUnderstood(Method):
             returns=None,
             description=description,
             contracts=contracts,
-            node=node
+            node=node,
         )
 
         self.body = body
@@ -436,7 +442,7 @@ class Serialization:
     def __init__(self, with_model_type: Optional[bool]) -> None:
         """
         Initialize with the given values.
-
+    
         :param with_model_type: The parsed ``with_model_type`` argument
         """
         self.with_model_type = with_model_type
@@ -444,6 +450,40 @@ class Serialization:
 
 class Class(DBC):
     """Represent a class of the meta-model."""
+
+    #: Name of the class
+    name: Final[Identifier]
+
+    #: If set, the class is implementation-specific and we need to provide a snippet
+    #: for it
+    is_implementation_specific: Final[bool]
+
+    #: List of all the ancestor classes
+    inheritances: Final[Sequence[Identifier]]
+
+    #: Properties of the class
+    properties: Final[Sequence[Property]]
+
+    #: Methods of the class
+    methods: Final[Sequence[Method]]
+
+    #: Invariants of the class
+    invariants: Final[Sequence[Invariant]]
+
+    #: Serialization settings of the class
+    serialization: Final[Optional[Serialization]]
+
+    #: Description of the class, if any given in the meta-model
+    description: Final[Optional[Description]]
+
+    #: Original node of the meta-model's Python AST
+    node: Final[ast.ClassDef]
+
+    #: Map each property by its name
+    properties_by_name: Final[Mapping[Identifier, Property]]
+
+    #: Map each method by its name
+    methods_by_name: Final[Mapping[Identifier, Method]]
 
     # fmt: off
     @require(
@@ -495,16 +535,16 @@ class Class(DBC):
         self.description = description
         self.node = node
 
-        self.property_map = {
+        self.properties_by_name = {
             prop.name: prop for prop in properties
         }  # type: Mapping[Identifier, Property]
 
-        self.method_map = {
+        self.methods_by_name = {
             method.name: method for method in methods
         }  # type: Mapping[Identifier, Method]
 
     @abc.abstractmethod
-    def __repr__(self) -> None:
+    def __repr__(self) -> str:
         raise NotImplementedError()
 
 
@@ -566,6 +606,25 @@ class EnumerationLiteral:
 class Enumeration:
     """Represent an enumeration."""
 
+    #: Name of the enumeration
+    name: Final[Identifier]
+
+    #: List of enumeration that this enumeration is a superset of;
+    #: think of the supersets as "inheritance for enumerations"
+    is_superset_of: Final[Sequence[Identifier]]
+
+    #: List of the enumeration literals
+    literals: Final[Sequence[EnumerationLiteral]]
+
+    #: Description of the enumeration, if any
+    description: Final[Optional[Description]]
+
+    #: Node of the enumeration in the meta-model's Python AST
+    node: Final[ast.ClassDef]
+
+    #: Map literals by their names
+    literals_by_name: Final[Mapping[Identifier, EnumerationLiteral]]
+
     def __init__(
             self,
             name: Identifier,
@@ -614,6 +673,7 @@ class UnverifiedSymbolTable(DBC):
 
     This symbol table is unverified and may contain inconsistencies.
     """
+
     #: List of parsed class symbols
     symbols: Final[Sequence[Symbol]]
 
@@ -621,7 +681,7 @@ class UnverifiedSymbolTable(DBC):
     ref_association: Final[Symbol]
 
     #: List of implementation-specific verification functions
-    verification_functions: Final[Sequence[Method]]
+    verification_functions: Final[Sequence["FunctionUnion"]]
 
     #: Additional information about the source meta-model
     meta_model: Final[MetaModel]
@@ -647,9 +707,11 @@ class UnverifiedSymbolTable(DBC):
     )
     # fmt: on
     def __init__(
-            self, symbols: Sequence[Symbol], ref_association: Symbol,
-            verification_functions: Sequence[Method],
-            meta_model: MetaModel
+            self,
+            symbols: Sequence[Symbol],
+            ref_association: Symbol,
+            verification_functions: Sequence["FunctionUnion"],
+            meta_model: MetaModel,
     ) -> None:
         """Initialize with the given values and map symbols to name."""
         self.symbols = symbols
@@ -744,3 +806,15 @@ class SymbolTable(UnverifiedSymbolTable):
     # fmt: on
     def __new__(cls, symbol_table: UnverifiedSymbolTable) -> "SymbolTable":
         raise AssertionError("Only for type annotation")
+
+
+ClassUnion = Union[AbstractClass, ConcreteClass]
+assert_union_of_descendants_exhaustive(union=ClassUnion, base_class=Class)
+
+FunctionUnion = Union[
+    UnderstoodMethod, ImplementationSpecificMethod
+]
+MethodUnion = Union[
+    UnderstoodMethod, ImplementationSpecificMethod, ConstructorToBeUnderstood]
+
+assert_union_of_descendants_exhaustive(union=MethodUnion, base_class=Method)

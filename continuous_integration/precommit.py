@@ -29,11 +29,11 @@ def main() -> int:
     parser.add_argument(
         "--select",
         help=(
-                "If set, only the selected steps are executed. "
-                "This is practical if some of the steps failed and you want to "
-                "fix them in isolation. "
-                "The steps are given as a space-separated list of: "
-                + " ".join(value.value for value in Step)
+            "If set, only the selected steps are executed. "
+            "This is practical if some of the steps failed and you want to "
+            "fix them in isolation. "
+            "The steps are given as a space-separated list of: "
+            + " ".join(value.value for value in Step)
         ),
         metavar="",
         nargs="+",
@@ -42,11 +42,11 @@ def main() -> int:
     parser.add_argument(
         "--skip",
         help=(
-                "If set, skips the specified steps. "
-                "This is practical if some of the steps passed and "
-                "you want to fix the remainder in isolation. "
-                "The steps are given as a space-separated list of: "
-                + " ".join(value.value for value in Step)
+            "If set, skips the specified steps. "
+            "This is practical if some of the steps passed and "
+            "you want to fix the remainder in isolation. "
+            "The steps are given as a space-separated list of: "
+            + " ".join(value.value for value in Step)
         ),
         metavar="",
         nargs="+",
@@ -64,7 +64,7 @@ def main() -> int:
     )
     skips = [Step(value) for value in args.skip] if args.skip is not None else []
 
-    repo_root = pathlib.Path(__file__).parent.parent
+    repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent
 
     if Step.REFORMAT in selects and Step.REFORMAT not in skips:
         print("Re-formatting...")
@@ -72,27 +72,35 @@ def main() -> int:
         reformat_targets = [
             "aas_core_codegen",
             "continuous_integration",
-            "tests"
+            "tests",
             "setup.py"
         ]
         # fmt: on
 
+        print(f"reformat_targets is {reformat_targets!r}")  # TODO: debug
         if overwrite:
-            subprocess.check_call(
-                ['black'] + reformat_targets,
-                cwd=str(repo_root))
+            subprocess.check_call(["black"] + reformat_targets, cwd=str(repo_root))
         else:
             subprocess.check_call(
-                ['black', '--check'] + reformat_targets,
-                cwd=str(repo_root))
+                ["black", "--check"] + reformat_targets, cwd=str(repo_root)
+            )
     else:
         print("Skipped re-formatting.")
 
     if Step.MYPY in selects and Step.MYPY not in skips:
         print("Mypy'ing...")
         # fmt: off
-        mypy_targets = ["aas_core_codegen", "tests", "continuous_integration"]
-        subprocess.check_call(["mypy", "--strict"] + mypy_targets, cwd=str(repo_root))
+        mypy_targets = [
+            "aas_core_codegen",
+            "tests",
+            "continuous_integration"
+        ]
+
+        config_file = pathlib.Path("continuous_integration") / "mypy.ini"
+
+        subprocess.check_call(
+            ["mypy", "--strict", f"--config-file", str(config_file)] + mypy_targets,
+            cwd=str(repo_root))
         # fmt: on
     else:
         print("Skipped mypy'ing.")
@@ -138,7 +146,8 @@ def main() -> int:
         # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
         #  Add ``{repo_root}/docs/source/**/*.rst`` as well here
         subprocess.check_call(
-            [sys.executable, "-m", "doctest"] + doc_files, cwd=str(repo_root))
+            [sys.executable, "-m", "doctest"] + doc_files, cwd=str(repo_root)
+        )
 
         for pth in (repo_root / "aas_core_codegen").glob("**/*.py"):
             subprocess.check_call([sys.executable, "-m", "doctest", str(pth)])
@@ -147,12 +156,10 @@ def main() -> int:
         print("Skipped doctest'ing.")
 
     if (
-            Step.CHECK_INIT_AND_SETUP_COINCIDE in selects
-            and Step.CHECK_INIT_AND_SETUP_COINCIDE not in skips
+        Step.CHECK_INIT_AND_SETUP_COINCIDE in selects
+        and Step.CHECK_INIT_AND_SETUP_COINCIDE not in skips
     ):
-        print(
-            "Checking that aas_core_codegen/__init__.py and setup.py coincide..."
-        )
+        print("Checking that aas_core_codegen/__init__.py and setup.py coincide...")
         subprocess.check_call([sys.executable, "check_init_and_setup_coincide.py"])
     else:
         print(

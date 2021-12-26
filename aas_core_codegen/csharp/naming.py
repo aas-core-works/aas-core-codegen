@@ -66,10 +66,9 @@ def class_name(identifier: Identifier) -> Identifier:
 
 
 def name_of(
-        something: Union[
-            intermediate.Enumeration,
-            intermediate.ConcreteClass,
-            intermediate.Interface]
+    something: Union[
+        intermediate.Enumeration, intermediate.ConcreteClass, intermediate.Interface
+    ]
 ) -> Identifier:
     """Dispatch to the appropriate naming function."""
     if isinstance(something, intermediate.Enumeration):

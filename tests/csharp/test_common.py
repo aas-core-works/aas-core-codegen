@@ -17,8 +17,9 @@ class TestStringLiteral(unittest.TestCase):
         self.assertEqual('"some\\"thing"', csharp_common.string_literal('some"thing'))
 
     def test_special_chars(self) -> None:
-        self.assertEqual('"some\\n\\\\thing"',
-                         csharp_common.string_literal('some\n\\thing'))
+        self.assertEqual(
+            '"some\\n\\\\thing"', csharp_common.string_literal("some\n\\thing")
+        )
 
 
 if __name__ == "__main__":

@@ -5,10 +5,7 @@ from typing import TypeVar, Generic, Tuple, Optional
 import docutils.nodes
 from icontract import ensure, DBC
 
-from aas_core_codegen.intermediate._types import (
-    SymbolReferenceInDoc,
-    AttributeReferenceInDoc, ArgumentReferenceInDoc,
-)
+from aas_core_codegen.intermediate import doc
 
 T = TypeVar("T")
 
@@ -29,16 +26,20 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform(
         self, element: docutils.nodes.Element
     ) -> Tuple[Optional[T], Optional[str]]:
+        # NOTE (mristin, 2021-12-26):
+        # Please keep the dispatching order. We have to implement a chain-of-command,
+        # not an efficient dispatch as classes inherit from each other.
+
         if isinstance(element, docutils.nodes.Text):
             return self.transform_text(element)
 
-        elif isinstance(element, SymbolReferenceInDoc):
+        elif isinstance(element, doc.SymbolReference):
             return self.transform_symbol_reference_in_doc(element)
 
-        elif isinstance(element, AttributeReferenceInDoc):
+        elif isinstance(element, doc.AttributeReference):
             return self.transform_attribute_reference_in_doc(element)
 
-        elif isinstance(element, ArgumentReferenceInDoc):
+        elif isinstance(element, doc.ArgumentReference):
             return self.transform_argument_reference_in_doc(element)
 
         elif isinstance(element, docutils.nodes.literal):
@@ -81,21 +82,21 @@ class DocutilsElementTransformer(Generic[T], DBC):
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_symbol_reference_in_doc(
-        self, element: SymbolReferenceInDoc
+        self, element: doc.SymbolReference
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_attribute_reference_in_doc(
-        self, element: AttributeReferenceInDoc
+        self, element: doc.AttributeReference
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_argument_reference_in_doc(
-            self, element: ArgumentReferenceInDoc
+        self, element: doc.ArgumentReference
     ) -> Tuple[Optional[T], Optional[str]]:
         raise NotImplementedError()
 

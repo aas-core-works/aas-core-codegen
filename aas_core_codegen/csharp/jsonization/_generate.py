@@ -24,7 +24,7 @@ from aas_core_codegen.csharp.common import (
 
 
 def _generate_json_converter_for_enumeration(
-        enumeration: intermediate.Enumeration,
+    enumeration: intermediate.Enumeration,
 ) -> Stripped:
     """Generate the custom JSON converter based on the intermediate ``enumeration``."""
     enum_name = csharp_naming.enum_name(enumeration.name)
@@ -78,8 +78,7 @@ def _generate_json_converter_for_enumeration(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_read_for_interface(
-        interface: intermediate.Interface,
-        ref_association: intermediate.Class
+    interface: intermediate.Interface, ref_association: intermediate.Class
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the ``Read`` method for de-serializing the ``interface``.
@@ -126,15 +125,13 @@ def _generate_read_for_interface(
         for arg_name, type_anno in arg_type_map.items():
             var_name = csharp_naming.variable_name(Identifier(f"the_{arg_name}"))
             arg_type = csharp_common.generate_type(
-                type_annotation=type_anno,
-                ref_association=ref_association)
+                type_annotation=type_anno, ref_association=ref_association
+            )
 
             if arg_type.endswith("?"):
                 initialization_lines.append(Stripped(f"{arg_type} {var_name} = null;"))
             else:
-                initialization_lines.append(
-                    Stripped(f"{arg_type}? {var_name} = null;")
-                )
+                initialization_lines.append(Stripped(f"{arg_type}? {var_name} = null;"))
 
         blocks.append("\n".join(initialization_lines))
 
@@ -183,7 +180,7 @@ def _generate_read_for_interface(
                 var_name = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
 
                 if not isinstance(
-                        arg.type_annotation, intermediate.OptionalTypeAnnotation
+                    arg.type_annotation, intermediate.OptionalTypeAnnotation
                 ):
                     json_prop_name = naming.json_property(arg.name)
 
@@ -255,12 +252,12 @@ case Json.JsonTokenType.EndObject:
 
         if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
             arg_type = csharp_common.generate_type(
-                type_annotation=type_anno.value,
-                ref_association=ref_association)
+                type_annotation=type_anno.value, ref_association=ref_association
+            )
         else:
             arg_type = csharp_common.generate_type(
-                type_annotation=type_anno,
-                ref_association=ref_association)
+                type_annotation=type_anno, ref_association=ref_association
+            )
 
         json_prop_name = naming.json_property(arg_name)
 
@@ -380,9 +377,7 @@ case Json.JsonTokenType.PropertyName:
     return Stripped(writer.getvalue()), None
 
 
-def _generate_write_for_interface(
-        interface: intermediate.Interface
-) -> Stripped:
+def _generate_write_for_interface(interface: intermediate.Interface) -> Stripped:
     """Generate the ``Write`` method for serializing the ``interface``."""
     interface_name = csharp_naming.interface_name(interface.name)
 
@@ -459,8 +454,7 @@ def _generate_write_for_interface(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_json_converter_for_interface(
-        interface: intermediate.Interface,
-        ref_association: intermediate.Class
+    interface: intermediate.Interface, ref_association: intermediate.Class
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the custom JSON converter based on the intermediate ``interface``.
@@ -469,16 +463,13 @@ def _generate_json_converter_for_interface(
     within an AAS.
     """
     read_code, error = _generate_read_for_interface(
-        interface=interface,
-        ref_association=ref_association
+        interface=interface, ref_association=ref_association
     )
 
     if error is not None:
         return None, error
 
-    write_code = _generate_write_for_interface(
-        interface=interface
-    )
+    write_code = _generate_write_for_interface(interface=interface)
 
     interface_name = csharp_naming.interface_name(interface.name)
 
@@ -510,8 +501,7 @@ def _generate_json_converter_for_interface(
 
 
 def _generate_read_for_class(
-        cls: intermediate.ConcreteClass,
-        ref_association: intermediate.Class
+    cls: intermediate.ConcreteClass, ref_association: intermediate.Class
 ) -> Stripped:
     """
     Generate the ``Read`` method for de-serializing the class ``cls``.
@@ -527,9 +517,9 @@ def _generate_read_for_class(
                 {{
                 {I}throw new Json.JsonException();
                 }}"""
-                )
             )
-        ]
+        )
+    ]
 
     # region Initializations
 
@@ -541,15 +531,13 @@ def _generate_read_for_class(
         for arg in cls.constructor.arguments:
             var_name = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
             arg_type = csharp_common.generate_type(
-                type_annotation=arg.type_annotation,
-                ref_association=ref_association)
+                type_annotation=arg.type_annotation, ref_association=ref_association
+            )
 
             if arg_type.endswith("?"):
                 initialization_lines.append(Stripped(f"{arg_type} {var_name} = null;"))
             else:
-                initialization_lines.append(
-                    Stripped(f"{arg_type}? {var_name} = null;")
-                )
+                initialization_lines.append(Stripped(f"{arg_type}? {var_name} = null;"))
 
         blocks.append("\n".join(initialization_lines))
 
@@ -566,9 +554,7 @@ def _generate_read_for_class(
         for i, arg in enumerate(cls.constructor.arguments):
             var_name = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
 
-            if not isinstance(
-                    arg.type_annotation, intermediate.OptionalTypeAnnotation
-            ):
+            if not isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation):
                 json_prop_name = naming.json_property(arg.name)
 
                 error_msg = csharp_common.string_literal(
@@ -620,8 +606,8 @@ case Json.JsonTokenType.EndObject:
                 switch (propertyName)
                 {{
                 """
-                )
             )
+        )
 
         for prop in cls.properties:
             var_name = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
@@ -629,11 +615,13 @@ case Json.JsonTokenType.EndObject:
             if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
                 arg_type = csharp_common.generate_type(
                     type_annotation=prop.type_annotation.value,
-                    ref_association=ref_association)
+                    ref_association=ref_association,
+                )
             else:
                 arg_type = csharp_common.generate_type(
                     type_annotation=prop.type_annotation,
-                    ref_association=ref_association)
+                    ref_association=ref_association,
+                )
 
             json_prop_name = naming.json_property(prop.name)
 
@@ -840,8 +828,7 @@ def _generate_write_for_class(cls: intermediate.ConcreteClass) -> Stripped:
 
 
 def _generate_json_converter_for_class(
-        cls: intermediate.ConcreteClass,
-        ref_association: intermediate.Class
+    cls: intermediate.ConcreteClass, ref_association: intermediate.Class
 ) -> Stripped:
     """
     Generate the custom JSON converter based on the intermediate ``cls``.
@@ -865,7 +852,9 @@ def _generate_json_converter_for_class(
 
     writer.write(
         textwrap.indent(
-            _generate_read_for_class(cls=cls, ref_association=ref_association), I))
+            _generate_read_for_class(cls=cls, ref_association=ref_association), I
+        )
+    )
 
     writer.write("\n\n")
 
@@ -885,9 +874,9 @@ def _generate_json_converter_for_class(
 )
 # fmt: on
 def generate(
-        symbol_table: intermediate.SymbolTable,
-        namespace: csharp_common.NamespaceIdentifier,
-        spec_impls: specific_implementations.SpecificImplementations,
+    symbol_table: intermediate.SymbolTable,
+    namespace: csharp_common.NamespaceIdentifier,
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the C# code for the general serialization.
@@ -947,7 +936,7 @@ def generate(
             if symbol.interface is not None:
                 jsonization_block, error = _generate_json_converter_for_interface(
                     interface=symbol.interface,
-                    ref_association=symbol_table.ref_association
+                    ref_association=symbol_table.ref_association,
                 )
 
                 if error is not None:
@@ -956,7 +945,8 @@ def generate(
 
                 converters.append(
                     Identifier(
-                        f"{csharp_naming.interface_name(symbol.name)}JsonConverter")
+                        f"{csharp_naming.interface_name(symbol.name)}JsonConverter"
+                    )
                 )
 
             if isinstance(symbol, intermediate.ConcreteClass):
@@ -980,7 +970,8 @@ def generate(
                     jsonization_block = spec_impls[jsonization_key]
                 else:
                     jsonization_block = _generate_json_converter_for_class(
-                        cls=symbol, ref_association=symbol_table.ref_association)
+                        cls=symbol, ref_association=symbol_table.ref_association
+                    )
 
                 converters.append(
                     Identifier(f"{csharp_naming.class_name(symbol.name)}JsonConverter")

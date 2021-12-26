@@ -3,6 +3,7 @@ import abc
 import ast
 import collections
 import itertools
+import pathlib
 from typing import (
     List,
     Optional,
@@ -17,9 +18,12 @@ from typing import (
 import asttokens
 from icontract import ensure, require, DBC
 
-from aas_core_codegen import parse
-from aas_core_codegen.common import Identifier, Error
+from aas_core_codegen import parse, stringify
+from aas_core_codegen.common import Identifier, Error, \
+    assert_union_of_descendants_exhaustive
 from aas_core_codegen.parse import Method
+
+_MODULE_NAME = pathlib.Path(__file__).parent.name
 
 
 class CallSuperConstructor:
@@ -44,16 +48,19 @@ class Default(DBC):
         self.node = node
 
     @abc.abstractmethod
-    def _dummy_abstract_method(self) -> str:
-        """Signal that the class is purely abstract."""
+    def __repr__(self) -> str:
+        # Signal that the class is purely abstract
         raise NotImplementedError()
 
 
 class EmptyList(Default):
     """Represent an empty list set to a property if the argument is unspecified."""
 
-    def _dummy_abstract_method(self) -> None:
-        pass
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
+        )
 
 
 class DefaultEnumLiteral(Default):
@@ -69,8 +76,11 @@ class DefaultEnumLiteral(Default):
         self.enum = enum
         self.literal = literal
 
-    def _dummy_abstract_method(self) -> None:
-        pass
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
+        )
 
 
 class AssignArgument:
@@ -78,10 +88,11 @@ class AssignArgument:
 
     name: Identifier  #: Identifier of the property
     argument: Identifier  #: Identifier of the argument
-    default: Optional[Default]  #: Default value if the argument is None
+    default: Optional["DefaultUnion"]  #: Default value if the argument is None
 
     def __init__(
-            self, name: Identifier, argument: Identifier, default: Optional[Default]
+            self, name: Identifier, argument: Identifier,
+            default: Optional["DefaultUnion"]
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -149,7 +160,7 @@ def _call_as_call_to_super_init(
 
     parsed_super_class = parsed_symbol_table.must_find_class(name=identifier)
 
-    if "__init__" not in parsed_super_class.method_map:
+    if "__init__" not in parsed_super_class.methods_by_name:
         return (
             None,
             Error(
@@ -200,7 +211,7 @@ def _call_as_call_to_super_init(
             ),
         )
 
-    super_init = parsed_super_class.method_map[Identifier("__init__")]
+    super_init = parsed_super_class.methods_by_name[Identifier("__init__")]
     resolved_kwargs = dict()  # type: MutableMapping[str, str]
 
     if len(call.args) > len(super_init.arguments):
@@ -245,7 +256,7 @@ def _call_as_call_to_super_init(
             ),
         )
 
-    init = parsed_class.method_map[Identifier("__init__")]
+    init = parsed_class.methods_by_name[Identifier("__init__")]
     for key, val in resolved_kwargs.items():
         if val not in init.arguments_by_name:
             underlying_errors.append(
@@ -335,7 +346,7 @@ def _understand_assignment(
             ),
         )
 
-    if target.attr not in parsed_class.property_map:
+    if target.attr not in parsed_class.properties_by_name:
         return (
             None,
             Error(
@@ -415,9 +426,11 @@ def _understand_assignment(
             pass
 
         if default_node is not None:
-            default = None  # type: Optional[Default]
+            default = None  # type: Optional[DefaultUnion]
+
             if isinstance(default_node, ast.List) and default_node.elts == []:
                 default = EmptyList(node=default_node)
+
             elif isinstance(default_node, ast.Attribute) and isinstance(
                     default_node.value, ast.Name
             ):
@@ -438,10 +451,13 @@ def _understand_assignment(
                 return None, Error(
                     if_exp.orelse,
                     f"The handling of this default value for "
-                    f"the property {target.attr} has not been implemented: "
+                    f"the property {target.attr!r} has not been implemented: "
                     f"{ast.dump(default_node)}",
                 )
             else:
+                assert isinstance(if_exp.test, ast.Compare)
+                assert isinstance(if_exp.test.left, ast.Name)
+
                 return (
                     AssignArgument(
                         name=Identifier(target.attr),
@@ -477,7 +493,9 @@ def _understand_body(
     errors = []  # type: List[Error]
     result = []  # type: List[Statement]
 
-    for stmt in init.body:
+    assert isinstance(init.node, ast.FunctionDef)
+
+    for stmt in init.node.body:
         if isinstance(stmt, ast.Pass):
             continue
         elif isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
@@ -607,3 +625,103 @@ def understand_all(
         )
 
     return ConstructorTable(mapping=mapping), None
+
+
+# NOTE (mristin, 2021-12-26):
+# At this point we need to dump only a subset of this module, so we go for YAGNI
+# principle and do not provide dump functions for everything.
+
+Dumpable = Union[
+    Default,
+    EmptyList,
+    DefaultEnumLiteral,
+    AssignArgument,
+]
+
+
+def _stringify_empty_list(
+        that: EmptyList,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.PropertyEllipsis("node", that.node),
+        ],
+    )
+
+    return result
+
+
+def _stringify_default_enum_literal(
+        that: DefaultEnumLiteral,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.PropertyEllipsis("node", that.node),
+            stringify.Property(
+                "enum",
+                f"Reference to {that.enum.__class__.__name__} "
+                f"{that.enum.name}"),
+            stringify.Property(
+                "literal",
+                f"Reference to {that.literal.__class__.__name__} "
+                f"{that.literal.name}"),
+        ],
+    )
+
+    return result
+
+
+def _stringify_assign_argument(
+        that: AssignArgument,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("name", that.name),
+            stringify.Property("argument", that.argument),
+            stringify.Property("default", _stringify(that.default)),
+        ],
+    )
+
+    return result
+
+
+_DISPATCH = {
+    EmptyList: _stringify_empty_list,
+    DefaultEnumLiteral: _stringify_default_enum_literal,
+    AssignArgument: _stringify_assign_argument
+}
+
+stringify.assert_dispatch_exhaustive(dispatch=_DISPATCH, dumpable=Dumpable)
+
+
+def _stringify(that: Optional[Dumpable]) -> Optional[stringify.Entity]:
+    """Dispatch to the correct ``_stringify_*`` method."""
+    if that is None:
+        return None
+
+    stringify_func = _DISPATCH.get(that.__class__, None)
+    if stringify_func is None:
+        raise AssertionError(
+            f"No stringify function could be found for the class {that.__class__}")
+
+    stringified = stringify_func(that)  # type: ignore
+    assert isinstance(stringified, stringify.Entity)
+    stringify.assert_compares_against_dict(stringified, that)
+
+    return stringified
+
+
+def dump(that: Optional[Dumpable]) -> str:
+    """Produce a string representation of the ``dumpable`` for testing or debugging."""
+    if that is None:
+        return repr(None)
+
+    stringified = _stringify(that)
+    return stringify.dump(stringified)
+
+
+DefaultUnion = Union[EmptyList, DefaultEnumLiteral]
+assert_union_of_descendants_exhaustive(union=DefaultUnion, base_class=Default)

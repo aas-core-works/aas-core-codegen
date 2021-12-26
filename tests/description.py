@@ -12,15 +12,14 @@ def parse_restructured_text(text: str) -> docutils.nodes.document:
     document = None  # type: Optional[docutils.nodes.document]
 
     document = docutils.core.publish_doctree(
-        text,
-        settings_overrides={
-            "warning_stream": warnings
-        })
+        text, settings_overrides={"warning_stream": warnings}
+    )
 
     warnings_text = warnings.getvalue()
     if warnings_text:
         raise RuntimeError(
-            f"Failed to parse the description with docutils:\n{warnings_text.strip()}")
+            f"Failed to parse the description with docutils:\n{warnings_text.strip()}"
+        )
 
     assert document is not None
 

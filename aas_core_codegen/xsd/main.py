@@ -47,10 +47,10 @@ assert all(literal in _PRIMITIVE_MAP for literal in intermediate.PrimitiveType)
 
 
 def _define_for_property(
-        prop: intermediate.Property,
-        ref_association: intermediate.Symbol,
-        len_constraint: Optional[infer_for_schema.LenConstraint],
-        pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
+    prop: intermediate.Property,
+    ref_association: intermediate.Symbol,
+    len_constraint: Optional[infer_for_schema.LenConstraint],
+    pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
 ) -> ET.Element:
     """
     Generate the definition of a property element.
@@ -166,8 +166,7 @@ def _define_for_property(
             # to discriminate on the concrete classes.
 
             if isinstance(
-                    type_anno.items.symbol,
-                    (intermediate.Enumeration, intermediate.Class)
+                type_anno.items.symbol, (intermediate.Enumeration, intermediate.Class)
             ):
 
                 list_element = ET.Element("xs:sequence")
@@ -248,9 +247,9 @@ def _define_for_property(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_properties(
-        symbol: Union[intermediate.Interface, intermediate.Class],
-        ref_association: intermediate.Symbol,
-        pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName
+    symbol: Union[intermediate.Interface, intermediate.Class],
+    ref_association: intermediate.Symbol,
+    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
 ) -> Tuple[Optional[List[ET.Element]], Optional[List[Error]]]:
     """
     Define the properties of the ``symbol`` as a sequence of tags.
@@ -269,8 +268,7 @@ def _define_properties(
     assert len_constraints_by_property is not None
 
     pattern_constraints_by_property = infer_for_schema.infer_pattern_constraints(
-        symbol=symbol,
-        pattern_verifications_by_name=pattern_verifications_by_name
+        symbol=symbol, pattern_verifications_by_name=pattern_verifications_by_name
     )
 
     sequence = []  # type: List[ET.Element]
@@ -296,11 +294,11 @@ def _define_properties(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_for_interface(
-        interface: intermediate.Interface,
-        implementers: Sequence[intermediate.Class],
-        ids_of_used_interfaces: Set[int],
-        ref_association: intermediate.Symbol,
-        pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName
+    interface: intermediate.Interface,
+    implementers: Sequence[intermediate.Class],
+    ids_of_used_interfaces: Set[int],
+    ref_association: intermediate.Symbol,
+    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
 ) -> Tuple[Optional[List[ET.Element]], Optional[List[Error]]]:
     """
     Generate the definitions for the ``interface``.
@@ -321,8 +319,9 @@ def _define_for_interface(
         sequence.append(inheritance_part)
 
     properties, properties_errors = _define_properties(
-        symbol=interface, ref_association=ref_association,
-        pattern_verifications_by_name=pattern_verifications_by_name
+        symbol=interface,
+        ref_association=ref_association,
+        pattern_verifications_by_name=pattern_verifications_by_name,
     )
 
     if properties_errors is not None:
@@ -365,8 +364,9 @@ def _define_for_interface(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_for_class(
-        cls: intermediate.Class, ref_association: intermediate.Symbol,
-        pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName
+    cls: intermediate.Class,
+    ref_association: intermediate.Symbol,
+    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
 ) -> Tuple[Optional[List[ET.Element]], Optional[List[Error]]]:
     """
     Generate the definitions for the class ``cls``.
@@ -385,8 +385,9 @@ def _define_for_class(
         sequence.append(interface_part)
 
     properties, properties_errors = _define_properties(
-        symbol=cls, ref_association=ref_association,
-        pattern_verifications_by_name=pattern_verifications_by_name
+        symbol=cls,
+        ref_association=ref_association,
+        pattern_verifications_by_name=pattern_verifications_by_name,
     )
 
     if properties_errors is not None:
@@ -410,9 +411,9 @@ _WHITESPACE_RE = re.compile(r"\s+")
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate(
-        symbol_table: intermediate.SymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations,
-        interface_implementers: intermediate.InterfaceImplementers,
+    symbol_table: intermediate.SymbolTable,
+    spec_impls: specific_implementations.SpecificImplementations,
+    interface_implementers: intermediate.InterfaceImplementers,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate the XML Schema Definition (XSD) based on the ``symbol_table."""
     root_element_key = specific_implementations.ImplementationKey("root_element.xml")
@@ -517,7 +518,7 @@ def _generate(
                     implementers=interface_implementers.get(symbol, []),
                     ids_of_used_interfaces=ids_of_used_interfaces,
                     ref_association=symbol_table.ref_association,
-                    pattern_verifications_by_name=pattern_verifications_by_name
+                    pattern_verifications_by_name=pattern_verifications_by_name,
                 )
 
                 if definition_errors is not None:
@@ -526,8 +527,9 @@ def _generate(
 
             elif isinstance(symbol, intermediate.Class):
                 elements, definition_errors = _define_for_class(
-                    cls=symbol, ref_association=symbol_table.ref_association,
-                    pattern_verifications_by_name=pattern_verifications_by_name
+                    cls=symbol,
+                    ref_association=symbol_table.ref_association,
+                    pattern_verifications_by_name=pattern_verifications_by_name,
                 )
 
                 if definition_errors is not None:
@@ -594,7 +596,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     if errors is not None:
         run.write_error_report(
             message=f"Failed to generate the XML Schema Definition "
-                    f"based on {context.model_path}",
+            f"based on {context.model_path}",
             errors=[context.lineno_columner.error_message(error) for error in errors],
             stderr=stderr,
         )

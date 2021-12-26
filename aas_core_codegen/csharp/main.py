@@ -109,7 +109,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     errors = csharp_verification.verify(
         spec_impls=context.spec_impls,
-        verification_functions=verified_ir_table.verification_functions)
+        verification_functions=verified_ir_table.verification_functions,
+    )
 
     if errors is not None:
         run.write_error_report(

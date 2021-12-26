@@ -202,7 +202,7 @@ def _define_for_class_or_interface(
         Union[intermediate.Interface, intermediate.Class], Stripped
     ],
     url_prefix: Stripped,
-    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName
+    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition for the intermediate ``symbol``."""
     prop_blocks = []  # type: List[Stripped]
@@ -217,8 +217,7 @@ def _define_for_class_or_interface(
         errors.extend(len_constraints_errors)
 
     pattern_constraints_by_property = infer_for_schema.infer_pattern_constraints(
-        symbol=symbol,
-        pattern_verifications_by_name=pattern_verifications_by_name
+        symbol=symbol, pattern_verifications_by_name=pattern_verifications_by_name
     )
 
     if len(errors) > 0:
@@ -347,7 +346,7 @@ def generate(
                     symbol=symbol,
                     symbol_to_rdfs_range=symbol_to_rdfs_range,
                     url_prefix=url_prefix,
-                    pattern_verifications_by_name=pattern_verifications_by_name
+                    pattern_verifications_by_name=pattern_verifications_by_name,
                 )
 
                 if error is not None:

@@ -170,10 +170,7 @@ class RefTypeAnnotation(SubscriptedTypeAnnotation):
         return f"Ref[{self.value}]"
 
 
-def _type_annotations_equal(
-        that: TypeAnnotation,
-        other: TypeAnnotation
-):
+def _type_annotations_equal(that: TypeAnnotation, other: TypeAnnotation):
     """Check whether the ``that`` and ``other`` type annotations are identical."""
     if isinstance(that, PrimitiveTypeAnnotation):
         if not isinstance(other, PrimitiveTypeAnnotation):
@@ -221,10 +218,7 @@ def _type_annotations_equal(
         assert_never(that)
 
 
-def _assignable(
-        target_type: TypeAnnotation,
-        value_type: TypeAnnotation
-):
+def _assignable(target_type: TypeAnnotation, value_type: TypeAnnotation):
     """Check whether the value can be assigned to the target."""
     if isinstance(target_type, PrimitiveTypeAnnotation):
         if isinstance(value_type, PrimitiveTypeAnnotation):
@@ -234,12 +228,12 @@ def _assignable(
         # We have to be careful about the constrained primitives,
         # since we can always assign a constrained primitive to a primitive, if they
         # primitive types match.
-        elif (
-                isinstance(value_type, OurTypeAnnotation)
-                and isinstance(value_type.symbol, _types.ConstrainedPrimitive)
+        elif isinstance(value_type, OurTypeAnnotation) and isinstance(
+            value_type.symbol, _types.ConstrainedPrimitive
         ):
             return target_type.a_type == PRIMITIVE_TYPE_MAP.get(
-                value_type.symbol.constrainee)
+                value_type.symbol.constrainee
+            )
 
         else:
             return False
@@ -249,41 +243,41 @@ def _assignable(
             # NOTE (mristin, 2021-12-25):
             # The enumerations are invariant.
             return (
-                    isinstance(value_type, OurTypeAnnotation)
-                    and isinstance(value_type.symbol, _types.Enumeration)
-                    and id(target_type.symbol) == id(value_type.symbol)
+                isinstance(value_type, OurTypeAnnotation)
+                and isinstance(value_type.symbol, _types.Enumeration)
+                and id(target_type.symbol) == id(value_type.symbol)
             )
 
         elif isinstance(target_type.symbol, _types.ConstrainedPrimitive):
             # NOTE (mristin, 2021-12-25):
             # If it is a constrained primitive with no constraints, allow the assignment
             # if the target and the value match on the primitive type.
-            if (
-                    len(target_type.symbol.invariants) == 0
-                    and isinstance(value_type, PrimitiveTypeAnnotation)
+            if len(target_type.symbol.invariants) == 0 and isinstance(
+                value_type, PrimitiveTypeAnnotation
             ):
-                return PRIMITIVE_TYPE_MAP.get(
-                    target_type.symbol.constrainee) == value_type.a_type
+                return (
+                    PRIMITIVE_TYPE_MAP.get(target_type.symbol.constrainee)
+                    == value_type.a_type
+                )
             else:
                 # NOTE (mristin, 2021-12-25):
                 # We assume the assignments of constrained primitives to be co-variant.
                 if (
-                        isinstance(value_type, OurTypeAnnotation)
-                        and isinstance(value_type.symbol, _types.ConstrainedPrimitive)
-                        and target_type.symbol.constrainee ==
-                        value_type.symbol.constrainee
+                    isinstance(value_type, OurTypeAnnotation)
+                    and isinstance(value_type.symbol, _types.ConstrainedPrimitive)
+                    and target_type.symbol.constrainee == value_type.symbol.constrainee
                 ):
                     return (
-                            id(target_type.symbol) == id(value_type.symbol)
-                            or value_type.symbol in target_type.symbol.descendant_id_set
+                        id(target_type.symbol) == id(value_type.symbol)
+                        or value_type.symbol in target_type.symbol.descendant_id_set
                     )
 
             return False
 
         elif isinstance(target_type.symbol, _types.Class):
             if not (
-                    isinstance(value_type, OurTypeAnnotation)
-                    and isinstance(value_type.symbol, _types.Class)
+                isinstance(value_type, OurTypeAnnotation)
+                and isinstance(value_type.symbol, _types.Class)
             ):
                 return False
 
@@ -292,12 +286,8 @@ def _assignable(
             # the value type are equal *or* the value symbol is a descendant of the
             # target symbol.
 
-            return (
-                    id(target_type.symbol) == id(value_type.symbol)
-                    or (
-                            id(
-                                value_type.symbol) in target_type.symbol.descendant_id_set
-                    )
+            return id(target_type.symbol) == id(value_type.symbol) or (
+                id(value_type.symbol) in target_type.symbol.descendant_id_set
             )
 
     elif isinstance(target_type, VerificationTypeAnnotation):
@@ -330,7 +320,8 @@ def _assignable(
             # NOTE (mristin, 2021-12-25):
             # We assume the optionals to be co-variant.
             return _assignable(
-                target_type=target_type.value, value_type=value_type.value)
+                target_type=target_type.value, value_type=value_type.value
+            )
 
     elif isinstance(target_type, RefTypeAnnotation):
         if not isinstance(value_type, RefTypeAnnotation):
@@ -339,7 +330,8 @@ def _assignable(
             # NOTE (mristin, 2021-12-25):
             # We assume the references to be co-variant.
             return _assignable(
-                target_type=target_type.value, value_type=value_type.value)
+                target_type=target_type.value, value_type=value_type.value
+            )
 
     else:
         assert_never(target_type)
@@ -354,57 +346,59 @@ PRIMITIVE_TYPE_MAP = {
 }
 
 for _types_primitive_type in _types.PrimitiveType:
-    assert _types_primitive_type in PRIMITIVE_TYPE_MAP, (
-        f"All primitive types from _types covered, but: {_types_primitive_type=}"
-    )
+    assert (
+        _types_primitive_type in PRIMITIVE_TYPE_MAP
+    ), f"All primitive types from _types covered, but: {_types_primitive_type=}"
 
 
 def _type_annotation_to_inferred_type_annotation(
-        type_annotation: _types.TypeAnnotation
+    type_annotation: _types.TypeAnnotation,
 ) -> TypeAnnotation:
     """Convert from the :py:mod:`aas_core_codegen.intermediate._types`."""
     if isinstance(type_annotation, _types.PrimitiveTypeAnnotation):
         return PrimitiveTypeAnnotation(
-            a_type=PRIMITIVE_TYPE_MAP.get(type_annotation.a_type))
+            a_type=PRIMITIVE_TYPE_MAP.get(type_annotation.a_type)
+        )
 
     elif isinstance(type_annotation, _types.OurTypeAnnotation):
         return OurTypeAnnotation(symbol=type_annotation.symbol)
 
     elif isinstance(type_annotation, _types.ListTypeAnnotation):
         return ListTypeAnnotation(
-            items=_type_annotation_to_inferred_type_annotation(type_annotation.items))
+            items=_type_annotation_to_inferred_type_annotation(type_annotation.items)
+        )
 
     elif isinstance(type_annotation, _types.OptionalTypeAnnotation):
         return OptionalTypeAnnotation(
-            value=_type_annotation_to_inferred_type_annotation(type_annotation.value))
+            value=_type_annotation_to_inferred_type_annotation(type_annotation.value)
+        )
 
     else:
         assert_never(type_annotation)
 
 
-class Inferrer(
-    parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
+class Inferrer(parse_tree.RestrictedTransformer[Optional[TypeAnnotation]]):
     """Infer the types of the given parse tree."""
 
     #: Track of the inferred types
-    type_map: Final[MutableMapping[
-        Union[parse_tree.Node, parse_tree.FormattedValue], TypeAnnotation]]
+    type_map: Final[
+        MutableMapping[
+            Union[parse_tree.Node, parse_tree.FormattedValue], TypeAnnotation
+        ]
+    ]
 
     #: Errors encountered during the inference
     errors: Final[List[Error]]
 
     def __init__(
-            self,
-            symbol_table: _types.SymbolTable,
-            environment: Mapping[Identifier, TypeAnnotation]
+        self,
+        symbol_table: _types.SymbolTable,
+        environment: Mapping[Identifier, TypeAnnotation],
     ) -> None:
         """Initialize with the given values."""
         self._symbol_table = symbol_table
 
-        self._environment = {
-            key: value
-            for key, value in environment.items()
-        }
+        self._environment = {key: value for key, value in environment.items()}
 
         self.type_map = dict()
         self.errors = []
@@ -420,14 +414,14 @@ class Inferrer(
             return None
 
         if not (
-                isinstance(instance_type, OurTypeAnnotation)
-                and isinstance(instance_type.symbol, _types.Class)
+            isinstance(instance_type, OurTypeAnnotation)
+            and isinstance(instance_type.symbol, _types.Class)
         ):
             self.errors.append(
                 Error(
                     node.original_node,
                     f"Expected an instance to be of type class, "
-                    f"but got: {instance_type}"
+                    f"but got: {instance_type}",
                 )
             )
             return None
@@ -437,9 +431,7 @@ class Inferrer(
 
         prop = cls.properties_by_name.get(node.name, None)
         if prop is not None:
-            result = _type_annotation_to_inferred_type_annotation(
-                prop.type_annotation
-            )
+            result = _type_annotation_to_inferred_type_annotation(prop.type_annotation)
             self.type_map[node] = result
             return result
 
@@ -452,20 +444,19 @@ class Inferrer(
         self.errors.append(
             Error(
                 node.original_node,
-                f"The member {node.name!r} could not be found in the class {cls.name!r}"
+                f"The member {node.name!r} could not be found in the class {cls.name!r}",
             )
         )
 
         return None
 
     def transform_comparison(
-            self, node: parse_tree.Comparison
+        self, node: parse_tree.Comparison
     ) -> Optional[TypeAnnotation]:
         # Just recurse to fill ``type_map`` on ``left`` and ``right`` even though we
         # know the type in advance
-        success = (
-                (self.transform(node.left) is not None)
-                and (self.transform(node.right) is not None)
+        success = (self.transform(node.left) is not None) and (
+            self.transform(node.right) is not None
         )
 
         if not success:
@@ -476,14 +467,12 @@ class Inferrer(
         return result
 
     def transform_implication(
-            self,
-            node: parse_tree.Implication
+        self, node: parse_tree.Implication
     ) -> Optional[TypeAnnotation]:
         # Just recurse to fill ``type_map`` on ``antecedent`` and ``consequent`` even
         # though we know the type in advance
-        success = (
-                (self.transform(node.antecedent) is not None)
-                and (self.transform(node.consequent) is not None)
+        success = (self.transform(node.antecedent) is not None) and (
+            self.transform(node.consequent) is not None
         )
 
         if not success:
@@ -494,8 +483,7 @@ class Inferrer(
         return result
 
     def transform_method_call(
-            self,
-            node: parse_tree.MethodCall
+        self, node: parse_tree.MethodCall
     ) -> Optional[TypeAnnotation]:
         # Simply recurse to track the type, but we don't care about the arguments
         failed = False
@@ -517,7 +505,7 @@ class Inferrer(
                 Error(
                     node.original_node,
                     f"Expected the member in a method call to be a method, "
-                    f"but got: {member_type}"
+                    f"but got: {member_type}",
                 )
             )
             return None
@@ -536,8 +524,7 @@ class Inferrer(
         return result
 
     def transform_function_call(
-            self,
-            node: parse_tree.FunctionCall
+        self, node: parse_tree.FunctionCall
     ) -> Optional[TypeAnnotation]:
         result = None  # type: Optional[TypeAnnotation]
         failed = False
@@ -621,7 +608,8 @@ class Inferrer(
         return result
 
     def transform_is_not_none(
-            self, node: parse_tree.IsNotNone) -> Optional[TypeAnnotation]:
+        self, node: parse_tree.IsNotNone
+    ) -> Optional[TypeAnnotation]:
         # Just recurse to fill ``type_map`` on ``value`` even though we know the type in
         # advance
         success = self.transform(node.value) is not None
@@ -643,7 +631,7 @@ class Inferrer(
                     f"the variable with the identifier {node.identifier!r} from the "
                     f"given environment. Mind that we do not consider the module "
                     f"scope nor handle all built-in functions due to simplicity! If "
-                    f"you believe this needs to work, please notify the developers."
+                    f"you believe this needs to work, please notify the developers.",
                 )
             )
             return None
@@ -655,8 +643,7 @@ class Inferrer(
         # Just recurse to fill ``type_map`` on ``values`` even though we know the type
         # in advance
         success = all(
-            self.transform(value_node) is not None
-            for value_node in node.values
+            self.transform(value_node) is not None for value_node in node.values
         )
 
         if not success:
@@ -670,8 +657,7 @@ class Inferrer(
         # Just recurse to fill ``type_map`` on ``values`` even though we know the type
         # in advance
         success = all(
-            self.transform(value_node) is not None
-            for value_node in node.values
+            self.transform(value_node) is not None for value_node in node.values
         )
 
         if not success:
@@ -682,7 +668,7 @@ class Inferrer(
         return result
 
     def transform_joined_str(
-            self, node: parse_tree.JoinedStr
+        self, node: parse_tree.JoinedStr
     ) -> Optional[TypeAnnotation]:
         # Just recurse to fill ``type_map`` on ``values`` even though we know the type
         # in advance
@@ -710,7 +696,7 @@ class Inferrer(
         return result
 
     def transform_assignment(
-            self, node: parse_tree.Assignment
+        self, node: parse_tree.Assignment
     ) -> Optional[TypeAnnotation]:
         is_new_variable = False
 
@@ -727,16 +713,15 @@ class Inferrer(
         if (not is_new_variable and target_type is None) or (value_type is None):
             return None
 
-        if (
-                target_type is not None
-                and not _assignable(target_type=target_type, value_type=value_type)
+        if target_type is not None and not _assignable(
+            target_type=target_type, value_type=value_type
         ):
             self.errors.append(
                 Error(
                     node.original_node,
                     f"We inferred the target type of the assignment to "
                     f"be {target_type}, while the value type is inferred to "
-                    f"be {value_type}. We do not know how to model this assignment."
+                    f"be {value_type}. We do not know how to model this assignment.",
                 )
             )
             return None
@@ -749,9 +734,7 @@ class Inferrer(
         self.type_map[node] = result
         return result
 
-    def transform_return(
-            self, node: parse_tree.Return
-    ) -> Optional[TypeAnnotation]:
+    def transform_return(self, node: parse_tree.Return) -> Optional[TypeAnnotation]:
         # Just recurse to fill ``type_map`` on ``value`` even though we know the type
         # in advance
         success = self.transform(node.value) is not None

@@ -21,9 +21,9 @@ def match_property(node: parse_tree.Node) -> Optional[Identifier]:
     For example, matching ``self.something`` will be a ``"something"``.
     """
     if (
-            isinstance(node, parse_tree.Member)
-            and isinstance(node.instance, parse_tree.Name)
-            and node.instance.identifier == "self"
+        isinstance(node, parse_tree.Member)
+        and isinstance(node.instance, parse_tree.Name)
+        and node.instance.identifier == "self"
     ):
         return node.name
 
@@ -39,9 +39,9 @@ class SingleArgFunctionOnMemberOrName:
     """
 
     def __init__(
-            self,
-            function_name: Identifier,
-            member_or_name: Union[parse_tree.Member, parse_tree.Name]
+        self,
+        function_name: Identifier,
+        member_or_name: Union[parse_tree.Member, parse_tree.Name],
     ) -> None:
         """Initialize with the given values."""
         self.function_name = function_name
@@ -49,7 +49,7 @@ class SingleArgFunctionOnMemberOrName:
 
 
 def match_single_arg_function_on_member_or_name(
-        node: parse_tree.Node,
+    node: parse_tree.Node,
 ) -> Optional[SingleArgFunctionOnMemberOrName]:
     """
     Match a call of a function with a single argument on a member or a variable.
@@ -70,8 +70,7 @@ def match_single_arg_function_on_member_or_name(
 
     # noinspection PyTypeChecker
     return SingleArgFunctionOnMemberOrName(
-        function_name=node.name.identifier,
-        member_or_name=node.args[0]
+        function_name=node.name.identifier, member_or_name=node.args[0]
     )
 
 
@@ -79,7 +78,7 @@ class ConditionalOnProp:
     """Represent an invariant conditioned on an optional property."""
 
     def __init__(
-            self, prop_name: Identifier, consequent: parse_tree.Expression
+        self, prop_name: Identifier, consequent: parse_tree.Expression
     ) -> None:
         """Initialize with the given values."""
         self.prop_name = prop_name

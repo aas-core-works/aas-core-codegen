@@ -1,7 +1,7 @@
 """Provide common functions and types for the code generation."""
 import ast
+import inspect
 import io
-import pathlib
 import re
 import textwrap
 from typing import (
@@ -13,12 +13,11 @@ from typing import (
     Union,
     Iterator,
     Sequence,
-    NoReturn,
+    NoReturn, TypeVar, Any, Type,
 )
 
 import asttokens
-from icontract import require, DBC, ensure
-import inflect
+from icontract import require, DBC
 
 IDENTIFIER_RE = re.compile(r"[a-zA-Z_][a-zA-Z_0-9]*")
 
@@ -229,30 +228,62 @@ def indent_but_first_line(text: str, indention: str) -> str:
     )
 
 
-_INFLECT_ENGINE = inflect.engine()
+def assert_union_of_descendants_exhaustive(
+        union: Any, base_class: Any) -> None:
+    """
+    Check that the ``union`` covers all the concrete subclasses of ``base_class``.
 
+    Make sure you put the assertion at the end of the module where no new classes are
+    defined.
+    """
+    if inspect.isclass(union):
+        union_map = {
+            id(union): union
+        }
+    elif hasattr(union, "__args__"):
+        union_map = {
+            id(cls): cls
+            for cls in union.__args__
+        }
+    else:
+        raise NotImplementedError(f"We do not know how to handle the union: {union}")
 
-@ensure(lambda identifier, result: plural_to_singular(result) == identifier)
-def singular_to_plural(identifier: Identifier) -> Identifier:
-    """Translate the singular form of the identifier to its plural form."""
-    text = identifier.replace("_", " ")
+    subclass_map = {
+        id(sub_cls): sub_cls
+        for sub_cls in base_class.__subclasses__()
+        if not inspect.isabstract(sub_cls)
+    }
 
-    result = _INFLECT_ENGINE.plural(text)
-    if result is False:
-        raise RuntimeError(f"Failed to find the plural of: {identifier=}")
+    union_set = set(union_map.keys())
+    subclass_set = set(subclass_map.keys())
 
-    return Identifier("_".join(result.split(" ")))
+    if union_set != subclass_set:
+        union_diff = union_set.difference(subclass_set)
+        union_diff_names = [
+            union_map[cls_id].__name__
+            for cls_id in union_diff
+        ]
 
+        subclass_diff = subclass_set.difference(union_set)
+        subclass_diff_names = [
+            subclass_map[cls_id].__name__
+            for cls_id in subclass_diff
+        ]
 
-@ensure(lambda identifier, result: singular_to_plural(result) == identifier)
-def plural_to_singular(identifier: Identifier) -> Identifier:
-    """Translate the plural form of the identifier to its singular form."""
-    text = identifier.replace("_", " ")
+        if len(union_diff_names) == 0 and len(subclass_diff_names) > 0:
+            raise AssertionError(
+                f"The following concrete subclasses of {base_class.__name__!r} were "
+                f"not listed in the union: {subclass_diff_names}")
 
-    result = _INFLECT_ENGINE.singular_noun(text)
-
-    if result is False:
-        raise RuntimeError(f"Failed to find the singular noun of: {identifier=}")
-
-    assert isinstance(result, str)
-    return Identifier("_".join(result.split(" ")))
+        elif len(union_diff_names) > 0 and len(subclass_diff_names) == 0:
+            raise AssertionError(
+                f"The following classes were listed in the union, "
+                f"but they are not sub-classes "
+                f"of {base_class.__name__!r}: {union_diff_names}")
+        else:
+            raise AssertionError(
+                f"The following classes were listed in the union {union}, "
+                f"but they are not sub-classes "
+                f"of {base_class.__name__!r}: {union_diff_names}.\n\n"
+                f"The following concrete sub-classes of {base_class.__name__!r} were "
+                f"not listed in the union: {subclass_diff_names}")

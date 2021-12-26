@@ -12,7 +12,7 @@ from aas_core_codegen.intermediate import construction
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def understand_constructor_table(
-        source: str
+    source: str,
 ) -> Tuple[Optional[construction.ConstructorTable], Optional[Error]]:
     """Parse the source and try to understand all the constructors."""
     atok, parse_exception = parse.source_to_atok(source=source)
@@ -26,16 +26,13 @@ def understand_constructor_table(
     assert error is None, f"{error=}"
     assert symbol_table is not None
 
-    either = construction.understand_all(
-        symbol_table=symbol_table,
-        atok=atok)
+    either = construction.understand_all(symbol_table=symbol_table, atok=atok)
 
     return either
 
 
 def must_find_item_for(
-        constructor_table: construction.ConstructorTable,
-        name: str
+    constructor_table: construction.ConstructorTable, name: str
 ) -> Tuple[parse.Class, Sequence[construction.Statement]]:
     """
     Find the constructor statements for the class given with ``identifier``.
@@ -59,10 +56,11 @@ class Test_empty_ok(unittest.TestCase):
 
     def test_no_constructor(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             class Something:
                 pass
-            ''')
+            """
+        )
 
         constructor_table, error = understand_constructor_table(source=source)
         assert error is None, f"{error=}"
@@ -76,11 +74,12 @@ class Test_empty_ok(unittest.TestCase):
 
     def test_pass(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             class Something:
                 def __init__(self) -> None:
                     pass
-            ''')
+            """
+        )
 
         constructor_table, error = understand_constructor_table(source=source)
         assert error is None, f"{error=}"
@@ -95,7 +94,7 @@ class Test_empty_ok(unittest.TestCase):
 class Test_call_to_super_constructor_ok(unittest.TestCase):
     def test_without_arguments(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             @abstract
             class Parent:
                 def __init__(self) -> None:
@@ -104,7 +103,8 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
             class Something(Parent):
                 def __init__(self) -> None:
                     Parent.__init__(self)
-            ''')
+            """
+        )
 
         constructor_table, error = understand_constructor_table(source=source)
         assert error is None, f"{error=}"
@@ -121,7 +121,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
 
     def test_with_arguments(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             @abstract
             class Parent:
                 a: int
@@ -134,7 +134,8 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
             class Something(Parent):
                 def __init__(self, a: int, b: int) -> None:
                     Parent.__init__(self, a, b)
-            ''')
+            """
+        )
 
         constructor_table, error = understand_constructor_table(source=source)
         assert error is None, f"{error=}"
@@ -153,13 +154,14 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
 class Test_assign_property_ok(unittest.TestCase):
     def test_argument_assignment(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             class Something:
                 x: int
 
                 def __init__(self, x: int) -> None:
                     self.x = x
-            ''')
+            """
+        )
 
         constructor_table, error = understand_constructor_table(source=source)
         assert error is None, f"{error=}"
@@ -176,32 +178,35 @@ class Test_assign_property_ok(unittest.TestCase):
 class Test_assign_fail(unittest.TestCase):
     def test_multiple_targets_in_assignment(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             class Something:
                 a: int
                 b: int
 
                 def __init__(self, a: int) -> None:
                     self.a = self.b = a
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
 
         self.assertEqual(
             "Expected only a single target for property assignment, but got 2 targets",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_tuple_in_assignment_targets(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             class Something:
                 a: int
                 b: int
 
                 def __init__(self, a: int, b: int) -> None:
                     self.a, self.b = a, b
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -209,50 +214,56 @@ class Test_assign_fail(unittest.TestCase):
         self.assertEqual(
             "Expected a property as the target of an assignment, "
             "but got: self.a, self.b",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_variable_instead_of_property_assignment(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             class Something:
                 a: int
                 b: int
 
                 def __init__(self, a: int, b: int) -> None:
                     x = a
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
 
         self.assertEqual(
             "Expected a property as the target of an assignment, but got: x",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_assignment_to_undefined_property(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             class Something:
                 def __init__(self, a: int) -> None:
                     self.a = a
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
 
         self.assertEqual(
             "The property has not been previously defined in Something: a",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_assignment_value_is_not_a_name(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             class Something:
                 a: int
 
                 def __init__(self, a: int) -> None:
                     self.a = a + 100
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -260,17 +271,19 @@ class Test_assign_fail(unittest.TestCase):
         self.assertEqual(
             "Expected a name as the value to be assigned to the property, "
             "but got: a + 100",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_argument_and_property_name_differ(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             class Something:
                 a: int
 
                 def __init__(self, b: int) -> None:
                     self.a = b
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -278,7 +291,8 @@ class Test_assign_fail(unittest.TestCase):
         self.assertEqual(
             "Expected the property a to be assigned exactly the argument "
             "with the same name, but got: b",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
 
 class Test_call_to_super_constructor_fail(unittest.TestCase):
@@ -302,7 +316,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
                 def __init__(self, a: int, b: int) -> None:
                     super().__init__(self, a, b)
-            ''')
+            '''
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -310,7 +325,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Expected a super class as a name for a call to super ``__init__``, "
             "but got: super()",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_passed_double_start_keyword_argument(self) -> None:
         source = textwrap.dedent(
@@ -332,7 +348,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
                 def __init__(self, a: int, b: int) -> None:
                     Parent.__init__(self, **{'a': a, 'b': b})
-            ''')
+            '''
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -340,11 +357,12 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Expected a call to a super ``__init__`` to provide only "
             "explicit keyword arguments, but got a double-star keyword argument",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_calling_constructor_from_a_non_super_class(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             class Unrelated:
                 a: int
                 b: int
@@ -356,7 +374,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something:
                 def __init__(self, a: int, b: int) -> None:
                     Unrelated.__init__(self, a=a, b=b)
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -364,11 +383,12 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Expected a super class in the call to a super ``__init__``, "
             "but Something does not inherit from Unrelated",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_super_class_has_no_init(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             @abstract
             class Parent:
                 pass
@@ -377,18 +397,20 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
                 def __init__(self, a: int, b: int) -> None:
                     Parent.__init__(self)
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
 
         self.assertEqual(
             "The super class Parent does not define a ``__init__``",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_positional_argument_to_super_init_transformed(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             @abstract
             class Parent(DBC):
                 a: int
@@ -399,7 +421,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(DBC, Parent):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a + 100)
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -407,11 +430,12 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Expected only names in the arguments to super ``__init__``, "
             "but got: a + 100",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_keyword_argument_to_super_init_transformed(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             @abstract
             class Parent(DBC):
                 a: int
@@ -422,7 +446,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(DBC, Parent):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a=a + 100)
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -430,11 +455,12 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Expected only names in the arguments to super ``__init__``, "
             "but got: a + 100",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_too_many_positional_arguments(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             @abstract
             class Parent:
                 a: int
@@ -447,7 +473,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(Parent):
                 def __init__(self, a: int, b: int, c: int) -> None:
                     Parent.__init__(self, a, b, c)
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -455,11 +482,12 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "The ``Parent.__init__`` expected 3 argument(s), "
             "but the call provides 4 positional argument(s)",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_unexpected_keyword_arguments_supplied_to_super_init(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             @abstract
             class Parent:
                 a: int
@@ -472,14 +500,16 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(DBC, Parent):
                 def __init__(self, a: int, b: int, c: int) -> None:
                     Parent.__init__(self, a=a, b=b, c=c)
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
 
         self.assertEqual(
             "The ``Parent.__init__`` does not expect the argument c",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_non_init_names_passed_to_super_init(self) -> None:
         source = textwrap.dedent(
@@ -498,7 +528,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(Parent):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a, b)
-            ''')
+            '''
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -507,11 +538,12 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             "Expected all the arguments to ``Parent.__init__`` "
             "to be propagation of the original ``__init__`` arguments, "
             "but the name b is not an argument of ``Something.__init__``",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_arguments_not_passed_as_are(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             @abstract
             class Parent:
                 a: int
@@ -524,7 +556,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(DBC, Parent):
                 def __init__(self, a: int, y: int) -> None:
                     Parent.__init__(self, a, b=y)
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -534,11 +567,12 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Expected the arguments to super ``__init__`` to be passed with "
             "the same names, but the argument b is passed as the name y",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_missing_argument_to_super_init(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             @abstract
             class Parent:
                 a: int
@@ -551,18 +585,20 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(Parent):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a)
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
 
         self.assertEqual(
             "The call to ``Parent.__init__`` is missing one or more arguments: b",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_call_to_non_attribute_in_init(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             def initialize_something(smth: 'Something', a: int, b: int) -> None:
                 smth.a = a
                 smth.b = b
@@ -574,7 +610,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
                 def __init__(self, a: int, b: int) -> None:
                     initialize_something(a, b)
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -582,11 +619,12 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Unexpected call in the body of ``__init__``: initialize_something; "
             "only calls to super ``__init__``'s are expected",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_call_to_non_super_init_from_init(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             class Something:
                 a: int
                 b: int
@@ -597,7 +635,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
                 def __init__(self, a: int, b: int) -> None:
                     self.initialize(a, b)
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -605,19 +644,21 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Unexpected call in the body of ``__init__``: self.initialize; "
             "only calls to super ``__init__``'s are expected",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
 
 class Test_unexpected_statements(unittest.TestCase):
     def test_unexpected_call(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             class Something:
                 a: int
 
                 def __init__(self, a: int) -> None:
                     print("something")
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -625,17 +666,19 @@ class Test_unexpected_statements(unittest.TestCase):
         self.assertEqual(
             "Unexpected call in the body of ``__init__``: print; "
             "only calls to super ``__init__``'s are expected",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
     def test_unexpected_expr(self) -> None:
         source = textwrap.dedent(
-            '''\
+            """\
             class Something:
                 a: int
 
                 def __init__(self, a: int) -> None:
                     1 + 2
-            ''')
+            """
+        )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
@@ -643,7 +686,8 @@ class Test_unexpected_statements(unittest.TestCase):
         self.assertEqual(
             "Unexpected statement in the body of ``__init__``: 1 + 2; "
             "only calls to super ``__init__``'s and property assignments expected",
-            tests.common.most_underlying_message(error))
+            tests.common.most_underlying_message(error),
+        )
 
 
 if __name__ == "__main__":

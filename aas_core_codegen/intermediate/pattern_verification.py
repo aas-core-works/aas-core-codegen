@@ -16,14 +16,11 @@ from icontract import require, ensure
 from aas_core_codegen.intermediate._types import PatternVerification
 from aas_core_codegen import parse
 from aas_core_codegen.common import Error, Identifier, assert_never
-from aas_core_codegen.parse import (
-    tree as parse_tree
-)
+from aas_core_codegen.parse import tree as parse_tree
 
 
 def _check_support(
-        node: parse_tree.Node,
-        argument: Identifier
+    node: parse_tree.Node, argument: Identifier
 ) -> Optional[List[Error]]:
     """
     Check that we understand the ``node`` in the pattern-matching function.
@@ -45,7 +42,7 @@ def _check_support(
                     f"We did not implement the support for non-string constants "
                     f"in pattern matching: {parse_tree.dump(node)}.\n"
                     f"\n"
-                    f"Please notify the developers if you need this."
+                    f"Please notify the developers if you need this.",
                 )
             ]
 
@@ -74,7 +71,7 @@ def _check_support(
                 Error(
                     node.original_node,
                     f"The verification arguments, {argument!r}, is not expected "
-                    f"to be accessed neither for reading nor for writing."
+                    f"to be accessed neither for reading nor for writing.",
                 )
             ]
         else:
@@ -88,7 +85,7 @@ def _check_support(
                     f"We currently support only assignments to simple variables, "
                     f"but got: {parse_tree.dump(node.target)}.\n"
                     f"\n"
-                    f"Please notify the developers if you need this."
+                    f"Please notify the developers if you need this.",
                 )
             ]
 
@@ -101,15 +98,14 @@ def _check_support(
                 f"We did not implement the support for this construct "
                 f"in pattern matching: {parse_tree.dump(node)}.\n"
                 f"\n"
-                f"Please notify the developers if you need this."
+                f"Please notify the developers if you need this.",
             )
         ]
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _evaluate(
-        expr: parse_tree.Expression,
-        state: Mapping[Identifier, str]
+    expr: parse_tree.Expression, state: Mapping[Identifier, str]
 ) -> Tuple[Optional[str], Optional[Error]]:
     """Evaluate the expression to a string constant."""
     if isinstance(expr, parse_tree.Constant):
@@ -124,27 +120,28 @@ def _evaluate(
                 Error(
                     expr.original_node,
                     f"The value of variable {expr.identifier} has not been assigned "
-                    f"before"
-                )
+                    f"before",
+                ),
             )
 
         return value, None
 
     elif isinstance(expr, parse_tree.JoinedStr):
         parts = []  # type: List[str]
-        for value in expr.values:
-            if isinstance(value, str):
-                parts.append(value)
-            elif isinstance(value, parse_tree.FormattedValue):
+        for joined_str_value in expr.values:
+            if isinstance(joined_str_value, str):
+                parts.append(joined_str_value)
 
-                part, error = _evaluate(value.value, state=state)
+            elif isinstance(joined_str_value, parse_tree.FormattedValue):
+
+                part, error = _evaluate(joined_str_value.value, state=state)
                 if error is not None:
                     return None, error
 
                 assert part is not None
                 parts.append(part)
             else:
-                assert_never(value)
+                assert_never(joined_str_value)
 
         return "".join(parts), None
 
@@ -178,7 +175,7 @@ def _evaluate(
 )
 # fmt: on
 def try_to_understand(
-        parsed: parse.UnderstoodMethod
+    parsed: parse.UnderstoodMethod,
 ) -> Tuple[Optional[str], Optional[bool], Optional[Error]]:
     """
     Try to understand the given verification function as a pattern matching function.
@@ -191,20 +188,18 @@ def try_to_understand(
     """
     # Understand only functions that take a single string argument
     if not (
-            len(parsed.arguments) == 1
-            and isinstance(
-        parsed.arguments[0].type_annotation,
-        parse.AtomicTypeAnnotation)
-            and parsed.arguments[0].type_annotation.identifier == 'str'
+        len(parsed.arguments) == 1
+        and isinstance(parsed.arguments[0].type_annotation, parse.AtomicTypeAnnotation)
+        and parsed.arguments[0].type_annotation.identifier == "str"
     ):
         print("exit here")  # TODO: debug
         return None, False, None
 
     # We need to return something,
     if not (
-            parsed.returns is not None
-            and isinstance(parsed.returns, parse.AtomicTypeAnnotation)
-            and parsed.returns.identifier == 'bool'
+        parsed.returns is not None
+        and isinstance(parsed.returns, parse.AtomicTypeAnnotation)
+        and parsed.returns.identifier == "bool"
     ):
         print("exit here 1")  # TODO: debug
         return None, False, None
@@ -222,8 +217,8 @@ def try_to_understand(
 
     # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test this
     if (
-            isinstance(return_node.value, parse_tree.FunctionCall)
-            and return_node.value.name == 'match'
+        isinstance(return_node.value, parse_tree.FunctionCall)
+        and return_node.value.name == "match"
     ):
         return (
             None,
@@ -232,14 +227,14 @@ def try_to_understand(
                 return_node.original_node,
                 "The ``match`` function returns a re.Match object, "
                 "but this function expected the return value to be a boolean. "
-                "Did you maybe want to write ``return match(...) is not None``?"
-            )
+                "Did you maybe want to write ``return match(...) is not None``?",
+            ),
         )
 
     if not (
-            isinstance(return_node.value, parse_tree.IsNotNone)
-            and isinstance(return_node.value.value, parse_tree.FunctionCall)
-            and return_node.value.value.name.identifier == 'match'
+        isinstance(return_node.value, parse_tree.IsNotNone)
+        and isinstance(return_node.value.value, parse_tree.FunctionCall)
+        and return_node.value.value.name.identifier == "match"
     ):
         return None, False, None
 
@@ -250,7 +245,7 @@ def try_to_understand(
 
     match_call = return_node.value.value
     assert isinstance(match_call, parse_tree.FunctionCall)
-    assert match_call.name.identifier == 'match'
+    assert match_call.name.identifier == "match"
 
     # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test this
     if len(match_call.args) < 2:
@@ -261,8 +256,8 @@ def try_to_understand(
                 match_call.original_node,
                 f"The ``match`` function expects two arguments "
                 f"(pattern and the text to be matched), "
-                f"but you provided {len(match_call.args)} argument(s)"
-            )
+                f"but you provided {len(match_call.args)} argument(s)",
+            ),
         )
 
     # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test this
@@ -275,14 +270,14 @@ def try_to_understand(
                 f"We do not support calls to the ``match`` function with more than "
                 f"two arguments (pattern and the text to be matched) "
                 f"since we could not transpile to other languages and schemas "
-                f"(*e.g.*, flags such as multi-line matching)"
-            )
+                f"(*e.g.*, flags such as multi-line matching)",
+            ),
         )
 
     # noinspection PyUnresolvedReferences
     if not (
-            isinstance(match_call.args[1], parse_tree.Name)
-            and match_call.args[1].identifier == parsed.arguments[0].name
+        isinstance(match_call.args[1], parse_tree.Name)
+        and match_call.args[1].identifier == parsed.arguments[0].name
     ):
         return (
             None,
@@ -294,14 +289,14 @@ def try_to_understand(
                 f"the verification function, {parsed.arguments[0].name!r}. "
                 f"Otherwise, we can not transpile the pattern to schemas.\n"
                 f"\n"
-                f"However, we got: {parse_tree.dump(match_call.args[1])}"
-            )
+                f"However, we got: {parse_tree.dump(match_call.args[1])}",
+            ),
         )
 
     # noinspection PyUnresolvedReferences
     if (
-            isinstance(match_call.args[0], parse_tree.Name)
-            and match_call.args[0].identifier == parsed.arguments[0].name
+        isinstance(match_call.args[0], parse_tree.Name)
+        and match_call.args[0].identifier == parsed.arguments[0].name
     ):
         return (
             None,
@@ -310,8 +305,8 @@ def try_to_understand(
                 match_call.original_node,
                 f"The first argument, the pattern, to the ``match`` function "
                 f"must not be the argument supplied to "
-                f"the verification function, {parsed.arguments[0].name!r}."
-            )
+                f"the verification function, {parsed.arguments[0].name!r}.",
+            ),
         )
 
     # region Check the support of the statements
@@ -328,7 +323,8 @@ def try_to_understand(
             errors.extend(underlying_errors)
 
     underlying_errors = _check_support(
-        node=match_call.args[0], argument=parsed.arguments[0].name)
+        node=match_call.args[0], argument=parsed.arguments[0].name
+    )
 
     if underlying_errors is not None:
         errors.extend(underlying_errors)
@@ -341,8 +337,8 @@ def try_to_understand(
                 parsed.node,
                 f"We could not understand "
                 f"the pattern matching function {parsed.name!r}",
-                errors
-            )
+                errors,
+            ),
         )
 
     # endregion
@@ -361,6 +357,8 @@ def try_to_understand(
             if error is not None:
                 return None, None, error
 
+            assert value is not None
+
             state[stmt.target.identifier] = value
 
         else:
@@ -368,7 +366,11 @@ def try_to_understand(
             if error is not None:
                 return None, None, error
 
+            assert pattern is not None
+
     # endregion
+
+    assert pattern is not None
 
     try:
         re.compile(pattern)
@@ -381,8 +383,8 @@ def try_to_understand(
                 f"Failed to compile the pattern with the Python's ``re`` module.\n"
                 f"\n"
                 f"The evaluated pattern was: {pattern!r}.\n"
-                f"The error message was: {exception}"
-            )
+                f"The error message was: {exception}",
+            ),
         )
 
     return pattern, True, None

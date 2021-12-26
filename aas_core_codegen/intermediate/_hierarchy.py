@@ -8,7 +8,9 @@ from typing import (
     MutableMapping,
     List,
     cast,
-    Tuple, Callable, Any,
+    Tuple,
+    Callable,
+    Any,
 )
 
 import sortedcontainers
@@ -19,7 +21,7 @@ from aas_core_codegen.common import Error, Identifier
 
 
 def first_not_in_topological_order(
-        classes: Sequence[parse.Class], parsed_symbol_table: parse.SymbolTable
+    classes: Sequence[parse.Class], parsed_symbol_table: parse.SymbolTable
 ) -> Optional[parse.Class]:
     """
     Verify that ``classes`` are topologically sorted.
@@ -101,23 +103,20 @@ class _UnverifiedOntology:
     )
     # fmt: on
     def __init__(
-            self, classes: Sequence[parse.Class], parsed_symbol_table: parse.SymbolTable
+        self, classes: Sequence[parse.Class], parsed_symbol_table: parse.SymbolTable
     ) -> None:
         """Initialize with the given values and pre-compute the ancestors."""
         self.classes = classes
 
         # region Determine ancestors
 
-        ancestors_of = (
-            dict()
-        )  # type: MutableMapping[parse.Class, List[parse.Class]]
+        ancestors_of = dict()  # type: MutableMapping[parse.Class, List[parse.Class]]
 
         order_of = {cls: i for i, cls in enumerate(classes)}
 
         for cls in classes:
             if any(
-                parent_name in parse.PRIMITIVE_TYPES
-                for parent_name in cls.inheritances
+                parent_name in parse.PRIMITIVE_TYPES for parent_name in cls.inheritances
             ):
                 assert len(cls.inheritances) == 1, (
                     f"A constrained primitive type in the initial set should only "
@@ -156,14 +155,12 @@ class _UnverifiedOntology:
 
         # region Determine descendants
 
-        descendants_of = (
-            dict()
-        )  # type: MutableMapping[parse.Class, List[parse.Class]]
+        descendants_of = dict()  # type: MutableMapping[parse.Class, List[parse.Class]]
 
         # Simply inverse
 
         for cls in self.classes:
-            descendants_of[cls] = []  # type: List[parse.Class]
+            descendants_of[cls] = []
 
         for cls, ancestors in ancestors_of.items():
             for ancestor in ancestors:
@@ -205,7 +202,7 @@ class _UnverifiedOntology:
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _topologically_sort(
-        parsed_symbol_table: parse.SymbolTable,
+    parsed_symbol_table: parse.SymbolTable,
 ) -> Tuple[Optional[_UnverifiedOntology], Optional[parse.Class]]:
     """
     Sort topologically all the classes in the ``parsed_symbol_table``.
@@ -294,7 +291,7 @@ class Ontology(_UnverifiedOntology):
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def map_symbol_table_to_ontology(
-        parsed_symbol_table: parse.SymbolTable,
+    parsed_symbol_table: parse.SymbolTable,
 ) -> Tuple[Optional[Ontology], Optional[List[Error]]]:
     """Infer the ontology of the classes from the ``parsed_symbol_table``."""
     ontology, visited_more_than_once = _topologically_sort(
@@ -368,11 +365,9 @@ def map_symbol_table_to_ontology(
         if not isinstance(symbol, parse.Class):
             continue
 
-        if "__init__" not in symbol.method_map:
+        if "__init__" not in symbol.methods_by_name:
             for ancestor in ontology.list_ancestors(symbol):
-                ancestor_init = ancestor.method_map.get(
-                    Identifier("__init__"), None
-                )
+                ancestor_init = ancestor.methods_by_name.get(Identifier("__init__"), None)
 
                 if ancestor_init is not None and len(ancestor_init.arguments) > 1:
                     argument_names_str = ", ".join(

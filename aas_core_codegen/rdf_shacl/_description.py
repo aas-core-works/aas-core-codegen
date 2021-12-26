@@ -4,9 +4,11 @@ from typing import Optional, List, Tuple, Sequence, cast
 import docutils.nodes
 from icontract import ensure
 
-from aas_core_codegen import intermediate
 from aas_core_codegen.common import assert_never
-from aas_core_codegen.intermediate import rendering as intermediate_rendering
+from aas_core_codegen.intermediate import (
+    doc as intermediate_doc,
+    rendering as intermediate_rendering
+)
 from aas_core_codegen.rdf_shacl import naming as rdf_shacl_naming
 
 
@@ -114,20 +116,20 @@ class Renderer(intermediate_rendering.DocutilsElementTransformer[List[Token]]):
         return [TokenText(element.astext().replace("\n", " "))], None
 
     def transform_symbol_reference_in_doc(
-        self, element: intermediate.SymbolReferenceInDoc
+        self, element: intermediate_doc.SymbolReference
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
         cls_name = rdf_shacl_naming.class_name(element.symbol.name)
         return [TokenText(f"'{cls_name}'")], None
 
     def transform_attribute_reference_in_doc(
-        self, element: intermediate.AttributeReferenceInDoc
+        self, element: intermediate_doc.AttributeReference
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
-        if isinstance(element.reference, intermediate.PropertyReferenceInDoc):
+        if isinstance(element.reference, intermediate_doc.PropertyReference):
             prop_name = rdf_shacl_naming.property_name(element.reference.prop.name)
             return [TokenText(f"'{prop_name}'")], None
 
         elif isinstance(
-            element.reference, intermediate.EnumerationLiteralReferenceInDoc
+            element.reference, intermediate_doc.EnumerationLiteralReference
         ):
             literal_name = rdf_shacl_naming.enumeration_literal(
                 element.reference.literal.name
@@ -139,7 +141,7 @@ class Renderer(intermediate_rendering.DocutilsElementTransformer[List[Token]]):
             assert_never(element.reference)
 
     def transform_argument_reference_in_doc(
-        self, element: intermediate.ArgumentReferenceInDoc
+        self, element: intermediate_doc.ArgumentReference
     ) -> Tuple[Optional[List[Token]], Optional[str]]:
         # Argument references are not really meaningful for SHACL, so we just
         # return them as-is.
@@ -196,7 +198,7 @@ class Renderer(intermediate_rendering.DocutilsElementTransformer[List[Token]]):
         tokens = []  # type: List[Token]
 
         if len(para_element.children) == 0:
-            return ([TokenText("* (empty)")], None)
+            return [TokenText("* (empty)")], None
 
         for child in para_element.children:
             child_tokens, error = self.transform(child)

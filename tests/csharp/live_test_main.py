@@ -18,20 +18,22 @@ def main() -> int:
     """Execute the main routine."""
     print("Running dotnet --version to check that dotnet is available...")
     run = subprocess.run(
-        ['dotnet', '--version'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        ["dotnet", "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
     if run.returncode != 0:
         print(
             f"Failed to execute ``dotnet --version`` "
             f"with the exit code {run.returncode}. Is dotnet installed?",
-            file=sys.stderr)
+            file=sys.stderr,
+        )
         return 1
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
         # TODO: remove
-        tmp_dir = repo_dir/"deleteme"
-        tmp_dir.mkdir(parents=True,exist_ok=True)
+        tmp_dir = repo_dir / "deleteme"
+        tmp_dir.mkdir(parents=True, exist_ok=True)
 
         parent_case_dir = repo_dir / "test_data" / "test_csharp" / "test_main"
         assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
@@ -49,7 +51,8 @@ def main() -> int:
 
             print(
                 f"Generating the files based on the case {case_dir} "
-                f"to: {output_dir} ...")
+                f"to: {output_dir} ..."
+            )
 
             output_dir.mkdir(exist_ok=True, parents=True)
 
@@ -57,23 +60,29 @@ def main() -> int:
                 model_path=model_pth,
                 target=aas_core_codegen.main.Target.CSHARP,
                 snippets_dir=snippets_dir,
-                output_dir=output_dir)
+                output_dir=output_dir,
+            )
 
             stdout = io.StringIO()
             stderr = io.StringIO()
 
             return_code = aas_core_codegen.main.execute(
-                params=params, stdout=stdout, stderr=stderr)
+                params=params, stdout=stdout, stderr=stderr
+            )
 
-            assert stderr.getvalue() == "", (
-                f"Expected no stderr on valid models, but got:\n{stderr.getvalue()}")
+            assert (
+                stderr.getvalue() == ""
+            ), f"Expected no stderr on valid models, but got:\n{stderr.getvalue()}"
 
-            assert return_code == 0, (
-                f"Expected return code 0 on valid models, but got: {return_code}")
+            assert (
+                return_code == 0
+            ), f"Expected return code 0 on valid models, but got: {return_code}"
 
             print("Generating the .csproj file...")
             csproj_pth = output_dir / "SomeProject.csproj"
-            csproj_pth.write_text(textwrap.dedent('''\
+            csproj_pth.write_text(
+                textwrap.dedent(
+                    """\
                 <Project Sdk="Microsoft.NET.Sdk">
                     <PropertyGroup>
                         <TargetFrameworks>net5.0;netstandard2.1;netstandard2.0</TargetFrameworks>
@@ -92,13 +101,15 @@ def main() -> int:
                     </ItemGroup>
 
                 </Project>
-                '''))
+                """
+                )
+            )
 
             print("Calling dotnet build...")
-            run = subprocess.run(
-                ['dotnet', 'build', '.'], cwd=str(output_dir))
-            assert run.returncode == 0, (
-                f"Expected the build to succeed, but got exit code: {run.returncode}")
+            run = subprocess.run(["dotnet", "build", "."], cwd=str(output_dir))
+            assert (
+                run.returncode == 0
+            ), f"Expected the build to succeed, but got exit code: {run.returncode}"
 
 
 if __name__ == "__main__":

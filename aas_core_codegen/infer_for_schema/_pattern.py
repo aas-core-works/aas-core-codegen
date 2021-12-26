@@ -23,21 +23,21 @@ from aas_core_codegen.infer_for_schema import _common as infer_for_schema_common
 # fmt: on
 class PatternVerificationsByName(Mapping[Identifier, intermediate.PatternVerification]):
     def __new__(
-            cls,
-            mapping: Mapping[Identifier, intermediate.PatternVerification]
-    ) -> 'PatternVerificationsByName':
+        cls, mapping: Mapping[Identifier, intermediate.PatternVerification]
+    ) -> "PatternVerificationsByName":
         return cast(PatternVerificationsByName, mapping)
 
 
 def map_pattern_verifications_by_name(
-        verifications: Sequence[intermediate.Verification]
+    verifications: Sequence[intermediate.Verification],
 ) -> PatternVerificationsByName:
     """
     Go over all verifications and map the pattern verifications by their name.
 
     The verifications which do not perform pattern matching are ignored.
     """
-    result = dict(
+    result = (
+        dict()
     )  # type: MutableMapping[Identifier, intermediate.PatternVerification]
 
     for verification in verifications:
@@ -65,8 +65,7 @@ class _ConstraintOnProperty:
 
 
 def _match_constraint_on_property(
-        node: parse_tree.Node,
-        pattern_verifications_by_name: PatternVerificationsByName
+    node: parse_tree.Node, pattern_verifications_by_name: PatternVerificationsByName
 ) -> Optional[_ConstraintOnProperty]:
     """
     Match the pattern constraints on a property.
@@ -89,13 +88,13 @@ def _match_constraint_on_property(
 
     return _ConstraintOnProperty(
         prop_name=prop_name,
-        constraint=PatternConstraint(pattern=pattern_verification.pattern)
+        constraint=PatternConstraint(pattern=pattern_verification.pattern),
     )
 
 
 def infer_pattern_constraints(
-        symbol: Union[intermediate.Interface, intermediate.Class],
-        pattern_verifications_by_name: PatternVerificationsByName
+    symbol: Union[intermediate.Interface, intermediate.Class],
+    pattern_verifications_by_name: PatternVerificationsByName,
 ) -> MutableMapping[intermediate.Property, List[PatternConstraint]]:
     """
     Infer the pattern constraints for every property of the class ``cls``.
@@ -132,12 +131,13 @@ def infer_pattern_constraints(
                 for value_node in conditional_on_prop.consequent.values:
                     constraint_on_prop = _match_constraint_on_property(
                         node=value_node,
-                        pattern_verifications_by_name=pattern_verifications_by_name)
+                        pattern_verifications_by_name=pattern_verifications_by_name,
+                    )
 
                     if (
-                            constraint_on_prop is not None
-                            and constraint_on_prop.prop_name
-                            == conditional_on_prop.prop_name
+                        constraint_on_prop is not None
+                        and constraint_on_prop.prop_name
+                        == conditional_on_prop.prop_name
                     ):
                         constraints_on_props.append(constraint_on_prop)
 
@@ -145,7 +145,7 @@ def infer_pattern_constraints(
             elif isinstance(conditional_on_prop.consequent, parse_tree.FunctionCall):
                 constraint_on_prop = _match_constraint_on_property(
                     node=conditional_on_prop.consequent,
-                    pattern_verifications_by_name=pattern_verifications_by_name
+                    pattern_verifications_by_name=pattern_verifications_by_name,
                 )
 
                 if constraint_on_prop is not None:
@@ -162,7 +162,7 @@ def infer_pattern_constraints(
                 for value_node in invariant.body.values:
                     constraint_on_prop = _match_constraint_on_property(
                         node=value_node,
-                        pattern_verifications_by_name=pattern_verifications_by_name
+                        pattern_verifications_by_name=pattern_verifications_by_name,
                     )
 
                     if constraint_on_prop is not None:
@@ -172,7 +172,7 @@ def infer_pattern_constraints(
             elif isinstance(invariant.body, parse_tree.FunctionCall):
                 constraint_on_prop = _match_constraint_on_property(
                     node=invariant.body,
-                    pattern_verifications_by_name=pattern_verifications_by_name
+                    pattern_verifications_by_name=pattern_verifications_by_name,
                 )
 
                 if constraint_on_prop is not None:

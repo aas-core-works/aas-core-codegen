@@ -11,6 +11,7 @@ import docutils.utils
 from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
 from aas_core_codegen import intermediate
 from aas_core_codegen.intermediate import (
+    doc as intermediate_doc,
     rendering as intermediate_rendering
 )
 from aas_core_codegen.csharp import (
@@ -19,18 +20,16 @@ from aas_core_codegen.csharp import (
 from aas_core_codegen.csharp.common import INDENT as I
 
 
-class _ElementRenderer(
-    intermediate_rendering.DocutilsElementTransformer[str]
-):
+class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
     """Render descriptions as C# docstring XML."""
 
     def transform_text(
-            self, element: docutils.nodes.Text
+        self, element: docutils.nodes.Text
     ) -> Tuple[Optional[str], Optional[str]]:
         return xml.sax.saxutils.escape(element.astext()), None
 
     def transform_symbol_reference_in_doc(
-            self, element: intermediate.SymbolReferenceInDoc
+        self, element: intermediate_doc.SymbolReference
     ) -> Tuple[Optional[str], Optional[str]]:
         name = None  # type: Optional[str]
 
@@ -59,11 +58,11 @@ class _ElementRenderer(
         return f"<see cref={xml.sax.saxutils.quoteattr(name)} />", None
 
     def transform_attribute_reference_in_doc(
-            self, element: intermediate.AttributeReferenceInDoc
+        self, element: intermediate_doc.AttributeReference
     ) -> Tuple[Optional[str], Optional[str]]:
         cref = None  # type: Optional[str]
 
-        if isinstance(element.reference, intermediate.PropertyReferenceInDoc):
+        if isinstance(element.reference, intermediate_doc.PropertyReference):
             symbol_name = None  # type: Optional[str]
 
             if isinstance(element.reference.cls, intermediate.AbstractClass):
@@ -86,10 +85,12 @@ class _ElementRenderer(
             assert symbol_name is not None
             cref = f"{symbol_name}.{prop_name}"
         elif isinstance(
-                element.reference, intermediate.EnumerationLiteralReferenceInDoc):
+            element.reference, intermediate_doc.EnumerationLiteralReference
+        ):
             symbol_name = csharp_naming.enum_name(element.reference.symbol.name)
             literal_name = csharp_naming.enum_literal_name(
-                element.reference.literal.name)
+                element.reference.literal.name
+            )
 
             cref = f"{symbol_name}.{literal_name}"
         else:
@@ -99,18 +100,18 @@ class _ElementRenderer(
         return f"<see cref={xml.sax.saxutils.quoteattr(cref)} />", None
 
     def transform_argument_reference_in_doc(
-            self, element: intermediate.ArgumentReferenceInDoc
+        self, element: intermediate_doc.ArgumentReference
     ) -> Tuple[Optional[str], Optional[str]]:
         arg_name = csharp_naming.argument_name(Identifier(element.reference))
         return f"<paramref name={xml.sax.saxutils.quoteattr(arg_name)} />", None
 
     def transform_literal(
-            self, element: docutils.nodes.literal
+        self, element: docutils.nodes.literal
     ) -> Tuple[Optional[str], Optional[str]]:
         return f"<c>{xml.sax.saxutils.escape(element.astext())}</c>", None
 
     def transform_paragraph(
-            self, element: docutils.nodes.paragraph
+        self, element: docutils.nodes.paragraph
     ) -> Tuple[Optional[str], Optional[str]]:
         parts = []  # type: List[str]
         for child in element.children:
@@ -124,7 +125,7 @@ class _ElementRenderer(
         return "".join(parts), None
 
     def transform_emphasis(
-            self, element: docutils.nodes.emphasis
+        self, element: docutils.nodes.emphasis
     ) -> Tuple[Optional[str], Optional[str]]:
         parts = []  # type: List[str]
         for child in element.children:
@@ -138,7 +139,7 @@ class _ElementRenderer(
         return "<em>{}</em>".format("".join(parts)), None
 
     def transform_list_item(
-            self, element: docutils.nodes.list_item
+        self, element: docutils.nodes.list_item
     ) -> Tuple[Optional[str], Optional[str]]:
         parts = []  # type: List[str]
         for child in element.children:
@@ -152,7 +153,7 @@ class _ElementRenderer(
         return "<li>{}</li>".format("".join(parts)), None
 
     def transform_bullet_list(
-            self, element: docutils.nodes.bullet_list
+        self, element: docutils.nodes.bullet_list
     ) -> Tuple[Optional[str], Optional[str]]:
         parts = ["<ul>\n"]
         for child in element.children:
@@ -167,7 +168,7 @@ class _ElementRenderer(
         return "".join(parts), None
 
     def transform_note(
-            self, element: docutils.nodes.note
+        self, element: docutils.nodes.note
     ) -> Tuple[Optional[str], Optional[str]]:
         parts = []  # type: List[str]
         for child in element.children:
@@ -181,7 +182,7 @@ class _ElementRenderer(
         return "".join(parts), None
 
     def transform_reference(
-            self, element: docutils.nodes.reference
+        self, element: docutils.nodes.reference
     ) -> Tuple[Optional[str], Optional[str]]:
         parts = []  # type: List[str]
         for child in element.children:
@@ -195,7 +196,7 @@ class _ElementRenderer(
         return "".join(parts), None
 
     def transform_document(
-            self, element: docutils.nodes.document
+        self, element: docutils.nodes.document
     ) -> Tuple[Optional[str], Optional[str]]:
         if len(element.children) == 0:
             return "", None
@@ -217,10 +218,13 @@ class _ElementRenderer(
         remainder = element.children[1:]
         for i, child in enumerate(remainder):
             if isinstance(
-                    child,
-                    (docutils.nodes.paragraph,
-                     docutils.nodes.bullet_list,
-                     docutils.nodes.note)):
+                child,
+                (
+                    docutils.nodes.paragraph,
+                    docutils.nodes.bullet_list,
+                    docutils.nodes.note,
+                ),
+            ):
                 remarks.append(child)
             else:
                 tail = remainder[i:]
@@ -380,7 +384,7 @@ class _ElementRenderer(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def generate_comment(
-        description: intermediate.Description,
+    description: intermediate.Description,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate a documentation comment based on the docstring."""
     if len(description.document.children) == 0:

@@ -36,8 +36,7 @@ class Test_against_recorded(unittest.TestCase):
                     expected_output_dir.mkdir(exist_ok=True, parents=True)
                 else:
                     assert (
-                            expected_output_dir.exists()
-                            and expected_output_dir.is_dir()
+                        expected_output_dir.exists() and expected_output_dir.is_dir()
                     ), expected_output_dir
 
                     tmp_dir = tempfile.TemporaryDirectory()
@@ -48,13 +47,15 @@ class Test_against_recorded(unittest.TestCase):
                     model_path=model_pth,
                     target=aas_core_codegen.main.Target.JSONSCHEMA,
                     snippets_dir=snippets_dir,
-                    output_dir=output_dir)
+                    output_dir=output_dir,
+                )
 
                 stdout = io.StringIO()
                 stderr = io.StringIO()
 
                 return_code = aas_core_codegen.main.execute(
-                    params=params, stdout=stdout, stderr=stderr)
+                    params=params, stdout=stdout, stderr=stderr
+                )
 
                 if stderr.getvalue() != "":
                     raise AssertionError(
@@ -63,27 +64,31 @@ class Test_against_recorded(unittest.TestCase):
                     )
 
                 self.assertEqual(
-                    0, return_code, "Expected 0 return code on valid models")
+                    0, return_code, "Expected 0 return code on valid models"
+                )
 
                 stdout_pth = expected_output_dir / "stdout.txt"
                 normalized_stdout = stdout.getvalue().replace(
-                    str(output_dir), '<output dir>')
+                    str(output_dir), "<output dir>"
+                )
 
                 if Test_against_recorded.RERECORD:
                     stdout_pth.write_text(normalized_stdout)
                 else:
                     self.assertEqual(
-                        normalized_stdout, stdout_pth.read_text(), stdout_pth)
+                        normalized_stdout, stdout_pth.read_text(), stdout_pth
+                    )
 
                 for relevant_rel_pth in [
-                    pathlib.Path('schema.json'),
+                    pathlib.Path("schema.json"),
                 ]:
                     expected_pth = expected_output_dir / relevant_rel_pth
                     output_pth = output_dir / relevant_rel_pth
 
                     if not output_pth.exists():
                         raise FileNotFoundError(
-                            f"The output file is missing: {output_pth}")
+                            f"The output file is missing: {output_pth}"
+                        )
 
                     if Test_against_recorded.RERECORD:
                         expected_pth.write_text(output_pth.read_text())
@@ -91,7 +96,8 @@ class Test_against_recorded(unittest.TestCase):
                         self.assertEqual(
                             expected_pth.read_text(),
                             output_pth.read_text(),
-                            f"The files {expected_pth} and {output_pth} do not match.")
+                            f"The files {expected_pth} and {output_pth} do not match.",
+                        )
 
 
 if __name__ == "__main__":

@@ -17,83 +17,117 @@ class TestDescription(unittest.TestCase):
         ``Some_class``.
         """
         symbol_table, error = tests.common.translate_source_to_intermediate(
-            source=source)
+            source=source
+        )
         assert error is None, f"{error=}"
 
-        some_class = symbol_table.must_find(Identifier('Some_class'))
+        some_class = symbol_table.must_find(Identifier("Some_class"))
         assert some_class.description is not None
 
         code, error = csharp_structure_generate._description_comment(
-            some_class.description)
+            some_class.description
+        )
         assert error is None, f"{error=}"
 
         return code
 
     def test_empty(self) -> None:
         comment_code = TestDescription.render(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                '''\
                 class Some_class:
                     """"""  # Intentionally left empty    
-                '''))
+                '''
+            )
+        )
 
-        self.assertEqual('', comment_code)
+        self.assertEqual("", comment_code)
 
     def test_only_summary(self) -> None:
         comment_code = TestDescription.render(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                '''\
                 class Some_class:
                     """Do & drink something."""
-                '''))
+                '''
+            )
+        )
 
         self.assertEqual(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                """\
                 /// <summary>
                 /// Do &amp; drink something.
-                /// </summary>'''), comment_code)
+                /// </summary>"""
+            ),
+            comment_code,
+        )
 
     def test_summary_with_class_reference(self) -> None:
         comment_code = TestDescription.render(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                '''\
                 class Some_class:
                     """Do & drink :class:`.Some_class`."""
-                '''))
+                '''
+            )
+        )
 
         self.assertEqual(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                """\
                 /// <summary>
                 /// Do &amp; drink <see cref="SomeClass" />.
-                /// </summary>'''), comment_code)
+                /// </summary>"""
+            ),
+            comment_code,
+        )
 
     def test_summary_with_interface_reference(self) -> None:
         comment_code = TestDescription.render(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                '''\
                 @abstract
                 class Some_class:
                     """Do & drink :class:`.Some_class`."""
-                '''))
+                '''
+            )
+        )
 
         self.assertEqual(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                """\
                 /// <summary>
                 /// Do &amp; drink <see cref="ISomeClass" />.
-                /// </summary>'''), comment_code)
+                /// </summary>"""
+            ),
+            comment_code,
+        )
 
     def test_summary_with_enumeration_reference(self) -> None:
         comment_code = TestDescription.render(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                '''\
                 class Some_class(Enum):
                     """Do & drink :class:`.Some_class`."""
-                '''))
+                '''
+            )
+        )
 
         self.assertEqual(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                """\
                 /// <summary>
                 /// Do &amp; drink <see cref="SomeClass" />.
-                /// </summary>'''), comment_code)
+                /// </summary>"""
+            ),
+            comment_code,
+        )
 
     def test_summary_and_remarks(self) -> None:
         comment_code = TestDescription.render(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                '''\
                 class Some_class:
                     """
                     Do & drink something.
@@ -102,22 +136,28 @@ class TestDescription(unittest.TestCase):
                     
                     Second & remark.
                     """
-                '''))
+                '''
+            )
+        )
 
         self.assertEqual(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                """\
                 /// <summary>
                 /// Do &amp; drink something.
                 /// </summary>
                 /// <remarks>
                 /// <para>First &amp; remark.</para>
                 /// <para>Second &amp; remark.</para>
-                /// </remarks>'''),
-            comment_code)
+                /// </remarks>"""
+            ),
+            comment_code,
+        )
 
     def test_summary_remarks_and_fields(self) -> None:
         comment_code = TestDescription.render(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                '''\
                 class Some_class:
                     """
                     Do & drink something.
@@ -133,9 +173,12 @@ class TestDescription(unittest.TestCase):
                         text
                     :returns: some result
                     """
-                '''))
+                '''
+            )
+        )
         self.assertEqual(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                """\
                 /// <summary>
                 /// Do &amp; drink something.
                 /// </summary>
@@ -153,8 +196,10 @@ class TestDescription(unittest.TestCase):
                 /// </param>
                 /// <returns>
                 ///     some result
-                /// </returns>'''),
-            comment_code)
+                /// </returns>"""
+            ),
+            comment_code,
+        )
 
 
 if __name__ == "__main__":

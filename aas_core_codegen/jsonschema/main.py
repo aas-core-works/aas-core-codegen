@@ -188,7 +188,7 @@ def _define_type(
 def _define_properties_and_required(
     symbol: Union[intermediate.Interface, intermediate.Class],
     ref_association: intermediate.Symbol,
-    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName
+    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
 ) -> Tuple[
     Optional[MutableMapping[str, Any]],
     Optional[List[Identifier]],
@@ -216,8 +216,7 @@ def _define_properties_and_required(
     assert len_constraints_by_property is not None
 
     pattern_constraints_by_property = infer_for_schema.infer_pattern_constraints(
-        symbol=symbol,
-        pattern_verifications_by_name=pattern_verifications_by_name
+        symbol=symbol, pattern_verifications_by_name=pattern_verifications_by_name
     )
 
     properties = collections.OrderedDict()
@@ -267,7 +266,7 @@ def _define_for_interface(
     implementers: Sequence[intermediate.Class],
     ids_of_used_interfaces: Set[int],
     ref_association: intermediate.Symbol,
-    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName
+    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
     Generate the definitions resulting from the ``interface``.
@@ -293,8 +292,9 @@ def _define_for_interface(
     errors = []  # type: List[Error]
 
     properties, required, properties_error = _define_properties_and_required(
-        symbol=interface, ref_association=ref_association,
-        pattern_verifications_by_name=pattern_verifications_by_name
+        symbol=interface,
+        ref_association=ref_association,
+        pattern_verifications_by_name=pattern_verifications_by_name,
     )
 
     if properties_error is not None:
@@ -337,8 +337,9 @@ def _define_for_interface(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_for_class(
-    cls: intermediate.Class, ref_association: intermediate.Symbol,
-    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName
+    cls: intermediate.Class,
+    ref_association: intermediate.Symbol,
+    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
     Generate the definition for the intermediate class ``cls``.
@@ -366,8 +367,9 @@ def _define_for_class(
     errors = []  # type: List[Error]
 
     properties, required, properties_error = _define_properties_and_required(
-        symbol=cls, ref_association=ref_association,
-        pattern_verifications_by_name=pattern_verifications_by_name
+        symbol=cls,
+        ref_association=ref_association,
+        pattern_verifications_by_name=pattern_verifications_by_name,
     )
 
     if properties_error is not None:
@@ -515,7 +517,7 @@ def _generate(
                     implementers=interface_implementers.get(symbol, []),
                     ids_of_used_interfaces=ids_of_used_interfaces,
                     ref_association=symbol_table.ref_association,
-                    pattern_verifications_by_name=pattern_verifications_by_name
+                    pattern_verifications_by_name=pattern_verifications_by_name,
                 )
 
                 if definition_errors is not None:
@@ -524,8 +526,9 @@ def _generate(
 
             elif isinstance(symbol, intermediate.Class):
                 extension, definition_errors = _define_for_class(
-                    cls=symbol, ref_association=symbol_table.ref_association,
-                    pattern_verifications_by_name=pattern_verifications_by_name
+                    cls=symbol,
+                    ref_association=symbol_table.ref_association,
+                    pattern_verifications_by_name=pattern_verifications_by_name,
                 )
 
                 if definition_errors is not None:

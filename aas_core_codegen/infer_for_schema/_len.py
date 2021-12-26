@@ -50,8 +50,9 @@ class _ExactLength(_Constraint):
 class _LenOnMemberOrName:
     """Represent a match on a call to ``len(.)`` on a member or a name."""
 
-    def __init__(self,
-                 member_or_name: Union[parse_tree.Member, parse_tree.Name]) -> None:
+    def __init__(
+        self, member_or_name: Union[parse_tree.Member, parse_tree.Name]
+    ) -> None:
         """Initialize with the given values."""
         self.member_or_name = member_or_name
 
@@ -91,9 +92,9 @@ class _LenConstraintOnMemberOrName:
     """
 
     def __init__(
-            self,
-            member_or_name: Union[parse_tree.Member, parse_tree.Name],
-            constraint: _Constraint
+        self,
+        member_or_name: Union[parse_tree.Member, parse_tree.Name],
+        constraint: _Constraint,
     ) -> None:
         """Initialize with the given values."""
         self.member_or_name = member_or_name
@@ -101,7 +102,7 @@ class _LenConstraintOnMemberOrName:
 
 
 def _match_len_constraint_on_member_or_name(
-        node: parse_tree.Node,
+    node: parse_tree.Node,
 ) -> Optional[_LenConstraintOnMemberOrName]:
     """
     Match the constraint on ``len`` of a member or a variable.
@@ -144,8 +145,8 @@ def _match_len_constraint_on_member_or_name(
             assert_never(node.op)
 
         return _LenConstraintOnMemberOrName(
-            member_or_name=len_on_member_or_name.member_or_name,
-            constraint=constraint)
+            member_or_name=len_on_member_or_name.member_or_name, constraint=constraint
+        )
 
     # endregion
 
@@ -178,7 +179,8 @@ def _match_len_constraint_on_member_or_name(
             assert_never(node.op)
 
         return _LenConstraintOnMemberOrName(
-            member_or_name=len_on_member_or_name.member_or_name, constraint=constraint)
+            member_or_name=len_on_member_or_name.member_or_name, constraint=constraint
+        )
 
     # endregion
 
@@ -215,19 +217,20 @@ class _LenConstraintOnProperty:
 
 
 def _match_len_constraint_on_property(
-        node: parse_tree.Expression
+    node: parse_tree.Expression,
 ) -> Optional[_LenConstraintOnProperty]:
     """Match a len constraint on a property such as ``len(self.something) < 42``."""
     len_constraint_on_member_or_name = _match_len_constraint_on_member_or_name(node)
 
     if len_constraint_on_member_or_name:
         prop_name = infer_for_schema_common.match_property(
-            len_constraint_on_member_or_name.member_or_name)
+            len_constraint_on_member_or_name.member_or_name
+        )
 
         if prop_name is not None:
             return _LenConstraintOnProperty(
                 prop_name=prop_name,
-                constraint=len_constraint_on_member_or_name.constraint
+                constraint=len_constraint_on_member_or_name.constraint,
             )
 
     return None
@@ -235,7 +238,7 @@ def _match_len_constraint_on_property(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _reduce_constraints(
-        constraints: Sequence[_Constraint]
+    constraints: Sequence[_Constraint],
 ) -> Tuple[Optional[LenConstraint], Optional[List[str]]]:
     """
     Reduce a list of constraints to a range that encompasses all the constraints.
@@ -303,7 +306,7 @@ def _reduce_constraints(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def infer_len_constraints_by_class_properties(
-        cls: intermediate.Class
+    cls: intermediate.Class,
 ) -> Tuple[
     Optional[MutableMapping[intermediate.Property, LenConstraint]],
     Optional[List[Error]],
@@ -338,7 +341,8 @@ def infer_len_constraints_by_class_properties(
         )
         if conditional_on_prop is not None:
             len_constraint_on_prop = _match_len_constraint_on_property(
-                conditional_on_prop.consequent)
+                conditional_on_prop.consequent
+            )
 
         else:
             # Match ``len(self.something) < X``
@@ -350,7 +354,7 @@ def infer_len_constraints_by_class_properties(
                     Error(
                         invariant.body.original_node,
                         f"The property {len_constraint_on_prop.prop_name} does not "
-                        f"appear in the properties of the class {cls.name}"
+                        f"appear in the properties of the class {cls.name}",
                     )
                 )
                 continue
@@ -373,7 +377,8 @@ def infer_len_constraints_by_class_properties(
 
     for prop_name, constraints in constraint_map.items():
         reduced_constraint, reduction_errors = _reduce_constraints(
-            constraints=constraints)
+            constraints=constraints
+        )
 
         if reduction_errors is not None:
             for reduction_error in reduction_errors:
@@ -387,9 +392,7 @@ def infer_len_constraints_by_class_properties(
             continue
 
         prop = cls.properties_by_name.get(prop_name, None)
-        assert (
-                prop is not None
-        ), (
+        assert prop is not None, (
             f"Expected the property {prop_name!r} in the properties "
             f"of the symbol {cls}"
         )
@@ -405,9 +408,7 @@ def infer_len_constraints_by_class_properties(
 
 
 LENGTHABLE_PRIMITIVES = frozenset(
-    [
-        intermediate.PrimitiveType.STR, intermediate.PrimitiveType.BYTEARRAY
-    ]
+    [intermediate.PrimitiveType.STR, intermediate.PrimitiveType.BYTEARRAY]
 )
 
 
@@ -420,11 +421,8 @@ LENGTHABLE_PRIMITIVES = frozenset(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def infer_len_constraint_of_self(
-        constrained_primitive: intermediate.ConstrainedPrimitive
-) -> Tuple[
-    Optional[LenConstraint],
-    Optional[List[Error]],
-]:
+    constrained_primitive: intermediate.ConstrainedPrimitive,
+) -> Tuple[Optional[LenConstraint], Optional[List[Error]],]:
     """
     Infer the constraint on ``len(self)``.
 
@@ -440,15 +438,15 @@ def infer_len_constraint_of_self(
     for invariant in constrained_primitive.parsed.invariants:
         # Match something like ``len(self) < 42``
         len_constraint_on_member_or_name = _match_len_constraint_on_member_or_name(
-            invariant.body)
+            invariant.body
+        )
 
         if len_constraint_on_member_or_name:
             # Abbreviate for readability
             member_or_name = len_constraint_on_member_or_name.member_or_name
 
-            if (
-                    isinstance(member_or_name, parse_tree.Name)
-                    and (member_or_name.identifier == 'self')
+            if isinstance(member_or_name, parse_tree.Name) and (
+                member_or_name.identifier == "self"
             ):
                 constraints.append(len_constraint_on_member_or_name.constraint)
 
@@ -461,8 +459,7 @@ def infer_len_constraint_of_self(
 
     # region Compress the loose constraints
 
-    reduced_constraint, reduction_errors = _reduce_constraints(
-        constraints=constraints)
+    reduced_constraint, reduction_errors = _reduce_constraints(constraints=constraints)
 
     if reduction_errors is not None:
         for reduction_error in reduction_errors:

@@ -83,12 +83,12 @@ class Unroller(DBC):
     @require(lambda item_level: item_level >= 0)
     @require(lambda key_value_level: key_value_level >= 0)
     def unroll(
-            self,
-            unrollee_expr: str,
-            type_annotation: intermediate.TypeAnnotation,
-            path: List[str],
-            item_level: int,
-            key_value_level: int,
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.TypeAnnotation,
+        path: List[str],
+        item_level: int,
+        key_value_level: int,
     ) -> List[Node]:
         """
         Dispatch the given type annotation to unrolling.
@@ -112,7 +112,7 @@ class Unroller(DBC):
                 type_annotation=type_annotation,
                 path=path,
                 item_level=item_level,
-                key_value_level=key_value_level
+                key_value_level=key_value_level,
             )
 
         elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
@@ -121,7 +121,7 @@ class Unroller(DBC):
                 type_annotation=type_annotation,
                 path=path,
                 item_level=item_level,
-                key_value_level=key_value_level
+                key_value_level=key_value_level,
             )
 
         elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
@@ -130,7 +130,7 @@ class Unroller(DBC):
                 type_annotation=type_annotation,
                 path=path,
                 item_level=item_level,
-                key_value_level=key_value_level
+                key_value_level=key_value_level,
             )
 
         elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
@@ -139,7 +139,7 @@ class Unroller(DBC):
                 type_annotation=type_annotation,
                 path=path,
                 item_level=item_level,
-                key_value_level=key_value_level
+                key_value_level=key_value_level,
             )
         elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
             return self._unroll_ref_type_annotation(
@@ -147,67 +147,67 @@ class Unroller(DBC):
                 type_annotation=type_annotation,
                 path=path,
                 item_level=item_level,
-                key_value_level=key_value_level
+                key_value_level=key_value_level,
             )
         else:
             assert_never(type_annotation)
 
     @abc.abstractmethod
     def _unroll_primitive_type_annotation(
-            self,
-            unrollee_expr: str,
-            type_annotation: intermediate.PrimitiveTypeAnnotation,
-            path: List[str],
-            item_level: int,
-            key_value_level: int,
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.PrimitiveTypeAnnotation,
+        path: List[str],
+        item_level: int,
+        key_value_level: int,
     ) -> List[Node]:
         """Generate code for the given specific ``type_annotation``."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def _unroll_our_type_annotation(
-            self,
-            unrollee_expr: str,
-            type_annotation: intermediate.OurTypeAnnotation,
-            path: List[str],
-            item_level: int,
-            key_value_level: int,
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.OurTypeAnnotation,
+        path: List[str],
+        item_level: int,
+        key_value_level: int,
     ) -> List[Node]:
         """Generate code for the given specific ``type_annotation``."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def _unroll_list_type_annotation(
-            self,
-            unrollee_expr: str,
-            type_annotation: intermediate.ListTypeAnnotation,
-            path: List[str],
-            item_level: int,
-            key_value_level: int,
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.ListTypeAnnotation,
+        path: List[str],
+        item_level: int,
+        key_value_level: int,
     ) -> List[Node]:
         """Generate code for the given specific ``type_annotation``."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def _unroll_optional_type_annotation(
-            self,
-            unrollee_expr: str,
-            type_annotation: intermediate.OptionalTypeAnnotation,
-            path: List[str],
-            item_level: int,
-            key_value_level: int,
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.OptionalTypeAnnotation,
+        path: List[str],
+        item_level: int,
+        key_value_level: int,
     ) -> List[Node]:
         """Generate code for the given specific ``type_annotation``."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def _unroll_ref_type_annotation(
-            self,
-            unrollee_expr: str,
-            type_annotation: intermediate.RefTypeAnnotation,
-            path: List[str],
-            item_level: int,
-            key_value_level: int,
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.RefTypeAnnotation,
+        path: List[str],
+        item_level: int,
+        key_value_level: int,
     ) -> List[Node]:
         """Generate code for the given specific ``type_annotation``."""
         raise NotImplementedError()

@@ -3,7 +3,6 @@ import abc
 import ast
 import collections
 import enum
-import itertools
 import pathlib
 from typing import (
     Sequence,
@@ -14,37 +13,20 @@ from typing import (
     MutableMapping,
     List,
     Tuple,
-    Set,
     Final,
-    FrozenSet, OrderedDict, Iterable,
-)
+    FrozenSet,
+    OrderedDict, )
 
 import docutils.nodes
 from icontract import require, invariant, ensure, DBC
 
 from aas_core_codegen import parse
-from aas_core_codegen.parse import (
-    tree as parse_tree
-)
-from aas_core_codegen.common import Identifier, assert_never, Error
+from aas_core_codegen.common import Identifier, assert_never, Error, \
+    assert_union_of_descendants_exhaustive
 from aas_core_codegen.intermediate import construction
+from aas_core_codegen.parse import tree as parse_tree
 
 _MODULE_NAME = pathlib.Path(__file__).parent.name
-
-
-class AtomicTypeAnnotation(DBC):
-    """
-    Represent an atomic type annotation.
-
-    Atomic, in this context, means a non-generic type annotation.
-
-    For example, ``Asset`` or ``int``.
-    """
-
-    @abc.abstractmethod
-    def __str__(self) -> str:
-        # Signal that this is a purely abstract class
-        raise NotImplementedError()
 
 
 class PrimitiveType(enum.Enum):
@@ -66,19 +48,35 @@ STR_TO_PRIMITIVE_TYPE = {
 }  # type: Mapping[str, PrimitiveType]
 
 
-class PrimitiveTypeAnnotation(AtomicTypeAnnotation):
+class TypeAnnotation(DBC):
+    """Represent a general type annotation."""
+
+    #: Relation to the parse stage
+    parsed: Final[parse.TypeAnnotation]
+
+    def __init__(self, parsed: parse.TypeAnnotation) -> None:
+        """Initialize with the given values."""
+        self.parsed = parsed
+
+    @abc.abstractmethod
+    def __str__(self) -> str:
+        # Signal that this class is a purely abstract one
+        raise NotImplementedError()
+
+
+class PrimitiveTypeAnnotation(TypeAnnotation):
     """Represent a primitive type such as ``int``."""
 
     def __init__(self, a_type: PrimitiveType, parsed: parse.TypeAnnotation) -> None:
         """Initialize with the given values."""
+        TypeAnnotation.__init__(self, parsed=parsed)
         self.a_type = a_type
-        self.parsed = parsed
 
     def __str__(self) -> str:
         return str(self.a_type.value)
 
 
-class OurTypeAnnotation(AtomicTypeAnnotation):
+class OurTypeAnnotation(TypeAnnotation):
     """
     Represent an atomic annotation defined by a symbol in the meta-model.
 
@@ -87,27 +85,20 @@ class OurTypeAnnotation(AtomicTypeAnnotation):
 
     def __init__(self, symbol: "Symbol", parsed: parse.TypeAnnotation) -> None:
         """Initialize with the given values."""
+        TypeAnnotation.__init__(self, parsed=parsed)
         self.symbol = symbol
-        self.parsed = parsed
 
     def __str__(self) -> str:
         return self.symbol.name
 
 
-class SubscriptedTypeAnnotation:
-    """Represent a subscripted (i.e. generic) type annotation.
-
-    The subscripted type annotations are, for example, ``List[...]`` (or
-    ``Mapping[..., ...]``, *etc.*).
-    """
-
-
-class ListTypeAnnotation(SubscriptedTypeAnnotation):
+class ListTypeAnnotation(TypeAnnotation):
     """Represent a type annotation involving a ``List[...]``."""
 
-    def __init__(self, items: "TypeAnnotation", parsed: parse.TypeAnnotation):
+    def __init__(self, items: "TypeAnnotationUnion", parsed: parse.TypeAnnotation):
+        TypeAnnotation.__init__(self, parsed=parsed)
+
         self.items = items
-        self.parsed = parsed
 
     def __str__(self) -> str:
         return f"List[{self.items}]"
@@ -118,32 +109,41 @@ class ListTypeAnnotation(SubscriptedTypeAnnotation):
 # add support for ``Set``, ``MutableMapping`` *etc.*
 
 
-class OptionalTypeAnnotation(SubscriptedTypeAnnotation):
+class OptionalTypeAnnotation(TypeAnnotation):
     """Represent a type annotation involving an ``Optional[...]``."""
 
-    def __init__(self, value: "TypeAnnotation", parsed: parse.TypeAnnotation):
+    def __init__(self, value: "TypeAnnotationUnion", parsed: parse.TypeAnnotation):
+        TypeAnnotation.__init__(self, parsed=parsed)
+
         self.value = value
-        self.parsed = parsed
 
     def __str__(self) -> str:
         return f"Optional[{self.value}]"
 
 
-class RefTypeAnnotation(SubscriptedTypeAnnotation):
+class RefTypeAnnotation(TypeAnnotation):
     """Represent a type annotation involving a reference ``Ref[...]``."""
 
-    def __init__(self, value: "TypeAnnotation", parsed: parse.TypeAnnotation):
+    def __init__(self, value: "TypeAnnotationUnion", parsed: parse.TypeAnnotation):
+        TypeAnnotation.__init__(self, parsed=parsed)
+
         self.value = value
-        self.parsed = parsed
 
     def __str__(self) -> str:
         return f"Ref[{self.value}]"
 
 
-TypeAnnotation = Union[AtomicTypeAnnotation, SubscriptedTypeAnnotation]
+TypeAnnotationUnion = Union[
+    PrimitiveTypeAnnotation, OurTypeAnnotation, ListTypeAnnotation,
+    OptionalTypeAnnotation, RefTypeAnnotation
+]
+
+assert_union_of_descendants_exhaustive(
+    union=TypeAnnotationUnion, base_class=TypeAnnotation)
 
 
-def type_annotations_equal(that: TypeAnnotation, other: TypeAnnotation) -> bool:
+def type_annotations_equal(
+        that: TypeAnnotationUnion, other: TypeAnnotationUnion) -> bool:
     """
     Compare two type annotations for equality.
 
@@ -155,15 +155,23 @@ def type_annotations_equal(that: TypeAnnotation, other: TypeAnnotation) -> bool:
     if isinstance(that, PrimitiveTypeAnnotation):
         assert isinstance(other, PrimitiveTypeAnnotation)
         return that.a_type == other.a_type
+
     elif isinstance(that, OurTypeAnnotation):
         assert isinstance(other, OurTypeAnnotation)
         return that.symbol == other.symbol
+
     elif isinstance(that, ListTypeAnnotation):
         assert isinstance(other, ListTypeAnnotation)
         return type_annotations_equal(that.items, other.items)
+
     elif isinstance(that, OptionalTypeAnnotation):
         assert isinstance(other, OptionalTypeAnnotation)
         return type_annotations_equal(that.value, other.value)
+
+    elif isinstance(that, RefTypeAnnotation):
+        assert isinstance(other, RefTypeAnnotation)
+        return type_annotations_equal(that.value, other.value)
+
     else:
         assert_never(that)
 
@@ -181,12 +189,30 @@ class Description:
 class Property:
     """Represent a property of a class."""
 
+    #: Name of the property
+    name: Final[Identifier]
+
+    #: Type annotation of the property
+    type_annotation: Final[TypeAnnotationUnion]
+
+    #: Description of the property, if any
+    description: Final[Optional[Description]]
+
+    #: The original class where this property is specified.
+    #: We stack all the properties over the ancestors, so using ``implemented_for``
+    #: you can distinguish between inherited properties and genuine properties of
+    #: a class.
+    implemented_for: Final["Class"]
+
+    #: Relation to the property from the parse stage
+    parsed: Final[parse.Property]
+
     def __init__(
             self,
             name: Identifier,
-            type_annotation: TypeAnnotation,
+            type_annotation: TypeAnnotationUnion,
             description: Optional[Description],
-            implemented_for: Optional["Symbol"],
+            implemented_for: "Class",
             parsed: parse.Property,
     ) -> None:
         """Initialize with the given values."""
@@ -206,6 +232,12 @@ class Property:
 class DefaultConstant:
     """Represent a constant value as a default for an argument."""
 
+    #: The default value
+    value: Final[Union[bool, int, float, str, None]]
+
+    #: Relation to the parsed stage
+    parsed: Final[parse.Default]
+
     def __init__(
             self, value: Union[bool, int, float, str, None], parsed: parse.Default
     ) -> None:
@@ -216,6 +248,15 @@ class DefaultConstant:
 
 class DefaultEnumerationLiteral:
     """Represent an enumeration literal as a default for an argument."""
+
+    #: Related enumeration
+    enumeration: Final["Enumeration"]
+
+    #: Related enumeration literal
+    literal: Final["EnumerationLiteral"]
+
+    #: Relation to the parse stage
+    parsed: Final[parse.Default]
 
     # fmt: off
     @require(
@@ -242,10 +283,22 @@ Default = Union[DefaultConstant, DefaultEnumerationLiteral]
 class Argument:
     """Represent an argument of a method (both of an interface and of class)."""
 
+    #: Name of the argument
+    name: Final[Identifier]
+
+    #: Type annotation of the argument
+    type_annotation: Final[TypeAnnotationUnion]
+
+    #: Default value of the argument, if any
+    default: Final[Optional[Default]]
+
+    #: Relation to the parse stage
+    parsed: Final[parse.Argument]
+
     def __init__(
             self,
             name: Identifier,
-            type_annotation: TypeAnnotation,
+            type_annotation: TypeAnnotationUnion,
             default: Optional[Default],
             parsed: parse.Argument,
     ) -> None:
@@ -272,11 +325,19 @@ class Serialization:
 class Invariant:
     """Represent an invariant of a class."""
 
+    #: Human-readable description of the invariant, if any
+    description: Final[Optional[str]]
+
+    #: Understood body of the invariant
+    body: Final[parse_tree.Node]
+
+    #: Relation to the parse stage
+    parsed: Final[parse.Invariant]
+
     def __init__(
-            self,
-            description: Optional[str],
-            body: parse_tree.Node,
-            parsed: parse.Invariant) -> None:
+            self, description: Optional[str], body: parse_tree.Node,
+            parsed: parse.Invariant
+    ) -> None:
         self.description = description
         self.body = body
         self.parsed = parsed
@@ -284,6 +345,18 @@ class Invariant:
 
 class Contract:
     """Represent a contract of a method."""
+
+    #: Argument names of the contract
+    args: Final[Sequence[Identifier]]
+
+    #: Human-readable description of the contract, if any
+    description: Final[Optional[str]]
+
+    #: Understood body of the contract
+    body: Final[parse_tree.Node]
+
+    #: Relation to the parse stage
+    parsed: Final[parse.Contract]
 
     def __init__(
             self,
@@ -301,6 +374,18 @@ class Contract:
 
 class Snapshot:
     """Represent a snapshot of an OLD value capture before the method execution."""
+
+    #: Argument names of the snapshot
+    args: Final[Sequence[Identifier]]
+
+    #: Understood body of the snapshot
+    body: Final[parse_tree.Node]
+
+    #: Name of the snapshot variable
+    name: Final[Identifier]
+
+    #: Relation to parse stage
+    parsed: Final[parse.Snapshot]
 
     def __init__(
             self,
@@ -335,18 +420,33 @@ class SignatureLike(DBC):
     """
     Represent a signature-like "something".
 
-    This can be either a class method or a function.
+    This can be either a signature of a method, a method or a function.
     """
+
+    #: Name of the signature-like
     name: Final[Identifier]
+
+    #: Arguments of the signature-like
     arguments: Final[Sequence[Argument]]
-    returns: Final[Optional[TypeAnnotation]]
+
+    #: Return type of the signature-like
+    returns: Final[Optional[TypeAnnotationUnion]]
+
+    #: Description of the signature-like, if any
     description: Final[Optional[Description]]
+
+    #: List of contracts of the signature-like. The contracts are stacked from the
+    #: ancestors.
     contracts: Final[Contracts]
 
+    # NOTE (mristin, 2021-12-26):
     # The ``parsed`` must be optional since constructors can be synthesized without
     # being defined in the original meta-model.
-    parsed: Final[Optional[parse.Method]]
 
+    #: Relation to the parse stage
+    parsed: Optional[parse.Method]
+
+    #: Map arguments by their names
     arguments_by_name: Final[Mapping[Identifier, Argument]]
 
     # fmt: off
@@ -382,10 +482,10 @@ class SignatureLike(DBC):
             self,
             name: Identifier,
             arguments: Sequence[Argument],
-            returns: Optional[TypeAnnotation],
+            returns: Optional[TypeAnnotationUnion],
             description: Optional[Description],
             contracts: Contracts,
-            parsed: parse.Method,
+            parsed: Optional[parse.Method],
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -396,8 +496,7 @@ class SignatureLike(DBC):
         self.parsed = parsed
 
         self.arguments_by_name = {
-            argument.name: argument
-            for argument in self.arguments
+            argument.name: argument for argument in self.arguments
         }
 
     @abc.abstractmethod
@@ -408,6 +507,13 @@ class SignatureLike(DBC):
 
 class Method(SignatureLike):
     """Represent a method of a class."""
+
+    # NOTE (mristin, 2021-12-26):
+    # The ``parsed`` must be optional in the parent class, ``SignatureLike``, since
+    # constructors can be synthesized without being defined in the original meta-model.
+    #
+    # However, methods are never synthesized so we always have a clear link to the parse
+    # stage.
 
     parsed: parse.Method
 
@@ -447,7 +553,7 @@ class Method(SignatureLike):
             self,
             name: Identifier,
             arguments: Sequence[Argument],
-            returns: Optional[TypeAnnotation],
+            returns: Optional[TypeAnnotationUnion],
             description: Optional[Description],
             contracts: Contracts,
             parsed: parse.Method,
@@ -460,7 +566,7 @@ class Method(SignatureLike):
             returns=returns,
             description=description,
             contracts=contracts,
-            parsed=parsed
+            parsed=parsed,
         )
 
     @abc.abstractmethod
@@ -474,8 +580,19 @@ class Method(SignatureLike):
 # that we will try to understand the methods in the very near future so we already
 # prepare the class hierarchy for it.
 
+
 class ImplementationSpecificMethod(Method):
     """Represent an implementation-specific method of a class."""
+
+    # NOTE (mristin, 2021-12-26):
+    # The ``parsed`` must be optional in the parent class, ``SignatureLike``, since
+    # constructors can be synthesized without being defined in the original meta-model.
+    #
+    # However, methods are never synthesized so we always have a clear link to the parse
+    # stage here.
+
+    #: Relation to parse stage
+    parsed: parse.Method
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -494,22 +611,10 @@ class Constructor(SignatureLike):
     #: Interpreted statements of the constructor, stacked over all the ancestors
     statements: Final[Sequence[construction.AssignArgument]]
 
-    # fmt: on
-    @require(
-        lambda arguments: len(arguments) == len(set(arg.name for arg in arguments))
-    )
-    @ensure(
-        lambda self:
-        len(self.arguments) == len(self.arguments_by_name)
-        and all(
-            (
-                    mapped_arg := self.arguments_by_name.get(argument.name, None),
-                    mapped_arg is not None and id(mapped_arg) == id(argument)
-            )[1]
-            for argument in self.arguments
-        ), "``arguments_by_name`` consistent"
-    )
-    # fmt: off
+    #: If set, the constructor is implementation-specific and we need to provide
+    #: a snippet for it.
+    is_implementation_specific: Final[bool]
+
     def __init__(
             self,
             is_implementation_specific: bool,
@@ -698,8 +803,8 @@ class ConstrainedPrimitive:
     def __init__(
             self,
             name: Identifier,
-            inheritances: Sequence['ConstrainedPrimitive'],
-            descendants: Sequence['ConstrainedPrimitive'],
+            inheritances: Sequence["ConstrainedPrimitive"],
+            descendants: Sequence["ConstrainedPrimitive"],
             constrainee: PrimitiveType,
             is_implementation_specific: bool,
             invariants: Sequence[Invariant],
@@ -717,18 +822,14 @@ class ConstrainedPrimitive:
 
         self.invariant_id_set = frozenset(id(inv) for inv in self.invariants)
 
-    def _set_descendants(
-            self,
-            descendants: Sequence["ConstrainedPrimitive"]
-    ) -> None:
+    def _set_descendants(self, descendants: Sequence["ConstrainedPrimitive"]) -> None:
         """
         Set the descendants in the constrained primitive.
 
         This method is expected to be called only during the translation phase.
         """
         self._descendant_id_set = frozenset(
-            id(descendant)
-            for descendant in descendants
+            id(descendant) for descendant in descendants
         )
 
     def __repr__(self) -> str:
@@ -757,7 +858,7 @@ class ConstrainedPrimitive:
         )
 
 
-class Class:
+class Class(DBC):
     """Represent an abstract or a concrete class."""
 
     #: Name of the class
@@ -769,10 +870,10 @@ class Class:
     # We have to decorate inheritances with ``@property`` so that the translation code
     # is forced to use ``_set_inheritances``.
 
-    _inheritances: Sequence["Class"]
+    _inheritances: Sequence["ClassUnion"]
 
     @property
-    def inheritances(self) -> Sequence["Class"]:
+    def inheritances(self) -> Sequence["ClassUnion"]:
         """Return direct parents that this class inherits from."""
         return self._inheritances
 
@@ -865,9 +966,9 @@ class Class:
     def __init__(
             self,
             name: Identifier,
-            inheritances: Sequence["Class"],
+            inheritances: Sequence["ClassUnion"],
             interface: Optional["Interface"],
-            descendants: Sequence["Class"],
+            descendants: Sequence["ClassUnion"],
             is_implementation_specific: bool,
             properties: Sequence[Property],
             methods: Sequence[Method],
@@ -892,15 +993,11 @@ class Class:
         self.description = description
         self.parsed = parsed
 
-        self.properties_by_name = {
-            prop.name: prop for prop in self.properties
-        }
+        self.properties_by_name = {prop.name: prop for prop in self.properties}
 
         self.property_id_set = frozenset(id(prop) for prop in self.properties)
 
-        self.methods_by_name = {
-            method.name: method for method in self.methods
-        }
+        self.methods_by_name = {method.name: method for method in self.methods}
 
         self.invariant_id_set = frozenset(id(inv) for inv in self.invariants)
 
@@ -911,7 +1008,7 @@ class Class:
         "No duplicate inheritances"
     )
     # fmt: on
-    def _set_inheritances(self, inheritances: Sequence["Class"]) -> None:
+    def _set_inheritances(self, inheritances: Sequence["ClassUnion"]) -> None:
         """
         Set the inheritances in the class.
 
@@ -923,18 +1020,14 @@ class Class:
             id(inheritance) for inheritance in self._inheritances
         )
 
-    def _set_descendants(
-            self,
-            descendants: Sequence["Class"]
-    ) -> None:
+    def _set_descendants(self, descendants: Sequence["ClassUnion"]) -> None:
         """
         Set the descendants and the concrete descendants in the class.
 
         This method is expected to be called only during the translation phase.
         """
         self._descendant_id_set = frozenset(
-            id(descendant)
-            for descendant in descendants
+            id(descendant) for descendant in descendants
         )
 
         self._concrete_descendants = [
@@ -970,9 +1063,9 @@ class AbstractClass(Class):
     def __init__(
             self,
             name: Identifier,
-            inheritances: Sequence["Class"],
+            inheritances: Sequence["ClassUnion"],
             interface: "Interface",
-            descendants: Sequence["Class"],
+            descendants: Sequence["ClassUnion"],
             is_implementation_specific: bool,
             properties: Sequence[Property],
             methods: Sequence[Method],
@@ -996,7 +1089,7 @@ class AbstractClass(Class):
             invariants=invariants,
             serialization=serialization,
             description=description,
-            parsed=parsed
+            parsed=parsed,
         )
 
     def __repr__(self) -> str:
@@ -1004,9 +1097,6 @@ class AbstractClass(Class):
         return (
             f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
         )
-
-
-Symbol = Union[Enumeration, ConstrainedPrimitive, Class]
 
 
 class Verification(SignatureLike):
@@ -1043,7 +1133,7 @@ class Verification(SignatureLike):
             self,
             name: Identifier,
             arguments: Sequence[Argument],
-            returns: Optional[TypeAnnotation],
+            returns: Optional[TypeAnnotationUnion],
             description: Optional[Description],
             contracts: Contracts,
             parsed: parse.Method,
@@ -1056,7 +1146,7 @@ class Verification(SignatureLike):
             returns=returns,
             description=description,
             contracts=contracts,
-            parsed=parsed
+            parsed=parsed,
         )
 
     @abc.abstractmethod
@@ -1072,7 +1162,7 @@ class ImplementationSpecificVerification(Verification):
             self,
             name: Identifier,
             arguments: Sequence[Argument],
-            returns: Optional[TypeAnnotation],
+            returns: Optional[TypeAnnotationUnion],
             description: Optional[Description],
             contracts: Contracts,
             parsed: parse.Method,
@@ -1085,7 +1175,7 @@ class ImplementationSpecificVerification(Verification):
             returns=returns,
             description=description,
             contracts=contracts,
-            parsed=parsed
+            parsed=parsed,
         )
 
     def __repr__(self) -> str:
@@ -1128,7 +1218,7 @@ class PatternVerification(Verification):
             self,
             name: Identifier,
             arguments: Sequence[Argument],
-            returns: Optional[TypeAnnotation],
+            returns: Optional[TypeAnnotationUnion],
             description: Optional[Description],
             contracts: Contracts,
             pattern: str,
@@ -1142,7 +1232,7 @@ class PatternVerification(Verification):
             returns=returns,
             description=description,
             contracts=contracts,
-            parsed=parsed
+            parsed=parsed,
         )
 
         self.pattern = pattern
@@ -1161,7 +1251,7 @@ class Signature(SignatureLike):
             self,
             name: Identifier,
             arguments: Sequence[Argument],
-            returns: Optional[TypeAnnotation],
+            returns: Optional[TypeAnnotationUnion],
             description: Optional[Description],
             contracts: Contracts,
             parsed: parse.Method,
@@ -1180,7 +1270,7 @@ class Signature(SignatureLike):
             returns=returns,
             description=description,
             contracts=contracts,
-            parsed=parsed
+            parsed=parsed,
         )
 
     def __repr__(self) -> str:
@@ -1198,6 +1288,7 @@ class Interface:
     it at the intermediate stage to facilitate generation of the code, especially for
     targets where multiple inheritance is not supported.
     """
+
     #: Class which this interface is based on
     base: Final[Class]
 
@@ -1239,8 +1330,7 @@ class Interface:
         self.inheritances = inheritances
 
         implementers = [
-            concrete_descendant
-            for concrete_descendant in base.concrete_descendants
+            concrete_descendant for concrete_descendant in base.concrete_descendants
         ]
 
         if isinstance(base, ConcreteClass):
@@ -1257,7 +1347,7 @@ class Interface:
                 returns=method.returns,
                 description=method.description,
                 contracts=method.contracts,
-                parsed=method.parsed
+                parsed=method.parsed,
             )
             for method in base.methods
         ]
@@ -1305,7 +1395,7 @@ class SymbolTable:
     """Represent all the symbols of the intermediate representation."""
 
     #: List of all symbols that we need for the code generation
-    symbols: Final[Sequence[Symbol]]
+    symbols: Final[Sequence['Symbol']]
 
     #: List of all functions used in the verification
     verification_functions: Final[Sequence[Verification]]
@@ -1319,7 +1409,7 @@ class SymbolTable:
     #: Additional information about the source meta-model
     meta_model: Final[MetaModel]
 
-    _name_to_symbol: Final[Mapping[Identifier, Symbol]]
+    _name_to_symbol: Final[Mapping[Identifier, 'Symbol']]
 
     # fmt: off
     @require(
@@ -1353,10 +1443,10 @@ class SymbolTable:
     # fmt: on
     def __init__(
             self,
-            symbols: Sequence[Symbol],
+            symbols: Sequence['Symbol'],
             verification_functions: Sequence[Verification],
             ref_association: Class,
-            meta_model: parse.MetaModel,
+            meta_model: MetaModel,
     ) -> None:
         """Initialize with the given values and map symbols to name."""
         self.symbols = symbols
@@ -1365,17 +1455,16 @@ class SymbolTable:
         self.meta_model = meta_model
 
         self.verification_functions_by_name = {
-            func.name: func
-            for func in self.verification_functions
+            func.name: func for func in self.verification_functions
         }
 
         self._name_to_symbol = {symbol.name: symbol for symbol in symbols}
 
-    def find(self, name: Identifier) -> Optional[Symbol]:
+    def find(self, name: Identifier) -> Optional['Symbol']:
         """Find the symbol with the given ``name``."""
         return self._name_to_symbol.get(name, None)
 
-    def must_find(self, name: Identifier) -> Symbol:
+    def must_find(self, name: Identifier) -> 'Symbol':
         """
         Find the symbol with the given ``name``.
 
@@ -1391,86 +1480,9 @@ class SymbolTable:
         return result
 
 
-class SymbolReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
-    """Represent a reference in the documentation to a symbol in the symbol table."""
-
-    def __init__(
-            self, symbol: Symbol, rawsource="", text="", *children, **attributes
-    ) -> None:
-        """Initialize with the given symbol and propagate the rest to the parent."""
-        self.symbol = symbol
-        docutils.nodes.TextElement.__init__(
-            self, rawsource, text, *children, **attributes
-        )
-
-
-class PropertyReferenceInDoc:
-    """Model a reference to a property, usually used in the docstrings."""
-
-    @require(lambda cls, prop: id(prop) in cls.property_id_set)
-    def __init__(self, cls: Class, prop: Property) -> None:
-        self.cls = cls
-        self.prop = prop
-
-
-class EnumerationLiteralReferenceInDoc:
-    """Model a reference to an enumeration literal, usually used in the docstrings."""
-
-    @require(lambda symbol, literal: id(literal) in symbol.literal_id_set)
-    def __init__(self, symbol: Enumeration, literal: EnumerationLiteral) -> None:
-        self.symbol = symbol
-        self.literal = literal
-
-
-class AttributeReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
-    """
-    Represent a reference in the documentation to an "attribute".
-
-    The attribute, in this context, refers to the role ``:attr:``. The references
-    implies either a reference to a property of a class or a literal of an enumeration.
-    """
-
-    def __init__(
-            self,
-            reference: Union[PropertyReferenceInDoc, EnumerationLiteralReferenceInDoc],
-            rawsource="",
-            text="",
-            *children,
-            **attributes,
-    ) -> None:
-        """Initialize with ``property_name`` and propagate the rest to the parent."""
-        self.reference = reference
-        docutils.nodes.TextElement.__init__(
-            self, rawsource, text, *children, **attributes
-        )
-
-
-class ArgumentReferenceInDoc(docutils.nodes.Inline, docutils.nodes.TextElement):
-    """
-    Represent a reference in the documentation to a method argument ("parameter").
-
-    The argument, in this context, refers to the role ``:paramref:``.
-    """
-
-    def __init__(
-            self,
-            reference: str,
-            rawsource="",
-            text="",
-            *children,
-            **attributes,
-    ) -> None:
-        """Initialize with ``reference`` and propagate the rest to the parent."""
-        self.reference = reference
-        docutils.nodes.TextElement.__init__(
-            self, rawsource, text, *children, **attributes
-        )
-
-
 def map_descendability(
-        type_annotation: TypeAnnotation,
-        ref_association: Class
-) -> MutableMapping[TypeAnnotation, bool]:
+        type_annotation: TypeAnnotationUnion, ref_association: Class
+) -> MutableMapping[TypeAnnotationUnion, bool]:
     """
     Map the type annotation recursively by the descendability.
 
@@ -1486,9 +1498,9 @@ def map_descendability(
     The ``ref_association`` indicates which symbol to use for representing references
     within an AAS.
     """
-    mapping = dict()  # type: MutableMapping[TypeAnnotation, bool]
+    mapping = dict()  # type: MutableMapping[TypeAnnotationUnion, bool]
 
-    def recurse(a_type_annotation: TypeAnnotation) -> bool:
+    def recurse(a_type_annotation: TypeAnnotationUnion) -> bool:
         """Recursively iterate over subscripted type annotations."""
         if isinstance(a_type_annotation, PrimitiveTypeAnnotation):
             mapping[a_type_annotation] = False
@@ -1520,8 +1532,9 @@ def map_descendability(
             return result
 
         elif isinstance(a_type_annotation, RefTypeAnnotation):
-            assert isinstance(ref_association, Class), (
-                "Explicit assumption for descendability")
+            assert isinstance(
+                ref_association, Class
+            ), "Explicit assumption for descendability"
             mapping[a_type_annotation] = True
             return True
 
@@ -1543,8 +1556,8 @@ class _ConstructorArgumentOfClass:
 
 
 def make_union_of_constructor_arguments(
-        interface: Interface
-) -> Tuple[Optional[OrderedDict[Identifier, TypeAnnotation]], Optional[Error]]:
+        interface: Interface,
+) -> Tuple[Optional[OrderedDict[Identifier, TypeAnnotationUnion]], Optional[Error]]:
     """
     Make a union of all the constructor arguments over all the implementing classes.
 
@@ -1555,7 +1568,8 @@ def make_union_of_constructor_arguments(
     """
     errors = []  # type: List[Error]
 
-    arg_union = collections.OrderedDict(
+    arg_union = (
+        collections.OrderedDict()
     )  # type: OrderedDict[Identifier, List[_ConstructorArgumentOfClass]]
 
     # region Collect
@@ -1576,8 +1590,9 @@ def make_union_of_constructor_arguments(
 
     # region Resolve
 
-    resolution = collections.OrderedDict(
-    )  # type: OrderedDict[Identifier, TypeAnnotation]
+    resolution = (
+        collections.OrderedDict()
+    )  # type: OrderedDict[Identifier, TypeAnnotationUnion]
 
     for arg_name, args_of_clses in arg_union.items():
         # NOTE (mristin, 2021-12-19):
@@ -1588,7 +1603,9 @@ def make_union_of_constructor_arguments(
         # This is the argument that defines the current resolved type.
         defining_arg = None  # type: Optional[_ConstructorArgumentOfClass]
 
-        def normalize_type_annotation(type_anno: TypeAnnotation) -> TypeAnnotation:
+        def normalize_type_annotation(
+                type_anno: TypeAnnotationUnion
+        ) -> TypeAnnotationUnion:
             """Normalize the type annotation by removing prefix ``Optional``'s."""
             while isinstance(type_anno, OptionalTypeAnnotation):
                 type_anno = type_anno.value
@@ -1603,29 +1620,26 @@ def make_union_of_constructor_arguments(
                 defining_arg = arg_of_cls
             else:
                 if type_annotations_equal(
-                        defining_arg.arg.type_annotation,
-                        arg_of_cls.arg.type_annotation
+                        defining_arg.arg.type_annotation, arg_of_cls.arg.type_annotation
                 ):
                     # Leave the previous argument the defining one
                     continue
                 else:
                     if type_annotations_equal(
                             normalize_type_annotation(defining_arg.arg.type_annotation),
-                            normalize_type_annotation(arg_of_cls.arg.type_annotation)
+                            normalize_type_annotation(arg_of_cls.arg.type_annotation),
                     ):
                         # NOTE (mristin, 2021-12-19):
                         # The type with ``Optional`` will win the resolution so that
                         # we allow for strengthening of invariants.
 
                         if isinstance(
-                                defining_arg.arg.type_annotation,
-                                OptionalTypeAnnotation
+                                defining_arg.arg.type_annotation, OptionalTypeAnnotation
                         ):
                             # The defining argument wins.
                             continue
                         elif isinstance(
-                                arg_of_cls.arg.type_annotation,
-                                OptionalTypeAnnotation
+                                arg_of_cls.arg.type_annotation, OptionalTypeAnnotation
                         ):
                             # The current argument wins.
                             defining_arg = arg_of_cls
@@ -1633,7 +1647,8 @@ def make_union_of_constructor_arguments(
                             raise AssertionError(
                                 f"Unexpected case: "
                                 f"{arg_of_cls.arg.type_annotation=}, "
-                                f"{defining_arg.arg.type_annotation=}")
+                                f"{defining_arg.arg.type_annotation=}"
+                            )
                     else:
                         inconsistent = True
 
@@ -1669,3 +1684,9 @@ def make_union_of_constructor_arguments(
         )
 
     return resolution, None
+
+
+ClassUnion = Union[AbstractClass, ConcreteClass]
+assert_union_of_descendants_exhaustive(union=ClassUnion, base_class=Class)
+
+Symbol = Union[Enumeration, ConstrainedPrimitive, ClassUnion]

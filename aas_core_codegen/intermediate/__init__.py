@@ -5,11 +5,9 @@
 from aas_core_codegen.intermediate import _types, _translate, _stringify
 
 TypeAnnotation = _types.TypeAnnotation
-AtomicTypeAnnotation = _types.AtomicTypeAnnotation
 PrimitiveType = _types.PrimitiveType
 PrimitiveTypeAnnotation = _types.PrimitiveTypeAnnotation
 OurTypeAnnotation = _types.OurTypeAnnotation
-SubscriptedTypeAnnotation = _types.SubscriptedTypeAnnotation
 ListTypeAnnotation = _types.ListTypeAnnotation
 OptionalTypeAnnotation = _types.OptionalTypeAnnotation
 RefTypeAnnotation = _types.RefTypeAnnotation
@@ -40,11 +38,6 @@ PatternVerification = _types.PatternVerification
 Signature = _types.Signature
 Interface = _types.Interface
 SymbolTable = _types.SymbolTable
-SymbolReferenceInDoc = _types.SymbolReferenceInDoc
-PropertyReferenceInDoc = _types.PropertyReferenceInDoc
-EnumerationLiteralReferenceInDoc = _types.EnumerationLiteralReferenceInDoc
-AttributeReferenceInDoc = _types.AttributeReferenceInDoc
-ArgumentReferenceInDoc = _types.ArgumentReferenceInDoc
 
 map_descendability = _types.map_descendability
 make_union_of_constructor_arguments = _types.make_union_of_constructor_arguments

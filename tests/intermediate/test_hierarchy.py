@@ -10,10 +10,12 @@ class Test_ontology_ok(unittest.TestCase):
     def test_no_ancestors(self) -> None:
         symbol_table, error = tests.common.parse_source(
             textwrap.dedent(
-                '''\
+                """\
                 class Something:
                     pass
-                '''))
+                """
+            )
+        )
 
         assert error is None, f"{error=}"
         assert symbol_table is not None
@@ -23,7 +25,8 @@ class Test_ontology_ok(unittest.TestCase):
         assert ontology is not None
 
         ancestors = ontology.list_ancestors(
-            cls=symbol_table.must_find_class(Identifier("Something")))
+            cls=symbol_table.must_find_class(Identifier("Something"))
+        )
 
         ancestor_names = [cls.name for cls in ancestors]
         self.assertListEqual([], ancestor_names)
@@ -31,7 +34,7 @@ class Test_ontology_ok(unittest.TestCase):
     def test_complex_graph(self) -> None:
         symbol_table, error = tests.common.parse_source(
             textwrap.dedent(
-                '''\
+                """\
                 @abstract
                 class Another_grand_parent:
                     pass
@@ -50,7 +53,9 @@ class Test_ontology_ok(unittest.TestCase):
 
                 class Something(Parent, Another_parent):
                     pass
-                '''))
+                """
+            )
+        )
 
         assert symbol_table is not None
 
@@ -59,21 +64,29 @@ class Test_ontology_ok(unittest.TestCase):
         assert ontology is not None
 
         ancestors = ontology.list_ancestors(
-            cls=symbol_table.must_find_class(Identifier("Something")))
+            cls=symbol_table.must_find_class(Identifier("Something"))
+        )
 
         ancestor_names = [cls.name for cls in ancestors]
 
         self.assertListEqual(
-            ['Another_grand_parent', 'Grand_parent', 'Another_parent',
-             'Another_grand_parent', 'Grand_parent', 'Parent'],
-            ancestor_names)
+            [
+                "Another_grand_parent",
+                "Grand_parent",
+                "Another_parent",
+                "Another_grand_parent",
+                "Grand_parent",
+                "Parent",
+            ],
+            ancestor_names,
+        )
 
 
 class Test_ontology_fail(unittest.TestCase):
     def test_duplicate_properties_in_ancestors(self) -> None:
         symbol_table, error = tests.common.parse_source(
             textwrap.dedent(
-                '''\
+                """\
                 @abstract
                 class Abstract:
                     x: int
@@ -81,7 +94,9 @@ class Test_ontology_fail(unittest.TestCase):
                 @abstract
                 class Something(Abstract):
                     x: int
-                '''))
+                """
+            )
+        )
         assert error is None, f"{error=}"
         assert symbol_table is not None
 
@@ -91,12 +106,13 @@ class Test_ontology_fail(unittest.TestCase):
         self.assertEqual(
             "The property has already been defined "
             "in the ancestor class Abstract: x",
-            tests.common.most_underlying_message(errors[0]))
+            tests.common.most_underlying_message(errors[0]),
+        )
 
     def test_duplicate_methods_in_ancestors(self) -> None:
         symbol_table, error = tests.common.parse_source(
             textwrap.dedent(
-                '''\
+                """\
                 @abstract
                 class Abstract:
                     def do_something(self) -> None:
@@ -106,7 +122,9 @@ class Test_ontology_fail(unittest.TestCase):
                 class Something(Abstract):
                     def do_something(self) -> None:
                         pass
-                '''))
+                """
+            )
+        )
         assert error is None, f"{error=}"
         assert symbol_table is not None
 
@@ -116,12 +134,13 @@ class Test_ontology_fail(unittest.TestCase):
         self.assertEqual(
             "The method has already been defined "
             "in the ancestor class Abstract: do_something",
-            tests.common.most_underlying_message(errors[0]))
+            tests.common.most_underlying_message(errors[0]),
+        )
 
     def test_missing_constructor_when_the_parent_has_one(self) -> None:
         symbol_table, error = tests.common.parse_source(
             textwrap.dedent(
-                '''\
+                """\
                 @abstract
                 class Abstract:
                     def __init__(self, x: int) -> None:
@@ -129,7 +148,9 @@ class Test_ontology_fail(unittest.TestCase):
 
                 class Something(Abstract):
                     pass
-                '''))
+                """
+            )
+        )
         assert error is None, f"{error=}"
         assert symbol_table is not None
 
@@ -140,12 +161,13 @@ class Test_ontology_fail(unittest.TestCase):
             "The class Something does not specify a constructor, "
             "but the ancestor class Abstract specifies a constructor "
             "with arguments: self, x",
-            tests.common.most_underlying_message(errors[0]))
+            tests.common.most_underlying_message(errors[0]),
+        )
 
     def test_cycle_inheritance(self) -> None:
         symbol_table, error = tests.common.parse_source(
             textwrap.dedent(
-                '''\
+                """\
                 @abstract
                 class Cycle(Something):
                     pass
@@ -153,7 +175,9 @@ class Test_ontology_fail(unittest.TestCase):
                 @abstract
                 class Something(Cycle):
                     pass
-                '''))
+                """
+            )
+        )
         assert error is None, f"{error=}"
         assert symbol_table is not None
 
@@ -163,7 +187,8 @@ class Test_ontology_fail(unittest.TestCase):
         self.assertEqual(
             "Expected no cycles in the inheritance, "
             "but the class Cycle has been observed in a cycle",
-            tests.common.most_underlying_message(errors[0]))
+            tests.common.most_underlying_message(errors[0]),
+        )
 
 
 class Test_against_real_meta_models(unittest.TestCase):
@@ -175,8 +200,7 @@ class Test_against_real_meta_models(unittest.TestCase):
             assert error is None, f"{meta_model_pth=}, {error=}"
             assert symbol_table is not None
 
-            _, errors = _hierarchy.map_symbol_table_to_ontology(
-                symbol_table)
+            _, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
 
             assert errors is None, f"{meta_model_pth=}, {errors=}"
 

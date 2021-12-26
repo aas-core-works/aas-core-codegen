@@ -20,7 +20,8 @@ class Test_parsing_AST(unittest.TestCase):
             """\
             class Something:
                 pass
-            """)
+            """
+        )
 
         atok, error = parse.source_to_atok(source=source)
         assert atok is not None
@@ -30,7 +31,8 @@ class Test_parsing_AST(unittest.TestCase):
         source = textwrap.dedent(
             """\
             class Something: 12 this is wrong
-            """)
+            """
+        )
 
         atok, error = parse.source_to_atok(source=source)
         assert error is not None
@@ -43,7 +45,8 @@ class Test_checking_imports(unittest.TestCase):
         source = textwrap.dedent(
             """\
             import typing
-            """)
+            """
+        )
 
         atok, error = parse.source_to_atok(source=source)
         assert atok is not None
@@ -51,16 +54,19 @@ class Test_checking_imports(unittest.TestCase):
         errors = parse.check_expected_imports(atok=atok)
         self.assertListEqual(
             [
-                'At line 1 and column 1: '
-                'Unexpected ``import ...``. '
-                'Only ``from ... import...`` statements are expected.'
-            ], errors)
+                "At line 1 and column 1: "
+                "Unexpected ``import ...``. "
+                "Only ``from ... import...`` statements are expected."
+            ],
+            errors,
+        )
 
     def test_from_import_as_reported(self) -> None:
         source = textwrap.dedent(
             """\
             from typing import List as Lst
-            """)
+            """
+        )
 
         atok, error = parse.source_to_atok(source=source)
         assert atok is not None
@@ -68,15 +74,18 @@ class Test_checking_imports(unittest.TestCase):
         errors = parse.check_expected_imports(atok=atok)
         self.assertListEqual(
             [
-                'At line 1 and column 1: Unexpected ``from ... import ... as ...``. '
-                'Only ``from ... import...`` statements are expected.'
-            ], errors)
+                "At line 1 and column 1: Unexpected ``from ... import ... as ...``. "
+                "Only ``from ... import...`` statements are expected."
+            ],
+            errors,
+        )
 
     def test_unexpected_name_from_module(self) -> None:
         source = textwrap.dedent(
             """\
             from enum import List
-            """)
+            """
+        )
 
         atok, error = parse.source_to_atok(source=source)
         assert atok is not None
@@ -88,13 +97,16 @@ class Test_checking_imports(unittest.TestCase):
                 "At line 1 and column 1: "
                 "Expected to import 'List' from the module typing, "
                 "but it is imported from enum."
-            ], errors)
+            ],
+            errors,
+        )
 
     def test_unexpected_import_from_a_module(self) -> None:
         source = textwrap.dedent(
             """\
             from something import Else
-            """)
+            """
+        )
 
         atok, error = parse.source_to_atok(source=source)
         assert atok is not None
@@ -102,9 +114,8 @@ class Test_checking_imports(unittest.TestCase):
 
         errors = parse.check_expected_imports(atok=atok)
         self.assertListEqual(
-            [
-                "At line 1 and column 1: Unexpected import of a name 'Else'."
-            ], errors)
+            ["At line 1 and column 1: Unexpected import of a name 'Else'."], errors
+        )
 
 
 class Test_parsing_docstring(unittest.TestCase):
@@ -116,26 +127,30 @@ class Test_parsing_docstring(unittest.TestCase):
         The description is expected to belong to a single class, ``Some_class``.
         """
         symbol_table, error = tests.common.parse_source(source)
-        assert error is None, f'{error}'
+        assert error is None, f"{error}"
 
-        symbol = symbol_table.must_find_class(Identifier('Some_class'))
+        symbol = symbol_table.must_find_class(Identifier("Some_class"))
         return symbol.description.document
 
     def test_empty(self) -> None:
-        source = textwrap.dedent('''\
+        source = textwrap.dedent(
+            '''\
             class Some_class:
                 """"""
-            ''')
+            '''
+        )
 
         document = Test_parsing_docstring.parse_and_extract_docstring(source=source)
 
         self.assertEqual(0, len(document.children))
 
     def test_simple_single_line(self) -> None:
-        source = textwrap.dedent('''\
+        source = textwrap.dedent(
+            '''\
             class Some_class:
                 """This is some documentation."""
-            ''')
+            '''
+        )
 
         document = Test_parsing_docstring.parse_and_extract_docstring(source=source)
 
@@ -143,20 +158,21 @@ class Test_parsing_docstring(unittest.TestCase):
         self.assertIsInstance(document.children[0], docutils.nodes.paragraph)
 
     def test_that_multi_line_docstring_is_not_parsed_as_a_block_quote(self) -> None:
-        source = textwrap.dedent('''\
+        source = textwrap.dedent(
+            '''\
             class Some_class:
                 """
                 This is some documentation.
 
                 Another paragraph.
                 """
-            ''')
+            '''
+        )
 
         document = Test_parsing_docstring.parse_and_extract_docstring(source=source)
         self.assertEqual(2, len(document.children))
         self.assertIsInstance(document.children[0], docutils.nodes.paragraph)
         self.assertIsInstance(document.children[1], docutils.nodes.paragraph)
-
 
 
 class Test_against_recorded(unittest.TestCase):
@@ -180,14 +196,10 @@ class Test_against_recorded(unittest.TestCase):
             source = source_pth.read_text()
             symbol_table, error = tests.common.parse_source(source)
 
-            symbol_table_str = (
-                "" if symbol_table is None
-                else parse.dump(symbol_table)
-            )
+            symbol_table_str = "" if symbol_table is None else parse.dump(symbol_table)
 
             error_str = (
-                "" if error is None
-                else tests.common.most_underlying_message(error)
+                "" if error is None else tests.common.most_underlying_message(error)
             )
 
             if Test_against_recorded.RERECORD:
@@ -196,8 +208,10 @@ class Test_against_recorded(unittest.TestCase):
             else:
                 expected_symbol_table_str = expected_symbol_table_pth.read_text()
                 self.assertEqual(
-                    expected_symbol_table_str, symbol_table_str,
-                    f"{case_dir=}, {error=}")
+                    expected_symbol_table_str,
+                    symbol_table_str,
+                    f"{case_dir=}, {error=}",
+                )
 
                 expected_error_str = expected_error_pth.read_text()
                 self.assertEqual(expected_error_str, error_str, f"{case_dir=}")
@@ -208,7 +222,7 @@ class Test_unexpected_class_definitions(unittest.TestCase):
     def error_from_source(source: str) -> Optional[Error]:
         """Encapsulate the observation of the error when parsing a class."""
         atok, parse_exception = parse.source_to_atok(source=source)
-        assert parse_exception is None, f'{parse_exception=}'
+        assert parse_exception is None, f"{parse_exception=}"
         assert atok is not None
 
         symbol_table, error = parse.atok_to_symbol_table(atok=atok)
@@ -218,17 +232,17 @@ class Test_unexpected_class_definitions(unittest.TestCase):
 class Test_parse_type_annotation(unittest.TestCase):
     @staticmethod
     def parse_type_annotation_from_ann_assign(
-            source: str
+        source: str,
     ) -> Tuple[ast.AST, asttokens.ASTTokens]:
         """Encapsulate the parsing of the type annotation of a variable."""
         atok = asttokens.ASTTokens(source, parse=True)
 
         module = atok.tree
         assert isinstance(module, ast.Module)
-        assert len(module.body) == 1, f'{module.body=}'
+        assert len(module.body) == 1, f"{module.body=}"
 
         ann_assign = module.body[0]
-        assert isinstance(ann_assign, ast.AnnAssign), f'{ann_assign=}'
+        assert isinstance(ann_assign, ast.AnnAssign), f"{ann_assign=}"
 
         assert ann_assign.annotation is not None
 
@@ -236,7 +250,8 @@ class Test_parse_type_annotation(unittest.TestCase):
 
     def test_atomic(self) -> None:
         anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: int")
+            "x: int"
+        )
 
         type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
         assert error is None, f"{error=}"
@@ -245,7 +260,8 @@ class Test_parse_type_annotation(unittest.TestCase):
 
     def test_subscripted(self) -> None:
         anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: Mapping[str, Optional[int]]")
+            "x: Mapping[str, Optional[int]]"
+        )
 
         type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
         assert error is None, f"{error=}"
@@ -254,7 +270,8 @@ class Test_parse_type_annotation(unittest.TestCase):
 
     def test_nested(self) -> None:
         anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: Optional[List[Reference]]")
+            "x: Optional[List[Reference]]"
+        )
 
         type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
         assert error is None, f"{error=}"
@@ -265,7 +282,8 @@ class Test_parse_type_annotation(unittest.TestCase):
 class Test_parse_type_annotation_fail(unittest.TestCase):
     def test_ellipsis(self) -> None:
         anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: Mapping[str, ...]")
+            "x: Mapping[str, ...]"
+        )
 
         type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
         assert error is not None
@@ -273,11 +291,13 @@ class Test_parse_type_annotation_fail(unittest.TestCase):
         self.assertEqual(
             "Expected a string literal if the type annotation is given as a constant, "
             "but got: Ellipsis (as <class 'ellipsis'>)",
-            error.message)
+            error.message,
+        )
 
     def test_non_name_type_identifier(self) -> None:
         anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: (int if True else str)")
+            "x: (int if True else str)"
+        )
 
         type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
         assert error is not None
@@ -286,11 +306,13 @@ class Test_parse_type_annotation_fail(unittest.TestCase):
             "Expected either atomic type annotation (as name or string literal) "
             "or a subscripted one (as a subscript), "
             "but got: int if True else str (as <class '_ast.IfExp'>)",
-            error.message)
+            error.message,
+        )
 
     def test_unexpected_slice_in_index(self) -> None:
         anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: Optional[str:int]")
+            "x: Optional[str:int]"
+        )
 
         type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
         assert error is not None
@@ -298,11 +320,13 @@ class Test_parse_type_annotation_fail(unittest.TestCase):
         self.assertEqual(
             "Expected an index to define a subscripted type annotation, "
             "but got: str:int",
-            error.message)
+            error.message,
+        )
 
     def test_unexpected_expression_in_index(self) -> None:
         anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: Optional[str if True else int]")
+            "x: Optional[str if True else int]"
+        )
 
         type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
         assert error is not None
@@ -310,7 +334,8 @@ class Test_parse_type_annotation_fail(unittest.TestCase):
         self.assertEqual(
             "Expected a tuple, a name, a subscript or a string literal "
             "for a subscripted type annotation, but got: str if True else int",
-            error.message)
+            error.message,
+        )
 
 
 class Test_against_real_meta_models(unittest.TestCase):
@@ -330,7 +355,8 @@ class Test_against_real_meta_models(unittest.TestCase):
                 writer = io.StringIO()
                 writer.write(
                     f"Failed to construct the symbol table "
-                    f"from the file: {meta_model_pth}\n")
+                    f"from the file: {meta_model_pth}\n"
+                )
 
                 lineno_columner = LinenoColumner(atok=atok)
                 writer.write(f"{lineno_columner.error_message(parse_error)}\n")

@@ -7,9 +7,7 @@ from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Stripped, assert_never
-from aas_core_codegen.csharp import (
-    naming as csharp_naming
-)
+from aas_core_codegen.csharp import naming as csharp_naming
 
 
 @ensure(lambda result: result.startswith('"'))
@@ -60,10 +58,10 @@ assert sorted(literal.value for literal in PRIMITIVE_TYPE_MAP.keys()) == sorted(
 
 
 def generate_type(
-        type_annotation: Union[
-            intermediate.SubscriptedTypeAnnotation, intermediate.AtomicTypeAnnotation
-        ],
-        ref_association: intermediate.Class,
+    type_annotation: Union[
+        intermediate.SubscriptedTypeAnnotation, intermediate.AtomicTypeAnnotation
+    ],
+    ref_association: intermediate.Class,
 ) -> Stripped:
     """
     Generate the C# type for the given type annotation.
@@ -104,15 +102,15 @@ def generate_type(
     elif isinstance(type_annotation, intermediate.SubscriptedTypeAnnotation):
         if isinstance(type_annotation, intermediate.ListTypeAnnotation):
             item_type = generate_type(
-                type_annotation=type_annotation.items,
-                ref_association=ref_association)
+                type_annotation=type_annotation.items, ref_association=ref_association
+            )
 
             return Stripped(f"List<{item_type}>")
 
         elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
             value = generate_type(
-                type_annotation=type_annotation.value,
-                ref_association=ref_association)
+                type_annotation=type_annotation.value, ref_association=ref_association
+            )
             return Stripped(f"{value}?")
 
         elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
@@ -157,9 +155,10 @@ WARNING = Stripped(
 
 
 def over_enumerations_classes_and_interfaces(
-        symbol_table: intermediate.SymbolTable
-) -> Iterator[Union[
-    intermediate.Enumeration, intermediate.ConcreteClass, intermediate.Interface]]:
+    symbol_table: intermediate.SymbolTable,
+) -> Iterator[
+    Union[intermediate.Enumeration, intermediate.ConcreteClass, intermediate.Interface]
+]:
     """
     Iterate over all enumerations, concrete classes and interfaces.
 

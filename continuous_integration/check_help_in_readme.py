@@ -180,6 +180,7 @@ def main() -> int:
             result.extend(code_block_lines)
             previous_block = block
 
+        assert previous_block is not None
         result.extend(lines[previous_block.end_line_idx :])
         result.append("")  # new line at the end of file
 

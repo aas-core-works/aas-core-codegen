@@ -9,7 +9,7 @@ from icontract import ensure
 from aas_core_codegen import parse, intermediate
 from aas_core_codegen.intermediate import (
     construction as intermediate_construction,
-    _hierarchy as intermediate_hierarchy
+    _hierarchy as intermediate_hierarchy,
 )
 from aas_core_codegen.common import Error
 
@@ -26,25 +26,26 @@ def most_underlying_message(error: Error) -> str:
     if len(error.underlying) > 1:
         raise ValueError(
             f"Expected all errors to be in a chain, "
-            f"but found an error with more than one underlying causes: {error}")
+            f"but found an error with more than one underlying causes: {error}"
+        )
 
     return most_underlying_message(error.underlying[0])
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def parse_atok(
-        atok: asttokens.ASTTokens
+    atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[parse.SymbolTable], Optional[Error]]:
     """Parse the ``atok``, an abstract syntax tree of a meta-model."""
     import_errors = parse.check_expected_imports(atok=atok)
     if len(import_errors) > 0:
         import_errors_str = "\n".join(
-            f"* {import_error}"
-            for import_error in import_errors
+            f"* {import_error}" for import_error in import_errors
         )
 
         raise AssertionError(
-            f"Unexpected imports in the source code:\n{import_errors_str}")
+            f"Unexpected imports in the source code:\n{import_errors_str}"
+        )
 
     symbol_table, error = parse.atok_to_symbol_table(atok=atok)
     return symbol_table, error
@@ -83,7 +84,8 @@ def list_valid_meta_models_from_test_data() -> List[pathlib.Path]:
     if not meta_models_dir.exists():
         raise FileNotFoundError(
             f"Expected the directory containing the test meta-models "
-            f"to exist: {meta_models_dir}")
+            f"to exist: {meta_models_dir}"
+        )
 
     for case_dir in sorted(meta_models_dir.iterdir()):
         if not case_dir.is_dir():
@@ -94,7 +96,8 @@ def list_valid_meta_models_from_test_data() -> List[pathlib.Path]:
             if not meta_model_pth.is_file():
                 raise RuntimeError(
                     f"Expected the meta-model to be a file, "
-                    f"but it is not: {meta_model_pth}")
+                    f"but it is not: {meta_model_pth}"
+                )
 
             result.append(meta_model_pth)
 
@@ -103,7 +106,7 @@ def list_valid_meta_models_from_test_data() -> List[pathlib.Path]:
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def translate_source_to_intermediate(
-        source: str
+    source: str,
 ) -> Tuple[Optional[intermediate.SymbolTable], Optional[Error]]:
     atok, parse_exception = parse.source_to_atok(source=source)
     if parse_exception:
@@ -115,7 +118,4 @@ def translate_source_to_intermediate(
     assert error is None, f"{error=}"
     assert parsed_symbol_table is not None
 
-    return intermediate.translate(
-        parsed_symbol_table=parsed_symbol_table,
-        atok=atok
-    )
+    return intermediate.translate(parsed_symbol_table=parsed_symbol_table, atok=atok)
