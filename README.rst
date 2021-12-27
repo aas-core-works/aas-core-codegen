@@ -39,18 +39,29 @@ Therefore we can easily scale to many languages and schemas.
 Here is a diagram to illustrate the whole process:
 
 ..
-    digraph {
-        details [label="Details of Asset Administration Shell (the book)"];
-        metamodel [label="Meta-model in a subset of Python\n* Data types\n* Constraints\n* Markers (such as implementation-specific)"];
-        parser [label="Parser"];
-        intermediate [label="Intermediate representation\n(Meta-model-specific, but language agnostic)"];
+    digraph G {
+        node [shape=rect]
 
-        csharpgen [label="C\# generator"];
-        javagen [label="Java generator"];
+        details [label="Details of Asset Administration Shell (the book)"];
+        metamodel [label="Meta-model in a subset of Python\n\n* Data types\n* Constraints\n* Markers"];
+
+        subgraph cluster_1 {
+            label="aas-core-codegen"
+            color=blue
+            labelloc="t"
+            labeljust="r"
+
+            parser [label="Parser"];
+            intermediate [label="Intermediate representation\n(Meta-model-specific, but language agnostic)"];
+
+            csharpgen [label="C\# generator"];
+            javagen [label="Java generator"];
+
+            dot [label="..."];
+        }
 
         csharpcode [label="C\# code"];
         javacode [label="Java code"];
-        dot [label="..."]
 
         details -> metamodel;
         metamodel -> parser;
@@ -60,12 +71,9 @@ Here is a diagram to illustrate the whole process:
         intermediate -> dot;
         csharpgen -> csharpcode;
         javagen -> javacode;
-
-        {rank = same; javagen; csharpgen;}
-        {rank = same; javacode; csharpcode;}
     }
 
-.. image:: https://media.githubusercontent.com/media/aas-core-works/aas-core-codegen/main/diagram.svg
+.. image:: https://raw.githubusercontent.com/aas-core-works/aas-core-codegen/main/diagram.svg
 
 Warning about Stability
 =======================
