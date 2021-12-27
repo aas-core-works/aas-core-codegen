@@ -9,7 +9,7 @@ from icontract import DBC
 from aas_core_codegen import stringify
 from aas_core_codegen.common import Identifier, assert_never
 
-T = TypeVar("T")
+T = TypeVar("T")  # pylint: disable=invalid-name
 
 
 class Node(abc.ABC):
@@ -34,12 +34,32 @@ class Node(abc.ABC):
         raise NotImplementedError()
 
 
-class Statement(Node, abc.ABC):
+class Statement(Node):
     """Represent a statement in a program."""
 
+    @abc.abstractmethod
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        raise NotImplementedError()
 
-class Expression(Node, abc.ABC):
+    @abc.abstractmethod
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the transformer."""
+        raise NotImplementedError()
+
+
+class Expression(Node):
     """Represent an expression in our abstract syntax tree."""
+
+    @abc.abstractmethod
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the transformer."""
+        raise NotImplementedError()
 
 
 class Member(Expression):
@@ -53,7 +73,7 @@ class Member(Expression):
         self, instance: "Expression", name: Identifier, original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
-        Node.__init__(self, original_node=original_node)
+        Expression.__init__(self, original_node=original_node)
         self.instance = instance
         self.name = name
 
@@ -67,6 +87,8 @@ class Member(Expression):
 
 
 class Comparator(enum.Enum):
+    """List comparison operands."""
+
     LT = "LT"
     LE = "LE"
     GT = "GT"
@@ -76,18 +98,18 @@ class Comparator(enum.Enum):
 
 
 class Comparison(Expression):
-    """Represent a comparison."""
+    """Represent a comparison operation."""
 
     def __init__(
         self,
         left: "Expression",
-        op: Comparator,
+        op: Comparator,  # pylint: disable=invalid-name
         right: "Expression",
         original_node: ast.AST,
     ) -> None:
-        Node.__init__(self, original_node=original_node)
+        Expression.__init__(self, original_node=original_node)
         self.left = left
-        self.op = op
+        self.op = op  # pylint: disable=invalid-name
         self.right = right
 
     def transform(self, transformer: "Transformer[T]") -> T:
@@ -106,7 +128,7 @@ class Implication(Expression):
         self, antecedent: "Expression", consequent: "Expression", original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
-        Node.__init__(self, original_node=original_node)
+        Expression.__init__(self, original_node=original_node)
         self.antecedent = antecedent
         self.consequent = consequent
 
@@ -126,7 +148,7 @@ class MethodCall(Expression):
         self, member: Member, args: Sequence["Expression"], original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
-        Node.__init__(self, original_node=original_node)
+        Expression.__init__(self, original_node=original_node)
         self.member = member
         self.args = args
 
@@ -144,7 +166,7 @@ class Name(Expression):
 
     def __init__(self, identifier: Identifier, original_node: ast.AST) -> None:
         """Initialize with the given values."""
-        Node.__init__(self, original_node=original_node)
+        Expression.__init__(self, original_node=original_node)
         self.identifier = identifier
 
     def transform(self, transformer: "Transformer[T]") -> T:
@@ -163,7 +185,7 @@ class FunctionCall(Expression):
         self, name: Name, args: Sequence["Expression"], original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
-        Node.__init__(self, original_node=original_node)
+        Expression.__init__(self, original_node=original_node)
         self.name = name
         self.args = args
 
@@ -183,7 +205,7 @@ class Constant(Expression):
         self, value: Union[bool, int, float, str], original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
-        Node.__init__(self, original_node=original_node)
+        Expression.__init__(self, original_node=original_node)
         self.value = value
 
     def transform(self, transformer: "Transformer[T]") -> T:
@@ -200,7 +222,7 @@ class IsNone(Expression):
 
     def __init__(self, value: Expression, original_node: ast.AST) -> None:
         """Initialize with the given values."""
-        Node.__init__(self, original_node=original_node)
+        Expression.__init__(self, original_node=original_node)
         self.value = value
 
     def transform(self, transformer: "Transformer[T]") -> T:
@@ -217,7 +239,7 @@ class IsNotNone(Expression):
 
     def __init__(self, value: Expression, original_node: ast.AST) -> None:
         """Initialize with the given values."""
-        Node.__init__(self, original_node=original_node)
+        Expression.__init__(self, original_node=original_node)
         self.value = value
 
     def transform(self, transformer: "Transformer[T]") -> T:
@@ -233,7 +255,7 @@ class And(Expression):
     """Represent a conjunction."""
 
     def __init__(self, values: Sequence[Expression], original_node: ast.AST) -> None:
-        Node.__init__(self, original_node=original_node)
+        Expression.__init__(self, original_node=original_node)
         self.values = values
 
     def transform(self, transformer: "Transformer[T]") -> T:
@@ -249,7 +271,7 @@ class Or(Expression):
     """Represent a disjunction."""
 
     def __init__(self, values: Sequence[Expression], original_node: ast.AST) -> None:
-        Node.__init__(self, original_node=original_node)
+        Expression.__init__(self, original_node=original_node)
         self.values = values
 
     def transform(self, transformer: "Transformer[T]") -> T:
@@ -268,7 +290,7 @@ class Declaration(Statement):
         self, identifier: Identifier, value: Expression, original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
-        Node.__init__(self, original_node=original_node)
+        Statement.__init__(self, original_node=original_node)
         self.identifier = identifier
         self.value = value
 
@@ -296,7 +318,7 @@ class ExpressionWithDeclarations(Expression):
         original_node: ast.AST,
     ) -> None:
         """Initialize with the given values."""
-        Node.__init__(self, original_node=original_node)
+        Expression.__init__(self, original_node=original_node)
         self.declarations = declarations
         self.expression = expression
 
@@ -354,7 +376,7 @@ class Assignment(Statement):
         self, target: Expression, value: Expression, original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
-        Node.__init__(self, original_node=original_node)
+        Statement.__init__(self, original_node=original_node)
         self.target = target
         self.value = value
 
@@ -372,7 +394,7 @@ class Return(Statement):
 
     def __init__(self, value: Optional[Expression], original_node: ast.AST) -> None:
         """Initialize with the given values."""
-        Node.__init__(self, original_node=original_node)
+        Statement.__init__(self, original_node=original_node)
         self.value = value
 
     def transform(self, transformer: "Transformer[T]") -> T:

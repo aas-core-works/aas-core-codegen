@@ -6,14 +6,12 @@ The classes
 and :py:class:`aas_core_codegen.intermediate._types.PatternVerification` had to be
 defined in :py:mod:`aas_core_codegen.intermediate._types` to avoid circular imports.
 """
-import ast
 import collections
 import re
 from typing import Optional, Tuple, List, MutableMapping, Mapping
 
 from icontract import require, ensure
 
-from aas_core_codegen.intermediate._types import PatternVerification
 from aas_core_codegen import parse
 from aas_core_codegen.common import Error, Identifier, assert_never
 from aas_core_codegen.parse import tree as parse_tree
@@ -192,7 +190,6 @@ def try_to_understand(
         and isinstance(parsed.arguments[0].type_annotation, parse.AtomicTypeAnnotation)
         and parsed.arguments[0].type_annotation.identifier == "str"
     ):
-        print("exit here")  # TODO: debug
         return None, False, None
 
     # We need to return something,
@@ -201,21 +198,18 @@ def try_to_understand(
         and isinstance(parsed.returns, parse.AtomicTypeAnnotation)
         and parsed.returns.identifier == "bool"
     ):
-        print("exit here 1")  # TODO: debug
         return None, False, None
 
     if len(parsed.body) == 0:
-        print("exit here 2")  # TODO: debug
         return None, False, None
 
     if not isinstance(parsed.body[-1], parse_tree.Return):
-        print("exit here 3")  # TODO: debug
         return None, False, None
 
     return_node = parsed.body[-1]
     assert isinstance(return_node, parse_tree.Return)
 
-    # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test this
+    # BEFORE-RELEASE (mristin, 2021-12-19): test this
     if (
         isinstance(return_node.value, parse_tree.FunctionCall)
         and return_node.value.name.identifier == "match"
@@ -247,7 +241,7 @@ def try_to_understand(
     assert isinstance(match_call, parse_tree.FunctionCall)
     assert match_call.name.identifier == "match"
 
-    # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test this
+    # BEFORE-RELEASE (mristin, 2021-12-19): test this
     if len(match_call.args) < 2:
         return (
             None,
@@ -260,7 +254,7 @@ def try_to_understand(
             ),
         )
 
-    # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test this
+    # BEFORE-RELEASE (mristin, 2021-12-19): test this
     if len(match_call.args) > 2:
         return (
             None,

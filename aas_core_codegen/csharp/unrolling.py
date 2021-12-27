@@ -4,10 +4,10 @@ import io
 import textwrap
 from typing import Sequence, List
 
-from aas_core_codegen import intermediate
-from aas_core_codegen.common import Identifier, assert_never
 from icontract import DBC, require
 
+from aas_core_codegen import intermediate
+from aas_core_codegen.common import Identifier, assert_never
 from aas_core_codegen.csharp.common import INDENT as I
 
 
@@ -151,6 +151,8 @@ class Unroller(DBC):
             )
         else:
             assert_never(type_annotation)
+
+        raise AssertionError("Should not have gotten here")
 
     @abc.abstractmethod
     def _unroll_primitive_type_annotation(

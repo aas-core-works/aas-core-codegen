@@ -618,10 +618,10 @@ def _args_to_arguments(
         # region Default
         default = None  # type: Optional[Default]
 
-        # TODO-BEFORE-RELEASE (mristin, 2021-12-16):
+        # BEFORE-RELEASE (mristin, 2021-12-16):
         #  test the defaults in verification function
         #
-        # TODO-BEFORE-RELEASE (mristin, 2021-12-16):
+        # BEFORE-RELEASE (mristin, 2021-12-16):
         #  test the defaults in a class method
 
         # NOTE (mristin, 2021-12-16):
@@ -834,11 +834,11 @@ def _parse_snapshot(
     )
 
 
-# TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+# BEFORE-RELEASE (mristin, 2021-12-13):
 #  include severity levels for contracts in the meta model and
 #  consider them in the imports
 
-# TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+# BEFORE-RELEASE (mristin, 2021-12-13):
 #  test for unknown severity level
 
 # fmt: off
@@ -1379,7 +1379,7 @@ def _class_decorator_to_invariant(
     condition_node = None  # type: Optional[ast.AST]
     description_node = None  # type: Optional[ast.AST]
 
-    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test parsing of args and kwargs
+    # BEFORE-RELEASE (mristin, 2021-12-13): test parsing of args and kwargs
     if len(decorator.args) >= 1:
         condition_node = decorator.args[0]
 
@@ -1852,7 +1852,8 @@ def _verify_symbol_table(
             "stringification",
             "transform",
             "transformer",
-            "transformer_with_context" "verification",
+            "transformer_with_context",
+            "verification",
             "visit",
             "visitation",
             "visitor",
@@ -1945,7 +1946,7 @@ def _verify_symbol_table(
             if isinstance(method, UnderstoodMethod)
         ),
     ):
-        # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test
+        # BEFORE-RELEASE (mristin, 2021-12-19): test
         for stmt in understood_method.body:
             if (
                 isinstance(stmt, tree.Assignment)
@@ -1966,7 +1967,7 @@ def _verify_symbol_table(
 
     # region Check that no class methods are used in verification
 
-    # TODO-BEFORE-RELEASE (mristin, 2021-12-16): test
+    # BEFORE-RELEASE (mristin, 2021-12-16): test
     for symbol in symbol_table.symbols:
         if not isinstance(symbol, Class):
             continue
@@ -2096,7 +2097,7 @@ def _verify_symbol_table(
             if error is not None:
                 errors.append(error)
             else:
-                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+                # BEFORE-RELEASE (mristin, 2021-12-13): test
                 if isinstance(prop.type_annotation, SubscriptedTypeAnnotation):
                     error = _verify_arity_of_type_annotation_subscript(
                         prop.type_annotation
@@ -2114,7 +2115,7 @@ def _verify_symbol_table(
                 if error is not None:
                     errors.append(error)
                 else:
-                    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+                    # BEFORE-RELEASE (mristin, 2021-12-13): test
                     if isinstance(arg.type_annotation, SubscriptedTypeAnnotation):
                         error = _verify_arity_of_type_annotation_subscript(
                             arg.type_annotation
@@ -2124,14 +2125,14 @@ def _verify_symbol_table(
                             errors.append(error)
 
             if method.returns is not None:
-                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+                # BEFORE-RELEASE (mristin, 2021-12-13): test
                 error = verify_no_dangling_references_in_type_annotation(
                     type_annotation=method.returns
                 )
                 if error is not None:
                     errors.append(error)
                 else:
-                    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+                    # BEFORE-RELEASE (mristin, 2021-12-13): test
                     if isinstance(method.returns, SubscriptedTypeAnnotation):
                         error = _verify_arity_of_type_annotation_subscript(
                             method.returns
@@ -2348,7 +2349,7 @@ def _atok_to_symbol_table(
         )
 
     if len(underlying_errors) > 0:
-        return None, Error(None, "Failed to parse the AST", underlying_errors)
+        return None, Error(None, "Failed to parse the meta-model", underlying_errors)
 
     if ref_association_id is None and len(underlying_errors) == 0:
         return None, Error(

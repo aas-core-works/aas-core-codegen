@@ -239,6 +239,8 @@ def _type_annotations_equal(
     else:
         assert_never(that)
 
+    raise AssertionError("Should not have gotten here")
+
 
 def _assignable(
     target_type: "TypeAnnotationUnion", value_type: "TypeAnnotationUnion"
@@ -412,6 +414,8 @@ def _type_annotation_to_inferred_type_annotation(
 
     else:
         assert_never(type_annotation)
+
+    raise AssertionError("Should not have gotten here")
 
 
 class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]):
@@ -817,6 +821,8 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         self.type_map[node] = result
         return result
 
+
+# pylint: disable=invalid-name
 
 TypeAnnotationUnion = Union[
     PrimitiveTypeAnnotation,

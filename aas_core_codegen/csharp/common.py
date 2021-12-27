@@ -1,7 +1,7 @@
 """Provide common functions shared among difference C# code generation modules."""
 import re
 import textwrap
-from typing import List, Union, cast, Iterator, TypeVar, Generic
+from typing import List, Union, cast, Iterator
 
 from icontract import ensure, require
 
@@ -50,11 +50,9 @@ PRIMITIVE_TYPE_MAP = {
 }
 
 # noinspection PyTypeChecker
-assert sorted(literal.value for literal in PRIMITIVE_TYPE_MAP.keys()) == sorted(
+assert sorted(literal.value for literal in PRIMITIVE_TYPE_MAP) == sorted(
     literal.value for literal in intermediate.PrimitiveType
-), (
-    "Expected complete mapping of primitive to implementation-specific types"
-)  # type: ignore
+), "Expected complete mapping of primitive to implementation-specific types"
 
 
 def generate_type(
@@ -66,7 +64,7 @@ def generate_type(
 
     The ``ref_association`` describes how the references should be represented.
     """
-    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
+    # BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
     if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
         return PRIMITIVE_TYPE_MAP[type_annotation.a_type]
 
@@ -111,6 +109,8 @@ def generate_type(
 
     else:
         assert_never(type_annotation)
+
+    raise AssertionError("Should not have gotten here")
 
 
 INDENT = "    "

@@ -9,8 +9,6 @@ from typing import (
     List,
     cast,
     Tuple,
-    Callable,
-    Any,
 )
 
 import sortedcontainers

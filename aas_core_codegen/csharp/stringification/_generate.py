@@ -129,8 +129,8 @@ def _generate_enum_to_and_from_string(
         /// Parse the string representation of <see cref={xml.sax.saxutils.quoteattr(name)} />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref={xml.sax.saxutils.quoteattr(name)} />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref={xml.sax.saxutils.quoteattr(name)} />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.{name}? {from_str_name}(string text)
@@ -176,7 +176,7 @@ def generate(
             textwrap.dedent(
                 f"""\
             using System.Collections.Generic;  // can't alias
-    
+
             using Aas = {namespace};"""
             )
         ),

@@ -142,7 +142,7 @@ def main() -> int:
         print("Doctest'ing...")
 
         doc_files = ["README.rst"]
-        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        # BEFORE-RELEASE (mristin, 2021-12-13):
         #  Add ``{repo_root}/docs/source/**/*.rst`` as well here
         subprocess.check_call(
             [sys.executable, "-m", "doctest"] + doc_files, cwd=str(repo_root)

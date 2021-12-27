@@ -28,6 +28,8 @@ _AST_COMPARATOR_TO_OURS = {
     ast.NotEq: tree.Comparator.NE,
 }  # type: Mapping[Type[ast.cmpop], tree.Comparator]
 
+_AST_COMPARATORS = tuple(_AST_COMPARATOR_TO_OURS.keys())
+
 
 class _Parse(abc.ABC):
     """Define a parse rule from a Python AST node to our custom AST."""
@@ -49,7 +51,7 @@ class _ParseComparison(_Parse):
         return (
             isinstance(node, ast.Compare)
             and len(node.ops) == 1
-            and type(node.ops[0]) in _AST_COMPARATOR_TO_OURS
+            and isinstance(node.ops[0], _AST_COMPARATORS)
             and len(node.comparators) == 1
         )
 
@@ -62,7 +64,7 @@ class _ParseComparison(_Parse):
 
         assert isinstance(left, tree.Expression), f"{left=}"
 
-        op = _AST_COMPARATOR_TO_OURS[type(node.ops[0])]
+        op = _AST_COMPARATOR_TO_OURS[type(node.ops[0])]  # pylint: disable=invalid-name
 
         right, error = ast_node_to_our_node(node.comparators[0])
         if error is not None:

@@ -137,6 +137,13 @@ class Test_parsing_docstring(unittest.TestCase):
             '''\
             class Some_class:
                 """"""
+                
+            class Reference:
+                pass
+                
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             '''
         )
 
@@ -149,6 +156,13 @@ class Test_parsing_docstring(unittest.TestCase):
             '''\
             class Some_class:
                 """This is some documentation."""
+                
+            class Reference:
+                pass
+                
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             '''
         )
 
@@ -166,6 +180,13 @@ class Test_parsing_docstring(unittest.TestCase):
 
                 Another paragraph.
                 """
+            
+            class Reference:
+                pass
+                
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             '''
         )
 
@@ -187,7 +208,7 @@ class Test_against_recorded(unittest.TestCase):
         assert test_cases_dir.exists(), f"{test_cases_dir=}"
         assert test_cases_dir.is_dir(), f"{test_cases_dir=}"
 
-        for source_pth in test_cases_dir.glob("**/source.py"):
+        for source_pth in test_cases_dir.glob("**/meta_model.py"):
             case_dir = source_pth.parent
 
             expected_symbol_table_pth = case_dir / "expected_symbol_table.txt"
@@ -336,34 +357,6 @@ class Test_parse_type_annotation_fail(unittest.TestCase):
             "for a subscripted type annotation, but got: str if True else int",
             error.message,
         )
-
-
-class Test_against_real_meta_models(unittest.TestCase):
-    def test_smoke_on_files(self) -> None:
-        for meta_model_pth in tests.common.list_valid_meta_models_from_test_data():
-            source = meta_model_pth.read_text()
-
-            atok, parse_exception = parse.source_to_atok(source=source)
-            assert parse_exception is None, f"{meta_model_pth=}, {parse_exception=}"
-            assert atok is not None
-
-            import_errors = parse.check_expected_imports(atok=atok)
-            assert not import_errors, f"{meta_model_pth=}, {import_errors=}"
-
-            symbol_table, parse_error = parse.atok_to_symbol_table(atok=atok)
-            if parse_error is not None:
-                writer = io.StringIO()
-                writer.write(
-                    f"Failed to construct the symbol table "
-                    f"from the file: {meta_model_pth}\n"
-                )
-
-                lineno_columner = LinenoColumner(atok=atok)
-                writer.write(f"{lineno_columner.error_message(parse_error)}\n")
-
-                raise AssertionError(writer.getvalue())
-
-            assert symbol_table is not None
 
 
 if __name__ == "__main__":

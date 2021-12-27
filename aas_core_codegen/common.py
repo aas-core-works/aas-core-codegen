@@ -14,9 +14,7 @@ from typing import (
     Iterator,
     Sequence,
     NoReturn,
-    TypeVar,
     Any,
-    Type,
 )
 
 import asttokens

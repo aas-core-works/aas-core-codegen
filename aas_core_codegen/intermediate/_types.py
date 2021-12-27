@@ -185,6 +185,8 @@ def type_annotations_equal(
     else:
         assert_never(that)
 
+    raise AssertionError("Should not have gotten here")
+
 
 class Description:
     """Represent a docstring describing something in the meta-model."""
@@ -693,7 +695,7 @@ class Enumeration:
     #: Literals associated with the enumeration
     literals: Final[Sequence[EnumerationLiteral]]
 
-    # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+    # BEFORE-RELEASE (mristin, 2021-12-13):
     #  document all properties, also do the same for Class, Method etc.
 
     #: Map literals by their identifiers
@@ -1550,6 +1552,8 @@ def map_descendability(
         else:
             assert_never(a_type_annotation)
 
+        raise AssertionError("Should not have gotten here")
+
     _ = recurse(a_type_annotation=type_annotation)
 
     return mapping
@@ -1603,7 +1607,7 @@ def make_union_of_constructor_arguments(
         collections.OrderedDict()
     )  # type: OrderedDict[Identifier, TypeAnnotationUnion]
 
-    for arg_name, args_of_clses in arg_union.items():
+    for args_of_clses in arg_union.values():
         # NOTE (mristin, 2021-12-19):
         # We have to check that the arguments share the same type. We have to allow
         # that the non-nullability constraint is strengthened since implementers can

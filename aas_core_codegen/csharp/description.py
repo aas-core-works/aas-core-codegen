@@ -289,7 +289,7 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
                 )
 
         for tail_element in tail:
-            # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+            # BEFORE-RELEASE (mristin, 2021-12-13): test
             if not isinstance(tail_element, docutils.nodes.field_list):
                 return None, (
                     f"Expected only a field list to follow the summary and remarks, "
@@ -334,7 +334,7 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
                 name = field_name.children[0].astext()
                 name_parts = name.split()
                 if len(name_parts) > 2:
-                    # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+                    # BEFORE-RELEASE (mristin, 2021-12-13): test
                     return (
                         None,
                         f"Expected one or two parts in a field name, "

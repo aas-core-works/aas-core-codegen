@@ -15,7 +15,7 @@ namespace AasCore.Aas3
     public interface IClass
     {
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce();
@@ -26,29 +26,29 @@ namespace AasCore.Aas3
         public IEnumerable<IClass> Descend();
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor);
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context);
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer);
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context);                        
+            Visitation.ITransformerWithContext<C, T> transformer, C context);
     }
 
     /// <summary>
@@ -104,7 +104,7 @@ namespace AasCore.Aas3
         public IReference? RefersTo { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -149,7 +149,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -158,7 +158,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -167,7 +167,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -176,7 +176,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -225,11 +225,6 @@ namespace AasCore.Aas3
             IHasExtensions,
             IClass
     {
-        /// <summary>
-        /// An extension of the element.
-        /// </summary>
-        public List<Extension> Extensions { get; set; }
-
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
         /// In case of referable this ID is an identifying string of
@@ -308,81 +303,6 @@ namespace AasCore.Aas3
             IReferable,
             IClass
     {
-        /// <summary>
-        /// An extension of the element.
-        /// </summary>
-        public List<Extension> Extensions { get; set; }
-
-        /// <summary>
-        /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
-        /// </summary>
-        /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
-        /// </remarks>
-        public string? IdShort { get; set; }
-
-        /// <summary>
-        /// Display name. Can be provided in several languages.
-        /// </summary>
-        /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
-        /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
-
-        /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
-        /// Description or comments on the element.
-        /// </summary>
-        /// <remarks>
-        /// The description can be provided in several languages. If no description is defined,
-        /// then the definition of the concept description that defines the semantics
-        /// of the element is used. Additional information can be provided,
-        /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
-        /// in which context or which additional data specification templates are provided.
-        /// </remarks>
-        public LangStringSet? Description { get; set; }
-
         /// <summary>
         /// The globally unique identification of the element.
         /// </summary>
@@ -484,7 +404,7 @@ namespace AasCore.Aas3
         public string? Revision { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -513,7 +433,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -522,7 +442,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -531,7 +451,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -540,7 +460,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -619,7 +539,7 @@ namespace AasCore.Aas3
         public IReference? ValueId { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -664,7 +584,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -673,7 +593,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -682,7 +602,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -691,7 +611,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -734,7 +654,7 @@ namespace AasCore.Aas3
         public List<IReference> DependsOn { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -763,7 +683,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -772,7 +692,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -781,7 +701,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -790,7 +710,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -930,7 +850,7 @@ namespace AasCore.Aas3
         public List<IReference> Submodels { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -1065,7 +985,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -1074,7 +994,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -1083,7 +1003,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -1092,7 +1012,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -1180,7 +1100,7 @@ namespace AasCore.Aas3
         public File? DefaultThumbnail { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -1241,7 +1161,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -1250,7 +1170,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -1259,7 +1179,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -1268,7 +1188,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -1353,7 +1273,7 @@ namespace AasCore.Aas3
         public IReference? ExternalSubjectId { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -1398,7 +1318,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -1407,7 +1327,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -1416,7 +1336,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -1425,7 +1345,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -1583,7 +1503,7 @@ namespace AasCore.Aas3
         public List<ISubmodelElement> SubmodelElements { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -1724,7 +1644,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -1733,7 +1653,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -1742,7 +1662,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -1751,7 +1671,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -1812,104 +1732,7 @@ namespace AasCore.Aas3
             IHasDataSpecification,
             IClass
     {
-        /// <summary>
-        /// Global reference to the data specification template used by the element.
-        /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
 
-        /// <summary>
-        /// An extension of the element.
-        /// </summary>
-        public List<Extension> Extensions { get; set; }
-
-        /// <summary>
-        /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
-        /// </summary>
-        /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
-        /// </remarks>
-        public string? IdShort { get; set; }
-
-        /// <summary>
-        /// Display name. Can be provided in several languages.
-        /// </summary>
-        /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
-        /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
-
-        /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
-        /// Description or comments on the element.
-        /// </summary>
-        /// <remarks>
-        /// The description can be provided in several languages. If no description is defined,
-        /// then the definition of the concept description that defines the semantics
-        /// of the element is used. Additional information can be provided,
-        /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
-        /// in which context or which additional data specification templates are provided.
-        /// </remarks>
-        public LangStringSet? Description { get; set; }
-
-        /// <summary>
-        /// Kind of the element: either type or instance.
-        /// </summary>
-        /// <remarks>
-        /// Default Value = Instance
-        /// </remarks>
-        public ModelingKind? Kind { get; set; }
-
-        /// <summary>
-        /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
-        /// </summary>
-        public IReference? SemanticId { get; set; }
-
-        /// <summary>
-        /// Additional qualification of a qualifiable element.
-        /// </summary>
-        public List<IConstraint> Qualifiers { get; set; }
     }
 
     /// <summary>
@@ -1925,105 +1748,6 @@ namespace AasCore.Aas3
             ISubmodelElement,
             IClass
     {
-        /// <summary>
-        /// Global reference to the data specification template used by the element.
-        /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
-
-        /// <summary>
-        /// An extension of the element.
-        /// </summary>
-        public List<Extension> Extensions { get; set; }
-
-        /// <summary>
-        /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
-        /// </summary>
-        /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
-        /// </remarks>
-        public string? IdShort { get; set; }
-
-        /// <summary>
-        /// Display name. Can be provided in several languages.
-        /// </summary>
-        /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
-        /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
-
-        /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
-        /// Description or comments on the element.
-        /// </summary>
-        /// <remarks>
-        /// The description can be provided in several languages. If no description is defined,
-        /// then the definition of the concept description that defines the semantics
-        /// of the element is used. Additional information can be provided,
-        /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
-        /// in which context or which additional data specification templates are provided.
-        /// </remarks>
-        public LangStringSet? Description { get; set; }
-
-        /// <summary>
-        /// Kind of the element: either type or instance.
-        /// </summary>
-        /// <remarks>
-        /// Default Value = Instance
-        /// </remarks>
-        public ModelingKind? Kind { get; set; }
-
-        /// <summary>
-        /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
-        /// </summary>
-        public IReference? SemanticId { get; set; }
-
-        /// <summary>
-        /// Additional qualification of a qualifiable element.
-        /// </summary>
-        public List<IConstraint> Qualifiers { get; set; }
-
         /// <summary>
         /// Reference to the first element in the relationship taking the role of the subject.
         /// </summary>
@@ -2187,7 +1911,7 @@ namespace AasCore.Aas3
         public DataTypeDef? ValueTypeValues { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -2328,7 +2052,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -2337,7 +2061,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -2346,7 +2070,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -2355,7 +2079,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -2520,7 +2244,7 @@ namespace AasCore.Aas3
         public List<ISubmodelElement> Values { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -2645,7 +2369,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -2654,7 +2378,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -2663,7 +2387,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -2672,7 +2396,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -2729,104 +2453,7 @@ namespace AasCore.Aas3
             ISubmodelElement,
             IClass
     {
-        /// <summary>
-        /// Global reference to the data specification template used by the element.
-        /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
 
-        /// <summary>
-        /// An extension of the element.
-        /// </summary>
-        public List<Extension> Extensions { get; set; }
-
-        /// <summary>
-        /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
-        /// </summary>
-        /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
-        /// </remarks>
-        public string? IdShort { get; set; }
-
-        /// <summary>
-        /// Display name. Can be provided in several languages.
-        /// </summary>
-        /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
-        /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
-
-        /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
-        /// Description or comments on the element.
-        /// </summary>
-        /// <remarks>
-        /// The description can be provided in several languages. If no description is defined,
-        /// then the definition of the concept description that defines the semantics
-        /// of the element is used. Additional information can be provided,
-        /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
-        /// in which context or which additional data specification templates are provided.
-        /// </remarks>
-        public LangStringSet? Description { get; set; }
-
-        /// <summary>
-        /// Kind of the element: either type or instance.
-        /// </summary>
-        /// <remarks>
-        /// Default Value = Instance
-        /// </remarks>
-        public ModelingKind? Kind { get; set; }
-
-        /// <summary>
-        /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
-        /// </summary>
-        public IReference? SemanticId { get; set; }
-
-        /// <summary>
-        /// Additional qualification of a qualifiable element.
-        /// </summary>
-        public List<IConstraint> Qualifiers { get; set; }
     }
 
     /// <summary>
@@ -2977,7 +2604,7 @@ namespace AasCore.Aas3
         public IReference? ValueId { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -3102,7 +2729,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -3111,7 +2738,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -3120,7 +2747,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -3129,7 +2756,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -3308,7 +2935,7 @@ namespace AasCore.Aas3
         public IReference? ValueId { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -3449,7 +3076,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -3458,7 +3085,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -3467,7 +3094,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -3476,7 +3103,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -3652,7 +3279,7 @@ namespace AasCore.Aas3
         public string? Max { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -3761,7 +3388,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -3770,7 +3397,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -3779,7 +3406,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -3788,7 +3415,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -3955,7 +3582,7 @@ namespace AasCore.Aas3
         public IReference? Reference { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -4080,7 +3707,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -4089,7 +3716,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -4098,7 +3725,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -4107,7 +3734,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -4278,7 +3905,7 @@ namespace AasCore.Aas3
         public byte[]? Content { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -4387,7 +4014,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -4396,7 +4023,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -4405,7 +4032,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -4414,7 +4041,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -4581,7 +4208,7 @@ namespace AasCore.Aas3
         public string? Value { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -4690,7 +4317,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -4699,7 +4326,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -4708,7 +4335,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -4717,7 +4344,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -4886,7 +4513,7 @@ namespace AasCore.Aas3
         public List<IDataElement> Annotation { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -5031,7 +4658,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -5040,7 +4667,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -5049,7 +4676,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -5058,7 +4685,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -5269,7 +4896,7 @@ namespace AasCore.Aas3
         public IdentifierKeyValuePair? SpecificAssetId { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -5426,7 +5053,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -5435,7 +5062,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -5444,7 +5071,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -5453,7 +5080,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -5513,104 +5140,7 @@ namespace AasCore.Aas3
             ISubmodelElement,
             IClass
     {
-        /// <summary>
-        /// Global reference to the data specification template used by the element.
-        /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
 
-        /// <summary>
-        /// An extension of the element.
-        /// </summary>
-        public List<Extension> Extensions { get; set; }
-
-        /// <summary>
-        /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
-        /// </summary>
-        /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
-        /// </remarks>
-        public string? IdShort { get; set; }
-
-        /// <summary>
-        /// Display name. Can be provided in several languages.
-        /// </summary>
-        /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
-        /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
-
-        /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
-        /// Description or comments on the element.
-        /// </summary>
-        /// <remarks>
-        /// The description can be provided in several languages. If no description is defined,
-        /// then the definition of the concept description that defines the semantics
-        /// of the element is used. Additional information can be provided,
-        /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
-        /// in which context or which additional data specification templates are provided.
-        /// </remarks>
-        public LangStringSet? Description { get; set; }
-
-        /// <summary>
-        /// Kind of the element: either type or instance.
-        /// </summary>
-        /// <remarks>
-        /// Default Value = Instance
-        /// </remarks>
-        public ModelingKind? Kind { get; set; }
-
-        /// <summary>
-        /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
-        /// </summary>
-        public IReference? SemanticId { get; set; }
-
-        /// <summary>
-        /// Additional qualification of a qualifiable element.
-        /// </summary>
-        public List<IConstraint> Qualifiers { get; set; }
     }
 
     /// <summary>
@@ -5726,7 +5256,7 @@ namespace AasCore.Aas3
         public IReference Observed { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -5845,7 +5375,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -5854,7 +5384,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -5863,7 +5393,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -5872,7 +5402,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -6039,7 +5569,7 @@ namespace AasCore.Aas3
         public List<OperationVariable> InoutputVariables { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -6196,7 +5726,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -6205,7 +5735,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -6214,7 +5744,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -6223,7 +5753,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -6285,7 +5815,7 @@ namespace AasCore.Aas3
         public ISubmodelElement Value { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -6308,7 +5838,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -6317,7 +5847,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -6326,7 +5856,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -6335,7 +5865,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -6464,7 +5994,7 @@ namespace AasCore.Aas3
         public List<IConstraint> Qualifiers { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -6573,7 +6103,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -6582,7 +6112,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -6591,7 +6121,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -6600,7 +6130,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -6756,7 +6286,7 @@ namespace AasCore.Aas3
         public List<IReference> IsCaseOf { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -6865,7 +6395,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -6874,7 +6404,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -6883,7 +6413,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -6892,7 +6422,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -7038,7 +6568,7 @@ namespace AasCore.Aas3
         public List<IReference> ContainedElements { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -7147,7 +6677,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -7156,7 +6686,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -7165,7 +6695,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -7174,7 +6704,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -7233,7 +6763,7 @@ namespace AasCore.Aas3
         public List<string> Values { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -7252,7 +6782,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -7261,7 +6791,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -7270,7 +6800,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -7279,7 +6809,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -7315,7 +6845,7 @@ namespace AasCore.Aas3
         public IReference? ReferredSemanticId { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -7360,7 +6890,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -7369,7 +6899,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -7378,7 +6908,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -7387,7 +6917,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -7415,7 +6945,7 @@ namespace AasCore.Aas3
         public string Value { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -7434,7 +6964,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -7443,7 +6973,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -7452,7 +6982,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -7461,7 +6991,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -8361,7 +7891,7 @@ namespace AasCore.Aas3
         public IReference ValueId { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -8384,7 +7914,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -8393,7 +7923,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -8402,7 +7932,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -8411,7 +7941,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -8440,7 +7970,7 @@ namespace AasCore.Aas3
         public List<ValueReferencePair> ValueReferencePairs { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -8469,7 +7999,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -8478,7 +8008,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -8487,7 +8017,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -8496,7 +8026,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -8633,7 +8163,7 @@ namespace AasCore.Aas3
         public LevelType? LevelType { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -8742,7 +8272,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -8751,7 +8281,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -8760,7 +8290,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -8769,7 +8299,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -8877,7 +8407,7 @@ namespace AasCore.Aas3
         public string? Supplier { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -8906,7 +8436,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -8915,7 +8445,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -8924,7 +8454,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -8933,7 +8463,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -8983,7 +8513,7 @@ namespace AasCore.Aas3
         public List<ConceptDescription> ConceptDescriptions { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance 
+        /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
@@ -9044,7 +8574,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -9053,7 +8583,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -9062,7 +8592,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -9071,7 +8601,7 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(

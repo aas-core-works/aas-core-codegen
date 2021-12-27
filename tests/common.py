@@ -63,47 +63,6 @@ def parse_source(source: str) -> Tuple[Optional[parse.SymbolTable], Optional[Err
     return parse_atok(atok=atok)
 
 
-# fmt: off
-@ensure(
-    lambda result:
-    all(
-        pth.exists()
-        and pth.is_file()
-        and pth.name == "meta_model.py"
-        for pth in result
-    )
-)
-# fmt: on
-def list_valid_meta_models_from_test_data() -> List[pathlib.Path]:
-    """List the meta-models stored in the ``test_data`` project directory."""
-    result = []  # type: List[pathlib.Path]
-
-    this_dir = pathlib.Path(os.path.realpath(__file__)).parent
-
-    meta_models_dir = this_dir.parent / "test_data/meta_models"
-    if not meta_models_dir.exists():
-        raise FileNotFoundError(
-            f"Expected the directory containing the test meta-models "
-            f"to exist: {meta_models_dir}"
-        )
-
-    for case_dir in sorted(meta_models_dir.iterdir()):
-        if not case_dir.is_dir():
-            continue
-
-        meta_model_pth = case_dir / "meta_model.py"
-        if meta_model_pth.exists():
-            if not meta_model_pth.is_file():
-                raise RuntimeError(
-                    f"Expected the meta-model to be a file, "
-                    f"but it is not: {meta_model_pth}"
-                )
-
-            result.append(meta_model_pth)
-
-    return result
-
-
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def translate_source_to_intermediate(
     source: str,

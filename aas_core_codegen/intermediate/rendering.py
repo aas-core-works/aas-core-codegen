@@ -7,7 +7,7 @@ from icontract import ensure, DBC
 
 from aas_core_codegen.intermediate import doc
 
-T = TypeVar("T")
+T = TypeVar("T")  # pylint: disable=invalid-name
 
 
 class DocutilsElementTransformer(Generic[T], DBC):
@@ -26,6 +26,7 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform(
         self, element: docutils.nodes.Element
     ) -> Tuple[Optional[T], Optional[str]]:
+        """Dispatch the transformation to the appropriate ``transform_*``."""
         # NOTE (mristin, 2021-12-26):
         # Please keep the dispatching order. We have to implement a chain-of-command,
         # not an efficient dispatch as classes inherit from each other.
@@ -77,6 +78,7 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform_text(
         self, element: docutils.nodes.Text
     ) -> Tuple[Optional[T], Optional[str]]:
+        """Transform a text element into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -84,6 +86,7 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform_symbol_reference_in_doc(
         self, element: doc.SymbolReference
     ) -> Tuple[Optional[T], Optional[str]]:
+        """Transform a symbol reference into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -91,6 +94,7 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform_attribute_reference_in_doc(
         self, element: doc.AttributeReference
     ) -> Tuple[Optional[T], Optional[str]]:
+        """Transform an attribute reference into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -98,6 +102,7 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform_argument_reference_in_doc(
         self, element: doc.ArgumentReference
     ) -> Tuple[Optional[T], Optional[str]]:
+        """Transform an argument reference into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -105,6 +110,7 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform_literal(
         self, element: docutils.nodes.literal
     ) -> Tuple[Optional[T], Optional[str]]:
+        """Transform a code literal into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -112,6 +118,7 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform_paragraph(
         self, element: docutils.nodes.paragraph
     ) -> Tuple[Optional[T], Optional[str]]:
+        """Transform a paragraph element into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -119,6 +126,7 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform_emphasis(
         self, element: docutils.nodes.emphasis
     ) -> Tuple[Optional[T], Optional[str]]:
+        """Transform an emphasis element into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -126,6 +134,7 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform_list_item(
         self, element: docutils.nodes.list_item
     ) -> Tuple[Optional[T], Optional[str]]:
+        """Transform a list item element into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -133,6 +142,7 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform_bullet_list(
         self, element: docutils.nodes.bullet_list
     ) -> Tuple[Optional[T], Optional[str]]:
+        """Transform a bullet list element into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -140,6 +150,7 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform_note(
         self, element: docutils.nodes.note
     ) -> Tuple[Optional[T], Optional[str]]:
+        """Transform a note element into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -147,6 +158,7 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform_reference(
         self, element: docutils.nodes.reference
     ) -> Tuple[Optional[T], Optional[str]]:
+        """Transform a general reference element into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -154,4 +166,5 @@ class DocutilsElementTransformer(Generic[T], DBC):
     def transform_document(
         self, element: docutils.nodes.document
     ) -> Tuple[Optional[T], Optional[str]]:
+        """Transform a whole document into something."""
         raise NotImplementedError()

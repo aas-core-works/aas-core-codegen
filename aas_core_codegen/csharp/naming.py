@@ -83,6 +83,8 @@ def name_of(
     else:
         assert_never(something)
 
+    raise AssertionError("Should not have gotten here")
+
 
 def property_name(identifier: Identifier) -> Identifier:
     """

@@ -1,6 +1,5 @@
 """Generate the visitor classes based on the intermediate representation."""
 
-"""Generate the invariant verifiers from the intermediate representation."""
 import io
 import textwrap
 from typing import Tuple, Optional, List
@@ -112,7 +111,7 @@ def _generate_visitor_through(symbol_table: intermediate.SymbolTable) -> Strippe
             /// This class is meaningless for itself. However, it is a good base if you
             /// want to descend through instances and apply actions only on a subset of
             /// classes.
-            /// </remarks> 
+            /// </remarks>
             public class VisitorThrough
             {
                 public void Visit(IClass that)
@@ -212,7 +211,7 @@ def _generate_itransformer(symbol_table: intermediate.SymbolTable) -> Stripped:
         textwrap.dedent(
             """\
             /// <summary>
-            /// Define the interface for a transformer which transforms recursively 
+            /// Define the interface for a transformer which transforms recursively
             /// the instances into something else.
             /// </summary>
             /// <typeparam name="T">The type of the transformation result</typeparam>

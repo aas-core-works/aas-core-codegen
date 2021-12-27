@@ -46,12 +46,12 @@ atok_to_symbol_table = _translate.atok_to_symbol_table
 
 dump = _stringify.dump
 
-# TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+# BEFORE-RELEASE (mristin, 2021-12-13):
 #  integrate __book_version__ and __book_url__ into parsed and intermediate types,
 #  and add them to comments in the generated code
 
-# TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+# BEFORE-RELEASE (mristin, 2021-12-13):
 #  parse markers reference_in_the_book and integrate them in the generated code
 
-# TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+# BEFORE-RELEASE (mristin, 2021-12-13):
 #  handle constrained primitive types

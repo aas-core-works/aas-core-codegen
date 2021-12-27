@@ -149,247 +149,262 @@ namespace AasCore.Aas3
         {
             /// <summary>
             /// Hash allowed enum values for efficient validation of enums.
-            /// </summary> 
+            /// </summary>
             private static class EnumValueSet
             {
                 public static HashSet<int> ForModelingKind = new HashSet<int>
-                {    (int)Template,
-                    (int)Instance
-                }
+                {
+                    (int)Aas.ModelingKind.Template,
+                    (int)Aas.ModelingKind.Instance
+                };
 
                 public static HashSet<int> ForAssetKind = new HashSet<int>
-                {    (int)Type,
-                    (int)Instance
-                }
+                {
+                    (int)Aas.AssetKind.Type,
+                    (int)Aas.AssetKind.Instance
+                };
 
                 public static HashSet<int> ForEntityType = new HashSet<int>
-                {    (int)CoManagedEntity,
-                    (int)SelfManagedEntity
-                }
+                {
+                    (int)Aas.EntityType.CoManagedEntity,
+                    (int)Aas.EntityType.SelfManagedEntity
+                };
 
                 public static HashSet<int> ForIdentifiableElements = new HashSet<int>
-                {    (int)AssetAdministrationShell,
-                    (int)ConceptDescription,
-                    (int)Submodel
-                }
+                {
+                    (int)Aas.IdentifiableElements.AssetAdministrationShell,
+                    (int)Aas.IdentifiableElements.ConceptDescription,
+                    (int)Aas.IdentifiableElements.Submodel
+                };
 
                 public static HashSet<int> ForReferableElements = new HashSet<int>
-                {    (int)AccessPermissionRule,
-                    (int)AnnotatedRelationshipElement,
-                    (int)Asset,
-                    (int)AssetAdministrationShell,
-                    (int)BasicEvent,
-                    (int)Blob,
-                    (int)Capability,
-                    (int)ConceptDescription,
-                    (int)DataElement,
-                    (int)Entity,
-                    (int)Event,
-                    (int)File,
-                    (int)MultiLanguageProperty,
-                    (int)Operation,
-                    (int)Property,
-                    (int)Range,
-                    (int)ReferenceElement,
-                    (int)RelationshipElement,
-                    (int)Submodel,
-                    (int)SubmodelElement,
-                    (int)SubmodelElementList,
-                    (int)SubmodelElementStruct
-                }
+                {
+                    (int)Aas.ReferableElements.AccessPermissionRule,
+                    (int)Aas.ReferableElements.AnnotatedRelationshipElement,
+                    (int)Aas.ReferableElements.Asset,
+                    (int)Aas.ReferableElements.AssetAdministrationShell,
+                    (int)Aas.ReferableElements.BasicEvent,
+                    (int)Aas.ReferableElements.Blob,
+                    (int)Aas.ReferableElements.Capability,
+                    (int)Aas.ReferableElements.ConceptDescription,
+                    (int)Aas.ReferableElements.DataElement,
+                    (int)Aas.ReferableElements.Entity,
+                    (int)Aas.ReferableElements.Event,
+                    (int)Aas.ReferableElements.File,
+                    (int)Aas.ReferableElements.MultiLanguageProperty,
+                    (int)Aas.ReferableElements.Operation,
+                    (int)Aas.ReferableElements.Property,
+                    (int)Aas.ReferableElements.Range,
+                    (int)Aas.ReferableElements.ReferenceElement,
+                    (int)Aas.ReferableElements.RelationshipElement,
+                    (int)Aas.ReferableElements.Submodel,
+                    (int)Aas.ReferableElements.SubmodelElement,
+                    (int)Aas.ReferableElements.SubmodelElementList,
+                    (int)Aas.ReferableElements.SubmodelElementStruct
+                };
 
                 public static HashSet<int> ForKeyElements = new HashSet<int>
-                {    (int)FragmentReference,
-                    (int)AccessPermissionRule,
-                    (int)AnnotatedRelationshipElement,
-                    (int)Asset,
-                    (int)AssetAdministrationShell,
-                    (int)BasicEvent,
-                    (int)Blob,
-                    (int)Capability,
-                    (int)ConceptDescription,
-                    (int)DataElement,
-                    (int)Entity,
-                    (int)Event,
-                    (int)File,
-                    (int)MultiLanguageProperty,
-                    (int)Operation,
-                    (int)Property,
-                    (int)Range,
-                    (int)GlobalReference,
-                    (int)ReferenceElement,
-                    (int)RelationshipElement,
-                    (int)Submodel,
-                    (int)SubmodelElement,
-                    (int)SubmodelElementList,
-                    (int)SubmodelElementStruct
-                }
+                {
+                    (int)Aas.KeyElements.FragmentReference,
+                    (int)Aas.KeyElements.AccessPermissionRule,
+                    (int)Aas.KeyElements.AnnotatedRelationshipElement,
+                    (int)Aas.KeyElements.Asset,
+                    (int)Aas.KeyElements.AssetAdministrationShell,
+                    (int)Aas.KeyElements.BasicEvent,
+                    (int)Aas.KeyElements.Blob,
+                    (int)Aas.KeyElements.Capability,
+                    (int)Aas.KeyElements.ConceptDescription,
+                    (int)Aas.KeyElements.DataElement,
+                    (int)Aas.KeyElements.Entity,
+                    (int)Aas.KeyElements.Event,
+                    (int)Aas.KeyElements.File,
+                    (int)Aas.KeyElements.MultiLanguageProperty,
+                    (int)Aas.KeyElements.Operation,
+                    (int)Aas.KeyElements.Property,
+                    (int)Aas.KeyElements.Range,
+                    (int)Aas.KeyElements.GlobalReference,
+                    (int)Aas.KeyElements.ReferenceElement,
+                    (int)Aas.KeyElements.RelationshipElement,
+                    (int)Aas.KeyElements.Submodel,
+                    (int)Aas.KeyElements.SubmodelElement,
+                    (int)Aas.KeyElements.SubmodelElementList,
+                    (int)Aas.KeyElements.SubmodelElementStruct
+                };
 
                 public static HashSet<int> ForSubmodelElements = new HashSet<int>
-                {    (int)AnnotatedRelationshipElement,
-                    (int)Asset,
-                    (int)AssetAdministrationShell,
-                    (int)BasicEvent,
-                    (int)Blob,
-                    (int)Capability,
-                    (int)ConceptDescription,
-                    (int)DataElement,
-                    (int)Entity,
-                    (int)Event,
-                    (int)File,
-                    (int)MultiLanguageProperty,
-                    (int)Operation,
-                    (int)Property,
-                    (int)Range,
-                    (int)ReferenceElement,
-                    (int)RelationshipElement,
-                    (int)Submodel,
-                    (int)SubmodelElement,
-                    (int)SubmodelElementList,
-                    (int)SubmodelElementStruct
-                }
+                {
+                    (int)Aas.SubmodelElements.AnnotatedRelationshipElement,
+                    (int)Aas.SubmodelElements.Asset,
+                    (int)Aas.SubmodelElements.AssetAdministrationShell,
+                    (int)Aas.SubmodelElements.BasicEvent,
+                    (int)Aas.SubmodelElements.Blob,
+                    (int)Aas.SubmodelElements.Capability,
+                    (int)Aas.SubmodelElements.ConceptDescription,
+                    (int)Aas.SubmodelElements.DataElement,
+                    (int)Aas.SubmodelElements.Entity,
+                    (int)Aas.SubmodelElements.Event,
+                    (int)Aas.SubmodelElements.File,
+                    (int)Aas.SubmodelElements.MultiLanguageProperty,
+                    (int)Aas.SubmodelElements.Operation,
+                    (int)Aas.SubmodelElements.Property,
+                    (int)Aas.SubmodelElements.Range,
+                    (int)Aas.SubmodelElements.ReferenceElement,
+                    (int)Aas.SubmodelElements.RelationshipElement,
+                    (int)Aas.SubmodelElements.Submodel,
+                    (int)Aas.SubmodelElements.SubmodelElement,
+                    (int)Aas.SubmodelElements.SubmodelElementList,
+                    (int)Aas.SubmodelElements.SubmodelElementStruct
+                };
 
                 public static HashSet<int> ForBuildInListTypes = new HashSet<int>
-                {    (int)Entities,
-                    (int)IdRefs,
-                    (int)NMTokens
-                }
+                {
+                    (int)Aas.BuildInListTypes.Entities,
+                    (int)Aas.BuildInListTypes.IdRefs,
+                    (int)Aas.BuildInListTypes.NMTokens
+                };
 
                 public static HashSet<int> ForDecimalBuildInTypes = new HashSet<int>
-                {    (int)Integer,
-                    (int)Long,
-                    (int)Int,
-                    (int)Short,
-                    (int)Byte,
-                    (int)NonNegativeInteger,
-                    (int)PositiveInteger,
-                    (int)UnsignedInteger,
-                    (int)UnsignedLong,
-                    (int)UnsignedInt,
-                    (int)UnsignedShort,
-                    (int)UnsignedByte,
-                    (int)NonPositiveInteger,
-                    (int)NegativeInteger
-                }
+                {
+                    (int)Aas.DecimalBuildInTypes.Integer,
+                    (int)Aas.DecimalBuildInTypes.Long,
+                    (int)Aas.DecimalBuildInTypes.Int,
+                    (int)Aas.DecimalBuildInTypes.Short,
+                    (int)Aas.DecimalBuildInTypes.Byte,
+                    (int)Aas.DecimalBuildInTypes.NonNegativeInteger,
+                    (int)Aas.DecimalBuildInTypes.PositiveInteger,
+                    (int)Aas.DecimalBuildInTypes.UnsignedInteger,
+                    (int)Aas.DecimalBuildInTypes.UnsignedLong,
+                    (int)Aas.DecimalBuildInTypes.UnsignedInt,
+                    (int)Aas.DecimalBuildInTypes.UnsignedShort,
+                    (int)Aas.DecimalBuildInTypes.UnsignedByte,
+                    (int)Aas.DecimalBuildInTypes.NonPositiveInteger,
+                    (int)Aas.DecimalBuildInTypes.NegativeInteger
+                };
 
                 public static HashSet<int> ForDurationBuildInTypes = new HashSet<int>
-                {    (int)DayTimeDuration,
-                    (int)YearMonthDuration
-                }
+                {
+                    (int)Aas.DurationBuildInTypes.DayTimeDuration,
+                    (int)Aas.DurationBuildInTypes.YearMonthDuration
+                };
 
                 public static HashSet<int> ForPrimitiveTypes = new HashSet<int>
-                {    (int)AnyUri,
-                    (int)Base64Binary,
-                    (int)Boolean,
-                    (int)Date,
-                    (int)DateTime,
-                    (int)Decimal,
-                    (int)Double,
-                    (int)Duration,
-                    (int)Float,
-                    (int)GDay,
-                    (int)GMonth,
-                    (int)GMonthDay,
-                    (int)HeyBinary,
-                    (int)Notation,
-                    (int)QName,
-                    (int)String,
-                    (int)Time
-                }
+                {
+                    (int)Aas.PrimitiveTypes.AnyUri,
+                    (int)Aas.PrimitiveTypes.Base64Binary,
+                    (int)Aas.PrimitiveTypes.Boolean,
+                    (int)Aas.PrimitiveTypes.Date,
+                    (int)Aas.PrimitiveTypes.DateTime,
+                    (int)Aas.PrimitiveTypes.Decimal,
+                    (int)Aas.PrimitiveTypes.Double,
+                    (int)Aas.PrimitiveTypes.Duration,
+                    (int)Aas.PrimitiveTypes.Float,
+                    (int)Aas.PrimitiveTypes.GDay,
+                    (int)Aas.PrimitiveTypes.GMonth,
+                    (int)Aas.PrimitiveTypes.GMonthDay,
+                    (int)Aas.PrimitiveTypes.HeyBinary,
+                    (int)Aas.PrimitiveTypes.Notation,
+                    (int)Aas.PrimitiveTypes.QName,
+                    (int)Aas.PrimitiveTypes.String,
+                    (int)Aas.PrimitiveTypes.Time
+                };
 
                 public static HashSet<int> ForStringBuildInTypes = new HashSet<int>
-                {    (int)NormalizedString,
-                    (int)Token,
-                    (int)Language,
-                    (int)NCName,
-                    (int)Entity,
-                    (int)Id,
-                    (int)Idref
-                }
+                {
+                    (int)Aas.StringBuildInTypes.NormalizedString,
+                    (int)Aas.StringBuildInTypes.Token,
+                    (int)Aas.StringBuildInTypes.Language,
+                    (int)Aas.StringBuildInTypes.NCName,
+                    (int)Aas.StringBuildInTypes.Entity,
+                    (int)Aas.StringBuildInTypes.Id,
+                    (int)Aas.StringBuildInTypes.Idref
+                };
 
                 public static HashSet<int> ForDataTypeDef = new HashSet<int>
-                {    (int)Entities,
-                    (int)IdRefs,
-                    (int)NMTokens,
-                    (int)Integer,
-                    (int)Long,
-                    (int)Int,
-                    (int)Short,
-                    (int)Byte,
-                    (int)NonNegativeInteger,
-                    (int)PositiveInteger,
-                    (int)UnsignedInteger,
-                    (int)UnsignedLong,
-                    (int)UnsignedInt,
-                    (int)UnsignedShort,
-                    (int)UnsignedByte,
-                    (int)NonPositiveInteger,
-                    (int)NegativeInteger,
-                    (int)DayTimeDuration,
-                    (int)YearMonthDuration,
-                    (int)AnyUri,
-                    (int)Base64Binary,
-                    (int)Boolean,
-                    (int)Date,
-                    (int)DateTime,
-                    (int)Decimal,
-                    (int)Double,
-                    (int)Duration,
-                    (int)Float,
-                    (int)GDay,
-                    (int)GMonth,
-                    (int)GMonthDay,
-                    (int)HeyBinary,
-                    (int)Notation,
-                    (int)QName,
-                    (int)String,
-                    (int)Time,
-                    (int)NormalizedString,
-                    (int)Token,
-                    (int)Language,
-                    (int)NCName,
-                    (int)Entity,
-                    (int)Id,
-                    (int)Idref
-                }
+                {
+                    (int)Aas.DataTypeDef.Entities,
+                    (int)Aas.DataTypeDef.IdRefs,
+                    (int)Aas.DataTypeDef.NMTokens,
+                    (int)Aas.DataTypeDef.Integer,
+                    (int)Aas.DataTypeDef.Long,
+                    (int)Aas.DataTypeDef.Int,
+                    (int)Aas.DataTypeDef.Short,
+                    (int)Aas.DataTypeDef.Byte,
+                    (int)Aas.DataTypeDef.NonNegativeInteger,
+                    (int)Aas.DataTypeDef.PositiveInteger,
+                    (int)Aas.DataTypeDef.UnsignedInteger,
+                    (int)Aas.DataTypeDef.UnsignedLong,
+                    (int)Aas.DataTypeDef.UnsignedInt,
+                    (int)Aas.DataTypeDef.UnsignedShort,
+                    (int)Aas.DataTypeDef.UnsignedByte,
+                    (int)Aas.DataTypeDef.NonPositiveInteger,
+                    (int)Aas.DataTypeDef.NegativeInteger,
+                    (int)Aas.DataTypeDef.DayTimeDuration,
+                    (int)Aas.DataTypeDef.YearMonthDuration,
+                    (int)Aas.DataTypeDef.AnyUri,
+                    (int)Aas.DataTypeDef.Base64Binary,
+                    (int)Aas.DataTypeDef.Boolean,
+                    (int)Aas.DataTypeDef.Date,
+                    (int)Aas.DataTypeDef.DateTime,
+                    (int)Aas.DataTypeDef.Decimal,
+                    (int)Aas.DataTypeDef.Double,
+                    (int)Aas.DataTypeDef.Duration,
+                    (int)Aas.DataTypeDef.Float,
+                    (int)Aas.DataTypeDef.GDay,
+                    (int)Aas.DataTypeDef.GMonth,
+                    (int)Aas.DataTypeDef.GMonthDay,
+                    (int)Aas.DataTypeDef.HeyBinary,
+                    (int)Aas.DataTypeDef.Notation,
+                    (int)Aas.DataTypeDef.QName,
+                    (int)Aas.DataTypeDef.String,
+                    (int)Aas.DataTypeDef.Time,
+                    (int)Aas.DataTypeDef.NormalizedString,
+                    (int)Aas.DataTypeDef.Token,
+                    (int)Aas.DataTypeDef.Language,
+                    (int)Aas.DataTypeDef.NCName,
+                    (int)Aas.DataTypeDef.Entity,
+                    (int)Aas.DataTypeDef.Id,
+                    (int)Aas.DataTypeDef.Idref
+                };
 
                 public static HashSet<int> ForDataTypeIec61360 = new HashSet<int>
-                {    (int)Date,
-                    (int)String,
-                    (int)StringTranslatable,
-                    (int)IntegerMeasure,
-                    (int)IntegerCount,
-                    (int)IntegerCurrency,
-                    (int)RealMeasure,
-                    (int)RealCount,
-                    (int)RealCurrency,
-                    (int)Boolean,
-                    (int)Iri,
-                    (int)Irdi,
-                    (int)Rational,
-                    (int)RationalMeasure,
-                    (int)Time,
-                    (int)Timestamp,
-                    (int)File,
-                    (int)Html,
-                    (int)Blob
-                }
+                {
+                    (int)Aas.DataTypeIec61360.Date,
+                    (int)Aas.DataTypeIec61360.String,
+                    (int)Aas.DataTypeIec61360.StringTranslatable,
+                    (int)Aas.DataTypeIec61360.IntegerMeasure,
+                    (int)Aas.DataTypeIec61360.IntegerCount,
+                    (int)Aas.DataTypeIec61360.IntegerCurrency,
+                    (int)Aas.DataTypeIec61360.RealMeasure,
+                    (int)Aas.DataTypeIec61360.RealCount,
+                    (int)Aas.DataTypeIec61360.RealCurrency,
+                    (int)Aas.DataTypeIec61360.Boolean,
+                    (int)Aas.DataTypeIec61360.Iri,
+                    (int)Aas.DataTypeIec61360.Irdi,
+                    (int)Aas.DataTypeIec61360.Rational,
+                    (int)Aas.DataTypeIec61360.RationalMeasure,
+                    (int)Aas.DataTypeIec61360.Time,
+                    (int)Aas.DataTypeIec61360.Timestamp,
+                    (int)Aas.DataTypeIec61360.File,
+                    (int)Aas.DataTypeIec61360.Html,
+                    (int)Aas.DataTypeIec61360.Blob
+                };
 
                 public static HashSet<int> ForLevelType = new HashSet<int>
-                {    (int)Min,
-                    (int)Max,
-                    (int)Nom,
-                    (int)Type
-                }
+                {
+                    (int)Aas.LevelType.Min,
+                    (int)Aas.LevelType.Max,
+                    (int)Aas.LevelType.Nom,
+                    (int)Aas.LevelType.Type
+                };
             }  // private static class EnumValueSet
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
-            public static void VerifyNonemptystring (
+            public static void VerifyNonEmptyString (
                 string that,
                 string path,
                 Verification.Errors errors)
@@ -405,9 +420,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyMimeTyped (
@@ -435,9 +450,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyExtension (
@@ -447,7 +462,7 @@ namespace AasCore.Aas3
             {
                 if (errors.Full()) return;
 
-                Verification.Implementation.VerifyNonemptystring(
+                Verification.Implementation.VerifyNonEmptyString(
                     that.Name,
                     $"{path}/Name",
                     errors);
@@ -470,7 +485,7 @@ namespace AasCore.Aas3
 
                 if (that.Value != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Value,
                         $"{path}/Value",
                         errors);
@@ -478,9 +493,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyAdministrativeInformation (
@@ -505,7 +520,7 @@ namespace AasCore.Aas3
 
                 if (that.Version != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Version,
                         $"{path}/Version",
                         errors);
@@ -515,7 +530,7 @@ namespace AasCore.Aas3
 
                 if (that.Revision != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Revision,
                         $"{path}/Revision",
                         errors);
@@ -523,9 +538,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyQualifier (
@@ -535,7 +550,7 @@ namespace AasCore.Aas3
             {
                 if (errors.Full()) return;
 
-                Verification.Implementation.VerifyNonemptystring(
+                Verification.Implementation.VerifyNonEmptyString(
                     that.Type,
                     $"{path}/Type",
                     errors);
@@ -555,7 +570,7 @@ namespace AasCore.Aas3
 
                 if (that.Value != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Value,
                         $"{path}/Value",
                         errors);
@@ -563,9 +578,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyFormula (
@@ -577,9 +592,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyAssetAdministrationShell (
@@ -591,7 +606,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -601,7 +616,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -609,16 +624,16 @@ namespace AasCore.Aas3
 
                 if (errors.Full()) return;
 
-                Verification.Implementation.VerifyNonemptystring(
+                Verification.Implementation.VerifyNonEmptyString(
                     that.Id,
                     $"{path}/Id",
                     errors);
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyAssetInformation (
@@ -639,9 +654,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyIdentifierKeyValuePair (
@@ -651,23 +666,23 @@ namespace AasCore.Aas3
             {
                 if (errors.Full()) return;
 
-                Verification.Implementation.VerifyNonemptystring(
+                Verification.Implementation.VerifyNonEmptyString(
                     that.Key,
                     $"{path}/Key",
                     errors);
 
                 if (errors.Full()) return;
 
-                Verification.Implementation.VerifyNonemptystring(
+                Verification.Implementation.VerifyNonEmptyString(
                     that.Value,
                     $"{path}/Value",
                     errors);
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifySubmodel (
@@ -693,7 +708,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -703,7 +718,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -711,16 +726,16 @@ namespace AasCore.Aas3
 
                 if (errors.Full()) return;
 
-                Verification.Implementation.VerifyNonemptystring(
+                Verification.Implementation.VerifyNonEmptyString(
                     that.Id,
                     $"{path}/Id",
                     errors);
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifySubmodelElementList (
@@ -732,7 +747,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -742,7 +757,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -789,9 +804,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifySubmodelElementStruct (
@@ -803,7 +818,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -813,7 +828,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -835,9 +850,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyProperty (
@@ -849,7 +864,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -859,7 +874,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -894,7 +909,7 @@ namespace AasCore.Aas3
 
                 if (that.Value != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Value,
                         $"{path}/Value",
                         errors);
@@ -902,9 +917,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyMultiLanguageProperty (
@@ -916,7 +931,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -926,7 +941,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -948,9 +963,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyRange (
@@ -962,7 +977,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -972,7 +987,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -1007,7 +1022,7 @@ namespace AasCore.Aas3
 
                 if (that.Min != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Min,
                         $"{path}/Min",
                         errors);
@@ -1017,7 +1032,7 @@ namespace AasCore.Aas3
 
                 if (that.Max != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Max,
                         $"{path}/Max",
                         errors);
@@ -1025,9 +1040,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyReferenceElement (
@@ -1039,7 +1054,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -1049,7 +1064,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -1071,9 +1086,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyBlob (
@@ -1094,7 +1109,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -1104,7 +1119,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -1133,9 +1148,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyFile (
@@ -1156,7 +1171,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -1166,7 +1181,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -1197,7 +1212,7 @@ namespace AasCore.Aas3
 
                 if (that.Value != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Value,
                         $"{path}/Value",
                         errors);
@@ -1205,9 +1220,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyAnnotatedRelationshipElement (
@@ -1219,7 +1234,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -1229,7 +1244,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -1251,9 +1266,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyEntity (
@@ -1265,7 +1280,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -1275,7 +1290,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -1308,9 +1323,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyBasicEvent (
@@ -1322,7 +1337,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -1332,7 +1347,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -1354,9 +1369,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyOperation (
@@ -1368,7 +1383,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -1378,7 +1393,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -1400,9 +1415,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyOperationVariable (
@@ -1414,9 +1429,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyCapability (
@@ -1428,7 +1443,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -1438,7 +1453,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -1460,9 +1475,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyConceptDescription (
@@ -1474,7 +1489,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -1484,7 +1499,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -1492,16 +1507,16 @@ namespace AasCore.Aas3
 
                 if (errors.Full()) return;
 
-                Verification.Implementation.VerifyNonemptystring(
+                Verification.Implementation.VerifyNonEmptyString(
                     that.Id,
                     $"{path}/Id",
                     errors);
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyView (
@@ -1513,7 +1528,7 @@ namespace AasCore.Aas3
 
                 if (that.IdShort != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.IdShort,
                         $"{path}/IdShort",
                         errors);
@@ -1523,7 +1538,7 @@ namespace AasCore.Aas3
 
                 if (that.Category != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Category,
                         $"{path}/Category",
                         errors);
@@ -1531,9 +1546,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyGlobalReference (
@@ -1552,19 +1567,19 @@ namespace AasCore.Aas3
 
                 if (errors.Full()) return;
 
-                foreach (var anItem in that.Values
+                foreach (var anItem in that.Values)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         anItem,
-                        $"{path}/Values/{item_var}",
+                        $"{path}/Values/{anItem}",
                         errors);
                 }
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyModelReference (
@@ -1583,9 +1598,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyKey (
@@ -1606,7 +1621,7 @@ namespace AasCore.Aas3
 
                 if (errors.Full()) return;
 
-                Verification.Implementation.VerifyNonemptystring(
+                Verification.Implementation.VerifyNonEmptyString(
                     that.Value,
                     $"{path}/Value",
                     errors);
@@ -1627,9 +1642,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyValueReferencePair (
@@ -1639,16 +1654,16 @@ namespace AasCore.Aas3
             {
                 if (errors.Full()) return;
 
-                Verification.Implementation.VerifyNonemptystring(
+                Verification.Implementation.VerifyNonEmptyString(
                     that.Value,
                     $"{path}/Value",
                     errors);
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyValueList (
@@ -1660,9 +1675,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyDataSpecificationIec61360 (
@@ -1674,7 +1689,7 @@ namespace AasCore.Aas3
 
                 if (that.Unit != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Unit,
                         $"{path}/Unit",
                         errors);
@@ -1684,7 +1699,7 @@ namespace AasCore.Aas3
 
                 if (that.SourceOfDefinition != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.SourceOfDefinition,
                         $"{path}/SourceOfDefinition",
                         errors);
@@ -1694,7 +1709,7 @@ namespace AasCore.Aas3
 
                 if (that.Symbol != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Symbol,
                         $"{path}/Symbol",
                         errors);
@@ -1718,7 +1733,7 @@ namespace AasCore.Aas3
 
                 if (that.ValueFormat != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.ValueFormat,
                         $"{path}/ValueFormat",
                         errors);
@@ -1728,7 +1743,7 @@ namespace AasCore.Aas3
 
                 if (that.Value != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Value,
                         $"{path}/Value",
                         errors);
@@ -1750,9 +1765,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyDataSpecificationPhysicalUnit (
@@ -1764,7 +1779,7 @@ namespace AasCore.Aas3
 
                 if (that.UnitName != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.UnitName,
                         $"{path}/UnitName",
                         errors);
@@ -1774,7 +1789,7 @@ namespace AasCore.Aas3
 
                 if (that.UnitSymbol != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.UnitSymbol,
                         $"{path}/UnitSymbol",
                         errors);
@@ -1784,7 +1799,7 @@ namespace AasCore.Aas3
 
                 if (that.SiNotation != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.SiNotation,
                         $"{path}/SiNotation",
                         errors);
@@ -1794,7 +1809,7 @@ namespace AasCore.Aas3
 
                 if (that.DinNotation != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.DinNotation,
                         $"{path}/DinNotation",
                         errors);
@@ -1804,7 +1819,7 @@ namespace AasCore.Aas3
 
                 if (that.EceName != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.EceName,
                         $"{path}/EceName",
                         errors);
@@ -1814,7 +1829,7 @@ namespace AasCore.Aas3
 
                 if (that.EceCode != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.EceCode,
                         $"{path}/EceCode",
                         errors);
@@ -1824,7 +1839,7 @@ namespace AasCore.Aas3
 
                 if (that.NistName != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.NistName,
                         $"{path}/NistName",
                         errors);
@@ -1834,7 +1849,7 @@ namespace AasCore.Aas3
 
                 if (that.SourceOfDefinition != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.SourceOfDefinition,
                         $"{path}/SourceOfDefinition",
                         errors);
@@ -1844,7 +1859,7 @@ namespace AasCore.Aas3
 
                 if (that.ConversionFactor != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.ConversionFactor,
                         $"{path}/ConversionFactor",
                         errors);
@@ -1854,7 +1869,7 @@ namespace AasCore.Aas3
 
                 if (that.RegistrationAuthorityId != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.RegistrationAuthorityId,
                         $"{path}/RegistrationAuthorityId",
                         errors);
@@ -1864,7 +1879,7 @@ namespace AasCore.Aas3
 
                 if (that.Supplier != null)
                 {
-                    Verification.Implementation.VerifyNonemptystring(
+                    Verification.Implementation.VerifyNonEmptyString(
                         that.Supplier,
                         $"{path}/Supplier",
                         errors);
@@ -1872,9 +1887,9 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to 
+            /// Verify <paramref name="that" /> and append any errors to
             /// <paramref name="Errors" />.
-            /// 
+            ///
             /// The <paramref name="path" /> localizes <paramref name="that" />.
             /// </summary>
             public static void VerifyEnvironment (
@@ -1889,7 +1904,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Verify the instances of the model classes non-recursively.
         /// </summary>
-        public class NonRecursiveVerifier : 
+        public class NonRecursiveVerifier :
             Visitation.IVisitorWithContext<string>
         {
             public readonly Verification.Errors Errors;
@@ -1912,7 +1927,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.Extension that, string context)
@@ -1923,7 +1938,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.AdministrativeInformation that, string context)
@@ -1934,7 +1949,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.Qualifier that, string context)
@@ -1945,7 +1960,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.Formula that, string context)
@@ -1956,7 +1971,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.AssetAdministrationShell that, string context)
@@ -1967,7 +1982,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.AssetInformation that, string context)
@@ -1978,7 +1993,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.IdentifierKeyValuePair that, string context)
@@ -1989,7 +2004,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.Submodel that, string context)
@@ -2000,7 +2015,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.SubmodelElementList that, string context)
@@ -2011,7 +2026,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.SubmodelElementStruct that, string context)
@@ -2022,7 +2037,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.Property that, string context)
@@ -2033,7 +2048,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.MultiLanguageProperty that, string context)
@@ -2044,7 +2059,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.Range that, string context)
@@ -2055,7 +2070,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.ReferenceElement that, string context)
@@ -2066,7 +2081,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.Blob that, string context)
@@ -2077,7 +2092,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.File that, string context)
@@ -2088,7 +2103,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.AnnotatedRelationshipElement that, string context)
@@ -2099,7 +2114,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.Entity that, string context)
@@ -2110,7 +2125,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.BasicEvent that, string context)
@@ -2121,7 +2136,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.Operation that, string context)
@@ -2132,7 +2147,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.OperationVariable that, string context)
@@ -2143,7 +2158,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.Capability that, string context)
@@ -2154,7 +2169,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.ConceptDescription that, string context)
@@ -2165,7 +2180,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.View that, string context)
@@ -2176,7 +2191,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.GlobalReference that, string context)
@@ -2187,7 +2202,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.ModelReference that, string context)
@@ -2198,7 +2213,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.Key that, string context)
@@ -2209,7 +2224,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.LangStringSet that, string context)
@@ -2220,7 +2235,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.ValueReferencePair that, string context)
@@ -2231,7 +2246,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.ValueList that, string context)
@@ -2242,7 +2257,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.DataSpecificationIec61360 that, string context)
@@ -2253,7 +2268,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.DataSpecificationPhysicalUnit that, string context)
@@ -2264,7 +2279,7 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.Environment that, string context)
@@ -2277,7 +2292,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Verify the instances of the model classes recursively.
         /// </summary>
-        public class RecursiveVerifier : 
+        public class RecursiveVerifier :
             Visitation.IVisitorWithContext<string>
         {
             public readonly Errors Errors;
@@ -2300,10 +2315,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Extension that, string context) 
+            public void Visit(Extension that, string context)
             {
                 Implementation.VerifyExtension(
                     that, context, Errors);
@@ -2327,10 +2342,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(AdministrativeInformation that, string context) 
+            public void Visit(AdministrativeInformation that, string context)
             {
                 Implementation.VerifyAdministrativeInformation(
                     that, context, Errors);
@@ -2349,10 +2364,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Qualifier that, string context) 
+            public void Visit(Qualifier that, string context)
             {
                 Implementation.VerifyQualifier(
                     that, context, Errors);
@@ -2376,10 +2391,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Formula that, string context) 
+            public void Visit(Formula that, string context)
             {
                 Implementation.VerifyFormula(
                     that, context, Errors);
@@ -2395,10 +2410,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(AssetAdministrationShell that, string context) 
+            public void Visit(AssetAdministrationShell that, string context)
             {
                 Implementation.VerifyAssetAdministrationShell(
                     that, context, Errors);
@@ -2470,10 +2485,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(AssetInformation that, string context) 
+            public void Visit(AssetInformation that, string context)
             {
                 Implementation.VerifyAssetInformation(
                     that, context, Errors);
@@ -2505,10 +2520,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(IdentifierKeyValuePair that, string context) 
+            public void Visit(IdentifierKeyValuePair that, string context)
             {
                 Implementation.VerifyIdentifierKeyValuePair(
                     that, context, Errors);
@@ -2532,10 +2547,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Submodel that, string context) 
+            public void Visit(Submodel that, string context)
             {
                 Implementation.VerifySubmodel(
                     that, context, Errors);
@@ -2613,10 +2628,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(SubmodelElementList that, string context) 
+            public void Visit(SubmodelElementList that, string context)
             {
                 Implementation.VerifySubmodelElementList(
                     that, context, Errors);
@@ -2691,10 +2706,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(SubmodelElementStruct that, string context) 
+            public void Visit(SubmodelElementStruct that, string context)
             {
                 Implementation.VerifySubmodelElementStruct(
                     that, context, Errors);
@@ -2761,10 +2776,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Property that, string context) 
+            public void Visit(Property that, string context)
             {
                 Implementation.VerifyProperty(
                     that, context, Errors);
@@ -2831,10 +2846,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(MultiLanguageProperty that, string context) 
+            public void Visit(MultiLanguageProperty that, string context)
             {
                 Implementation.VerifyMultiLanguageProperty(
                     that, context, Errors);
@@ -2909,10 +2924,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Range that, string context) 
+            public void Visit(Range that, string context)
             {
                 Implementation.VerifyRange(
                     that, context, Errors);
@@ -2971,10 +2986,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(ReferenceElement that, string context) 
+            public void Visit(ReferenceElement that, string context)
             {
                 Implementation.VerifyReferenceElement(
                     that, context, Errors);
@@ -3041,10 +3056,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Blob that, string context) 
+            public void Visit(Blob that, string context)
             {
                 Implementation.VerifyBlob(
                     that, context, Errors);
@@ -3103,10 +3118,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(File that, string context) 
+            public void Visit(File that, string context)
             {
                 Implementation.VerifyFile(
                     that, context, Errors);
@@ -3165,10 +3180,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(AnnotatedRelationshipElement that, string context) 
+            public void Visit(AnnotatedRelationshipElement that, string context)
             {
                 Implementation.VerifyAnnotatedRelationshipElement(
                     that, context, Errors);
@@ -3245,10 +3260,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Entity that, string context) 
+            public void Visit(Entity that, string context)
             {
                 Implementation.VerifyEntity(
                     that, context, Errors);
@@ -3331,10 +3346,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(BasicEvent that, string context) 
+            public void Visit(BasicEvent that, string context)
             {
                 Implementation.VerifyBasicEvent(
                     that, context, Errors);
@@ -3398,10 +3413,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Operation that, string context) 
+            public void Visit(Operation that, string context)
             {
                 Implementation.VerifyOperation(
                     that, context, Errors);
@@ -3490,10 +3505,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(OperationVariable that, string context) 
+            public void Visit(OperationVariable that, string context)
             {
                 Implementation.VerifyOperationVariable(
                     that, context, Errors);
@@ -3506,10 +3521,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Capability that, string context) 
+            public void Visit(Capability that, string context)
             {
                 Implementation.VerifyCapability(
                     that, context, Errors);
@@ -3568,10 +3583,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(ConceptDescription that, string context) 
+            public void Visit(ConceptDescription that, string context)
             {
                 Implementation.VerifyConceptDescription(
                     that, context, Errors);
@@ -3630,10 +3645,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(View that, string context) 
+            public void Visit(View that, string context)
             {
                 Implementation.VerifyView(
                     that, context, Errors);
@@ -3695,10 +3710,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(GlobalReference that, string context) 
+            public void Visit(GlobalReference that, string context)
             {
                 Implementation.VerifyGlobalReference(
                     that, context, Errors);
@@ -3708,10 +3723,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(ModelReference that, string context) 
+            public void Visit(ModelReference that, string context)
             {
                 Implementation.VerifyModelReference(
                     that, context, Errors);
@@ -3735,10 +3750,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Key that, string context) 
+            public void Visit(Key that, string context)
             {
                 Implementation.VerifyKey(
                     that, context, Errors);
@@ -3758,10 +3773,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(ValueReferencePair that, string context) 
+            public void Visit(ValueReferencePair that, string context)
             {
                 Implementation.VerifyValueReferencePair(
                     that, context, Errors);
@@ -3774,10 +3789,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(ValueList that, string context) 
+            public void Visit(ValueList that, string context)
             {
                 Implementation.VerifyValueList(
                     that, context, Errors);
@@ -3796,10 +3811,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(DataSpecificationIec61360 that, string context) 
+            public void Visit(DataSpecificationIec61360 that, string context)
             {
                 Implementation.VerifyDataSpecificationIec61360(
                     that, context, Errors);
@@ -3855,10 +3870,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(DataSpecificationPhysicalUnit that, string context) 
+            public void Visit(DataSpecificationPhysicalUnit that, string context)
             {
                 Implementation.VerifyDataSpecificationPhysicalUnit(
                     that, context, Errors);
@@ -3874,10 +3889,10 @@ namespace AasCore.Aas3
 
             /// <summary>
             /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
-            public void Visit(Environment that, string context) 
+            public void Visit(Environment that, string context)
             {
                 Implementation.VerifyEnvironment(
                     that, context, Errors);

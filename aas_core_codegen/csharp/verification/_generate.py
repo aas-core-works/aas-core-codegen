@@ -10,15 +10,12 @@ from typing import (
     Final,
     Set,
     MutableMapping,
-    NewType,
     Mapping,
-    get_args,
 )
 
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate, specific_implementations
-from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
 from aas_core_codegen.common import Error, Stripped, assert_never, Identifier
 from aas_core_codegen.csharp import (
     common as csharp_common,
@@ -27,6 +24,7 @@ from aas_core_codegen.csharp import (
     description as csharp_description,
 )
 from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II, INDENT3 as III
+from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
 from aas_core_codegen.parse import tree as parse_tree
 
 
@@ -309,7 +307,7 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
             """\
         /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
-        /// </summary> 
+        /// </summary>
         private static class EnumValueSet
         {
         """
@@ -1008,6 +1006,8 @@ class _InvariantTranspiler(
         else:
             assert_never(func_type)
 
+        raise AssertionError("Should not have gotten here")
+
     def transform_constant(
         self, node: parse_tree.Constant
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -1019,6 +1019,8 @@ class _InvariantTranspiler(
             return Stripped(repr(node.value)), None
         else:
             assert_never(node.value)
+
+        raise AssertionError("Should not have gotten here")
 
     def transform_is_none(
         self, node: parse_tree.IsNone
@@ -1097,7 +1099,7 @@ class _InvariantTranspiler(
                 node.original_node, "Failed to transpile the conjunction", errors
             )
 
-        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        # BEFORE-RELEASE (mristin, 2021-12-13):
         #  add heuristic for breaking the lines
         return Stripped(" && ".join(values)), None
 
@@ -1133,21 +1135,21 @@ class _InvariantTranspiler(
                 node.original_node, "Failed to transpile the conjunction", errors
             )
 
-        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        # BEFORE-RELEASE (mristin, 2021-12-13):
         #  add heuristic for breaking the lines
         return Stripped(" || ".join(values)), None
 
     def transform_declaration(
         self, node: parse_tree.Declaration
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        # BEFORE-RELEASE (mristin, 2021-12-13):
         #  implement once we got to end-to-end with serialization
         raise NotImplementedError()
 
     def transform_expression_with_declarations(
         self, node: parse_tree.ExpressionWithDeclarations
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        # BEFORE-RELEASE (mristin, 2021-12-13):
         #  implement once we got to end-to-end with serialization
         raise NotImplementedError()
 
@@ -1383,9 +1385,9 @@ def _generate_implementation_verify(
         textwrap.dedent(
             f"""\
         /// <summary>
-        /// Verify <paramref name="that" /> and append any errors to 
+        /// Verify <paramref name="that" /> and append any errors to
         /// <paramref name="Errors" />.
-        /// 
+        ///
         /// The <paramref name="path" /> localizes <paramref name="that" />.
         /// </summary>
         public static void Verify{cls_name} (
@@ -1548,7 +1550,7 @@ def _generate_non_recursive_verifier(
                     f"""\
             /// <summary>
             /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" /> 
+            /// append any error to <see cref="Errors" />
             /// where <paramref name="context" /> is used to localize the error.
             /// </summary>
             public void Visit(Aas.{cls_name} that, string context)
@@ -1567,7 +1569,7 @@ def _generate_non_recursive_verifier(
         /// <summary>
         /// Verify the instances of the model classes non-recursively.
         /// </summary>
-        public class NonRecursiveVerifier : 
+        public class NonRecursiveVerifier :
         {I}Visitation.IVisitorWithContext<string>
         {{
         """
@@ -1816,10 +1818,10 @@ def _generate_recursive_verifier_visit(
     writer.write(textwrap.dedent(f'''\
         /// <summary>
         /// Verify recursively <paramref name="that" /> instance and
-        /// append any error to <see cref="Errors" /> 
+        /// append any error to <see cref="Errors" />
         /// where <paramref name="context" /> is used to localize the error.
         /// </summary>
-        public void Visit({cls_name} that, string context) 
+        public void Visit({cls_name} that, string context)
         {{
         '''))
 
@@ -1932,7 +1934,7 @@ def _generate_recursive_verifier(
         /// <summary>
         /// Verify the instances of the model classes recursively.
         /// </summary>
-        public class RecursiveVerifier : 
+        public class RecursiveVerifier :
         {I}Visitation.IVisitorWithContext<string>
         {{
         """
@@ -1976,7 +1978,7 @@ def generate(
             using System.Collections.Generic;  // can't alias
             using System.Collections.ObjectModel;  // can't alias
             using System.Linq;  // can't alias"
-    
+
             using Aas = {namespace};
             using Visitation = {namespace}.Visitation;"""
             )

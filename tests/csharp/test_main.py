@@ -79,7 +79,7 @@ class Test_against_recorded(unittest.TestCase):
                         normalized_stdout, stdout_pth.read_text(), stdout_pth
                     )
 
-                # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+                # BEFORE-RELEASE (mristin, 2021-12-13):
                 #  check the remainder of the generated files
                 for relevant_rel_pth in [
                     pathlib.Path("types.cs"),
@@ -87,7 +87,7 @@ class Test_against_recorded(unittest.TestCase):
                     pathlib.Path("verification.cs"),
                     pathlib.Path("stringification.cs"),
                     pathlib.Path("jsonization.cs"),
-                    # TODO-BEFORE-RELEASE (mristin, 2021-12-19):
+                    # BEFORE-RELEASE (mristin, 2021-12-19):
                     #  Uncomment and make sure it is implemented once we nailed down
                     #  how the XML de/serialization should be implemented.
                     # pathlib.Path('xmlization.cs')

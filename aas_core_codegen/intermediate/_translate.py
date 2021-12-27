@@ -33,7 +33,6 @@ from aas_core_codegen.common import (
     Identifier,
     assert_never,
     IDENTIFIER_RE,
-    assert_union_of_descendants_exhaustive,
 )
 from aas_core_codegen.intermediate import (
     _hierarchy,
@@ -71,7 +70,6 @@ from aas_core_codegen.intermediate._types import (
     RefTypeAnnotation,
     ImplementationSpecificMethod,
     ImplementationSpecificVerification,
-    Verification,
     PatternVerification,
     ConstrainedPrimitive,
     ConcreteClass,
@@ -84,6 +82,8 @@ from aas_core_codegen.intermediate._types import (
 )
 from aas_core_codegen.parse import tree as parse_tree
 
+
+# pylint: disable=unused-argument
 
 # noinspection PyUnusedLocal
 def _symbol_reference_role(  # type: ignore
@@ -191,6 +191,8 @@ def _argument_reference_role(  # type: ignore
     )
     return [node], []
 
+
+# pylint: enable=unused-argument
 
 # The global registration is unfortunate since it is unpredictable and might affect
 # other modules, but it is the only way to register the roles.
@@ -333,6 +335,8 @@ def _parsed_type_annotation_to_type_annotation(
 
     else:
         assert_never(parsed)
+
+    raise AssertionError("Should not have gotten here")
 
 
 class _DefaultPlaceholder:
@@ -524,7 +528,7 @@ def _stack_contracts(contracts: Contracts, other: Contracts) -> Contracts:
     )
 
 
-T = TypeVar("T")
+T = TypeVar("T")  # pylint: disable=invalid-name
 
 
 class _SettingWithSource(Generic[T]):
@@ -817,7 +821,7 @@ def _determine_constrained_primitives_by_name(
 
     # region Check the inheritances of all the constrained primitive types
 
-    # TODO-BEFORE-RELEASE (mristin, 2021-12-23): test this
+    # BEFORE-RELEASE (mristin, 2021-12-23): test this
     for identifier in extended_map.keys():
         # We know for sure that the initial set is valid so we can skip it in the check.
         if identifier in initial_map:
@@ -862,7 +866,7 @@ def _determine_constrained_primitives_by_name(
 
     # region Check that primitive types do not have unexpected specification
 
-    # TODO-BEFORE-RELEASE (mristin, 2021-12-23): test this
+    # BEFORE-RELEASE (mristin, 2021-12-23): test this
     for identifier in result:
         parsed_cls = parsed_symbol_table.must_find_class(identifier)
         if len(parsed_cls.methods) > 0 or len(parsed_cls.properties) > 0:
@@ -1006,7 +1010,7 @@ def _parsed_class_to_class(
 
     # region Stack properties from the ancestors
 
-    # TODO-BEFORE-RELEASE (mristin, 2021-12-14):
+    # BEFORE-RELEASE (mristin, 2021-12-14):
     #  We need to refactor this function since it is now running in quadratic time
     #  for properties, methods and constructors. We just have to follow the same trick
     #  as with ``_stack_invariants``, but we have to be careful not to miss one or the
@@ -1221,6 +1225,8 @@ def _parsed_verification_function_to_verification_function(
     else:
         assert_never(parsed)
 
+    raise AssertionError("Should not have gotten here")
+
 
 def _over_our_type_annotations(
     something: Union[Symbol, TypeAnnotationUnion]
@@ -1429,7 +1435,7 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
 
     # The ``symbol`` is None if the description is in the context outside of a symbol.
     for symbol, description in _over_descriptions(symbol_table):
-        # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
+        # BEFORE-RELEASE (mristin, 2021-12-13):
         #  test this, especially the failure cases
         for attr_ref_in_doc in description.document.traverse(
             condition=doc.AttributeReference
@@ -2027,15 +2033,15 @@ class _ContractChecker(parse_tree.Visitor):
         )
 
         if verification_function is not None:
-            # TODO-BEFORE-RELEASE (mristin, 2021-12-19):
+            # BEFORE-RELEASE (mristin, 2021-12-19):
             #  test failure case
             expected_argument_count = len(verification_function.arguments)
         elif node.name.identifier == "len":
-            # TODO-BEFORE-RELEASE (mristin, 2021-12-19):
+            # BEFORE-RELEASE (mristin, 2021-12-19):
             #  test failure case
             expected_argument_count = 1
         else:
-            # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test this
+            # BEFORE-RELEASE (mristin, 2021-12-19): test this
             self.errors.append(
                 Error(
                     node.original_node,
@@ -2045,7 +2051,7 @@ class _ContractChecker(parse_tree.Visitor):
             return
 
         if len(node.args) != expected_argument_count:
-            # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test this
+            # BEFORE-RELEASE (mristin, 2021-12-19): test this
             self.errors.append(
                 Error(
                     node.original_node,

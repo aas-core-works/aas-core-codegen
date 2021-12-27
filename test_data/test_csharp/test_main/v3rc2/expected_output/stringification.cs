@@ -47,8 +47,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="ModelingKind" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="ModelingKind" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="ModelingKind" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.ModelingKind? ModelingKindFromString(string text)
@@ -99,8 +99,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="AssetKind" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="AssetKind" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="AssetKind" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.AssetKind? AssetKindFromString(string text)
@@ -151,8 +151,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="EntityType" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="EntityType" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="EntityType" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.EntityType? EntityTypeFromString(string text)
@@ -205,8 +205,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="IdentifiableElements" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="IdentifiableElements" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="IdentifiableElements" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.IdentifiableElements? IdentifiableElementsFromString(string text)
@@ -297,8 +297,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="ReferableElements" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="ReferableElements" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="ReferableElements" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.ReferableElements? ReferableElementsFromString(string text)
@@ -393,8 +393,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="KeyElements" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="KeyElements" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="KeyElements" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.KeyElements? KeyElementsFromString(string text)
@@ -483,8 +483,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="SubmodelElements" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="SubmodelElements" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="SubmodelElements" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.SubmodelElements? SubmodelElementsFromString(string text)
@@ -537,8 +537,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="BuildInListTypes" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="BuildInListTypes" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="BuildInListTypes" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.BuildInListTypes? BuildInListTypesFromString(string text)
@@ -613,8 +613,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="DecimalBuildInTypes" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="DecimalBuildInTypes" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="DecimalBuildInTypes" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.DecimalBuildInTypes? DecimalBuildInTypesFromString(string text)
@@ -665,8 +665,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="DurationBuildInTypes" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="DurationBuildInTypes" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="DurationBuildInTypes" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.DurationBuildInTypes? DurationBuildInTypesFromString(string text)
@@ -747,8 +747,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="PrimitiveTypes" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="PrimitiveTypes" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="PrimitiveTypes" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.PrimitiveTypes? PrimitiveTypesFromString(string text)
@@ -809,8 +809,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="StringBuildInTypes" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="StringBuildInTypes" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="StringBuildInTypes" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.StringBuildInTypes? StringBuildInTypesFromString(string text)
@@ -943,8 +943,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="DataTypeDef" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="DataTypeDef" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="DataTypeDef" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.DataTypeDef? DataTypeDefFromString(string text)
@@ -1029,8 +1029,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="DataTypeIec61360" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="DataTypeIec61360" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="DataTypeIec61360" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.DataTypeIec61360? DataTypeIec61360FromString(string text)
@@ -1085,8 +1085,8 @@ namespace AasCore.Aas3
         /// Parse the string representation of <see cref="LevelType" />.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation 
-        /// of a literal of <see cref="LevelType" />, 
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="LevelType" />,
         /// return <c>null</c>.
         /// </remarks>
         public static Aas.LevelType? LevelTypeFromString(string text)

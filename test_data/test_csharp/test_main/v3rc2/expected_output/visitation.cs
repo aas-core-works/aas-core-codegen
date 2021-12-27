@@ -91,7 +91,7 @@ namespace AasCore.Aas3
         }  // public interface IVisitorWithContext
 
         /// <summary>
-        /// Define the interface for a transformer which transforms recursively 
+        /// Define the interface for a transformer which transforms recursively
         /// the instances into something else.
         /// </summary>
         /// <typeparam name="T">The type of the transformation result</typeparam>

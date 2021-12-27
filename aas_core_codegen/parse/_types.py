@@ -1,10 +1,9 @@
 """Provide the types into which we parse the original meta-model."""
 import abc
 import ast
-import inspect
 import os
 import pathlib
-from typing import Sequence, Optional, Union, Final, Mapping, Any, Type, TypeVar
+from typing import Sequence, Optional, Union, Final, Mapping
 
 import docutils.nodes
 from icontract import require, DBC, ensure, invariant

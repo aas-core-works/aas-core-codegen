@@ -8,19 +8,13 @@ from typing import (
     Tuple,
     cast,
     Union,
-    Sequence,
     Mapping,
     Final,
-    Iterator,
 )
 
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate
-from aas_core_codegen.intermediate import (
-    construction as intermediate_construction,
-)
-
 from aas_core_codegen import specific_implementations
 from aas_core_codegen.common import Error, Identifier, assert_never, Stripped, Rstripped
 from aas_core_codegen.csharp import (
@@ -30,6 +24,9 @@ from aas_core_codegen.csharp import (
     description as csharp_description,
 )
 from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II
+from aas_core_codegen.intermediate import (
+    construction as intermediate_construction,
+)
 
 
 # region Checks
@@ -128,7 +125,7 @@ def _verify_intra_structure_collisions(
         for prop in intermediate_symbol.properties:
             prop_name = csharp_naming.property_name(prop.name)
             if prop_name in observed_member_names:
-                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+                # BEFORE-RELEASE (mristin, 2021-12-13): test
                 errors.append(
                     Error(
                         prop.parsed.node,
@@ -147,7 +144,7 @@ def _verify_intra_structure_collisions(
             method_name = csharp_naming.method_name(method.name)
 
             if method_name in observed_member_names:
-                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test
+                # BEFORE-RELEASE (mristin, 2021-12-13): test
                 errors.append(
                     Error(
                         method.parsed.node,
@@ -675,7 +672,7 @@ def _generate_descend_once_method(
     return Stripped(
         f"""\
 /// <summary>
-/// Iterate over all the class instances referenced from this instance 
+/// Iterate over all the class instances referenced from this instance
 /// without further recursion.
 /// </summary>
 public IEnumerable<IClass> DescendOnce()
@@ -993,7 +990,7 @@ def _generate_class(
             textwrap.dedent(
                 f"""\
         /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance 
+        /// Accept the <paramref name="visitor" /> to visit this instance
         /// for double dispatch.
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
@@ -1009,7 +1006,7 @@ def _generate_class(
             textwrap.dedent(
                 f"""\
         /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch 
+        /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
         public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
@@ -1025,7 +1022,7 @@ def _generate_class(
             textwrap.dedent(
                 f"""\
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance 
+        /// Accept the <paramref name="transformer" /> to transform this instance
         /// for double dispatch.
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
@@ -1041,7 +1038,7 @@ def _generate_class(
             textwrap.dedent(
                 f"""\
         /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance 
+        /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
         public T Transform<C, T>(
@@ -1145,40 +1142,40 @@ def generate(
         public interface IClass
         {{
             /// <summary>
-            /// Iterate over all the class instances referenced from this instance 
+            /// Iterate over all the class instances referenced from this instance
             /// without further recursion.
             /// </summary>
             public IEnumerable<IClass> DescendOnce();
-            
+
             /// <summary>
             /// Iterate recursively over all the class instances referenced from this instance.
             /// </summary>
             public IEnumerable<IClass> Descend();
 
             /// <summary>
-            /// Accept the <paramref name="visitor" /> to visit this instance 
+            /// Accept the <paramref name="visitor" /> to visit this instance
             /// for double dispatch.
             /// </summary>
             public void Accept(Visitation.IVisitor visitor);
-            
+
             /// <summary>
-            /// Accept the visitor to visit this instance for double dispatch 
+            /// Accept the visitor to visit this instance for double dispatch
             /// with the <paramref name="context" />.
             /// </summary>
             public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context);
-            
+
             /// <summary>
-            /// Accept the <paramref name="transformer" /> to transform this instance 
+            /// Accept the <paramref name="transformer" /> to transform this instance
             /// for double dispatch.
             /// </summary>
             public T Transform<T>(Visitation.ITransformer<T> transformer);
-            
+
             /// <summary>
-            /// Accept the <paramref name="transformer" /> to visit this instance 
+            /// Accept the <paramref name="transformer" /> to visit this instance
             /// for double dispatch with the <paramref name="context" />.
             /// </summary>
             public T Transform<C, T>(
-            {I}Visitation.ITransformerWithContext<C, T> transformer, C context);                        
+            {I}Visitation.ITransformerWithContext<C, T> transformer, C context);
         }}"""
                 ),
                 I,
@@ -1211,16 +1208,16 @@ def generate(
                 )
         else:
             if isinstance(something, intermediate.Enumeration):
-                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
+                # BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
                 code, error = _generate_enum(enum=something)
             elif isinstance(something, intermediate.Interface):
-                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
+                # BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
                 code, error = _generate_interface(
                     interface=something, ref_association=symbol_table.ref_association
                 )
 
             elif isinstance(something, intermediate.ConcreteClass):
-                # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
+                # BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
                 code, error = _generate_class(
                     cls=something,
                     spec_impls=spec_impls,

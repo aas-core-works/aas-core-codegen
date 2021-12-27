@@ -2,7 +2,7 @@
 
 import io
 import textwrap
-from typing import Tuple, Optional, List, Sequence
+from typing import Tuple, Optional, List
 
 from icontract import ensure
 
@@ -297,7 +297,7 @@ case Json.JsonTokenType.EndObject:
             f"""\
             {I}default:
             {II}throw new Json.JsonException(
-            {III}$"Unexpected property in an implementer class " + 
+            {III}$"Unexpected property in an implementer class " +
             {III}$"of {interface_name}: {{propertyName}}");
             }}  // switch on propertyName"""
         )
@@ -417,7 +417,7 @@ def _generate_write_for_interface(interface: intermediate.Interface) -> Stripped
                 f"""\
                 default:
                 {I}throw new System.ArgumentException(
-                    $"Instance `that` of type {{that.GetType()}} is " + 
+                    $"Instance `that` of type {{that.GetType()}} is " +
                     $"not an implementer class of {interface_name}: {{that}}");"""
             ),
             I,
@@ -631,7 +631,7 @@ case Json.JsonTokenType.EndObject:
                 textwrap.indent(
                     textwrap.dedent(
                         f"""\
-                        case {csharp_common.string_literal(json_prop_name)}: 
+                        case {csharp_common.string_literal(json_prop_name)}:
                         {I}{var_name} =  (
                         {II}Json.JsonSerializer.Deserialize<{arg_type}>(
                         {III}ref reader));
@@ -647,7 +647,7 @@ case Json.JsonTokenType.EndObject:
                 textwrap.indent(
                     textwrap.dedent(
                         f"""\
-                case "modelType": 
+                case "modelType":
                 {I}// Ignore the property modelType as we already know the exact type
                 {I}break;
                 """
@@ -669,7 +669,7 @@ case Json.JsonTokenType.EndObject:
             {II}if (!reader.TrySkip())
             {II}{{
             {III}throw new Json.JsonException(
-            {IIII}"Unexpected end-of-stream when skipping " + 
+            {IIII}"Unexpected end-of-stream when skipping " +
             {IIII}$"the value of the unknown property: {{propertyName}}");
             {II}}}
             {II}break;
@@ -887,6 +887,7 @@ def generate(
     """
     errors = []  # type: List[Error]
 
+    # pylint: disable=line-too-long
     blocks = [
         csharp_common.WARNING,
         Stripped(
@@ -1028,7 +1029,7 @@ def generate(
         return None, errors
 
     writer = io.StringIO()
-    # TODO-BEFORE-RELEASE (mristin, 2021-11-06): add a good docstring 🠒 add examples!
+    # BEFORE-RELEASE (mristin, 2021-11-06): add a good docstring 🠒 add examples!
     writer.write(
         textwrap.dedent(
             f"""\

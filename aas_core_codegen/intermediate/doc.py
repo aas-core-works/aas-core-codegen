@@ -1,3 +1,7 @@
+"""Provide types for the references in the docstrings."""
+
+# pylint: disable=keyword-arg-before-vararg
+
 from typing import Union
 
 import docutils
@@ -6,7 +10,6 @@ from icontract import require
 
 from aas_core_codegen.intermediate._types import (
     Symbol,
-    Class,
     Property,
     Enumeration,
     EnumerationLiteral,
