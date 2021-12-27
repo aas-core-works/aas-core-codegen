@@ -12,3 +12,12 @@ class Something:
     @ensure(lambda y, result: y > result)
     def do_something(self, x: int, y: int) -> int:
         pass
+
+
+class Reference:
+    pass
+
+
+__book_url__ = "dummy"
+__book_version__ = "dummy"
+associate_ref_with(Reference)

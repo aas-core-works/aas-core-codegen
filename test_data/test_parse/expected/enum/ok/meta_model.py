@@ -9,3 +9,12 @@ class Some_enum(Enum):
     """This is a literal."""
 
     LITERAL_WITHOUT_DOC = "LiteralWithoutDoc"
+
+
+class Reference:
+    pass
+
+
+__book_url__ = "dummy"
+__book_version__ = "dummy"
+associate_ref_with(Reference)
