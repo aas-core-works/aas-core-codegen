@@ -165,6 +165,11 @@ Versioning
 We are still not clear about how to version the generator.
 For the moment, we use a lax incremental versioning with ``0.0`` prefix (``0.0.1``, 0.0.2``) *etc.*
 
+The changelog is available in `CHANGELOG.rst`.
+
+.. _CHANGELOG.rst: https://github.com/aas-core-works/aas-core-codegen/blob/main/CHANGELOG.rst
+
+
 Contributing
 ============
 
