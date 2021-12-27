@@ -1,9 +1,9 @@
 SymbolTable(
-  symbols=[
-    Interface(
-      name='Abstract',
-      inheritances=[],
-      signatures=[],
-      properties=[],
-      is_implementation_specific=False,
-      parsed=...)])
+  symbols=[],
+  verification_functions=[],
+  verification_functions_by_name=...,
+  ref_association='Reference to ConcreteClass Reference',
+  meta_model=MetaModel(
+    description=None,
+    book_url='__book_url__',
+    book_version='__book_version__'))

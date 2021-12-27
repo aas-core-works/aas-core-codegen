@@ -80,7 +80,7 @@ def translate_source_to_intermediate(
     assert atok is not None
 
     parsed_symbol_table, error = parse_atok(atok=atok)
-    assert error is None, f"{error=}"
+    assert error is None, f"{most_underlying_messages(error)}"
     assert parsed_symbol_table is not None
 
     return intermediate.translate(parsed_symbol_table=parsed_symbol_table, atok=atok)

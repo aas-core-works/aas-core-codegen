@@ -7,7 +7,7 @@ class VeryAbstract:
         self.some_property = some_property
 
     def some_func(self) -> None:
-        pass
+        """Do something."""
 
 
 @abstract
@@ -20,7 +20,7 @@ class Abstract(VeryAbstract):
         self.another_property = another_property
 
     def another_func(self) -> None:
-        pass
+        """Do something else."""
 
 
 class Concrete(Abstract):
@@ -28,13 +28,19 @@ class Concrete(Abstract):
 
     @require(lambda yet_another_property: yet_another_property > 0)
     def __init__(
-            self,
-            some_property: int,
-            another_property: int,
-            yet_another_property: int
+        self, some_property: int, another_property: int, yet_another_property: int
     ) -> None:
         Abstract.__init__(self, some_property, another_property)
         self.yet_another_property = yet_another_property
 
     def yet_another_func(self) -> None:
-        pass
+        """Do yet something else."""
+
+
+class Reference:
+    pass
+
+
+__book_url__ = "dummy"
+__book_version__ = "dummy"
+associate_ref_with(Reference)

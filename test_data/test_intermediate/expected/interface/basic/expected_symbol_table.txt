@@ -1,28 +1,9 @@
 SymbolTable(
-  symbols=[
-    Interface(
-      name='Abstract',
-      inheritances=[],
-      signatures=[
-        Signature(
-          name='some_func',
-          arguments=[
-            Argument(
-              name='self',
-              type_annotation=SelfTypeAnnotation(),
-              default=None,
-              parsed=...)],
-          returns=None,
-          description=None,
-          parsed=...)],
-      properties=[
-        Property(
-          name='some_property',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='int',
-            parsed=...),
-          description=None,
-          is_readonly=False,
-          parsed=...)],
-      is_implementation_specific=False,
-      parsed=...)])
+  symbols=[],
+  verification_functions=[],
+  verification_functions_by_name=...,
+  ref_association='Reference to ConcreteClass Reference',
+  meta_model=MetaModel(
+    description=None,
+    book_url='__book_url__',
+    book_version='__book_version__'))

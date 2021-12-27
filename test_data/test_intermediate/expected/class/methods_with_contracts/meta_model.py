@@ -8,4 +8,13 @@ class Concrete:
     @require(lambda self: self.x > 2)
     @require(lambda number: number > 0)
     def some_func(self, number: int) -> int:
-        pass
+        """Do something."""
+
+
+class Reference:
+    pass
+
+
+__book_url__ = "dummy"
+__book_version__ = "dummy"
+associate_ref_with(Reference)

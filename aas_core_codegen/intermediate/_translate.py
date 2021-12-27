@@ -78,7 +78,7 @@ from aas_core_codegen.intermediate._types import (
     Interface,
     TypeAnnotationUnion,
     ClassUnion,
-    VerificationUnion,
+    VerificationUnion, UnderstoodMethod,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -445,28 +445,49 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
     "Expected only non-verification methods"
 )
 # fmt: on
-def _parsed_method_to_method(parsed: parse.Method) -> Method:
+def _parsed_method_to_method(
+        parsed: Union[parse.UnderstoodMethod, parse.ImplementationSpecificMethod]
+) -> Union[UnderstoodMethod, ImplementationSpecificMethod]:
     """Translate the parsed method into an intermediate representation."""
-    assert isinstance(
-        parsed, parse.ImplementationSpecificMethod
-    ), "Only implementation-specific class methods are supported at the moment."
+    if isinstance(parsed, parse.ImplementationSpecificMethod):
+        return ImplementationSpecificMethod(
+            name=parsed.name,
+            arguments=_parsed_arguments_to_arguments(parsed=parsed.arguments),
+            returns=(
+                None
+                if parsed.returns is None
+                else _parsed_type_annotation_to_type_annotation(parsed.returns)
+            ),
+            description=(
+                _parsed_description_to_description(parsed.description)
+                if parsed.description is not None
+                else None
+            ),
+            contracts=_parsed_contracts_to_contracts(parsed.contracts),
+            parsed=parsed,
+        )
+    elif isinstance(parsed, parse.UnderstoodMethod):
+        return UnderstoodMethod(
+            name=parsed.name,
+            arguments=_parsed_arguments_to_arguments(parsed=parsed.arguments),
+            returns=(
+                None
+                if parsed.returns is None
+                else _parsed_type_annotation_to_type_annotation(parsed.returns)
+            ),
+            description=(
+                _parsed_description_to_description(parsed.description)
+                if parsed.description is not None
+                else None
+            ),
+            contracts=_parsed_contracts_to_contracts(parsed.contracts),
+            body=parsed.body,
+            parsed=parsed,
+        )
+    else:
+        assert_never(parsed)
 
-    return ImplementationSpecificMethod(
-        name=parsed.name,
-        arguments=_parsed_arguments_to_arguments(parsed=parsed.arguments),
-        returns=(
-            None
-            if parsed.returns is None
-            else _parsed_type_annotation_to_type_annotation(parsed.returns)
-        ),
-        description=(
-            _parsed_description_to_description(parsed.description)
-            if parsed.description is not None
-            else None
-        ),
-        contracts=_parsed_contracts_to_contracts(parsed.contracts),
-        parsed=parsed,
-    )
+    raise AssertionError("Should have never gotten here")
 
 
 def _in_line_constructors(
@@ -1093,11 +1114,13 @@ def _parsed_class_to_class(
         methods.extend(
             _parsed_method_to_method(parsed=parsed_method)
             for parsed_method in ancestor.methods
-            if parsed_method.name != "__init__"
+            if isinstance(
+                parsed_method, (parse.UnderstoodMethod, ImplementationSpecificMethod))
         )
 
     for parsed_method in parsed.methods:
-        if parsed_method.name == "__init__":
+        if not isinstance(
+                parsed_method, (parse.UnderstoodMethod, ImplementationSpecificMethod)):
             # Constructors are in-lined and handled in a different way through
             # :py:class:`Constructors`.
             continue
@@ -2609,6 +2632,41 @@ def errors_if_contracts_for_functions_or_methods_defined(
                     f"for {signature_like.name!r}",
                 )
             )
+
+    if len(errors) > 0:
+        return errors
+
+    return None
+
+
+def errors_if_non_implementation_specific_methods(
+        symbol_table: SymbolTable
+) -> Optional[List[Error]]:
+    """
+    Generate an error if one or more class methods are not implementation-specific.
+
+    We added some support for understood methods already and keep maintaining it as
+    it is only a matter of time when we will introduce their transpilation. Introducing
+    them "after the fact" would have been much more difficult.
+
+    At the given moment, however, we deliberately focus only on implementation-specific
+    methods.
+    """
+    errors = []  # type: List[Error]
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Class):
+            continue
+
+        for method in symbol.methods:
+            if not isinstance(method, ImplementationSpecificMethod):
+                errors.append(
+                    Error(
+                        method.parsed.node,
+                        f"Method {method.name!r} of class {symbol.name!r} is not "
+                        f"implementation-specific"
+                    )
+                )
 
     if len(errors) > 0:
         return errors

@@ -6,7 +6,21 @@ SymbolTable(
         EnumerationLiteral(
           name='some_literal',
           value='SomeLiteral',
-          description='Represent something.',
+          description=Description(
+            document=...,
+            node=...),
           parsed=...)],
-      description='Enumerate something.',
-      parsed=...)])
+      is_superset_of=[],
+      description=Description(
+        document=...,
+        node=...),
+      literals_by_name=...,
+      literal_id_set=...,
+      parsed=...)],
+  verification_functions=[],
+  verification_functions_by_name=...,
+  ref_association='Reference to ConcreteClass Reference',
+  meta_model=MetaModel(
+    description=None,
+    book_url='__book_url__',
+    book_version='__book_version__'))

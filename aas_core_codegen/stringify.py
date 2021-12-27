@@ -138,21 +138,35 @@ def assert_compares_against_dict(entity: Entity, obj: object) -> None:
     obj_property_set = {key for key in obj.__dict__.keys() if not key.startswith("_")}
 
     if entity_property_set != obj_property_set:
-        first_diff_in_entity = next(
-            iter(entity_property_set.difference(obj_property_set)), None
-        )
+        diff_in_entity = sorted(entity_property_set.difference(obj_property_set))
 
-        first_diff_in_obj = next(iter(obj_property_set.difference(entity_property_set)))
+        diff_in_obj = sorted(obj_property_set.difference(entity_property_set))
 
-        raise AssertionError(
-            "Expected the stringified properties to match the object properties, "
-            "but they do not.\n\n"
-            f"{type(obj)=}\n"
-            f"{first_diff_in_entity=}\n"
-            f"{first_diff_in_obj=}\n\n"
-            f"{sorted(entity_property_set)=}\n"
-            f"{sorted(obj_property_set)=}"
-        )
+        if len(diff_in_entity) > 0 and len(diff_in_obj) == 0:
+            raise AssertionError(
+                f"Expected the stringified properties to match the object properties, "
+                f"but they do not.\n\n"
+                f"The following properties were find in the stringified entity, "
+                f"but not in the object: {diff_in_entity}"
+            )
+
+        elif len(diff_in_obj) > 0 and len(diff_in_entity) == 0:
+            raise AssertionError(
+                f"Expected the stringified properties to match the object properties, "
+                f"but they do not.\n\n"
+                f"The following properties were find in the object, "
+                f"but not in the stringified entity: {diff_in_obj}"
+            )
+
+        else:
+            raise AssertionError(
+                f"Expected the stringified properties to match the object properties, "
+                f"but they do not.\n\n"
+                f"The following properties were find in the stringified entity, "
+                f"but not in the object: {diff_in_entity}\n\n"
+                f"The following properties were find in the object, "
+                f"but not in the stringified entity: {diff_in_obj}"
+            )
 
 
 def assert_all_public_types_listed_as_dumpables(

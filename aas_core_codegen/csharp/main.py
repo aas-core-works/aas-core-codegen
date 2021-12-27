@@ -30,19 +30,42 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     assert verified_ir_table is not None
 
-    contracts_errors = (
+    unsupported_contracts_errors = (
         intermediate.errors_if_contracts_for_functions_or_methods_defined(
             verified_ir_table
         )
     )
-    if errors is not None:
+    if unsupported_contracts_errors is not None:
         run.write_error_report(
             message=f"We do not support pre and post-conditions and snapshots "
                     f"at the moment. Please notify the developers if you need this "
                     f"feature (based on meta-model {context.model_path})",
             errors=[
                 context.lineno_columner.error_message(error)
-                for error in contracts_errors
+                for error in unsupported_contracts_errors
+            ],
+            stderr=stderr,
+        )
+        return 1
+
+    unsupported_methods_errors = (
+        intermediate.errors_if_non_implementation_specific_methods(
+            verified_ir_table
+        )
+    )
+    if unsupported_methods_errors is not None:
+        run.write_error_report(
+            message=f"We added some support for understood methods already and keep "
+                    f"maintaining it as it is only a matter of time when we will "
+                    f"introduce their transpilation. Introducing them after the fact "
+                    f"would have been much more difficult.\n"
+                    f"\n"
+                    f"At the given moment, however, we deliberately focus only on "
+                    f"implementation-specific methods. "
+                    f"(based on meta-model {context.model_path})",
+            errors=[
+                context.lineno_columner.error_message(error)
+                for error in unsupported_methods_errors
             ],
             stderr=stderr,
         )

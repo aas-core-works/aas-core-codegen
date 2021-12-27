@@ -40,6 +40,7 @@ from aas_core_codegen.intermediate._types import (
     SymbolTable,
     TypeAnnotation,
     Verification,
+    UnderstoodMethod
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -319,6 +320,26 @@ def _stringify_implementation_specific_method(
     return result
 
 
+def _stringify_understood_method(
+    that: UnderstoodMethod,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("name", that.name),
+            stringify.Property("arguments", list(map(_stringify, that.arguments))),
+            stringify.Property("returns", _stringify(that.returns)),
+            stringify.Property("description", _stringify(that.description)),
+            stringify.Property("contracts", _stringify(that.contracts)),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify.Property("body", [parse_tree.dump(stmt) for stmt in that.body]),
+            stringify.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
+        ],
+    )
+
+    return result
+
+
 def _stringify_constructor(
     that: Constructor,
 ) -> stringify.Entity:
@@ -368,8 +389,18 @@ def _stringify_enumeration(
         properties=[
             stringify.Property("name", that.name),
             stringify.Property("literals", list(map(_stringify, that.literals))),
+            stringify.Property(
+                "is_superset_of",
+                [
+                    f"Reference to {parent_enum.__class__.__name__} "
+                    f"{parent_enum.name}"
+                    for parent_enum in that.is_superset_of
+                ]
+            ),
+            stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("literals_by_name", that.literals_by_name),
             stringify.PropertyEllipsis("literal_id_set", that.literal_id_set),
+            stringify.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -596,6 +627,7 @@ Dumpable = Union[
     SymbolTable,
     TypeAnnotation,
     Verification,
+    UnderstoodMethod
 ]
 
 stringify.assert_all_public_types_listed_as_dumpables(
@@ -631,6 +663,7 @@ _DISPATCH = {
     Signature: _stringify_signature,
     Snapshot: _stringify_snapshot,
     SymbolTable: _stringify_symbol_table,
+    UnderstoodMethod: _stringify_understood_method,
 }
 
 stringify.assert_dispatch_exhaustive(dispatch=_DISPATCH, dumpable=Dumpable)
