@@ -439,7 +439,9 @@ def _understand_assignment(
                 )
 
                 if isinstance(symbol, parse.Enumeration):
-                    literal = symbol.literals_by_name.get(Identifier(default_node.attr))
+                    literal = symbol.literals_by_name.get(
+                        Identifier(default_node.attr), None)
+
                     if literal is not None:
                         default = DefaultEnumLiteral(
                             enum=symbol, literal=literal, node=default_node

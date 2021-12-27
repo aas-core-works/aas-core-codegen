@@ -1398,13 +1398,13 @@ class SymbolTable:
     symbols: Final[Sequence['Symbol']]
 
     #: List of all functions used in the verification
-    verification_functions: Final[Sequence[Verification]]
+    verification_functions: Final[Sequence["VerificationUnion"]]
 
     #: Map verification functions by their name
-    verification_functions_by_name: Final[Mapping[Identifier, Verification]]
+    verification_functions_by_name: Final[Mapping[Identifier, "VerificationUnion"]]
 
     #: Type to be used to represent a ``Ref[T]``
-    ref_association: Final[Class]
+    ref_association: Final["ClassUnion"]
 
     #: Additional information about the source meta-model
     meta_model: Final[MetaModel]
@@ -1444,8 +1444,8 @@ class SymbolTable:
     def __init__(
             self,
             symbols: Sequence['Symbol'],
-            verification_functions: Sequence[Verification],
-            ref_association: Class,
+            verification_functions: Sequence["VerificationUnion"],
+            ref_association: "ClassUnion",
             meta_model: MetaModel,
     ) -> None:
         """Initialize with the given values and map symbols to name."""
@@ -1690,3 +1690,6 @@ ClassUnion = Union[AbstractClass, ConcreteClass]
 assert_union_of_descendants_exhaustive(union=ClassUnion, base_class=Class)
 
 Symbol = Union[Enumeration, ConstrainedPrimitive, ClassUnion]
+
+VerificationUnion = Union[ImplementationSpecificVerification, PatternVerification]
+assert_union_of_descendants_exhaustive(union=VerificationUnion, base_class=Verification)

@@ -392,8 +392,11 @@ class _ParseJoinedStr(_Parse):
                 if error is not None:
                     return None, error
 
+                assert value is not None
+
                 assert isinstance(value, tree.Expression)
-                values.append(tree.FormattedValue(value=value))
+                values.append(tree.FormattedValue(
+                    value=value, original_node=value_node))
 
             elif isinstance(value_node, ast.expr):
                 return None, Error(

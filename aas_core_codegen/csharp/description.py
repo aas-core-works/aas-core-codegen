@@ -36,11 +36,19 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
         if isinstance(element.symbol, intermediate.Enumeration):
             name = csharp_naming.enum_name(element.symbol.name)
 
+        elif isinstance(element.symbol, intermediate.ConstrainedPrimitive):
+            # NOTE (mristin, 2021-12-17):
+            # We do not generate a class for constrained primitives, but we
+            # leave it as class name, as that is what we used for ``Verify*`` function.
+            name = csharp_naming.class_name(element.symbol.name)
+
         elif isinstance(element.symbol, intermediate.Class):
             if isinstance(element.symbol, intermediate.AbstractClass):
+                # NOTE (mristin, 2021-12-25):
                 # We do not generate C# code for abstract classes, so we have to refer
                 # to the interface.
                 name = csharp_naming.interface_name(element.symbol.name)
+
             elif isinstance(element.symbol, intermediate.ConcreteClass):
                 # NOTE (mristin, 2021-12-25):
                 # Though a concrete class can have multiple descendants and the writer
@@ -48,6 +56,7 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
                 # the concrete class, we do the best effort here and resolve it to the
                 # name of the concrete class.
                 name = csharp_naming.class_name(element.symbol.name)
+
             else:
                 assert_never(element.symbol)
 
@@ -202,7 +211,7 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
             return "", None
 
         summary = None  # type: Optional[docutils.nodes.paragraph]
-        remarks = []  # type: Optional[List[docutils.nodes.Element]]
+        remarks = []  # type: List[docutils.nodes.Element]
         tail = []  # type: List[docutils.nodes.Element]
 
         # Try to match the summary and the remarks
@@ -300,6 +309,8 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
                     body_block, error = renderer.transform(body_child)
                     if error:
                         return None, error
+
+                    assert body_block is not None
 
                     body_blocks.append(body_block)
 

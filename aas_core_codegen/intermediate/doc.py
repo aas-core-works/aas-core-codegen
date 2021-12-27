@@ -5,7 +5,7 @@ import docutils.nodes
 from icontract import require
 
 from aas_core_codegen.intermediate._types import Symbol, Class, Property, Enumeration, \
-    EnumerationLiteral
+    EnumerationLiteral, ClassUnion
 
 
 class SymbolReference(docutils.nodes.Inline, docutils.nodes.TextElement):
@@ -25,7 +25,7 @@ class PropertyReference:
     """Model a reference to a property, usually used in the docstrings."""
 
     @require(lambda cls, prop: id(prop) in cls.property_id_set)
-    def __init__(self, cls: Class, prop: Property) -> None:
+    def __init__(self, cls: ClassUnion, prop: Property) -> None:
         self.cls = cls
         self.prop = prop
 

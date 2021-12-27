@@ -9,7 +9,7 @@ be traced back to the parse stage.
 """
 import abc
 import enum
-from typing import Mapping, MutableMapping, Optional, List, Final, Union
+from typing import Mapping, MutableMapping, Optional, List, Final, Union, get_args
 
 from icontract import DBC, ensure
 
@@ -86,7 +86,16 @@ class OurTypeAnnotation(AtomicTypeAnnotation):
         return self.symbol.name
 
 
-class VerificationTypeAnnotation(AtomicTypeAnnotation):
+class FunctionTypeAnnotation(AtomicTypeAnnotation):
+    """Represent a function as a type."""
+
+    @abc.abstractmethod
+    def __str__(self) -> str:
+        # Signal that this is a purely abstract class
+        raise NotImplementedError()
+
+
+class VerificationTypeAnnotation(FunctionTypeAnnotation):
     """Represent a type of a verification function."""
 
     def __init__(self, func: _types.Verification):
@@ -106,7 +115,7 @@ class BuiltinFunction:
         self.returns = returns
 
 
-class BuiltinFunctionTypeAnnotation(AtomicTypeAnnotation):
+class BuiltinFunctionTypeAnnotation(FunctionTypeAnnotation):
     """Represent a type of a built-in function."""
 
     def __init__(self, func: BuiltinFunction):
@@ -238,9 +247,8 @@ def _assignable(target_type: "TypeAnnotationUnion", value_type: "TypeAnnotationU
         elif isinstance(value_type, OurTypeAnnotation) and isinstance(
                 value_type.symbol, _types.ConstrainedPrimitive
         ):
-            return target_type.a_type == PRIMITIVE_TYPE_MAP.get(
-                value_type.symbol.constrainee
-            )
+            return target_type.a_type == PRIMITIVE_TYPE_MAP[
+                value_type.symbol.constrainee]
 
         else:
             return False
@@ -263,7 +271,7 @@ def _assignable(target_type: "TypeAnnotationUnion", value_type: "TypeAnnotationU
                     value_type, PrimitiveTypeAnnotation
             ):
                 return (
-                        PRIMITIVE_TYPE_MAP.get(target_type.symbol.constrainee)
+                        PRIMITIVE_TYPE_MAP[target_type.symbol.constrainee]
                         == value_type.a_type
                 )
             else:
@@ -399,11 +407,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
     """Infer the types of the given parse tree."""
 
     #: Track of the inferred types
-    type_map: Final[
-        MutableMapping[
-            Union[parse_tree.Node, parse_tree.FormattedValue], "TypeAnnotationUnion"
-        ]
-    ]
+    type_map: Final[MutableMapping[parse_tree.Node, "TypeAnnotationUnion"]]
 
     #: Errors encountered during the inference
     errors: Final[List[Error]]
@@ -710,6 +714,17 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         self.type_map[node] = result
         return result
 
+    def transform_formatted_value(
+            self, node: parse_tree.FormattedValue
+    ) -> Optional["TypeAnnotationUnion"]:
+        value_type = self.transform(node.value)
+        if value_type is None:
+            return None
+
+        result = PrimitiveTypeAnnotation(PrimitiveType.STR)
+        self.type_map[node] = result
+        return result
+
     def transform_joined_str(
             self, node: parse_tree.JoinedStr
     ) -> Optional["TypeAnnotationUnion"]:
@@ -720,14 +735,9 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             if isinstance(value, str):
                 continue
             elif isinstance(value, parse_tree.FormattedValue):
-                # NOTE (mristin, 2021-12-25):
-                # Since ``FormattedValue`` is not a ``Node``, we have to treat it in a
-                # special way.
-                formatted_value_type = self.transform(value.value)
+                formatted_value_type = self.transform(value)
                 if formatted_value_type is None:
                     success = False
-                else:
-                    self.type_map[value] = formatted_value_type
             else:
                 assert_never(value)
 
@@ -807,3 +817,15 @@ TypeAnnotationUnion = Union[
 ]
 assert_union_of_descendants_exhaustive(
     union=TypeAnnotationUnion, base_class=TypeAnnotation)
+
+FunctionTypeAnnotationUnion = Union[
+    VerificationTypeAnnotation, BuiltinFunctionTypeAnnotation]
+assert_union_of_descendants_exhaustive(
+    union=FunctionTypeAnnotationUnion, base_class=FunctionTypeAnnotation)
+
+# NOTE (mristin, 2021-12-27):
+# Mypy is not smart enough to work with ``get_args``, so we have to manually write it
+# out.
+FunctionTypeAnnotationUnionAsTuple = (
+    VerificationTypeAnnotation, BuiltinFunctionTypeAnnotation)
+assert FunctionTypeAnnotationUnionAsTuple == get_args(FunctionTypeAnnotationUnion)

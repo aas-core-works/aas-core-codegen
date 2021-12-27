@@ -5,6 +5,7 @@
 from aas_core_codegen.intermediate import _types, _translate, _stringify
 
 TypeAnnotation = _types.TypeAnnotation
+TypeAnnotationUnion = _types.TypeAnnotationUnion
 PrimitiveType = _types.PrimitiveType
 PrimitiveTypeAnnotation = _types.PrimitiveTypeAnnotation
 OurTypeAnnotation = _types.OurTypeAnnotation
@@ -30,6 +31,7 @@ EnumerationLiteral = _types.EnumerationLiteral
 Enumeration = _types.Enumeration
 ConstrainedPrimitive = _types.ConstrainedPrimitive
 Class = _types.Class
+ClassUnion = _types.ClassUnion
 ConcreteClass = _types.ConcreteClass
 AbstractClass = _types.AbstractClass
 Verification = _types.Verification

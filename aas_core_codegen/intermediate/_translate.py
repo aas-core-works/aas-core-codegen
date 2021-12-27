@@ -69,7 +69,7 @@ from aas_core_codegen.intermediate._types import (
     AbstractClass,
     SignatureLike,
     Interface, TypeAnnotationUnion,
-    ClassUnion
+    ClassUnion, VerificationUnion
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -1016,8 +1016,8 @@ def _parsed_class_to_class(
     contracts = Contracts(preconditions=[], snapshots=[], postconditions=[])
 
     for ancestor in ancestors:
-        parsed_ancestor_init = ancestor.methods_by_name.get(Identifier("__init__"),
-                                                            None)
+        parsed_ancestor_init = ancestor.methods_by_name.get(
+            Identifier("__init__"), None)
 
         if parsed_ancestor_init is not None:
             contracts = _stack_contracts(
@@ -1131,7 +1131,7 @@ def _parsed_class_to_class(
 # fmt: on
 def _parsed_verification_function_to_verification_function(
         parsed: parse.FunctionUnion,
-) -> Tuple[Optional[Verification], Optional[Error]]:
+) -> Tuple[Optional[VerificationUnion], Optional[Error]]:
     """Translate the verification function and try to understand it, if necessary."""
     name = parsed.name
     arguments = _parsed_arguments_to_arguments(parsed=parsed.arguments)
@@ -2462,7 +2462,7 @@ def translate(
         ),
     )
 
-    verification_functions = []  # type: List[Verification]
+    verification_functions = []  # type: List[VerificationUnion]
     for func in parsed_symbol_table.verification_functions:
         verification, error = _parsed_verification_function_to_verification_function(
             func

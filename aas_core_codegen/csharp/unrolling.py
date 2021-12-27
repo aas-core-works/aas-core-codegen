@@ -85,7 +85,7 @@ class Unroller(DBC):
     def unroll(
         self,
         unrollee_expr: str,
-        type_annotation: intermediate.TypeAnnotation,
+        type_annotation: intermediate.TypeAnnotationUnion,
         path: List[str],
         item_level: int,
         key_value_level: int,

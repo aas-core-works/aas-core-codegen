@@ -235,6 +235,8 @@ def assert_union_of_descendants_exhaustive(
 
     Make sure you put the assertion at the end of the module where no new classes are
     defined.
+
+    See also for more details: https://hakibenita.com/python-mypy-exhaustive-checking
     """
     if inspect.isclass(union):
         union_map = {
@@ -248,10 +250,21 @@ def assert_union_of_descendants_exhaustive(
     else:
         raise NotImplementedError(f"We do not know how to handle the union: {union}")
 
+    # We have to recursively figure out the sub-classes.
+    concrete_subclasses = []  # type: List[Any]
+
+    stack = base_class.__subclasses__()  # type: List[Any]
+
+    while len(stack) > 0:
+        sub_cls = stack.pop()
+        if not inspect.isabstract(sub_cls):
+            concrete_subclasses.append(sub_cls)
+
+        stack.extend(sub_cls.__subclasses__())
+
     subclass_map = {
         id(sub_cls): sub_cls
-        for sub_cls in base_class.__subclasses__()
-        if not inspect.isabstract(sub_cls)
+        for sub_cls in concrete_subclasses
     }
 
     union_set = set(union_map.keys())
@@ -282,7 +295,7 @@ def assert_union_of_descendants_exhaustive(
                 f"of {base_class.__name__!r}: {union_diff_names}")
         else:
             raise AssertionError(
-                f"The following classes were listed in the union {union}, "
+                f"The following classes were listed in the union, "
                 f"but they are not sub-classes "
                 f"of {base_class.__name__!r}: {union_diff_names}.\n\n"
                 f"The following concrete sub-classes of {base_class.__name__!r} were "

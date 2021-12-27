@@ -36,9 +36,9 @@ from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II
 
 
 def _human_readable_identifier(
-    something: Union[
-        intermediate.Enumeration, intermediate.ConcreteClass, intermediate.Interface
-    ]
+        something: Union[
+            intermediate.Enumeration, intermediate.ConcreteClass, intermediate.Interface
+        ]
 ) -> str:
     """
     Represent ``something`` in a human-readable text.
@@ -61,19 +61,21 @@ def _human_readable_identifier(
 
 
 def _verify_structure_name_collisions(
-    symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
 ) -> List[Error]:
     """Verify that the C# names of the structures do not collide."""
-    observed_structure_names = (
-        {}
-    )  # type: Dict[Identifier, Union[intermediate.Symbol, intermediate.Interface]]
+    observed_structure_names: Dict[
+        Identifier,
+        Union[
+            intermediate.Enumeration, intermediate.ConcreteClass, intermediate.Interface
+        ]] = dict()
 
     errors = []  # type: List[Error]
 
     # region Inter-structure collisions
 
     for something in csharp_common.over_enumerations_classes_and_interfaces(
-        symbol_table
+            symbol_table
     ):
         name = csharp_naming.name_of(something)
 
@@ -108,7 +110,7 @@ def _verify_structure_name_collisions(
 
 
 def _verify_intra_structure_collisions(
-    intermediate_symbol: intermediate.Symbol,
+        intermediate_symbol: intermediate.Symbol,
 ) -> Optional[Error]:
     """Verify that no member names collide in the C# structure of the given symbol."""
     errors = []  # type: List[Error]
@@ -180,14 +182,14 @@ class VerifiedIntermediateSymbolTable(intermediate.SymbolTable):
 
     # noinspection PyInitNewSignature
     def __new__(
-        cls, symbol_table: intermediate.SymbolTable
+            cls, symbol_table: intermediate.SymbolTable
     ) -> "VerifiedIntermediateSymbolTable":
         raise AssertionError("Only for type annotation")
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def verify(
-    symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[VerifiedIntermediateSymbolTable], Optional[List[Error]]]:
     """Verify that C# code can be generated from the ``symbol_table``."""
     errors = []  # type: List[Error]
@@ -211,7 +213,7 @@ def verify(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_enum(
-    enum: intermediate.Enumeration,
+        enum: intermediate.Enumeration,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the C# code for the enum."""
     writer = io.StringIO()
@@ -220,6 +222,8 @@ def _generate_enum(
         comment, error = csharp_description.generate_comment(enum.description)
         if error:
             return None, error
+
+        assert comment is not None
 
         writer.write(comment)
         writer.write("\n")
@@ -242,6 +246,8 @@ def _generate_enum(
             if error:
                 return None, error
 
+            assert literal_comment is not None
+
             writer.write(textwrap.indent(literal_comment, I))
             writer.write("\n")
 
@@ -260,7 +266,7 @@ def _generate_enum(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_interface(
-    interface: intermediate.Interface, ref_association: intermediate.Class
+        interface: intermediate.Interface, ref_association: intermediate.ClassUnion
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate C# code for the given interface.
@@ -274,6 +280,8 @@ def _generate_interface(
         comment, error = csharp_description.generate_comment(interface.description)
         if error:
             return None, error
+
+        assert comment is not None
 
         writer.write(comment)
         writer.write("\n")
@@ -345,6 +353,8 @@ def _generate_interface(
             if error:
                 return None, error
 
+            assert signature_comment is not None
+
             signature_blocks.append(signature_comment)
 
         # fmt: off
@@ -403,16 +413,16 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
 
     #: Pre-computed descendability map. A type is descendable if we should unroll it
     #: further.
-    _descendability: Final[Mapping[intermediate.TypeAnnotation, bool]]
+    _descendability: Final[Mapping[intermediate.TypeAnnotationUnion, bool]]
 
     #: Symbol to be used to represent references within an AAS
-    _ref_association: Final[intermediate.Class]
+    _ref_association: Final[intermediate.ClassUnion]
 
     def __init__(
-        self,
-        recurse: bool,
-        descendability: Mapping[intermediate.TypeAnnotation, bool],
-        ref_association: intermediate.Class,
+            self,
+            recurse: bool,
+            descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+            ref_association: intermediate.ClassUnion,
     ) -> None:
         """Initialize with the given values."""
         self._recurse = recurse
@@ -420,12 +430,12 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
         self._ref_association = ref_association
 
     def _unroll_primitive_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.PrimitiveTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.PrimitiveTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
         # We can not descend into a primitive type.
@@ -433,14 +443,14 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
 
     # noinspection PyUnusedLocal
     def _unroll_our_type_or_ref_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: Union[
-            intermediate.OurTypeAnnotation, intermediate.RefTypeAnnotation
-        ],
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
+            self,
+            unrollee_expr: str,
+            type_annotation: Union[
+                intermediate.OurTypeAnnotation, intermediate.RefTypeAnnotation
+            ],
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """
         Generate the code for both our atomic type annotations and references.
@@ -499,12 +509,12 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
         return result
 
     def _unroll_our_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.OurTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.OurTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
         return self._unroll_our_type_or_ref_annotation(
@@ -516,12 +526,12 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
         )
 
     def _unroll_list_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.ListTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.ListTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
         item_var = csharp_unrolling.Unroller._loop_var_name(
@@ -547,12 +557,12 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
         return [node]
 
     def _unroll_optional_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.OptionalTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.OptionalTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
         children = self.unroll(
@@ -573,12 +583,12 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
         ]
 
     def _unroll_ref_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.RefTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
+            self,
+            unrollee_expr: str,
+            type_annotation: intermediate.RefTypeAnnotation,
+            path: List[str],
+            item_level: int,
+            key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
         return self._unroll_our_type_or_ref_annotation(
@@ -591,7 +601,8 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
 
 
 def _generate_descend_body(
-    cls: intermediate.ConcreteClass, recurse: bool, ref_association: intermediate.Class
+        cls: intermediate.ConcreteClass, recurse: bool,
+        ref_association: intermediate.ClassUnion
 ) -> Stripped:
     """
     Generate the body of the ``Descend`` and ``DescendOnce`` methods.
@@ -644,7 +655,7 @@ def _generate_descend_body(
 
 
 def _generate_descend_once_method(
-    cls: intermediate.ConcreteClass, ref_association: intermediate.Class
+        cls: intermediate.ConcreteClass, ref_association: intermediate.ClassUnion
 ) -> Stripped:
     """
     Generate the ``DescendOnce`` method for the concrete class ``cls``.
@@ -673,7 +684,7 @@ public IEnumerable<IClass> DescendOnce()
 
 
 def _generate_descend_method(
-    cls: intermediate.ConcreteClass, ref_association: intermediate.Symbol
+        cls: intermediate.ConcreteClass, ref_association: intermediate.ClassUnion
 ) -> Stripped:
     """
     Generate the recursive ``Descend`` method for the concrete class ``cls``.
@@ -714,7 +725,7 @@ def _generate_default_value(default: intermediate.Default) -> Stripped:
                 code = csharp_common.string_literal(default.value)
             elif isinstance(default.value, int):
                 code = str(default.value)
-            elif isinstance(default, float):
+            elif isinstance(default.value, float):
                 code = f"{default}d"
             else:
                 assert_never(default.value)
@@ -736,7 +747,7 @@ def _generate_default_value(default: intermediate.Default) -> Stripped:
 @require(lambda cls: not cls.constructor.is_implementation_specific)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_constructor(
-    cls: intermediate.ConcreteClass, ref_association: intermediate.Class
+        cls: intermediate.ConcreteClass, ref_association: intermediate.ClassUnion
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the constructor function for the given concrete class ``cls``.
@@ -813,7 +824,7 @@ def _generate_constructor(
 
                     body.append(writer.getvalue())
                 elif isinstance(
-                    stmt.default, intermediate_construction.DefaultEnumLiteral
+                        stmt.default, intermediate_construction.DefaultEnumLiteral
                 ):
                     literal_code = ".".join(
                         [
@@ -842,9 +853,9 @@ def _generate_constructor(
 @require(lambda cls: not cls.is_implementation_specific)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
-    cls: intermediate.ConcreteClass,
-    spec_impls: specific_implementations.SpecificImplementations,
-    ref_association: intermediate.Class,
+        cls: intermediate.ConcreteClass,
+        spec_impls: specific_implementations.SpecificImplementations,
+        ref_association: intermediate.ClassUnion,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate C# code for the given concrete class ``cls``.
@@ -858,6 +869,8 @@ def _generate_class(
         comment, error = csharp_description.generate_comment(cls.description)
         if error:
             return None, error
+
+        assert comment is not None
 
         writer.write(comment)
         writer.write("\n")
@@ -918,6 +931,8 @@ def _generate_class(
             prop_comment, error = csharp_description.generate_comment(prop.description)
             if error:
                 return None, error
+
+            assert prop_comment is not None
 
             prop_blocks.append(prop_comment)
 
@@ -1064,6 +1079,7 @@ def _generate_class(
         if error is not None:
             errors.append(error)
         else:
+            assert constructor_block is not None
             blocks.append(constructor_block)
 
     # endregion
@@ -1095,9 +1111,9 @@ def _generate_class(
 )
 # fmt: on
 def generate(
-    symbol_table: VerifiedIntermediateSymbolTable,
-    namespace: csharp_common.NamespaceIdentifier,
-    spec_impls: specific_implementations.SpecificImplementations,
+        symbol_table: VerifiedIntermediateSymbolTable,
+        namespace: csharp_common.NamespaceIdentifier,
+        spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the C# code of the structures based on the symbol table.
@@ -1171,14 +1187,14 @@ def generate(
     errors = []  # type: List[Error]
 
     for something in csharp_common.over_enumerations_classes_and_interfaces(
-        symbol_table
+            symbol_table
     ):
         code = None  # type: Optional[Stripped]
         error = None  # type: Optional[Error]
 
         if (
-            isinstance(something, intermediate.Class)
-            and something.is_implementation_specific
+                isinstance(something, intermediate.Class)
+                and something.is_implementation_specific
         ):
             implementation_key = specific_implementations.ImplementationKey(
                 f"{something.name}.cs"
@@ -1235,6 +1251,5 @@ def generate(
     out.write("\n")
 
     return out.getvalue(), None
-
 
 # endregion

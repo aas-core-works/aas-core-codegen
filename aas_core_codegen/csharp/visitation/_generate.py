@@ -73,6 +73,9 @@ def _generate_visitor_through(symbol_table: intermediate.SymbolTable) -> Strippe
         if isinstance(symbol, intermediate.Enumeration):
             continue
 
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            continue
+
         elif isinstance(symbol, intermediate.Interface):
             continue
 

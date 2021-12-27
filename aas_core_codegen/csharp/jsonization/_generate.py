@@ -78,7 +78,7 @@ def _generate_json_converter_for_enumeration(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_read_for_interface(
-    interface: intermediate.Interface, ref_association: intermediate.Class
+    interface: intermediate.Interface, ref_association: intermediate.ClassUnion
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the ``Read`` method for de-serializing the ``interface``.
@@ -133,7 +133,7 @@ def _generate_read_for_interface(
             else:
                 initialization_lines.append(Stripped(f"{arg_type}? {var_name} = null;"))
 
-        blocks.append("\n".join(initialization_lines))
+        blocks.append(Stripped("\n".join(initialization_lines)))
 
     # endregion
 
@@ -454,7 +454,7 @@ def _generate_write_for_interface(interface: intermediate.Interface) -> Stripped
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_json_converter_for_interface(
-    interface: intermediate.Interface, ref_association: intermediate.Class
+    interface: intermediate.Interface, ref_association: intermediate.ClassUnion
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the custom JSON converter based on the intermediate ``interface``.
@@ -468,6 +468,8 @@ def _generate_json_converter_for_interface(
 
     if error is not None:
         return None, error
+
+    assert read_code is not None
 
     write_code = _generate_write_for_interface(interface=interface)
 
@@ -501,7 +503,7 @@ def _generate_json_converter_for_interface(
 
 
 def _generate_read_for_class(
-    cls: intermediate.ConcreteClass, ref_association: intermediate.Class
+    cls: intermediate.ConcreteClass, ref_association: intermediate.ClassUnion
 ) -> Stripped:
     """
     Generate the ``Read`` method for de-serializing the class ``cls``.
@@ -539,7 +541,7 @@ def _generate_read_for_class(
             else:
                 initialization_lines.append(Stripped(f"{arg_type}? {var_name} = null;"))
 
-        blocks.append("\n".join(initialization_lines))
+        blocks.append(Stripped("\n".join(initialization_lines)))
 
     # endregion
 
@@ -828,7 +830,7 @@ def _generate_write_for_class(cls: intermediate.ConcreteClass) -> Stripped:
 
 
 def _generate_json_converter_for_class(
-    cls: intermediate.ConcreteClass, ref_association: intermediate.Class
+    cls: intermediate.ConcreteClass, ref_association: intermediate.ClassUnion
 ) -> Stripped:
     """
     Generate the custom JSON converter based on the intermediate ``cls``.

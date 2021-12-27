@@ -28,6 +28,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
+    assert verified_ir_table is not None
+
     namespace_key = specific_implementations.ImplementationKey("namespace.txt")
     namespace_text = context.spec_impls.get(namespace_key, None)
     if namespace_text is None:
@@ -107,7 +109,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Verification
 
-    errors = csharp_verification.verify(
+    verify_errors = csharp_verification.verify(
         spec_impls=context.spec_impls,
         verification_functions=verified_ir_table.verification_functions,
     )
@@ -115,7 +117,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     if errors is not None:
         run.write_error_report(
             message=f"Failed to verify the C#-specific structures",
-            errors=errors,
+            errors=verify_errors,
             stderr=stderr,
         )
         return 1

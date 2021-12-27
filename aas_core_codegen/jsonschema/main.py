@@ -56,7 +56,7 @@ assert all(literal in _PRIMITIVE_MAP for literal in intermediate.PrimitiveType)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_type(
     type_annotation: intermediate.TypeAnnotation,
-    ref_association: intermediate.Symbol,
+    ref_association: intermediate.ClassUnion,
     len_constraint: Optional[infer_for_schema.LenConstraint],
     pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[Error]]:
@@ -187,7 +187,7 @@ def _define_type(
 # fmt: on
 def _define_properties_and_required(
     symbol: Union[intermediate.Interface, intermediate.Class],
-    ref_association: intermediate.Symbol,
+    ref_association: intermediate.ClassUnion,
     pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
 ) -> Tuple[
     Optional[MutableMapping[str, Any]],
@@ -265,7 +265,7 @@ def _define_for_interface(
     interface: intermediate.Interface,
     implementers: Sequence[intermediate.Class],
     ids_of_used_interfaces: Set[int],
-    ref_association: intermediate.Symbol,
+    ref_association: intermediate.ClassUnion,
     pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
@@ -338,7 +338,7 @@ def _define_for_interface(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_for_class(
     cls: intermediate.Class,
-    ref_association: intermediate.Symbol,
+    ref_association: intermediate.ClassUnion,
     pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """

@@ -1,7 +1,7 @@
 """Provide common functions shared among difference C# code generation modules."""
 import re
 import textwrap
-from typing import List, Union, cast, Iterator
+from typing import List, Union, cast, Iterator, TypeVar, Generic
 
 from icontract import ensure, require
 
@@ -58,10 +58,8 @@ assert sorted(literal.value for literal in PRIMITIVE_TYPE_MAP.keys()) == sorted(
 
 
 def generate_type(
-    type_annotation: Union[
-        intermediate.SubscriptedTypeAnnotation, intermediate.AtomicTypeAnnotation
-    ],
-    ref_association: intermediate.Class,
+    type_annotation: intermediate.TypeAnnotationUnion,
+    ref_association: intermediate.ClassUnion,
 ) -> Stripped:
     """
     Generate the C# type for the given type annotation.
@@ -69,58 +67,48 @@ def generate_type(
     The ``ref_association`` describes how the references should be represented.
     """
     # TODO-BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
-    if isinstance(type_annotation, intermediate.AtomicTypeAnnotation):
-        if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
-            return PRIMITIVE_TYPE_MAP[type_annotation.a_type]
+    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
+        return PRIMITIVE_TYPE_MAP[type_annotation.a_type]
 
-        elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
-            symbol = type_annotation.symbol
+    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
+        symbol = type_annotation.symbol
 
-            if isinstance(symbol, intermediate.Enumeration):
-                return Stripped(csharp_naming.enum_name(type_annotation.symbol.name))
+        if isinstance(symbol, intermediate.Enumeration):
+            return Stripped(csharp_naming.enum_name(type_annotation.symbol.name))
 
-            elif isinstance(symbol, intermediate.ConstrainedPrimitive):
-                return PRIMITIVE_TYPE_MAP.get(symbol.constrainee)
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            return PRIMITIVE_TYPE_MAP[symbol.constrainee]
 
-            elif isinstance(symbol, intermediate.Class):
-                # NOTE (mristin, 2021-12-26):
-                # Always prefer an interface to allow for discrimination. If there is
-                # an interface based on the class, it means that there are one or more
-                # descendants.
+        elif isinstance(symbol, intermediate.Class):
+            # NOTE (mristin, 2021-12-26):
+            # Always prefer an interface to allow for discrimination. If there is
+            # an interface based on the class, it means that there are one or more
+            # descendants.
 
-                if symbol.interface:
-                    return Stripped(csharp_naming.interface_name(symbol.name))
-                else:
-                    return Stripped(csharp_naming.class_name(symbol.name))
-
+            if symbol.interface:
+                return Stripped(csharp_naming.interface_name(symbol.name))
             else:
-                assert_never(symbol)
+                return Stripped(csharp_naming.class_name(symbol.name))
 
+    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
+        item_type = generate_type(
+            type_annotation=type_annotation.items, ref_association=ref_association
+        )
+
+        return Stripped(f"List<{item_type}>")
+
+    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
+        value = generate_type(
+            type_annotation=type_annotation.value, ref_association=ref_association
+        )
+        return Stripped(f"{value}?")
+
+    elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
+        if ref_association.interface is not None:
+            return Stripped(csharp_naming.interface_name(ref_association.name))
         else:
-            assert_never(type_annotation)
+            return Stripped(csharp_naming.class_name(ref_association.name))
 
-    elif isinstance(type_annotation, intermediate.SubscriptedTypeAnnotation):
-        if isinstance(type_annotation, intermediate.ListTypeAnnotation):
-            item_type = generate_type(
-                type_annotation=type_annotation.items, ref_association=ref_association
-            )
-
-            return Stripped(f"List<{item_type}>")
-
-        elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-            value = generate_type(
-                type_annotation=type_annotation.value, ref_association=ref_association
-            )
-            return Stripped(f"{value}?")
-
-        elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
-            if ref_association.interface is not None:
-                return Stripped(csharp_naming.interface_name(ref_association.name))
-            else:
-                return Stripped(csharp_naming.class_name(ref_association.name))
-
-        else:
-            assert_never(type_annotation)
     else:
         assert_never(type_annotation)
 
