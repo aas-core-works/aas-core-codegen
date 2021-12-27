@@ -1,0 +1,1 @@
+Expected decorators of a method to be only ``ast.Name`` and ``ast.Call``, but got: 'some_module.some_decorator'

@@ -1,0 +1,1 @@
+Unexpected method without a type annotation for the result: do_something

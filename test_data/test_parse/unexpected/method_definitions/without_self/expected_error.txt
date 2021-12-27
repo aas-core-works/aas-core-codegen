@@ -1,0 +1,1 @@
+Expected the first argument to be ``self`` in the method 'do_something', but got 'x'

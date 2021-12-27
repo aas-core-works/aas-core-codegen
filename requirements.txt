@@ -1,0 +1,4 @@
+icontract>=2.5.2,<3
+asttokens>=2.0.5,<3
+sortedcontainers>=2.4.0,<3
+docutils>=0.17.1,<1

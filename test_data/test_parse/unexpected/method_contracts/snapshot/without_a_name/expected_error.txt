@@ -1,0 +1,1 @@
+Expected the name of the snapshot to be defined, but there was neither the single argument in the capture nor explicit ``name`` given

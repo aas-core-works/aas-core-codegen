@@ -1,0 +1,1 @@
+The argument OLD of the postcondition is not provided since there were no snapshots defined for the method: do_something

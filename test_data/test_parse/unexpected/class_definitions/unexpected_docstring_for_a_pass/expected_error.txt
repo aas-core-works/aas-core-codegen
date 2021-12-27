@@ -1,0 +1,1 @@
+Expected only either properties explicitly annotated with types or instance methods, but got: """unexpected description"""
