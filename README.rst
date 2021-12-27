@@ -164,3 +164,18 @@ Versioning
 ==========
 We are still not clear about how to version the generator.
 For the moment, we use a lax incremental versioning with ``0.0`` prefix (``0.0.1``, 0.0.2``) *etc.*
+
+Contributing
+============
+
+Feature requests or bug reports are always very, very welcome!
+
+Please see quickly if the issue does not already exist in the `issue section`_ and, if not, create `a new issue`_.
+
+.. _issue section: https://github.com/aas-core-works/aas-core-codegen/issues
+.. _a new issue: https://github.com/aas-core-works/aas-core-codegen/issues/new
+
+Contributions in code are also welcome!
+Please see `CONTRIBUTING.rst`_ for developing guidelines.
+
+.. _CONTRIBUTING.rst: https://github.com/aas-core-works/aas-core-codegen/blob/main/CONTRIBUTING.rst
