@@ -94,6 +94,8 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
+    assert spec_impls is not None
+
     text = params.model_path.read_text(encoding="utf-8")
 
     # TODO-BEFORE-RELEASE (mristin, 2021-12-13):
@@ -152,6 +154,8 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
         return 1
 
+    assert ir_symbol_table is not None
+
     # endregion
 
     # region Dispatch
@@ -169,24 +173,24 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     # Additionally, bugs in the individual modules still allow us to run the other
     # modules.
 
-    if params.target == Target.CSHARP:
+    if params.target is Target.CSHARP:
         import aas_core_codegen.csharp.main as csharp_main
 
         return csharp_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
-    elif params.target == Target.JSONSCHEMA:
+    elif params.target is Target.JSONSCHEMA:
         import aas_core_codegen.jsonschema.main as jsonschema_main
 
         return jsonschema_main.execute(
             context=run_context, stdout=stdout, stderr=stderr
         )
 
-    elif params.target == Target.RDF_SHACL:
+    elif params.target is Target.RDF_SHACL:
         import aas_core_codegen.rdf_shacl.main as rdf_shacl_main
 
         return rdf_shacl_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
-    elif params.target == Target.XSD:
+    elif params.target is Target.XSD:
         import aas_core_codegen.xsd.main as xsd_main
 
         return xsd_main.execute(context=run_context, stdout=stdout, stderr=stderr)

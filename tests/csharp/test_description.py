@@ -2,7 +2,7 @@ import textwrap
 import unittest.mock
 
 # noinspection PyProtectedMember
-import aas_core_codegen.csharp.structure._generate as csharp_structure_generate
+import aas_core_codegen.csharp.description as csharp_description
 import tests.common
 from aas_core_codegen.common import Stripped, Identifier
 
@@ -20,14 +20,17 @@ class TestDescription(unittest.TestCase):
             source=source
         )
         assert error is None, f"{error=}"
+        assert symbol_table is not None
 
         some_class = symbol_table.must_find(Identifier("Some_class"))
         assert some_class.description is not None
 
-        code, error = csharp_structure_generate._description_comment(
+        code, error = csharp_description.generate_comment(
             some_class.description
         )
         assert error is None, f"{error=}"
+
+        assert code is not None
 
         return code
 
@@ -36,7 +39,14 @@ class TestDescription(unittest.TestCase):
             textwrap.dedent(
                 '''\
                 class Some_class:
-                    """"""  # Intentionally left empty    
+                    """"""  # Intentionally left empty
+                
+                class Reference:
+                    pass
+                    
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                associate_ref_with(Reference)
                 '''
             )
         )
@@ -49,6 +59,13 @@ class TestDescription(unittest.TestCase):
                 '''\
                 class Some_class:
                     """Do & drink something."""
+                
+                class Reference:
+                    pass
+                    
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                associate_ref_with(Reference)
                 '''
             )
         )
@@ -69,6 +86,13 @@ class TestDescription(unittest.TestCase):
                 '''\
                 class Some_class:
                     """Do & drink :class:`.Some_class`."""
+                    
+                class Reference:
+                    pass
+                    
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                associate_ref_with(Reference)
                 '''
             )
         )
@@ -90,6 +114,13 @@ class TestDescription(unittest.TestCase):
                 @abstract
                 class Some_class:
                     """Do & drink :class:`.Some_class`."""
+                    
+                class Reference:
+                    pass
+                    
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                associate_ref_with(Reference)
                 '''
             )
         )
@@ -110,6 +141,13 @@ class TestDescription(unittest.TestCase):
                 '''\
                 class Some_class(Enum):
                     """Do & drink :class:`.Some_class`."""
+                    
+                class Reference:
+                    pass
+                    
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                associate_ref_with(Reference)
                 '''
             )
         )
@@ -131,11 +169,18 @@ class TestDescription(unittest.TestCase):
                 class Some_class:
                     """
                     Do & drink something.
-                    
+
                     First & remark.
-                    
+
                     Second & remark.
                     """
+                    
+                class Reference:
+                    pass
+                    
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                associate_ref_with(Reference)
                 '''
             )
         )
@@ -161,18 +206,25 @@ class TestDescription(unittest.TestCase):
                 class Some_class:
                     """
                     Do & drink something.
-    
+
                     First & remark.
-    
+
                     :param without_description:
                     :param something: argument description same-line
                     :param another:
                         argument description as paragraph &
                         longer
-                        
+
                         text
                     :returns: some result
                     """
+                    
+                class Reference:
+                    pass
+                    
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                associate_ref_with(Reference)
                 '''
             )
         )

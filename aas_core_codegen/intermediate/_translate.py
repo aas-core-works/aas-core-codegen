@@ -1887,7 +1887,7 @@ def _second_pass_to_resolve_interfaces_in_place(
     for parsed_cls in ontology.classes:
         cls = symbol_table.must_find(parsed_cls.name)
 
-        assert id(cls.parsed) == id(parsed_cls)
+        assert cls.parsed is parsed_cls
         assert isinstance(cls, (ConstrainedPrimitive, Class))
 
         if isinstance(cls, ConstrainedPrimitive):

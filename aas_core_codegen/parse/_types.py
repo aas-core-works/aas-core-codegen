@@ -294,7 +294,7 @@ class Method(DBC):
         lambda self:
         len(self.arguments_by_name) == len(self.arguments)
         and all(
-            id(self.arguments_by_name[argument.name]) == id(argument)
+            self.arguments_by_name[argument.name] is argument
             for argument in self.arguments
         ),
         "Arguments and arguments by name are consistent"

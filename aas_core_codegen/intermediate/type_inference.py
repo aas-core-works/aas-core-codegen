@@ -192,25 +192,25 @@ def _type_annotations_equal(that: "TypeAnnotationUnion", other: "TypeAnnotationU
         if not isinstance(other, OurTypeAnnotation):
             return False
         else:
-            return id(that.symbol) == id(other.symbol)
+            return that.symbol is other.symbol
 
     elif isinstance(that, VerificationTypeAnnotation):
         if not isinstance(other, VerificationTypeAnnotation):
             return False
         else:
-            return id(that.func) == id(other.func)
+            return that.func is other.func
 
     elif isinstance(that, BuiltinFunctionTypeAnnotation):
         if not isinstance(other, BuiltinFunctionTypeAnnotation):
             return False
         else:
-            return id(that.func) == id(other.func)
+            return that.func is other.func
 
     elif isinstance(that, MethodTypeAnnotation):
         if not isinstance(other, MethodTypeAnnotation):
             return False
         else:
-            return id(that.method) == id(other.method)
+            return that.method is other.method
 
     elif isinstance(that, ListTypeAnnotation):
         if not isinstance(other, ListTypeAnnotation):
@@ -260,7 +260,7 @@ def _assignable(target_type: "TypeAnnotationUnion", value_type: "TypeAnnotationU
             return (
                     isinstance(value_type, OurTypeAnnotation)
                     and isinstance(value_type.symbol, _types.Enumeration)
-                    and id(target_type.symbol) == id(value_type.symbol)
+                    and target_type.symbol is value_type.symbol
             )
 
         elif isinstance(target_type.symbol, _types.ConstrainedPrimitive):
@@ -283,7 +283,7 @@ def _assignable(target_type: "TypeAnnotationUnion", value_type: "TypeAnnotationU
                         and target_type.symbol.constrainee == value_type.symbol.constrainee
                 ):
                     return (
-                            id(target_type.symbol) == id(value_type.symbol)
+                            target_type.symbol is value_type.symbol
                             or value_type.symbol in target_type.symbol.descendant_id_set
                     )
 
@@ -301,7 +301,7 @@ def _assignable(target_type: "TypeAnnotationUnion", value_type: "TypeAnnotationU
             # the value type are equal *or* the value symbol is a descendant of the
             # target symbol.
 
-            return id(target_type.symbol) == id(value_type.symbol) or (
+            return target_type.symbol is value_type.symbol or (
                     id(value_type.symbol) in target_type.symbol.descendant_id_set
             )
 
@@ -309,19 +309,19 @@ def _assignable(target_type: "TypeAnnotationUnion", value_type: "TypeAnnotationU
         if not isinstance(value_type, VerificationTypeAnnotation):
             return False
         else:
-            return id(target_type.func) == id(value_type.func)
+            return target_type.func is value_type.func
 
     elif isinstance(target_type, BuiltinFunctionTypeAnnotation):
         if not isinstance(value_type, BuiltinFunctionTypeAnnotation):
             return False
         else:
-            return id(target_type.func) == id(value_type.func)
+            return target_type.func is value_type.func
 
     elif isinstance(target_type, MethodTypeAnnotation):
         if not isinstance(value_type, MethodTypeAnnotation):
             return False
         else:
-            return id(target_type.method) == id(value_type.method)
+            return target_type.method is value_type.method
 
     elif isinstance(target_type, ListTypeAnnotation):
         if not isinstance(value_type, ListTypeAnnotation):

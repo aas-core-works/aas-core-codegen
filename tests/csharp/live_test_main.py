@@ -31,10 +31,6 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as tmp_dir:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
-        # TODO: remove
-        tmp_dir = repo_dir / "deleteme"
-        tmp_dir.mkdir(parents=True, exist_ok=True)
-
         parent_case_dir = repo_dir / "test_data" / "test_csharp" / "test_main"
         assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
 
@@ -111,6 +107,7 @@ def main() -> int:
                 run.returncode == 0
             ), f"Expected the build to succeed, but got exit code: {run.returncode}"
 
+    return 0
 
 if __name__ == "__main__":
     sys.exit(main())

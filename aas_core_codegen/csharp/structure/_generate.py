@@ -313,7 +313,7 @@ def _generate_interface(
     # region Getters and setters
 
     for prop in interface.properties:
-        if id(prop.implemented_for) == id(interface.base):
+        if prop.implemented_for is interface.base:
             prop_type = csharp_common.generate_type(
                 type_annotation=prop.type_annotation, ref_association=ref_association
             )

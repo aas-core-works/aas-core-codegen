@@ -471,7 +471,7 @@ class SignatureLike(DBC):
         and all(
             (
                     found_argument := self.arguments_by_name.get(argument.name, None),
-                    found_argument is not None and id(found_argument) == id(argument)
+                    found_argument is not None and found_argument is argument
             )[1]
             for argument in self.arguments
         ),
@@ -1422,7 +1422,7 @@ class SymbolTable:
     @ensure(
         lambda self:
         all(
-            id(self.verification_functions_by_name[func.name]) == id(func)
+            self.verification_functions_by_name[func.name] is func
             for func in self.verification_functions
         )
         and len(self.verification_functions_by_name) == len(
@@ -1434,7 +1434,7 @@ class SymbolTable:
         all(
             (
                     found_symbol := self.find(symbol.name),
-                    found_symbol is not None and id(found_symbol) == id(symbol)
+                    found_symbol is not None and found_symbol is symbol
             )[1]
             for symbol in self.symbols
         ),
