@@ -350,7 +350,7 @@ def map_symbol_table_to_ontology(
                 errors.append(
                     Error(
                         method.node,
-                        f"The method has already been defined in the antecedent "
+                        f"The method has already been defined in the ancestor "
                         f"class {observed_methods[method.name].name}: {method.name}",
                     )
                 )

@@ -349,7 +349,7 @@ def _understand_assignment(
             Error(
                 target.value,
                 f"The property has not been previously "
-                f"defined in {parsed_class.name}: {target.attr}",
+                f"defined in the class {parsed_class.name!r}: {target.attr}",
             ),
         )
 
@@ -470,7 +470,8 @@ def _understand_assignment(
     return None, Error(
         assign,
         f"The handling of the constructor statement "
-        f"has not been implemented: {ast.dump(assign)}",
+        f"has not been implemented: {ast.dump(assign)}; "
+        f"please notify the developers if you really need this feature",
     )
 
 

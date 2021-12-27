@@ -40,7 +40,7 @@ def most_underlying_messages(error: Error) -> str:
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def parse_atok(
-        atok: asttokens.ASTTokens,
+    atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[parse.SymbolTable], Optional[Error]]:
     """Parse the ``atok``, an abstract syntax tree of a meta-model."""
     import_errors = parse.check_expected_imports(atok=atok)
@@ -71,7 +71,7 @@ def parse_source(source: str) -> Tuple[Optional[parse.SymbolTable], Optional[Err
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def translate_source_to_intermediate(
-        source: str,
+    source: str,
 ) -> Tuple[Optional[intermediate.SymbolTable], Optional[Error]]:
     atok, parse_exception = parse.source_to_atok(source=source)
     if parse_exception:

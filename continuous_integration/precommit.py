@@ -149,7 +149,9 @@ def main() -> int:
         )
 
         for pth in (repo_root / "aas_core_codegen").glob("**/*.py"):
-            subprocess.check_call([sys.executable, "-m", "doctest", str(pth)])
+            subprocess.check_call(
+                [sys.executable, "-m", "doctest", str(pth)], cwd=str(repo_root)
+            )
 
     else:
         print("Skipped doctest'ing.")

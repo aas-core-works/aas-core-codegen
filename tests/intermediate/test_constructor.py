@@ -1,3 +1,4 @@
+import re
 import textwrap
 import unittest
 from typing import Tuple, Optional, Sequence
@@ -22,11 +23,13 @@ def understand_constructor_table(
     import_errors = parse.check_expected_imports(atok=atok)
     assert len(import_errors) == 0
 
-    symbol_table, error = parse.atok_to_symbol_table(atok=atok)
-    assert error is None, f"{error=}"
-    assert symbol_table is not None
+    parsed_symbol_table, error = parse.atok_to_symbol_table(atok=atok)
+    assert error is None, f"{tests.common.most_underlying_messages(error)}"
+    assert parsed_symbol_table is not None
 
-    either = construction.understand_all(symbol_table=symbol_table, atok=atok)
+    either = construction.understand_all(
+        parsed_symbol_table=parsed_symbol_table, atok=atok
+    )
 
     return either
 
@@ -47,18 +50,18 @@ def must_find_item_for(
 
 
 class Test_empty_ok(unittest.TestCase):
-    def test_no_classes(self) -> None:
-        constructor_table, error = understand_constructor_table(source="")
-        assert error is None, f"{error=}"
-        assert constructor_table is not None
-
-        self.assertEqual(0, len(constructor_table.entries()))
-
     def test_no_constructor(self) -> None:
         source = textwrap.dedent(
             """\
             class Something:
                 pass
+                
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -66,10 +69,14 @@ class Test_empty_ok(unittest.TestCase):
         assert error is None, f"{error=}"
         assert constructor_table is not None
 
-        self.assertEqual(1, len(constructor_table.entries()))
+        self.assertEqual(2, len(constructor_table.entries()))
 
         cls, statements = must_find_item_for(constructor_table, "Something")
         self.assertEqual("Something", cls.name)
+        self.assertEqual(0, len(statements))
+
+        cls, statements = must_find_item_for(constructor_table, "Reference")
+        self.assertEqual("Reference", cls.name)
         self.assertEqual(0, len(statements))
 
     def test_pass(self) -> None:
@@ -78,6 +85,13 @@ class Test_empty_ok(unittest.TestCase):
             class Something:
                 def __init__(self) -> None:
                     pass
+            
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -85,9 +99,12 @@ class Test_empty_ok(unittest.TestCase):
         assert error is None, f"{error=}"
         assert constructor_table is not None
 
-        self.assertEqual(1, len(constructor_table.entries()))
+        self.assertEqual(2, len(constructor_table.entries()))
 
         _, statements = must_find_item_for(constructor_table, "Something")
+        self.assertEqual(0, len(statements))
+
+        _, statements = must_find_item_for(constructor_table, "Reference")
         self.assertEqual(0, len(statements))
 
 
@@ -103,6 +120,13 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
             class Something(Parent):
                 def __init__(self) -> None:
                     Parent.__init__(self)
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -110,7 +134,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
         assert error is None, f"{error=}"
         assert constructor_table is not None
 
-        self.assertEqual(2, len(constructor_table.entries()))
+        self.assertEqual(3, len(constructor_table.entries()))
 
         _, statements = must_find_item_for(constructor_table, "Something")
         self.assertEqual(1, len(statements))
@@ -134,6 +158,13 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
             class Something(Parent):
                 def __init__(self, a: int, b: int) -> None:
                     Parent.__init__(self, a, b)
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -141,7 +172,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
         assert error is None, f"{error=}"
         assert constructor_table is not None
 
-        self.assertEqual(2, len(constructor_table.entries()))
+        self.assertEqual(3, len(constructor_table.entries()))
 
         _, statements = must_find_item_for(constructor_table, "Something")
         self.assertEqual(1, len(statements))
@@ -160,6 +191,13 @@ class Test_assign_property_ok(unittest.TestCase):
 
                 def __init__(self, x: int) -> None:
                     self.x = x
+            
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -185,6 +223,13 @@ class Test_assign_fail(unittest.TestCase):
 
                 def __init__(self, a: int) -> None:
                     self.a = self.b = a
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -205,6 +250,13 @@ class Test_assign_fail(unittest.TestCase):
 
                 def __init__(self, a: int, b: int) -> None:
                     self.a, self.b = a, b
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -226,6 +278,13 @@ class Test_assign_fail(unittest.TestCase):
 
                 def __init__(self, a: int, b: int) -> None:
                     x = a
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -243,6 +302,13 @@ class Test_assign_fail(unittest.TestCase):
             class Something:
                 def __init__(self, a: int) -> None:
                     self.a = a
+            
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -250,7 +316,7 @@ class Test_assign_fail(unittest.TestCase):
         assert error is not None
 
         self.assertEqual(
-            "The property has not been previously defined in Something: a",
+            "The property has not been previously defined in the class 'Something': a",
             tests.common.most_underlying_messages(error),
         )
 
@@ -262,16 +328,26 @@ class Test_assign_fail(unittest.TestCase):
 
                 def __init__(self, a: int) -> None:
                     self.a = a + 100
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
         _, error = understand_constructor_table(source=source)
         assert error is not None
 
+        error_str = tests.common.most_underlying_messages(error)
+        error_str = re.sub(r"Assign\(.*\); ", "Assign(...); ", error_str)
+
         self.assertEqual(
-            "Expected a name as the value to be assigned to the property, "
-            "but got: a + 100",
-            tests.common.most_underlying_messages(error),
+            "The handling of the constructor statement has not been implemented: "
+            "Assign(...); please notify the developers if you really need this feature",
+            error_str,
         )
 
     def test_argument_and_property_name_differ(self) -> None:
@@ -282,6 +358,14 @@ class Test_assign_fail(unittest.TestCase):
 
                 def __init__(self, b: int) -> None:
                     self.a = b
+
+
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -316,6 +400,13 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
                 def __init__(self, a: int, b: int) -> None:
                     super().__init__(self, a, b)
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             '''
         )
 
@@ -348,6 +439,13 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
                 def __init__(self, a: int, b: int) -> None:
                     Parent.__init__(self, **{'a': a, 'b': b})
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             '''
         )
 
@@ -374,6 +472,13 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something:
                 def __init__(self, a: int, b: int) -> None:
                     Unrelated.__init__(self, a=a, b=b)
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -397,6 +502,13 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
                 def __init__(self, a: int, b: int) -> None:
                     Parent.__init__(self)
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -421,6 +533,13 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(DBC, Parent):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a + 100)
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -446,6 +565,13 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(DBC, Parent):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a=a + 100)
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -473,6 +599,13 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(Parent):
                 def __init__(self, a: int, b: int, c: int) -> None:
                     Parent.__init__(self, a, b, c)
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -500,6 +633,13 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(DBC, Parent):
                 def __init__(self, a: int, b: int, c: int) -> None:
                     Parent.__init__(self, a=a, b=b, c=c)
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -528,6 +668,13 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(Parent):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a, b)
+            
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             '''
         )
 
@@ -556,6 +703,13 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(DBC, Parent):
                 def __init__(self, a: int, y: int) -> None:
                     Parent.__init__(self, a, b=y)
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -585,6 +739,13 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             class Something(Parent):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a)
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -593,57 +754,6 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
         self.assertEqual(
             "The call to ``Parent.__init__`` is missing one or more arguments: b",
-            tests.common.most_underlying_messages(error),
-        )
-
-    def test_call_to_non_attribute_in_init(self) -> None:
-        source = textwrap.dedent(
-            """\
-            def initialize_something(smth: 'Something', a: int, b: int) -> None:
-                smth.a = a
-                smth.b = b
-
-
-            class Something:
-                a: int
-                b: int
-
-                def __init__(self, a: int, b: int) -> None:
-                    initialize_something(a, b)
-            """
-        )
-
-        _, error = understand_constructor_table(source=source)
-        assert error is not None
-
-        self.assertEqual(
-            "Unexpected call in the body of ``__init__``: initialize_something; "
-            "only calls to super ``__init__``'s are expected",
-            tests.common.most_underlying_messages(error),
-        )
-
-    def test_call_to_non_super_init_from_init(self) -> None:
-        source = textwrap.dedent(
-            """\
-            class Something:
-                a: int
-                b: int
-
-                def initialize(self, a: int, b: int) -> None:
-                    self.a = a + 10
-                    self.b = b + 100
-
-                def __init__(self, a: int, b: int) -> None:
-                    self.initialize(a, b)
-            """
-        )
-
-        _, error = understand_constructor_table(source=source)
-        assert error is not None
-
-        self.assertEqual(
-            "Unexpected call in the body of ``__init__``: self.initialize; "
-            "only calls to super ``__init__``'s are expected",
             tests.common.most_underlying_messages(error),
         )
 
@@ -657,6 +767,13 @@ class Test_unexpected_statements(unittest.TestCase):
 
                 def __init__(self, a: int) -> None:
                     print("something")
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -677,6 +794,13 @@ class Test_unexpected_statements(unittest.TestCase):
 
                 def __init__(self, a: int) -> None:
                     1 + 2
+                    
+            class Reference:
+                pass
+            
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 

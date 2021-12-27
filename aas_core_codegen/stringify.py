@@ -15,7 +15,8 @@ from aas_core_codegen.common import assert_never, indent_but_first_line
 # We have to separate Stringifiable and Sequence[Stringifiable] since recursive types
 # are not supported in mypy, see https://github.com/python/mypy/issues/731.
 PrimitiveStringifiable = Union[
-    bool, int, float, str, "Entity", "Property", "PropertyEllipsis", None]
+    bool, int, float, str, "Entity", "Property", "PropertyEllipsis", None
+]
 
 Stringifiable = Union[PrimitiveStringifiable, Sequence[PrimitiveStringifiable]]
 
@@ -54,7 +55,7 @@ class Entity:
     """
 
     def __init__(
-            self, name: str, properties: Sequence[Union[Property, PropertyEllipsis]]
+        self, name: str, properties: Sequence[Union[Property, PropertyEllipsis]]
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -132,6 +133,8 @@ def dump(stringifiable: Stringifiable) -> str:
     else:
         assert_never(stringifiable)
 
+    raise AssertionError("Should not have gotten here")
+
 
 def compares_against_dict(entity: Entity, obj: object) -> bool:
     """
@@ -197,7 +200,7 @@ def assert_compares_against_dict(entity: Entity, obj: object) -> None:
 
 
 def assert_all_public_types_listed_as_dumpables(
-        dumpable: Any, types_module: Any
+    dumpable: Any, types_module: Any
 ) -> None:
     """Make sure that all classes in :py:mod:`_types` are listed as dumpables."""
 

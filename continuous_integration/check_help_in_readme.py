@@ -79,12 +79,21 @@ def capture_output_lines(command: str) -> List[str]:
         # is not properly inherited.
         command_parts[0] = sys.executable
 
-    proc = subprocess.Popen(
-        command_parts,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        encoding="utf-8",
-    )
+    proc = None  # type: Optional[subprocess.Popen]
+    try:
+        proc = subprocess.Popen(
+            command_parts,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            encoding="utf-8",
+        )
+    except Exception as exception:
+        raise RuntimeError(
+            f"Failed to start the command {command_parts!r} "
+            f"derived from the command {command!r} in the document") from exception
+
+    assert proc is not None
+
     output, err = proc.communicate()
     if err:
         raise RuntimeError(
@@ -148,7 +157,8 @@ def main() -> int:
     overwrite = bool(args.overwrite)
 
     this_dir = pathlib.Path(os.path.realpath(__file__)).parent
-    pth = this_dir / "README.rst"
+    repo_root = this_dir.parent
+    pth = repo_root / "README.rst"
 
     text = pth.read_text(encoding="utf-8")
     lines = text.splitlines()

@@ -128,8 +128,10 @@ class Test_parsing_docstring(unittest.TestCase):
         """
         symbol_table, error = tests.common.parse_source(source)
         assert error is None, f"{error}"
+        assert symbol_table is not None
 
         symbol = symbol_table.must_find_class(Identifier("Some_class"))
+        assert symbol.description is not None
         return symbol.description.document
 
     def test_empty(self) -> None:
@@ -215,7 +217,7 @@ class Test_against_recorded(unittest.TestCase):
             expected_error_pth = case_dir / "expected_error.txt"
 
             try:
-                source = source_pth.read_text(encoding='utf-8')
+                source = source_pth.read_text(encoding="utf-8")
 
                 symbol_table, error = tests.common.parse_source(source)
 
@@ -265,7 +267,7 @@ class Test_unexpected_class_definitions(unittest.TestCase):
 class Test_parse_type_annotation(unittest.TestCase):
     @staticmethod
     def parse_type_annotation_from_ann_assign(
-            source: str,
+        source: str,
     ) -> Tuple[ast.AST, asttokens.ASTTokens]:
         """Encapsulate the parsing of the type annotation of a variable."""
         atok = asttokens.ASTTokens(source, parse=True)

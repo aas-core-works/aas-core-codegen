@@ -40,7 +40,7 @@ from aas_core_codegen.intermediate._types import (
     SymbolTable,
     TypeAnnotation,
     Verification,
-    UnderstoodMethod
+    UnderstoodMethod,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -395,7 +395,7 @@ def _stringify_enumeration(
                     f"Reference to {parent_enum.__class__.__name__} "
                     f"{parent_enum.name}"
                     for parent_enum in that.is_superset_of
-                ]
+                ],
             ),
             stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("literals_by_name", that.literals_by_name),
@@ -628,7 +628,7 @@ Dumpable = Union[
     SymbolTable,
     TypeAnnotation,
     Verification,
-    UnderstoodMethod
+    UnderstoodMethod,
 ]
 
 stringify.assert_all_public_types_listed_as_dumpables(

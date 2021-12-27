@@ -58,7 +58,7 @@ from aas_core_codegen.parse._types import (
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def source_to_atok(
-        source: str,
+    source: str,
 ) -> Tuple[Optional[asttokens.ASTTokens], Optional[Exception]]:
     """
     Parse the Python code.
@@ -161,15 +161,15 @@ def check_expected_imports(atok: asttokens.ASTTokens) -> List[str]:
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _enum_to_symbol(
-        node: ast.ClassDef, atok: asttokens.ASTTokens
+    node: ast.ClassDef, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Enumeration], Optional[Error]]:
     """Interpret a class which defines an enumeration."""
     is_superset_of = None  # type: Optional[List[Identifier]]
     for decorator_node in node.decorator_list:
         if (
-                isinstance(decorator_node, ast.Call)
-                and isinstance(decorator_node.func, ast.Name)
-                and decorator_node.func.id == "is_superset_of"
+            isinstance(decorator_node, ast.Call)
+            and isinstance(decorator_node.func, ast.Name)
+            and decorator_node.func.id == "is_superset_of"
         ):
             if is_superset_of is not None:
                 return None, Error(
@@ -215,9 +215,9 @@ def _enum_to_symbol(
                 is_superset_of.append(Identifier(elt.id))
 
         elif (
-                isinstance(decorator_node, ast.Call)
-                and isinstance(decorator_node.func, ast.Name)
-                and decorator_node.func.id == "reference_in_the_book"
+            isinstance(decorator_node, ast.Call)
+            and isinstance(decorator_node.func, ast.Name)
+            and decorator_node.func.id == "reference_in_the_book"
         ):
             # NOTE (mristin, 2021-11-17):
             # We ignore references at the moment. At some later point, it might
@@ -367,7 +367,7 @@ def _enum_to_symbol(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _type_annotation(
-        node: ast.AST, atok: asttokens.ASTTokens
+    node: ast.AST, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[TypeAnnotation], Optional[Error]]:
     """Parse the type annotation."""
     if isinstance(node, ast.Name):
@@ -468,8 +468,7 @@ def _type_annotation(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _ann_assign_to_property(
-        node: ast.AnnAssign, description: Optional[Description],
-        atok: asttokens.ASTTokens
+    node: ast.AnnAssign, description: Optional[Description], atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Property], Optional[Error]]:
     if not isinstance(node.target, ast.Name):
         return (
@@ -521,7 +520,7 @@ def _ann_assign_to_property(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _args_to_arguments(
-        node: ast.arguments, atok: asttokens.ASTTokens
+    node: ast.arguments, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[List[Argument]], Optional[Error]]:
     """Parse arguments of a method."""
     if hasattr(node, "posonlyargs") and len(node.posonlyargs) > 0:
@@ -657,7 +656,7 @@ def _args_to_arguments(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _parse_contract_condition(
-        node: ast.Call, atok: asttokens.ASTTokens
+    node: ast.Call, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Contract], Optional[Error]]:
     """Parse the contract decorator."""
     condition_node = None  # type: Optional[ast.AST]
@@ -699,8 +698,8 @@ def _parse_contract_condition(
     description = None  # type: Optional[str]
     if description_node is not None:
         if not (
-                isinstance(description_node, ast.Constant)
-                and isinstance(description_node.value, str)
+            isinstance(description_node, ast.Constant)
+            and isinstance(description_node.value, str)
         ):
             return (
                 None,
@@ -739,7 +738,7 @@ def _parse_contract_condition(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _parse_snapshot(
-        node: ast.Call, atok: asttokens.ASTTokens
+    node: ast.Call, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Snapshot], Optional[Error]]:
     """Parse the snapshot decorator."""
     capture_node = None  # type: Optional[ast.AST]
@@ -776,7 +775,7 @@ def _parse_snapshot(
         )
 
     if name_node is not None and not (
-            isinstance(name_node, ast.Constant) and isinstance(name_node.value, str)
+        isinstance(name_node, ast.Constant) and isinstance(name_node.value, str)
     ):
         return (
             None,
@@ -862,7 +861,7 @@ def _parse_snapshot(
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 # fmt: on
 def _function_def_to_method(
-        node: ast.FunctionDef, expect_self: bool, atok: asttokens.ASTTokens
+    node: ast.FunctionDef, expect_self: bool, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Method], Optional[Error]]:
     """
     Parse the function definition into a method.
@@ -1247,7 +1246,7 @@ def _function_def_to_method(
 @require(lambda constant: isinstance(constant.value, str))
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _string_constant_to_description(
-        constant: ast.Constant,
+    constant: ast.Constant,
 ) -> Tuple[Optional[Description], Optional[Error]]:
     """Extract the docstring from the given string constant."""
     text = constant.value
@@ -1294,7 +1293,7 @@ _CLASS_MARKER_FROM_STRING: Mapping[str, _ClassMarker] = {
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _class_decorator_to_marker(
-        decorator: ast.Name,
+    decorator: ast.Name,
 ) -> Tuple[Optional[_ClassMarker], Optional[Error]]:
     """Parse a simple decorator as a class marker."""
     class_marker = _CLASS_MARKER_FROM_STRING.get(decorator.id, None)
@@ -1321,7 +1320,7 @@ def _class_decorator_to_marker(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def _class_decorator_to_serialization(
-        decorator: ast.Call,
+    decorator: ast.Call,
 ) -> Tuple[Optional[Serialization], Optional[Error]]:
     """Translate a decorator to general serialization settings."""
     with_model_type_node = None  # type: Optional[ast.AST]
@@ -1380,7 +1379,7 @@ def _class_decorator_to_serialization(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def _class_decorator_to_invariant(
-        decorator: ast.Call, atok: asttokens.ASTTokens
+    decorator: ast.Call, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Invariant], Optional[Error]]:
     """Parse the decorator node as a class invariant."""
     condition_node = None  # type: Optional[ast.AST]
@@ -1420,8 +1419,8 @@ def _class_decorator_to_invariant(
         )
 
     if description_node is not None and (
-            not isinstance(description_node, ast.Constant)
-            or not isinstance(description_node.value, str)
+        not isinstance(description_node, ast.Constant)
+        or not isinstance(description_node.value, str)
     ):
         return (
             None,
@@ -1468,7 +1467,7 @@ def _class_decorator_to_invariant(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _classdef_to_symbol(
-        node: ast.ClassDef, atok: asttokens.ASTTokens
+    node: ast.ClassDef, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Symbol], Optional[Error]]:
     """Interpret the class definition as a symbol."""
     underlying_errors = []  # type: List[Error]
@@ -1548,9 +1547,9 @@ def _classdef_to_symbol(
                 raise AssertionError(f"Unhandled enum: {class_marker}")
 
         elif (
-                isinstance(decorator, ast.Call)
-                and isinstance(decorator.func, ast.Name)
-                and isinstance(decorator.func.ctx, ast.Load)
+            isinstance(decorator, ast.Call)
+            and isinstance(decorator.func, ast.Name)
+            and isinstance(decorator.func.ctx, ast.Load)
         ):
             if decorator.func.id == "invariant":
                 invariant, error = _class_decorator_to_invariant(
@@ -1602,7 +1601,7 @@ def _classdef_to_symbol(
                 Error(
                     decorator,
                     message=f"Handling of a decorator has not been "
-                            f"implemented: {ast.dump(decorator)!r}",
+                    f"implemented: {ast.dump(decorator)!r}",
                 )
             )
 
@@ -1624,8 +1623,8 @@ def _classdef_to_symbol(
             Error(
                 node,
                 message=f"Abstract classes can not be implementation-specific "
-                        f"at the same time "
-                        f"(otherwise we can not convert them to interfaces etc.)",
+                f"at the same time "
+                f"(otherwise we can not convert them to interfaces etc.)",
             ),
         )
 
@@ -1754,7 +1753,7 @@ def _classdef_to_symbol(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def _parse_associate_ref_with(
-        call: ast.Call,
+    call: ast.Call,
 ) -> Tuple[Optional[Identifier], Optional[Error]]:
     """Parse the call to ``associate_ref_with`` in the meta-model module."""
     cls_node = None  # type: Optional[ast.AST]
@@ -1779,7 +1778,7 @@ def _parse_associate_ref_with(
 
 
 def _verify_arity_of_type_annotation_subscript(
-        type_annotation: SubscriptedTypeAnnotation,
+    type_annotation: SubscriptedTypeAnnotation,
 ) -> Optional[Error]:
     """
     Check that the subscripted type annotation has the expected number of arguments.
@@ -1814,7 +1813,7 @@ def _verify_arity_of_type_annotation_subscript(
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 # fmt: on
 def _verify_symbol_table(
-        symbol_table: UnverifiedSymbolTable,
+    symbol_table: UnverifiedSymbolTable,
 ) -> Tuple[Optional[SymbolTable], Optional[List[Error]]]:
     """
     Check that the symbol table is consistent.
@@ -1924,8 +1923,8 @@ def _verify_symbol_table(
     for func in symbol_table.verification_functions:
         func_name_lower = func.name.lower()
         if (
-                func_name_lower in reserved_member_names
-                or func_name_lower in reserved_symbol_names
+            func_name_lower in reserved_member_names
+            or func_name_lower in reserved_symbol_names
         ):
             errors.append(
                 Error(
@@ -1940,25 +1939,25 @@ def _verify_symbol_table(
     # region Check that imported symbols are not re-assigned in an understood method
 
     for understood_method in itertools.chain(
-            (
-                    method
-                    for method in symbol_table.verification_functions
-                    if isinstance(method, UnderstoodMethod)
-            ),
-            (
-                    method
-                    for symbol in symbol_table.symbols
-                    if isinstance(symbol, Class)
-                    for method in symbol.methods
-                    if isinstance(method, UnderstoodMethod)
-            ),
+        (
+            method
+            for method in symbol_table.verification_functions
+            if isinstance(method, UnderstoodMethod)
+        ),
+        (
+            method
+            for symbol in symbol_table.symbols
+            if isinstance(symbol, Class)
+            for method in symbol.methods
+            if isinstance(method, UnderstoodMethod)
+        ),
     ):
         # BEFORE-RELEASE (mristin, 2021-12-19): test
         for stmt in understood_method.body:
             if (
-                    isinstance(stmt, tree.Assignment)
-                    and isinstance(stmt.target, tree.Name)
-                    and stmt.target.identifier == "match"
+                isinstance(stmt, tree.Assignment)
+                and isinstance(stmt.target, tree.Name)
+                and stmt.target.identifier == "match"
             ):
                 errors.append(
                     Error(
@@ -2042,7 +2041,7 @@ def _verify_symbol_table(
     # the ``GENERIC_TYPES`` and add them to the copy.
 
     def verify_no_dangling_references_in_type_annotation(
-            type_annotation: TypeAnnotation,
+        type_annotation: TypeAnnotation,
     ) -> Optional[Error]:
         """
         Check that the type annotation contains no dangling references.
@@ -2162,7 +2161,7 @@ def _verify_symbol_table(
 @require(lambda atok: isinstance(atok.tree, ast.Module))
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _atok_to_symbol_table(
-        atok: asttokens.ASTTokens,
+    atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[SymbolTable], Optional[Error]]:
     symbols = []  # type: List[Symbol]
     underlying_errors = []  # type: List[Error]
@@ -2197,9 +2196,9 @@ def _atok_to_symbol_table(
                 matched = True
 
         elif (
-                isinstance(node, ast.Expr)
-                and isinstance(node.value, ast.Constant)
-                and isinstance(node.value.value, str)
+            isinstance(node, ast.Expr)
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
         ):
             matched = True
 
@@ -2245,11 +2244,11 @@ def _atok_to_symbol_table(
             pass
 
         elif (
-                isinstance(node, ast.Assign)
-                and len(node.targets) == 1
-                and isinstance(node.targets[0], ast.Name)
-                and isinstance(node.value, ast.Constant)
-                and isinstance(node.value.value, str)
+            isinstance(node, ast.Assign)
+            and len(node.targets) == 1
+            and isinstance(node.targets[0], ast.Name)
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
         ):
             matched = True
 
@@ -2267,9 +2266,9 @@ def _atok_to_symbol_table(
                 )
                 continue
         elif (
-                isinstance(node, ast.Expr)
-                and isinstance(node.value, ast.Call)
-                and isinstance(node.value.func, ast.Name)
+            isinstance(node, ast.Expr)
+            and isinstance(node.value, ast.Call)
+            and isinstance(node.value.func, ast.Name)
         ):
             matched = True
 
@@ -2365,10 +2364,10 @@ def _atok_to_symbol_table(
             [
                 Error(
                     symbol.node,
-                    f"The symbol {symbol.name!r} has been already defined before"
+                    f"The symbol {symbol.name!r} has been already defined before",
                 )
                 for symbol in duplicate_symbols
-            ]
+            ],
         )
 
     # endregion
@@ -2402,7 +2401,7 @@ def _atok_to_symbol_table(
 @require(lambda atok: isinstance(atok.tree, ast.Module))
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def atok_to_symbol_table(
-        atok: asttokens.ASTTokens,
+    atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[SymbolTable], Optional[Error]]:
     """Construct the symbol table based on the parsed AST."""
     table, error = _atok_to_symbol_table(atok=atok)

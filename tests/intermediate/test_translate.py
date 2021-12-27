@@ -131,7 +131,7 @@ class Test_against_recorded(unittest.TestCase):
             expected_symbol_table_pth = case_dir / "expected_symbol_table.txt"
             expected_error_pth = case_dir / "expected_error.txt"
 
-            source = source_pth.read_text(encoding='utf-8')
+            source = source_pth.read_text(encoding="utf-8")
 
             try:
                 symbol_table, error = tests.common.translate_source_to_intermediate(

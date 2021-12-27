@@ -7,7 +7,7 @@ Aas-core-codegen generates code to handle asset administration shells based on t
 ``--help``
 ==========
 
-.. Help starts: aas-core-csharp-codegen --help
+.. Help starts: aas-core-codegen --help
 .. code-block::
 
     usage: aas-core-codegen [-h] --model_path MODEL_PATH --output_dir
@@ -23,4 +23,4 @@ Aas-core-codegen generates code to handle asset administration shells based on t
       --output_dir OUTPUT_DIR
                             path to the generated code
 
-.. Help ends: aas-core-csharp-codegen --help
+.. Help ends: aas-core-codegen --help

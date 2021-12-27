@@ -32,7 +32,7 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     license="License :: OSI Approved :: MIT License",
-    keywords="asset administration shell code generation csharp c#",
+    keywords="asset administration shell code generation industry 4.0 industrie i4.0",
     packages=find_packages(exclude=["tests", "continuous_integration"]),
     install_requires=install_requires,
     # fmt: off
@@ -40,7 +40,7 @@ setup(
         "dev": [
             "black==20.8b1",
             "mypy==0.930",
-            "pylint==2.3.1",
+            "pylint==2.12.2",
             "pydocstyle>=2.1.1,<3",
             "coverage>=4.5.1,<5",
             "docutils>=0.14,<1",

@@ -13,6 +13,13 @@ class Test_ontology_ok(unittest.TestCase):
                 """\
                 class Something:
                     pass
+                    
+                class Reference:
+                    pass
+                
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                associate_ref_with(Reference)
                 """
             )
         )
@@ -53,6 +60,13 @@ class Test_ontology_ok(unittest.TestCase):
 
                 class Something(Parent, Another_parent):
                     pass
+                    
+                class Reference:
+                    pass
+                
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                associate_ref_with(Reference)
                 """
             )
         )
@@ -94,6 +108,13 @@ class Test_ontology_fail(unittest.TestCase):
                 @abstract
                 class Something(Abstract):
                     x: int
+                    
+                class Reference:
+                    pass
+                
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                associate_ref_with(Reference)
                 """
             )
         )
@@ -122,6 +143,13 @@ class Test_ontology_fail(unittest.TestCase):
                 class Something(Abstract):
                     def do_something(self) -> None:
                         pass
+                        
+                class Reference:
+                    pass
+                
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                associate_ref_with(Reference)
                 """
             )
         )
@@ -148,6 +176,13 @@ class Test_ontology_fail(unittest.TestCase):
 
                 class Something(Abstract):
                     pass
+                    
+                class Reference:
+                    pass
+                
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                associate_ref_with(Reference)
                 """
             )
         )
@@ -175,6 +210,13 @@ class Test_ontology_fail(unittest.TestCase):
                 @abstract
                 class Something(Cycle):
                     pass
+                    
+                class Reference:
+                    pass
+                
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                associate_ref_with(Reference)
                 """
             )
         )
@@ -189,20 +231,6 @@ class Test_ontology_fail(unittest.TestCase):
             "but the class Cycle has been observed in a cycle",
             tests.common.most_underlying_messages(errors[0]),
         )
-
-
-class Test_against_real_meta_models(unittest.TestCase):
-    def test_smoke_on_files(self) -> None:
-        for meta_model_pth in tests.common.list_valid_meta_models_from_test_data():
-            source = meta_model_pth.read_text()
-
-            symbol_table, error = tests.common.parse_source(source)
-            assert error is None, f"{meta_model_pth=}, {error=}"
-            assert symbol_table is not None
-
-            _, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
-
-            assert errors is None, f"{meta_model_pth=}, {errors=}"
 
 
 if __name__ == "__main__":

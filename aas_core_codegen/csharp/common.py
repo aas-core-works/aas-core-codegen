@@ -49,15 +49,41 @@ PRIMITIVE_TYPE_MAP = {
     intermediate.PrimitiveType.BYTEARRAY: Stripped("byte[]"),
 }
 
-# noinspection PyTypeChecker
-assert sorted(literal.value for literal in PRIMITIVE_TYPE_MAP) == sorted(
-    literal.value for literal in intermediate.PrimitiveType
-), "Expected complete mapping of primitive to implementation-specific types"
+
+def _assert_all_primitive_types_are_mapped() -> None:
+    """Assert that we have explicitly mapped all the primitive types to C#."""
+    all_primitive_literals = set(
+        literal.value for literal in PRIMITIVE_TYPE_MAP)
+
+    mapped_primitive_literals = set(
+        literal.value for literal in intermediate.PrimitiveType)
+
+    all_diff = all_primitive_literals.difference(mapped_primitive_literals)
+    mapped_diff = mapped_primitive_literals.difference(all_primitive_literals)
+
+    messages = []  # type: List[str]
+    if len(mapped_diff) > 0:
+        messages.append(
+            f"More primitive maps are mapped than there were defined "
+            f"in the ``intermediate._types``: {sorted(mapped_diff)}"
+        )
+
+    if len(all_diff) > 0:
+        messages.append(
+            f"One or more primitive types in the ``intermediate._types`` were not "
+            f"mapped in PRIMITIVE_TYPE_MAP: {sorted(all_diff)}"
+        )
+
+    if len(messages) > 0:
+        raise AssertionError('\n\n'.join(messages))
+
+
+_assert_all_primitive_types_are_mapped()
 
 
 def generate_type(
-    type_annotation: intermediate.TypeAnnotationUnion,
-    ref_association: intermediate.ClassUnion,
+        type_annotation: intermediate.TypeAnnotationUnion,
+        ref_association: intermediate.ClassUnion,
 ) -> Stripped:
     """
     Generate the C# type for the given type annotation.
@@ -143,7 +169,7 @@ WARNING = Stripped(
 
 
 def over_enumerations_classes_and_interfaces(
-    symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
 ) -> Iterator[
     Union[intermediate.Enumeration, intermediate.ConcreteClass, intermediate.Interface]
 ]:
