@@ -1,46 +1,93 @@
 SymbolTable(
   symbols=[
-    Class(
+    ConcreteClass(
       name='Concrete',
-      interfaces=[],
+      inheritances=[],
+      inheritance_id_set=...,
       is_implementation_specific=False,
+      interface=None,
+      descendant_id_set=...,
+      concrete_descendants=[],
       properties=[
         Property(
           name='x',
-          type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
-            subscripts=[
-              AtomicTypeAnnotation(
-                identifier='int',
-                parsed=...)],
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
             parsed=...),
           description=None,
-          is_readonly=False,
+          implemented_for='Reference to ConcreteClass Concrete',
           parsed=...)],
       methods=[],
       constructor=Constructor(
+        name='__init__',
         arguments=[
           Argument(
-            name='self',
-            type_annotation=SelfTypeAnnotation(),
-            default=None,
-            parsed=...),
-          Argument(
             name='x',
-            type_annotation=SubscriptedTypeAnnotation(
-              identifier='List',
-              subscripts=[
-                AtomicTypeAnnotation(
-                  identifier='int',
-                  parsed=...)],
+            type_annotation=ListTypeAnnotation(
+              items=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
               parsed=...),
             default=None,
             parsed=...)],
+        returns=None,
+        description=None,
         contracts=Contracts(
           preconditions=[],
           snapshots=[],
           postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
         is_implementation_specific=False,
-        statements=...),
+        statements=[
+          "AssignArgument(\n  name='x',\n  argument='x',\n  default=None)"]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=False),
       description=None,
-      parsed=...)])
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Reference',
+      inheritances=[],
+      inheritance_id_set=...,
+      is_implementation_specific=False,
+      interface=None,
+      descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=None,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=False),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      invariant_id_set=...)],
+  verification_functions=[],
+  verification_functions_by_name=...,
+  ref_association='Reference to ConcreteClass Reference',
+  meta_model=MetaModel(
+    description=None,
+    book_url='__book_url__',
+    book_version='__book_version__'))

@@ -14,7 +14,8 @@ from aas_core_codegen.common import assert_never, indent_but_first_line
 
 # We have to separate Stringifiable and Sequence[Stringifiable] since recursive types
 # are not supported in mypy, see https://github.com/python/mypy/issues/731.
-PrimitiveStringifiable = Union[bool, int, float, str, "Entity", None]
+PrimitiveStringifiable = Union[
+    bool, int, float, str, "Entity", "Property", "PropertyEllipsis", None]
 
 Stringifiable = Union[PrimitiveStringifiable, Sequence[PrimitiveStringifiable]]
 
@@ -25,6 +26,9 @@ class Property:
     def __init__(self, name: str, value: Stringifiable) -> None:
         self.name = name
         self.value = value
+
+    def __repr__(self) -> str:
+        return dump(self)
 
 
 class PropertyEllipsis:
@@ -39,6 +43,9 @@ class PropertyEllipsis:
         # (*e.g.*, as can happen in a refactoring).
         self.ignored_value = ignored_value
 
+    def __repr__(self) -> str:
+        return dump(self)
+
 
 class Entity:
     """Represent a stringifiable entity which is defined by its properties.
@@ -47,7 +54,7 @@ class Entity:
     """
 
     def __init__(
-        self, name: str, properties: Sequence[Union[Property, PropertyEllipsis]]
+            self, name: str, properties: Sequence[Union[Property, PropertyEllipsis]]
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -109,8 +116,21 @@ def dump(stringifiable: Stringifiable) -> str:
     elif stringifiable is None:
         return repr(None)
 
+    elif isinstance(stringifiable, Property):
+        value_str = dump(stringifiable.value)
+        indention = ""
+        return (
+            f"Property("
+            f"{stringifiable.name}={indent_but_first_line(value_str, indention)}"
+            f")"
+        )
+
+    elif isinstance(stringifiable, PropertyEllipsis):
+        value_str = "None" if stringifiable.ignored_value is None else "..."
+        return f"PropertyEllipsis({stringifiable.name}={value_str})"
+
     else:
-        raise AssertionError(f"Unexpected: {stringifiable}")
+        assert_never(stringifiable)
 
 
 def compares_against_dict(entity: Entity, obj: object) -> bool:
@@ -135,33 +155,40 @@ def assert_compares_against_dict(entity: Entity, obj: object) -> None:
     """
     entity_property_set = {prop.name for prop in entity.properties}
 
-    obj_property_set = {key for key in obj.__dict__.keys() if not key.startswith("_")}
+    obj_property_set = {
+        attr
+        for attr in dir(obj)
+        if not attr.startswith("_") and not inspect.ismethod(getattr(obj, attr))
+    }
 
     if entity_property_set != obj_property_set:
         diff_in_entity = sorted(entity_property_set.difference(obj_property_set))
 
         diff_in_obj = sorted(obj_property_set.difference(entity_property_set))
 
+        prefix = (
+            f"Expected the stringified properties "
+            f"of {obj.__class__.__name__!r} to match the object properties, "
+            f"but they do not.\n\n"
+        )
+
         if len(diff_in_entity) > 0 and len(diff_in_obj) == 0:
             raise AssertionError(
-                f"Expected the stringified properties to match the object properties, "
-                f"but they do not.\n\n"
+                f"{prefix}"
                 f"The following properties were find in the stringified entity, "
                 f"but not in the object: {diff_in_entity}"
             )
 
         elif len(diff_in_obj) > 0 and len(diff_in_entity) == 0:
             raise AssertionError(
-                f"Expected the stringified properties to match the object properties, "
-                f"but they do not.\n\n"
+                f"{prefix}"
                 f"The following properties were find in the object, "
                 f"but not in the stringified entity: {diff_in_obj}"
             )
 
         else:
             raise AssertionError(
-                f"Expected the stringified properties to match the object properties, "
-                f"but they do not.\n\n"
+                f"{prefix}"
                 f"The following properties were find in the stringified entity, "
                 f"but not in the object: {diff_in_entity}\n\n"
                 f"The following properties were find in the object, "
@@ -170,7 +197,7 @@ def assert_compares_against_dict(entity: Entity, obj: object) -> None:
 
 
 def assert_all_public_types_listed_as_dumpables(
-    dumpable: Any, types_module: Any
+        dumpable: Any, types_module: Any
 ) -> None:
     """Make sure that all classes in :py:mod:`_types` are listed as dumpables."""
 

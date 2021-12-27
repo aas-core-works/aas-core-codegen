@@ -428,6 +428,7 @@ def _stringify_constrained_primitive(
                 "is_implementation_specific", that.is_implementation_specific
             ),
             stringify.Property("invariants", list(map(_stringify, that.invariants))),
+            stringify.PropertyEllipsis("invariant_id_set", that.invariant_id_set),
             stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("parsed", that.parsed),
         ],
