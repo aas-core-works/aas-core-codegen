@@ -249,4 +249,4 @@ def entry_point() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main("aas-core-codegen"))
+    sys.exit(main(prog="aas-core-codegen"))

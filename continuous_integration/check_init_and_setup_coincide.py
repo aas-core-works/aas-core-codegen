@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 """Check that the distribution and aas_core_codegen/__init__.py are in sync."""
+import os
+import pathlib
 import subprocess
 import sys
 from typing import Optional, Dict
@@ -10,52 +12,58 @@ import aas_core_codegen
 
 def main() -> int:
     """Execute the main routine."""
+    repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent
+
+    setup_py_pth = repo_root / "setup.py"
+    if not setup_py_pth.exists():
+        raise RuntimeError(f"Could not find the setup.py: {setup_py_pth}")
+
     success = True
 
     ##
     # Check basic fields
     ##
 
-    setup_py = dict()  # type: Dict[str, str]
+    setup_py_map = dict()  # type: Dict[str, str]
 
     fields = ["version", "author", "license", "description"]
     for field in fields:
         out = subprocess.check_output(
-            [sys.executable, "setup.py", f"--{field}"], encoding="utf-8"
+            [sys.executable, str(repo_root/"setup.py"), f"--{field}"], encoding="utf-8"
         ).strip()
 
-        setup_py[field] = out
+        setup_py_map[field] = out
 
-    if setup_py["version"] != aas_core_codegen.__version__:
+    if setup_py_map["version"] != aas_core_codegen.__version__:
         print(
-            f"The version in the setup.py is {setup_py['version']}, "
+            f"The version in the setup.py is {setup_py_map['version']}, "
             f"while the version in aas_core_codegen/__init__.py is: "
             f"{aas_core_codegen.__version__}",
             file=sys.stderr,
         )
         success = False
 
-    if setup_py["author"] != aas_core_codegen.__author__:
+    if setup_py_map["author"] != aas_core_codegen.__author__:
         print(
-            f"The author in the setup.py is {setup_py['author']}, "
+            f"The author in the setup.py is {setup_py_map['author']}, "
             f"while the author in aas_core_codegen/__init__.py is: "
             f"{aas_core_codegen.__author__}",
             file=sys.stderr,
         )
         success = False
 
-    if setup_py["license"] != aas_core_codegen.__license__:
+    if setup_py_map["license"] != aas_core_codegen.__license__:
         print(
-            f"The license in the setup.py is {setup_py['license']}, "
+            f"The license in the setup.py is {setup_py_map['license']}, "
             f"while the license in aas_core_codegen/__init__.py is: "
             f"{aas_core_codegen.__license__}",
             file=sys.stderr,
         )
         success = False
 
-    if setup_py["description"] != aas_core_codegen.__doc__:
+    if setup_py_map["description"] != aas_core_codegen.__doc__:
         print(
-            f"The description in the setup.py is {setup_py['description']}, "
+            f"The description in the setup.py is {setup_py_map['description']}, "
             f"while the description in aas_core_codegen/__init__.py is: "
             f"{aas_core_codegen.__doc__}",
             file=sys.stderr,
@@ -79,7 +87,7 @@ def main() -> int:
 
     classifiers = (
         subprocess.check_output(
-            [sys.executable, "setup.py", f"--classifiers"], encoding="utf-8"
+            [sys.executable, str(setup_py_pth), f"--classifiers"], encoding="utf-8"
         )
         .strip()
         .splitlines()

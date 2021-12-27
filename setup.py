@@ -21,7 +21,7 @@ with open(os.path.join(here, "requirements.txt"), encoding="utf-8") as fid:
 setup(
     name="aas-core-codegen",
     version="0.0.1rc1",
-    description="Generate code to handle asset administration shells based on the meta-model.",
+    description="Generate different implementations and schemas based on an AAS meta-model.",
     long_description=long_description,
     url="https://github.com/aas-core-works/aas-core-codegen",
     author="Marko Ristin, Nico Braunisch, Robert Lehmann",
@@ -43,7 +43,6 @@ setup(
             "pylint==2.12.2",
             "pydocstyle>=2.1.1,<3",
             "coverage>=4.5.1,<5",
-            "docutils>=0.14,<1",
             "pygments>=2,<3"
         ],
     },
@@ -53,7 +52,7 @@ setup(
     data_files=[(".", ["LICENSE", "README.rst", "requirements.txt"])],
     entry_points={
         "console_scripts": [
-            "aas-core-codegen = aas_core_codegen.csharp.main:entry_point"
+            "aas-core-codegen=aas_core_codegen.main:entry_point"
         ]
     },
 )
