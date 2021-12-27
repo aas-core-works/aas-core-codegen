@@ -7,7 +7,7 @@ from icontract import ensure
 from aas_core_codegen.common import assert_never
 from aas_core_codegen.intermediate import (
     doc as intermediate_doc,
-    rendering as intermediate_rendering
+    rendering as intermediate_rendering,
 )
 from aas_core_codegen.rdf_shacl import naming as rdf_shacl_naming
 

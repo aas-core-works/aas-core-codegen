@@ -4,15 +4,28 @@ import docutils
 import docutils.nodes
 from icontract import require
 
-from aas_core_codegen.intermediate._types import Symbol, Class, Property, Enumeration, \
-    EnumerationLiteral, ClassUnion
+from aas_core_codegen.intermediate._types import (
+    Symbol,
+    Class,
+    Property,
+    Enumeration,
+    EnumerationLiteral,
+    ClassUnion,
+)
 
 
-class SymbolReference(docutils.nodes.Inline, docutils.nodes.TextElement):
+class SymbolReference(
+    docutils.nodes.Inline, docutils.nodes.TextElement  # type: ignore
+):
     """Represent a reference in the documentation to a symbol in the symbol table."""
 
-    def __init__(
-            self, symbol: Symbol, rawsource="", text="", *children, **attributes
+    def __init__(  # type: ignore
+        self,
+        symbol: Symbol,
+        rawsource="",
+        text="",
+        *children,
+        **attributes,
     ) -> None:
         """Initialize with the given symbol and propagate the rest to the parent."""
         self.symbol = symbol
@@ -39,7 +52,9 @@ class EnumerationLiteralReference:
         self.literal = literal
 
 
-class AttributeReference(docutils.nodes.Inline, docutils.nodes.TextElement):
+class AttributeReference(
+    docutils.nodes.Inline, docutils.nodes.TextElement  # type: ignore
+):
     """
     Represent a reference in the documentation to an "attribute".
 
@@ -47,13 +62,13 @@ class AttributeReference(docutils.nodes.Inline, docutils.nodes.TextElement):
     implies either a reference to a property of a class or a literal of an enumeration.
     """
 
-    def __init__(
-            self,
-            reference: Union[PropertyReference, EnumerationLiteralReference],
-            rawsource="",
-            text="",
-            *children,
-            **attributes,
+    def __init__(  # type: ignore
+        self,
+        reference: Union[PropertyReference, EnumerationLiteralReference],
+        rawsource="",
+        text="",
+        *children,
+        **attributes,
     ) -> None:
         """Initialize with ``property_name`` and propagate the rest to the parent."""
         self.reference = reference
@@ -62,20 +77,22 @@ class AttributeReference(docutils.nodes.Inline, docutils.nodes.TextElement):
         )
 
 
-class ArgumentReference(docutils.nodes.Inline, docutils.nodes.TextElement):
+class ArgumentReference(
+    docutils.nodes.Inline, docutils.nodes.TextElement  # type: ignore
+):
     """
     Represent a reference in the documentation to a method argument ("parameter").
 
     The argument, in this context, refers to the role ``:paramref:``.
     """
 
-    def __init__(
-            self,
-            reference: str,
-            rawsource="",
-            text="",
-            *children,
-            **attributes,
+    def __init__(  # type: ignore
+        self,
+        reference: str,
+        rawsource="",
+        text="",
+        *children,
+        **attributes,
     ) -> None:
         """Initialize with ``reference`` and propagate the rest to the parent."""
         self.reference = reference

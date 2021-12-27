@@ -51,7 +51,8 @@ from aas_core_codegen.parse._types import (
     MetaModel,
     ImplementationSpecificMethod,
     UnderstoodMethod,
-    ConstructorToBeUnderstood, FunctionUnion,
+    ConstructorToBeUnderstood,
+    FunctionUnion,
 )
 
 

@@ -19,8 +19,11 @@ import asttokens
 from icontract import ensure, require, DBC
 
 from aas_core_codegen import parse, stringify
-from aas_core_codegen.common import Identifier, Error, \
-    assert_union_of_descendants_exhaustive
+from aas_core_codegen.common import (
+    Identifier,
+    Error,
+    assert_union_of_descendants_exhaustive,
+)
 from aas_core_codegen.parse import Method
 
 _MODULE_NAME = pathlib.Path(__file__).parent.name
@@ -58,9 +61,7 @@ class EmptyList(Default):
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
-        return (
-            f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
-        )
+        return f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
 
 
 class DefaultEnumLiteral(Default):
@@ -68,8 +69,7 @@ class DefaultEnumLiteral(Default):
 
     @require(lambda enum, literal: literal in enum.literals)
     def __init__(
-            self, enum: parse.Enumeration, literal: parse.EnumerationLiteral,
-            node: ast.AST
+        self, enum: parse.Enumeration, literal: parse.EnumerationLiteral, node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Default.__init__(self, node=node)
@@ -78,9 +78,7 @@ class DefaultEnumLiteral(Default):
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
-        return (
-            f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
-        )
+        return f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
 
 
 class AssignArgument:
@@ -91,8 +89,7 @@ class AssignArgument:
     default: Optional["DefaultUnion"]  #: Default value if the argument is None
 
     def __init__(
-            self, name: Identifier, argument: Identifier,
-            default: Optional["DefaultUnion"]
+        self, name: Identifier, argument: Identifier, default: Optional["DefaultUnion"]
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -105,10 +102,10 @@ Statement = Union[CallSuperConstructor, AssignArgument]
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _call_as_call_to_super_init(
-        call: ast.Call,
-        parsed_class: parse.Class,
-        parsed_symbol_table: parse.SymbolTable,
-        atok: asttokens.ASTTokens,
+    call: ast.Call,
+    parsed_class: parse.Class,
+    parsed_symbol_table: parse.SymbolTable,
+    atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[CallSuperConstructor], Optional[Error]]:
     """Understand a call as a call to the constructor of a super-class."""
     if not isinstance(call.func, ast.Attribute):
@@ -190,7 +187,7 @@ def _call_as_call_to_super_init(
     underlying_errors = []  # type: List[Error]
 
     for arg_node in itertools.chain(
-            call.args, (keyword.value for keyword in call.keywords)
+        call.args, (keyword.value for keyword in call.keywords)
     ):
         if not isinstance(arg_node, ast.Name):
             underlying_errors.append(
@@ -314,11 +311,11 @@ def _call_as_call_to_super_init(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _understand_assignment(
-        assign: ast.Assign,
-        init: Method,
-        parsed_class: parse.Class,
-        parsed_symbol_table: parse.SymbolTable,
-        atok: asttokens.ASTTokens,
+    assign: ast.Assign,
+    init: Method,
+    parsed_class: parse.Class,
+    parsed_symbol_table: parse.SymbolTable,
+    atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[Statement], Optional[Error]]:
     if len(assign.targets) > 1:
         return (
@@ -333,9 +330,9 @@ def _understand_assignment(
     target = assign.targets[0]
 
     if not (
-            isinstance(target, ast.Attribute)
-            and isinstance(target.value, ast.Name)
-            and target.value.id == "self"
+        isinstance(target, ast.Attribute)
+        and isinstance(target.value, ast.Name)
+        and target.value.id == "self"
     ):
         return (
             None,
@@ -392,33 +389,33 @@ def _understand_assignment(
 
         if_exp = assign.value
         if (
-                isinstance(if_exp.test, ast.Compare)
-                and isinstance(if_exp.test.left, ast.Name)
-                and isinstance(if_exp.test.left.ctx, ast.Load)
-                and if_exp.test.left.id in init.arguments_by_name
-                and len(if_exp.test.ops) == 1
-                and isinstance(if_exp.test.ops[0], ast.IsNot)
-                and len(if_exp.test.comparators) == 1
-                and isinstance(if_exp.test.comparators[0], ast.Constant)
-                and if_exp.test.comparators[0].value is None
-                and isinstance(if_exp.body, ast.Name)
-                and if_exp.body.id == if_exp.test.left.id
-                and if_exp.orelse is not None
+            isinstance(if_exp.test, ast.Compare)
+            and isinstance(if_exp.test.left, ast.Name)
+            and isinstance(if_exp.test.left.ctx, ast.Load)
+            and if_exp.test.left.id in init.arguments_by_name
+            and len(if_exp.test.ops) == 1
+            and isinstance(if_exp.test.ops[0], ast.IsNot)
+            and len(if_exp.test.comparators) == 1
+            and isinstance(if_exp.test.comparators[0], ast.Constant)
+            and if_exp.test.comparators[0].value is None
+            and isinstance(if_exp.body, ast.Name)
+            and if_exp.body.id == if_exp.test.left.id
+            and if_exp.orelse is not None
         ):
             default_node = if_exp.orelse
 
         elif (
-                isinstance(if_exp.test, ast.Compare)
-                and isinstance(if_exp.test.left, ast.Name)
-                and if_exp.test.left.id in init.arguments_by_name
-                and len(if_exp.test.ops) == 1
-                and isinstance(if_exp.test.ops[0], ast.Is)
-                and len(if_exp.test.comparators) == 1
-                and isinstance(if_exp.test.comparators[0], ast.Constant)
-                and if_exp.test.comparators[0].value is None
-                and isinstance(if_exp.orelse, ast.Name)
-                and if_exp.orelse.id == if_exp.test.left.id
-                and if_exp.body is not None
+            isinstance(if_exp.test, ast.Compare)
+            and isinstance(if_exp.test.left, ast.Name)
+            and if_exp.test.left.id in init.arguments_by_name
+            and len(if_exp.test.ops) == 1
+            and isinstance(if_exp.test.ops[0], ast.Is)
+            and len(if_exp.test.comparators) == 1
+            and isinstance(if_exp.test.comparators[0], ast.Constant)
+            and if_exp.test.comparators[0].value is None
+            and isinstance(if_exp.orelse, ast.Name)
+            and if_exp.orelse.id == if_exp.test.left.id
+            and if_exp.body is not None
         ):
             default_node = if_exp.body
         else:
@@ -432,7 +429,7 @@ def _understand_assignment(
                 default = EmptyList(node=default_node)
 
             elif isinstance(default_node, ast.Attribute) and isinstance(
-                    default_node.value, ast.Name
+                default_node.value, ast.Name
             ):
                 symbol = parsed_symbol_table.find(
                     name=Identifier(default_node.value.id)
@@ -440,7 +437,8 @@ def _understand_assignment(
 
                 if isinstance(symbol, parse.Enumeration):
                     literal = symbol.literals_by_name.get(
-                        Identifier(default_node.attr), None)
+                        Identifier(default_node.attr), None
+                    )
 
                     if literal is not None:
                         default = DefaultEnumLiteral(
@@ -478,9 +476,9 @@ def _understand_assignment(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _understand_body(
-        parsed_class: parse.Class,
-        parsed_symbol_table: parse.SymbolTable,
-        atok: asttokens.ASTTokens,
+    parsed_class: parse.Class,
+    parsed_symbol_table: parse.SymbolTable,
+    atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[List[Statement]], Optional[Error]]:
     """Try to understand the body of the constructor for the given ``parsed_class``."""
     init = None  # type: Optional[parse.Method]
@@ -596,7 +594,7 @@ class ConstructorTable:
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def understand_all(
-        parsed_symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
+    parsed_symbol_table: parse.SymbolTable, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[ConstructorTable], Optional[Error]]:
     """Understand the constructors of all the classes in the symbol table."""
     errors = []  # type: List[Error]
@@ -642,7 +640,7 @@ Dumpable = Union[
 
 
 def _stringify_empty_list(
-        that: EmptyList,
+    that: EmptyList,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -655,7 +653,7 @@ def _stringify_empty_list(
 
 
 def _stringify_default_enum_literal(
-        that: DefaultEnumLiteral,
+    that: DefaultEnumLiteral,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -663,12 +661,13 @@ def _stringify_default_enum_literal(
             stringify.PropertyEllipsis("node", that.node),
             stringify.Property(
                 "enum",
-                f"Reference to {that.enum.__class__.__name__} "
-                f"{that.enum.name}"),
+                f"Reference to {that.enum.__class__.__name__} " f"{that.enum.name}",
+            ),
             stringify.Property(
                 "literal",
                 f"Reference to {that.literal.__class__.__name__} "
-                f"{that.literal.name}"),
+                f"{that.literal.name}",
+            ),
         ],
     )
 
@@ -676,7 +675,7 @@ def _stringify_default_enum_literal(
 
 
 def _stringify_assign_argument(
-        that: AssignArgument,
+    that: AssignArgument,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -693,7 +692,7 @@ def _stringify_assign_argument(
 _DISPATCH = {
     EmptyList: _stringify_empty_list,
     DefaultEnumLiteral: _stringify_default_enum_literal,
-    AssignArgument: _stringify_assign_argument
+    AssignArgument: _stringify_assign_argument,
 }
 
 stringify.assert_dispatch_exhaustive(dispatch=_DISPATCH, dumpable=Dumpable)
@@ -707,7 +706,8 @@ def _stringify(that: Optional[Dumpable]) -> Optional[stringify.Entity]:
     stringify_func = _DISPATCH.get(that.__class__, None)
     if stringify_func is None:
         raise AssertionError(
-            f"No stringify function could be found for the class {that.__class__}")
+            f"No stringify function could be found for the class {that.__class__}"
+        )
 
     stringified = stringify_func(that)  # type: ignore
     assert isinstance(stringified, stringify.Entity)

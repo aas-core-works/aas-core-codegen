@@ -367,7 +367,9 @@ def map_symbol_table_to_ontology(
 
         if "__init__" not in symbol.methods_by_name:
             for ancestor in ontology.list_ancestors(symbol):
-                ancestor_init = ancestor.methods_by_name.get(Identifier("__init__"), None)
+                ancestor_init = ancestor.methods_by_name.get(
+                    Identifier("__init__"), None
+                )
 
                 if ancestor_init is not None and len(ancestor_init.arguments) > 1:
                     argument_names_str = ", ".join(

@@ -50,7 +50,7 @@ class Member(Expression):
     """
 
     def __init__(
-            self, instance: "Expression", name: Identifier, original_node: ast.AST
+        self, instance: "Expression", name: Identifier, original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
@@ -79,11 +79,11 @@ class Comparison(Expression):
     """Represent a comparison."""
 
     def __init__(
-            self,
-            left: "Expression",
-            op: Comparator,
-            right: "Expression",
-            original_node: ast.AST,
+        self,
+        left: "Expression",
+        op: Comparator,
+        right: "Expression",
+        original_node: ast.AST,
     ) -> None:
         Node.__init__(self, original_node=original_node)
         self.left = left
@@ -103,8 +103,7 @@ class Implication(Expression):
     """Represent an implication of the form ``A => B``."""
 
     def __init__(
-            self, antecedent: "Expression", consequent: "Expression",
-            original_node: ast.AST
+        self, antecedent: "Expression", consequent: "Expression", original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
@@ -124,7 +123,7 @@ class MethodCall(Expression):
     """Represent a method call."""
 
     def __init__(
-            self, member: Member, args: Sequence["Expression"], original_node: ast.AST
+        self, member: Member, args: Sequence["Expression"], original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
@@ -161,7 +160,7 @@ class FunctionCall(Expression):
     """Represent a function call."""
 
     def __init__(
-            self, name: Name, args: Sequence["Expression"], original_node: ast.AST
+        self, name: Name, args: Sequence["Expression"], original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
@@ -181,7 +180,7 @@ class Constant(Expression):
     """Represent a constant value."""
 
     def __init__(
-            self, value: Union[bool, int, float, str], original_node: ast.AST
+        self, value: Union[bool, int, float, str], original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
@@ -266,7 +265,7 @@ class Declaration(Statement):
     """Represent a variable declaration with a walrus operator, ``:=``."""
 
     def __init__(
-            self, identifier: Identifier, value: Expression, original_node: ast.AST
+        self, identifier: Identifier, value: Expression, original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
@@ -291,10 +290,10 @@ class ExpressionWithDeclarations(Expression):
     """
 
     def __init__(
-            self,
-            declarations: Sequence[Declaration],
-            expression: Expression,
-            original_node: ast.AST,
+        self,
+        declarations: Sequence[Declaration],
+        expression: Expression,
+        original_node: ast.AST,
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
@@ -332,7 +331,7 @@ class JoinedStr(Expression):
     """Represent a string interpolation."""
 
     def __init__(
-            self, values: Sequence[Union[str, FormattedValue]], original_node: ast.AST
+        self, values: Sequence[Union[str, FormattedValue]], original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Expression.__init__(self, original_node=original_node)
@@ -352,7 +351,7 @@ class Assignment(Statement):
     """Represent an assignment of a single value to a single target."""
 
     def __init__(
-            self, target: Expression, value: Expression, original_node: ast.AST
+        self, target: Expression, value: Expression, original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Node.__init__(self, original_node=original_node)
@@ -453,7 +452,7 @@ class Visitor(DBC):
         self.visit(node.value)
 
     def visit_expression_with_declarations(
-            self, node: ExpressionWithDeclarations
+        self, node: ExpressionWithDeclarations
     ) -> None:
         """Visit an expression with variable declarations."""
         for declaration in node.declarations:
@@ -555,7 +554,7 @@ class Transformer(Generic[T], DBC):
 
     @abc.abstractmethod
     def transform_expression_with_declarations(
-            self, node: ExpressionWithDeclarations
+        self, node: ExpressionWithDeclarations
     ) -> T:
         """Transform an expression with variable declarations into something."""
         raise NotImplementedError(f"{node=}")
@@ -638,7 +637,7 @@ class RestrictedTransformer(Transformer[T], DBC):
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
     def transform_expression_with_declarations(
-            self, node: ExpressionWithDeclarations
+        self, node: ExpressionWithDeclarations
     ) -> T:
         """Transform an expression with variable declarations into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
@@ -786,7 +785,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
         )
 
     def transform_expression_with_declarations(
-            self, node: ExpressionWithDeclarations
+        self, node: ExpressionWithDeclarations
     ) -> stringify.Entity:
         return stringify.Entity(
             name=Declaration.__name__,
@@ -803,9 +802,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
     def transform_formatted_value(self, node: FormattedValue) -> stringify.Entity:
         return stringify.Entity(
             name=FormattedValue.__name__,
-            properties=[
-                stringify.Property("value", self.transform(node.value))
-            ],
+            properties=[stringify.Property("value", self.transform(node.value))],
         )
 
     def transform_joined_str(self, node: JoinedStr) -> stringify.Entity:
@@ -845,7 +842,8 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             properties=[
                 stringify.Property(
                     "value",
-                    self.transform(node.value) if node.value is not None else None),
+                    self.transform(node.value) if node.value is not None else None,
+                ),
                 stringify.PropertyEllipsis("original_node", node.original_node),
             ],
         )

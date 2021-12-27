@@ -77,7 +77,6 @@ def main() -> int:
         ]
         # fmt: on
 
-        print(f"reformat_targets is {reformat_targets!r}")  # TODO: debug
         if overwrite:
             subprocess.check_call(["black"] + reformat_targets, cwd=str(repo_root))
         else:

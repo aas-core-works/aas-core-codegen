@@ -25,13 +25,17 @@ from aas_core_codegen.parse._types import (
     TypeAnnotation,
     UnverifiedSymbolTable,
     Description,
-    Invariant, ImplementationSpecificMethod, UnderstoodMethod,
-    ConstructorToBeUnderstood, Serialization, MetaModel
+    Invariant,
+    ImplementationSpecificMethod,
+    UnderstoodMethod,
+    ConstructorToBeUnderstood,
+    Serialization,
+    MetaModel,
 )
 
 
 def _stringify_atomic_type_annotation(
-        that: AtomicTypeAnnotation,
+    that: AtomicTypeAnnotation,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -45,7 +49,7 @@ def _stringify_atomic_type_annotation(
 
 
 def _stringify_self_type_annotation(
-        that: SelfTypeAnnotation,
+    that: SelfTypeAnnotation,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -56,15 +60,13 @@ def _stringify_self_type_annotation(
 
 
 def _stringify_subscripted_type_annotation(
-        that: SubscriptedTypeAnnotation,
+    that: SubscriptedTypeAnnotation,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
         properties=[
             stringify.Property("identifier", that.identifier),
-            stringify.Property(
-                "subscripts", list(map(_stringify, that.subscripts))
-            ),
+            stringify.Property("subscripts", list(map(_stringify, that.subscripts))),
             stringify.PropertyEllipsis("node", that.node),
         ],
     )
@@ -87,9 +89,7 @@ def _stringify_property(that: Property) -> stringify.Entity:
         name=that.__class__.__name__,
         properties=[
             stringify.Property("name", that.name),
-            stringify.Property(
-                "type_annotation", _stringify(that.type_annotation)
-            ),
+            stringify.Property("type_annotation", _stringify(that.type_annotation)),
             stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("node", that.node),
         ],
@@ -112,9 +112,7 @@ def _stringify_argument(that: Argument) -> stringify.Entity:
         name=that.__class__.__name__,
         properties=[
             stringify.Property("name", that.name),
-            stringify.Property(
-                "type_annotation", _stringify(that.type_annotation)
-            ),
+            stringify.Property("type_annotation", _stringify(that.type_annotation)),
             stringify.Property(
                 "default",
                 _stringify(that.default),
@@ -174,10 +172,7 @@ def _stringify_contracts(that: Contracts) -> stringify.Entity:
             stringify.Property(
                 "preconditions", list(map(_stringify, that.preconditions))
             ),
-            stringify.Property(
-                "snapshots",
-                list(map(_stringify, that.snapshots))
-            ),
+            stringify.Property("snapshots", list(map(_stringify, that.snapshots))),
             stringify.Property(
                 "postconditions",
                 list(map(_stringify, that.postconditions)),
@@ -189,15 +184,14 @@ def _stringify_contracts(that: Contracts) -> stringify.Entity:
 
 
 def _stringify_implementation_specific_method(
-        that: ImplementationSpecificMethod,
+    that: ImplementationSpecificMethod,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
         properties=[
             stringify.Property("name", that.name),
             stringify.Property("verification", that.verification),
-            stringify.Property(
-                "arguments", list(map(_stringify, that.arguments))),
+            stringify.Property("arguments", list(map(_stringify, that.arguments))),
             stringify.Property("returns", _stringify(that.returns)),
             stringify.Property("description", _stringify(that.description)),
             stringify.Property("contracts", _stringify(that.contracts)),
@@ -210,15 +204,14 @@ def _stringify_implementation_specific_method(
 
 
 def _stringify_understood_method(
-        that: UnderstoodMethod,
+    that: UnderstoodMethod,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
         properties=[
             stringify.Property("name", that.name),
             stringify.Property("verification", that.verification),
-            stringify.Property(
-                "arguments", list(map(_stringify, that.arguments))),
+            stringify.Property("arguments", list(map(_stringify, that.arguments))),
             stringify.Property("returns", _stringify(that.returns)),
             stringify.Property("description", _stringify(that.description)),
             stringify.Property("contracts", _stringify(that.contracts)),
@@ -232,15 +225,14 @@ def _stringify_understood_method(
 
 
 def _stringify_constructor_to_be_understood(
-        that: ConstructorToBeUnderstood,
+    that: ConstructorToBeUnderstood,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
         properties=[
             stringify.Property("name", that.name),
             stringify.Property("verification", that.verification),
-            stringify.Property(
-                "arguments", list(map(_stringify, that.arguments))),
+            stringify.Property("arguments", list(map(_stringify, that.arguments))),
             stringify.Property("returns", _stringify(that.returns)),
             stringify.Property("description", _stringify(that.description)),
             stringify.Property("contracts", _stringify(that.contracts)),
@@ -254,7 +246,7 @@ def _stringify_constructor_to_be_understood(
 
 
 def _stringify_serialization(
-        that: Serialization,
+    that: Serialization,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -281,7 +273,6 @@ def _stringify_abstract_class(that: AbstractClass) -> stringify.Entity:
             stringify.Property("serialization", _stringify(that.serialization)),
             stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("node", that.node),
-
             stringify.PropertyEllipsis("properties_by_name", that.properties_by_name),
             stringify.PropertyEllipsis("methods_by_name", that.methods_by_name),
         ],
@@ -305,7 +296,6 @@ def _stringify_concrete_class(that: ConcreteClass) -> stringify.Entity:
             stringify.Property("serialization", _stringify(that.serialization)),
             stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("node", that.node),
-
             stringify.PropertyEllipsis("properties_by_name", that.properties_by_name),
             stringify.PropertyEllipsis("methods_by_name", that.methods_by_name),
         ],
@@ -315,7 +305,7 @@ def _stringify_concrete_class(that: ConcreteClass) -> stringify.Entity:
 
 
 def _stringify_enumeration_literal(
-        that: EnumerationLiteral,
+    that: EnumerationLiteral,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -347,7 +337,7 @@ def _stringify_enumeration(that: Enumeration) -> stringify.Entity:
 
 
 def _stringify_meta_model(
-        that: MetaModel,
+    that: MetaModel,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -362,7 +352,7 @@ def _stringify_meta_model(
 
 
 def _stringify_unverified_symbol_table(
-        that: UnverifiedSymbolTable,
+    that: UnverifiedSymbolTable,
 ) -> stringify.Entity:
     entity = stringify.Entity(
         name=that.__class__.__name__,
@@ -371,10 +361,12 @@ def _stringify_unverified_symbol_table(
             stringify.Property(
                 "ref_association",
                 f"Reference to {that.ref_association.__class__.__name__} "
-                f"{that.ref_association.name}"),
+                f"{that.ref_association.name}",
+            ),
             stringify.Property(
                 "verification_functions",
-                list(map(_stringify, that.verification_functions))),
+                list(map(_stringify, that.verification_functions)),
+            ),
             stringify.Property("meta_model", _stringify(that.meta_model)),
         ],
     )
@@ -390,10 +382,12 @@ def _stringify_symbol_table(that: SymbolTable) -> stringify.Entity:
             stringify.Property(
                 "ref_association",
                 f"Reference to {that.ref_association.__class__.__name__} "
-                f"{that.ref_association.name}"),
+                f"{that.ref_association.name}",
+            ),
             stringify.Property(
                 "verification_functions",
-                list(map(_stringify, that.verification_functions))),
+                list(map(_stringify, that.verification_functions)),
+            ),
             stringify.Property("meta_model", _stringify(that.meta_model)),
         ],
     )
@@ -429,7 +423,9 @@ Dumpable = Union[
     UnverifiedSymbolTable,
 ]
 
-stringify.assert_all_public_types_listed_as_dumpables(dumpable=Dumpable, types_module=_types)
+stringify.assert_all_public_types_listed_as_dumpables(
+    dumpable=Dumpable, types_module=_types
+)
 
 _DISPATCH = {
     AbstractClass: _stringify_abstract_class,
@@ -467,7 +463,8 @@ def _stringify(that: Optional[Dumpable]) -> Optional[stringify.Entity]:
     stringify_func = _DISPATCH.get(that.__class__, None)
     if stringify_func is None:
         raise AssertionError(
-            f"No stringify function could be found for the class {that.__class__}")
+            f"No stringify function could be found for the class {that.__class__}"
+        )
 
     stringified = stringify_func(that)  # type: ignore
     assert isinstance(stringified, stringify.Entity)

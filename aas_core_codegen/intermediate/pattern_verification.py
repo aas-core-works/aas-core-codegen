@@ -218,7 +218,7 @@ def try_to_understand(
     # TODO-BEFORE-RELEASE (mristin, 2021-12-19): test this
     if (
         isinstance(return_node.value, parse_tree.FunctionCall)
-        and return_node.value.name == "match"
+        and return_node.value.name.identifier == "match"
     ):
         return (
             None,

@@ -5,9 +5,7 @@ import unittest
 
 import tests.common
 from aas_core_codegen import intermediate
-from aas_core_codegen.intermediate import (
-    doc as intermediate_doc
-)
+from aas_core_codegen.intermediate import doc as intermediate_doc
 from aas_core_codegen.common import Identifier
 
 

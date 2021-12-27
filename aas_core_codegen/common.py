@@ -13,7 +13,10 @@ from typing import (
     Union,
     Iterator,
     Sequence,
-    NoReturn, TypeVar, Any, Type,
+    NoReturn,
+    TypeVar,
+    Any,
+    Type,
 )
 
 import asttokens
@@ -228,8 +231,7 @@ def indent_but_first_line(text: str, indention: str) -> str:
     )
 
 
-def assert_union_of_descendants_exhaustive(
-        union: Any, base_class: Any) -> None:
+def assert_union_of_descendants_exhaustive(union: Any, base_class: Any) -> None:
     """
     Check that the ``union`` covers all the concrete subclasses of ``base_class``.
 
@@ -239,14 +241,9 @@ def assert_union_of_descendants_exhaustive(
     See also for more details: https://hakibenita.com/python-mypy-exhaustive-checking
     """
     if inspect.isclass(union):
-        union_map = {
-            id(union): union
-        }
+        union_map = {id(union): union}
     elif hasattr(union, "__args__"):
-        union_map = {
-            id(cls): cls
-            for cls in union.__args__
-        }
+        union_map = {id(cls): cls for cls in union.__args__}
     else:
         raise NotImplementedError(f"We do not know how to handle the union: {union}")
 
@@ -262,41 +259,37 @@ def assert_union_of_descendants_exhaustive(
 
         stack.extend(sub_cls.__subclasses__())
 
-    subclass_map = {
-        id(sub_cls): sub_cls
-        for sub_cls in concrete_subclasses
-    }
+    subclass_map = {id(sub_cls): sub_cls for sub_cls in concrete_subclasses}
 
     union_set = set(union_map.keys())
     subclass_set = set(subclass_map.keys())
 
     if union_set != subclass_set:
         union_diff = union_set.difference(subclass_set)
-        union_diff_names = [
-            union_map[cls_id].__name__
-            for cls_id in union_diff
-        ]
+        union_diff_names = [union_map[cls_id].__name__ for cls_id in union_diff]
 
         subclass_diff = subclass_set.difference(union_set)
         subclass_diff_names = [
-            subclass_map[cls_id].__name__
-            for cls_id in subclass_diff
+            subclass_map[cls_id].__name__ for cls_id in subclass_diff
         ]
 
         if len(union_diff_names) == 0 and len(subclass_diff_names) > 0:
             raise AssertionError(
                 f"The following concrete subclasses of {base_class.__name__!r} were "
-                f"not listed in the union: {subclass_diff_names}")
+                f"not listed in the union: {subclass_diff_names}"
+            )
 
         elif len(union_diff_names) > 0 and len(subclass_diff_names) == 0:
             raise AssertionError(
                 f"The following classes were listed in the union, "
                 f"but they are not sub-classes "
-                f"of {base_class.__name__!r}: {union_diff_names}")
+                f"of {base_class.__name__!r}: {union_diff_names}"
+            )
         else:
             raise AssertionError(
                 f"The following classes were listed in the union, "
                 f"but they are not sub-classes "
                 f"of {base_class.__name__!r}: {union_diff_names}.\n\n"
                 f"The following concrete sub-classes of {base_class.__name__!r} were "
-                f"not listed in the union: {subclass_diff_names}")
+                f"not listed in the union: {subclass_diff_names}"
+            )

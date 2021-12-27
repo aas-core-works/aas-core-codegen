@@ -395,8 +395,9 @@ class _ParseJoinedStr(_Parse):
                 assert value is not None
 
                 assert isinstance(value, tree.Expression)
-                values.append(tree.FormattedValue(
-                    value=value, original_node=value_node))
+                values.append(
+                    tree.FormattedValue(value=value, original_node=value_node)
+                )
 
             elif isinstance(value_node, ast.expr):
                 return None, Error(

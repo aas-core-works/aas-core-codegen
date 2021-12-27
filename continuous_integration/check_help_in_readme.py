@@ -194,9 +194,9 @@ def main() -> int:
             expected_lines = lines[block.start_line_idx : block.end_line_idx]
             expected_lines = [line.rstrip() for line in expected_lines]
 
-            error = diff(got_lines=code_block_lines, expected_lines=expected_lines)
-            if error:
-                print(error, file=sys.stderr)
+            diff_error = diff(got_lines=code_block_lines, expected_lines=expected_lines)
+            if diff_error is not None:
+                print(diff_error, file=sys.stderr)
                 return -1
 
     return 0

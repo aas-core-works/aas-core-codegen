@@ -47,7 +47,7 @@ class Entity:
     """
 
     def __init__(
-            self, name: str, properties: Sequence[Union[Property, PropertyEllipsis]]
+        self, name: str, properties: Sequence[Union[Property, PropertyEllipsis]]
     ) -> None:
         """Initialize with the given values."""
         self.name = name
@@ -155,7 +155,9 @@ def assert_compares_against_dict(entity: Entity, obj: object) -> None:
         )
 
 
-def assert_all_public_types_listed_as_dumpables(dumpable: Any, types_module: Any):
+def assert_all_public_types_listed_as_dumpables(
+    dumpable: Any, types_module: Any
+) -> None:
     """Make sure that all classes in :py:mod:`_types` are listed as dumpables."""
 
     dumpable_set = set()  # type: Set[str]
@@ -195,15 +197,10 @@ def assert_dispatch_exhaustive(dispatch: Mapping[Any, Any], dumpable: Any) -> No
     the types that can be converted to a stringified entity.
     """
     dumpable_map = {
-        id(cls): cls
-        for cls in dumpable.__args__  # type: ignore
-        if not inspect.isabstract(cls)
+        id(cls): cls for cls in dumpable.__args__ if not inspect.isabstract(cls)
     }
 
-    dispatch_map = {
-        id(cls): cls
-        for cls in dispatch
-    }
+    dispatch_map = {id(cls): cls for cls in dispatch}
 
     dumpable_set = set(dumpable_map.keys())
     dispatch_set = set(dispatch_map.keys())
@@ -213,13 +210,11 @@ def assert_dispatch_exhaustive(dispatch: Mapping[Any, Any], dumpable: Any) -> No
         dispatch_diff = dispatch_set.difference(dumpable_set)
 
         dumpable_diff_names = [
-            dumpable_map[cls_id].__name__
-            for cls_id in dumpable_diff
+            dumpable_map[cls_id].__name__ for cls_id in dumpable_diff
         ]
 
         dispatch_diff_names = [
-            dispatch_map[cls_id].__name__
-            for cls_id in dispatch_diff
+            dispatch_map[cls_id].__name__ for cls_id in dispatch_diff
         ]
 
         raise AssertionError(
@@ -231,8 +226,8 @@ def assert_dispatch_exhaustive(dispatch: Mapping[Any, Any], dumpable: Any) -> No
 
     unexpected_function_names = []  # type: List[Tuple[str, str]]
     for cls, func in dispatch.items():
-        cls_snake_case = re.sub(r'(?<!^)(?=[A-Z])', '_', cls.__name__).lower()
-        expected_func_name = f'_stringify_{cls_snake_case}'
+        cls_snake_case = re.sub(r"(?<!^)(?=[A-Z])", "_", cls.__name__).lower()
+        expected_func_name = f"_stringify_{cls_snake_case}"
 
         if func.__name__ != expected_func_name:
             unexpected_function_names.append((cls.__name__, func.__name__))
