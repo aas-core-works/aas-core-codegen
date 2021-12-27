@@ -4,6 +4,7 @@
 # an inheritance chain, but changed our mind eventually due to intuition (but no
 # hard reason!).
 
+
 @abstract
 @implementation_specific
 class Parent:

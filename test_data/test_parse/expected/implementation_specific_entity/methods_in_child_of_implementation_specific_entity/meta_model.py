@@ -4,6 +4,7 @@
 #
 # We have to see in the future how this construct plays out in practice.
 
+
 @abstract
 @implementation_specific
 class Abstract:

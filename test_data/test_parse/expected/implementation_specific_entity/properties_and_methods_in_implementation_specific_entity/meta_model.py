@@ -4,6 +4,7 @@
 # This is useful, for example, for linting or for visualizing the meta-model
 # even though no code is generated based on these properties and methods.
 
+
 @abstract
 @implementation_specific
 class Abstract:

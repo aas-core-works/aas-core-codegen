@@ -4,6 +4,7 @@ class Something:
 
         Indented.
     """
+
     pass
 
 

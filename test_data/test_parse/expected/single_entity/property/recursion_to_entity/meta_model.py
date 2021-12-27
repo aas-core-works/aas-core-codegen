@@ -1,5 +1,5 @@
 class Something(DBC):
-    something: 'Something'
+    something: "Something"
 
 
 class Reference:
