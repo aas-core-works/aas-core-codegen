@@ -1,0 +1,1 @@
+Handling of a decorator has not been implemented: "Attribute(value=Name(id='some_module', ctx=Load()), attr='some_decorator', ctx=Load())"

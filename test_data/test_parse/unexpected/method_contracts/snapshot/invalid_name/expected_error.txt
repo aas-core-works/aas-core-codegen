@@ -1,0 +1,1 @@
+Expected a capture name to be a valid identifier, but got: '0932invalid'

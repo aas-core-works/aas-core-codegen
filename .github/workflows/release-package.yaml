@@ -1,0 +1,61 @@
+name: release-package
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Infer the version from the github ref
+      id: inferVersion
+      run: |
+        $prefix = "refs/tags/v"
+        if (!${env:GITHUB_REF}.StartsWith($prefix))
+        {
+            throw "Unexpected GITHUB_REF: ${env:GITHUB_REF}"
+        }
+
+        $version = ${env:GITHUB_REF}.Substring($prefix.Length)
+        Write-Host "The version is: $version"
+
+        if ($version.Contains("'"))
+        {
+            throw "Unexpected version containing a single quote: $version"
+        }
+        if ($version.Contains('"'))
+        {
+            throw "Unexpected version containing a double quote: $version"
+        }
+        if ($version.Contains(':'))
+        {
+            throw "Unexpected version containing a full colon: $version"
+        }
+
+        Write-Output "::set-output name=version::$version"
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+        architecture: 'x64'
+
+    - name: Install dependencies
+      run: pip3 install -e .[dev]
+
+    - name: Package the release
+      run: |
+        pyinstaller.exe aas_core_codegen\main.py --name aas-core-codegen
+        cd dist
+        Compress-Archive -Path aas-core-codegen aas-core-codegen.${{ steps.inferVersion.outputs.version }}.win-x64.zip
+
+    - name: Upload the release assets
+      uses: AButler/upload-release-assets@v2.0
+      with:
+        files: "dist/aas-core-codegen.${{ steps.inferVersion.outputs.version }}.win-x64.zip"
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        release-tag: "v${{ steps.inferVersion.outputs.version }}"

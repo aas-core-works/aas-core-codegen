@@ -1,0 +1,1 @@
+Expected a string literal in the enumeration, but got: 3

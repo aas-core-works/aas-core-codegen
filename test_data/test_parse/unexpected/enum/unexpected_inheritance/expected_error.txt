@@ -1,0 +1,1 @@
+Expected an enumeration to only inherit from ``Enum``, but it inherits from: ['Enum', 'SomeUnexpectedClass']

@@ -1,0 +1,1 @@
+Expected a base as a name, but got: some_module.SomeOtherClass

@@ -1,0 +1,1 @@
+Expected a lambda function as a capture of a snapshot, but got: some_capture_function
