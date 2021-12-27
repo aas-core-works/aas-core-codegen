@@ -14,27 +14,33 @@ from aas_core_codegen.intermediate import (
 from aas_core_codegen.common import Error
 
 
-def most_underlying_message(error: Error) -> str:
-    """
-    Find the message of the most underlying error.
-
-    The errors are expected to be all chains with at most one underlying cause.
-    """
+def most_underlying_messages(error: Error) -> str:
+    """Find the "leaf" errors and render them as a new-line separated list."""
     if error.underlying is None:
         return error.message
 
-    if len(error.underlying) > 1:
-        raise ValueError(
-            f"Expected all errors to be in a chain, "
-            f"but found an error with more than one underlying causes: {error}"
-        )
+    most_underlying_errors = []  # type: List[Error]
 
-    return most_underlying_message(error.underlying[0])
+    stack = error.underlying  # type: List[Error]
+
+    while len(stack) > 0:
+        top_error = stack.pop()
+
+        if top_error.underlying is not None:
+            stack.extend(top_error.underlying)
+
+        if top_error.underlying is None or len(top_error.underlying) == 0:
+            most_underlying_errors.append(top_error)
+
+    return "\n".join(
+        most_underlying_error.message
+        for most_underlying_error in most_underlying_errors
+    )
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def parse_atok(
-    atok: asttokens.ASTTokens,
+        atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[parse.SymbolTable], Optional[Error]]:
     """Parse the ``atok``, an abstract syntax tree of a meta-model."""
     import_errors = parse.check_expected_imports(atok=atok)
@@ -65,7 +71,7 @@ def parse_source(source: str) -> Tuple[Optional[parse.SymbolTable], Optional[Err
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def translate_source_to_intermediate(
-    source: str,
+        source: str,
 ) -> Tuple[Optional[intermediate.SymbolTable], Optional[Error]]:
     atok, parse_exception = parse.source_to_atok(source=source)
     if parse_exception:

@@ -45,5 +45,7 @@ map_descendability = _types.map_descendability
 make_union_of_constructor_arguments = _types.make_union_of_constructor_arguments
 
 translate = _translate.translate
+errors_if_contracts_for_functions_or_methods_defined = (
+    _translate.errors_if_contracts_for_functions_or_methods_defined)
 
 dump = _stringify.dump

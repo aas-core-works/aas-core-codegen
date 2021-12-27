@@ -2146,41 +2146,6 @@ def _verify_symbol_table(
 
     # endregion
 
-    # region Notify that we do not support and pre- and post-conditions and snapshots
-
-    # NOTE (mristin, 2021-12-16):
-    # I added some support for the pre-conditions, post-conditions and snapshots
-    # already and keep maintaining it as it is only a matter of time when we will
-    # introduce their transpilation. Introducing them "after the fact" would have been
-    # much more difficult.
-    #
-    # At the given moment, however, we deliberately focus only on the invariants.
-
-    for method in itertools.chain(
-        symbol_table.verification_functions,
-        (
-            method
-            for symbol in symbol_table.symbols
-            if isinstance(symbol, Class)
-            for method in symbol.methods
-        ),
-    ):
-        if (
-            len(method.contracts.preconditions) > 0
-            or len(method.contracts.postconditions) > 0
-            or len(method.contracts.snapshots) > 0
-        ):
-            errors.append(
-                Error(
-                    method.node,
-                    "We do not support pre and post-conditions and snapshots "
-                    "at the moment. Please notify the developers if you need "
-                    "this feature.",
-                )
-            )
-
-    # endregion
-
     if len(errors) > 0:
         return None, errors
 
@@ -2376,6 +2341,27 @@ def _atok_to_symbol_table(
             f"Expected the symbol to be associated with ``Ref``, "
             f"{ref_association.name} to be a class, "
             f"but got: {type(ref_association)}",
+        )
+
+    observed_symbol_names = set()  # type: Set[Identifier]
+    duplicate_symbols = []  # type: List[Symbol]
+    for symbol in symbols:
+        if symbol.name not in observed_symbol_names:
+            observed_symbol_names.add(symbol.name)
+        else:
+            duplicate_symbols.append(symbol)
+
+    if len(duplicate_symbols) > 0:
+        return None, Error(
+            None,
+            "There are one or more duplicate symbol definitions",
+            [
+                Error(
+                    symbol.node,
+                    f"The symbol {symbol.name!r} has been already defined before"
+                )
+                for symbol in duplicate_symbols
+            ]
         )
 
     # endregion

@@ -1,7 +1,7 @@
 """Generate C# code to handle asset administration shells based on the meta-model."""
 from typing import TextIO
 
-from aas_core_codegen import specific_implementations, run
+from aas_core_codegen import specific_implementations, run, intermediate
 from aas_core_codegen.csharp import (
     common as csharp_common,
     structure as csharp_structure,
@@ -21,14 +21,32 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     if errors is not None:
         run.write_error_report(
             message=f"Failed to verify the intermediate symbol table "
-            f"for generation of C# code"
-            f"based on {context.model_path}",
+                    f"for generation of C# code"
+                    f"based on {context.model_path}",
             errors=[context.lineno_columner.error_message(error) for error in errors],
             stderr=stderr,
         )
         return 1
 
     assert verified_ir_table is not None
+
+    contracts_errors = (
+        intermediate.errors_if_contracts_for_functions_or_methods_defined(
+            verified_ir_table
+        )
+    )
+    if errors is not None:
+        run.write_error_report(
+            message=f"We do not support pre and post-conditions and snapshots "
+                    f"at the moment. Please notify the developers if you need this "
+                    f"feature (based on meta-model {context.model_path})",
+            errors=[
+                context.lineno_columner.error_message(error)
+                for error in contracts_errors
+            ],
+            stderr=stderr,
+        )
+        return 1
 
     namespace_key = specific_implementations.ImplementationKey("namespace.txt")
     namespace_text = context.spec_impls.get(namespace_key, None)
@@ -56,7 +74,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     if errors is not None:
         run.write_error_report(
             message=f"Failed to generate the structures in the C# code "
-            f"based on {context.model_path}",
+                    f"based on {context.model_path}",
             errors=[context.lineno_columner.error_message(error) for error in errors],
             stderr=stderr,
         )
@@ -86,7 +104,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     if errors is not None:
         run.write_error_report(
             message=f"Failed to generate the C# code for visitation "
-            f"based on {context.model_path}",
+                    f"based on {context.model_path}",
             errors=[context.lineno_columner.error_message(error) for error in errors],
             stderr=stderr,
         )
@@ -131,7 +149,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     if errors is not None:
         run.write_error_report(
             message=f"Failed to generate the verification C# code "
-            f"based on {context.model_path}",
+                    f"based on {context.model_path}",
             errors=[context.lineno_columner.error_message(error) for error in errors],
             stderr=stderr,
         )
@@ -161,7 +179,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     if errors is not None:
         run.write_error_report(
             message=f"Failed to generate the stringification C# code "
-            f"based on {context.model_path}",
+                    f"based on {context.model_path}",
             errors=[context.lineno_columner.error_message(error) for error in errors],
             stderr=stderr,
         )
@@ -195,7 +213,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     if errors is not None:
         run.write_error_report(
             message=f"Failed to generate the jsonization C# code "
-            f"based on {context.model_path}",
+                    f"based on {context.model_path}",
             errors=[context.lineno_columner.error_message(error) for error in errors],
             stderr=stderr,
         )

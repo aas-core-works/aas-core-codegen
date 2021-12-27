@@ -193,7 +193,7 @@ class Test_assign_fail(unittest.TestCase):
 
         self.assertEqual(
             "Expected only a single target for property assignment, but got 2 targets",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_tuple_in_assignment_targets(self) -> None:
@@ -214,7 +214,7 @@ class Test_assign_fail(unittest.TestCase):
         self.assertEqual(
             "Expected a property as the target of an assignment, "
             "but got: self.a, self.b",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_variable_instead_of_property_assignment(self) -> None:
@@ -234,7 +234,7 @@ class Test_assign_fail(unittest.TestCase):
 
         self.assertEqual(
             "Expected a property as the target of an assignment, but got: x",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_assignment_to_undefined_property(self) -> None:
@@ -251,7 +251,7 @@ class Test_assign_fail(unittest.TestCase):
 
         self.assertEqual(
             "The property has not been previously defined in Something: a",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_assignment_value_is_not_a_name(self) -> None:
@@ -271,7 +271,7 @@ class Test_assign_fail(unittest.TestCase):
         self.assertEqual(
             "Expected a name as the value to be assigned to the property, "
             "but got: a + 100",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_argument_and_property_name_differ(self) -> None:
@@ -291,7 +291,7 @@ class Test_assign_fail(unittest.TestCase):
         self.assertEqual(
             "Expected the property a to be assigned exactly the argument "
             "with the same name, but got: b",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
 
@@ -325,7 +325,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Expected a super class as a name for a call to super ``__init__``, "
             "but got: super()",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_passed_double_start_keyword_argument(self) -> None:
@@ -357,7 +357,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Expected a call to a super ``__init__`` to provide only "
             "explicit keyword arguments, but got a double-star keyword argument",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_calling_constructor_from_a_non_super_class(self) -> None:
@@ -383,7 +383,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Expected a super class in the call to a super ``__init__``, "
             "but Something does not inherit from Unrelated",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_super_class_has_no_init(self) -> None:
@@ -405,7 +405,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
         self.assertEqual(
             "The super class Parent does not define a ``__init__``",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_positional_argument_to_super_init_transformed(self) -> None:
@@ -430,7 +430,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Expected only names in the arguments to super ``__init__``, "
             "but got: a + 100",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_keyword_argument_to_super_init_transformed(self) -> None:
@@ -455,7 +455,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Expected only names in the arguments to super ``__init__``, "
             "but got: a + 100",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_too_many_positional_arguments(self) -> None:
@@ -482,7 +482,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "The ``Parent.__init__`` expected 3 argument(s), "
             "but the call provides 4 positional argument(s)",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_unexpected_keyword_arguments_supplied_to_super_init(self) -> None:
@@ -508,7 +508,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
         self.assertEqual(
             "The ``Parent.__init__`` does not expect the argument c",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_non_init_names_passed_to_super_init(self) -> None:
@@ -538,7 +538,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
             "Expected all the arguments to ``Parent.__init__`` "
             "to be propagation of the original ``__init__`` arguments, "
             "but the name b is not an argument of ``Something.__init__``",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_arguments_not_passed_as_are(self) -> None:
@@ -567,7 +567,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Expected the arguments to super ``__init__`` to be passed with "
             "the same names, but the argument b is passed as the name y",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_missing_argument_to_super_init(self) -> None:
@@ -593,7 +593,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
         self.assertEqual(
             "The call to ``Parent.__init__`` is missing one or more arguments: b",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_call_to_non_attribute_in_init(self) -> None:
@@ -619,7 +619,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Unexpected call in the body of ``__init__``: initialize_something; "
             "only calls to super ``__init__``'s are expected",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_call_to_non_super_init_from_init(self) -> None:
@@ -644,7 +644,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
         self.assertEqual(
             "Unexpected call in the body of ``__init__``: self.initialize; "
             "only calls to super ``__init__``'s are expected",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
 
@@ -666,7 +666,7 @@ class Test_unexpected_statements(unittest.TestCase):
         self.assertEqual(
             "Unexpected call in the body of ``__init__``: print; "
             "only calls to super ``__init__``'s are expected",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_unexpected_expr(self) -> None:
@@ -686,7 +686,7 @@ class Test_unexpected_statements(unittest.TestCase):
         self.assertEqual(
             "Unexpected statement in the body of ``__init__``: 1 + 2; "
             "only calls to super ``__init__``'s and property assignments expected",
-            tests.common.most_underlying_message(error),
+            tests.common.most_underlying_messages(error),
         )
 
 

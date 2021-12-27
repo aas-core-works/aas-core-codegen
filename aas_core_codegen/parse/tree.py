@@ -824,7 +824,10 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
     def transform_formatted_value(self, node: FormattedValue) -> stringify.Entity:
         return stringify.Entity(
             name=FormattedValue.__name__,
-            properties=[stringify.Property("value", self.transform(node.value))],
+            properties=[
+                stringify.Property("value", self.transform(node.value)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
         )
 
     def transform_joined_str(self, node: JoinedStr) -> stringify.Entity:

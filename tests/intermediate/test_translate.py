@@ -43,6 +43,14 @@ class Test_in_lining_of_constructor_statements(unittest.TestCase):
                 ) -> None:
                     Abstract.__init__(self, some_property, another_property)
                     self.yet_another_property = yet_another_property
+
+
+            class Reference:
+                pass
+                
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             """
         )
 
@@ -72,6 +80,13 @@ class Test_parsing_docstrings(unittest.TestCase):
 
                  * Nested reference :class:`.Some_class`
                  """
+            
+            class Reference:
+                pass
+                
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            associate_ref_with(Reference)
             '''
         )
 
@@ -133,7 +148,7 @@ class Test_against_recorded(unittest.TestCase):
             )
 
             error_str = (
-                "" if error is None else tests.common.most_underlying_message(error)
+                "" if error is None else tests.common.most_underlying_messages(error)
             )
 
             if Test_against_recorded.RERECORD:

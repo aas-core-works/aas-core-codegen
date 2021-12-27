@@ -3,6 +3,7 @@ import abc
 import ast
 import collections
 import enum
+import itertools
 import pathlib
 from typing import (
     Sequence,

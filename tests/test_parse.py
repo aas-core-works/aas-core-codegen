@@ -214,14 +214,26 @@ class Test_against_recorded(unittest.TestCase):
             expected_symbol_table_pth = case_dir / "expected_symbol_table.txt"
             expected_error_pth = case_dir / "expected_error.txt"
 
-            source = source_pth.read_text()
-            symbol_table, error = tests.common.parse_source(source)
+            try:
+                source = source_pth.read_text(encoding='utf-8')
 
-            symbol_table_str = "" if symbol_table is None else parse.dump(symbol_table)
+                symbol_table, error = tests.common.parse_source(source)
 
-            error_str = (
-                "" if error is None else tests.common.most_underlying_message(error)
-            )
+                symbol_table_str = (
+                    "" if symbol_table is None else parse.dump(symbol_table)
+                )
+
+                error_str = (
+                    ""
+                    if error is None
+                    else tests.common.most_underlying_messages(error)
+                )
+
+            except Exception as exception:
+                raise AssertionError(
+                    f"Expected no exception "
+                    f"for the test case {case_dir.relative_to(test_cases_dir)}"
+                ) from exception
 
             if Test_against_recorded.RERECORD:
                 expected_symbol_table_pth.write_text(symbol_table_str)
@@ -253,7 +265,7 @@ class Test_unexpected_class_definitions(unittest.TestCase):
 class Test_parse_type_annotation(unittest.TestCase):
     @staticmethod
     def parse_type_annotation_from_ann_assign(
-        source: str,
+            source: str,
     ) -> Tuple[ast.AST, asttokens.ASTTokens]:
         """Encapsulate the parsing of the type annotation of a variable."""
         atok = asttokens.ASTTokens(source, parse=True)
