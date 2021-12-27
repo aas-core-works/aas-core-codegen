@@ -1,15 +1,14 @@
 UnverifiedSymbolTable(
   symbols=[
-    ConcreteEntity(
+    ConcreteClass(
       name='Something',
       is_implementation_specific=False,
       inheritances=[],
       properties=[],
-      property_map=...,
       methods=[
-        Method(
+        ConstructorToBeUnderstood(
           name='__init__',
-          is_implementation_specific=False,
+          verification=False,
           arguments=[
             Argument(
               name='self',
@@ -19,18 +18,40 @@ UnverifiedSymbolTable(
             Argument(
               name='x',
               type_annotation=AtomicTypeAnnotation(
-                identifier='int'),
+                identifier='int',
+                node=...),
               default=None,
               node=...)],
-          argument_map=...,
           returns=None,
           description=None,
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
-          body=...,
-          node=...)],
-      method_map=...,
+          node=...,
+          arguments_by_name=...,
+          body=...)],
+      invariants=[],
+      serialization=None,
       description=None,
-      node=...)])
+      node=...,
+      properties_by_name=...,
+      methods_by_name=...),
+    ConcreteClass(
+      name='Reference',
+      is_implementation_specific=False,
+      inheritances=[],
+      properties=[],
+      methods=[],
+      invariants=[],
+      serialization=None,
+      description=None,
+      node=...,
+      properties_by_name=...,
+      methods_by_name=...)],
+  ref_association='Reference to ConcreteClass Reference',
+  verification_functions=[],
+  meta_model=MetaModel(
+    description=None,
+    book_url='__book_url__',
+    book_version='__book_version__'))

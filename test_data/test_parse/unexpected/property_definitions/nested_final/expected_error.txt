@@ -1,1 +1,1 @@
-Unexpected nested Final type qualifier: Final[Final[List[int]]]
+Unexpected subscripted type: Final

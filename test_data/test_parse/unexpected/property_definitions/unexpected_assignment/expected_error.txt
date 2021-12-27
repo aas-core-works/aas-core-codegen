@@ -1,1 +1,2 @@
+We do not know how to parse the AST node: ClassDef(name='Something', bases=[], keywords=[], body=[AnnAssign(target=Name(id='some_property', ctx=Store()), annotation=Name(id='int', ctx=Load()), value=Call(func=Name(id='something_unexpected', ctx=Load()), args=[], keywords=[]), simple=1)], decorator_list=[])
 Unexpected assignment of a value to a property

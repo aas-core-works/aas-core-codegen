@@ -1,1 +1,2 @@
+We do not know how to parse the AST node: ClassDef(name='Something', bases=[], keywords=[], body=[AnnAssign(target=Attribute(value=Attribute(value=Name(id='non', ctx=Load()), attr='name', ctx=Load()), attr='property', ctx=Store()), annotation=Name(id='int', ctx=Load()), value=None, simple=0)], decorator_list=[])
 Expected property target to be a name, but got: non.name.property

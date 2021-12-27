@@ -1,1 +1,1 @@
-Expected the entity Something to inherit from an abstract entity, but it inherits from a symbol of type Enumeration: Some_enum
+Expected the class 'Something' to inherit from another class, but it inherits from a symbol 'Some_enum' of type 'Enumeration'

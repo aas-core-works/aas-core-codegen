@@ -1,1 +1,2 @@
+We do not know how to parse the AST node: ClassDef(name='Something', bases=[], keywords=[], body=[FunctionDef(name='do_something', args=arguments(posonlyargs=[], args=[arg(arg='self', annotation=Constant(value='Something', kind=None), type_comment=None), arg(arg='x', annotation=Name(id='int', ctx=Load()), type_comment=None)], vararg=None, kwonlyargs=[], kw_defaults=[], kwarg=None, defaults=[]), body=[Pass()], decorator_list=[], returns=None, type_comment=None)], decorator_list=[])
 Unexpected type annotation for the method argument ``self``

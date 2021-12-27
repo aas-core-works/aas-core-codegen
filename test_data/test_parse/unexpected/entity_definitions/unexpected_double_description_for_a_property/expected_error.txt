@@ -1,1 +1,2 @@
+We do not know how to parse the AST node: ClassDef(name='Something', bases=[], keywords=[], body=[Expr(value=Constant(value='Represent something.', kind=None)), Expr(value=Constant(value='unexpected description', kind=None)), AnnAssign(target=Name(id='some_property', ctx=Store()), annotation=Name(id='int', ctx=Load()), value=None, simple=1), Expr(value=Constant(value='some property', kind=None))], decorator_list=[])
 Expected only either properties explicitly annotated with types or instance methods, but got: """unexpected description"""

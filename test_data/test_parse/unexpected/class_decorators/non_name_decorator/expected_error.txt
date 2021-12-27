@@ -1,1 +1,2 @@
-Expected a decorator as a name, but got: some_module.some_decorator
+We do not know how to parse the AST node: ClassDef(name='Something', bases=[], keywords=[], body=[Pass()], decorator_list=[Attribute(value=Name(id='some_module', ctx=Load()), attr='some_decorator', ctx=Load())])
+Handling of a decorator has not been implemented: "Attribute(value=Name(id='some_module', ctx=Load()), attr='some_decorator', ctx=Load())"

@@ -1,1 +1,2 @@
+We do not know how to parse the AST node: ClassDef(name='Something', bases=[], keywords=[], body=[Assign(targets=[Name(id='some_property', ctx=Store())], value=Constant(value=3, kind=None), type_comment=None)], decorator_list=[])
 Expected only either properties explicitly annotated with types or instance methods, but got: some_property = 3

@@ -1,1 +1,2 @@
+We do not know how to parse the AST node: ClassDef(name='Something', bases=[Attribute(value=Name(id='some_module', ctx=Load()), attr='SomeOtherClass', ctx=Load())], keywords=[], body=[Pass()], decorator_list=[])
 Expected a base as a name, but got: some_module.SomeOtherClass

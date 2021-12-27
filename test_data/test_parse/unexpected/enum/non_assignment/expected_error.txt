@@ -1,1 +1,2 @@
+We do not know how to parse the AST node: ClassDef(name='Some_enum', bases=[Name(id='Enum', ctx=Load())], keywords=[], body=[Assign(targets=[Name(id='some_literal', ctx=Store())], value=Constant(value='SomeLiteral', kind=None), type_comment=None), Expr(value=Call(func=Name(id='some_func', ctx=Load()), args=[], keywords=[]))], decorator_list=[])
 Expected either a docstring or an assignment in an enumeration, but got: some_func()

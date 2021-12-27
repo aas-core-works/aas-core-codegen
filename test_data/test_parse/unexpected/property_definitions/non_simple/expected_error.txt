@@ -1,1 +1,2 @@
+We do not know how to parse the AST node: ClassDef(name='Something', bases=[], keywords=[], body=[AnnAssign(target=Name(id='some_property', ctx=Store()), annotation=Name(id='int', ctx=Load()), value=None, simple=0)], decorator_list=[])
 Expected a property with a simple target (no parentheses!)

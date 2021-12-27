@@ -1,1 +1,2 @@
-Expected a constant of type int, float, bool, or a None literal as a default value, but got: b'xyz'
+We do not know how to parse the AST node: ClassDef(name='Something', bases=[], keywords=[], body=[FunctionDef(name='do_something', args=arguments(posonlyargs=[], args=[arg(arg='self', annotation=None, type_comment=None), arg(arg='x', annotation=Name(id='int', ctx=Load()), type_comment=None)], vararg=None, kwonlyargs=[], kw_defaults=[], kwarg=None, defaults=[Constant(value=b'xyz', kind=None)]), body=[Pass()], decorator_list=[], returns=Constant(value=None, kind=None), type_comment=None)], decorator_list=[])
+The code matched no pattern for transpilation at the parse stage: Pass()

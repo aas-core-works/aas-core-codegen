@@ -1,12 +1,34 @@
 UnverifiedSymbolTable(
   symbols=[
-    ConcreteEntity(
+    ConcreteClass(
       name='Something',
       is_implementation_specific=False,
       inheritances=[],
       properties=[],
-      property_map=...,
       methods=[],
-      method_map=...,
-      description='Represent something.\n\n    Indented.',
-      node=...)])
+      invariants=[],
+      serialization=None,
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      properties_by_name=...,
+      methods_by_name=...),
+    ConcreteClass(
+      name='Reference',
+      is_implementation_specific=False,
+      inheritances=[],
+      properties=[],
+      methods=[],
+      invariants=[],
+      serialization=None,
+      description=None,
+      node=...,
+      properties_by_name=...,
+      methods_by_name=...)],
+  ref_association='Reference to ConcreteClass Reference',
+  verification_functions=[],
+  meta_model=MetaModel(
+    description=None,
+    book_url='__book_url__',
+    book_version='__book_version__'))

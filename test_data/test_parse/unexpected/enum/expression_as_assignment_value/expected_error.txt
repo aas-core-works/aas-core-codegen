@@ -1,1 +1,2 @@
+We do not know how to parse the AST node: ClassDef(name='Some_enum', bases=[Name(id='Enum', ctx=Load())], keywords=[], body=[Assign(targets=[Name(id='some_literal', ctx=Store())], value=Call(func=Name(id='str', ctx=Load()), args=[BinOp(left=Constant(value=3, kind=None), op=Add(), right=Constant(value=7, kind=None))], keywords=[]), type_comment=None)], decorator_list=[])
 Expected a constant in the enumeration assignment, but got: str(3 + 7)

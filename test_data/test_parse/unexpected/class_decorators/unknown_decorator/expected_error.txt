@@ -1,1 +1,2 @@
-Unexpected decorator for a class: 'some_unknown_marker'
+We do not know how to parse the AST node: ClassDef(name='Something', bases=[], keywords=[], body=[Pass()], decorator_list=[Name(id='some_unknown_marker', ctx=Load())])
+The handling of the marker has not been implemented: 'some_unknown_marker'
