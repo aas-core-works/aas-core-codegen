@@ -41,7 +41,7 @@ jobs:
 
   Finish-Coveralls:
     name: Finish Coveralls
-    needs: Execute
+    needs: Execute-continuous-integration
     runs-on: ubuntu-latest
     container: python:3-slim
     steps:

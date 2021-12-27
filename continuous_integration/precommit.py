@@ -152,9 +152,17 @@ def main() -> int:
         )
 
         for pth in (repo_root / "aas_core_codegen").glob("**/*.py"):
-            subprocess.check_call(
-                [sys.executable, "-m", "doctest", str(pth)], cwd=str(repo_root)
-            )
+            if pth.name == "__main__.py":
+                continue
+
+            # NOTE (mristin, 2021-12-27):
+            # The subprocess calls are expensive, call only if there is an actual
+            # doctest
+            text = pth.read_text(encoding="utf-8")
+            if ">>>" in text:
+                subprocess.check_call(
+                    [sys.executable, "-m", "doctest", str(pth)], cwd=str(repo_root)
+                )
 
     else:
         print("Skipped doctest'ing.")
@@ -164,7 +172,10 @@ def main() -> int:
         and Step.CHECK_INIT_AND_SETUP_COINCIDE not in skips
     ):
         print("Checking that aas_core_codegen/__init__.py and setup.py coincide...")
-        subprocess.check_call([sys.executable, "check_init_and_setup_coincide.py"])
+        subprocess.check_call(
+            [sys.executable, "continuous_integration/check_init_and_setup_coincide.py"],
+            cwd=str(repo_root),
+        )
     else:
         print(
             "Skipped checking that aas_core_codegen/__init__.py and "
@@ -172,7 +183,7 @@ def main() -> int:
         )
 
     if Step.CHECK_HELP_IN_README in selects and Step.CHECK_HELP_IN_README not in skips:
-        cmd = [sys.executable, "check_help_in_readme.py"]
+        cmd = [sys.executable, "continuous_integration/check_help_in_readme.py"]
         if overwrite:
             cmd.append("--overwrite")
 
@@ -181,7 +192,7 @@ def main() -> int:
         else:
             print("Overwriting the --help's in the readme...")
 
-        subprocess.check_call(cmd)
+        subprocess.check_call(cmd, cwd=str(repo_root))
     else:
         print("Skipped checking that --help's and the doc coincide.")
 
