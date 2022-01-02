@@ -16,7 +16,7 @@ class Test_against_recorded(unittest.TestCase):
     def test_cases(self) -> None:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
-        parent_case_dir = repo_dir / "test_data" / "test_csharp" / "test_main"
+        parent_case_dir = repo_dir / "test_data" / "csharp" / "test_main"
         assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
 
         for case_dir in parent_case_dir.iterdir():
