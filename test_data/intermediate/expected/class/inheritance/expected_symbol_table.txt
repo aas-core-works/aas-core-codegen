@@ -9,7 +9,8 @@ SymbolTable(
         base='Reference to AbstractClass VeryAbstract',
         name='VeryAbstract',
         inheritances=[],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Concrete'],
         properties=[
           Property(
             name='some_property',
@@ -38,7 +39,8 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Concrete'],
       properties=[
         Property(
           name='some_property',
@@ -110,7 +112,8 @@ SymbolTable(
         name='Abstract',
         inheritances=[
           'Reference to Interface VeryAbstract'],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Concrete'],
         properties=[
           Property(
             name='some_property',
@@ -160,7 +163,8 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Concrete'],
       properties=[
         Property(
           name='some_property',

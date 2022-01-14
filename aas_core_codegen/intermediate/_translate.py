@@ -1888,16 +1888,29 @@ def _second_pass_to_resolve_descendants_in_place(
     introduce it only as a convenience for the code generation.
     """
     for symbol in symbol_table.symbols:
-        if not isinstance(symbol, Class):
-            continue
+        if isinstance(symbol, Enumeration):
+            pass
 
-        descendants = []  # type: List[ClassUnion]
-        for descendant in ontology.list_descendants(symbol.parsed):
-            symbol = symbol_table.must_find(descendant.name)
-            assert isinstance(symbol, (AbstractClass, ConcreteClass))
-            descendants.append(symbol)
+        elif isinstance(symbol, ConstrainedPrimitive):
+            constrained_primitive_descendants = []  # type: List[ConstrainedPrimitive]
+            for descendant in ontology.list_descendants(symbol.parsed):
+                symbol = symbol_table.must_find(descendant.name)
+                assert isinstance(symbol, ConstrainedPrimitive)
+                constrained_primitive_descendants.append(symbol)
 
-        symbol._set_descendants(descendants)
+            symbol._set_descendants(constrained_primitive_descendants)
+
+        elif isinstance(symbol, Class):
+            class_descendants = []  # type: List[ClassUnion]
+            for descendant in ontology.list_descendants(symbol.parsed):
+                descendant_symbol = symbol_table.must_find(descendant.name)
+                assert isinstance(descendant_symbol, (AbstractClass, ConcreteClass))
+                class_descendants.append(descendant_symbol)
+
+            symbol._set_descendants(class_descendants)
+
+        else:
+            assert_never(symbol)
 
 
 # fmt: off

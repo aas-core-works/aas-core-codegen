@@ -192,8 +192,8 @@ def _generate_read_for_interface(
                         textwrap.indent(
                             textwrap.dedent(
                                 f"""\
-                        {var_name} ?? throw new Json.JsonException(
-                        {I}{error_msg})"""
+                                {var_name} ?? throw new Json.JsonException(
+                                {I}{error_msg})"""
                             ),
                             III,
                         )
@@ -210,16 +210,15 @@ def _generate_read_for_interface(
         textwrap.indent(
             textwrap.dedent(
                 f"""\
-        default:
-        {I}throw new Json.JsonException(
-        {II}$"Unknown model type: {{modelType}}");
-        """
+                default:
+                {I}throw new Json.JsonException(
+                {II}$"Unknown model type: {{modelType}}");"""
             ),
             I,
         )
     )
 
-    return_writer.write("\n}  // switch on modelType")
+    return_writer.write("\n\n}  // switch on modelType")
 
     # endregion
 
