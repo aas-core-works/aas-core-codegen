@@ -11,7 +11,7 @@ import aas_core_codegen.main
 class Test_against_recorded(unittest.TestCase):
     # Set this variable to True if you want to re-record the test data,
     # without any checks
-    RERECORD = True  # TODO: undo after debugging
+    RERECORD = False
 
     def test_cases(self) -> None:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
@@ -100,12 +100,27 @@ class Test_against_recorded(unittest.TestCase):
                             f"The output file is missing: {output_pth}"
                         )
 
+                    try:
+                        output = output_pth.read_text(encoding="utf-8")
+                    except Exception as exception:
+                        raise RuntimeError(
+                            f"Failed to read the output from {output_pth}"
+                        ) from exception
+
                     if Test_against_recorded.RERECORD:
-                        expected_pth.write_text(output_pth.read_text())
+                        expected_pth.write_text(output, encoding="utf-8")
                     else:
+                        try:
+                            expected_output = expected_pth.read_text(encoding="utf-8")
+                        except Exception as exception:
+                            raise RuntimeError(
+                                f"Failed to read the expected output "
+                                f"from {expected_pth}"
+                            ) from exception
+
                         self.assertEqual(
-                            expected_pth.read_text(),
-                            output_pth.read_text(),
+                            expected_output,
+                            output,
                             f"The files {expected_pth} and {output_pth} do not match.",
                         )
 
