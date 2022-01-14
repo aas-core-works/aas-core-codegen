@@ -139,9 +139,9 @@ def _stringify_property(
             stringify.Property("type_annotation", _stringify(that.type_annotation)),
             stringify.Property("description", _stringify(that.description)),
             stringify.Property(
-                "implemented_for",
-                f"Reference to {that.implemented_for.__class__.__name__} "
-                f"{that.implemented_for.name}",
+                "specified_for",
+                f"Reference to {that.specified_for.__class__.__name__} "
+                f"{that.specified_for.name}",
             ),
             stringify.PropertyEllipsis("parsed", that.parsed),
         ],

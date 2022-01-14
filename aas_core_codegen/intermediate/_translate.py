@@ -388,10 +388,10 @@ def _parsed_property_to_property(parsed: parse.Property, cls: parse.Class) -> Pr
             else None
         ),
         # NOTE (mristin, 2021-12-26):
-        # We can only resolve the ``implemented_for`` when the class is actually
+        # We can only resolve the ``specified_for`` when the class is actually
         # created. Therefore, we assign here a placeholder and fix it later in a second
         # pass.
-        implemented_for=_PlaceholderSymbol(cls.name),  # type: ignore
+        specified_for=_PlaceholderSymbol(cls.name),  # type: ignore
         parsed=parsed,
     )
 
@@ -1777,10 +1777,10 @@ def _second_pass_to_resolve_supersets_of_enumerations_in_place(
     return errors
 
 
-def _second_pass_to_resolve_resulting_class_of_implemented_for(
+def _second_pass_to_resolve_resulting_class_of_specified_for(
     symbol_table: SymbolTable,
 ) -> None:
-    """Resolve the resulting class of the ``implemented_for`` in a property in-place."""
+    """Resolve the resulting class of the ``specified_for`` in a property in-place."""
     for symbol in symbol_table.symbols:
         if isinstance(symbol, Enumeration):
             continue
@@ -1790,13 +1790,13 @@ def _second_pass_to_resolve_resulting_class_of_implemented_for(
 
         elif isinstance(symbol, Class):
             for prop in symbol.properties:
-                assert isinstance(prop.implemented_for, _PlaceholderSymbol), (
-                    f"Expected the placeholder symbol for ``implemented_for`` in "
-                    f"the property {prop} of {symbol}, but got: {prop.implemented_for}"
+                assert isinstance(prop.specified_for, _PlaceholderSymbol), (
+                    f"Expected the placeholder symbol for ``specified_for`` in "
+                    f"the property {prop} of {symbol}, but got: {prop.specified_for}"
                 )
 
-                prop.implemented_for = symbol_table.must_find(
-                    Identifier(prop.implemented_for.name)
+                prop.specified_for = symbol_table.must_find(
+                    Identifier(prop.specified_for.name)
                 )
         else:
             assert_never(symbol)
@@ -2608,7 +2608,7 @@ def translate(
 
     _second_pass_to_resolve_inheritances_in_place(symbol_table=symbol_table)
 
-    _second_pass_to_resolve_resulting_class_of_implemented_for(
+    _second_pass_to_resolve_resulting_class_of_specified_for(
         symbol_table=symbol_table,
     )
 

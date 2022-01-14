@@ -211,10 +211,10 @@ class Property:
     description: Final[Optional[Description]]
 
     #: The original class where this property is specified.
-    #: We stack all the properties over the ancestors, so using ``implemented_for``
+    #: We stack all the properties over the ancestors, so using ``specified_for``
     #: you can distinguish between inherited properties and genuine properties of
     #: a class.
-    implemented_for: Final["Class"]
+    specified_for: Final["Class"]
 
     #: Relation to the property from the parse stage
     parsed: Final[parse.Property]
@@ -224,14 +224,14 @@ class Property:
         name: Identifier,
         type_annotation: TypeAnnotationUnion,
         description: Optional[Description],
-        implemented_for: "Class",
+        specified_for: "Class",
         parsed: parse.Property,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
         self.type_annotation = type_annotation
         self.description = description
-        self.implemented_for = implemented_for
+        self.specified_for = specified_for
         self.parsed = parsed
 
     def __repr__(self) -> str:

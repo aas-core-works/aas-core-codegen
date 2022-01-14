@@ -17,7 +17,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             description=None,
-            implemented_for='Reference to AbstractClass Abstract',
+            specified_for='Reference to AbstractClass Abstract',
             parsed=...)],
         signatures=[],
         description=None,
@@ -33,7 +33,7 @@ SymbolTable(
             a_type='INT',
             parsed=...),
           description=None,
-          implemented_for='Reference to AbstractClass Abstract',
+          specified_for='Reference to AbstractClass Abstract',
           parsed=...)],
       methods=[],
       constructor=Constructor(
