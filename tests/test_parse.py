@@ -1,5 +1,4 @@
 import ast
-import io
 import os
 import pathlib
 import textwrap
@@ -11,7 +10,7 @@ import docutils.nodes
 
 import tests.common
 from aas_core_codegen import parse
-from aas_core_codegen.common import Error, LinenoColumner, Identifier
+from aas_core_codegen.common import Error, Identifier
 
 
 class Test_parsing_AST(unittest.TestCase):

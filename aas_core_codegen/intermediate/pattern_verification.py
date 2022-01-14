@@ -221,6 +221,14 @@ def try_to_understand(
             None,
         )
 
+    # noinspection PyUnresolvedReferences
+    if return_node.value is None:
+        return (
+            None,
+            Error(parsed.body[-1].original_node, "Expected to return a value"),
+            None,
+        )
+
     # BEFORE-RELEASE (mristin, 2021-12-19): test this
     if (
         isinstance(return_node.value, parse_tree.FunctionCall)

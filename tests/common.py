@@ -1,7 +1,7 @@
 """Provide common functionality across different tests."""
 import os
 import pathlib
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Union, Sequence
 
 import asttokens
 from icontract import ensure
@@ -14,23 +14,30 @@ from aas_core_codegen.intermediate import (
 from aas_core_codegen.common import Error
 
 
-def most_underlying_messages(error: Error) -> str:
+def most_underlying_messages(error_or_errors: Union[Error, Sequence[Error]]) -> str:
     """Find the "leaf" errors and render them as a new-line separated list."""
-    if error.underlying is None:
-        return error.message
+    if isinstance(error_or_errors, Error):
+        errors = [error_or_errors]  # type: Sequence[Error]
+    else:
+        errors = error_or_errors
 
     most_underlying_errors = []  # type: List[Error]
 
-    stack = error.underlying  # type: List[Error]
+    for error in errors:
+        if error.underlying is None or len(error.underlying) == 0:
+            most_underlying_errors.append(error)
+            continue
 
-    while len(stack) > 0:
-        top_error = stack.pop()
+        stack = error.underlying  # type: List[Error]
 
-        if top_error.underlying is not None:
-            stack.extend(top_error.underlying)
+        while len(stack) > 0:
+            top_error = stack.pop()
 
-        if top_error.underlying is None or len(top_error.underlying) == 0:
-            most_underlying_errors.append(top_error)
+            if top_error.underlying is not None:
+                stack.extend(top_error.underlying)
+
+            if top_error.underlying is None or len(top_error.underlying) == 0:
+                most_underlying_errors.append(top_error)
 
     return "\n".join(
         most_underlying_error.message
