@@ -1614,6 +1614,11 @@ def _classdef_to_symbol(
             ),
         )
 
+    # NOTE (mristin, 20222-01-02):
+    # We need to inverse the invariants as we collect them top-down, while
+    # the decorators are applied bottom-up.
+    invariants = list(reversed(invariants))
+
     # endregion
 
     if is_abstract and is_implementation_specific:
