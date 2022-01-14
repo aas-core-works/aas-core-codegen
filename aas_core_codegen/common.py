@@ -224,9 +224,17 @@ def indent_but_first_line(text: str, indention: str) -> str:
 
     For example, this helps you insert indented blocks into formatted string literals.
     """
-    return "\n".join(
-        indention + line if i > 0 else line for i, line in enumerate(text.splitlines())
-    )
+    indented_lines = []  # type: List[str]
+    for i, line in enumerate(text.splitlines()):
+        if i == 0:
+            indented_lines.append(line)
+        else:
+            if len(line) > 0:
+                indented_lines.append(indention + line)
+            else:
+                indented_lines.append(line)
+
+    return "\n".join(indented_lines)
 
 
 def assert_union_of_descendants_exhaustive(union: Any, base_class: Any) -> None:

@@ -50,14 +50,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -131,7 +131,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "semanticID":
@@ -257,14 +257,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -331,14 +331,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -405,14 +405,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -520,14 +520,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -594,14 +594,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -670,7 +670,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -772,14 +772,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -846,14 +846,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -928,7 +928,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "semanticID":
@@ -1056,7 +1056,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dependsOn":
@@ -1162,7 +1162,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -1360,7 +1360,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "assetKind":
@@ -1521,7 +1521,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "semanticID":
@@ -1654,7 +1654,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -1859,14 +1859,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -1933,14 +1933,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -2030,7 +2030,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -2263,7 +2263,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -2447,14 +2447,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -2543,7 +2543,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -2769,7 +2769,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -2990,7 +2990,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -3215,7 +3215,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -3422,7 +3422,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -3638,7 +3638,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -3856,7 +3856,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -4122,7 +4122,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -4339,14 +4339,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -4431,7 +4431,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -4635,7 +4635,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -4836,7 +4836,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "value":
@@ -4928,7 +4928,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -5119,7 +5119,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -5303,7 +5303,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "dataSpecifications":
@@ -5466,14 +5466,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -5539,7 +5539,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "values":
@@ -5625,7 +5625,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "keys":
@@ -5724,7 +5724,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "type":
@@ -6241,14 +6241,14 @@ namespace AasCore.Aas3
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-    
+
                             }  // switch on modelType
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "modelType":
@@ -6399,7 +6399,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "value":
@@ -6484,7 +6484,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "valueReferencePairs":
@@ -6584,7 +6584,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "preferredName":
@@ -6829,7 +6829,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "unitName":
@@ -7044,7 +7044,7 @@ namespace AasCore.Aas3
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
                                     "Unexpected property name null");
-    
+
                             switch (propertyName)
                             {
                                 case "assetAdministrationShells":
