@@ -1212,37 +1212,46 @@ def _parsed_verification_function_to_verification_function(
         )
 
     elif isinstance(parsed, parse.UnderstoodMethod):
-        pattern, found, error = pattern_verification.try_to_understand(parsed=parsed)
+        pattern, ok_error, fatal_error = pattern_verification.try_to_understand(
+            parsed=parsed
+        )
 
-        if error is not None:
-            return None, error
+        if fatal_error is not None:
+            return None, fatal_error
 
-        assert found is not None
-        if found:
-            assert pattern is not None
+        # NOTE (mristin, 2021-01-02):
+        # Since we only have a single rule, we also return an ``ok_error`` as critical
+        # error to explain the user what we could not match. In the future, when
+        # there are more rules, we should trace all the "ok" errors and explain why
+        # *each single rule* did not match so that the user can debug their verification
+        # functions.
 
+        if ok_error is not None:
             return (
-                PatternVerification(
-                    name=name,
-                    arguments=arguments,
-                    returns=returns,
-                    description=description,
-                    contracts=contracts,
-                    pattern=pattern,
-                    parsed=parsed,
-                ),
                 None,
+                Error(
+                    parsed.node,
+                    f"We do not know how to interpret the verification function {name!r} "
+                    f"as it does not match our pre-defined interpretation rules. "
+                    f"Please contact the developers if you expect this function "
+                    f"to be understood.",
+                    [ok_error],
+                ),
             )
 
+        assert pattern is not None
+
         return (
-            None,
-            Error(
-                parsed.node,
-                f"We do not know how to interpret the verification function {name!r} "
-                f"as it does not match our pre-defined interpretation rules. "
-                f"Please contact the developers if you expect this function "
-                f"to be understood.",
+            PatternVerification(
+                name=name,
+                arguments=arguments,
+                returns=returns,
+                description=description,
+                contracts=contracts,
+                pattern=pattern,
+                parsed=parsed,
             ),
+            None,
         )
 
     elif isinstance(parsed, parse.ConstructorToBeUnderstood):
