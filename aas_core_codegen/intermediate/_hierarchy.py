@@ -69,7 +69,13 @@ class _UnverifiedOntology:
         first_not_in_topological_order(classes, parsed_symbol_table) is None
     )
     @require(
-        lambda classes: len(classes) == 0 or len(classes[0].inheritances) == 0,
+        lambda classes:
+        len(classes) == 0
+        or sum(
+            1
+            for inheritance in classes[0].inheritances
+            if inheritance not in parse.PRIMITIVE_TYPES
+        ) == 0,
         "Origins first",
     )
     @require(
