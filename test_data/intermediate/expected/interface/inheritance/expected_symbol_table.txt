@@ -17,7 +17,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             description=None,
-            implemented_for='Reference to AbstractClass VeryAbstract',
+            specified_for='Reference to AbstractClass VeryAbstract',
             parsed=...)],
         signatures=[
           Signature(
@@ -44,7 +44,7 @@ SymbolTable(
             a_type='INT',
             parsed=...),
           description=None,
-          implemented_for='Reference to AbstractClass VeryAbstract',
+          specified_for='Reference to AbstractClass VeryAbstract',
           parsed=...)],
       methods=[
         UnderstoodMethod(
@@ -114,7 +114,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             description=None,
-            implemented_for='Reference to AbstractClass VeryAbstract',
+            specified_for='Reference to AbstractClass VeryAbstract',
             parsed=...),
           Property(
             name='another_property',
@@ -122,7 +122,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             description=None,
-            implemented_for='Reference to AbstractClass Abstract',
+            specified_for='Reference to AbstractClass Abstract',
             parsed=...)],
         signatures=[
           Signature(
@@ -160,7 +160,7 @@ SymbolTable(
             a_type='INT',
             parsed=...),
           description=None,
-          implemented_for='Reference to AbstractClass VeryAbstract',
+          specified_for='Reference to AbstractClass VeryAbstract',
           parsed=...),
         Property(
           name='another_property',
@@ -168,7 +168,7 @@ SymbolTable(
             a_type='INT',
             parsed=...),
           description=None,
-          implemented_for='Reference to AbstractClass Abstract',
+          specified_for='Reference to AbstractClass Abstract',
           parsed=...)],
       methods=[
         UnderstoodMethod(

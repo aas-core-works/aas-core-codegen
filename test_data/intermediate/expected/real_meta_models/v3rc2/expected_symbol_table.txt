@@ -78,7 +78,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_semantics',
+            specified_for='Reference to AbstractClass Has_semantics',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -118,7 +118,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -177,7 +177,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='name',
@@ -187,7 +187,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Extension',
+          specified_for='Reference to ConcreteClass Extension',
           parsed=...),
         Property(
           name='value_type',
@@ -199,7 +199,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Extension',
+          specified_for='Reference to ConcreteClass Extension',
           parsed=...),
         Property(
           name='value',
@@ -211,7 +211,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Extension',
+          specified_for='Reference to ConcreteClass Extension',
           parsed=...),
         Property(
           name='refers_to',
@@ -223,7 +223,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Extension',
+          specified_for='Reference to ConcreteClass Extension',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -344,7 +344,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_extensions',
+            specified_for='Reference to AbstractClass Has_extensions',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -383,7 +383,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -464,7 +464,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_extensions',
+            specified_for='Reference to AbstractClass Has_extensions',
             parsed=...),
           Property(
             name='ID_short',
@@ -476,7 +476,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='display_name',
@@ -488,7 +488,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='category',
@@ -500,7 +500,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='description',
@@ -512,7 +512,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -551,7 +551,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -563,7 +563,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -575,7 +575,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -587,7 +587,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -599,7 +599,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -714,7 +714,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_extensions',
+            specified_for='Reference to AbstractClass Has_extensions',
             parsed=...),
           Property(
             name='ID_short',
@@ -726,7 +726,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='display_name',
@@ -738,7 +738,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='category',
@@ -750,7 +750,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='description',
@@ -762,7 +762,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='ID',
@@ -772,7 +772,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Identifiable',
+            specified_for='Reference to AbstractClass Identifiable',
             parsed=...),
           Property(
             name='administration',
@@ -784,7 +784,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Identifiable',
+            specified_for='Reference to AbstractClass Identifiable',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -809,7 +809,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -821,7 +821,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -833,7 +833,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -845,7 +845,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -857,7 +857,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='ID',
@@ -867,7 +867,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Identifiable',
+          specified_for='Reference to AbstractClass Identifiable',
           parsed=...),
         Property(
           name='administration',
@@ -879,7 +879,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Identifiable',
+          specified_for='Reference to AbstractClass Identifiable',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -1047,7 +1047,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_kind',
+            specified_for='Reference to AbstractClass Has_kind',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -1083,7 +1083,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -1161,7 +1161,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_data_specification',
+            specified_for='Reference to AbstractClass Has_data_specification',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -1201,7 +1201,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -1262,7 +1262,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='version',
@@ -1274,7 +1274,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Administrative_information',
+          specified_for='Reference to ConcreteClass Administrative_information',
           parsed=...),
         Property(
           name='revision',
@@ -1286,7 +1286,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Administrative_information',
+          specified_for='Reference to ConcreteClass Administrative_information',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -1440,7 +1440,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Qualifiable',
+            specified_for='Reference to AbstractClass Qualifiable',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -1476,7 +1476,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -1538,7 +1538,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='type',
@@ -1548,7 +1548,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Qualifier',
+          specified_for='Reference to ConcreteClass Qualifier',
           parsed=...),
         Property(
           name='value_type',
@@ -1558,7 +1558,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Qualifier',
+          specified_for='Reference to ConcreteClass Qualifier',
           parsed=...),
         Property(
           name='value',
@@ -1570,7 +1570,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Qualifier',
+          specified_for='Reference to ConcreteClass Qualifier',
           parsed=...),
         Property(
           name='value_ID',
@@ -1582,7 +1582,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Qualifier',
+          specified_for='Reference to ConcreteClass Qualifier',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -1681,7 +1681,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Formula',
+          specified_for='Reference to ConcreteClass Formula',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -1741,7 +1741,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -1753,7 +1753,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -1765,7 +1765,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -1777,7 +1777,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -1789,7 +1789,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -1801,7 +1801,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='ID',
@@ -1811,7 +1811,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Identifiable',
+          specified_for='Reference to AbstractClass Identifiable',
           parsed=...),
         Property(
           name='administration',
@@ -1823,7 +1823,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Identifiable',
+          specified_for='Reference to AbstractClass Identifiable',
           parsed=...),
         Property(
           name='derived_from',
@@ -1837,7 +1837,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Asset_administration_shell',
+          specified_for='Reference to ConcreteClass Asset_administration_shell',
           parsed=...),
         Property(
           name='asset_information',
@@ -1847,7 +1847,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Asset_administration_shell',
+          specified_for='Reference to ConcreteClass Asset_administration_shell',
           parsed=...),
         Property(
           name='submodels',
@@ -1861,7 +1861,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Asset_administration_shell',
+          specified_for='Reference to ConcreteClass Asset_administration_shell',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -2035,7 +2035,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Asset_information',
+          specified_for='Reference to ConcreteClass Asset_information',
           parsed=...),
         Property(
           name='global_asset_ID',
@@ -2047,7 +2047,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Asset_information',
+          specified_for='Reference to ConcreteClass Asset_information',
           parsed=...),
         Property(
           name='specific_asset_ID',
@@ -2059,7 +2059,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Asset_information',
+          specified_for='Reference to ConcreteClass Asset_information',
           parsed=...),
         Property(
           name='default_thumbnail',
@@ -2071,7 +2071,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Asset_information',
+          specified_for='Reference to ConcreteClass Asset_information',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -2186,7 +2186,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='key',
@@ -2196,7 +2196,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Identifier_key_value_pair',
+          specified_for='Reference to ConcreteClass Identifier_key_value_pair',
           parsed=...),
         Property(
           name='value',
@@ -2206,7 +2206,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Identifier_key_value_pair',
+          specified_for='Reference to ConcreteClass Identifier_key_value_pair',
           parsed=...),
         Property(
           name='external_subject_ID',
@@ -2218,7 +2218,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Identifier_key_value_pair',
+          specified_for='Reference to ConcreteClass Identifier_key_value_pair',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -2309,7 +2309,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='kind',
@@ -2321,7 +2321,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -2333,7 +2333,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -2345,7 +2345,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='extensions',
@@ -2357,7 +2357,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -2369,7 +2369,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -2381,7 +2381,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -2393,7 +2393,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -2405,7 +2405,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='ID',
@@ -2415,7 +2415,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Identifiable',
+          specified_for='Reference to AbstractClass Identifiable',
           parsed=...),
         Property(
           name='administration',
@@ -2427,7 +2427,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Identifiable',
+          specified_for='Reference to AbstractClass Identifiable',
           parsed=...),
         Property(
           name='submodel_elements',
@@ -2439,7 +2439,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Submodel',
+          specified_for='Reference to ConcreteClass Submodel',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -2654,7 +2654,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_data_specification',
+            specified_for='Reference to AbstractClass Has_data_specification',
             parsed=...),
           Property(
             name='extensions',
@@ -2666,7 +2666,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_extensions',
+            specified_for='Reference to AbstractClass Has_extensions',
             parsed=...),
           Property(
             name='ID_short',
@@ -2678,7 +2678,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='display_name',
@@ -2690,7 +2690,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='category',
@@ -2702,7 +2702,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='description',
@@ -2714,7 +2714,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='kind',
@@ -2726,7 +2726,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_kind',
+            specified_for='Reference to AbstractClass Has_kind',
             parsed=...),
           Property(
             name='semantic_ID',
@@ -2738,7 +2738,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_semantics',
+            specified_for='Reference to AbstractClass Has_semantics',
             parsed=...),
           Property(
             name='qualifiers',
@@ -2750,7 +2750,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Qualifiable',
+            specified_for='Reference to AbstractClass Qualifiable',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -2785,7 +2785,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -2797,7 +2797,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -2809,7 +2809,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -2821,7 +2821,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -2833,7 +2833,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -2845,7 +2845,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -2857,7 +2857,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -2869,7 +2869,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -2881,7 +2881,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -3046,7 +3046,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_data_specification',
+            specified_for='Reference to AbstractClass Has_data_specification',
             parsed=...),
           Property(
             name='extensions',
@@ -3058,7 +3058,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_extensions',
+            specified_for='Reference to AbstractClass Has_extensions',
             parsed=...),
           Property(
             name='ID_short',
@@ -3070,7 +3070,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='display_name',
@@ -3082,7 +3082,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='category',
@@ -3094,7 +3094,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='description',
@@ -3106,7 +3106,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='kind',
@@ -3118,7 +3118,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_kind',
+            specified_for='Reference to AbstractClass Has_kind',
             parsed=...),
           Property(
             name='semantic_ID',
@@ -3130,7 +3130,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_semantics',
+            specified_for='Reference to AbstractClass Has_semantics',
             parsed=...),
           Property(
             name='qualifiers',
@@ -3142,7 +3142,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Qualifiable',
+            specified_for='Reference to AbstractClass Qualifiable',
             parsed=...),
           Property(
             name='first',
@@ -3152,7 +3152,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Relationship_element',
+            specified_for='Reference to AbstractClass Relationship_element',
             parsed=...),
           Property(
             name='second',
@@ -3162,7 +3162,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Relationship_element',
+            specified_for='Reference to AbstractClass Relationship_element',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -3185,7 +3185,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -3197,7 +3197,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -3209,7 +3209,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -3221,7 +3221,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -3233,7 +3233,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -3245,7 +3245,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -3257,7 +3257,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -3269,7 +3269,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -3281,7 +3281,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='first',
@@ -3291,7 +3291,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Relationship_element',
+          specified_for='Reference to AbstractClass Relationship_element',
           parsed=...),
         Property(
           name='second',
@@ -3301,7 +3301,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Relationship_element',
+          specified_for='Reference to AbstractClass Relationship_element',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -3478,7 +3478,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -3490,7 +3490,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -3502,7 +3502,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -3514,7 +3514,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -3526,7 +3526,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -3538,7 +3538,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -3550,7 +3550,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -3562,7 +3562,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -3574,7 +3574,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='submodel_element_type_values',
@@ -3584,7 +3584,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Submodel_element_list',
+          specified_for='Reference to ConcreteClass Submodel_element_list',
           parsed=...),
         Property(
           name='values',
@@ -3596,7 +3596,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Submodel_element_list',
+          specified_for='Reference to ConcreteClass Submodel_element_list',
           parsed=...),
         Property(
           name='semantic_ID_values',
@@ -3608,7 +3608,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Submodel_element_list',
+          specified_for='Reference to ConcreteClass Submodel_element_list',
           parsed=...),
         Property(
           name='value_type_values',
@@ -3620,7 +3620,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Submodel_element_list',
+          specified_for='Reference to ConcreteClass Submodel_element_list',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -3827,7 +3827,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -3839,7 +3839,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -3851,7 +3851,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -3863,7 +3863,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -3875,7 +3875,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -3887,7 +3887,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -3899,7 +3899,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -3911,7 +3911,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -3923,7 +3923,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='values',
@@ -3935,7 +3935,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Submodel_element_struct',
+          specified_for='Reference to ConcreteClass Submodel_element_struct',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -4119,7 +4119,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_data_specification',
+            specified_for='Reference to AbstractClass Has_data_specification',
             parsed=...),
           Property(
             name='extensions',
@@ -4131,7 +4131,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_extensions',
+            specified_for='Reference to AbstractClass Has_extensions',
             parsed=...),
           Property(
             name='ID_short',
@@ -4143,7 +4143,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='display_name',
@@ -4155,7 +4155,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='category',
@@ -4167,7 +4167,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='description',
@@ -4179,7 +4179,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='kind',
@@ -4191,7 +4191,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_kind',
+            specified_for='Reference to AbstractClass Has_kind',
             parsed=...),
           Property(
             name='semantic_ID',
@@ -4203,7 +4203,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_semantics',
+            specified_for='Reference to AbstractClass Has_semantics',
             parsed=...),
           Property(
             name='qualifiers',
@@ -4215,7 +4215,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Qualifiable',
+            specified_for='Reference to AbstractClass Qualifiable',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -4243,7 +4243,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -4255,7 +4255,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -4267,7 +4267,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -4279,7 +4279,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -4291,7 +4291,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -4303,7 +4303,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -4315,7 +4315,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -4327,7 +4327,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -4339,7 +4339,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -4500,7 +4500,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -4512,7 +4512,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -4524,7 +4524,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -4536,7 +4536,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -4548,7 +4548,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -4560,7 +4560,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -4572,7 +4572,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -4584,7 +4584,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -4596,7 +4596,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='value_type',
@@ -4606,7 +4606,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Property',
+          specified_for='Reference to ConcreteClass Property',
           parsed=...),
         Property(
           name='value',
@@ -4618,7 +4618,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Property',
+          specified_for='Reference to ConcreteClass Property',
           parsed=...),
         Property(
           name='value_ID',
@@ -4630,7 +4630,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Property',
+          specified_for='Reference to ConcreteClass Property',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -4819,7 +4819,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -4831,7 +4831,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -4843,7 +4843,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -4855,7 +4855,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -4867,7 +4867,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -4879,7 +4879,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -4891,7 +4891,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -4903,7 +4903,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -4915,7 +4915,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='translatable',
@@ -4927,7 +4927,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Multi_language_property',
+          specified_for='Reference to ConcreteClass Multi_language_property',
           parsed=...),
         Property(
           name='value_ID',
@@ -4939,7 +4939,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Multi_language_property',
+          specified_for='Reference to ConcreteClass Multi_language_property',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -5124,7 +5124,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -5136,7 +5136,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -5148,7 +5148,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -5160,7 +5160,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -5172,7 +5172,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -5184,7 +5184,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -5196,7 +5196,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -5208,7 +5208,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -5220,7 +5220,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='value_type',
@@ -5230,7 +5230,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Range',
+          specified_for='Reference to ConcreteClass Range',
           parsed=...),
         Property(
           name='min',
@@ -5242,7 +5242,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Range',
+          specified_for='Reference to ConcreteClass Range',
           parsed=...),
         Property(
           name='max',
@@ -5254,7 +5254,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Range',
+          specified_for='Reference to ConcreteClass Range',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -5443,7 +5443,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -5455,7 +5455,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -5467,7 +5467,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -5479,7 +5479,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -5491,7 +5491,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -5503,7 +5503,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -5515,7 +5515,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -5527,7 +5527,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -5539,7 +5539,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='reference',
@@ -5551,7 +5551,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Reference_element',
+          specified_for='Reference to ConcreteClass Reference_element',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -5720,7 +5720,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -5732,7 +5732,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -5744,7 +5744,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -5756,7 +5756,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -5768,7 +5768,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -5780,7 +5780,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -5792,7 +5792,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -5804,7 +5804,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -5816,7 +5816,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='MIME_type',
@@ -5826,7 +5826,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Blob',
+          specified_for='Reference to ConcreteClass Blob',
           parsed=...),
         Property(
           name='content',
@@ -5838,7 +5838,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Blob',
+          specified_for='Reference to ConcreteClass Blob',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -6019,7 +6019,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -6031,7 +6031,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -6043,7 +6043,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -6055,7 +6055,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -6067,7 +6067,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -6079,7 +6079,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -6091,7 +6091,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -6103,7 +6103,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -6115,7 +6115,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='MIME_type',
@@ -6125,7 +6125,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass File',
+          specified_for='Reference to ConcreteClass File',
           parsed=...),
         Property(
           name='value',
@@ -6137,7 +6137,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass File',
+          specified_for='Reference to ConcreteClass File',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -6318,7 +6318,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -6330,7 +6330,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -6342,7 +6342,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -6354,7 +6354,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -6366,7 +6366,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -6378,7 +6378,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -6390,7 +6390,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -6402,7 +6402,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -6414,7 +6414,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='first',
@@ -6424,7 +6424,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Relationship_element',
+          specified_for='Reference to AbstractClass Relationship_element',
           parsed=...),
         Property(
           name='second',
@@ -6434,7 +6434,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Relationship_element',
+          specified_for='Reference to AbstractClass Relationship_element',
           parsed=...),
         Property(
           name='annotation',
@@ -6446,7 +6446,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Annotated_relationship_element',
+          specified_for='Reference to ConcreteClass Annotated_relationship_element',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -6661,7 +6661,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -6673,7 +6673,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -6685,7 +6685,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -6697,7 +6697,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -6709,7 +6709,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -6721,7 +6721,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -6733,7 +6733,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -6745,7 +6745,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -6757,7 +6757,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='entity_type',
@@ -6767,7 +6767,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Entity',
+          specified_for='Reference to ConcreteClass Entity',
           parsed=...),
         Property(
           name='statements',
@@ -6779,7 +6779,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Entity',
+          specified_for='Reference to ConcreteClass Entity',
           parsed=...),
         Property(
           name='global_asset_ID',
@@ -6791,7 +6791,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Entity',
+          specified_for='Reference to ConcreteClass Entity',
           parsed=...),
         Property(
           name='specific_asset_ID',
@@ -6803,7 +6803,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Entity',
+          specified_for='Reference to ConcreteClass Entity',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -7014,7 +7014,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_data_specification',
+            specified_for='Reference to AbstractClass Has_data_specification',
             parsed=...),
           Property(
             name='extensions',
@@ -7026,7 +7026,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_extensions',
+            specified_for='Reference to AbstractClass Has_extensions',
             parsed=...),
           Property(
             name='ID_short',
@@ -7038,7 +7038,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='display_name',
@@ -7050,7 +7050,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='category',
@@ -7062,7 +7062,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='description',
@@ -7074,7 +7074,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Referable',
+            specified_for='Reference to AbstractClass Referable',
             parsed=...),
           Property(
             name='kind',
@@ -7086,7 +7086,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_kind',
+            specified_for='Reference to AbstractClass Has_kind',
             parsed=...),
           Property(
             name='semantic_ID',
@@ -7098,7 +7098,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Has_semantics',
+            specified_for='Reference to AbstractClass Has_semantics',
             parsed=...),
           Property(
             name='qualifiers',
@@ -7110,7 +7110,7 @@ SymbolTable(
             description=Description(
               document=...,
               node=...),
-            implemented_for='Reference to AbstractClass Qualifiable',
+            specified_for='Reference to AbstractClass Qualifiable',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -7133,7 +7133,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -7145,7 +7145,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -7157,7 +7157,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -7169,7 +7169,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -7181,7 +7181,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -7193,7 +7193,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -7205,7 +7205,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -7217,7 +7217,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -7229,7 +7229,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -7390,7 +7390,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -7402,7 +7402,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -7414,7 +7414,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -7426,7 +7426,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -7438,7 +7438,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -7450,7 +7450,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -7462,7 +7462,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -7474,7 +7474,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -7486,7 +7486,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='observed',
@@ -7498,7 +7498,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Basic_Event',
+          specified_for='Reference to ConcreteClass Basic_Event',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -7665,7 +7665,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -7677,7 +7677,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -7689,7 +7689,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -7701,7 +7701,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -7713,7 +7713,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -7725,7 +7725,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -7737,7 +7737,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -7749,7 +7749,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -7761,7 +7761,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
           name='input_variables',
@@ -7773,7 +7773,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Operation',
+          specified_for='Reference to ConcreteClass Operation',
           parsed=...),
         Property(
           name='output_variables',
@@ -7785,7 +7785,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Operation',
+          specified_for='Reference to ConcreteClass Operation',
           parsed=...),
         Property(
           name='inoutput_variables',
@@ -7797,7 +7797,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Operation',
+          specified_for='Reference to ConcreteClass Operation',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -7997,7 +7997,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Operation_variable',
+          specified_for='Reference to ConcreteClass Operation_variable',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -8052,7 +8052,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -8064,7 +8064,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -8076,7 +8076,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -8088,7 +8088,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -8100,7 +8100,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -8112,7 +8112,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='kind',
@@ -8124,7 +8124,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_kind',
+          specified_for='Reference to AbstractClass Has_kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -8136,7 +8136,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='qualifiers',
@@ -8148,7 +8148,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Qualifiable',
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -8310,7 +8310,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -8322,7 +8322,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -8334,7 +8334,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -8346,7 +8346,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -8358,7 +8358,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -8370,7 +8370,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='ID',
@@ -8380,7 +8380,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Identifiable',
+          specified_for='Reference to AbstractClass Identifiable',
           parsed=...),
         Property(
           name='administration',
@@ -8392,7 +8392,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Identifiable',
+          specified_for='Reference to AbstractClass Identifiable',
           parsed=...),
         Property(
           name='is_case_of',
@@ -8404,7 +8404,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Concept_description',
+          specified_for='Reference to ConcreteClass Concept_description',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -8559,7 +8559,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_data_specification',
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='extensions',
@@ -8571,7 +8571,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_extensions',
+          specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Property(
           name='ID_short',
@@ -8583,7 +8583,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='display_name',
@@ -8595,7 +8595,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='category',
@@ -8607,7 +8607,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='description',
@@ -8619,7 +8619,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Referable',
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -8631,7 +8631,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to AbstractClass Has_semantics',
+          specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Property(
           name='contained_elements',
@@ -8645,7 +8645,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass View',
+          specified_for='Reference to ConcreteClass View',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -8846,7 +8846,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Global_reference',
+          specified_for='Reference to ConcreteClass Global_reference',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -8907,7 +8907,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Model_reference',
+          specified_for='Reference to ConcreteClass Model_reference',
           parsed=...),
         Property(
           name='referred_semantic_ID',
@@ -8919,7 +8919,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Model_reference',
+          specified_for='Reference to ConcreteClass Model_reference',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -8987,7 +8987,7 @@ SymbolTable(
             symbol='Reference to symbol Key_elements',
             parsed=...),
           description=None,
-          implemented_for='Reference to ConcreteClass Key',
+          specified_for='Reference to ConcreteClass Key',
           parsed=...),
         Property(
           name='value',
@@ -8995,7 +8995,7 @@ SymbolTable(
             symbol='Reference to symbol Non_empty_string',
             parsed=...),
           description=None,
-          implemented_for='Reference to ConcreteClass Key',
+          specified_for='Reference to ConcreteClass Key',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -10253,7 +10253,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Value_reference_pair',
+          specified_for='Reference to ConcreteClass Value_reference_pair',
           parsed=...),
         Property(
           name='value_ID',
@@ -10263,7 +10263,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Value_reference_pair',
+          specified_for='Reference to ConcreteClass Value_reference_pair',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -10325,7 +10325,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Value_list',
+          specified_for='Reference to ConcreteClass Value_list',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -10386,7 +10386,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_IEC61360',
+          specified_for='Reference to ConcreteClass Data_specification_IEC61360',
           parsed=...),
         Property(
           name='short_name',
@@ -10398,7 +10398,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_IEC61360',
+          specified_for='Reference to ConcreteClass Data_specification_IEC61360',
           parsed=...),
         Property(
           name='unit',
@@ -10410,7 +10410,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_IEC61360',
+          specified_for='Reference to ConcreteClass Data_specification_IEC61360',
           parsed=...),
         Property(
           name='unit_ID',
@@ -10422,7 +10422,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_IEC61360',
+          specified_for='Reference to ConcreteClass Data_specification_IEC61360',
           parsed=...),
         Property(
           name='source_of_definition',
@@ -10434,7 +10434,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_IEC61360',
+          specified_for='Reference to ConcreteClass Data_specification_IEC61360',
           parsed=...),
         Property(
           name='symbol',
@@ -10446,7 +10446,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_IEC61360',
+          specified_for='Reference to ConcreteClass Data_specification_IEC61360',
           parsed=...),
         Property(
           name='data_type',
@@ -10458,7 +10458,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_IEC61360',
+          specified_for='Reference to ConcreteClass Data_specification_IEC61360',
           parsed=...),
         Property(
           name='definition',
@@ -10470,7 +10470,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_IEC61360',
+          specified_for='Reference to ConcreteClass Data_specification_IEC61360',
           parsed=...),
         Property(
           name='value_format',
@@ -10482,7 +10482,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_IEC61360',
+          specified_for='Reference to ConcreteClass Data_specification_IEC61360',
           parsed=...),
         Property(
           name='value_list',
@@ -10494,7 +10494,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_IEC61360',
+          specified_for='Reference to ConcreteClass Data_specification_IEC61360',
           parsed=...),
         Property(
           name='value',
@@ -10506,7 +10506,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_IEC61360',
+          specified_for='Reference to ConcreteClass Data_specification_IEC61360',
           parsed=...),
         Property(
           name='value_ID',
@@ -10518,7 +10518,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_IEC61360',
+          specified_for='Reference to ConcreteClass Data_specification_IEC61360',
           parsed=...),
         Property(
           name='level_type',
@@ -10530,7 +10530,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_IEC61360',
+          specified_for='Reference to ConcreteClass Data_specification_IEC61360',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -10733,7 +10733,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_physical_unit',
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
           parsed=...),
         Property(
           name='unit_symbol',
@@ -10745,7 +10745,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_physical_unit',
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
           parsed=...),
         Property(
           name='definition',
@@ -10757,7 +10757,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_physical_unit',
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
           parsed=...),
         Property(
           name='SI_notation',
@@ -10769,7 +10769,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_physical_unit',
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
           parsed=...),
         Property(
           name='DIN_notation',
@@ -10781,7 +10781,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_physical_unit',
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
           parsed=...),
         Property(
           name='ECE_name',
@@ -10793,7 +10793,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_physical_unit',
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
           parsed=...),
         Property(
           name='ECE_code',
@@ -10805,7 +10805,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_physical_unit',
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
           parsed=...),
         Property(
           name='NIST_name',
@@ -10817,7 +10817,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_physical_unit',
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
           parsed=...),
         Property(
           name='source_of_definition',
@@ -10829,7 +10829,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_physical_unit',
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
           parsed=...),
         Property(
           name='conversion_factor',
@@ -10841,7 +10841,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_physical_unit',
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
           parsed=...),
         Property(
           name='registration_authority_ID',
@@ -10853,7 +10853,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_physical_unit',
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
           parsed=...),
         Property(
           name='supplier',
@@ -10865,7 +10865,7 @@ SymbolTable(
           description=Description(
             document=...,
             node=...),
-          implemented_for='Reference to ConcreteClass Data_specification_physical_unit',
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -11053,7 +11053,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           description=None,
-          implemented_for='Reference to ConcreteClass Environment',
+          specified_for='Reference to ConcreteClass Environment',
           parsed=...),
         Property(
           name='submodels',
@@ -11063,7 +11063,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           description=None,
-          implemented_for='Reference to ConcreteClass Environment',
+          specified_for='Reference to ConcreteClass Environment',
           parsed=...),
         Property(
           name='concept_descriptions',
@@ -11073,7 +11073,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           description=None,
-          implemented_for='Reference to ConcreteClass Environment',
+          specified_for='Reference to ConcreteClass Environment',
           parsed=...)],
       methods=[],
       constructor=Constructor(

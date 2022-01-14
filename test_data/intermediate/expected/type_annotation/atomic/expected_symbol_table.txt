@@ -15,7 +15,7 @@ SymbolTable(
             a_type='INT',
             parsed=...),
           description=None,
-          implemented_for='Reference to ConcreteClass Concrete',
+          specified_for='Reference to ConcreteClass Concrete',
           parsed=...)],
       methods=[],
       constructor=Constructor(
