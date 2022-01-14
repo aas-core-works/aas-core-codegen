@@ -204,6 +204,17 @@ def main(prog: str) -> int:
         required=True,
         choices=[literal.value for literal in Target],
     )
+    parser.add_argument(
+        "--version", help="show the current version and exit", action="store_true"
+    )
+
+    # NOTE (mristin, 2022-01-14):
+    # The module ``argparse`` is not flexible enough to understand special options such
+    # as ``--version`` so we manually hard-wire.
+    if "--version" in sys.argv and "--help" not in sys.argv:
+        print(aas_core_codegen.__version__)
+        return 1
+
     args = parser.parse_args()
 
     target_to_str = {literal.value: literal for literal in Target}
