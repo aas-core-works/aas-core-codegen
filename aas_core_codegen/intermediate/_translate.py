@@ -946,10 +946,12 @@ def _stack_invariants(
             invariants = []
             invariants_map[parsed_cls.name] = invariants
 
+        # noinspection PyTypeChecker
         invariants.extend(
             Invariant(
                 description=parsed_invariant.description,
                 body=parsed_invariant.body,
+                specified_for=_PlaceholderSymbol(parsed_cls.name),  # type: ignore
                 parsed=parsed_invariant,
             )
             for parsed_invariant in parsed_cls.invariants
@@ -1802,6 +1804,44 @@ def _second_pass_to_resolve_resulting_class_of_specified_for(
             assert_never(symbol)
 
 
+def _second_pass_to_resolve_specified_for_in_invariants(
+    symbol_table: SymbolTable,
+) -> None:
+    """Resolve the symbol of the ``specified_for`` of an invariant in-place."""
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, Enumeration):
+            continue
+
+        elif isinstance(symbol, (ConstrainedPrimitive, Class)):
+            for invariant in symbol.invariants:
+                # NOTE (mristin, 2022-01-02):
+                # Since we stack invariants, it might be that we already resolved
+                # the invariants coming from the parent. Hence we need to check that
+                # we haven't resolved ``specified_for`` here.
+
+                if isinstance(invariant.specified_for, _PlaceholderSymbol):
+                    symbol = symbol_table.must_find(
+                        Identifier(invariant.specified_for.name)
+                    )
+
+                    assert isinstance(symbol, (ConstrainedPrimitive, Class)), (
+                        f"Expected the ``specified_for`` of an invariant to be either "
+                        f"a constrained primitive or a class, but got: {symbol}"
+                    )
+
+                    # NOTE (mristin, 2022-01-02):
+                    # We have to override the ``specified_for`` as we could not set it
+                    # during the first pass of the translation phase. The ``Final`` in
+                    # this context is meant for the users of the translation phase, not
+                    # the translation phase itself.
+
+                    # noinspection PyFinal
+                    invariant.specified_for = symbol
+
+        else:
+            assert_never(symbol)
+
+
 # fmt: off
 @require(
     lambda symbol_table:
@@ -2609,6 +2649,10 @@ def translate(
     _second_pass_to_resolve_inheritances_in_place(symbol_table=symbol_table)
 
     _second_pass_to_resolve_resulting_class_of_specified_for(
+        symbol_table=symbol_table,
+    )
+
+    _second_pass_to_resolve_specified_for_in_invariants(
         symbol_table=symbol_table,
     )
 

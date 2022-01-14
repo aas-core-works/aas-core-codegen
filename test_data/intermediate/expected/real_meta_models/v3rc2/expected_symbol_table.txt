@@ -11,6 +11,7 @@ SymbolTable(
         Invariant(
           description=None,
           body="Comparison(\n  left=FunctionCall(\n    name='len',\n    args=[\n      Name(\n        identifier='self',\n        original_node=...)],\n    original_node=...),\n  op='GE',\n  right=Constant(\n    value=1,\n    original_node=...),\n  original_node=...)",
+          specified_for='Reference to ConstrainedPrimitive Non_empty_string',
           parsed=...)],
       invariant_id_set=...,
       description=Description(
@@ -29,10 +30,12 @@ SymbolTable(
         Invariant(
           description=None,
           body="Comparison(\n  left=FunctionCall(\n    name='len',\n    args=[\n      Name(\n        identifier='self',\n        original_node=...)],\n    original_node=...),\n  op='GE',\n  right=Constant(\n    value=1,\n    original_node=...),\n  original_node=...)",
+          specified_for='Reference to ConstrainedPrimitive Non_empty_string',
           parsed=...),
         Invariant(
           description=None,
           body="FunctionCall(\n  name='is_MIME_type',\n  args=[\n    Name(\n      identifier='self',\n      original_node=...)],\n  original_node=...)",
+          specified_for='Reference to ConstrainedPrimitive MIME_typed',
           parsed=...)],
       invariant_id_set=...,
       description=Description(
@@ -1344,6 +1347,7 @@ SymbolTable(
         Invariant(
           description='Constraint AASd-005',
           body="Implication(\n  antecedent=IsNotNone(\n    value=Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='revision',\n      original_node=...),\n    original_node=...),\n  consequent=IsNotNone(\n    value=Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='version',\n      original_node=...),\n    original_node=...),\n  original_node=...)",
+          specified_for='Reference to ConcreteClass Administrative_information',
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
@@ -5988,6 +5992,7 @@ SymbolTable(
         Invariant(
           description=None,
           body="FunctionCall(\n  name='is_MIME_type',\n  args=[\n    Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='MIME_type',\n      original_node=...)],\n  original_node=...)",
+          specified_for='Reference to ConcreteClass Blob',
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
@@ -6287,6 +6292,7 @@ SymbolTable(
         Invariant(
           description=None,
           body="FunctionCall(\n  name='is_MIME_type',\n  args=[\n    Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='MIME_type',\n      original_node=...)],\n  original_node=...)",
+          specified_for='Reference to ConcreteClass File',
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
@@ -8876,6 +8882,7 @@ SymbolTable(
         Invariant(
           description=None,
           body="Comparison(\n  left=FunctionCall(\n    name='len',\n    args=[\n      Member(\n        instance=Name(\n          identifier='self',\n          original_node=...),\n        name='values',\n        original_node=...)],\n    original_node=...),\n  op='GE',\n  right=Constant(\n    value=1,\n    original_node=...),\n  original_node=...)",
+          specified_for='Reference to ConcreteClass Global_reference',
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
@@ -8961,6 +8968,7 @@ SymbolTable(
         Invariant(
           description=None,
           body="Comparison(\n  left=FunctionCall(\n    name='len',\n    args=[\n      Member(\n        instance=Name(\n          identifier='self',\n          original_node=...),\n        name='keys',\n        original_node=...)],\n    original_node=...),\n  op='GE',\n  right=Constant(\n    value=1,\n    original_node=...),\n  original_node=...)",
+          specified_for='Reference to ConcreteClass Model_reference',
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
