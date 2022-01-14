@@ -1059,7 +1059,7 @@ namespace AasCore.Aas3
     /// </summary>
     /// <remarks>
     /// The asset may either represent an asset type or an asset instance. The asset has
-    /// a globally unique identifier plus – if needed – additional domain-specific
+    /// a globally unique identifier plus â€“ if needed â€“ additional domain-specific
     /// (proprietary) identifiers. However, to support the corner case of very first
     /// phase of lifecycle where a stabilised/constant global asset identifier does not
     /// already exist, the corresponding attribute <see cref="AssetInformation.GlobalAssetId" /> is optional.
@@ -1256,7 +1256,7 @@ namespace AasCore.Aas3
         /// Key of the identifier
         /// </summary>
         /// <remarks>
-        /// Constraint AASd-116: “globalAssetId” (case-insensitive) is a reserved key. If used
+        /// Constraint AASd-116: â€œglobalAssetIdâ€ (case-insensitive) is a reserved key. If used
         /// as value for IdentifierKeyValuePair/key IdentifierKeyValuePair/value shall be
         /// identical to AssetInformation/globalAssetId.
         /// </remarks>
@@ -2589,8 +2589,8 @@ namespace AasCore.Aas3
         /// The value of the property instance.
         /// </summary>
         /// <remarks>
-        /// See Constraint AASd-065
-        /// See Constraint AASd-007
+        /// See ConstraintÂ AASd-065
+        /// See ConstraintÂ AASd-007
         /// </remarks>
         public string? Value { get; set; }
 
@@ -2598,8 +2598,8 @@ namespace AasCore.Aas3
         /// Reference to the global unique id of a coded value.
         /// </summary>
         /// <remarks>
-        /// See Constraint AASd-065
-        /// See Constraint AASd-007
+        /// See ConstraintÂ AASd-065
+        /// See ConstraintÂ AASd-007
         /// </remarks>
         public IReference? ValueId { get; set; }
 
@@ -2922,15 +2922,15 @@ namespace AasCore.Aas3
 
         /// <summary>
         /// The value of the property instance.
-        /// See Constraint AASd-012
-        /// See Constraint AASd-065"
+        /// See ConstraintÂ AASd-012
+        /// See ConstraintÂ AASd-065"
         /// </summary>
         public LangStringSet? Translatable { get; set; }
 
         /// <summary>
         /// Reference to the global unique id of a coded value.
-        /// See Constraint AASd-012
-        /// See Constraint AASd-065"
+        /// See ConstraintÂ AASd-012
+        /// See ConstraintÂ AASd-065"
         /// </summary>
         public IReference? ValueId { get; set; }
 
@@ -3890,7 +3890,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Mime type of the content of the BLOB.
         /// The mime type states which file extensions the file can have.
-        /// Valid values are e.g. “application/json”, “application/xls”, ”image/jpg”
+        /// Valid values are e.g. â€œapplication/jsonâ€, â€œapplication/xlsâ€, â€image/jpgâ€
         /// The allowed values are defined as in RFC2046.
         /// </summary>
         public string MimeType { get; set; }
@@ -4880,8 +4880,8 @@ namespace AasCore.Aas3
         /// Reference to the asset the entity is representing.
         /// </summary>
         /// <remarks>
-        /// Constraint AASd-014: Either the attribute globalAssetId or specificAssetId of an
-        /// Entity must be set if Entity/entityType is set to “SelfManagedEntity”. They are
+        /// ConstraintÂ AASd-014: Either the attribute globalAssetId or specificAssetId of an
+        /// Entity must be set if Entity/entityType is set to â€œSelfManagedEntityâ€. They are
         /// not existing otherwise.
         /// </remarks>
         public IReference? GlobalAssetId { get; set; }
@@ -7291,7 +7291,7 @@ namespace AasCore.Aas3
         /// Data Element.
         /// </summary>
         /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses “DataElement” the reference may
+        /// Data Element is abstract, <em>i.e.</em> if a key uses â€œDataElementâ€ the reference may
         /// be a Property, a File etc.
         /// </remarks>
         [EnumMember(Value = "DataElement")]
@@ -7364,7 +7364,7 @@ namespace AasCore.Aas3
         /// Submodel Element
         /// </summary>
         /// <remarks>
-        /// Submodel Element is abstract, i.e. if a key uses “SubmodelElement”
+        /// Submodel Element is abstract, i.e. if a key uses â€œSubmodelElementâ€
         /// the reference may be a Property, a SubmodelElementList,
         /// an Operation etc.
         /// </remarks>
@@ -7790,8 +7790,8 @@ namespace AasCore.Aas3
         /// <summary>
         /// values conforming to ISO/IEC 11179 series global identifier sequences IRDI can be
         /// used instead of the more specific data types ICID or ISO29002_IRDI. ICID values are
-        /// value conformant to an IRDI, where the delimiter between RAI and ID is “#” while the
-        /// delimiter between DI and VI is confined to “##” ISO29002_IRDI values are values
+        /// value conformant to an IRDI, where the delimiter between RAI and ID is â€œ#â€ while the
+        /// delimiter between DI and VI is confined to â€œ##â€ ISO29002_IRDI values are values
         /// containing a global identifier that identifies an administrated item in a registry.
         /// The structure of this identifier complies with identifier syntax defined in ISO/TS
         /// 29002-5. The identifier shall fulfill the requirements specified in ISO/TS 29002-5
@@ -7847,7 +7847,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// values containing the content of a file. Values may be binaries.
         /// HTML conformant to HTML5 is a special blob. In IEC61360 binary is for a sequence of
-        /// bits, each bit being represented by “0” and “1” only. A binary is a blob but a blob
+        /// bits, each bit being represented by â€œ0â€ and â€œ1â€ only. A binary is a blob but a blob
         /// may also contain other source code.
         /// </summary>
         [EnumMember(Value = "BLOB")]
