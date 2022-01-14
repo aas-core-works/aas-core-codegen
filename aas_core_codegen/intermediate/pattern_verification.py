@@ -157,32 +157,33 @@ def _evaluate(
     lambda result:
     not (result[2] is None)
     or (
-            (result[1] is not None)
-            and (
-                    (result[0] is not None) and result[1]
-                    or ((result[0] is None) and not result[1])
-            )
+        (result[0] is not None) ^ (result[1] is not None)
     ),
-    "Valid match and found if no error"
+    "Valid match and cause if no error"
 )
 @ensure(
     lambda result:
     not (result[2] is not None)
     or (result[0] is None and result[1] is None),
-    "No match and found if error"
+    "No match and cause if error"
 )
 # fmt: on
 def try_to_understand(
     parsed: parse.UnderstoodMethod,
-) -> Tuple[Optional[str], Optional[bool], Optional[Error]]:
+) -> Tuple[Optional[str], Optional[Error], Optional[Error]]:
     """
     Try to understand the given verification function as a pattern matching function.
 
     :param parsed: Verification function as parsed in the parsing phase
-    :return: tuple of (pattern, found, error)
+    :return: tuple of (pattern, reason for not matching, error)
 
-    We return an error if the method looks like a pattern matching, but has a slightly
-    unexpected form (*e.g.*, flags in the call to ``match(...)``).
+    We distinguish between two causes why the method could not be understood. The first
+    cause, returned as the middle value in the tuple, indicates why the method could
+    not be matched, but this non-matching is actually expected.
+
+    The second error, the last value in the return tuple, is an unexpected error. For
+    example, if everything looks like a pattern matching function, but there are flags
+    in the call to ``match(...)``.
     """
     # Understand only functions that take a single string argument
     if not (
@@ -190,7 +191,7 @@ def try_to_understand(
         and isinstance(parsed.arguments[0].type_annotation, parse.AtomicTypeAnnotation)
         and parsed.arguments[0].type_annotation.identifier == "str"
     ):
-        return None, False, None
+        return None, Error(parsed.node, "Expected a single ``str`` argument"), None
 
     # We need to return something,
     if not (
@@ -198,16 +199,27 @@ def try_to_understand(
         and isinstance(parsed.returns, parse.AtomicTypeAnnotation)
         and parsed.returns.identifier == "bool"
     ):
-        return None, False, None
+        return None, Error(parsed.node, "Expected a ``bool`` return value"), None
 
     if len(parsed.body) == 0:
-        return None, False, None
+        return None, Error(parsed.node, "Unexpected empty body"), None
 
     if not isinstance(parsed.body[-1], parse_tree.Return):
-        return None, False, None
+        return (
+            None,
+            Error(parsed.body[-1].original_node, "Last statement not a a return"),
+            None,
+        )
 
     return_node = parsed.body[-1]
     assert isinstance(return_node, parse_tree.Return)
+    # noinspection PyUnresolvedReferences
+    if return_node.value is None:
+        return (
+            None,
+            Error(parsed.body[-1].original_node, "Expected to return a value"),
+            None,
+        )
 
     # BEFORE-RELEASE (mristin, 2021-12-19): test this
     if (
@@ -225,12 +237,39 @@ def try_to_understand(
             ),
         )
 
-    if not (
-        isinstance(return_node.value, parse_tree.IsNotNone)
-        and isinstance(return_node.value.value, parse_tree.FunctionCall)
-        and return_node.value.value.name.identifier == "match"
-    ):
-        return None, False, None
+    if not isinstance(return_node.value, parse_tree.IsNotNone):
+        return (
+            None,
+            Error(
+                return_node.value.original_node,
+                f"Expected to return a ``match(...) is not None``, "
+                f"but got: {parse_tree.dump(return_node.value)}",
+            ),
+            None,
+        )
+
+    if not isinstance(return_node.value.value, parse_tree.FunctionCall):
+        return (
+            None,
+            Error(
+                return_node.value.value.original_node,
+                f"Expected a function call ``match(...)``, "
+                f"but got: {parse_tree.dump(return_node.value.value)}",
+            ),
+            None,
+        )
+
+    if return_node.value.value.name.identifier != "match":
+        return (
+            None,
+            Error(
+                return_node.value.value.name.original_node,
+                f"Expected a call to the function ``match(...)``, "
+                f"but got a call "
+                f"to function: {return_node.value.value.name.identifier!r}",
+            ),
+            None,
+        )
 
     # NOTE (mristin, 2021-12-19):
     # From here on we return errors. The verification function looks like a pattern
@@ -381,4 +420,4 @@ def try_to_understand(
             ),
         )
 
-    return pattern, True, None
+    return pattern, None, None
