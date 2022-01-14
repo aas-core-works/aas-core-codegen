@@ -10,6 +10,7 @@ import aas_core_codegen
 from aas_core_codegen import parse, run, specific_implementations, intermediate
 from aas_core_codegen.common import LinenoColumner, assert_never
 import aas_core_codegen.csharp.main as csharp_main
+import aas_core_codegen.jsonschema.main as jsonschema_main
 
 assert aas_core_codegen.__doc__ == __doc__
 
@@ -18,6 +19,7 @@ class Target(enum.Enum):
     """List available target implementations."""
 
     CSHARP = "csharp"
+    JSONSCHEMA = "jsonschema"
 
 
 class Parameters:
@@ -172,6 +174,11 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
     if params.target is Target.CSHARP:
         return csharp_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
+    elif params.target is Target.JSONSCHEMA:
+        return jsonschema_main.execute(
+            context=run_context, stdout=stdout, stderr=stderr
+        )
+
     else:
         assert_never(params.target)
 
@@ -204,17 +211,6 @@ def main(prog: str) -> int:
         required=True,
         choices=[literal.value for literal in Target],
     )
-    parser.add_argument(
-        "--version", help="show the current version and exit", action="store_true"
-    )
-
-    # NOTE (mristin, 2022-01-14):
-    # The module ``argparse`` is not flexible enough to understand special options such
-    # as ``--version`` so we manually hard-wire.
-    if "--version" in sys.argv and "--help" not in sys.argv:
-        print(aas_core_codegen.__version__)
-        return 1
-
     args = parser.parse_args()
 
     target_to_str = {literal.value: literal for literal in Target}

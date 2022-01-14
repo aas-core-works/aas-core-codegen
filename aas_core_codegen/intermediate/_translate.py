@@ -16,7 +16,6 @@ from typing import (
     Generic,
     cast,
     Final,
-    Set,
     Type,
     Any,
 )
@@ -45,7 +44,6 @@ from aas_core_codegen.intermediate._types import (
     Enumeration,
     EnumerationLiteral,
     PrimitiveType,
-    TypeAnnotation,
     Argument,
     Default,
     DefaultConstant,
@@ -80,6 +78,7 @@ from aas_core_codegen.intermediate._types import (
     ClassUnion,
     VerificationUnion,
     UnderstoodMethod,
+    collect_ids_of_classes_in_properties,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -2052,49 +2051,6 @@ def _second_pass_to_resolve_interfaces_in_place(
             cls.interface = None
 
 
-def _collect_ids_of_classes_in_properties(symbol_table: SymbolTable) -> Set[int]:
-    """
-    Collect the IDs of the classes occurring in type annotations of the properties.
-
-    The IDs refer to IDs of the Python objects in this context.
-    """
-    result = set()  # type: Set[int]
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, Enumeration):
-            continue
-
-        elif isinstance(symbol, ConstrainedPrimitive):
-            continue
-
-        elif isinstance(symbol, Class):
-            for prop in symbol.properties:
-                type_anno = prop.type_annotation
-
-                old_type_anno = None  # type: Optional[TypeAnnotation]
-                while True:
-                    if isinstance(type_anno, OptionalTypeAnnotation):
-                        # noinspection PyUnresolvedReferences
-                        type_anno = type_anno.value
-                    elif isinstance(type_anno, ListTypeAnnotation):
-                        type_anno = type_anno.items
-                    elif isinstance(type_anno, RefTypeAnnotation):
-                        type_anno = type_anno.value
-                    elif isinstance(type_anno, PrimitiveTypeAnnotation):
-                        break
-                    elif isinstance(type_anno, OurTypeAnnotation):
-                        result.add(id(type_anno.symbol))
-                        break
-                    else:
-                        assert_never(type_anno)
-
-                    assert old_type_anno is not type_anno, "Loop invariant"
-                    old_type_anno = type_anno
-        else:
-            assert_never(symbol)
-
-    return result
-
-
 class _PropertyOfClass:
     """Represent the property with its corresponding class."""
 
@@ -2259,7 +2215,7 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
 
     # region Check ``with_model_type`` for classes with at least one concrete descendant
 
-    classes_in_properties = _collect_ids_of_classes_in_properties(
+    classes_in_properties = collect_ids_of_classes_in_properties(
         symbol_table=symbol_table
     )
 
