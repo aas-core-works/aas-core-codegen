@@ -48,7 +48,25 @@ SymbolTable(
         base='Reference to AbstractClass Has_semantics',
         name='Has_semantics',
         inheritances=[],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Annotated_relationship_element',
+          'Reference to ConcreteClass Basic_Event',
+          'Reference to ConcreteClass Blob',
+          'Reference to ConcreteClass Capability',
+          'Reference to ConcreteClass Entity',
+          'Reference to ConcreteClass Extension',
+          'Reference to ConcreteClass File',
+          'Reference to ConcreteClass Identifier_key_value_pair',
+          'Reference to ConcreteClass Multi_language_property',
+          'Reference to ConcreteClass Operation',
+          'Reference to ConcreteClass Property',
+          'Reference to ConcreteClass Qualifier',
+          'Reference to ConcreteClass Range',
+          'Reference to ConcreteClass Reference_element',
+          'Reference to ConcreteClass Submodel',
+          'Reference to ConcreteClass Submodel_element_list',
+          'Reference to ConcreteClass Submodel_element_struct',
+          'Reference to ConcreteClass View'],
         properties=[
           Property(
             name='semantic_ID',
@@ -70,7 +88,25 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Annotated_relationship_element',
+        'Reference to ConcreteClass Basic_Event',
+        'Reference to ConcreteClass Blob',
+        'Reference to ConcreteClass Capability',
+        'Reference to ConcreteClass Entity',
+        'Reference to ConcreteClass Extension',
+        'Reference to ConcreteClass File',
+        'Reference to ConcreteClass Identifier_key_value_pair',
+        'Reference to ConcreteClass Multi_language_property',
+        'Reference to ConcreteClass Operation',
+        'Reference to ConcreteClass Property',
+        'Reference to ConcreteClass Qualifier',
+        'Reference to ConcreteClass Range',
+        'Reference to ConcreteClass Reference_element',
+        'Reference to ConcreteClass Submodel',
+        'Reference to ConcreteClass Submodel_element_list',
+        'Reference to ConcreteClass Submodel_element_struct',
+        'Reference to ConcreteClass View'],
       properties=[
         Property(
           name='semantic_ID',
@@ -279,7 +315,24 @@ SymbolTable(
         base='Reference to AbstractClass Has_extensions',
         name='Has_extensions',
         inheritances=[],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Annotated_relationship_element',
+          'Reference to ConcreteClass Asset_administration_shell',
+          'Reference to ConcreteClass Basic_Event',
+          'Reference to ConcreteClass Blob',
+          'Reference to ConcreteClass Capability',
+          'Reference to ConcreteClass Concept_description',
+          'Reference to ConcreteClass Entity',
+          'Reference to ConcreteClass File',
+          'Reference to ConcreteClass Multi_language_property',
+          'Reference to ConcreteClass Operation',
+          'Reference to ConcreteClass Property',
+          'Reference to ConcreteClass Range',
+          'Reference to ConcreteClass Reference_element',
+          'Reference to ConcreteClass Submodel',
+          'Reference to ConcreteClass Submodel_element_list',
+          'Reference to ConcreteClass Submodel_element_struct',
+          'Reference to ConcreteClass View'],
         properties=[
           Property(
             name='extensions',
@@ -301,7 +354,24 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Annotated_relationship_element',
+        'Reference to ConcreteClass Asset_administration_shell',
+        'Reference to ConcreteClass Basic_Event',
+        'Reference to ConcreteClass Blob',
+        'Reference to ConcreteClass Capability',
+        'Reference to ConcreteClass Concept_description',
+        'Reference to ConcreteClass Entity',
+        'Reference to ConcreteClass File',
+        'Reference to ConcreteClass Multi_language_property',
+        'Reference to ConcreteClass Operation',
+        'Reference to ConcreteClass Property',
+        'Reference to ConcreteClass Range',
+        'Reference to ConcreteClass Reference_element',
+        'Reference to ConcreteClass Submodel',
+        'Reference to ConcreteClass Submodel_element_list',
+        'Reference to ConcreteClass Submodel_element_struct',
+        'Reference to ConcreteClass View'],
       properties=[
         Property(
           name='extensions',
@@ -365,7 +435,24 @@ SymbolTable(
         name='Referable',
         inheritances=[
           'Reference to Interface Has_extensions'],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Annotated_relationship_element',
+          'Reference to ConcreteClass Asset_administration_shell',
+          'Reference to ConcreteClass Basic_Event',
+          'Reference to ConcreteClass Blob',
+          'Reference to ConcreteClass Capability',
+          'Reference to ConcreteClass Concept_description',
+          'Reference to ConcreteClass Entity',
+          'Reference to ConcreteClass File',
+          'Reference to ConcreteClass Multi_language_property',
+          'Reference to ConcreteClass Operation',
+          'Reference to ConcreteClass Property',
+          'Reference to ConcreteClass Range',
+          'Reference to ConcreteClass Reference_element',
+          'Reference to ConcreteClass Submodel',
+          'Reference to ConcreteClass Submodel_element_list',
+          'Reference to ConcreteClass Submodel_element_struct',
+          'Reference to ConcreteClass View'],
         properties=[
           Property(
             name='extensions',
@@ -435,7 +522,24 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Annotated_relationship_element',
+        'Reference to ConcreteClass Asset_administration_shell',
+        'Reference to ConcreteClass Basic_Event',
+        'Reference to ConcreteClass Blob',
+        'Reference to ConcreteClass Capability',
+        'Reference to ConcreteClass Concept_description',
+        'Reference to ConcreteClass Entity',
+        'Reference to ConcreteClass File',
+        'Reference to ConcreteClass Multi_language_property',
+        'Reference to ConcreteClass Operation',
+        'Reference to ConcreteClass Property',
+        'Reference to ConcreteClass Range',
+        'Reference to ConcreteClass Reference_element',
+        'Reference to ConcreteClass Submodel',
+        'Reference to ConcreteClass Submodel_element_list',
+        'Reference to ConcreteClass Submodel_element_struct',
+        'Reference to ConcreteClass View'],
       properties=[
         Property(
           name='extensions',
@@ -595,7 +699,10 @@ SymbolTable(
         name='Identifiable',
         inheritances=[
           'Reference to Interface Referable'],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Asset_administration_shell',
+          'Reference to ConcreteClass Concept_description',
+          'Reference to ConcreteClass Submodel'],
         properties=[
           Property(
             name='extensions',
@@ -687,7 +794,10 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Asset_administration_shell',
+        'Reference to ConcreteClass Concept_description',
+        'Reference to ConcreteClass Submodel'],
       properties=[
         Property(
           name='extensions',
@@ -911,7 +1021,21 @@ SymbolTable(
         base='Reference to AbstractClass Has_kind',
         name='Has_kind',
         inheritances=[],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Annotated_relationship_element',
+          'Reference to ConcreteClass Basic_Event',
+          'Reference to ConcreteClass Blob',
+          'Reference to ConcreteClass Capability',
+          'Reference to ConcreteClass Entity',
+          'Reference to ConcreteClass File',
+          'Reference to ConcreteClass Multi_language_property',
+          'Reference to ConcreteClass Operation',
+          'Reference to ConcreteClass Property',
+          'Reference to ConcreteClass Range',
+          'Reference to ConcreteClass Reference_element',
+          'Reference to ConcreteClass Submodel',
+          'Reference to ConcreteClass Submodel_element_list',
+          'Reference to ConcreteClass Submodel_element_struct'],
         properties=[
           Property(
             name='kind',
@@ -933,7 +1057,21 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Annotated_relationship_element',
+        'Reference to ConcreteClass Basic_Event',
+        'Reference to ConcreteClass Blob',
+        'Reference to ConcreteClass Capability',
+        'Reference to ConcreteClass Entity',
+        'Reference to ConcreteClass File',
+        'Reference to ConcreteClass Multi_language_property',
+        'Reference to ConcreteClass Operation',
+        'Reference to ConcreteClass Property',
+        'Reference to ConcreteClass Range',
+        'Reference to ConcreteClass Reference_element',
+        'Reference to ConcreteClass Submodel',
+        'Reference to ConcreteClass Submodel_element_list',
+        'Reference to ConcreteClass Submodel_element_struct'],
       properties=[
         Property(
           name='kind',
@@ -993,7 +1131,25 @@ SymbolTable(
         base='Reference to AbstractClass Has_data_specification',
         name='Has_data_specification',
         inheritances=[],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Administrative_information',
+          'Reference to ConcreteClass Annotated_relationship_element',
+          'Reference to ConcreteClass Asset_administration_shell',
+          'Reference to ConcreteClass Basic_Event',
+          'Reference to ConcreteClass Blob',
+          'Reference to ConcreteClass Capability',
+          'Reference to ConcreteClass Concept_description',
+          'Reference to ConcreteClass Entity',
+          'Reference to ConcreteClass File',
+          'Reference to ConcreteClass Multi_language_property',
+          'Reference to ConcreteClass Operation',
+          'Reference to ConcreteClass Property',
+          'Reference to ConcreteClass Range',
+          'Reference to ConcreteClass Reference_element',
+          'Reference to ConcreteClass Submodel',
+          'Reference to ConcreteClass Submodel_element_list',
+          'Reference to ConcreteClass Submodel_element_struct',
+          'Reference to ConcreteClass View'],
         properties=[
           Property(
             name='data_specifications',
@@ -1015,7 +1171,25 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Administrative_information',
+        'Reference to ConcreteClass Annotated_relationship_element',
+        'Reference to ConcreteClass Asset_administration_shell',
+        'Reference to ConcreteClass Basic_Event',
+        'Reference to ConcreteClass Blob',
+        'Reference to ConcreteClass Capability',
+        'Reference to ConcreteClass Concept_description',
+        'Reference to ConcreteClass Entity',
+        'Reference to ConcreteClass File',
+        'Reference to ConcreteClass Multi_language_property',
+        'Reference to ConcreteClass Operation',
+        'Reference to ConcreteClass Property',
+        'Reference to ConcreteClass Range',
+        'Reference to ConcreteClass Reference_element',
+        'Reference to ConcreteClass Submodel',
+        'Reference to ConcreteClass Submodel_element_list',
+        'Reference to ConcreteClass Submodel_element_struct',
+        'Reference to ConcreteClass View'],
       properties=[
         Property(
           name='data_specifications',
@@ -1190,7 +1364,9 @@ SymbolTable(
         base='Reference to AbstractClass Constraint',
         name='Constraint',
         inheritances=[],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Formula',
+          'Reference to ConcreteClass Qualifier'],
         properties=[],
         signatures=[],
         description=Description(
@@ -1200,7 +1376,9 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Formula',
+        'Reference to ConcreteClass Qualifier'],
       properties=[],
       methods=[],
       constructor=Constructor(
@@ -1236,7 +1414,21 @@ SymbolTable(
         base='Reference to AbstractClass Qualifiable',
         name='Qualifiable',
         inheritances=[],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Annotated_relationship_element',
+          'Reference to ConcreteClass Basic_Event',
+          'Reference to ConcreteClass Blob',
+          'Reference to ConcreteClass Capability',
+          'Reference to ConcreteClass Entity',
+          'Reference to ConcreteClass File',
+          'Reference to ConcreteClass Multi_language_property',
+          'Reference to ConcreteClass Operation',
+          'Reference to ConcreteClass Property',
+          'Reference to ConcreteClass Range',
+          'Reference to ConcreteClass Reference_element',
+          'Reference to ConcreteClass Submodel',
+          'Reference to ConcreteClass Submodel_element_list',
+          'Reference to ConcreteClass Submodel_element_struct'],
         properties=[
           Property(
             name='qualifiers',
@@ -1258,7 +1450,21 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Annotated_relationship_element',
+        'Reference to ConcreteClass Basic_Event',
+        'Reference to ConcreteClass Blob',
+        'Reference to ConcreteClass Capability',
+        'Reference to ConcreteClass Entity',
+        'Reference to ConcreteClass File',
+        'Reference to ConcreteClass Multi_language_property',
+        'Reference to ConcreteClass Operation',
+        'Reference to ConcreteClass Property',
+        'Reference to ConcreteClass Range',
+        'Reference to ConcreteClass Reference_element',
+        'Reference to ConcreteClass Submodel',
+        'Reference to ConcreteClass Submodel_element_list',
+        'Reference to ConcreteClass Submodel_element_struct'],
       properties=[
         Property(
           name='qualifiers',
@@ -2423,7 +2629,20 @@ SymbolTable(
           'Reference to Interface Has_semantics',
           'Reference to Interface Qualifiable',
           'Reference to Interface Has_data_specification'],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Annotated_relationship_element',
+          'Reference to ConcreteClass Basic_Event',
+          'Reference to ConcreteClass Blob',
+          'Reference to ConcreteClass Capability',
+          'Reference to ConcreteClass Entity',
+          'Reference to ConcreteClass File',
+          'Reference to ConcreteClass Multi_language_property',
+          'Reference to ConcreteClass Operation',
+          'Reference to ConcreteClass Property',
+          'Reference to ConcreteClass Range',
+          'Reference to ConcreteClass Reference_element',
+          'Reference to ConcreteClass Submodel_element_list',
+          'Reference to ConcreteClass Submodel_element_struct'],
         properties=[
           Property(
             name='data_specifications',
@@ -2541,7 +2760,20 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Annotated_relationship_element',
+        'Reference to ConcreteClass Basic_Event',
+        'Reference to ConcreteClass Blob',
+        'Reference to ConcreteClass Capability',
+        'Reference to ConcreteClass Entity',
+        'Reference to ConcreteClass File',
+        'Reference to ConcreteClass Multi_language_property',
+        'Reference to ConcreteClass Operation',
+        'Reference to ConcreteClass Property',
+        'Reference to ConcreteClass Range',
+        'Reference to ConcreteClass Reference_element',
+        'Reference to ConcreteClass Submodel_element_list',
+        'Reference to ConcreteClass Submodel_element_struct'],
       properties=[
         Property(
           name='data_specifications',
@@ -2801,7 +3033,8 @@ SymbolTable(
         name='Relationship_element',
         inheritances=[
           'Reference to Interface Submodel_element'],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Annotated_relationship_element'],
         properties=[
           Property(
             name='data_specifications',
@@ -2939,7 +3172,8 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Annotated_relationship_element'],
       properties=[
         Property(
           name='data_specifications',
@@ -3867,7 +4101,13 @@ SymbolTable(
         name='Data_element',
         inheritances=[
           'Reference to Interface Submodel_element'],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Blob',
+          'Reference to ConcreteClass File',
+          'Reference to ConcreteClass Multi_language_property',
+          'Reference to ConcreteClass Property',
+          'Reference to ConcreteClass Range',
+          'Reference to ConcreteClass Reference_element'],
         properties=[
           Property(
             name='data_specifications',
@@ -3985,7 +4225,13 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Blob',
+        'Reference to ConcreteClass File',
+        'Reference to ConcreteClass Multi_language_property',
+        'Reference to ConcreteClass Property',
+        'Reference to ConcreteClass Range',
+        'Reference to ConcreteClass Reference_element'],
       properties=[
         Property(
           name='data_specifications',
@@ -6755,7 +7001,8 @@ SymbolTable(
         name='Event',
         inheritances=[
           'Reference to Interface Submodel_element'],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Basic_Event'],
         properties=[
           Property(
             name='data_specifications',
@@ -6873,7 +7120,8 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Basic_Event'],
       properties=[
         Property(
           name='data_specifications',
@@ -8537,7 +8785,9 @@ SymbolTable(
         base='Reference to AbstractClass Reference',
         name='Reference',
         inheritances=[],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Global_reference',
+          'Reference to ConcreteClass Model_reference'],
         properties=[],
         signatures=[],
         description=Description(
@@ -8547,7 +8797,9 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Global_reference',
+        'Reference to ConcreteClass Model_reference'],
       properties=[],
       methods=[],
       constructor=Constructor(
@@ -9774,7 +10026,9 @@ SymbolTable(
         base='Reference to AbstractClass Data_specification_content',
         name='Data_specification_content',
         inheritances=[],
-        implementers=[],
+        implementers=[
+          'Reference to ConcreteClass Data_specification_IEC61360',
+          'Reference to ConcreteClass Data_specification_physical_unit'],
         properties=[],
         signatures=[],
         description=Description(
@@ -9784,7 +10038,9 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
-      concrete_descendants=[],
+      concrete_descendants=[
+        'Reference to ConcreteClass Data_specification_IEC61360',
+        'Reference to ConcreteClass Data_specification_physical_unit'],
       properties=[],
       methods=[],
       constructor=Constructor(
