@@ -341,16 +341,27 @@ class Invariant:
     description: Final[Optional[str]]
 
     #: Understood body of the invariant
-    body: Final[parse_tree.Node]
+    body: Final[parse_tree.Expression]
+
+    #: The original symbol where this invariant is specified.
+    #: We stack all the invariants over the ancestors, so using ``specified_for``
+    #: you can distinguish between inherited invariants and genuine invariants of
+    #: a class or a constrained primitive.
+    specified_for: Final[Union["ConstrainedPrimitive", "Class"]]
 
     #: Relation to the parse stage
     parsed: Final[parse.Invariant]
 
     def __init__(
-        self, description: Optional[str], body: parse_tree.Node, parsed: parse.Invariant
+        self,
+        description: Optional[str],
+        body: parse_tree.Expression,
+        specified_for: Union["ConstrainedPrimitive", "Class"],
+        parsed: parse.Invariant,
     ) -> None:
         self.description = description
         self.body = body
+        self.specified_for = specified_for
         self.parsed = parsed
 
 

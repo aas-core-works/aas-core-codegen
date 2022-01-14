@@ -223,6 +223,11 @@ def _stringify_invariant(
         properties=[
             stringify.Property("description", that.description),
             stringify.Property("body", parse_tree.dump(that.body)),
+            stringify.Property(
+                "specified_for",
+                f"Reference to {that.specified_for.__class__.__name__} "
+                f"{that.specified_for.name}",
+            ),
             stringify.PropertyEllipsis("parsed", that.parsed),
         ],
     )
