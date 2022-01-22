@@ -1,5 +1,7 @@
 # Our own ignores
 /deleteme/
+/venv/
+/venv39/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
