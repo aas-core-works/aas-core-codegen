@@ -19,14 +19,14 @@ class TestDescription(unittest.TestCase):
         symbol_table, error = tests.common.translate_source_to_intermediate(
             source=source
         )
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
         some_class = symbol_table.must_find(Identifier("Some_class"))
         assert some_class.description is not None
 
         code, error = csharp_description.generate_comment(some_class.description)
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
 
         assert code is not None
 

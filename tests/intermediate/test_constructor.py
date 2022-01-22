@@ -66,7 +66,7 @@ class Test_empty_ok(unittest.TestCase):
         )
 
         constructor_table, error = understand_constructor_table(source=source)
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
         assert constructor_table is not None
 
         self.assertEqual(2, len(constructor_table.entries()))
@@ -96,7 +96,7 @@ class Test_empty_ok(unittest.TestCase):
         )
 
         constructor_table, error = understand_constructor_table(source=source)
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
         assert constructor_table is not None
 
         self.assertEqual(2, len(constructor_table.entries()))
@@ -131,7 +131,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
         )
 
         constructor_table, error = understand_constructor_table(source=source)
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
         assert constructor_table is not None
 
         self.assertEqual(3, len(constructor_table.entries()))
@@ -169,7 +169,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
         )
 
         constructor_table, error = understand_constructor_table(source=source)
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
         assert constructor_table is not None
 
         self.assertEqual(3, len(constructor_table.entries()))
@@ -202,7 +202,7 @@ class Test_assign_property_ok(unittest.TestCase):
         )
 
         constructor_table, error = understand_constructor_table(source=source)
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
         assert constructor_table is not None
 
         _, statements = must_find_item_for(constructor_table, "Something")
