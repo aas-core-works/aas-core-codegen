@@ -152,7 +152,7 @@ Call the generator with the appropriate target:
 
     usage: aas-core-codegen [-h] --model_path MODEL_PATH --snippets_dir
                             SNIPPETS_DIR --output_dir OUTPUT_DIR --target
-                            {csharp,jsonschema}
+                            {csharp,jsonschema} [--version]
 
     Generate different implementations and schemas based on an AAS meta-model.
 
@@ -167,6 +167,7 @@ Call the generator with the appropriate target:
                             path to the generated code
       --target {csharp,jsonschema}
                             target language or schema
+      --version             show the current version and exit
 
 .. Help ends: aas-core-codegen --help
 
