@@ -3,6 +3,14 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.3 (2022-01-22)
+==================
+
+* Add support for Python 3.10 (#27)
+* Add support for Python 3.9 (#26)
+* Remove ``ExpressionWithDeclarations`` from our tree (#25)
+* Revert lost `--version` command flag (#23)
+
 0.0.2 (2022-01-15)
 ==================
 
