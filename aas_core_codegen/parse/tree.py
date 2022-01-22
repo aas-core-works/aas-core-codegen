@@ -283,54 +283,6 @@ class Or(Expression):
         visitor.visit_or(self)
 
 
-class Declaration(Statement):
-    """Represent a variable declaration with a walrus operator, ``:=``."""
-
-    def __init__(
-        self, identifier: Identifier, value: Expression, original_node: ast.AST
-    ) -> None:
-        """Initialize with the given values."""
-        Statement.__init__(self, original_node=original_node)
-        self.identifier = identifier
-        self.value = value
-
-    def transform(self, transformer: "Transformer[T]") -> T:
-        """Accept the transformer."""
-        return transformer.transform_declaration(self)
-
-    def visit(self, visitor: "Visitor") -> None:
-        """Accept the visitor."""
-        visitor.visit_declaration(self)
-
-
-class ExpressionWithDeclarations(Expression):
-    """
-    Represent a declaration of a local variable followed by the expression.
-
-    This abstract the code patterns such as ``(x := ..., len(x) > 0)[1]``, similar to,
-    *e.g.*, short ``if`` statements in Golang.
-    """
-
-    def __init__(
-        self,
-        declarations: Sequence[Declaration],
-        expression: Expression,
-        original_node: ast.AST,
-    ) -> None:
-        """Initialize with the given values."""
-        Expression.__init__(self, original_node=original_node)
-        self.declarations = declarations
-        self.expression = expression
-
-    def transform(self, transformer: "Transformer[T]") -> T:
-        """Accept the transformer."""
-        return transformer.transform_expression_with_declarations(self)
-
-    def visit(self, visitor: "Visitor") -> None:
-        """Accept the visitor."""
-        visitor.visit_expression_with_declarations(self)
-
-
 class FormattedValue(Node):
     """Represent a formatted value in a :py:class`JoinedStr`."""
 
@@ -469,19 +421,6 @@ class Visitor(DBC):
         for value in node.values:
             self.visit(value)
 
-    def visit_declaration(self, node: Declaration) -> None:
-        """Visit a variable declaration."""
-        self.visit(node.value)
-
-    def visit_expression_with_declarations(
-        self, node: ExpressionWithDeclarations
-    ) -> None:
-        """Visit an expression with variable declarations."""
-        for declaration in node.declarations:
-            self.visit(declaration)
-
-        self.visit(node.expression)
-
     def visit_formatted_value(self, node: FormattedValue) -> None:
         """Visit a formatted value in a joined string."""
         self.visit(node.value)
@@ -570,18 +509,6 @@ class Transformer(Generic[T], DBC):
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
-    def transform_declaration(self, node: Declaration) -> T:
-        """Transform a variable declaration into something."""
-        raise NotImplementedError(f"{node=}")
-
-    @abc.abstractmethod
-    def transform_expression_with_declarations(
-        self, node: ExpressionWithDeclarations
-    ) -> T:
-        """Transform an expression with variable declarations into something."""
-        raise NotImplementedError(f"{node=}")
-
-    @abc.abstractmethod
     def transform_formatted_value(self, node: FormattedValue) -> T:
         """Transform a formatted value of a joined string into something."""
         raise NotImplementedError(f"{node=}")
@@ -652,16 +579,6 @@ class RestrictedTransformer(Transformer[T], DBC):
 
     def transform_or(self, node: Or) -> T:
         """Transform a disjunction into something."""
-        raise AssertionError(f"Unexpected node: {dump(node)}")
-
-    def transform_declaration(self, node: Declaration) -> T:
-        """Transform a variable declaration into something."""
-        raise AssertionError(f"Unexpected node: {dump(node)}")
-
-    def transform_expression_with_declarations(
-        self, node: ExpressionWithDeclarations
-    ) -> T:
-        """Transform an expression with variable declarations into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
     def transform_formatted_value(self, node: FormattedValue) -> T:
@@ -792,31 +709,6 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
                 stringify.Property(
                     "values", [self.transform(value) for value in node.values]
                 ),
-                stringify.PropertyEllipsis("original_node", node.original_node),
-            ],
-        )
-
-    def transform_declaration(self, node: Declaration) -> stringify.Entity:
-        return stringify.Entity(
-            name=Declaration.__name__,
-            properties=[
-                stringify.Property("identifier", node.identifier),
-                stringify.Property("value", self.transform(node.value)),
-                stringify.PropertyEllipsis("original_node", node.original_node),
-            ],
-        )
-
-    def transform_expression_with_declarations(
-        self, node: ExpressionWithDeclarations
-    ) -> stringify.Entity:
-        return stringify.Entity(
-            name=Declaration.__name__,
-            properties=[
-                stringify.Property(
-                    "declarations",
-                    [self.transform(declaration) for declaration in node.declarations],
-                ),
-                stringify.Property("expression", self.transform(node.expression)),
                 stringify.PropertyEllipsis("original_node", node.original_node),
             ],
         )

@@ -1139,20 +1139,6 @@ class _InvariantTranspiler(
         #  add heuristic for breaking the lines
         return Stripped(" || ".join(values)), None
 
-    def transform_declaration(
-        self, node: parse_tree.Declaration
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        # BEFORE-RELEASE (mristin, 2021-12-13):
-        #  implement once we got to end-to-end with serialization
-        raise NotImplementedError()
-
-    def transform_expression_with_declarations(
-        self, node: parse_tree.ExpressionWithDeclarations
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        # BEFORE-RELEASE (mristin, 2021-12-13):
-        #  implement once we got to end-to-end with serialization
-        raise NotImplementedError()
-
     def transform_joined_str(
         self, node: parse_tree.JoinedStr
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
