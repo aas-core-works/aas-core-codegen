@@ -182,19 +182,32 @@ def main() -> int:
             "setup.py coincide."
         )
 
-    if Step.CHECK_HELP_IN_README in selects and Step.CHECK_HELP_IN_README not in skips:
-        cmd = [sys.executable, "continuous_integration/check_help_in_readme.py"]
-        if overwrite:
-            cmd.append("--overwrite")
+    # NOTE (mristin, 2022-01-22):
+    # We need to check for the Python version since ``argparse`` output changes
+    # between the versions. Hence we pin it at the moment to Python 3.8.
 
-        if not overwrite:
-            print("Checking that --help's and the readme coincide...")
+    if sys.version_info < (3, 9):
+        if (
+            Step.CHECK_HELP_IN_README in selects
+            and Step.CHECK_HELP_IN_README not in skips
+        ):
+            cmd = [sys.executable, "continuous_integration/check_help_in_readme.py"]
+            if overwrite:
+                cmd.append("--overwrite")
+
+            if not overwrite:
+                print("Checking that --help's and the readme coincide...")
+            else:
+                print("Overwriting the --help's in the readme...")
+
+            subprocess.check_call(cmd, cwd=str(repo_root))
         else:
-            print("Overwriting the --help's in the readme...")
-
-        subprocess.check_call(cmd, cwd=str(repo_root))
+            print("Skipped checking that --help's and the doc coincide.")
     else:
-        print("Skipped checking that --help's and the doc coincide.")
+        print(
+            "Skipped checking that --help's and the doc coincide "
+            "since we pin it on Python version 3.8."
+        )
 
     return 0
 

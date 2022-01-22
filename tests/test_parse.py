@@ -42,6 +42,16 @@ class Test_parsing_AST(unittest.TestCase):
 
 
 class Test_checking_imports(unittest.TestCase):
+    @staticmethod
+    def replace_column_number_with_x(errors: List[str]) -> List[str]:
+        """
+        Replace the column number with ``"X"``.
+
+        We need to remove the column number as it changes between Python versions
+        (notably, it is more precise from Python 3.10 on).
+        """
+        return [re.sub(r"column [0-9]+", "column X", error) for error in errors]
+
     def test_import_reported(self) -> None:
         source = textwrap.dedent(
             """\
@@ -55,11 +65,11 @@ class Test_checking_imports(unittest.TestCase):
         errors = parse.check_expected_imports(atok=atok)
         self.assertListEqual(
             [
-                "At line 1 and column 1: "
+                "At line 1 and column X: "
                 "Unexpected ``import ...``. "
                 "Only ``from ... import...`` statements are expected."
             ],
-            errors,
+            Test_checking_imports.replace_column_number_with_x(errors),
         )
 
     def test_from_import_as_reported(self) -> None:
@@ -72,13 +82,17 @@ class Test_checking_imports(unittest.TestCase):
         atok, error = parse.source_to_atok(source=source)
         assert atok is not None
 
+        # NOTE (mristin, 2022-01-22):
+        # We need to remove the column number as it changes between Python versions
+        # (notably, it is more precise from Python 3.10 on.)
+
         errors = parse.check_expected_imports(atok=atok)
         self.assertListEqual(
             [
-                "At line 1 and column 1: Unexpected ``from ... import ... as ...``. "
+                "At line 1 and column X: Unexpected ``from ... import ... as ...``. "
                 "Only ``from ... import...`` statements are expected."
             ],
-            errors,
+            Test_checking_imports.replace_column_number_with_x(errors),
         )
 
     def test_unexpected_name_from_module(self) -> None:
@@ -95,11 +109,11 @@ class Test_checking_imports(unittest.TestCase):
         errors = parse.check_expected_imports(atok=atok)
         self.assertListEqual(
             [
-                "At line 1 and column 1: "
+                "At line 1 and column X: "
                 "Expected to import 'List' from the module typing, "
                 "but it is imported from enum."
             ],
-            errors,
+            Test_checking_imports.replace_column_number_with_x(errors),
         )
 
     def test_unexpected_import_from_a_module(self) -> None:
@@ -115,7 +129,8 @@ class Test_checking_imports(unittest.TestCase):
 
         errors = parse.check_expected_imports(atok=atok)
         self.assertListEqual(
-            ["At line 1 and column 1: Unexpected import of a name 'Else'."], errors
+            ["At line 1 and column X: Unexpected import of a name 'Else'."],
+            Test_checking_imports.replace_column_number_with_x(errors),
         )
 
 
