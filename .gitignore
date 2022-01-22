@@ -2,6 +2,7 @@
 /deleteme/
 /venv/
 /venv39/
+/venv310/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

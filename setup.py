@@ -31,6 +31,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
     license="License :: OSI Approved :: MIT License",
     keywords="asset administration shell code generation industry 4.0 industrie i4.0",
