@@ -24,7 +24,7 @@ class Test_ontology_ok(unittest.TestCase):
             )
         )
 
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
         ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
@@ -118,7 +118,7 @@ class Test_ontology_fail(unittest.TestCase):
                 """
             )
         )
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
         ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
@@ -153,7 +153,7 @@ class Test_ontology_fail(unittest.TestCase):
                 """
             )
         )
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
         ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
@@ -186,7 +186,7 @@ class Test_ontology_fail(unittest.TestCase):
                 """
             )
         )
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
         ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
@@ -220,7 +220,7 @@ class Test_ontology_fail(unittest.TestCase):
                 """
             )
         )
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
         ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)

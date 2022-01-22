@@ -330,7 +330,7 @@ class Test_parse_type_annotation(unittest.TestCase):
         )
 
         type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
 
         self.assertEqual("int", str(type_annotation))
 
@@ -340,7 +340,7 @@ class Test_parse_type_annotation(unittest.TestCase):
         )
 
         type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
 
         self.assertEqual("Mapping[str, Optional[int]]", str(type_annotation))
 
@@ -350,7 +350,7 @@ class Test_parse_type_annotation(unittest.TestCase):
         )
 
         type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
-        assert error is None, f"{error=}"
+        assert error is None, tests.common.most_underlying_messages(error)
 
         self.assertEqual("Optional[List[Reference]]", str(type_annotation))
 
