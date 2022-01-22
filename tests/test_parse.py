@@ -1,6 +1,8 @@
 import ast
 import os
 import pathlib
+import re
+import sys
 import textwrap
 import unittest
 from typing import Optional, Tuple, List
@@ -197,6 +199,155 @@ class Test_parsing_docstring(unittest.TestCase):
         self.assertIsInstance(document.children[1], docutils.nodes.paragraph)
 
 
+class Test_unexpected_class_definitions(unittest.TestCase):
+    @staticmethod
+    def error_from_source(source: str) -> Optional[Error]:
+        """Encapsulate the observation of the error when parsing a class."""
+        atok, parse_exception = parse.source_to_atok(source=source)
+        assert parse_exception is None, f"{parse_exception=}"
+        assert atok is not None
+
+        symbol_table, error = parse.atok_to_symbol_table(atok=atok)
+        return error
+
+
+class Test_parse_type_annotation(unittest.TestCase):
+    @staticmethod
+    def parse_type_annotation_from_ann_assign(
+        source: str,
+    ) -> Tuple[ast.AST, asttokens.ASTTokens]:
+        """Encapsulate the parsing of the type annotation of a variable."""
+        atok = asttokens.ASTTokens(source, parse=True)
+
+        module = atok.tree
+        assert isinstance(module, ast.Module)
+        assert len(module.body) == 1, f"{module.body=}"
+
+        ann_assign = module.body[0]
+        assert isinstance(ann_assign, ast.AnnAssign), f"{ann_assign=}"
+
+        assert ann_assign.annotation is not None
+
+        return ann_assign.annotation, atok
+
+    def test_atomic(self) -> None:
+        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
+            "x: int"
+        )
+
+        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        assert error is None, tests.common.most_underlying_messages(error)
+
+        self.assertEqual("int", str(type_annotation))
+
+    def test_subscripted_with_a_single_value(self) -> None:
+        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
+            "x: List[int]"
+        )
+
+        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        assert error is None, tests.common.most_underlying_messages(error)
+
+        self.assertEqual("List[int]", str(type_annotation))
+
+    def test_subscripted_with_a_tuple(self) -> None:
+        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
+            "x: Mapping[str, Optional[int]]"
+        )
+
+        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        assert error is None, tests.common.most_underlying_messages(error)
+
+        self.assertEqual("Mapping[str, Optional[int]]", str(type_annotation))
+
+    def test_nested(self) -> None:
+        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
+            "x: Optional[List[Reference]]"
+        )
+
+        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        assert error is None, tests.common.most_underlying_messages(error)
+
+        self.assertEqual("Optional[List[Reference]]", str(type_annotation))
+
+
+class Test_parse_type_annotation_fail(unittest.TestCase):
+    def test_ellipsis(self) -> None:
+        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
+            "x: Mapping[str, ...]"
+        )
+
+        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        assert error is not None
+
+        self.assertEqual(
+            "Expected a string literal if the type annotation is given as a constant, "
+            "but got: Ellipsis (as <class 'ellipsis'>)",
+            error.message,
+        )
+
+    def test_non_name_type_identifier(self) -> None:
+        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
+            "x: (int if True else str)"
+        )
+
+        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        assert error is not None
+
+        # NOTE (mristin, 2022-01-22):
+        # We need to remove the type since it differs between Python 3.8 and newer
+        # versions.
+
+        self.assertEqual(
+            "Expected either atomic type annotation (as name or string literal) "
+            "or a subscripted one (as a subscript), "
+            "but got: int if True else str",
+            re.sub(r" \(as <class .*>\)$", "", error.message),
+        )
+
+    def test_unexpected_slice_in_index(self) -> None:
+        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
+            "x: Optional[str:int]"
+        )
+
+        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        assert error is not None
+
+        self.assertEqual(
+            "Expected an index to define a subscripted type annotation, "
+            "but got a slice: str:int",
+            error.message,
+        )
+
+    def test_unexpected_ext_slice_in_index(self) -> None:
+        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
+            "x: Optional[1:2, 3]"
+        )
+
+        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        assert error is not None
+
+        self.assertEqual(
+            "Expected an index to define a subscripted type annotation, "
+            "but got an extended slice: 1:2, 3",
+            error.message,
+        )
+
+    def test_unexpected_expression_in_index(self) -> None:
+        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
+            "x: Optional[str if True else int]"
+        )
+
+        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        assert error is not None
+
+        self.assertEqual(
+            "Expected a tuple, a name, a subscript or a string literal "
+            "for a subscripted type annotation, but got: str if True else int",
+            error.message,
+        )
+
+
 class Test_against_recorded(unittest.TestCase):
     # Set this variable to True if you want to re-record the test data,
     # without any checks
@@ -291,127 +442,6 @@ class Test_against_recorded(unittest.TestCase):
                         symbol_table_str,
                         f"{case_dir=}, {error=}",
                     )
-
-
-class Test_unexpected_class_definitions(unittest.TestCase):
-    @staticmethod
-    def error_from_source(source: str) -> Optional[Error]:
-        """Encapsulate the observation of the error when parsing a class."""
-        atok, parse_exception = parse.source_to_atok(source=source)
-        assert parse_exception is None, f"{parse_exception=}"
-        assert atok is not None
-
-        symbol_table, error = parse.atok_to_symbol_table(atok=atok)
-        return error
-
-
-class Test_parse_type_annotation(unittest.TestCase):
-    @staticmethod
-    def parse_type_annotation_from_ann_assign(
-        source: str,
-    ) -> Tuple[ast.AST, asttokens.ASTTokens]:
-        """Encapsulate the parsing of the type annotation of a variable."""
-        atok = asttokens.ASTTokens(source, parse=True)
-
-        module = atok.tree
-        assert isinstance(module, ast.Module)
-        assert len(module.body) == 1, f"{module.body=}"
-
-        ann_assign = module.body[0]
-        assert isinstance(ann_assign, ast.AnnAssign), f"{ann_assign=}"
-
-        assert ann_assign.annotation is not None
-
-        return ann_assign.annotation, atok
-
-    def test_atomic(self) -> None:
-        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: int"
-        )
-
-        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
-        assert error is None, tests.common.most_underlying_messages(error)
-
-        self.assertEqual("int", str(type_annotation))
-
-    def test_subscripted(self) -> None:
-        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: Mapping[str, Optional[int]]"
-        )
-
-        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
-        assert error is None, tests.common.most_underlying_messages(error)
-
-        self.assertEqual("Mapping[str, Optional[int]]", str(type_annotation))
-
-    def test_nested(self) -> None:
-        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: Optional[List[Reference]]"
-        )
-
-        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
-        assert error is None, tests.common.most_underlying_messages(error)
-
-        self.assertEqual("Optional[List[Reference]]", str(type_annotation))
-
-
-class Test_parse_type_annotation_fail(unittest.TestCase):
-    def test_ellipsis(self) -> None:
-        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: Mapping[str, ...]"
-        )
-
-        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
-        assert error is not None
-
-        self.assertEqual(
-            "Expected a string literal if the type annotation is given as a constant, "
-            "but got: Ellipsis (as <class 'ellipsis'>)",
-            error.message,
-        )
-
-    def test_non_name_type_identifier(self) -> None:
-        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: (int if True else str)"
-        )
-
-        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
-        assert error is not None
-
-        self.assertEqual(
-            "Expected either atomic type annotation (as name or string literal) "
-            "or a subscripted one (as a subscript), "
-            "but got: int if True else str (as <class '_ast.IfExp'>)",
-            error.message,
-        )
-
-    def test_unexpected_slice_in_index(self) -> None:
-        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: Optional[str:int]"
-        )
-
-        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
-        assert error is not None
-
-        self.assertEqual(
-            "Expected an index to define a subscripted type annotation, "
-            "but got: str:int",
-            error.message,
-        )
-
-    def test_unexpected_expression_in_index(self) -> None:
-        anno, atok = Test_parse_type_annotation.parse_type_annotation_from_ann_assign(
-            "x: Optional[str if True else int]"
-        )
-
-        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
-        assert error is not None
-
-        self.assertEqual(
-            "Expected a tuple, a name, a subscript or a string literal "
-            "for a subscripted type annotation, but got: str if True else int",
-            error.message,
-        )
 
 
 if __name__ == "__main__":

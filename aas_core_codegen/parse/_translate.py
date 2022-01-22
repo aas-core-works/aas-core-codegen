@@ -4,6 +4,7 @@ import collections
 import enum
 import io
 import itertools
+import sys
 import textwrap
 from typing import List, Any, Optional, cast, Type, Tuple, Union, Mapping, Set
 
@@ -399,23 +400,69 @@ def _type_annotation(
                 ),
             )
 
-        if isinstance(node.slice, ast.Index):
-            subscripts = []  # type: List[TypeAnnotation]
+        # NOTE (mristin, 2022-01-22):
+        # There were breaking changes between Python 3.8 and 3.9 in ``ast`` module.
+        # Relevant to this particular piece of parsing logic is the deprecation of
+        # ``ast.Index`` and ``ast.ExtSlice`` which is replaced with their actual value
+        # and ``ast.Tuple``, respectively.
+        #
+        # Hence we need to switch on Python version and get the underlying slice value
+        # explicitly.
+        #
+        # See deprecation notes just at the end of:
+        # https://docs.python.org/3/library/ast.html#ast.AST
 
-            if isinstance(node.slice.value, ast.Tuple):
-                for elt in node.slice.value.elts:
-                    subscript_annotation, error = _type_annotation(node=elt, atok=atok)
-                    if error is not None:
-                        return None, error
+        if isinstance(node.slice, ast.Slice):
+            return (
+                None,
+                Error(
+                    node.slice,
+                    f"Expected an index to define a subscripted type annotation, "
+                    f"but got a slice: {atok.get_text(node.slice)}",
+                ),
+            )
 
-                    assert subscript_annotation is not None
+        # noinspection PyUnresolvedReferences
+        if (sys.version_info < (3, 9) and isinstance(node.slice, ast.ExtSlice)) or (
+            sys.version_info >= (3, 9)
+            and isinstance(node.slice, ast.Tuple)
+            and any(isinstance(elt, ast.Slice) for elt in node.slice.elts)
+        ):
+            return (
+                None,
+                Error(
+                    node.slice,
+                    f"Expected an index to define a subscripted type annotation, "
+                    f"but got an extended slice: {atok.get_text(node.slice)}",
+                ),
+            )
 
-                    subscripts.append(subscript_annotation)
-
-            elif isinstance(node.slice.value, (ast.Name, ast.Subscript, ast.Constant)):
-                subscript_annotation, error = _type_annotation(
-                    node=node.slice.value, atok=atok
+        # NOTE (mristin, 2022-01-22):
+        # Please see the note about the deprecation of ``ast.Index`` above.
+        index_node = None  # type: Optional[ast.AST]
+        if sys.version_info < (3, 9):
+            # noinspection PyUnresolvedReferences
+            if isinstance(node.slice, ast.Index):
+                index_node = node.slice.value
+            else:
+                return (
+                    None,
+                    Error(
+                        node.slice,
+                        f"Expected an index to define a subscripted type annotation, "
+                        f"but got: {atok.get_text(node.slice)}",
+                    ),
                 )
+        else:
+            index_node = node.slice
+
+        assert index_node is not None
+
+        subscripts = []  # type: List[TypeAnnotation]
+
+        if isinstance(index_node, ast.Tuple):
+            for elt in index_node.elts:
+                subscript_annotation, error = _type_annotation(node=elt, atok=atok)
                 if error is not None:
                     return None, error
 
@@ -423,36 +470,35 @@ def _type_annotation(
 
                 subscripts.append(subscript_annotation)
 
-            else:
-                return (
-                    None,
-                    Error(
-                        node.slice.value,
-                        f"Expected a tuple, a name, a subscript or a string literal "
-                        f"for a subscripted type annotation, "
-                        f"but got: {atok.get_text(node.slice.value)}",
-                    ),
-                )
+        elif isinstance(index_node, (ast.Name, ast.Subscript, ast.Constant)):
+            subscript_annotation, error = _type_annotation(node=index_node, atok=atok)
+            if error is not None:
+                return None, error
 
-            return (
-                SubscriptedTypeAnnotation(
-                    identifier=Identifier(node.value.id),
-                    subscripts=subscripts,
-                    node=node,
-                ),
-                None,
-            )
+            assert subscript_annotation is not None
+
+            subscripts.append(subscript_annotation)
 
         else:
             return (
                 None,
                 Error(
-                    node.slice,
-                    f"Expected an index to define "
-                    f"a subscripted type annotation, "
-                    f"but got: {atok.get_text(node.slice)}",
+                    index_node,
+                    f"Expected a tuple, a name, a subscript or a string literal "
+                    f"for a subscripted type annotation, "
+                    f"but got: {atok.get_text(index_node)}",
                 ),
             )
+
+        return (
+            SubscriptedTypeAnnotation(
+                identifier=Identifier(node.value.id),
+                subscripts=subscripts,
+                node=node,
+            ),
+            None,
+        )
+
     else:
         return (
             None,
