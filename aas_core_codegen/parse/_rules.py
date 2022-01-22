@@ -273,71 +273,6 @@ class _ParseAndOrOr(_Parse):
             raise AssertionError(f"Unexpected: {node.op=}")
 
 
-class _ParseExpressionWithDeclaration(_Parse):
-    def matches(self, node: ast.AST) -> bool:
-        return (
-            isinstance(node, ast.Subscript)
-            and isinstance(node.value, ast.Tuple)
-            and len(node.value.elts) == 2
-            and isinstance(node.value.elts[0], ast.NamedExpr)
-            and isinstance(node.slice, ast.Index)
-            and isinstance(node.slice.value, ast.Constant)
-            and node.slice.value.value == 1
-        )
-
-    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
-        assert (
-            isinstance(node, ast.Subscript)
-            and isinstance(node.value, ast.Tuple)
-            and len(node.value.elts) == 2
-            and isinstance(node.value.elts[0], ast.NamedExpr)
-            and isinstance(node.slice, ast.Index)
-            and isinstance(node.slice.value, ast.Constant)
-            and node.slice.value.value == 1
-        )
-
-        declaration, error = ast_node_to_our_node(node.value.elts[0])
-        if error is not None:
-            return None, error
-
-        assert isinstance(declaration, tree.Declaration), f"{declaration=}"
-
-        expression, error = ast_node_to_our_node(node.value.elts[1])
-        if error is not None:
-            return None, error
-
-        assert isinstance(expression, tree.Expression), f"{expression=}"
-
-        return (
-            tree.ExpressionWithDeclarations(
-                declarations=[declaration], expression=expression, original_node=node
-            ),
-            None,
-        )
-
-
-class _ParseDeclaration(_Parse):
-    def matches(self, node: ast.AST) -> bool:
-        return isinstance(node, ast.NamedExpr) and isinstance(node.target, ast.Name)
-
-    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
-        assert isinstance(node, ast.NamedExpr) and isinstance(node.target, ast.Name)
-
-        value, error = ast_node_to_our_node(node.value)
-        if error is not None:
-            return None, error
-
-        assert value is not None
-        assert isinstance(value, tree.Expression), f"{value=}"
-
-        return (
-            tree.Declaration(
-                identifier=Identifier(node.target.id), value=value, original_node=node
-            ),
-            None,
-        )
-
-
 class _ParseExpression(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.Expr)
@@ -470,8 +405,6 @@ _CHAIN_OF_RULES = [
     _ParseName(),
     _ParseIsNoneOrIsNotNone(),
     _ParseAndOrOr(),
-    _ParseExpressionWithDeclaration(),
-    _ParseDeclaration(),
     _ParseExpression(),
     _ParseJoinedStr(),
     _ParseAssignment(),
