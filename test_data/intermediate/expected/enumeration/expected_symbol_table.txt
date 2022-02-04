@@ -5,7 +5,7 @@ SymbolTable(
       literals=[
         EnumerationLiteral(
           name='some_literal',
-          value='SomeLiteral',
+          value='Some-Literal',
           description=Description(
             document=...,
             node=...),

@@ -1,7 +1,7 @@
 class Some_enum(Enum):
     """Enumerate something."""
 
-    some_literal = "SomeLiteral"
+    some_literal = "Some-Literal"
     """Represent something."""
 
 

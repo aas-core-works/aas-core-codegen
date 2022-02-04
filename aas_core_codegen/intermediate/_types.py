@@ -719,7 +719,7 @@ class EnumerationLiteral:
     def __init__(
         self,
         name: Identifier,
-        value: Identifier,
+        value: str,
         description: Optional[Description],
         parsed: parse.EnumerationLiteral,
     ) -> None:

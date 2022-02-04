@@ -332,7 +332,7 @@ def _enum_to_symbol(
             enumeration_literals.append(
                 EnumerationLiteral(
                     name=literal_name,
-                    value=Identifier(literal_value),
+                    value=literal_value,
                     description=literal_description,
                     node=assign,
                 )
