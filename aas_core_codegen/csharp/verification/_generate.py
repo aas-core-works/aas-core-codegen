@@ -9,7 +9,6 @@ from typing import (
     Union,
     Final,
     Set,
-    MutableMapping,
     Mapping,
 )
 
@@ -684,9 +683,7 @@ class _InvariantTranspiler(
         type_map: Mapping[
             parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
         ],
-        environment: Mapping[
-            Identifier, intermediate_type_inference.TypeAnnotationUnion
-        ],
+        environment: intermediate_type_inference.Environment,
     ) -> None:
         """Initialize with the given values."""
         self.type_map = type_map
@@ -713,6 +710,7 @@ class _InvariantTranspiler(
         ):
             member_type = member_type.value
 
+        # noinspection PyUnusedLocal
         member_name = None  # type: Optional[str]
 
         if isinstance(
@@ -736,6 +734,17 @@ class _InvariantTranspiler(
                     f"in the class {instance_type.symbol.name!r}",
                 )
 
+        elif isinstance(
+            instance_type, intermediate_type_inference.EnumerationAsTypeTypeAnnotation
+        ):
+            if node.name in instance_type.enumeration.literals_by_name:
+                member_name = csharp_naming.enum_literal_name(node.name)
+            else:
+                return None, Error(
+                    node.original_node,
+                    f"The property {node.name!r} has not been defined "
+                    f"in the class {instance_type.enumeration.name!r}",
+                )
         else:
             return None, Error(
                 node.original_node,
@@ -1192,7 +1201,7 @@ assert all(
 def _transpile_invariant(
     invariant: intermediate.Invariant,
     symbol_table: intermediate.SymbolTable,
-    environment: Mapping[Identifier, intermediate_type_inference.TypeAnnotationUnion],
+    environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Translate the invariant from the meta-model into C# code."""
     # NOTE (mristin, 2021-10-24):
@@ -1215,10 +1224,10 @@ def _transpile_invariant(
             type_inferrer.errors,
         )
 
-    transformer = _InvariantTranspiler(
+    transpiler = _InvariantTranspiler(
         type_map=type_inferrer.type_map, environment=environment
     )
-    expr, error = transformer.transform(invariant.parsed.body)
+    expr, error = transpiler.transform(invariant.parsed.body)
     if error is not None:
         return None, error
 
@@ -1280,35 +1289,20 @@ def _transpile_invariant(
 def _generate_implementation_verify(
     something: Union[intermediate.ConcreteClass, intermediate.ConstrainedPrimitive],
     symbol_table: intermediate.SymbolTable,
+    base_environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verify function in the ``Implementation`` class."""
     errors = []  # type: List[Error]
     blocks = []  # type: List[Stripped]
 
-    # Build up the environment;
-    # see https://craftinginterpreters.com/resolving-and-binding.html
-    environment: MutableMapping[
-        Identifier, intermediate_type_inference.TypeAnnotationUnion
-    ] = {
-        Identifier("len"): intermediate_type_inference.BuiltinFunctionTypeAnnotation(
-            func=intermediate_type_inference.BuiltinFunction(
-                name=Identifier("len"),
-                returns=intermediate_type_inference.PrimitiveTypeAnnotation(
-                    intermediate_type_inference.PrimitiveType.LENGTH
-                ),
-            )
-        )
-    }
+    environment = intermediate_type_inference.MutableEnvironment(
+        parent=base_environment
+    )
 
-    for verification in symbol_table.verification_functions:
-        assert verification.name not in environment
-        environment[
-            verification.name
-        ] = intermediate_type_inference.VerificationTypeAnnotation(func=verification)
-
-    assert "self" not in environment
-    environment[Identifier("self")] = intermediate_type_inference.OurTypeAnnotation(
-        symbol=something
+    assert environment.find(Identifier("self")) is None
+    environment.set(
+        identifier=Identifier("self"),
+        type_annotation=intermediate_type_inference.OurTypeAnnotation(symbol=something),
     )
 
     for invariant in something.invariants:
@@ -1400,6 +1394,7 @@ def _generate_implementation_verify(
 def _generate_implementation_class(
     symbol_table: intermediate.SymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
+    base_environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate a private static class, ``Implementation``, with verification logic."""
     errors = []  # type: List[Error]
@@ -1413,7 +1408,9 @@ def _generate_implementation_class(
 
         elif isinstance(symbol, intermediate.ConstrainedPrimitive):
             implementation_verify, error = _generate_implementation_verify(
-                something=symbol, symbol_table=symbol_table
+                something=symbol,
+                symbol_table=symbol_table,
+                base_environment=base_environment,
             )
             if error is not None:
                 errors.append(error)
@@ -1448,7 +1445,9 @@ def _generate_implementation_class(
                 blocks.append(spec_impls[verify_key])
             else:
                 implementation_verify, error = _generate_implementation_verify(
-                    something=symbol, symbol_table=symbol_table
+                    something=symbol,
+                    symbol_table=symbol_table,
+                    base_environment=base_environment,
                 )
                 if error is not None:
                     errors.append(error)
@@ -2020,8 +2019,14 @@ def generate(
         else:
             assert_never(verification)
 
+    base_environment = intermediate_type_inference.populate_base_environment(
+        symbol_table=symbol_table
+    )
+
     implementation_class, implementation_class_errors = _generate_implementation_class(
-        symbol_table=symbol_table, spec_impls=spec_impls
+        symbol_table=symbol_table,
+        spec_impls=spec_impls,
+        base_environment=base_environment,
     )
     if implementation_class_errors:
         errors.extend(implementation_class_errors)

@@ -786,6 +786,12 @@ class Enumeration:
 
         self.literal_id_set = frozenset(id(literal) for literal in literals)
 
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
 
 class ConstrainedPrimitive:
     """Represent a primitive type constrained by one or more invariants."""
