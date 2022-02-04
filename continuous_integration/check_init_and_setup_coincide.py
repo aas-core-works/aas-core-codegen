@@ -88,7 +88,7 @@ def main() -> int:
 
     classifiers = (
         subprocess.check_output(
-            [sys.executable, str(setup_py_pth), f"--classifiers"], encoding="utf-8"
+            [sys.executable, str(setup_py_pth), "--classifiers"], encoding="utf-8"
         )
         .strip()
         .splitlines()
@@ -102,8 +102,8 @@ def main() -> int:
 
     if status_classifier is None:
         print(
-            f"Expected a status classifier in setup.py "
-            f"(e.g., 'Development Status :: 3 - Alpha'), but found none.",
+            "Expected a status classifier in setup.py "
+            "(e.g., 'Development Status :: 3 - Alpha'), but found none.",
             file=sys.stderr,
         )
         success = False

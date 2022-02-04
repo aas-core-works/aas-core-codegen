@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring
+
 import textwrap
 import unittest.mock
 
@@ -38,10 +40,10 @@ class TestDescription(unittest.TestCase):
                 '''\
                 class Some_class:
                     """"""  # Intentionally left empty
-                
+
                 class Reference:
                     pass
-                    
+
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
                 associate_ref_with(Reference)
@@ -57,10 +59,10 @@ class TestDescription(unittest.TestCase):
                 '''\
                 class Some_class:
                     """Do & drink something."""
-                
+
                 class Reference:
                     pass
-                    
+
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
                 associate_ref_with(Reference)
@@ -84,10 +86,10 @@ class TestDescription(unittest.TestCase):
                 '''\
                 class Some_class:
                     """Do & drink :class:`.Some_class`."""
-                    
+
                 class Reference:
                     pass
-                    
+
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
                 associate_ref_with(Reference)
@@ -112,10 +114,10 @@ class TestDescription(unittest.TestCase):
                 @abstract
                 class Some_class:
                     """Do & drink :class:`.Some_class`."""
-                    
+
                 class Reference:
                     pass
-                    
+
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
                 associate_ref_with(Reference)
@@ -139,10 +141,10 @@ class TestDescription(unittest.TestCase):
                 '''\
                 class Some_class(Enum):
                     """Do & drink :class:`.Some_class`."""
-                    
+
                 class Reference:
                     pass
-                    
+
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
                 associate_ref_with(Reference)
@@ -172,10 +174,10 @@ class TestDescription(unittest.TestCase):
 
                     Second & remark.
                     """
-                    
+
                 class Reference:
                     pass
-                    
+
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
                 associate_ref_with(Reference)
@@ -216,10 +218,10 @@ class TestDescription(unittest.TestCase):
                         text
                     :returns: some result
                     """
-                    
+
                 class Reference:
                     pass
-                    
+
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
                 associate_ref_with(Reference)

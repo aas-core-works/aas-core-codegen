@@ -1,8 +1,12 @@
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-class-docstring
+# pylint: disable=missing-function-docstring
+# pylint: disable=no-self-use
+
 import ast
 import os
 import pathlib
 import re
-import sys
 import textwrap
 import unittest
 from typing import Optional, Tuple, List
@@ -35,7 +39,7 @@ class Test_parsing_AST(unittest.TestCase):
             """
         )
 
-        atok, error = parse.source_to_atok(source=source)
+        _, error = parse.source_to_atok(source=source)
         assert error is not None
         assert isinstance(error, SyntaxError)
         self.assertEqual(1, error.lineno)
@@ -60,6 +64,7 @@ class Test_checking_imports(unittest.TestCase):
         )
 
         atok, error = parse.source_to_atok(source=source)
+        assert error is None, f"{error=}"
         assert atok is not None
 
         errors = parse.check_expected_imports(atok=atok)
@@ -80,6 +85,7 @@ class Test_checking_imports(unittest.TestCase):
         )
 
         atok, error = parse.source_to_atok(source=source)
+        assert error is None, f"{error=}"
         assert atok is not None
 
         # NOTE (mristin, 2022-01-22):
@@ -155,10 +161,10 @@ class Test_parsing_docstring(unittest.TestCase):
             '''\
             class Some_class:
                 """"""
-                
+
             class Reference:
                 pass
-                
+
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             associate_ref_with(Reference)
@@ -174,10 +180,10 @@ class Test_parsing_docstring(unittest.TestCase):
             '''\
             class Some_class:
                 """This is some documentation."""
-                
+
             class Reference:
                 pass
-                
+
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             associate_ref_with(Reference)
@@ -198,10 +204,10 @@ class Test_parsing_docstring(unittest.TestCase):
 
                 Another paragraph.
                 """
-            
+
             class Reference:
                 pass
-                
+
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             associate_ref_with(Reference)
@@ -222,7 +228,7 @@ class Test_unexpected_class_definitions(unittest.TestCase):
         assert parse_exception is None, f"{parse_exception=}"
         assert atok is not None
 
-        symbol_table, error = parse.atok_to_symbol_table(atok=atok)
+        _, error = parse.atok_to_symbol_table(atok=atok)
         return error
 
 
@@ -292,7 +298,7 @@ class Test_parse_type_annotation_fail(unittest.TestCase):
             "x: Mapping[str, ...]"
         )
 
-        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        _, error = parse._translate._type_annotation(node=anno, atok=atok)
         assert error is not None
 
         self.assertEqual(
@@ -306,7 +312,7 @@ class Test_parse_type_annotation_fail(unittest.TestCase):
             "x: (int if True else str)"
         )
 
-        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        _, error = parse._translate._type_annotation(node=anno, atok=atok)
         assert error is not None
 
         # NOTE (mristin, 2022-01-22):
@@ -325,7 +331,7 @@ class Test_parse_type_annotation_fail(unittest.TestCase):
             "x: Optional[str:int]"
         )
 
-        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        _, error = parse._translate._type_annotation(node=anno, atok=atok)
         assert error is not None
 
         self.assertEqual(
@@ -339,7 +345,7 @@ class Test_parse_type_annotation_fail(unittest.TestCase):
             "x: Optional[1:2, 3]"
         )
 
-        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        _, error = parse._translate._type_annotation(node=anno, atok=atok)
         assert error is not None
 
         self.assertEqual(
@@ -353,7 +359,7 @@ class Test_parse_type_annotation_fail(unittest.TestCase):
             "x: Optional[str if True else int]"
         )
 
-        type_annotation, error = parse._translate._type_annotation(node=anno, atok=atok)
+        _, error = parse._translate._type_annotation(node=anno, atok=atok)
         assert error is not None
 
         self.assertEqual(

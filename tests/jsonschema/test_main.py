@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring
+
 import contextlib
 import io
 import os
@@ -11,7 +13,7 @@ import aas_core_codegen.main
 class Test_against_recorded(unittest.TestCase):
     # Set this variable to True if you want to re-record the test data,
     # without any checks
-    RERECORD = True  # TODO: undo
+    RERECORD = False
 
     def test_cases(self) -> None:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
@@ -39,7 +41,9 @@ class Test_against_recorded(unittest.TestCase):
                         expected_output_dir.exists() and expected_output_dir.is_dir()
                     ), expected_output_dir
 
-                    tmp_dir = tempfile.TemporaryDirectory()
+                    tmp_dir = (
+                        tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+                    )
                     exit_stack.push(tmp_dir)
                     output_dir = pathlib.Path(tmp_dir.name)
 

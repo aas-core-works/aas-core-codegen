@@ -1,9 +1,12 @@
+# pylint: disable=missing-docstring
+
 import textwrap
 import unittest
 
-import aas_core_codegen.intermediate._hierarchy as _hierarchy
-import tests.common
+from aas_core_codegen.intermediate import _hierarchy as intermediate_hierarchy
 from aas_core_codegen.common import Identifier
+
+import tests.common
 
 
 class Test_ontology_ok(unittest.TestCase):
@@ -13,10 +16,10 @@ class Test_ontology_ok(unittest.TestCase):
                 """\
                 class Something:
                     pass
-                    
+
                 class Reference:
                     pass
-                
+
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
                 associate_ref_with(Reference)
@@ -27,7 +30,9 @@ class Test_ontology_ok(unittest.TestCase):
         assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
-        ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
+        ontology, errors = intermediate_hierarchy.map_symbol_table_to_ontology(
+            symbol_table
+        )
         assert errors is None, f"{errors=}"
         assert ontology is not None
 
@@ -60,10 +65,10 @@ class Test_ontology_ok(unittest.TestCase):
 
                 class Something(Parent, Another_parent):
                     pass
-                    
+
                 class Reference:
                     pass
-                
+
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
                 associate_ref_with(Reference)
@@ -71,9 +76,12 @@ class Test_ontology_ok(unittest.TestCase):
             )
         )
 
+        assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
-        ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
+        ontology, errors = intermediate_hierarchy.map_symbol_table_to_ontology(
+            symbol_table
+        )
         assert errors is None, f"{errors=}"
         assert ontology is not None
 
@@ -108,10 +116,10 @@ class Test_ontology_fail(unittest.TestCase):
                 @abstract
                 class Something(Abstract):
                     x: int
-                    
+
                 class Reference:
                     pass
-                
+
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
                 associate_ref_with(Reference)
@@ -121,7 +129,7 @@ class Test_ontology_fail(unittest.TestCase):
         assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
-        ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
+        _, errors = intermediate_hierarchy.map_symbol_table_to_ontology(symbol_table)
         assert errors is not None and len(errors) == 1
 
         self.assertEqual(
@@ -143,10 +151,10 @@ class Test_ontology_fail(unittest.TestCase):
                 class Something(Abstract):
                     def do_something(self) -> None:
                         pass
-                        
+
                 class Reference:
                     pass
-                
+
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
                 associate_ref_with(Reference)
@@ -156,7 +164,7 @@ class Test_ontology_fail(unittest.TestCase):
         assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
-        ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
+        _, errors = intermediate_hierarchy.map_symbol_table_to_ontology(symbol_table)
         assert errors is not None and len(errors) == 1
 
         self.assertEqual(
@@ -176,10 +184,10 @@ class Test_ontology_fail(unittest.TestCase):
 
                 class Something(Abstract):
                     pass
-                    
+
                 class Reference:
                     pass
-                
+
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
                 associate_ref_with(Reference)
@@ -189,7 +197,7 @@ class Test_ontology_fail(unittest.TestCase):
         assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
-        ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
+        _, errors = intermediate_hierarchy.map_symbol_table_to_ontology(symbol_table)
         assert errors is not None and len(errors) == 1
 
         self.assertEqual(
@@ -210,10 +218,10 @@ class Test_ontology_fail(unittest.TestCase):
                 @abstract
                 class Something(Cycle):
                     pass
-                    
+
                 class Reference:
                     pass
-                
+
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
                 associate_ref_with(Reference)
@@ -223,7 +231,7 @@ class Test_ontology_fail(unittest.TestCase):
         assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
-        ontology, errors = _hierarchy.map_symbol_table_to_ontology(symbol_table)
+        _, errors = intermediate_hierarchy.map_symbol_table_to_ontology(symbol_table)
         assert errors is not None and len(errors) == 1
 
         self.assertEqual(

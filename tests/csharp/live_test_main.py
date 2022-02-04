@@ -17,13 +17,13 @@ import aas_core_codegen.main
 def main() -> int:
     """Execute the main routine."""
     print("Running dotnet --version to check that dotnet is available...")
-    run = subprocess.run(
+    exit_code = subprocess.call(
         ["dotnet", "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
     )
-    if run.returncode != 0:
+    if exit_code != 0:
         print(
             f"Failed to execute ``dotnet --version`` "
-            f"with the exit code {run.returncode}. Is dotnet installed?",
+            f"with the exit code {exit_code}. Is dotnet installed?",
             file=sys.stderr,
         )
         return 1
@@ -87,11 +87,11 @@ def main() -> int:
                         <Platforms>AnyCPU</Platforms>
                         <LangVersion>8</LangVersion>
                     </PropertyGroup>
-                    
+
                     <ItemGroup>
-                        <!-- 
-                            You can exclude this dependency if you are compiling 
-                            for net5.0 or netcore3.1. 
+                        <!--
+                            You can exclude this dependency if you are compiling
+                            for net5.0 or netcore3.1.
                         -->
                         <PackageReference Include="System.Text.Json" Version="5.*" />
                     </ItemGroup>
@@ -102,10 +102,14 @@ def main() -> int:
             )
 
             print("Calling dotnet build...")
-            run = subprocess.run(["dotnet", "build", "."], cwd=str(output_dir))
-            assert (
-                run.returncode == 0
-            ), f"Expected the build to succeed, but got exit code: {run.returncode}"
+            exit_code = subprocess.call(["dotnet", "build", "."], cwd=str(output_dir))
+            if exit_code != 0:
+                print(
+                    f"ERROR: Expected the build to succeed, "
+                    f"but got exit code: {exit_code}",
+                    file=sys.stderr,
+                )
+                return 1
 
     return 0
 
