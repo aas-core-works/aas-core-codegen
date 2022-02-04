@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring
+
 import textwrap
 import unittest
 from typing import Tuple, Optional, MutableMapping, List
@@ -257,9 +259,9 @@ class Test_expected(unittest.TestCase):
                 pass
 
 
-            @invariant(lambda self: len(self) > 5) 
+            @invariant(lambda self: len(self) > 5)
             class Something(Parent):
-                pass 
+                pass
 
 
             class Reference:
@@ -298,7 +300,7 @@ class Test_unexpected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @invariant(lambda self: len(self) > 10)
-            @invariant(lambda self: len(self) < 3) 
+            @invariant(lambda self: len(self) < 3)
             class Something(str):
                 pass
 
@@ -325,7 +327,7 @@ class Test_unexpected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @invariant(lambda self: len(self) > 10)
-            @invariant(lambda self: len(self) == 3) 
+            @invariant(lambda self: len(self) == 3)
             class Something(str):
                 pass
 
@@ -352,7 +354,7 @@ class Test_unexpected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @invariant(lambda self: len(self) < 10)
-            @invariant(lambda self: len(self) == 30) 
+            @invariant(lambda self: len(self) == 30)
             class Something(str):
                 pass
 

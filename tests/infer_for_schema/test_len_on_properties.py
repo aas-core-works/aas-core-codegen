@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring
+
 import textwrap
 import unittest
 from typing import Tuple, Optional, MutableMapping, List
@@ -61,7 +63,7 @@ class Test_expected(unittest.TestCase):
     def test_min_value_constant_left(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: 10 < len(self.some_property)) 
+            @invariant(lambda self: 10 < len(self.some_property))
             class Something:
                 some_property: str
 
@@ -102,7 +104,7 @@ class Test_expected(unittest.TestCase):
     def test_min_value_constant_right(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self.some_property) > 10) 
+            @invariant(lambda self: len(self.some_property) > 10)
             class Something:
                 some_property: str
 
@@ -143,7 +145,7 @@ class Test_expected(unittest.TestCase):
     def test_max_value_constant_right(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self.some_property) < 10) 
+            @invariant(lambda self: len(self.some_property) < 10)
             class Something:
                 some_property: str
 
@@ -184,7 +186,7 @@ class Test_expected(unittest.TestCase):
     def test_max_value_constant_left(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: 10 > len(self.some_property)) 
+            @invariant(lambda self: 10 > len(self.some_property))
             class Something:
                 some_property: str
 
@@ -225,7 +227,7 @@ class Test_expected(unittest.TestCase):
     def test_exact_value_constant_left(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: 10 == len(self.some_property)) 
+            @invariant(lambda self: 10 == len(self.some_property))
             class Something:
                 some_property: str
 
@@ -266,7 +268,7 @@ class Test_expected(unittest.TestCase):
     def test_exact_value_constant_right(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self.some_property) == 10) 
+            @invariant(lambda self: len(self.some_property) == 10)
             class Something:
                 some_property: str
 
@@ -308,10 +310,10 @@ class Test_expected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @invariant(
-                lambda self: 
+                lambda self:
                 not (self.some_property is not None)
                 or len(self.some_property) == 10
-            ) 
+            )
             class Something:
                 some_property: Optional[str]
 
@@ -359,14 +361,14 @@ class Test_expected(unittest.TestCase):
                 def __init__(self, some_property: str) -> None:
                     self.some_property = some_property
 
-                
-            @invariant(lambda self: len(self.some_property) > 5) 
+
+            @invariant(lambda self: len(self.some_property) > 5)
             class Something(Parent):
                 def __init__(self, some_property: str) -> None:
                     Parent.__init__(
                         self,
                         some_property=some_property
-                    ) 
+                    )
 
 
             class Reference:
@@ -410,7 +412,7 @@ class Test_unexpected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @invariant(lambda self: len(self.some_property) > 10)
-            @invariant(lambda self: len(self.some_property) < 3) 
+            @invariant(lambda self: len(self.some_property) < 3)
             class Something:
                 some_property: str
 
@@ -440,7 +442,7 @@ class Test_unexpected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @invariant(lambda self: len(self.some_property) > 10)
-            @invariant(lambda self: len(self.some_property) == 3) 
+            @invariant(lambda self: len(self.some_property) == 3)
             class Something:
                 some_property: str
 
@@ -470,7 +472,7 @@ class Test_unexpected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @invariant(lambda self: len(self.some_property) < 10)
-            @invariant(lambda self: len(self.some_property) == 30) 
+            @invariant(lambda self: len(self.some_property) == 30)
             class Something:
                 some_property: str
 

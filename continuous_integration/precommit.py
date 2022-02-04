@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """Run pre-commit checks on the repository."""
 import argparse
 import enum
@@ -9,8 +10,12 @@ import subprocess
 import sys
 from typing import Optional, Mapping, Sequence
 
+# pylint: disable=unnecessary-comprehension
+
 
 class Step(enum.Enum):
+    """Enumerate different pre-commit steps."""
+
     REFORMAT = "reformat"
     MYPY = "mypy"
     PYLINT = "pylint"
@@ -123,7 +128,7 @@ def main() -> int:
 
         exit_code = call_and_report(
             verb="mypy",
-            cmd=["mypy", "--strict", f"--config-file", str(config_file)] + mypy_targets,
+            cmd=["mypy", "--strict", "--config-file", str(config_file)] + mypy_targets,
             cwd=repo_root,
         )
         if exit_code != 0:
@@ -133,7 +138,7 @@ def main() -> int:
 
     if Step.PYLINT in selects and Step.PYLINT not in skips:
         print("Pylint'ing...")
-        pylint_targets = ["aas_core_codegen"]
+        pylint_targets = ["aas_core_codegen", "tests", "continuous_integration"]
         rcfile = pathlib.Path("continuous_integration") / "pylint.rc"
 
         exit_code = call_and_report(

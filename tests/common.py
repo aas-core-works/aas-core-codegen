@@ -1,17 +1,14 @@
 """Provide common functionality across different tests."""
-import os
-import pathlib
 from typing import List, Tuple, Optional, Union, Sequence
 
 import asttokens
 from icontract import ensure
 
 from aas_core_codegen import parse, intermediate
-from aas_core_codegen.intermediate import (
-    construction as intermediate_construction,
-    _hierarchy as intermediate_hierarchy,
-)
 from aas_core_codegen.common import Error
+
+
+# pylint: disable=missing-function-docstring
 
 
 def most_underlying_messages(error_or_errors: Union[Error, Sequence[Error]]) -> str:
@@ -69,7 +66,7 @@ def parse_source(source: str) -> Tuple[Optional[parse.SymbolTable], Optional[Err
     """Parse the given source text into a symbol table."""
     atok, parse_exception = parse.source_to_atok(source=source)
     if parse_exception:
-        raise parse_exception
+        raise parse_exception  # pylint: disable=raising-bad-type
 
     assert atok is not None
 
@@ -82,7 +79,7 @@ def translate_source_to_intermediate(
 ) -> Tuple[Optional[intermediate.SymbolTable], Optional[Error]]:
     atok, parse_exception = parse.source_to_atok(source=source)
     if parse_exception:
-        raise parse_exception
+        raise parse_exception  # pylint: disable=raising-bad-type
 
     assert atok is not None
 

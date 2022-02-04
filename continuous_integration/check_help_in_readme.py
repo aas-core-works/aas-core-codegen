@@ -95,15 +95,15 @@ def capture_output_lines(command: str) -> List[str]:
         ) from exception
 
     assert proc is not None
+    with proc:
+        output, err = proc.communicate()
+        if err:
+            raise RuntimeError(
+                f"The command {command!r} failed with exit code {proc.returncode} and "
+                f"stderr:\n{err}"
+            )
 
-    output, err = proc.communicate()
-    if err:
-        raise RuntimeError(
-            f"The command {command!r} failed with exit code {proc.returncode} and "
-            f"stderr:\n{err}"
-        )
-
-    return output.splitlines()
+        return output.splitlines()
 
 
 def output_lines_to_code_block(output_lines: List[str]) -> List[str]:

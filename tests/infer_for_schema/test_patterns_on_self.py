@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring
+
 import textwrap
 import unittest
 from typing import MutableMapping, List

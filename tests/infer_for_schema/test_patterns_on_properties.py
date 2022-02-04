@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring
+
 import textwrap
 import unittest
 from typing import MutableMapping, List
@@ -61,7 +63,7 @@ class Test_expected(unittest.TestCase):
                 prefix = "something"
                 return match(f"{prefix}-[a-zA-Z]+", text) is not None
 
-            
+
             @invariant(lambda self: is_something(self.some_property))
             class Something:
                 some_property: str
@@ -157,13 +159,13 @@ class Test_expected(unittest.TestCase):
                 return match("something-[a-zA-Z]+", text) is not None
 
             @invariant(
-                lambda self: 
-                not (self.some_property is not None) 
+                lambda self:
+                not (self.some_property is not None)
                 or  is_something(self.some_property)
             )
             class Something:
                 some_property: Optional[str]
-            
+
                 def __init__(self, some_property: Optional[str] = None) -> None:
                     self.some_property = some_property
 

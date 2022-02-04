@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring
+
 import unittest
 
 import aas_core_codegen.csharp.common as csharp_common

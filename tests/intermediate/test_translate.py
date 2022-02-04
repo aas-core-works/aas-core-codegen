@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring
+
 import os
 import pathlib
 import textwrap
@@ -17,28 +19,28 @@ class Test_in_lining_of_constructor_statements(unittest.TestCase):
             @abstract
             class VeryAbstract:
                 some_property: int
-            
+
                 @require(lambda some_property: some_property > 0)
                 def __init__(self, some_property: int) -> None:
                     self.some_property = some_property
-            
-            
+
+
             @abstract
             class Abstract(VeryAbstract):
                 another_property: int
-            
+
                 @require(lambda another_property: another_property > 0)
                 def __init__(self, some_property: int, another_property: int) -> None:
                     VeryAbstract.__init__(self, some_property)
                     self.another_property = another_property
-                    
+
             class Concrete(Abstract):
                 yet_another_property: int
-            
+
                 @require(lambda yet_another_property: yet_another_property > 0)
                 def __init__(
-                        self, 
-                        some_property: int, 
+                        self,
+                        some_property: int,
                         another_property: int,
                         yet_another_property: int
                 ) -> None:
@@ -48,7 +50,7 @@ class Test_in_lining_of_constructor_statements(unittest.TestCase):
 
             class Reference:
                 pass
-                
+
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             associate_ref_with(Reference)
@@ -81,10 +83,10 @@ class Test_parsing_docstrings(unittest.TestCase):
 
                  * Nested reference :class:`.Some_class`
                  """
-            
+
             class Reference:
                 pass
-                
+
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             associate_ref_with(Reference)
@@ -116,7 +118,7 @@ class Test_parsing_docstrings(unittest.TestCase):
 class Test_against_recorded(unittest.TestCase):
     # Set this variable to True if you want to re-record the test data,
     # without any checks
-    RERECORD = True  # TODO: undo
+    RERECORD = False
 
     def test_cases(self) -> None:
         this_dir = pathlib.Path(os.path.realpath(__file__)).parent
