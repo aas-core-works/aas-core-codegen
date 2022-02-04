@@ -20,6 +20,7 @@ from aas_core_codegen.common import (
     assert_union_of_descendants_exhaustive,
 )
 from aas_core_codegen.intermediate import _types
+from aas_core_codegen.intermediate._types import Enumeration
 from aas_core_codegen.parse import tree as parse_tree
 
 
@@ -184,6 +185,26 @@ class RefTypeAnnotation(SubscriptedTypeAnnotation):
         return f"Ref[{self.value}]"
 
 
+class EnumerationAsTypeTypeAnnotation(TypeAnnotation):
+    """
+    Represent an enum class as a type.
+
+    Note that this is not the enum as a type of that enum class, but
+    rather the type-as-a-type. We write``Type[T]`` in Python to describe this.
+    """
+
+    # NOTE (mristin, 2022-02-04):
+    # The name of this class is admittedly clumsy. Please feel free to change if you
+    # come up with a better idea.
+
+    def __init__(self, enumeration: Enumeration) -> None:
+        """Initialize with the given values."""
+        self.enumeration = enumeration
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}[{self.enumeration}]"
+
+
 def _type_annotations_equal(
     that: "TypeAnnotationUnion", other: "TypeAnnotationUnion"
 ) -> bool:
@@ -235,6 +256,12 @@ def _type_annotations_equal(
             return False
         else:
             return _type_annotations_equal(that.value, other.value)
+
+    elif isinstance(that, EnumerationAsTypeTypeAnnotation):
+        if not isinstance(other, EnumerationAsTypeTypeAnnotation):
+            return False
+        else:
+            return that.enumeration is other.enumeration
 
     else:
         assert_never(that)
@@ -365,6 +392,15 @@ def _assignable(
                 target_type=target_type.value, value_type=value_type.value
             )
 
+    elif isinstance(target_type, EnumerationAsTypeTypeAnnotation):
+        raise NotImplementedError(
+            "(mristin, 2022-02-04): Assigning enumeration-as-type to another "
+            "enumeration-as-type is a very niche program logic. As we do not have "
+            "a concrete example of such an assignment, we currently ignore this case "
+            "in determining whether the assignment makes sense. When you have "
+            "a concrete example, please revisit this part of the code."
+        )
+
     else:
         assert_never(target_type)
 
@@ -418,6 +454,86 @@ def _type_annotation_to_inferred_type_annotation(
     raise AssertionError("Should not have gotten here")
 
 
+class Environment(DBC):
+    """
+    Map names to type annotations for a given scope.
+
+    We first search in the given scope and then iterate over the ancestor scopes.
+    See, for example: https://craftinginterpreters.com/resolving-and-binding.html.
+
+    The most outer, global, scope is parentless.
+    """
+
+    @property
+    @abc.abstractmethod
+    def mapping(self) -> Mapping[Identifier, "TypeAnnotationUnion"]:
+        """Retrieve the underlying mapping."""
+        raise NotImplementedError()
+
+    def __init__(self, parent: Optional["Environment"]) -> None:
+        """Initialize with the given values."""
+        self.parent = parent
+
+    def find(self, identifier: Identifier) -> Optional["TypeAnnotationUnion"]:
+        """
+        Search for the type annotation of the given ``identifier``.
+
+        We search all the way to the most outer scope.
+        """
+        type_anno = self.mapping.get(identifier, None)
+        if type_anno is not None:
+            return type_anno
+
+        if self.parent is not None:
+            return self.parent.find(identifier)
+
+        return None
+
+
+class ImmutableEnvironment(Environment):
+    """
+    Map immutably names to type annotations for a given scope.
+    """
+
+    @property
+    def mapping(self) -> Mapping[Identifier, "TypeAnnotationUnion"]:
+        """Retrieve the underlying mapping."""
+        return self._mapping
+
+    def __init__(
+        self,
+        mapping: Mapping[Identifier, "TypeAnnotationUnion"],
+        parent: Optional["Environment"] = None,
+    ) -> None:
+        self._mapping = mapping
+
+        Environment.__init__(self, parent)
+
+
+class MutableEnvironment(Environment):
+    """
+    Map names to type annotations for a given scope and allow mutations.
+    """
+
+    @property
+    def mapping(self) -> Mapping[Identifier, "TypeAnnotationUnion"]:
+        """Retrieve the underlying mapping."""
+        return self._mapping
+
+    def __init__(self, parent: Optional["Environment"] = None) -> None:
+        self._mapping = (
+            dict()
+        )  # type: MutableMapping[Identifier, "TypeAnnotationUnion"]
+
+        Environment.__init__(self, parent)
+
+    def set(
+        self, identifier: Identifier, type_annotation: "TypeAnnotationUnion"
+    ) -> None:
+        """Set the ``type_annotation`` for the given ``identifier``."""
+        self._mapping[identifier] = type_annotation
+
+
 class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]):
     """Infer the types of the given parse tree."""
 
@@ -430,12 +546,14 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
     def __init__(
         self,
         symbol_table: _types.SymbolTable,
-        environment: Mapping[Identifier, "TypeAnnotationUnion"],
+        environment: "Environment",
     ) -> None:
         """Initialize with the given values."""
-        self._symbol_table = symbol_table
+        # We need to create our own child environment so that we can introduce new
+        # entries without affecting the variables from the outer scopes.
+        self._environment = MutableEnvironment(parent=environment)
 
-        self._environment = dict(environment.items())
+        self._symbol_table = symbol_table
 
         self.type_map = dict()
         self.errors = []
@@ -452,40 +570,58 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         if instance_type is None:
             return None
 
-        if not (
-            isinstance(instance_type, OurTypeAnnotation)
-            and isinstance(instance_type.symbol, _types.Class)
+        if isinstance(instance_type, OurTypeAnnotation) and isinstance(
+            instance_type.symbol, _types.Class
         ):
+            cls = instance_type.symbol
+            assert isinstance(cls, _types.Class)
+
+            prop = cls.properties_by_name.get(node.name, None)
+            if prop is not None:
+                result = _type_annotation_to_inferred_type_annotation(
+                    prop.type_annotation
+                )
+                self.type_map[node] = result
+                return result
+
+            method = cls.methods_by_name.get(node.name, None)
+            if method is not None:
+                result = MethodTypeAnnotation(method=method)
+                self.type_map[node] = result
+                return result
+
             self.errors.append(
                 Error(
                     node.original_node,
-                    f"Expected an instance to be of type class, "
-                    f"but got: {instance_type}",
+                    f"The member {node.name!r} could not be found "
+                    f"in the class {cls.name!r}",
+                )
+            )
+
+        elif isinstance(instance_type, EnumerationAsTypeTypeAnnotation):
+            enumeration = instance_type.enumeration
+            literal = enumeration.literals_by_name.get(node.name, None)
+            if literal is not None:
+                result = OurTypeAnnotation(symbol=enumeration)
+                self.type_map[node] = result
+                return result
+
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    f"The literal {node.name!r} could not be found "
+                    f"in the enumeration {enumeration.name!r}",
+                )
+            )
+        else:
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    f"Expected an instance type to be either an enumeration-as-type or "
+                    f"a class, but got: {instance_type}",
                 )
             )
             return None
-
-        cls = instance_type.symbol
-        assert isinstance(cls, _types.Class)
-
-        prop = cls.properties_by_name.get(node.name, None)
-        if prop is not None:
-            result = _type_annotation_to_inferred_type_annotation(prop.type_annotation)
-            self.type_map[node] = result
-            return result
-
-        method = cls.methods_by_name.get(node.name, None)
-        if method is not None:
-            result = MethodTypeAnnotation(method=method)
-            self.type_map[node] = result
-            return result
-
-        self.errors.append(
-            Error(
-                node.original_node,
-                f"The member {node.name!r} could not be found in the class {cls.name!r}",
-            )
-        )
 
         return None
 
@@ -602,6 +738,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
                     ListTypeAnnotation,
                     OptionalTypeAnnotation,
                     RefTypeAnnotation,
+                    EnumerationAsTypeTypeAnnotation,
                 ),
             ):
                 self.errors.append(
@@ -686,7 +823,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         return result
 
     def transform_name(self, node: parse_tree.Name) -> Optional["TypeAnnotationUnion"]:
-        type_in_env = self._environment.get(node.identifier, None)
+        type_in_env = self._environment.find(node.identifier)
         if type_in_env is None:
             self.errors.append(
                 Error(
@@ -774,7 +911,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         target_type = None  # type: Optional[TypeAnnotationUnion]
 
         if isinstance(node.target, parse_tree.Name):
-            target_type = self._environment.get(node.target.identifier, None)
+            target_type = self._environment.find(node.target.identifier)
             if target_type is None:
                 is_new_variable = True
         else:
@@ -800,7 +937,10 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
 
         if is_new_variable:
             assert isinstance(node.target, parse_tree.Name)
-            self._environment[node.target.identifier] = value_type
+
+            self._environment.set(
+                identifier=node.target.identifier, type_annotation=value_type
+            )
 
         result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
         self.type_map[node] = result
@@ -822,6 +962,34 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         return result
 
 
+def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
+    """Create a basic mapping name 🠒 type annotation from the global scope.
+
+    The global scope, in this context, refers to the level of symbol table.
+    """
+    # Build up the environment;
+    # see https://craftinginterpreters.com/resolving-and-binding.html
+    mapping: MutableMapping[Identifier, "TypeAnnotationUnion"] = {
+        Identifier("len"): BuiltinFunctionTypeAnnotation(
+            func=BuiltinFunction(
+                name=Identifier("len"),
+                returns=PrimitiveTypeAnnotation(PrimitiveType.LENGTH),
+            )
+        )
+    }
+
+    for verification in symbol_table.verification_functions:
+        assert verification.name not in mapping
+        mapping[verification.name] = VerificationTypeAnnotation(func=verification)
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, _types.Enumeration):
+            assert symbol.name not in mapping
+            mapping[symbol.name] = EnumerationAsTypeTypeAnnotation(enumeration=symbol)
+
+    return ImmutableEnvironment(mapping=mapping, parent=None)
+
+
 TypeAnnotationUnion = Union[
     PrimitiveTypeAnnotation,
     OurTypeAnnotation,
@@ -831,6 +999,7 @@ TypeAnnotationUnion = Union[
     ListTypeAnnotation,
     OptionalTypeAnnotation,
     RefTypeAnnotation,
+    EnumerationAsTypeTypeAnnotation,
 ]
 assert_union_of_descendants_exhaustive(
     union=TypeAnnotationUnion, base_class=TypeAnnotation
