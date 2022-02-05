@@ -1,7 +1,6 @@
 """Provide types of the intermediate representation."""
 import abc
 import ast
-import collections
 import enum
 import pathlib
 from typing import (
@@ -11,11 +10,8 @@ from typing import (
     TypeVar,
     Mapping,
     MutableMapping,
-    List,
-    Tuple,
     Final,
     FrozenSet,
-    OrderedDict,
     Set,
 )
 
@@ -26,7 +22,6 @@ from aas_core_codegen import parse
 from aas_core_codegen.common import (
     Identifier,
     assert_never,
-    Error,
     assert_union_of_descendants_exhaustive,
 )
 from aas_core_codegen.intermediate import construction
@@ -1632,137 +1627,6 @@ class _ConstructorArgumentOfClass:
         """Initialize with the given values."""
         self.arg = arg
         self.cls = cls
-
-
-def make_union_of_constructor_arguments(
-    interface: Interface,
-) -> Tuple[Optional[OrderedDict[Identifier, TypeAnnotationUnion]], Optional[Error]]:
-    """
-    Make a union of all the constructor arguments over all the implementing classes.
-
-    This union is necessary, for example, when you need to de-serialize an object, but
-    you are not yet sure which concrete type it has. Hence you need to be prepared to
-    de-serialize a yet-unknown *subset* of the properties of *this* union when you start
-    de-serializing an object of type ``interface``.
-    """
-    errors = []  # type: List[Error]
-
-    arg_union = (
-        collections.OrderedDict()
-    )  # type: OrderedDict[Identifier, List[_ConstructorArgumentOfClass]]
-
-    # region Collect
-
-    for cls_arg, arg in (
-        (implementer, arg)
-        for implementer in interface.implementers
-        for arg in implementer.constructor.arguments
-    ):
-        lst = arg_union.get(arg.name, None)
-        if lst is None:
-            lst = []
-            arg_union[arg.name] = lst
-
-        lst.append(_ConstructorArgumentOfClass(arg=arg, cls=cls_arg))
-
-    # endregion
-
-    # region Resolve
-
-    resolution = (
-        collections.OrderedDict()
-    )  # type: OrderedDict[Identifier, TypeAnnotationUnion]
-
-    for args_of_clses in arg_union.values():
-        # NOTE (mristin, 2021-12-19):
-        # We have to check that the arguments share the same type. We have to allow
-        # that the non-nullability constraint is strengthened since implementers can
-        # strengthen the invariants.
-
-        # This is the argument that defines the current resolved type.
-        defining_arg = None  # type: Optional[_ConstructorArgumentOfClass]
-
-        def normalize_type_annotation(
-            type_anno: TypeAnnotationUnion,
-        ) -> TypeAnnotationUnion:
-            """Normalize the type annotation by removing prefix ``Optional``'s."""
-            while isinstance(type_anno, OptionalTypeAnnotation):
-                type_anno = type_anno.value
-
-            return type_anno
-
-        for arg_of_cls in args_of_clses:
-            # Set if the resolution not possible for the current argument
-            inconsistent = False
-
-            if defining_arg is None:
-                defining_arg = arg_of_cls
-            else:
-                if type_annotations_equal(
-                    defining_arg.arg.type_annotation, arg_of_cls.arg.type_annotation
-                ):
-                    # Leave the previous argument the defining one
-                    continue
-                else:
-                    if type_annotations_equal(
-                        normalize_type_annotation(defining_arg.arg.type_annotation),
-                        normalize_type_annotation(arg_of_cls.arg.type_annotation),
-                    ):
-                        # NOTE (mristin, 2021-12-19):
-                        # The type with ``Optional`` will win the resolution so that
-                        # we allow for strengthening of invariants.
-
-                        if isinstance(
-                            defining_arg.arg.type_annotation, OptionalTypeAnnotation
-                        ):
-                            # The defining argument wins.
-                            continue
-                        elif isinstance(
-                            arg_of_cls.arg.type_annotation, OptionalTypeAnnotation
-                        ):
-                            # The current argument wins.
-                            defining_arg = arg_of_cls
-                        else:
-                            raise AssertionError(
-                                f"Unexpected case: "
-                                f"{arg_of_cls.arg.type_annotation=}, "
-                                f"{defining_arg.arg.type_annotation=}"
-                            )
-                    else:
-                        inconsistent = True
-
-            if inconsistent:
-                errors.append(
-                    Error(
-                        arg_of_cls.cls.parsed.node,
-                        f"The constructor argument {defining_arg.arg.name!r} "
-                        f"of the class {defining_arg.cls.name!r} "
-                        f"has inconsistent type ({defining_arg.arg.type_annotation}) "
-                        f"with the constructor argument {arg_of_cls.arg.name!r} "
-                        f"of the class {arg_of_cls.cls.name!r} "
-                        f"({arg_of_cls.arg.type_annotation}. "
-                        f"This is a blocker for generating efficient code for "
-                        f"JSON de-serialization of the interface {interface.name!r} "
-                        f"(which both {defining_arg.cls.name!r} and "
-                        f"{arg_of_cls.cls.name!r} implement).",
-                    )
-                )
-
-            # endregion
-
-        assert defining_arg is not None, "Expected to be set before"
-
-        resolution[defining_arg.arg.name] = defining_arg.arg.type_annotation
-
-    if len(errors) > 0:
-        return None, Error(
-            interface.parsed.node,
-            f"Failed to make a union of constructor arguments "
-            f"over all the concrete classes of the class {interface.name!r}",
-            errors,
-        )
-
-    return resolution, None
 
 
 def collect_ids_of_classes_in_properties(symbol_table: SymbolTable) -> Set[int]:

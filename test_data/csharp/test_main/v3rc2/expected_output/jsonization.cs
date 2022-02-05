@@ -40,533 +40,258 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                IReference? theFirst = null;
-                IReference? theSecond = null;
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                List<IDataElement>? theAnnotation = null;
-                IReference? theObserved = null;
-                string? theMimeType = null;
-                byte[]? theContent = null;
-                EntityType? theEntityType = null;
-                List<ISubmodelElement>? theStatements = null;
-                IReference? theGlobalAssetId = null;
-                IdentifierKeyValuePair? theSpecificAssetId = null;
-                string? theName = null;
-                DataTypeDef? theValueType = null;
-                string? theValue = null;
-                IReference? theRefersTo = null;
-                string? theKey = null;
-                IReference? theExternalSubjectId = null;
-                LangStringSet? theTranslatable = null;
-                IReference? theValueId = null;
-                List<OperationVariable>? theInputVariables = null;
-                List<OperationVariable>? theOutputVariables = null;
-                List<OperationVariable>? theInoutputVariables = null;
-                string? theType = null;
-                string? theMin = null;
-                string? theMax = null;
-                IReference? theReference = null;
-                string? theId = null;
-                List<ISubmodelElement>? theSubmodelElements = null;
-                AdministrativeInformation? theAdministration = null;
-                SubmodelElements? theSubmodelElementTypeValues = null;
-                List<ISubmodelElement>? theValues = null;
-                IReference? theSemanticIdValues = null;
-                DataTypeDef? theValueTypeValues = null;
-                List<IReference>? theContainedElements = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "AnnotatedRelationshipElement":
-                                    return new Aas.AnnotatedRelationshipElement(
-                                        theFirst ?? throw new Json.JsonException(
-                                            "Required property is missing: first"),
-                                        theSecond ?? throw new Json.JsonException(
-                                            "Required property is missing: second"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theAnnotation);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "BasicEvent":
-                                    return new Aas.BasicEvent(
-                                        theObserved ?? throw new Json.JsonException(
-                                            "Required property is missing: observed"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null BasicEvent from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Blob":
-                                    return new Aas.Blob(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theContent);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Blob from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Capability":
-                                    return new Aas.Capability(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Capability from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Entity":
-                                    return new Aas.Entity(
-                                        theEntityType ?? throw new Json.JsonException(
-                                            "Required property is missing: entityType"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theStatements,
-                                        theGlobalAssetId,
-                                        theSpecificAssetId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Entity from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Extension":
-                                    return new Aas.Extension(
-                                        theName ?? throw new Json.JsonException(
-                                            "Required property is missing: name"),
-                                        theSemanticId,
-                                        theValueType,
-                                        theValue,
-                                        theRefersTo);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Extension>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Extension from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "File":
-                                    return new Aas.File(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null File from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "IdentifierKeyValuePair":
-                                    return new Aas.IdentifierKeyValuePair(
-                                        theKey ?? throw new Json.JsonException(
-                                            "Required property is missing: key"),
-                                        theValue ?? throw new Json.JsonException(
-                                            "Required property is missing: value"),
-                                        theExternalSubjectId,
-                                        theSemanticId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.IdentifierKeyValuePair>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null IdentifierKeyValuePair from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "MultiLanguageProperty":
-                                    return new Aas.MultiLanguageProperty(
-                                        theIdShort,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theTranslatable,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null MultiLanguageProperty from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Operation":
-                                    return new Aas.Operation(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theInputVariables,
-                                        theOutputVariables,
-                                        theInoutputVariables);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Operation from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Property":
-                                    return new Aas.Property(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Property from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Qualifier":
-                                    return new Aas.Qualifier(
-                                        theType ?? throw new Json.JsonException(
-                                            "Required property is missing: type"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theValue,
-                                        theValueId,
-                                        theSemanticId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Qualifier>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Qualifier from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Range":
-                                    return new Aas.Range(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theMin,
-                                        theMax);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Range from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "ReferenceElement":
-                                    return new Aas.ReferenceElement(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theReference);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null ReferenceElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Submodel":
-                                    return new Aas.Submodel(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theSubmodelElements,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Submodel from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementList":
-                                    return new Aas.SubmodelElementList(
-                                        theSubmodelElementTypeValues ?? throw new Json.JsonException(
-                                            "Required property is missing: submodelElementTypeValues"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues,
-                                        theSemanticIdValues,
-                                        theValueTypeValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementList from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementStruct":
-                                    return new Aas.SubmodelElementStruct(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementStruct from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "View":
-                                    return new Aas.View(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theSemanticId,
-                                        theDataSpecifications,
-                                        theContainedElements);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.View>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null View from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "first":
-                                    theFirst =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "second":
-                                    theSecond =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticID":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "annotation":
-                                    theAnnotation =  (
-                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
-                                            ref reader));
-                                    break;
-                                case "observed":
-                                    theObserved =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "mimeType":
-                                    theMimeType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "content":
-                                    theContent =  (
-                                        Json.JsonSerializer.Deserialize<byte[]>(
-                                            ref reader));
-                                    break;
-                                case "entityType":
-                                    theEntityType =  (
-                                        Json.JsonSerializer.Deserialize<EntityType>(
-                                            ref reader));
-                                    break;
-                                case "statements":
-                                    theStatements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "globalAssetID":
-                                    theGlobalAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "specificAssetID":
-                                    theSpecificAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
-                                            ref reader));
-                                    break;
-                                case "name":
-                                    theName =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "valueType":
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "refersTo":
-                                    theRefersTo =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "key":
-                                    theKey =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "externalSubjectID":
-                                    theExternalSubjectId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "translatable":
-                                    theTranslatable =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "valueID":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "inputVariables":
-                                    theInputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "outputVariables":
-                                    theOutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "inoutputVariables":
-                                    theInoutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "type":
-                                    theType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "min":
-                                    theMin =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "max":
-                                    theMax =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "reference":
-                                    theReference =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "id":
-                                    theId =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "submodelElements":
-                                    theSubmodelElements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "administration":
-                                    theAdministration =  (
-                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
-                                            ref reader));
-                                    break;
-                                case "submodelElementTypeValues":
-                                    theSubmodelElementTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<SubmodelElements>(
-                                            ref reader));
-                                    break;
-                                case "values":
-                                    theValues =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "semanticIDValues":
-                                    theSemanticIdValues =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "valueTypeValues":
-                                    theValueTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "containedElements":
-                                    theContainedElements =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of IHasSemantics: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }
@@ -811,531 +536,247 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                IReference? theFirst = null;
-                IReference? theSecond = null;
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                List<IDataElement>? theAnnotation = null;
-                string? theId = null;
-                AssetInformation? theAssetInformation = null;
-                AdministrativeInformation? theAdministration = null;
-                IReference? theDerivedFrom = null;
-                List<IReference>? theSubmodels = null;
-                IReference? theObserved = null;
-                string? theMimeType = null;
-                byte[]? theContent = null;
-                List<IReference>? theIsCaseOf = null;
-                EntityType? theEntityType = null;
-                List<ISubmodelElement>? theStatements = null;
-                IReference? theGlobalAssetId = null;
-                IdentifierKeyValuePair? theSpecificAssetId = null;
-                string? theValue = null;
-                LangStringSet? theTranslatable = null;
-                IReference? theValueId = null;
-                List<OperationVariable>? theInputVariables = null;
-                List<OperationVariable>? theOutputVariables = null;
-                List<OperationVariable>? theInoutputVariables = null;
-                DataTypeDef? theValueType = null;
-                string? theMin = null;
-                string? theMax = null;
-                IReference? theReference = null;
-                List<ISubmodelElement>? theSubmodelElements = null;
-                SubmodelElements? theSubmodelElementTypeValues = null;
-                List<ISubmodelElement>? theValues = null;
-                IReference? theSemanticIdValues = null;
-                DataTypeDef? theValueTypeValues = null;
-                List<IReference>? theContainedElements = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "AnnotatedRelationshipElement":
-                                    return new Aas.AnnotatedRelationshipElement(
-                                        theFirst ?? throw new Json.JsonException(
-                                            "Required property is missing: first"),
-                                        theSecond ?? throw new Json.JsonException(
-                                            "Required property is missing: second"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theAnnotation);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "AssetAdministrationShell":
-                                    return new Aas.AssetAdministrationShell(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theAssetInformation ?? throw new Json.JsonException(
-                                            "Required property is missing: assetInformation"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theDataSpecifications,
-                                        theDerivedFrom,
-                                        theSubmodels);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AssetAdministrationShell>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null AssetAdministrationShell from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "BasicEvent":
-                                    return new Aas.BasicEvent(
-                                        theObserved ?? throw new Json.JsonException(
-                                            "Required property is missing: observed"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null BasicEvent from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Blob":
-                                    return new Aas.Blob(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theContent);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Blob from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Capability":
-                                    return new Aas.Capability(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Capability from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "ConceptDescription":
-                                    return new Aas.ConceptDescription(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theIsCaseOf,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ConceptDescription>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null ConceptDescription from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Entity":
-                                    return new Aas.Entity(
-                                        theEntityType ?? throw new Json.JsonException(
-                                            "Required property is missing: entityType"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theStatements,
-                                        theGlobalAssetId,
-                                        theSpecificAssetId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Entity from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "File":
-                                    return new Aas.File(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null File from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "MultiLanguageProperty":
-                                    return new Aas.MultiLanguageProperty(
-                                        theIdShort,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theTranslatable,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null MultiLanguageProperty from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Operation":
-                                    return new Aas.Operation(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theInputVariables,
-                                        theOutputVariables,
-                                        theInoutputVariables);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Operation from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Property":
-                                    return new Aas.Property(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Property from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Range":
-                                    return new Aas.Range(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theMin,
-                                        theMax);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Range from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "ReferenceElement":
-                                    return new Aas.ReferenceElement(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theReference);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null ReferenceElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Submodel":
-                                    return new Aas.Submodel(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theSubmodelElements,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Submodel from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementList":
-                                    return new Aas.SubmodelElementList(
-                                        theSubmodelElementTypeValues ?? throw new Json.JsonException(
-                                            "Required property is missing: submodelElementTypeValues"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues,
-                                        theSemanticIdValues,
-                                        theValueTypeValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementList from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementStruct":
-                                    return new Aas.SubmodelElementStruct(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementStruct from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "View":
-                                    return new Aas.View(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theSemanticId,
-                                        theDataSpecifications,
-                                        theContainedElements);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.View>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null View from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "first":
-                                    theFirst =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "second":
-                                    theSecond =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticID":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "annotation":
-                                    theAnnotation =  (
-                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
-                                            ref reader));
-                                    break;
-                                case "id":
-                                    theId =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "assetInformation":
-                                    theAssetInformation =  (
-                                        Json.JsonSerializer.Deserialize<AssetInformation>(
-                                            ref reader));
-                                    break;
-                                case "administration":
-                                    theAdministration =  (
-                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
-                                            ref reader));
-                                    break;
-                                case "derivedFrom":
-                                    theDerivedFrom =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "submodels":
-                                    theSubmodels =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "observed":
-                                    theObserved =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "mimeType":
-                                    theMimeType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "content":
-                                    theContent =  (
-                                        Json.JsonSerializer.Deserialize<byte[]>(
-                                            ref reader));
-                                    break;
-                                case "isCaseOf":
-                                    theIsCaseOf =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "entityType":
-                                    theEntityType =  (
-                                        Json.JsonSerializer.Deserialize<EntityType>(
-                                            ref reader));
-                                    break;
-                                case "statements":
-                                    theStatements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "globalAssetID":
-                                    theGlobalAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "specificAssetID":
-                                    theSpecificAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "translatable":
-                                    theTranslatable =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "valueID":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "inputVariables":
-                                    theInputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "outputVariables":
-                                    theOutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "inoutputVariables":
-                                    theInoutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "valueType":
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "min":
-                                    theMin =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "max":
-                                    theMax =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "reference":
-                                    theReference =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "submodelElements":
-                                    theSubmodelElements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "submodelElementTypeValues":
-                                    theSubmodelElementTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<SubmodelElements>(
-                                            ref reader));
-                                    break;
-                                case "values":
-                                    theValues =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "semanticIDValues":
-                                    theSemanticIdValues =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "valueTypeValues":
-                                    theValueTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "containedElements":
-                                    theContainedElements =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of IHasExtensions: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }
@@ -1443,531 +884,247 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                IReference? theFirst = null;
-                IReference? theSecond = null;
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                List<IDataElement>? theAnnotation = null;
-                string? theId = null;
-                AssetInformation? theAssetInformation = null;
-                AdministrativeInformation? theAdministration = null;
-                IReference? theDerivedFrom = null;
-                List<IReference>? theSubmodels = null;
-                IReference? theObserved = null;
-                string? theMimeType = null;
-                byte[]? theContent = null;
-                List<IReference>? theIsCaseOf = null;
-                EntityType? theEntityType = null;
-                List<ISubmodelElement>? theStatements = null;
-                IReference? theGlobalAssetId = null;
-                IdentifierKeyValuePair? theSpecificAssetId = null;
-                string? theValue = null;
-                LangStringSet? theTranslatable = null;
-                IReference? theValueId = null;
-                List<OperationVariable>? theInputVariables = null;
-                List<OperationVariable>? theOutputVariables = null;
-                List<OperationVariable>? theInoutputVariables = null;
-                DataTypeDef? theValueType = null;
-                string? theMin = null;
-                string? theMax = null;
-                IReference? theReference = null;
-                List<ISubmodelElement>? theSubmodelElements = null;
-                SubmodelElements? theSubmodelElementTypeValues = null;
-                List<ISubmodelElement>? theValues = null;
-                IReference? theSemanticIdValues = null;
-                DataTypeDef? theValueTypeValues = null;
-                List<IReference>? theContainedElements = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "AnnotatedRelationshipElement":
-                                    return new Aas.AnnotatedRelationshipElement(
-                                        theFirst ?? throw new Json.JsonException(
-                                            "Required property is missing: first"),
-                                        theSecond ?? throw new Json.JsonException(
-                                            "Required property is missing: second"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theAnnotation);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "AssetAdministrationShell":
-                                    return new Aas.AssetAdministrationShell(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theAssetInformation ?? throw new Json.JsonException(
-                                            "Required property is missing: assetInformation"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theDataSpecifications,
-                                        theDerivedFrom,
-                                        theSubmodels);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AssetAdministrationShell>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null AssetAdministrationShell from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "BasicEvent":
-                                    return new Aas.BasicEvent(
-                                        theObserved ?? throw new Json.JsonException(
-                                            "Required property is missing: observed"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null BasicEvent from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Blob":
-                                    return new Aas.Blob(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theContent);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Blob from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Capability":
-                                    return new Aas.Capability(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Capability from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "ConceptDescription":
-                                    return new Aas.ConceptDescription(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theIsCaseOf,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ConceptDescription>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null ConceptDescription from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Entity":
-                                    return new Aas.Entity(
-                                        theEntityType ?? throw new Json.JsonException(
-                                            "Required property is missing: entityType"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theStatements,
-                                        theGlobalAssetId,
-                                        theSpecificAssetId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Entity from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "File":
-                                    return new Aas.File(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null File from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "MultiLanguageProperty":
-                                    return new Aas.MultiLanguageProperty(
-                                        theIdShort,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theTranslatable,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null MultiLanguageProperty from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Operation":
-                                    return new Aas.Operation(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theInputVariables,
-                                        theOutputVariables,
-                                        theInoutputVariables);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Operation from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Property":
-                                    return new Aas.Property(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Property from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Range":
-                                    return new Aas.Range(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theMin,
-                                        theMax);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Range from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "ReferenceElement":
-                                    return new Aas.ReferenceElement(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theReference);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null ReferenceElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Submodel":
-                                    return new Aas.Submodel(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theSubmodelElements,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Submodel from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementList":
-                                    return new Aas.SubmodelElementList(
-                                        theSubmodelElementTypeValues ?? throw new Json.JsonException(
-                                            "Required property is missing: submodelElementTypeValues"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues,
-                                        theSemanticIdValues,
-                                        theValueTypeValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementList from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementStruct":
-                                    return new Aas.SubmodelElementStruct(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementStruct from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "View":
-                                    return new Aas.View(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theSemanticId,
-                                        theDataSpecifications,
-                                        theContainedElements);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.View>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null View from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "first":
-                                    theFirst =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "second":
-                                    theSecond =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticID":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "annotation":
-                                    theAnnotation =  (
-                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
-                                            ref reader));
-                                    break;
-                                case "id":
-                                    theId =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "assetInformation":
-                                    theAssetInformation =  (
-                                        Json.JsonSerializer.Deserialize<AssetInformation>(
-                                            ref reader));
-                                    break;
-                                case "administration":
-                                    theAdministration =  (
-                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
-                                            ref reader));
-                                    break;
-                                case "derivedFrom":
-                                    theDerivedFrom =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "submodels":
-                                    theSubmodels =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "observed":
-                                    theObserved =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "mimeType":
-                                    theMimeType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "content":
-                                    theContent =  (
-                                        Json.JsonSerializer.Deserialize<byte[]>(
-                                            ref reader));
-                                    break;
-                                case "isCaseOf":
-                                    theIsCaseOf =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "entityType":
-                                    theEntityType =  (
-                                        Json.JsonSerializer.Deserialize<EntityType>(
-                                            ref reader));
-                                    break;
-                                case "statements":
-                                    theStatements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "globalAssetID":
-                                    theGlobalAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "specificAssetID":
-                                    theSpecificAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "translatable":
-                                    theTranslatable =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "valueID":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "inputVariables":
-                                    theInputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "outputVariables":
-                                    theOutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "inoutputVariables":
-                                    theInoutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "valueType":
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "min":
-                                    theMin =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "max":
-                                    theMax =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "reference":
-                                    theReference =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "submodelElements":
-                                    theSubmodelElements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "submodelElementTypeValues":
-                                    theSubmodelElementTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<SubmodelElements>(
-                                            ref reader));
-                                    break;
-                                case "values":
-                                    theValues =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "semanticIDValues":
-                                    theSemanticIdValues =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "valueTypeValues":
-                                    theValueTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "containedElements":
-                                    theContainedElements =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of IReferable: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }
@@ -2075,184 +1232,93 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theId = null;
-                string? theIdShort = null;
-                AssetInformation? theAssetInformation = null;
-                List<Extension>? theExtensions = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                AdministrativeInformation? theAdministration = null;
-                List<IReference>? theDataSpecifications = null;
-                IReference? theDerivedFrom = null;
-                List<IReference>? theSubmodels = null;
-                List<IReference>? theIsCaseOf = null;
-                List<ISubmodelElement>? theSubmodelElements = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "AssetAdministrationShell":
-                                    return new Aas.AssetAdministrationShell(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theAssetInformation ?? throw new Json.JsonException(
-                                            "Required property is missing: assetInformation"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theDataSpecifications,
-                                        theDerivedFrom,
-                                        theSubmodels);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AssetAdministrationShell>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null AssetAdministrationShell from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "ConceptDescription":
-                                    return new Aas.ConceptDescription(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theIsCaseOf,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ConceptDescription>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null ConceptDescription from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Submodel":
-                                    return new Aas.Submodel(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theSubmodelElements,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Submodel from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "id":
-                                    theId =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "assetInformation":
-                                    theAssetInformation =  (
-                                        Json.JsonSerializer.Deserialize<AssetInformation>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "administration":
-                                    theAdministration =  (
-                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "derivedFrom":
-                                    theDerivedFrom =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "submodels":
-                                    theSubmodels =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "isCaseOf":
-                                    theIsCaseOf =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "submodelElements":
-                                    theSubmodelElements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticID":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of IIdentifiable: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }
@@ -2345,462 +1411,214 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                IReference? theFirst = null;
-                IReference? theSecond = null;
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                List<IDataElement>? theAnnotation = null;
-                IReference? theObserved = null;
-                string? theMimeType = null;
-                byte[]? theContent = null;
-                EntityType? theEntityType = null;
-                List<ISubmodelElement>? theStatements = null;
-                IReference? theGlobalAssetId = null;
-                IdentifierKeyValuePair? theSpecificAssetId = null;
-                string? theValue = null;
-                LangStringSet? theTranslatable = null;
-                IReference? theValueId = null;
-                List<OperationVariable>? theInputVariables = null;
-                List<OperationVariable>? theOutputVariables = null;
-                List<OperationVariable>? theInoutputVariables = null;
-                DataTypeDef? theValueType = null;
-                string? theMin = null;
-                string? theMax = null;
-                IReference? theReference = null;
-                string? theId = null;
-                List<ISubmodelElement>? theSubmodelElements = null;
-                AdministrativeInformation? theAdministration = null;
-                SubmodelElements? theSubmodelElementTypeValues = null;
-                List<ISubmodelElement>? theValues = null;
-                IReference? theSemanticIdValues = null;
-                DataTypeDef? theValueTypeValues = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "AnnotatedRelationshipElement":
-                                    return new Aas.AnnotatedRelationshipElement(
-                                        theFirst ?? throw new Json.JsonException(
-                                            "Required property is missing: first"),
-                                        theSecond ?? throw new Json.JsonException(
-                                            "Required property is missing: second"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theAnnotation);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "BasicEvent":
-                                    return new Aas.BasicEvent(
-                                        theObserved ?? throw new Json.JsonException(
-                                            "Required property is missing: observed"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null BasicEvent from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Blob":
-                                    return new Aas.Blob(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theContent);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Blob from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Capability":
-                                    return new Aas.Capability(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Capability from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Entity":
-                                    return new Aas.Entity(
-                                        theEntityType ?? throw new Json.JsonException(
-                                            "Required property is missing: entityType"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theStatements,
-                                        theGlobalAssetId,
-                                        theSpecificAssetId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Entity from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "File":
-                                    return new Aas.File(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null File from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "MultiLanguageProperty":
-                                    return new Aas.MultiLanguageProperty(
-                                        theIdShort,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theTranslatable,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null MultiLanguageProperty from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Operation":
-                                    return new Aas.Operation(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theInputVariables,
-                                        theOutputVariables,
-                                        theInoutputVariables);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Operation from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Property":
-                                    return new Aas.Property(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Property from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Range":
-                                    return new Aas.Range(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theMin,
-                                        theMax);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Range from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "ReferenceElement":
-                                    return new Aas.ReferenceElement(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theReference);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null ReferenceElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Submodel":
-                                    return new Aas.Submodel(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theSubmodelElements,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Submodel from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementList":
-                                    return new Aas.SubmodelElementList(
-                                        theSubmodelElementTypeValues ?? throw new Json.JsonException(
-                                            "Required property is missing: submodelElementTypeValues"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues,
-                                        theSemanticIdValues,
-                                        theValueTypeValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementList from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementStruct":
-                                    return new Aas.SubmodelElementStruct(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementStruct from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "first":
-                                    theFirst =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "second":
-                                    theSecond =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticID":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "annotation":
-                                    theAnnotation =  (
-                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
-                                            ref reader));
-                                    break;
-                                case "observed":
-                                    theObserved =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "mimeType":
-                                    theMimeType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "content":
-                                    theContent =  (
-                                        Json.JsonSerializer.Deserialize<byte[]>(
-                                            ref reader));
-                                    break;
-                                case "entityType":
-                                    theEntityType =  (
-                                        Json.JsonSerializer.Deserialize<EntityType>(
-                                            ref reader));
-                                    break;
-                                case "statements":
-                                    theStatements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "globalAssetID":
-                                    theGlobalAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "specificAssetID":
-                                    theSpecificAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "translatable":
-                                    theTranslatable =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "valueID":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "inputVariables":
-                                    theInputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "outputVariables":
-                                    theOutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "inoutputVariables":
-                                    theInoutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "valueType":
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "min":
-                                    theMin =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "max":
-                                    theMax =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "reference":
-                                    theReference =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "id":
-                                    theId =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "submodelElements":
-                                    theSubmodelElements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "administration":
-                                    theAdministration =  (
-                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
-                                            ref reader));
-                                    break;
-                                case "submodelElementTypeValues":
-                                    theSubmodelElementTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<SubmodelElements>(
-                                            ref reader));
-                                    break;
-                                case "values":
-                                    theValues =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "semanticIDValues":
-                                    theSemanticIdValues =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "valueTypeValues":
-                                    theValueTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of IHasKind: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }
@@ -2896,548 +1714,258 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theVersion = null;
-                string? theRevision = null;
-                List<IReference>? theDataSpecifications = null;
-                IReference? theFirst = null;
-                IReference? theSecond = null;
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IDataElement>? theAnnotation = null;
-                string? theId = null;
-                AssetInformation? theAssetInformation = null;
-                AdministrativeInformation? theAdministration = null;
-                IReference? theDerivedFrom = null;
-                List<IReference>? theSubmodels = null;
-                IReference? theObserved = null;
-                string? theMimeType = null;
-                byte[]? theContent = null;
-                List<IReference>? theIsCaseOf = null;
-                EntityType? theEntityType = null;
-                List<ISubmodelElement>? theStatements = null;
-                IReference? theGlobalAssetId = null;
-                IdentifierKeyValuePair? theSpecificAssetId = null;
-                string? theValue = null;
-                LangStringSet? theTranslatable = null;
-                IReference? theValueId = null;
-                List<OperationVariable>? theInputVariables = null;
-                List<OperationVariable>? theOutputVariables = null;
-                List<OperationVariable>? theInoutputVariables = null;
-                DataTypeDef? theValueType = null;
-                string? theMin = null;
-                string? theMax = null;
-                IReference? theReference = null;
-                List<ISubmodelElement>? theSubmodelElements = null;
-                SubmodelElements? theSubmodelElementTypeValues = null;
-                List<ISubmodelElement>? theValues = null;
-                IReference? theSemanticIdValues = null;
-                DataTypeDef? theValueTypeValues = null;
-                List<IReference>? theContainedElements = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "AdministrativeInformation":
-                                    return new Aas.AdministrativeInformation(
-                                        theVersion,
-                                        theRevision,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AdministrativeInformation>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null AdministrativeInformation from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "AnnotatedRelationshipElement":
-                                    return new Aas.AnnotatedRelationshipElement(
-                                        theFirst ?? throw new Json.JsonException(
-                                            "Required property is missing: first"),
-                                        theSecond ?? throw new Json.JsonException(
-                                            "Required property is missing: second"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theAnnotation);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "AssetAdministrationShell":
-                                    return new Aas.AssetAdministrationShell(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theAssetInformation ?? throw new Json.JsonException(
-                                            "Required property is missing: assetInformation"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theDataSpecifications,
-                                        theDerivedFrom,
-                                        theSubmodels);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AssetAdministrationShell>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null AssetAdministrationShell from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "BasicEvent":
-                                    return new Aas.BasicEvent(
-                                        theObserved ?? throw new Json.JsonException(
-                                            "Required property is missing: observed"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null BasicEvent from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Blob":
-                                    return new Aas.Blob(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theContent);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Blob from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Capability":
-                                    return new Aas.Capability(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Capability from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "ConceptDescription":
-                                    return new Aas.ConceptDescription(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theIsCaseOf,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ConceptDescription>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null ConceptDescription from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Entity":
-                                    return new Aas.Entity(
-                                        theEntityType ?? throw new Json.JsonException(
-                                            "Required property is missing: entityType"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theStatements,
-                                        theGlobalAssetId,
-                                        theSpecificAssetId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Entity from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "File":
-                                    return new Aas.File(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null File from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "MultiLanguageProperty":
-                                    return new Aas.MultiLanguageProperty(
-                                        theIdShort,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theTranslatable,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null MultiLanguageProperty from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Operation":
-                                    return new Aas.Operation(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theInputVariables,
-                                        theOutputVariables,
-                                        theInoutputVariables);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Operation from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Property":
-                                    return new Aas.Property(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Property from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Range":
-                                    return new Aas.Range(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theMin,
-                                        theMax);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Range from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "ReferenceElement":
-                                    return new Aas.ReferenceElement(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theReference);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null ReferenceElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Submodel":
-                                    return new Aas.Submodel(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theSubmodelElements,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Submodel from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementList":
-                                    return new Aas.SubmodelElementList(
-                                        theSubmodelElementTypeValues ?? throw new Json.JsonException(
-                                            "Required property is missing: submodelElementTypeValues"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues,
-                                        theSemanticIdValues,
-                                        theValueTypeValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementList from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementStruct":
-                                    return new Aas.SubmodelElementStruct(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementStruct from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "View":
-                                    return new Aas.View(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theSemanticId,
-                                        theDataSpecifications,
-                                        theContainedElements);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.View>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null View from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "version":
-                                    theVersion =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "revision":
-                                    theRevision =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "first":
-                                    theFirst =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "second":
-                                    theSecond =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticID":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "annotation":
-                                    theAnnotation =  (
-                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
-                                            ref reader));
-                                    break;
-                                case "id":
-                                    theId =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "assetInformation":
-                                    theAssetInformation =  (
-                                        Json.JsonSerializer.Deserialize<AssetInformation>(
-                                            ref reader));
-                                    break;
-                                case "administration":
-                                    theAdministration =  (
-                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
-                                            ref reader));
-                                    break;
-                                case "derivedFrom":
-                                    theDerivedFrom =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "submodels":
-                                    theSubmodels =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "observed":
-                                    theObserved =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "mimeType":
-                                    theMimeType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "content":
-                                    theContent =  (
-                                        Json.JsonSerializer.Deserialize<byte[]>(
-                                            ref reader));
-                                    break;
-                                case "isCaseOf":
-                                    theIsCaseOf =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "entityType":
-                                    theEntityType =  (
-                                        Json.JsonSerializer.Deserialize<EntityType>(
-                                            ref reader));
-                                    break;
-                                case "statements":
-                                    theStatements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "globalAssetID":
-                                    theGlobalAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "specificAssetID":
-                                    theSpecificAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "translatable":
-                                    theTranslatable =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "valueID":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "inputVariables":
-                                    theInputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "outputVariables":
-                                    theOutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "inoutputVariables":
-                                    theInoutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "valueType":
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "min":
-                                    theMin =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "max":
-                                    theMax =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "reference":
-                                    theReference =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "submodelElements":
-                                    theSubmodelElements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "submodelElementTypeValues":
-                                    theSubmodelElementTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<SubmodelElements>(
-                                            ref reader));
-                                    break;
-                                case "values":
-                                    theValues =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "semanticIDValues":
-                                    theSemanticIdValues =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "valueTypeValues":
-                                    theValueTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "containedElements":
-                                    theContainedElements =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of IHasDataSpecification: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }
@@ -3653,91 +2181,82 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDependsOn = null;
-                string? theType = null;
-                DataTypeDef? theValueType = null;
-                string? theValue = null;
-                IReference? theValueId = null;
-                IReference? theSemanticId = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "Formula":
-                                    return new Aas.Formula(
-                                        theDependsOn);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Formula>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Formula from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Qualifier":
-                                    return new Aas.Qualifier(
-                                        theType ?? throw new Json.JsonException(
-                                            "Required property is missing: type"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theValue,
-                                        theValueId,
-                                        theSemanticId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Qualifier>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Qualifier from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "dependsOn":
-                                    theDependsOn =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "type":
-                                    theType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "valueType":
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "valueID":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "semanticID":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of IConstraint: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }
@@ -3785,462 +2304,214 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                IReference? theFirst = null;
-                IReference? theSecond = null;
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                List<IDataElement>? theAnnotation = null;
-                IReference? theObserved = null;
-                string? theMimeType = null;
-                byte[]? theContent = null;
-                EntityType? theEntityType = null;
-                List<ISubmodelElement>? theStatements = null;
-                IReference? theGlobalAssetId = null;
-                IdentifierKeyValuePair? theSpecificAssetId = null;
-                string? theValue = null;
-                LangStringSet? theTranslatable = null;
-                IReference? theValueId = null;
-                List<OperationVariable>? theInputVariables = null;
-                List<OperationVariable>? theOutputVariables = null;
-                List<OperationVariable>? theInoutputVariables = null;
-                DataTypeDef? theValueType = null;
-                string? theMin = null;
-                string? theMax = null;
-                IReference? theReference = null;
-                string? theId = null;
-                List<ISubmodelElement>? theSubmodelElements = null;
-                AdministrativeInformation? theAdministration = null;
-                SubmodelElements? theSubmodelElementTypeValues = null;
-                List<ISubmodelElement>? theValues = null;
-                IReference? theSemanticIdValues = null;
-                DataTypeDef? theValueTypeValues = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "AnnotatedRelationshipElement":
-                                    return new Aas.AnnotatedRelationshipElement(
-                                        theFirst ?? throw new Json.JsonException(
-                                            "Required property is missing: first"),
-                                        theSecond ?? throw new Json.JsonException(
-                                            "Required property is missing: second"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theAnnotation);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "BasicEvent":
-                                    return new Aas.BasicEvent(
-                                        theObserved ?? throw new Json.JsonException(
-                                            "Required property is missing: observed"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null BasicEvent from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Blob":
-                                    return new Aas.Blob(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theContent);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Blob from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Capability":
-                                    return new Aas.Capability(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Capability from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Entity":
-                                    return new Aas.Entity(
-                                        theEntityType ?? throw new Json.JsonException(
-                                            "Required property is missing: entityType"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theStatements,
-                                        theGlobalAssetId,
-                                        theSpecificAssetId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Entity from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "File":
-                                    return new Aas.File(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null File from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "MultiLanguageProperty":
-                                    return new Aas.MultiLanguageProperty(
-                                        theIdShort,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theTranslatable,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null MultiLanguageProperty from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Operation":
-                                    return new Aas.Operation(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theInputVariables,
-                                        theOutputVariables,
-                                        theInoutputVariables);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Operation from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Property":
-                                    return new Aas.Property(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Property from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Range":
-                                    return new Aas.Range(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theMin,
-                                        theMax);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Range from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "ReferenceElement":
-                                    return new Aas.ReferenceElement(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theReference);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null ReferenceElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Submodel":
-                                    return new Aas.Submodel(
-                                        theId ?? throw new Json.JsonException(
-                                            "Required property is missing: id"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theSubmodelElements,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theAdministration,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Submodel from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementList":
-                                    return new Aas.SubmodelElementList(
-                                        theSubmodelElementTypeValues ?? throw new Json.JsonException(
-                                            "Required property is missing: submodelElementTypeValues"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues,
-                                        theSemanticIdValues,
-                                        theValueTypeValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementList from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementStruct":
-                                    return new Aas.SubmodelElementStruct(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementStruct from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "first":
-                                    theFirst =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "second":
-                                    theSecond =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticID":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "annotation":
-                                    theAnnotation =  (
-                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
-                                            ref reader));
-                                    break;
-                                case "observed":
-                                    theObserved =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "mimeType":
-                                    theMimeType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "content":
-                                    theContent =  (
-                                        Json.JsonSerializer.Deserialize<byte[]>(
-                                            ref reader));
-                                    break;
-                                case "entityType":
-                                    theEntityType =  (
-                                        Json.JsonSerializer.Deserialize<EntityType>(
-                                            ref reader));
-                                    break;
-                                case "statements":
-                                    theStatements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "globalAssetID":
-                                    theGlobalAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "specificAssetID":
-                                    theSpecificAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "translatable":
-                                    theTranslatable =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "valueID":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "inputVariables":
-                                    theInputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "outputVariables":
-                                    theOutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "inoutputVariables":
-                                    theInoutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "valueType":
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "min":
-                                    theMin =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "max":
-                                    theMax =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "reference":
-                                    theReference =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "id":
-                                    theId =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "submodelElements":
-                                    theSubmodelElements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "administration":
-                                    theAdministration =  (
-                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
-                                            ref reader));
-                                    break;
-                                case "submodelElementTypeValues":
-                                    theSubmodelElementTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<SubmodelElements>(
-                                            ref reader));
-                                    break;
-                                case "values":
-                                    theValues =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "semanticIDValues":
-                                    theSemanticIdValues =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "valueTypeValues":
-                                    theValueTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of IQualifiable: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }
@@ -5275,428 +3546,203 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                IReference? theFirst = null;
-                IReference? theSecond = null;
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                List<IDataElement>? theAnnotation = null;
-                IReference? theObserved = null;
-                string? theMimeType = null;
-                byte[]? theContent = null;
-                EntityType? theEntityType = null;
-                List<ISubmodelElement>? theStatements = null;
-                IReference? theGlobalAssetId = null;
-                IdentifierKeyValuePair? theSpecificAssetId = null;
-                string? theValue = null;
-                LangStringSet? theTranslatable = null;
-                IReference? theValueId = null;
-                List<OperationVariable>? theInputVariables = null;
-                List<OperationVariable>? theOutputVariables = null;
-                List<OperationVariable>? theInoutputVariables = null;
-                DataTypeDef? theValueType = null;
-                string? theMin = null;
-                string? theMax = null;
-                IReference? theReference = null;
-                SubmodelElements? theSubmodelElementTypeValues = null;
-                List<ISubmodelElement>? theValues = null;
-                IReference? theSemanticIdValues = null;
-                DataTypeDef? theValueTypeValues = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "AnnotatedRelationshipElement":
-                                    return new Aas.AnnotatedRelationshipElement(
-                                        theFirst ?? throw new Json.JsonException(
-                                            "Required property is missing: first"),
-                                        theSecond ?? throw new Json.JsonException(
-                                            "Required property is missing: second"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theAnnotation);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "BasicEvent":
-                                    return new Aas.BasicEvent(
-                                        theObserved ?? throw new Json.JsonException(
-                                            "Required property is missing: observed"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null BasicEvent from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Blob":
-                                    return new Aas.Blob(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theContent);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Blob from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Capability":
-                                    return new Aas.Capability(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Capability from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Entity":
-                                    return new Aas.Entity(
-                                        theEntityType ?? throw new Json.JsonException(
-                                            "Required property is missing: entityType"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theStatements,
-                                        theGlobalAssetId,
-                                        theSpecificAssetId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Entity from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "File":
-                                    return new Aas.File(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null File from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "MultiLanguageProperty":
-                                    return new Aas.MultiLanguageProperty(
-                                        theIdShort,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theTranslatable,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null MultiLanguageProperty from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Operation":
-                                    return new Aas.Operation(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theInputVariables,
-                                        theOutputVariables,
-                                        theInoutputVariables);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Operation from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Property":
-                                    return new Aas.Property(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Property from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Range":
-                                    return new Aas.Range(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theMin,
-                                        theMax);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Range from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "ReferenceElement":
-                                    return new Aas.ReferenceElement(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theReference);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null ReferenceElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementList":
-                                    return new Aas.SubmodelElementList(
-                                        theSubmodelElementTypeValues ?? throw new Json.JsonException(
-                                            "Required property is missing: submodelElementTypeValues"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues,
-                                        theSemanticIdValues,
-                                        theValueTypeValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementList from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "SubmodelElementStruct":
-                                    return new Aas.SubmodelElementStruct(
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValues);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null SubmodelElementStruct from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "first":
-                                    theFirst =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "second":
-                                    theSecond =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticID":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "annotation":
-                                    theAnnotation =  (
-                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
-                                            ref reader));
-                                    break;
-                                case "observed":
-                                    theObserved =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "mimeType":
-                                    theMimeType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "content":
-                                    theContent =  (
-                                        Json.JsonSerializer.Deserialize<byte[]>(
-                                            ref reader));
-                                    break;
-                                case "entityType":
-                                    theEntityType =  (
-                                        Json.JsonSerializer.Deserialize<EntityType>(
-                                            ref reader));
-                                    break;
-                                case "statements":
-                                    theStatements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "globalAssetID":
-                                    theGlobalAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "specificAssetID":
-                                    theSpecificAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "translatable":
-                                    theTranslatable =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "valueID":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "inputVariables":
-                                    theInputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "outputVariables":
-                                    theOutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "inoutputVariables":
-                                    theInoutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "valueType":
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "min":
-                                    theMin =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "max":
-                                    theMax =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "reference":
-                                    theReference =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "submodelElementTypeValues":
-                                    theSubmodelElementTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<SubmodelElements>(
-                                            ref reader));
-                                    break;
-                                case "values":
-                                    theValues =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "semanticIDValues":
-                                    theSemanticIdValues =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "valueTypeValues":
-                                    theValueTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of ISubmodelElement: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }
@@ -5788,131 +3834,71 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                IReference? theFirst = null;
-                IReference? theSecond = null;
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                List<IDataElement>? theAnnotation = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "AnnotatedRelationshipElement":
-                                    return new Aas.AnnotatedRelationshipElement(
-                                        theFirst ?? throw new Json.JsonException(
-                                            "Required property is missing: first"),
-                                        theSecond ?? throw new Json.JsonException(
-                                            "Required property is missing: second"),
-                                        theExtensions,
-                                        theIdShort,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theAnnotation);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "first":
-                                    theFirst =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "second":
-                                    theSecond =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticID":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "annotation":
-                                    theAnnotation =  (
-                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of IRelationshipElement: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }
@@ -6396,239 +4382,126 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theIdShort = null;
-                string? theMimeType = null;
-                List<Extension>? theExtensions = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                byte[]? theContent = null;
-                string? theValue = null;
-                LangStringSet? theTranslatable = null;
-                IReference? theValueId = null;
-                DataTypeDef? theValueType = null;
-                string? theMin = null;
-                string? theMax = null;
-                IReference? theReference = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "Blob":
-                                    return new Aas.Blob(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theContent);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Blob from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "File":
-                                    return new Aas.File(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theMimeType ?? throw new Json.JsonException(
-                                            "Required property is missing: mimeType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null File from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "MultiLanguageProperty":
-                                    return new Aas.MultiLanguageProperty(
-                                        theIdShort,
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theTranslatable,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null MultiLanguageProperty from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Property":
-                                    return new Aas.Property(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theValue,
-                                        theValueId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Property from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "Range":
-                                    return new Aas.Range(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theValueType ?? throw new Json.JsonException(
-                                            "Required property is missing: valueType"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theMin,
-                                        theMax);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null Range from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "ReferenceElement":
-                                    return new Aas.ReferenceElement(
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications,
-                                        theReference);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null ReferenceElement from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "mimeType":
-                                    theMimeType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticID":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "content":
-                                    theContent =  (
-                                        Json.JsonSerializer.Deserialize<byte[]>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "translatable":
-                                    theTranslatable =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "valueID":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "valueType":
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "min":
-                                    theMin =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "max":
-                                    theMax =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "reference":
-                                    theReference =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of IDataElement: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }
@@ -8510,117 +6383,71 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                IReference? theObserved = null;
-                string? theIdShort = null;
-                List<Extension>? theExtensions = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "BasicEvent":
-                                    return new Aas.BasicEvent(
-                                        theObserved ?? throw new Json.JsonException(
-                                            "Required property is missing: observed"),
-                                        theIdShort ?? throw new Json.JsonException(
-                                            "Required property is missing: idShort"),
-                                        theExtensions,
-                                        theDisplayName,
-                                        theCategory,
-                                        theDescription,
-                                        theKind,
-                                        theSemanticId,
-                                        theQualifiers,
-                                        theDataSpecifications);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null BasicEvent from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "observed":
-                                    theObserved =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticID":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of IEvent: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }
@@ -9717,70 +7544,82 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                List<string>? theValues = null;
-                List<Key>? theKeys = null;
-                IReference? theReferredSemanticId = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "GlobalReference":
-                                    return new Aas.GlobalReference(
-                                        theValues ?? throw new Json.JsonException(
-                                            "Required property is missing: values"));
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.GlobalReference>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null GlobalReference from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "ModelReference":
-                                    return new Aas.ModelReference(
-                                        theKeys ?? throw new Json.JsonException(
-                                            "Required property is missing: keys"),
-                                        theReferredSemanticId);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ModelReference>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null ModelReference from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "values":
-                                    theValues =  (
-                                        Json.JsonSerializer.Deserialize<List<string>>(
-                                            ref reader));
-                                    break;
-                                case "keys":
-                                    theKeys =  (
-                                        Json.JsonSerializer.Deserialize<List<Key>>(
-                                            ref reader));
-                                    break;
-                                case "referredSemanticID":
-                                    theReferredSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of IReference: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }
@@ -10529,210 +8368,82 @@ namespace AasCore.Aas3
 
                 string? modelType = null;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                LangStringSet? thePreferredName = null;
-                LangStringSet? theShortName = null;
-                string? theUnit = null;
-                IReference? theUnitId = null;
-                string? theSourceOfDefinition = null;
-                string? theSymbol = null;
-                DataTypeIec61360? theDataType = null;
-                LangStringSet? theDefinition = null;
-                string? theValueFormat = null;
-                ValueList? theValueList = null;
-                string? theValue = null;
-                IReference? theValueId = null;
-                LevelType? theLevelType = null;
-                string? theUnitName = null;
-                string? theUnitSymbol = null;
-                string? theSiNotation = null;
-                string? theDinNotation = null;
-                string? theEceName = null;
-                string? theEceCode = null;
-                string? theNistName = null;
-                string? theConversionFactor = null;
-                string? theRegistrationAuthorityId = null;
-                string? theSupplier = null;
+                // The initialization at 512 bytes is arbitrary, but plausible.
+                using var buffer = new System.IO.MemoryStream(512);
 
                 while (reader.Read())
                 {
+                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
+                    if (reader.HasValueSequence)
+                    {
+                            foreach (var item in reader.ValueSequence)
+                            {
+                                buffer.Write(item.Span);
+                            }
+                    }
+                    else
+                    {
+                        buffer.Write(reader.ValueSpan);
+                    }
+
                     switch (reader.TokenType)
                     {
                         case Json.JsonTokenType.EndObject:
+                        {
+                            var secondPassReader = new Json.Utf8JsonReader(
+                                buffer.GetBuffer(),
+                                new Json.JsonReaderOptions
+                                {
+                                    AllowTrailingCommas = options.AllowTrailingCommas,
+                                    CommentHandling = options.ReadCommentHandling,
+                                    MaxDepth = options.MaxDepth
+                                });
                             switch (modelType)
                             {
                                 case "DataSpecificationIec61360":
-                                    return new Aas.DataSpecificationIec61360(
-                                        thePreferredName,
-                                        theShortName,
-                                        theUnit,
-                                        theUnitId,
-                                        theSourceOfDefinition,
-                                        theSymbol,
-                                        theDataType,
-                                        theDefinition,
-                                        theValueFormat,
-                                        theValueList,
-                                        theValue,
-                                        theValueId,
-                                        theLevelType);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.DataSpecificationIec61360>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null DataSpecificationIec61360 from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 case "DataSpecificationPhysicalUnit":
-                                    return new Aas.DataSpecificationPhysicalUnit(
-                                        theUnitName,
-                                        theUnitSymbol,
-                                        theDefinition,
-                                        theSiNotation,
-                                        theDinNotation,
-                                        theEceName,
-                                        theEceCode,
-                                        theNistName,
-                                        theSourceOfDefinition,
-                                        theConversionFactor,
-                                        theRegistrationAuthorityId,
-                                        theSupplier);
+                                {
+                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.DataSpecificationPhysicalUnit>(
+                                        ref secondPassReader);
+                                    if (deserialized == null)
+                                    {
+                                        throw new System.InvalidOperationException(
+                                            "Unexpected null DataSpecificationPhysicalUnit from Deserialize call");
+                                    }
+                                    return deserialized;
+                                }
                                 default:
                                     throw new Json.JsonException(
                                         $"Unknown model type: {modelType}");
-
                             }  // switch on modelType
-
+                        }
                         case Json.JsonTokenType.PropertyName:
+                        {
                             string propertyName = reader.GetString()
                                 ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                                    "Unexpected null property name");
 
-                            switch (propertyName)
+                            if (propertyName == "modelType")
                             {
-                                case "preferredName":
-                                    thePreferredName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "shortName":
-                                    theShortName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "unit":
-                                    theUnit =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "unitID":
-                                    theUnitId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "sourceOfDefinition":
-                                    theSourceOfDefinition =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "symbol":
-                                    theSymbol =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "dataType":
-                                    theDataType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeIec61360>(
-                                            ref reader));
-                                    break;
-                                case "definition":
-                                    theDefinition =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "valueFormat":
-                                    theValueFormat =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "valueList":
-                                    theValueList =  (
-                                        Json.JsonSerializer.Deserialize<ValueList>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "valueID":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "levelType":
-                                    theLevelType =  (
-                                        Json.JsonSerializer.Deserialize<LevelType>(
-                                            ref reader));
-                                    break;
-                                case "unitName":
-                                    theUnitName =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "unitSymbol":
-                                    theUnitSymbol =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "siNotation":
-                                    theSiNotation =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "dinNotation":
-                                    theDinNotation =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "eceName":
-                                    theEceName =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "eceCode":
-                                    theEceCode =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "nistName":
-                                    theNistName =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "conversionFactor":
-                                    theConversionFactor =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "registrationAuthorityID":
-                                    theRegistrationAuthorityId =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "supplier":
-                                    theSupplier =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    modelType = Json.JsonSerializer.Deserialize<string>(
-                                        ref reader);
-                                    break;
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unexpected property in an implementer class " +
-                                        $"of IDataSpecificationContent: {propertyName}");
-                            }  // switch on propertyName
-                            break;
-
+                                modelType = Json.JsonSerializer.Deserialize<string>(
+                                    ref reader);
+                            }
+                                break;
+                        }
                         default:
                             throw new Json.JsonException();
                     }  // switch on token type
-                }  // while reader.Read
+                }  // while reader.Reader
 
                 throw new Json.JsonException();
             }

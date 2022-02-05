@@ -81,7 +81,7 @@ def main() -> int:
                     """\
                 <Project Sdk="Microsoft.NET.Sdk">
                     <PropertyGroup>
-                        <TargetFrameworks>net5.0;netstandard2.1;netstandard2.0</TargetFrameworks>
+                        <TargetFramework>net5.0</TargetFramework>
                         <Nullable>enable</Nullable>
                         <Configurations>Debug;Release;DebugSlow</Configurations>
                         <Platforms>AnyCPU</Platforms>
