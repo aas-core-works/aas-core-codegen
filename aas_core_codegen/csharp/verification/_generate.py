@@ -1475,7 +1475,7 @@ def _generate_implementation_class(
             /// visitors.
             /// </remarks>
             private static class Implementation
-            {{
+            {
             """
         )
     )

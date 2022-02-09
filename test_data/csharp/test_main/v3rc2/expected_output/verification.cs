@@ -146,7 +146,7 @@ namespace AasCore.Aas3
         /// visitors.
         /// </remarks>
         private static class Implementation
-        {{
+        {
             /// <summary>
             /// Hash allowed enum values for efficient validation of enums.
             /// </summary>
