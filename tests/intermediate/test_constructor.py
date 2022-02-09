@@ -58,12 +58,8 @@ class Test_empty_ok(unittest.TestCase):
             class Something:
                 pass
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -71,14 +67,10 @@ class Test_empty_ok(unittest.TestCase):
         assert error is None, tests.common.most_underlying_messages(error)
         assert constructor_table is not None
 
-        self.assertEqual(2, len(constructor_table.entries()))
+        self.assertEqual(1, len(constructor_table.entries()))
 
         cls, statements = must_find_item_for(constructor_table, "Something")
         self.assertEqual("Something", cls.name)
-        self.assertEqual(0, len(statements))
-
-        cls, statements = must_find_item_for(constructor_table, "Reference")
-        self.assertEqual("Reference", cls.name)
         self.assertEqual(0, len(statements))
 
     def test_pass(self) -> None:
@@ -88,12 +80,8 @@ class Test_empty_ok(unittest.TestCase):
                 def __init__(self) -> None:
                     pass
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -101,12 +89,9 @@ class Test_empty_ok(unittest.TestCase):
         assert error is None, tests.common.most_underlying_messages(error)
         assert constructor_table is not None
 
-        self.assertEqual(2, len(constructor_table.entries()))
+        self.assertEqual(1, len(constructor_table.entries()))
 
         _, statements = must_find_item_for(constructor_table, "Something")
-        self.assertEqual(0, len(statements))
-
-        _, statements = must_find_item_for(constructor_table, "Reference")
         self.assertEqual(0, len(statements))
 
 
@@ -123,12 +108,8 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
                 def __init__(self) -> None:
                     Parent.__init__(self)
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -136,7 +117,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
         assert error is None, tests.common.most_underlying_messages(error)
         assert constructor_table is not None
 
-        self.assertEqual(3, len(constructor_table.entries()))
+        self.assertEqual(2, len(constructor_table.entries()))
 
         _, statements = must_find_item_for(constructor_table, "Something")
         self.assertEqual(1, len(statements))
@@ -161,12 +142,8 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     Parent.__init__(self, a, b)
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -174,7 +151,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
         assert error is None, tests.common.most_underlying_messages(error)
         assert constructor_table is not None
 
-        self.assertEqual(3, len(constructor_table.entries()))
+        self.assertEqual(2, len(constructor_table.entries()))
 
         _, statements = must_find_item_for(constructor_table, "Something")
         self.assertEqual(1, len(statements))
@@ -194,12 +171,8 @@ class Test_assign_property_ok(unittest.TestCase):
                 def __init__(self, x: int) -> None:
                     self.x = x
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -226,12 +199,8 @@ class Test_assign_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     self.a = self.b = a
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -253,12 +222,8 @@ class Test_assign_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     self.a, self.b = a, b
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -281,12 +246,8 @@ class Test_assign_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     x = a
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -305,12 +266,8 @@ class Test_assign_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     self.a = a
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -331,12 +288,8 @@ class Test_assign_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     self.a = a + 100
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -362,12 +315,8 @@ class Test_assign_fail(unittest.TestCase):
                     self.a = b
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -403,12 +352,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     super().__init__(self, a, b)
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             '''
         )
 
@@ -442,12 +387,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     Parent.__init__(self, **{'a': a, 'b': b})
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             '''
         )
 
@@ -475,12 +416,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     Unrelated.__init__(self, a=a, b=b)
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -505,12 +442,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     Parent.__init__(self)
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -536,12 +469,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a + 100)
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -568,12 +497,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a=a + 100)
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -602,12 +527,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int, c: int) -> None:
                     Parent.__init__(self, a, b, c)
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -636,12 +557,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int, c: int) -> None:
                     Parent.__init__(self, a=a, b=b, c=c)
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -671,12 +588,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a, b)
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             '''
         )
 
@@ -706,12 +619,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, y: int) -> None:
                     Parent.__init__(self, a, b=y)
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -742,12 +651,8 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a)
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -770,12 +675,8 @@ class Test_unexpected_statements(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     print("something")
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -797,12 +698,8 @@ class Test_unexpected_statements(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     1 + 2
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 

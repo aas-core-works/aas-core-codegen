@@ -17,12 +17,8 @@ class Test_ontology_ok(unittest.TestCase):
                 class Something:
                     pass
 
-                class Reference:
-                    pass
-
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
-                associate_ref_with(Reference)
                 """
             )
         )
@@ -66,12 +62,8 @@ class Test_ontology_ok(unittest.TestCase):
                 class Something(Parent, Another_parent):
                     pass
 
-                class Reference:
-                    pass
-
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
-                associate_ref_with(Reference)
                 """
             )
         )
@@ -117,12 +109,8 @@ class Test_ontology_fail(unittest.TestCase):
                 class Something(Abstract):
                     x: int
 
-                class Reference:
-                    pass
-
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
-                associate_ref_with(Reference)
                 """
             )
         )
@@ -152,12 +140,8 @@ class Test_ontology_fail(unittest.TestCase):
                     def do_something(self) -> None:
                         pass
 
-                class Reference:
-                    pass
-
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
-                associate_ref_with(Reference)
                 """
             )
         )
@@ -185,12 +169,8 @@ class Test_ontology_fail(unittest.TestCase):
                 class Something(Abstract):
                     pass
 
-                class Reference:
-                    pass
-
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
-                associate_ref_with(Reference)
                 """
             )
         )
@@ -219,12 +199,8 @@ class Test_ontology_fail(unittest.TestCase):
                 class Something(Cycle):
                     pass
 
-                class Reference:
-                    pass
-
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
-                associate_ref_with(Reference)
                 """
             )
         )

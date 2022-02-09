@@ -359,11 +359,6 @@ def _stringify_unverified_symbol_table(
         properties=[
             stringify.Property("symbols", list(map(_stringify, that.symbols))),
             stringify.Property(
-                "ref_association",
-                f"Reference to {that.ref_association.__class__.__name__} "
-                f"{that.ref_association.name}",
-            ),
-            stringify.Property(
                 "verification_functions",
                 list(map(_stringify, that.verification_functions)),
             ),
@@ -379,11 +374,6 @@ def _stringify_symbol_table(that: SymbolTable) -> stringify.Entity:
         name=that.__class__.__name__,
         properties=[
             stringify.Property("symbols", list(map(_stringify, that.symbols))),
-            stringify.Property(
-                "ref_association",
-                f"Reference to {that.ref_association.__class__.__name__} "
-                f"{that.ref_association.name}",
-            ),
             stringify.Property(
                 "verification_functions",
                 list(map(_stringify, that.verification_functions)),

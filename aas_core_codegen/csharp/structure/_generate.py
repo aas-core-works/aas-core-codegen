@@ -264,14 +264,9 @@ def _generate_enum(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_interface(
-    interface: intermediate.Interface, ref_association: intermediate.ClassUnion
+    interface: intermediate.Interface,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """
-    Generate C# code for the given interface.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
+    """Generate C# code for the given interface."""
     writer = io.StringIO()
 
     if interface.description is not None:
@@ -313,7 +308,7 @@ def _generate_interface(
     for prop in interface.properties:
         if prop.specified_for is interface.base:
             prop_type = csharp_common.generate_type(
-                type_annotation=prop.type_annotation, ref_association=ref_association
+                type_annotation=prop.type_annotation
             )
             prop_name = csharp_naming.property_name(prop.name)
 
@@ -357,18 +352,14 @@ def _generate_interface(
 
         # fmt: off
         returns = (
-            csharp_common.generate_type(
-                type_annotation=signature.returns,
-                ref_association=ref_association)
+            csharp_common.generate_type(type_annotation=signature.returns)
             if signature.returns is not None else "void"
         )
         # fmt: on
 
         arg_codes = []  # type: List[Stripped]
         for arg in signature.arguments:
-            arg_type = csharp_common.generate_type(
-                type_annotation=arg.type_annotation, ref_association=ref_association
-            )
+            arg_type = csharp_common.generate_type(type_annotation=arg.type_annotation)
             arg_name = csharp_naming.argument_name(arg.name)
             arg_codes.append(Stripped(f"{arg_type} {arg_name}"))
 
@@ -413,19 +404,14 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
     #: further.
     _descendability: Final[Mapping[intermediate.TypeAnnotationUnion, bool]]
 
-    #: Symbol to be used to represent references within an AAS
-    _ref_association: Final[intermediate.ClassUnion]
-
     def __init__(
         self,
         recurse: bool,
         descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
-        ref_association: intermediate.ClassUnion,
     ) -> None:
         """Initialize with the given values."""
         self._recurse = recurse
         self._descendability = descendability
-        self._ref_association = ref_association
 
     def _unroll_primitive_type_annotation(
         self,
@@ -439,33 +425,16 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
         # We can not descend into a primitive type.
         return []
 
-    # noinspection PyUnusedLocal
-    def _unroll_our_type_or_ref_annotation(
+    def _unroll_our_type_annotation(
         self,
         unrollee_expr: str,
-        type_annotation: Union[
-            intermediate.OurTypeAnnotation, intermediate.RefTypeAnnotation
-        ],
+        type_annotation: intermediate.OurTypeAnnotation,
         path: List[str],
         item_level: int,
         key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
-        """
-        Generate the code for both our atomic type annotations and references.
-
-        We merged :py:method:`._unroll_our_type_annotation` and
-        :py:method:`._unroll_ref_type_annotation` together since they differ in only
-        which symbol is unrolled over.
-        """
-        symbol = None  # type: Optional[intermediate.Symbol]
-        if isinstance(type_annotation, intermediate.OurTypeAnnotation):
-            symbol = type_annotation.symbol
-        elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
-            symbol = self._ref_association
-        else:
-            assert_never(type_annotation)
-
-        assert symbol is not None
+        """Generate code for the given specific ``type_annotation``."""
+        symbol = type_annotation.symbol
 
         if isinstance(symbol, intermediate.Enumeration):
             return []
@@ -505,23 +474,6 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
                 )
 
         return result
-
-    def _unroll_our_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.OurTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
-    ) -> List[csharp_unrolling.Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        return self._unroll_our_type_or_ref_annotation(
-            unrollee_expr=unrollee_expr,
-            type_annotation=type_annotation,
-            path=path,
-            item_level=item_level,
-            key_value_level=key_value_level,
-        )
 
     def _unroll_list_type_annotation(
         self,
@@ -580,43 +532,19 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
             )
         ]
 
-    def _unroll_ref_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.RefTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
-    ) -> List[csharp_unrolling.Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        return self._unroll_our_type_or_ref_annotation(
-            unrollee_expr=unrollee_expr,
-            type_annotation=type_annotation,
-            path=path,
-            item_level=item_level,
-            key_value_level=key_value_level,
-        )
 
-
-def _generate_descend_body(
-    cls: intermediate.ConcreteClass,
-    recurse: bool,
-    ref_association: intermediate.ClassUnion,
-) -> Stripped:
+def _generate_descend_body(cls: intermediate.ConcreteClass, recurse: bool) -> Stripped:
     """
     Generate the body of the ``Descend`` and ``DescendOnce`` methods.
 
     With this function, we can unroll the recursion as a simple optimization
     in the recursive case.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
     """
     blocks = []  # type: List[Stripped]
 
     for prop in cls.properties:
         descendability = intermediate.map_descendability(
-            type_annotation=prop.type_annotation, ref_association=ref_association
+            type_annotation=prop.type_annotation
         )
 
         if not descendability[prop.type_annotation]:
@@ -624,11 +552,7 @@ def _generate_descend_body(
 
         # region Unroll
 
-        unroller = _DescendBodyUnroller(
-            recurse=recurse,
-            descendability=descendability,
-            ref_association=ref_association,
-        )
+        unroller = _DescendBodyUnroller(recurse=recurse, descendability=descendability)
 
         roots = unroller.unroll(
             unrollee_expr=csharp_naming.property_name(prop.name),
@@ -653,19 +577,10 @@ def _generate_descend_body(
     return Stripped("\n\n".join(blocks))
 
 
-def _generate_descend_once_method(
-    cls: intermediate.ConcreteClass, ref_association: intermediate.ClassUnion
-) -> Stripped:
-    """
-    Generate the ``DescendOnce`` method for the concrete class ``cls``.
+def _generate_descend_once_method(cls: intermediate.ConcreteClass) -> Stripped:
+    """Generate the ``DescendOnce`` method for the concrete class ``cls``."""
 
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
-
-    body = _generate_descend_body(
-        cls=cls, recurse=False, ref_association=ref_association
-    )
+    body = _generate_descend_body(cls=cls, recurse=False)
 
     indented_body = textwrap.indent(body, I)
 
@@ -682,19 +597,10 @@ public IEnumerable<IClass> DescendOnce()
     )
 
 
-def _generate_descend_method(
-    cls: intermediate.ConcreteClass, ref_association: intermediate.ClassUnion
-) -> Stripped:
-    """
-    Generate the recursive ``Descend`` method for the concrete class ``cls``.
+def _generate_descend_method(cls: intermediate.ConcreteClass) -> Stripped:
+    """Generate the recursive ``Descend`` method for the concrete class ``cls``."""
 
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
-
-    body = _generate_descend_body(
-        cls=cls, recurse=True, ref_association=ref_association
-    )
+    body = _generate_descend_body(cls=cls, recurse=True)
 
     indented_body = textwrap.indent(body, I)
 
@@ -746,23 +652,16 @@ def _generate_default_value(default: intermediate.Default) -> Stripped:
 @require(lambda cls: not cls.constructor.is_implementation_specific)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_constructor(
-    cls: intermediate.ConcreteClass, ref_association: intermediate.ClassUnion
+    cls: intermediate.ConcreteClass,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """
-    Generate the constructor function for the given concrete class ``cls``.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
+    """Generate the constructor function for the given concrete class ``cls``."""
     cls_name = csharp_naming.class_name(cls.name)
 
     blocks = []  # type: List[str]
 
     arg_codes = []  # type: List[str]
     for arg in cls.constructor.arguments:
-        arg_type = csharp_common.generate_type(
-            type_annotation=arg.type_annotation, ref_association=ref_association
-        )
+        arg_type = csharp_common.generate_type(type_annotation=arg.type_annotation)
         arg_name = csharp_naming.argument_name(arg.name)
 
         if arg.default is None:
@@ -808,9 +707,7 @@ def _generate_constructor(
                     while isinstance(type_anno, intermediate.OptionalTypeAnnotation):
                         type_anno = type_anno.value
 
-                    prop_type = csharp_common.generate_type(
-                        type_annotation=type_anno, ref_association=ref_association
-                    )
+                    prop_type = csharp_common.generate_type(type_annotation=type_anno)
 
                     arg_name = csharp_naming.argument_name(stmt.argument)
 
@@ -854,14 +751,8 @@ def _generate_constructor(
 def _generate_class(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
-    ref_association: intermediate.ClassUnion,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """
-    Generate C# code for the given concrete class ``cls``.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
+    """Generate C# code for the given concrete class ``cls``."""
     writer = io.StringIO()
 
     if cls.description is not None:
@@ -918,9 +809,7 @@ def _generate_class(
     # region Getters and setters
 
     for prop in cls.properties:
-        prop_type = csharp_common.generate_type(
-            type_annotation=prop.type_annotation, ref_association=ref_association
-        )
+        prop_type = csharp_common.generate_type(type_annotation=prop.type_annotation)
 
         prop_name = csharp_naming.property_name(prop.name)
 
@@ -979,11 +868,9 @@ def _generate_class(
                 )
             )
 
-    blocks.append(
-        _generate_descend_once_method(cls=cls, ref_association=ref_association)
-    )
+    blocks.append(_generate_descend_once_method(cls=cls))
 
-    blocks.append(_generate_descend_method(cls=cls, ref_association=ref_association))
+    blocks.append(_generate_descend_method(cls=cls))
 
     blocks.append(
         Stripped(
@@ -1071,9 +958,7 @@ def _generate_class(
         else:
             blocks.append(implementation)
     else:
-        constructor_block, error = _generate_constructor(
-            cls=cls, ref_association=ref_association
-        )
+        constructor_block, error = _generate_constructor(cls=cls)
 
         if error is not None:
             errors.append(error)
@@ -1212,17 +1097,11 @@ def generate(
                 code, error = _generate_enum(enum=something)
             elif isinstance(something, intermediate.Interface):
                 # BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
-                code, error = _generate_interface(
-                    interface=something, ref_association=symbol_table.ref_association
-                )
+                code, error = _generate_interface(interface=something)
 
             elif isinstance(something, intermediate.ConcreteClass):
                 # BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
-                code, error = _generate_class(
-                    cls=something,
-                    spec_impls=spec_impls,
-                    ref_association=symbol_table.ref_association,
-                )
+                code, error = _generate_class(cls=something, spec_impls=spec_impls)
             else:
                 assert_never(something)
 

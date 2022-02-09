@@ -9,7 +9,6 @@ PrimitiveTypeAnnotation = _types.PrimitiveTypeAnnotation
 OurTypeAnnotation = _types.OurTypeAnnotation
 ListTypeAnnotation = _types.ListTypeAnnotation
 OptionalTypeAnnotation = _types.OptionalTypeAnnotation
-RefTypeAnnotation = _types.RefTypeAnnotation
 Description = _types.Description
 Property = _types.Property
 Default = _types.Default

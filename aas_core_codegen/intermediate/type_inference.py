@@ -175,16 +175,6 @@ class OptionalTypeAnnotation(SubscriptedTypeAnnotation):
         return f"Optional[{self.value}]"
 
 
-class RefTypeAnnotation(SubscriptedTypeAnnotation):
-    """Represent a type annotation involving a reference ``Ref[...]``."""
-
-    def __init__(self, value: "TypeAnnotationUnion"):
-        self.value = value
-
-    def __str__(self) -> str:
-        return f"Ref[{self.value}]"
-
-
 class EnumerationAsTypeTypeAnnotation(TypeAnnotation):
     """
     Represent an enum class as a type.
@@ -247,12 +237,6 @@ def _type_annotations_equal(
 
     elif isinstance(that, OptionalTypeAnnotation):
         if not isinstance(other, OptionalTypeAnnotation):
-            return False
-        else:
-            return _type_annotations_equal(that.value, other.value)
-
-    elif isinstance(that, RefTypeAnnotation):
-        if not isinstance(other, RefTypeAnnotation):
             return False
         else:
             return _type_annotations_equal(that.value, other.value)
@@ -382,16 +366,6 @@ def _assignable(
                 target_type=target_type.value, value_type=value_type.value
             )
 
-    elif isinstance(target_type, RefTypeAnnotation):
-        if not isinstance(value_type, RefTypeAnnotation):
-            return False
-        else:
-            # NOTE (mristin, 2021-12-25):
-            # We assume the references to be co-variant.
-            return _assignable(
-                target_type=target_type.value, value_type=value_type.value
-            )
-
     elif isinstance(target_type, EnumerationAsTypeTypeAnnotation):
         raise NotImplementedError(
             "(mristin, 2022-02-04): Assigning enumeration-as-type to another "
@@ -440,11 +414,6 @@ def _type_annotation_to_inferred_type_annotation(
 
     elif isinstance(type_annotation, _types.OptionalTypeAnnotation):
         return OptionalTypeAnnotation(
-            value=_type_annotation_to_inferred_type_annotation(type_annotation.value)
-        )
-
-    elif isinstance(type_annotation, _types.RefTypeAnnotation):
-        return RefTypeAnnotation(
             value=_type_annotation_to_inferred_type_annotation(type_annotation.value)
         )
 
@@ -737,7 +706,6 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
                     MethodTypeAnnotation,
                     ListTypeAnnotation,
                     OptionalTypeAnnotation,
-                    RefTypeAnnotation,
                     EnumerationAsTypeTypeAnnotation,
                 ),
             ):
@@ -998,7 +966,6 @@ TypeAnnotationUnion = Union[
     MethodTypeAnnotation,
     ListTypeAnnotation,
     OptionalTypeAnnotation,
-    RefTypeAnnotation,
     EnumerationAsTypeTypeAnnotation,
 ]
 assert_union_of_descendants_exhaustive(

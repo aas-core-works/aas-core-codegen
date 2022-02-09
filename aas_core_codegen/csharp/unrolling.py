@@ -141,14 +141,6 @@ class Unroller(DBC):
                 item_level=item_level,
                 key_value_level=key_value_level,
             )
-        elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
-            return self._unroll_ref_type_annotation(
-                unrollee_expr=unrollee_expr,
-                type_annotation=type_annotation,
-                path=path,
-                item_level=item_level,
-                key_value_level=key_value_level,
-            )
         else:
             assert_never(type_annotation)
 
@@ -195,18 +187,6 @@ class Unroller(DBC):
         self,
         unrollee_expr: str,
         type_annotation: intermediate.OptionalTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
-    ) -> List[Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def _unroll_ref_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.RefTypeAnnotation,
         path: List[str],
         item_level: int,
         key_value_level: int,

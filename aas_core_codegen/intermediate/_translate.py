@@ -65,7 +65,6 @@ from aas_core_codegen.intermediate._types import (
     Description,
     DefaultEnumerationLiteral,
     MetaModel,
-    RefTypeAnnotation,
     ImplementationSpecificMethod,
     ImplementationSpecificVerification,
     PatternVerification,
@@ -306,17 +305,6 @@ def _parsed_type_annotation_to_type_annotation(
             )
 
             return OptionalTypeAnnotation(
-                value=_parsed_type_annotation_to_type_annotation(parsed.subscripts[0]),
-                parsed=parsed,
-            )
-
-        elif parsed.identifier == "Ref":
-            assert len(parsed.subscripts) == 1, (
-                f"Expected exactly one subscript for the Ref type annotation, "
-                f"but got: {parsed}; this should have been caught before!"
-            )
-
-            return RefTypeAnnotation(
                 value=_parsed_type_annotation_to_type_annotation(parsed.subscripts[0]),
                 parsed=parsed,
             )
@@ -1278,9 +1266,6 @@ def _over_our_type_annotations(
         yield from _over_our_type_annotations(something.items)
 
     elif isinstance(something, OptionalTypeAnnotation):
-        yield from _over_our_type_annotations(something.value)
-
-    elif isinstance(something, RefTypeAnnotation):
         yield from _over_our_type_annotations(something.value)
 
     elif isinstance(something, Enumeration):
@@ -2486,48 +2471,6 @@ def translate(
     if len(underlying_errors) > 0:
         return None, bundle_underlying_errors()
 
-    ref_association = next(
-        (
-            symbol
-            for symbol in symbols
-            if symbol.name == parsed_symbol_table.ref_association.name
-        ),
-        None,
-    )
-
-    if ref_association is None:
-        raise AssertionError(
-            f"The symbol associated with the references has been found in "
-            f"the symbol table at the parse stage, "
-            f"{parsed_symbol_table.ref_association.name=}, but could not be found "
-            f"in the intermediate list of symbols."
-        )
-
-    # Check that ref association is associated with a class
-    if isinstance(ref_association, Class):
-        pass
-    else:
-        human_readable_type = None  # type: Optional[str]
-        if isinstance(ref_association, Enumeration):
-            human_readable_type = "enumeration"
-        elif isinstance(ref_association, ConstrainedPrimitive):
-            human_readable_type = "constrained primitive"
-        else:
-            assert_never(ref_association)
-
-        underlying_errors.append(
-            Error(
-                ref_association.parsed.node,
-                f"Expected the ``Ref[.]`` to be associated with a class, "
-                f"but it was associated with a {human_readable_type}.",
-            )
-        )
-
-    if len(underlying_errors) > 0:
-        return None, bundle_underlying_errors()
-
-    assert isinstance(ref_association, Class), "Ref[.] associated with a class"
-
     meta_model = MetaModel(
         book_url=parsed_symbol_table.meta_model.book_url,
         book_version=parsed_symbol_table.meta_model.book_version,
@@ -2559,7 +2502,6 @@ def translate(
     symbol_table = SymbolTable(
         symbols=symbols,
         verification_functions=verification_functions,
-        ref_association=ref_association,
         meta_model=meta_model,
     )
 

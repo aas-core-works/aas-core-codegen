@@ -7,11 +7,9 @@ from icontract import invariant, DBC
 
 from aas_core_meta.marker import (
     abstract,
-    Ref,
     serialization,
     implementation_specific,
     reference_in_the_book,
-    associate_ref_with,
     is_superset_of,
     verification
 )
@@ -521,7 +519,7 @@ class Formula(Constraint):
 class Asset_administration_shell(Identifiable, Has_data_specification):
     """Structure a digital representation of an asset."""
 
-    derived_from: Optional[Ref["Asset_administration_shell"]]
+    derived_from: Optional[Reference]
     """The reference to the AAS the AAS was derived from."""
 
     # NOTE sadu, Manuel (2021-11-17)
@@ -531,7 +529,7 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
     asset_information: "Asset_information"
     """Meta-information about the asset the AAS is representing."""
 
-    submodels: List[Ref["Submodel"]]
+    submodels: List[Reference]
     """
     References to submodels of the AAS.
 
@@ -555,8 +553,8 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
             description: Optional["Lang_string_set"] = None,
             administration: Optional["Administrative_information"] = None,
             data_specifications: Optional[List["Reference"]] = None,
-            derived_from: Optional[Ref["Asset_administration_shell"]] = None,
-            submodels: Optional[List[Ref["Submodel"]]] = None,
+            derived_from: Optional[Reference] = None,
+            submodels: Optional[List[Reference]] = None,
     ) -> None:
         Identifiable.__init__(
             self,
@@ -1622,7 +1620,7 @@ class Basic_Event(Event):
     A basic event.
     """
 
-    observed: Ref[Referable]
+    observed: Reference
     """
     Reference to a referable, e.g. a data element or a submodel, that is being
     observed.
@@ -1630,7 +1628,7 @@ class Basic_Event(Event):
 
     def __init__(
             self,
-            observed: Ref[Referable],
+            observed: Reference,
             ID_short: Non_empty_string,
             extensions: Optional[List["Extension"]] = None,
             display_name: Optional["Lang_string_set"] = None,
@@ -1837,7 +1835,7 @@ class View(Referable, Has_semantics, Has_data_specification):
        They are not equivalent to submodels.
     """
 
-    contained_elements: List[Ref["Referable"]]
+    contained_elements: List[Reference]
     """
     Reference to a referable element that is contained in the view.
     """
@@ -1851,7 +1849,7 @@ class View(Referable, Has_semantics, Has_data_specification):
             description: Optional["Lang_string_set"] = None,
             semantic_ID: Optional["Reference"] = None,
             data_specifications: Optional[List["Reference"]] = None,
-            contained_elements: Optional[List[Ref["Referable"]]] = None,
+            contained_elements: Optional[List[Reference]] = None,
     ) -> None:
         Referable.__init__(
             self,
@@ -1879,9 +1877,6 @@ class Reference(DBC):
     Reference to either a model element of the same or another AAs or to an external
     entity.
     """
-
-
-associate_ref_with(cls=Reference)
 
 
 @invariant(lambda self: len(self.values) >= 1)

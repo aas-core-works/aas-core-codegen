@@ -7,7 +7,6 @@ from typing import (
     List,
     Sequence,
     Union,
-    Final,
     Set,
     Mapping,
 )
@@ -324,13 +323,6 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
 
 
 class _EnumerationCheckUnroller(csharp_unrolling.Unroller):
-    #: Symbol to be used to represent references within an AAS
-    _ref_association: Final[intermediate.ClassUnion]
-
-    def __init__(self, ref_association: intermediate.ClassUnion) -> None:
-        """Initialize with the given values."""
-        self._ref_association = ref_association
-
     def _unroll_primitive_type_annotation(
         self,
         unrollee_expr: str,
@@ -342,33 +334,16 @@ class _EnumerationCheckUnroller(csharp_unrolling.Unroller):
         # Primitives are not enumerations, so nothing to check here.
         return []
 
-    # noinspection PyUnusedLocal
-    def _unroll_our_type_or_ref_annotation(
+    def _unroll_our_type_annotation(
         self,
         unrollee_expr: str,
-        type_annotation: Union[
-            intermediate.OurTypeAnnotation, intermediate.RefTypeAnnotation
-        ],
+        type_annotation: intermediate.OurTypeAnnotation,
         path: List[str],
         item_level: int,
         key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
-        """
-        Generate the code for both our atomic type annotations and references.
-
-        We merged :py:method:`._unroll_our_type_annotation` and
-        :py:method:`._unroll_ref_type_annotation` together since they differ in only
-        which symbol is unrolled over.
-        """
-        symbol = None  # type: Optional[intermediate.Symbol]
-        if isinstance(type_annotation, intermediate.OurTypeAnnotation):
-            symbol = type_annotation.symbol
-        elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
-            symbol = self._ref_association
-        else:
-            assert_never(type_annotation)
-
-        assert symbol is not None
+        """Generate code for the given specific ``type_annotation``."""
+        symbol = type_annotation.symbol
 
         if not isinstance(symbol, intermediate.Enumeration):
             # NOTE (mristin, 2021-12-25):
@@ -383,35 +358,18 @@ class _EnumerationCheckUnroller(csharp_unrolling.Unroller):
             csharp_unrolling.Node(
                 text=textwrap.dedent(
                     f"""\
-                if (!Verification.Implementation.EnumValueSet.For{enum_name}.Contains(
-                {II}(int){unrollee_expr}))
-                {{
-                {I}errors.Add(
-                {II}new Verification.Error(
-                {III}$"{{path}}/{joined_pth}",
-                {III}$"Invalid {{nameof(Aas.{enum_name})}}: {{{unrollee_expr}}}"));
-                }}"""
+                        if (!Verification.Implementation.EnumValueSet.For{enum_name}.Contains(
+                        {II}(int){unrollee_expr}))
+                        {{
+                        {I}errors.Add(
+                        {II}new Verification.Error(
+                        {III}$"{{path}}/{joined_pth}",
+                        {III}$"Invalid {{nameof(Aas.{enum_name})}}: {{{unrollee_expr}}}"));
+                        }}"""
                 ),
                 children=[],
             )
         ]
-
-    def _unroll_our_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.OurTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
-    ) -> List[csharp_unrolling.Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        return self._unroll_our_type_or_ref_annotation(
-            unrollee_expr=unrollee_expr,
-            type_annotation=type_annotation,
-            path=path,
-            item_level=item_level,
-            key_value_level=key_value_level,
-        )
 
     def _unroll_list_type_annotation(
         self,
@@ -468,36 +426,12 @@ class _EnumerationCheckUnroller(csharp_unrolling.Unroller):
         else:
             return []
 
-    def _unroll_ref_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.RefTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
-    ) -> List[csharp_unrolling.Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        return self._unroll_our_type_or_ref_annotation(
-            unrollee_expr=unrollee_expr,
-            type_annotation=type_annotation,
-            path=path,
-            item_level=item_level,
-            key_value_level=key_value_level,
-        )
 
-
-def _unroll_enumeration_check(
-    prop: intermediate.Property, ref_association: intermediate.ClassUnion
-) -> Stripped:
-    """
-    Generate the code for unrolling the enumeration checks for the given property.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
+def _unroll_enumeration_check(prop: intermediate.Property) -> Stripped:
+    """Generate the code for unrolling the enumeration checks for the given property."""
     prop_name = csharp_naming.property_name(prop.name)
 
-    unroller = _EnumerationCheckUnroller(ref_association=ref_association)
+    unroller = _EnumerationCheckUnroller()
 
     roots = unroller.unroll(
         unrollee_expr=f"that.{prop_name}",
@@ -515,13 +449,6 @@ def _unroll_enumeration_check(
 
 
 class _ConstrainedPrimitiveCheckUnroller(csharp_unrolling.Unroller):
-    #: Symbol to be used to represent references within an AAS
-    _ref_association: Final[intermediate.Class]
-
-    def __init__(self, ref_association: intermediate.ClassUnion) -> None:
-        """Initialize with the given values."""
-        self._ref_association = ref_association
-
     def _unroll_primitive_type_annotation(
         self,
         unrollee_expr: str,
@@ -628,35 +555,12 @@ class _ConstrainedPrimitiveCheckUnroller(csharp_unrolling.Unroller):
         else:
             return []
 
-    def _unroll_ref_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.RefTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
-    ) -> List[csharp_unrolling.Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        assert isinstance(
-            self._ref_association, intermediate.Class
-        ), "Assume that the ``ref_association`` is a class so that we don't unroll"
 
-        # We do not descend into classes, this is done in the recursive verifier.
-        return []
-
-
-def _unroll_constrained_primitive_check(
-    prop: intermediate.Property, ref_association: intermediate.ClassUnion
-) -> Stripped:
-    """
-    Generate the code for unrolling checking primitive constraints on the property.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
+def _unroll_constrained_primitive_check(prop: intermediate.Property) -> Stripped:
+    """Generate the code for unrolling primitive constraints on the property."""
     prop_name = csharp_naming.property_name(prop.name)
 
-    unroller = _ConstrainedPrimitiveCheckUnroller(ref_association=ref_association)
+    unroller = _ConstrainedPrimitiveCheckUnroller()
 
     roots = unroller.unroll(
         unrollee_expr=f"that.{prop_name}",
@@ -1329,16 +1233,12 @@ def _generate_implementation_verify(
 
     elif isinstance(something, intermediate.ConcreteClass):
         for prop in something.properties:
-            enum_check_block = _unroll_enumeration_check(
-                prop=prop, ref_association=symbol_table.ref_association
-            )
+            enum_check_block = _unroll_enumeration_check(prop=prop)
             if enum_check_block != "":
                 blocks.append(Stripped("if (errors.Full()) return;"))
                 blocks.append(enum_check_block)
 
-            constrained_primitive_check = _unroll_constrained_primitive_check(
-                prop=prop, ref_association=symbol_table.ref_association
-            )
+            constrained_primitive_check = _unroll_constrained_primitive_check(prop=prop)
             if constrained_primitive_check != "":
                 blocks.append(Stripped("if (errors.Full()) return;"))
                 blocks.append(constrained_primitive_check)
@@ -1574,13 +1474,6 @@ def _generate_non_recursive_verifier(
 class _RecursionInRecursiveVerifyUnroller(csharp_unrolling.Unroller):
     """Generate the code that unrolls the recursive visits for the given property."""
 
-    #: Symbol to be used to represent references within an AAS
-    _ref_association: Final[intermediate.Symbol]
-
-    def __init__(self, ref_association: intermediate.ClassUnion) -> None:
-        """Initialize with the given values."""
-        self._ref_association = ref_association
-
     def _unroll_primitive_type_annotation(
         self,
         unrollee_expr: str,
@@ -1593,33 +1486,16 @@ class _RecursionInRecursiveVerifyUnroller(csharp_unrolling.Unroller):
         # We can not recurse visits into a primitive.
         return []
 
-    # noinspection PyUnusedLocal
-    def _unroll_our_type_or_ref_annotation(
+    def _unroll_our_type_annotation(
         self,
         unrollee_expr: str,
-        type_annotation: Union[
-            intermediate.OurTypeAnnotation, intermediate.RefTypeAnnotation
-        ],
+        type_annotation: intermediate.OurTypeAnnotation,
         path: List[str],
         item_level: int,
         key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
-        """
-        Generate the code for both our atomic type annotations and references.
-
-        We merged :py:method:`._unroll_our_type_annotation` and
-        :py:method:`._unroll_ref_type_annotation` together since they differ in only
-        which symbol is unrolled over.
-        """
-        symbol = None  # type: Optional[intermediate.Symbol]
-        if isinstance(type_annotation, intermediate.OurTypeAnnotation):
-            symbol = type_annotation.symbol
-        elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
-            symbol = self._ref_association
-        else:
-            assert_never(type_annotation)
-
-        assert symbol is not None
+        """Generate code for the given specific ``type_annotation``."""
+        symbol = type_annotation.symbol
 
         if isinstance(
             symbol, (intermediate.Enumeration, intermediate.ConstrainedPrimitive)
@@ -1633,31 +1509,14 @@ class _RecursionInRecursiveVerifyUnroller(csharp_unrolling.Unroller):
             csharp_unrolling.Node(
                 text=textwrap.dedent(
                     f"""\
-                if (Errors.Full()) return;
-                Visit(
-                    {unrollee_expr},
-                    ${csharp_common.string_literal(joined_pth)});"""
+                        if (Errors.Full()) return;
+                        Visit(
+                            {unrollee_expr},
+                            ${csharp_common.string_literal(joined_pth)});"""
                 ),
                 children=[],
             )
         ]
-
-    def _unroll_our_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.OurTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
-    ) -> List[csharp_unrolling.Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        return self._unroll_our_type_or_ref_annotation(
-            unrollee_expr=unrollee_expr,
-            type_annotation=type_annotation,
-            path=path,
-            item_level=item_level,
-            key_value_level=key_value_level,
-        )
 
     def _unroll_list_type_annotation(
         self,
@@ -1735,37 +1594,13 @@ class _RecursionInRecursiveVerifyUnroller(csharp_unrolling.Unroller):
         else:
             return []
 
-    def _unroll_ref_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.RefTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
-    ) -> List[csharp_unrolling.Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        return self._unroll_our_type_or_ref_annotation(
-            unrollee_expr=unrollee_expr,
-            type_annotation=type_annotation,
-            path=path,
-            item_level=item_level,
-            key_value_level=key_value_level,
-        )
 
-
-def _unroll_recursion_in_recursive_verify(
-    prop: intermediate.Property, ref_association: intermediate.ClassUnion
-) -> Stripped:
-    """
-    Generate the code for unrolling the recursive visits  for the given property.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
+def _unroll_recursion_in_recursive_verify(prop: intermediate.Property) -> Stripped:
+    """Generate the code for unrolling the recursive visits  for the given property."""
 
     prop_name = csharp_naming.property_name(prop.name)
 
-    unroller = _RecursionInRecursiveVerifyUnroller(ref_association=ref_association)
+    unroller = _RecursionInRecursiveVerifyUnroller()
     roots = unroller.unroll(
         unrollee_expr=f"that.{prop_name}",
         type_annotation=prop.type_annotation,
@@ -1788,15 +1623,9 @@ def _unroll_recursion_in_recursive_verify(
 )
 # fmt: off
 def _generate_recursive_verifier_visit(
-        cls: intermediate.ConcreteClass,
-        ref_association: intermediate.ClassUnion
+        cls: intermediate.ConcreteClass
 ) -> Stripped:
-    """
-    Generate the ``Visit`` method of the ``RecursiveVerifier`` for the ``cls``.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
+    """Generate the ``Visit`` method of the ``RecursiveVerifier`` for the ``cls``."""
     cls_name = csharp_naming.class_name(cls.name)
 
     writer = io.StringIO()
@@ -1821,8 +1650,7 @@ def _generate_recursive_verifier_visit(
     recursion_ends_here = True
     for prop in cls.properties:
         unrolled_prop_verification = _unroll_recursion_in_recursive_verify(
-            prop=prop,
-            ref_association=ref_association
+            prop=prop
         )
 
         if unrolled_prop_verification != '':
@@ -1903,11 +1731,7 @@ def _generate_recursive_verifier(
 
             blocks.append(implementation)
         else:
-            blocks.append(
-                _generate_recursive_verifier_visit(
-                    cls=symbol, ref_association=symbol_table.ref_association
-                )
-            )
+            blocks.append(_generate_recursive_verifier_visit(cls=symbol))
 
     if len(errors) > 0:
         return None, errors

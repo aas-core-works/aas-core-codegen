@@ -103,8 +103,6 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("abstract", "aas_core_meta.marker"),
             ("implementation_specific", "aas_core_meta.marker"),
             ("reference_in_the_book", "aas_core_meta.marker"),
-            ("Ref", "aas_core_meta.marker"),
-            ("associate_ref_with", "aas_core_meta.marker"),
             ("is_superset_of", "aas_core_meta.marker"),
             ("serialization", "aas_core_meta.marker"),
             ("verification", "aas_core_meta.marker"),
@@ -1794,39 +1792,6 @@ def _classdef_to_symbol(
     )
 
 
-# fmt: off
-@require(
-    lambda call:
-    isinstance(call.func, ast.Name)
-    and call.func.id == "associate_ref_with"
-)
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-# fmt: on
-def _parse_associate_ref_with(
-    call: ast.Call,
-) -> Tuple[Optional[Identifier], Optional[Error]]:
-    """Parse the call to ``associate_ref_with`` in the meta-model module."""
-    cls_node = None  # type: Optional[ast.AST]
-    if len(call.args) >= 1:
-        cls_node = call.args[0]
-
-    for keyword in call.keywords:
-        if keyword.arg == "cls":
-            cls_node = keyword.value
-
-    if cls_node is None:
-        return None, Error(call, "The argument for ``cls`` has not been specified")
-
-    if isinstance(cls_node, ast.Name):
-        return Identifier(cls_node.id), None
-    else:
-        return None, Error(
-            cls_node,
-            f"We do not know how to interpret "
-            f"the ``cls`` argument: {ast.dump(cls_node)}",
-        )
-
-
 def _verify_arity_of_type_annotation_subscript(
     type_annotation: SubscriptedTypeAnnotation,
 ) -> Optional[Error]:
@@ -1835,7 +1800,7 @@ def _verify_arity_of_type_annotation_subscript(
 
     :return: error message, if any
     """
-    expected_arity_map = {"List": 1, "Optional": 1, "Ref": 1}
+    expected_arity_map = {"List": 1, "Optional": 1}
     expected_arity = expected_arity_map.get(type_annotation.identifier, None)
     if expected_arity is None:
         raise AssertionError(
@@ -2216,9 +2181,6 @@ def _atok_to_symbol_table(
     symbols = []  # type: List[Symbol]
     underlying_errors = []  # type: List[Error]
 
-    ref_association_call = None  # type: Optional[ast.Call]
-    ref_association_id = None  # type: Optional[Identifier]
-
     description = None  # type: Optional[Description]
     book_url = None  # type: Optional[str]
     book_version = None  # type: Optional[str]
@@ -2321,32 +2283,6 @@ def _atok_to_symbol_table(
                     )
                 )
                 continue
-        elif (
-            isinstance(node, ast.Expr)
-            and isinstance(node.value, ast.Call)
-            and isinstance(node.value.func, ast.Name)
-        ):
-            matched = True
-
-            func_name = Identifier(node.value.func.id)
-
-            if func_name == "associate_ref_with":
-                ref_association_call = node.value
-                ref_association_id, error = _parse_associate_ref_with(
-                    call=ref_association_call
-                )
-                if error:
-                    underlying_errors.append(error)
-                    continue
-            else:
-                underlying_errors.append(
-                    Error(
-                        node,
-                        f"We do not know how to interpret the call "
-                        f"to function {func_name!r}",
-                    )
-                )
-                continue
 
         else:
             matched = False
@@ -2378,33 +2314,6 @@ def _atok_to_symbol_table(
     if len(underlying_errors) > 0:
         return None, Error(None, "Failed to parse the meta-model", underlying_errors)
 
-    if ref_association_id is None and len(underlying_errors) == 0:
-        return None, Error(
-            None,
-            "The association between ``Ref`` and the corresponding reference class "
-            "in the meta-model is missing; did you forget to call "
-            "``associate_ref_with call`` in your meta-model?",
-        )
-
-    ref_association = None  # type: Optional[Symbol]
-    for symbol in symbols:
-        if ref_association_id == symbol.name:
-            ref_association = symbol
-
-    if ref_association is None:
-        return None, Error(
-            ref_association_call,
-            "Could not find the symbol to be associated with ``Ref``",
-        )
-
-    if not isinstance(ref_association, (AbstractClass, ConcreteClass)):
-        return None, Error(
-            ref_association_call,
-            f"Expected the symbol to be associated with ``Ref``, "
-            f"{ref_association.name} to be a class, "
-            f"but got: {type(ref_association)}",
-        )
-
     observed_symbol_names = set()  # type: Set[Identifier]
     duplicate_symbols = []  # type: List[Symbol]
     for symbol in symbols:
@@ -2433,7 +2342,6 @@ def _atok_to_symbol_table(
 
     unverified_symbol_table = UnverifiedSymbolTable(
         symbols=symbols,
-        ref_association=ref_association,
         verification_functions=verification_functions,
         meta_model=MetaModel(
             book_version=book_version, book_url=book_url, description=description

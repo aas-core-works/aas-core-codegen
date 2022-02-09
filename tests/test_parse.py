@@ -162,12 +162,8 @@ class Test_parsing_docstring(unittest.TestCase):
             class Some_class:
                 """"""
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             '''
         )
 
@@ -181,12 +177,8 @@ class Test_parsing_docstring(unittest.TestCase):
             class Some_class:
                 """This is some documentation."""
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             '''
         )
 
@@ -205,12 +197,8 @@ class Test_parsing_docstring(unittest.TestCase):
                 Another paragraph.
                 """
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             '''
         )
 

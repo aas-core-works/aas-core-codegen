@@ -17,11 +17,7 @@ _MODULE_NAME = pathlib.Path(os.path.realpath(__file__)).parent.name
 PRIMITIVE_TYPES = {"bool", "int", "float", "str", "bytearray"}
 
 #: Built-in generic types
-GENERIC_TYPES = {
-    Identifier("List"),
-    Identifier("Optional"),
-    Identifier("Ref"),
-}
+GENERIC_TYPES = {Identifier("List"), Identifier("Optional")}
 
 
 class AtomicTypeAnnotation:
@@ -676,9 +672,6 @@ class UnverifiedSymbolTable(DBC):
     #: List of parsed class symbols
     symbols: Final[Sequence[Symbol]]
 
-    #: Type to be used to represent a ``Ref[T]``
-    ref_association: Final[Symbol]
-
     #: List of implementation-specific verification functions
     verification_functions: Final[Sequence["FunctionUnion"]]
 
@@ -708,14 +701,12 @@ class UnverifiedSymbolTable(DBC):
     def __init__(
         self,
         symbols: Sequence[Symbol],
-        ref_association: Symbol,
         verification_functions: Sequence["FunctionUnion"],
         meta_model: MetaModel,
     ) -> None:
         """Initialize with the given values and map symbols to name."""
         self.symbols = symbols
         self.verification_functions = verification_functions
-        self.ref_association = ref_association
         self.meta_model = meta_model
 
         self._name_to_symbol = {symbol.name: symbol for symbol in symbols}

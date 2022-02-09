@@ -1104,12 +1104,8 @@ UnverifiedSymbolTable(
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
-              SubscriptedTypeAnnotation(
-                identifier='Ref',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Asset_administration_shell',
-                    node=...)],
+              AtomicTypeAnnotation(
+                identifier='Reference',
                 node=...)],
             node=...),
           description=Description(
@@ -1130,12 +1126,8 @@ UnverifiedSymbolTable(
           type_annotation=SubscriptedTypeAnnotation(
             identifier='List',
             subscripts=[
-              SubscriptedTypeAnnotation(
-                identifier='Ref',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Submodel',
-                    node=...)],
+              AtomicTypeAnnotation(
+                identifier='Reference',
                 node=...)],
             node=...),
           description=Description(
@@ -1258,12 +1250,8 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  SubscriptedTypeAnnotation(
-                    identifier='Ref',
-                    subscripts=[
-                      AtomicTypeAnnotation(
-                        identifier='Asset_administration_shell',
-                        node=...)],
+                  AtomicTypeAnnotation(
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -1277,12 +1265,8 @@ UnverifiedSymbolTable(
                   SubscriptedTypeAnnotation(
                     identifier='List',
                     subscripts=[
-                      SubscriptedTypeAnnotation(
-                        identifier='Ref',
-                        subscripts=[
-                          AtomicTypeAnnotation(
-                            identifier='Submodel',
-                            node=...)],
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -4498,12 +4482,8 @@ UnverifiedSymbolTable(
       properties=[
         Property(
           name='observed',
-          type_annotation=SubscriptedTypeAnnotation(
-            identifier='Ref',
-            subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Referable',
-                node=...)],
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Reference',
             node=...),
           description=Description(
             document=...,
@@ -4521,12 +4501,8 @@ UnverifiedSymbolTable(
               node=...),
             Argument(
               name='observed',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Ref',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Referable',
-                    node=...)],
+              type_annotation=AtomicTypeAnnotation(
+                identifier='Reference',
                 node=...),
               default=None,
               node=...),
@@ -5274,12 +5250,8 @@ UnverifiedSymbolTable(
           type_annotation=SubscriptedTypeAnnotation(
             identifier='List',
             subscripts=[
-              SubscriptedTypeAnnotation(
-                identifier='Ref',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Referable',
-                    node=...)],
+              AtomicTypeAnnotation(
+                identifier='Reference',
                 node=...)],
             node=...),
           description=Description(
@@ -5396,12 +5368,8 @@ UnverifiedSymbolTable(
                   SubscriptedTypeAnnotation(
                     identifier='List',
                     subscripts=[
-                      SubscriptedTypeAnnotation(
-                        identifier='Ref',
-                        subscripts=[
-                          AtomicTypeAnnotation(
-                            identifier='Referable',
-                            node=...)],
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -7709,7 +7677,6 @@ UnverifiedSymbolTable(
       node=...,
       properties_by_name=...,
       methods_by_name=...)],
-  ref_association='Reference to AbstractClass Reference',
   verification_functions=[
     UnderstoodMethod(
       name='is_MIME_type',

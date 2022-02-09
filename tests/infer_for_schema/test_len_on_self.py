@@ -34,12 +34,8 @@ class Test_expected(unittest.TestCase):
             class Something(str):
                 pass
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -66,12 +62,8 @@ class Test_expected(unittest.TestCase):
             class Something(str):
                 pass
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -98,12 +90,8 @@ class Test_expected(unittest.TestCase):
             class Something(str):
                 pass
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -130,12 +118,8 @@ class Test_expected(unittest.TestCase):
             class Something(str):
                 pass
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -162,12 +146,8 @@ class Test_expected(unittest.TestCase):
             class Something(str):
                 pass
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -194,12 +174,8 @@ class Test_expected(unittest.TestCase):
             class Something(str):
                 pass
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -226,12 +202,8 @@ class Test_expected(unittest.TestCase):
             class Something(str):
                 pass
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -264,12 +236,8 @@ class Test_expected(unittest.TestCase):
                 pass
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -305,12 +273,8 @@ class Test_unexpected(unittest.TestCase):
                 pass
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -332,12 +296,8 @@ class Test_unexpected(unittest.TestCase):
                 pass
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -358,13 +318,8 @@ class Test_unexpected(unittest.TestCase):
             class Something(str):
                 pass
 
-
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 

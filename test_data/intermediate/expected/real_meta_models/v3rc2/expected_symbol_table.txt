@@ -1832,10 +1832,8 @@ SymbolTable(
         Property(
           name='derived_from',
           type_annotation=OptionalTypeAnnotation(
-            value=RefTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Asset_administration_shell',
-                parsed=...),
+            value=OurTypeAnnotation(
+              symbol='Reference to symbol Reference',
               parsed=...),
             parsed=...),
           description=Description(
@@ -1856,10 +1854,8 @@ SymbolTable(
         Property(
           name='submodels',
           type_annotation=ListTypeAnnotation(
-            items=RefTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Submodel',
-                parsed=...),
+            items=OurTypeAnnotation(
+              symbol='Reference to symbol Reference',
               parsed=...),
             parsed=...),
           description=Description(
@@ -1965,10 +1961,8 @@ SymbolTable(
           Argument(
             name='derived_from',
             type_annotation=OptionalTypeAnnotation(
-              value=RefTypeAnnotation(
-                value=OurTypeAnnotation(
-                  symbol='Reference to symbol Asset_administration_shell',
-                  parsed=...),
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -1979,10 +1973,8 @@ SymbolTable(
             name='submodels',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
-                items=RefTypeAnnotation(
-                  value=OurTypeAnnotation(
-                    symbol='Reference to symbol Submodel',
-                    parsed=...),
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Reference',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -7496,10 +7488,8 @@ SymbolTable(
           parsed=...),
         Property(
           name='observed',
-          type_annotation=RefTypeAnnotation(
-            value=OurTypeAnnotation(
-              symbol='Reference to symbol Referable',
-              parsed=...),
+          type_annotation=OurTypeAnnotation(
+            symbol='Reference to symbol Reference',
             parsed=...),
           description=Description(
             document=...,
@@ -7512,10 +7502,8 @@ SymbolTable(
         arguments=[
           Argument(
             name='observed',
-            type_annotation=RefTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Referable',
-                parsed=...),
+            type_annotation=OurTypeAnnotation(
+              symbol='Reference to symbol Reference',
               parsed=...),
             default=None,
             parsed=...),
@@ -8642,10 +8630,8 @@ SymbolTable(
         Property(
           name='contained_elements',
           type_annotation=ListTypeAnnotation(
-            items=RefTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Referable',
-                parsed=...),
+            items=OurTypeAnnotation(
+              symbol='Reference to symbol Reference',
               parsed=...),
             parsed=...),
           description=Description(
@@ -8742,10 +8728,8 @@ SymbolTable(
             name='contained_elements',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
-                items=RefTypeAnnotation(
-                  value=OurTypeAnnotation(
-                    symbol='Reference to symbol Referable',
-                    parsed=...),
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Reference',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -11175,7 +11159,6 @@ SymbolTable(
       arguments_by_name=...,
       pattern='([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+|"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*"))*')],
   verification_functions_by_name=...,
-  ref_association='Reference to AbstractClass Reference',
   meta_model=MetaModel(
     description=Description(
       document=...,
