@@ -11,6 +11,7 @@ from aas_core_codegen import parse, run, specific_implementations, intermediate
 from aas_core_codegen.common import LinenoColumner, assert_never
 import aas_core_codegen.csharp.main as csharp_main
 import aas_core_codegen.jsonschema.main as jsonschema_main
+import aas_core_codegen.rdf_shacl.main as rdf_shacl_main
 
 assert aas_core_codegen.__doc__ == __doc__
 
@@ -20,6 +21,7 @@ class Target(enum.Enum):
 
     CSHARP = "csharp"
     JSONSCHEMA = "jsonschema"
+    RDF_SHACL = "rdf_shacl"
 
 
 class Parameters:
@@ -178,6 +180,9 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
         return jsonschema_main.execute(
             context=run_context, stdout=stdout, stderr=stderr
         )
+
+    elif params.target is Target.RDF_SHACL:
+        return rdf_shacl_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
     else:
         assert_never(params.target)
