@@ -40,7 +40,6 @@ Interface = _types.Interface
 SymbolTable = _types.SymbolTable
 
 map_descendability = _types.map_descendability
-make_union_of_constructor_arguments = _types.make_union_of_constructor_arguments
 collect_ids_of_classes_in_properties = _types.collect_ids_of_classes_in_properties
 
 translate = _translate.translate
