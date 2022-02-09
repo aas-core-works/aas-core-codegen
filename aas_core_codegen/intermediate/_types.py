@@ -122,24 +122,11 @@ class OptionalTypeAnnotation(TypeAnnotation):
         return f"Optional[{self.value}]"
 
 
-class RefTypeAnnotation(TypeAnnotation):
-    """Represent a type annotation involving a reference ``Ref[...]``."""
-
-    def __init__(self, value: "TypeAnnotationUnion", parsed: parse.TypeAnnotation):
-        TypeAnnotation.__init__(self, parsed=parsed)
-
-        self.value = value
-
-    def __str__(self) -> str:
-        return f"Ref[{self.value}]"
-
-
 TypeAnnotationUnion = Union[
     PrimitiveTypeAnnotation,
     OurTypeAnnotation,
     ListTypeAnnotation,
     OptionalTypeAnnotation,
-    RefTypeAnnotation,
 ]
 
 assert_union_of_descendants_exhaustive(
@@ -172,10 +159,6 @@ def type_annotations_equal(
 
     elif isinstance(that, OptionalTypeAnnotation):
         assert isinstance(other, OptionalTypeAnnotation)
-        return type_annotations_equal(that.value, other.value)
-
-    elif isinstance(that, RefTypeAnnotation):
-        assert isinstance(other, RefTypeAnnotation)
         return type_annotations_equal(that.value, other.value)
 
     else:
@@ -1475,9 +1458,6 @@ class SymbolTable:
     #: Map verification functions by their name
     verification_functions_by_name: Final[Mapping[Identifier, "VerificationUnion"]]
 
-    #: Type to be used to represent a ``Ref[T]``
-    ref_association: Final["ClassUnion"]
-
     #: Additional information about the source meta-model
     meta_model: Final[MetaModel]
 
@@ -1517,13 +1497,11 @@ class SymbolTable:
         self,
         symbols: Sequence["Symbol"],
         verification_functions: Sequence["VerificationUnion"],
-        ref_association: "ClassUnion",
         meta_model: MetaModel,
     ) -> None:
         """Initialize with the given values and map symbols to name."""
         self.symbols = symbols
         self.verification_functions = verification_functions
-        self.ref_association = ref_association
         self.meta_model = meta_model
 
         self.verification_functions_by_name = {
@@ -1553,7 +1531,7 @@ class SymbolTable:
 
 
 def map_descendability(
-    type_annotation: TypeAnnotationUnion, ref_association: Class
+    type_annotation: TypeAnnotationUnion,
 ) -> MutableMapping[TypeAnnotationUnion, bool]:
     """
     Map the type annotation recursively by the descendability.
@@ -1566,9 +1544,6 @@ def map_descendability(
 
     The mapping is a form of caching. Otherwise, the time complexity would be quadratic
     if we queried at each type annotation subscript.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
     """
     mapping = dict()  # type: MutableMapping[TypeAnnotationUnion, bool]
 
@@ -1602,13 +1577,6 @@ def map_descendability(
             result = recurse(a_type_annotation=a_type_annotation.value)
             mapping[a_type_annotation] = result
             return result
-
-        elif isinstance(a_type_annotation, RefTypeAnnotation):
-            assert isinstance(
-                ref_association, Class
-            ), "Explicit assumption for descendability"
-            mapping[a_type_annotation] = True
-            return True
 
         else:
             assert_never(a_type_annotation)
@@ -1654,8 +1622,6 @@ def collect_ids_of_classes_in_properties(symbol_table: SymbolTable) -> Set[int]:
                         type_anno = type_anno.value
                     elif isinstance(type_anno, ListTypeAnnotation):
                         type_anno = type_anno.items
-                    elif isinstance(type_anno, RefTypeAnnotation):
-                        type_anno = type_anno.value
                     elif isinstance(type_anno, PrimitiveTypeAnnotation):
                         break
                     elif isinstance(type_anno, OurTypeAnnotation):

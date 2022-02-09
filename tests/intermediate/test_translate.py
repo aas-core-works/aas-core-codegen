@@ -48,12 +48,8 @@ class Test_in_lining_of_constructor_statements(unittest.TestCase):
                     self.yet_another_property = yet_another_property
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -84,12 +80,8 @@ class Test_parsing_docstrings(unittest.TestCase):
                  * Nested reference :class:`.Some_class`
                  """
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             '''
         )
 

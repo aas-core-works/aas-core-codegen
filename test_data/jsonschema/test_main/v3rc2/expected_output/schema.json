@@ -105,61 +105,6 @@
         }
       ]
     },
-    "Referable_abstract": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/AnnotatedRelationshipElement"
-        },
-        {
-          "$ref": "#/definitions/AssetAdministrationShell"
-        },
-        {
-          "$ref": "#/definitions/BasicEvent"
-        },
-        {
-          "$ref": "#/definitions/Blob"
-        },
-        {
-          "$ref": "#/definitions/Capability"
-        },
-        {
-          "$ref": "#/definitions/ConceptDescription"
-        },
-        {
-          "$ref": "#/definitions/Entity"
-        },
-        {
-          "$ref": "#/definitions/File"
-        },
-        {
-          "$ref": "#/definitions/MultiLanguageProperty"
-        },
-        {
-          "$ref": "#/definitions/Operation"
-        },
-        {
-          "$ref": "#/definitions/Property"
-        },
-        {
-          "$ref": "#/definitions/Range"
-        },
-        {
-          "$ref": "#/definitions/ReferenceElement"
-        },
-        {
-          "$ref": "#/definitions/Submodel"
-        },
-        {
-          "$ref": "#/definitions/SubmodelElementList"
-        },
-        {
-          "$ref": "#/definitions/SubmodelElementStruct"
-        },
-        {
-          "$ref": "#/definitions/View"
-        }
-      ]
-    },
     "Identifiable": {
       "allOf": [
         {
@@ -331,7 +276,7 @@
           "type": "object",
           "properties": {
             "derivedFrom": {
-              "$ref": "#/definitions/Reference"
+              "$ref": "#/definitions/Reference_abstract"
             },
             "assetInformation": {
               "$ref": "#/definitions/AssetInformation"
@@ -339,7 +284,7 @@
             "submodels": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Reference"
+                "$ref": "#/definitions/Reference_abstract"
               }
             }
           },
@@ -804,7 +749,7 @@
           "type": "object",
           "properties": {
             "observed": {
-              "$ref": "#/definitions/Reference"
+              "$ref": "#/definitions/Reference_abstract"
             }
           },
           "required": [
@@ -911,7 +856,7 @@
             "containedElements": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Reference"
+                "$ref": "#/definitions/Reference_abstract"
               }
             }
           },

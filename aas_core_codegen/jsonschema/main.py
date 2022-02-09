@@ -100,16 +100,10 @@ def _define_primitive_type(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_type(
     type_annotation: intermediate.TypeAnnotation,
-    ref_association: intermediate.ClassUnion,
     len_constraint: Optional[infer_for_schema.LenConstraint],
     pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[Error]]:
-    """
-    Generate the type definition for ``type_annotation``.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
+    """Generate the type definition for ``type_annotation``."""
     if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
         type_definition = _define_primitive_type(
             primitive_type=type_annotation.a_type,
@@ -194,7 +188,6 @@ def _define_type(
 
         items_type_definition, items_error = _define_type(
             type_annotation=type_annotation.items,
-            ref_association=ref_association,
             len_constraint=None,
             pattern_constraints=None,
         )
@@ -234,11 +227,6 @@ def _define_type(
             f"This feature needs yet to be implemented.\n\n"
             f"{type_annotation=}"
         )
-
-    elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
-        model_type = naming.json_model_type(ref_association.name)
-
-        return collections.OrderedDict([("$ref", f"#/definitions/{model_type}")]), None
 
     else:
         raise NotImplementedError(
@@ -324,19 +312,13 @@ def _define_for_constrained_primitive(
 # fmt: on
 def _define_properties_and_required(
     cls: intermediate.Class,
-    ref_association: intermediate.ClassUnion,
     pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
 ) -> Tuple[
     Optional[MutableMapping[str, Any]],
     Optional[List[Identifier]],
     Optional[List[Error]],
 ]:
-    """
-    Define the ``properties`` and ``required`` part for the given class ``cls``.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
+    """Define the ``properties`` and ``required`` part for the given class ``cls``."""
     errors = []  # type: List[Error]
 
     (
@@ -382,7 +364,6 @@ def _define_properties_and_required(
         assert type_anno is not None
         type_definition, error = _define_type(
             type_annotation=type_anno,
-            ref_association=ref_association,
             len_constraint=len_constraint,
             pattern_constraints=pattern_constraints,
         )
@@ -402,7 +383,6 @@ def _define_properties_and_required(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_for_class(
     cls: intermediate.Class,
-    ref_association: intermediate.ClassUnion,
     ids_of_classes_in_properties: Set[int],
     pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
@@ -410,9 +390,6 @@ def _define_for_class(
     Generate the JSON definitions based on the class ``cls``.
 
     The list of definitions is to be *extended* with the resulting mapping.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
     """
     all_of = []  # type: List[MutableMapping[str, Any]]
 
@@ -431,7 +408,6 @@ def _define_for_class(
 
     properties, required, properties_error = _define_properties_and_required(
         cls=cls,
-        ref_association=ref_association,
         pattern_verifications_by_name=pattern_verifications_by_name,
     )
 
@@ -595,7 +571,6 @@ def _generate(
             elif isinstance(symbol, intermediate.Class):
                 extension, definition_errors = _define_for_class(
                     cls=symbol,
-                    ref_association=symbol_table.ref_association,
                     ids_of_classes_in_properties=ids_of_classes_in_properties,
                     pattern_verifications_by_name=pattern_verifications_by_name,
                 )

@@ -77,12 +77,7 @@ def _generate_json_converter_for_enumeration(
 
 
 def _generate_read_for_interface(interface: intermediate.Interface) -> Stripped:
-    """
-    Generate the ``Read`` method for de-serializing the ``interface``.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
+    """Generate the ``Read`` method for de-serializing the ``interface``."""
     # NOTE (mristin, 2022-02-05):
     # We have to perform a two-pass de-serialization.
     #
@@ -324,12 +319,7 @@ def _generate_write_for_interface(interface: intermediate.Interface) -> Stripped
 def _generate_json_converter_for_interface(
     interface: intermediate.Interface,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """
-    Generate the custom JSON converter based on the intermediate ``interface``.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
+    """Generate the custom JSON converter based on the intermediate ``interface``."""
     read_code = _generate_read_for_interface(interface=interface)
 
     write_code = _generate_write_for_interface(interface=interface)
@@ -363,15 +353,8 @@ def _generate_json_converter_for_interface(
     return Stripped(writer.getvalue()), None
 
 
-def _generate_read_for_class(
-    cls: intermediate.ConcreteClass, ref_association: intermediate.ClassUnion
-) -> Stripped:
-    """
-    Generate the ``Read`` method for de-serializing the class ``cls``.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
+def _generate_read_for_class(cls: intermediate.ConcreteClass) -> Stripped:
+    """Generate the ``Read`` method for de-serializing the class ``cls``."""
     blocks = [
         Stripped(
             textwrap.dedent(
@@ -393,9 +376,7 @@ def _generate_read_for_class(
 
         for arg in cls.constructor.arguments:
             var_name = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
-            arg_type = csharp_common.generate_type(
-                type_annotation=arg.type_annotation, ref_association=ref_association
-            )
+            arg_type = csharp_common.generate_type(type_annotation=arg.type_annotation)
 
             if arg_type.endswith("?"):
                 initialization_lines.append(Stripped(f"{arg_type} {var_name} = null;"))
@@ -477,13 +458,11 @@ case Json.JsonTokenType.EndObject:
 
             if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
                 arg_type = csharp_common.generate_type(
-                    type_annotation=prop.type_annotation.value,
-                    ref_association=ref_association,
+                    type_annotation=prop.type_annotation.value
                 )
             else:
                 arg_type = csharp_common.generate_type(
-                    type_annotation=prop.type_annotation,
-                    ref_association=ref_association,
+                    type_annotation=prop.type_annotation
                 )
 
             json_prop_name = naming.json_property(prop.name)
@@ -690,15 +669,8 @@ def _generate_write_for_class(cls: intermediate.ConcreteClass) -> Stripped:
     return Stripped(writer.getvalue())
 
 
-def _generate_json_converter_for_class(
-    cls: intermediate.ConcreteClass, ref_association: intermediate.ClassUnion
-) -> Stripped:
-    """
-    Generate the custom JSON converter based on the intermediate ``cls``.
-
-    The ``ref_association`` indicates which symbol to use for representing references
-    within an AAS.
-    """
+def _generate_json_converter_for_class(cls: intermediate.ConcreteClass) -> Stripped:
+    """Generate the custom JSON converter based on the intermediate ``cls``."""
 
     cls_name = csharp_naming.class_name(cls.name)
 
@@ -713,11 +685,7 @@ def _generate_json_converter_for_class(
         )
     )
 
-    writer.write(
-        textwrap.indent(
-            _generate_read_for_class(cls=cls, ref_association=ref_association), I
-        )
-    )
+    writer.write(textwrap.indent(_generate_read_for_class(cls=cls), I))
 
     writer.write("\n\n")
 
@@ -832,9 +800,7 @@ def generate(
 
                     jsonization_block = spec_impls[jsonization_key]
                 else:
-                    jsonization_block = _generate_json_converter_for_class(
-                        cls=symbol, ref_association=symbol_table.ref_association
-                    )
+                    jsonization_block = _generate_json_converter_for_class(cls=symbol)
 
                 converters.append(
                     Identifier(f"{csharp_naming.class_name(symbol.name)}JsonConverter")

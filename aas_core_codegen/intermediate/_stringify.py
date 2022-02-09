@@ -31,7 +31,6 @@ from aas_core_codegen.intermediate._types import (
     PatternVerification,
     PrimitiveTypeAnnotation,
     Property,
-    RefTypeAnnotation,
     Serialization,
     Signature,
     SignatureLike,
@@ -89,20 +88,6 @@ def _stringify_list_type_annotation(
 
 def _stringify_optional_type_annotation(
     that: OptionalTypeAnnotation,
-) -> stringify.Entity:
-    result = stringify.Entity(
-        name=that.__class__.__name__,
-        properties=[
-            stringify.Property("value", _stringify(that.value)),
-            stringify.PropertyEllipsis("parsed", that.parsed),
-        ],
-    )
-
-    return result
-
-
-def _stringify_ref_type_annotation(
-    that: RefTypeAnnotation,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -588,11 +573,6 @@ def _stringify_symbol_table(
             stringify.PropertyEllipsis(
                 "verification_functions_by_name", that.verification_functions_by_name
             ),
-            stringify.Property(
-                "ref_association",
-                f"Reference to {that.ref_association.__class__.__name__} "
-                f"{that.ref_association.name}",
-            ),
             stringify.Property("meta_model", _stringify(that.meta_model)),
         ],
     )
@@ -624,7 +604,6 @@ Dumpable = Union[
     PatternVerification,
     PrimitiveTypeAnnotation,
     Property,
-    RefTypeAnnotation,
     Serialization,
     Signature,
     SignatureLike,
@@ -664,7 +643,6 @@ _DISPATCH = {
     PatternVerification: _stringify_pattern_verification,
     PrimitiveTypeAnnotation: _stringify_primitive_type_annotation,
     Property: _stringify_property,
-    RefTypeAnnotation: _stringify_ref_type_annotation,
     Serialization: _stringify_serialization,
     Signature: _stringify_signature,
     Snapshot: _stringify_snapshot,

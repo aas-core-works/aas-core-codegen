@@ -40,13 +40,8 @@ class Test_expected(unittest.TestCase):
                 def __init__(self, some_property: str) -> None:
                     self.some_property = some_property
 
-
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -71,12 +66,8 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -112,12 +103,8 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -153,12 +140,8 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -194,12 +177,8 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -235,12 +214,8 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -276,12 +251,8 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -321,12 +292,8 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -371,12 +338,8 @@ class Test_expected(unittest.TestCase):
                     )
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -420,12 +383,8 @@ class Test_unexpected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -450,12 +409,8 @@ class Test_unexpected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 
@@ -480,12 +435,8 @@ class Test_unexpected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            class Reference:
-                pass
-
             __book_url__ = "dummy"
             __book_version__ = "dummy"
-            associate_ref_with(Reference)
             """
         )
 

@@ -81,15 +81,8 @@ def _assert_all_primitive_types_are_mapped() -> None:
 _assert_all_primitive_types_are_mapped()
 
 
-def generate_type(
-    type_annotation: intermediate.TypeAnnotationUnion,
-    ref_association: intermediate.ClassUnion,
-) -> Stripped:
-    """
-    Generate the C# type for the given type annotation.
-
-    The ``ref_association`` describes how the references should be represented.
-    """
+def generate_type(type_annotation: intermediate.TypeAnnotationUnion) -> Stripped:
+    """Generate the C# type for the given type annotation."""
     # BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
     if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
         return PRIMITIVE_TYPE_MAP[type_annotation.a_type]
@@ -115,23 +108,13 @@ def generate_type(
                 return Stripped(csharp_naming.class_name(symbol.name))
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-        item_type = generate_type(
-            type_annotation=type_annotation.items, ref_association=ref_association
-        )
+        item_type = generate_type(type_annotation=type_annotation.items)
 
         return Stripped(f"List<{item_type}>")
 
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        value = generate_type(
-            type_annotation=type_annotation.value, ref_association=ref_association
-        )
+        value = generate_type(type_annotation=type_annotation.value)
         return Stripped(f"{value}?")
-
-    elif isinstance(type_annotation, intermediate.RefTypeAnnotation):
-        if ref_association.interface is not None:
-            return Stripped(csharp_naming.interface_name(ref_association.name))
-        else:
-            return Stripped(csharp_naming.class_name(ref_association.name))
 
     else:
         assert_never(type_annotation)
