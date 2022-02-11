@@ -215,6 +215,10 @@ class LenConstraint:
         self.min_value = min_value
         self.max_value = max_value
 
+    def copy(self) -> "LenConstraint":
+        """Create a copy of the self."""
+        return LenConstraint(min_value=self.min_value, max_value=self.max_value)
+
 
 class _LenConstraintOnProperty:
     """Represent a len constraint such as ``len(self.something) < 42``."""
