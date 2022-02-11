@@ -16,6 +16,7 @@ DefaultConstant = _types.DefaultConstant
 DefaultEnumerationLiteral = _types.DefaultEnumerationLiteral
 Argument = _types.Argument
 Symbol = _types.Symbol
+SymbolExceptEnumeration = _types.SymbolExceptEnumeration
 Invariant = _types.Invariant
 Contract = _types.Contract
 Snapshot = _types.Snapshot

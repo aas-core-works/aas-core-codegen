@@ -17,6 +17,7 @@ SymbolTable(
       literals_by_name=...,
       literal_id_set=...,
       parsed=...)],
+  symbols_topologically_sorted=[],
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(

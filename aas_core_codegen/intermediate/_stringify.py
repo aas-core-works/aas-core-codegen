@@ -567,6 +567,13 @@ def _stringify_symbol_table(
         properties=[
             stringify.Property("symbols", list(map(_stringify, that.symbols))),
             stringify.Property(
+                "symbols_topologically_sorted",
+                [
+                    f"Reference to symbol {symbol.name}"
+                    for symbol in that.symbols_topologically_sorted
+                ],
+            ),
+            stringify.Property(
                 "verification_functions",
                 list(map(_stringify, that.verification_functions)),
             ),
