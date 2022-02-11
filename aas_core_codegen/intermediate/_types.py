@@ -23,6 +23,7 @@ from aas_core_codegen.common import (
     Identifier,
     assert_never,
     assert_union_of_descendants_exhaustive,
+    assert_union_without_excluded,
 )
 from aas_core_codegen.intermediate import construction
 from aas_core_codegen.parse import tree as parse_tree
@@ -1452,6 +1453,9 @@ class SymbolTable:
     #: List of all symbols that we need for the code generation
     symbols: Final[Sequence["Symbol"]]
 
+    #: List of all the symbols, topologically sorted by inheritance
+    symbols_topologically_sorted: Final[Sequence["Symbol"]]
+
     #: List of all functions used in the verification
     verification_functions: Final[Sequence["VerificationUnion"]]
 
@@ -1470,6 +1474,17 @@ class SymbolTable:
                 len(names) == len(set(names)),
         )[1],
         "Symbol names unique",
+    )
+    @require(
+        lambda symbols, symbols_topologically_sorted:
+        set(
+            id(symbol)
+            for symbol in symbols
+            if not isinstance(symbol, Enumeration)
+        )
+        == set(id(symbol) for symbol in symbols_topologically_sorted),
+        "Only maybe the order differs between the symbols and "
+        "symbols_topologically_sorted"
     )
     @ensure(
         lambda self:
@@ -1496,11 +1511,13 @@ class SymbolTable:
     def __init__(
         self,
         symbols: Sequence["Symbol"],
+        symbols_topologically_sorted: Sequence["SymbolExceptEnumeration"],
         verification_functions: Sequence["VerificationUnion"],
         meta_model: MetaModel,
     ) -> None:
         """Initialize with the given values and map symbols to name."""
         self.symbols = symbols
+        self.symbols_topologically_sorted = symbols_topologically_sorted
         self.verification_functions = verification_functions
         self.meta_model = meta_model
 
@@ -1642,6 +1659,11 @@ ClassUnion = Union[AbstractClass, ConcreteClass]
 assert_union_of_descendants_exhaustive(union=ClassUnion, base_class=Class)
 
 Symbol = Union[Enumeration, ConstrainedPrimitive, ClassUnion]
+
+SymbolExceptEnumeration = Union[ConstrainedPrimitive, ClassUnion]
+assert_union_without_excluded(
+    original_union=Symbol, subset_union=SymbolExceptEnumeration, excluded=[Enumeration]
+)
 
 VerificationUnion = Union[ImplementationSpecificVerification, PatternVerification]
 assert_union_of_descendants_exhaustive(union=VerificationUnion, base_class=Verification)

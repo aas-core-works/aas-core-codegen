@@ -78,6 +78,7 @@ from aas_core_codegen.intermediate._types import (
     VerificationUnion,
     UnderstoodMethod,
     collect_ids_of_classes_in_properties,
+    SymbolExceptEnumeration,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -2499,8 +2500,17 @@ def translate(
     if len(underlying_errors) > 0:
         return None, bundle_underlying_errors()
 
+    symbols_by_name = {symbol.name: symbol for symbol in symbols}
+
+    symbols_topologically_sorted = []  # type: List[SymbolExceptEnumeration]
+    for parsed_cls in ontology.classes:
+        symbol = symbols_by_name[parsed_cls.name]
+        assert not isinstance(symbol, Enumeration)
+        symbols_topologically_sorted.append(symbol)
+
     symbol_table = SymbolTable(
         symbols=symbols,
+        symbols_topologically_sorted=symbols_topologically_sorted,
         verification_functions=verification_functions,
         meta_model=meta_model,
     )

@@ -15,6 +15,7 @@ from typing import (
     Sequence,
     NoReturn,
     Any,
+    Iterable,
 )
 
 import asttokens
@@ -299,3 +300,95 @@ def assert_union_of_descendants_exhaustive(union: Any, base_class: Any) -> None:
                 f"The following concrete sub-classes of {base_class.__name__!r} were "
                 f"not listed in the union: {subclass_diff_names}"
             )
+
+
+def assert_union_without_excluded(
+    original_union: Any, subset_union: Any, excluded: Iterable[Any]
+) -> None:
+    """
+    Check that the ``subset_union`` ∪ ``excluded`` is ``original_union``.
+
+    Make sure you put the assertion at the end of the module where no new classes are
+    defined.
+
+    See also for more details: https://hakibenita.com/python-mypy-exhaustive-checking
+    """
+    # region Map the identifiers of the inputs to their objects
+
+    if inspect.isclass(original_union):
+        original_union_map = {id(original_union): original_union}
+    elif hasattr(original_union, "__args__"):
+        original_union_map = {id(a_type): a_type for a_type in original_union.__args__}
+    else:
+        raise NotImplementedError(
+            f"We do not know how to handle the original_union: {original_union}"
+        )
+
+    if inspect.isclass(subset_union):
+        subset_union_map = {id(subset_union): subset_union}
+    elif hasattr(subset_union, "__args__"):
+        subset_union_map = {id(a_type): a_type for a_type in subset_union.__args__}
+    else:
+        raise NotImplementedError(
+            f"We do not know how to handle the subset_union: {subset_union}"
+        )
+
+    excluded_map = {id(a_type): a_type for a_type in excluded}
+
+    name_map = {**original_union_map, **subset_union_map, **excluded_map}
+
+    # endregion
+
+    # region Compute the sets of the identifiers
+
+    original_union_set = set(original_union_map.keys())
+    subset_union_set = set(subset_union_map.keys())
+    excluded_set = set(excluded_map.keys())
+
+    # endregion
+
+    # region Check that it all fits
+
+    intersection = subset_union_set.intersection(excluded_set)
+    if len(intersection) > 0:
+        names = sorted(name_map[type_id].__name__ for type_id in intersection)
+        raise AssertionError(
+            f"The following types were listed both "
+            f"in the subset_union and the excluded: {names}"
+        )
+
+    diff = subset_union_set.difference(original_union_set)
+    if len(diff) > 0:
+        names = sorted(name_map[type_id].__name__ for type_id in diff)
+        raise AssertionError(
+            f"The following types were listed in the subset_union, "
+            f"but not in the original_union: {names}"
+        )
+
+    diff = excluded_set.difference(original_union_set)
+    if len(diff) > 0:
+        names = sorted(name_map[type_id].__name__ for type_id in diff)
+        raise AssertionError(
+            f"The following types were listed in the excluded, "
+            f"but not in the original_union: {names}"
+        )
+
+    reconstructed_set = subset_union_set.union(excluded_set)
+
+    diff = original_union_set.difference(reconstructed_set)
+    if len(diff) > 0:
+        names = sorted(name_map[type_id].__name__ for type_id in diff)
+        raise AssertionError(
+            f"The following types were listed in the original_union, "
+            f"but not in the subset_union ∪ excluded: {names}"
+        )
+
+    diff = reconstructed_set.difference(original_union_set)
+    if len(diff) > 0:
+        names = sorted(name_map[type_id].__name__ for type_id in diff)
+        raise AssertionError(
+            f"The following types were listed in the subset_union ∪ excluded, "
+            f"but not in the original_union: {names}"
+        )
+
+    # endregion

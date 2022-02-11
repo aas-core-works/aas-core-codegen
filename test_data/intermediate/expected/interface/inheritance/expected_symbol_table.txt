@@ -245,6 +245,9 @@ SymbolTable(
       property_id_set=...,
       methods_by_name=...,
       invariant_id_set=...)],
+  symbols_topologically_sorted=[
+    'Reference to symbol VeryAbstract',
+    'Reference to symbol Abstract'],
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(
