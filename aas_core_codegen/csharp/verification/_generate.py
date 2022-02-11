@@ -469,13 +469,7 @@ class _ConstrainedPrimitiveCheckUnroller(csharp_unrolling.Unroller):
         item_level: int,
         key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
-        """
-        Generate the code for both our atomic type annotations and references.
-
-        We merged :py:method:`._unroll_our_type_annotation` and
-        :py:method:`._unroll_ref_type_annotation` together since they differ in only
-        which symbol is unrolled over.
-        """
+        """Generate the code for both our atomic type annotations."""
         if not isinstance(type_annotation.symbol, intermediate.ConstrainedPrimitive):
             # NOTE (mristin, 2021-12-25):
             # We do not descend into other types as this is generating the code
