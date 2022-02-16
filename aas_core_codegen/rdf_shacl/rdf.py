@@ -63,7 +63,7 @@ def _define_for_enumeration(
     writer.write(
         textwrap.dedent(
             f"""\
-        ### {url_prefix}/{cls_name}
+        ###  {url_prefix}/{cls_name}
         aas:{cls_name} rdf:type owl:Class ;"""
         )
     )
@@ -108,7 +108,7 @@ def _define_for_enumeration(
             writer.write(
                 textwrap.dedent(
                     f"""\
-                ### {url_prefix}/{cls_name}/{literal_name}
+                ###  {url_prefix}/{cls_name}/{literal_name}
                 <{url_prefix}/{cls_name}/{literal_name}> rdf:type aas:{cls_name} ;
                 {I}rdfs:label {rdf_shacl_common.string_literal(literal_label)}^^xsd:string ;"""
                 )
@@ -145,7 +145,7 @@ def _define_owl_class_for_class(
     cls_name = rdf_shacl_naming.class_name(cls.name)
 
     writer = io.StringIO()
-    writer.write(f"### {url_prefix}/{cls_name}\n")
+    writer.write(f"###  {url_prefix}/{cls_name}\n")
     writer.write(f"aas:{cls_name} rdf:type owl:Class ;\n")
 
     for inheritance in cls.inheritances:
@@ -246,7 +246,7 @@ def _define_property(
     writer.write(
         textwrap.dedent(
             f"""\
-        ### {url}
+        ###  {url}
         <{url}> rdf:type {rdf_type} ;
         {I}rdfs:label {rdf_shacl_common.string_literal(prop_label)}^^xsd:string ;
         {I}rdfs:domain {rdfs_domain} ;

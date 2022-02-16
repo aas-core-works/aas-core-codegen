@@ -18,13 +18,13 @@
     rdfs:isDefinedBy <https://admin-shell.io/aas/3/0/RC01/> ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControl
+###  https://admin-shell.io/aas/3/0/RC01/AccessControl
 aas:AccessControl rdf:type owl:Class ;
     rdfs:comment "Access Control defines the local access control policy administration point. Access Control has the major task to define the access permission rules."@en ;
     rdfs:label "Access Control"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControl/accessPermissionRules
+###  https://admin-shell.io/aas/3/0/RC01/AccessControl/accessPermissionRules
 <https://admin-shell.io/aas/3/0/RC01/AccessControl/accessPermissionRules> rdf:type owl:ObjectProperty ;
     rdfs:label "has access permission rules"^^xsd:string ;
     rdfs:domain aas:AccessControl ;
@@ -32,7 +32,7 @@ aas:AccessControl rdf:type owl:Class ;
     rdfs:comment "Access permission rules of the AAS describing the rights assigned to (already authenticated) subjects to access elements of the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControl/selectableSubjectAttributes
+###  https://admin-shell.io/aas/3/0/RC01/AccessControl/selectableSubjectAttributes
 <https://admin-shell.io/aas/3/0/RC01/AccessControl/selectableSubjectAttributes> rdf:type owl:ObjectProperty ;
     rdfs:label "has selectable subject attributes"^^xsd:string ;
     rdfs:domain aas:AccessControl ;
@@ -40,7 +40,7 @@ aas:AccessControl rdf:type owl:Class ;
     rdfs:comment "Reference to a submodel defining the authenticated subjects that are configured for the AAS. They are selectable by the access permission rules to assign permissions to the subjects.\n\nDefault: reference to the submodel referenced via defaultSubjectAttributes."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControl/defaultSubjectAttributes
+###  https://admin-shell.io/aas/3/0/RC01/AccessControl/defaultSubjectAttributes
 <https://admin-shell.io/aas/3/0/RC01/AccessControl/defaultSubjectAttributes> rdf:type owl:ObjectProperty ;
     rdfs:label "has default subject attributes"^^xsd:string ;
     rdfs:domain aas:AccessControl ;
@@ -48,7 +48,7 @@ aas:AccessControl rdf:type owl:Class ;
     rdfs:comment "Reference to a submodel defining the default subjects’ attributes for the AAS that can be used to describe access permission rules.\n\nThe submodel is of kind=Template."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControl/selectablePermissions
+###  https://admin-shell.io/aas/3/0/RC01/AccessControl/selectablePermissions
 <https://admin-shell.io/aas/3/0/RC01/AccessControl/selectablePermissions> rdf:type owl:ObjectProperty ;
     rdfs:label "has selectable permissions"^^xsd:string ;
     rdfs:domain aas:AccessControl ;
@@ -56,7 +56,7 @@ aas:AccessControl rdf:type owl:Class ;
     rdfs:comment "Reference to a submodel defining which permissions can be assigned to the subjects.\n\nDefault: reference to the submodel referenced via defaultPermissions"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControl/defaultPermissions
+###  https://admin-shell.io/aas/3/0/RC01/AccessControl/defaultPermissions
 <https://admin-shell.io/aas/3/0/RC01/AccessControl/defaultPermissions> rdf:type owl:ObjectProperty ;
     rdfs:label "has default permissions"^^xsd:string ;
     rdfs:domain aas:AccessControl ;
@@ -64,7 +64,7 @@ aas:AccessControl rdf:type owl:Class ;
     rdfs:comment "Reference to a submodel defining the default permissions for the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControl/selectableEnvironmentAttributes
+###  https://admin-shell.io/aas/3/0/RC01/AccessControl/selectableEnvironmentAttributes
 <https://admin-shell.io/aas/3/0/RC01/AccessControl/selectableEnvironmentAttributes> rdf:type owl:ObjectProperty ;
     rdfs:label "has selectable environment attributes"^^xsd:string ;
     rdfs:domain aas:AccessControl ;
@@ -72,7 +72,7 @@ aas:AccessControl rdf:type owl:Class ;
     rdfs:comment "Reference to a submodel defining which environment attributes can be accessed via the permission rules defined for the AAS, i.e. attributes that are not describing the asset itself.\n\nDefault: reference to the submodel referenced via defaultEnvironmentAttributes"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControl/defaultEnvironmentAttributes
+###  https://admin-shell.io/aas/3/0/RC01/AccessControl/defaultEnvironmentAttributes
 <https://admin-shell.io/aas/3/0/RC01/AccessControl/defaultEnvironmentAttributes> rdf:type owl:ObjectProperty ;
     rdfs:label "has default environment attributes"^^xsd:string ;
     rdfs:domain aas:AccessControl ;
@@ -80,13 +80,13 @@ aas:AccessControl rdf:type owl:Class ;
     rdfs:comment "Reference to a submodel defining default environment attributes, i.e. attributes that are not describing the asset itself.\n\nThe submodel is of kind=Template.\n\nAt the same type the values of these environment attributes need to be accessible when evaluating the access permission rules. This is realized as a policy information point."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints
+###  https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints
 aas:AccessControlPolicyPoints rdf:type owl:Class ;
     rdfs:comment "Container for access control policy points."@en ;
     rdfs:label "Access Control Policy Points"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyAdministrationPoint
+###  https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyAdministrationPoint
 <https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyAdministrationPoint> rdf:type owl:ObjectProperty ;
     rdfs:label "has policy administration point"^^xsd:string ;
     rdfs:domain aas:AccessControlPolicyPoints ;
@@ -94,7 +94,7 @@ aas:AccessControlPolicyPoints rdf:type owl:Class ;
     rdfs:comment "The access control administration policy point of the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyDecisionPoint
+###  https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyDecisionPoint
 <https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyDecisionPoint> rdf:type owl:ObjectProperty ;
     rdfs:label "has policy decision point"^^xsd:string ;
     rdfs:domain aas:AccessControlPolicyPoints ;
@@ -102,7 +102,7 @@ aas:AccessControlPolicyPoints rdf:type owl:Class ;
     rdfs:comment "The access control policy decision point of the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoint
+###  https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoint
 <https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoint> rdf:type owl:ObjectProperty ;
     rdfs:label "has policy enforcement point"^^xsd:string ;
     rdfs:domain aas:AccessControlPolicyPoints ;
@@ -110,7 +110,7 @@ aas:AccessControlPolicyPoints rdf:type owl:Class ;
     rdfs:comment "The access control policy enforcement point of the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyInformationPoints
+###  https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyInformationPoints
 <https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyInformationPoints> rdf:type owl:ObjectProperty ;
     rdfs:label "has policy information points"^^xsd:string ;
     rdfs:domain aas:AccessControlPolicyPoints ;
@@ -118,7 +118,7 @@ aas:AccessControlPolicyPoints rdf:type owl:Class ;
     rdfs:comment "The access control policy information points of the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessPermissionRule
+###  https://admin-shell.io/aas/3/0/RC01/AccessPermissionRule
 aas:AccessPermissionRule rdf:type owl:Class ;
     rdfs:subClassOf aas:Referable ;
     rdfs:subClassOf aas:Qualifiable ;
@@ -126,7 +126,7 @@ aas:AccessPermissionRule rdf:type owl:Class ;
     rdfs:label "Access Permission Rule"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessPermissionRule/targetSubjectAttributes
+###  https://admin-shell.io/aas/3/0/RC01/AccessPermissionRule/targetSubjectAttributes
 <https://admin-shell.io/aas/3/0/RC01/AccessPermissionRule/targetSubjectAttributes> rdf:type owl:ObjectProperty ;
     rdfs:label "has target subject attributes"^^xsd:string ;
     rdfs:domain aas:AccessPermissionRule ;
@@ -134,7 +134,7 @@ aas:AccessPermissionRule rdf:type owl:Class ;
     rdfs:comment "Target subject attributes that need to be fulfilled by accessing subject to get the permissions defined by this rule."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AccessPermissionRule/permissionsPerObject
+###  https://admin-shell.io/aas/3/0/RC01/AccessPermissionRule/permissionsPerObject
 <https://admin-shell.io/aas/3/0/RC01/AccessPermissionRule/permissionsPerObject> rdf:type owl:ObjectProperty ;
     rdfs:label "has permissions per object"^^xsd:string ;
     rdfs:domain aas:AccessPermissionRule ;
@@ -142,14 +142,14 @@ aas:AccessPermissionRule rdf:type owl:Class ;
     rdfs:comment "Set of object-permission pairs that define the permissions per object within the access permission rule."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AdministrativeInformation
+###  https://admin-shell.io/aas/3/0/RC01/AdministrativeInformation
 aas:AdministrativeInformation rdf:type owl:Class ;
     rdfs:subClassOf aas:HasDataSpecification ;
     rdfs:comment "Administrative meta-information for an element like version information."@en ;
     rdfs:label "Administrative Information"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AdministrativeInformation/version
+###  https://admin-shell.io/aas/3/0/RC01/AdministrativeInformation/version
 <https://admin-shell.io/aas/3/0/RC01/AdministrativeInformation/version> rdf:type owl:DatatypeProperty ;
     rdfs:label "has version"^^xsd:string ;
     rdfs:domain aas:AdministrativeInformation ;
@@ -157,7 +157,7 @@ aas:AdministrativeInformation rdf:type owl:Class ;
     rdfs:comment "Version of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AdministrativeInformation/revision
+###  https://admin-shell.io/aas/3/0/RC01/AdministrativeInformation/revision
 <https://admin-shell.io/aas/3/0/RC01/AdministrativeInformation/revision> rdf:type owl:DatatypeProperty ;
     rdfs:label "has revision"^^xsd:string ;
     rdfs:domain aas:AdministrativeInformation ;
@@ -165,14 +165,14 @@ aas:AdministrativeInformation rdf:type owl:Class ;
     rdfs:comment "Revision of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement
+###  https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement
 aas:AnnotatedRelationshipElement rdf:type owl:Class ;
     rdfs:subClassOf aas:RelationshipElement ;
     rdfs:comment "An annotated relationship element is a relationship element that can be annotated with additional data elements."@en ;
     rdfs:label "Annotated Relationship Element"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/annotation
+###  https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/annotation
 <https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/annotation> rdf:type owl:ObjectProperty ;
     rdfs:label "has annotation"^^xsd:string ;
     rdfs:domain aas:AnnotatedRelationshipElement ;
@@ -180,7 +180,7 @@ aas:AnnotatedRelationshipElement rdf:type owl:Class ;
     rdfs:comment "A reference to a data element that represents an annotation that holds for the relationship between the two elements."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Asset
+###  https://admin-shell.io/aas/3/0/RC01/Asset
 aas:Asset rdf:type owl:Class ;
     rdfs:subClassOf aas:Identifiable ;
     rdfs:subClassOf aas:HasDataSpecification ;
@@ -188,7 +188,7 @@ aas:Asset rdf:type owl:Class ;
     rdfs:label "Asset"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell
+###  https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell
 aas:AssetAdministrationShell rdf:type owl:Class ;
     rdfs:subClassOf aas:Identifiable ;
     rdfs:subClassOf aas:HasDataSpecification ;
@@ -196,7 +196,7 @@ aas:AssetAdministrationShell rdf:type owl:Class ;
     rdfs:label "Asset Administration Shell"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/derivedFrom
+###  https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/derivedFrom
 <https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/derivedFrom> rdf:type owl:ObjectProperty ;
     rdfs:label "has derived from"^^xsd:string ;
     rdfs:domain aas:AssetAdministrationShell ;
@@ -204,7 +204,7 @@ aas:AssetAdministrationShell rdf:type owl:Class ;
     rdfs:comment "The reference to the AAS the AAS was derived from."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/security
+###  https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/security
 <https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/security> rdf:type owl:ObjectProperty ;
     rdfs:label "has security"^^xsd:string ;
     rdfs:domain aas:AssetAdministrationShell ;
@@ -212,7 +212,7 @@ aas:AssetAdministrationShell rdf:type owl:Class ;
     rdfs:comment "Definition of the security relevant aspects of the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/assetInformation
+###  https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/assetInformation
 <https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/assetInformation> rdf:type owl:ObjectProperty ;
     rdfs:label "has asset information"^^xsd:string ;
     rdfs:domain aas:AssetAdministrationShell ;
@@ -220,7 +220,7 @@ aas:AssetAdministrationShell rdf:type owl:Class ;
     rdfs:comment "Meta-information about the asset the AAS is representing."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/submodels
+###  https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/submodels
 <https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/submodels> rdf:type owl:ObjectProperty ;
     rdfs:label "has submodels"^^xsd:string ;
     rdfs:domain aas:AssetAdministrationShell ;
@@ -228,7 +228,7 @@ aas:AssetAdministrationShell rdf:type owl:Class ;
     rdfs:comment "References to submodels of the AAS.\n\nA submodel is a description of an aspect of the asset the AAS is representing. The asset of an AAS is typically described by one or more submodels. Temporarily no submodel might be assigned to the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/views
+###  https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/views
 <https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShell/views> rdf:type owl:ObjectProperty ;
     rdfs:label "has views"^^xsd:string ;
     rdfs:domain aas:AssetAdministrationShell ;
@@ -236,13 +236,13 @@ aas:AssetAdministrationShell rdf:type owl:Class ;
     rdfs:comment "Stakeholder-specific views defined for the AAS.\n\nIf needed, stakeholder specific views can be defined on the elements of the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetInformation
+###  https://admin-shell.io/aas/3/0/RC01/AssetInformation
 aas:AssetInformation rdf:type owl:Class ;
     rdfs:comment "Identifying meta data of the asset that is represented by an AAS.\n\nThe asset may either represent an asset type or an asset instance. The asset has a globally unique identifier plus – if needed – additional domain-specific (proprietary) identifiers. However, to support the corner case of very first phase of lifecycle where a stabilized/constant global asset identifier does not already exist, the corresponding attribute 'globalAssetId' is optional."@en ;
     rdfs:label "Asset Information"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetInformation/assetKind
+###  https://admin-shell.io/aas/3/0/RC01/AssetInformation/assetKind
 <https://admin-shell.io/aas/3/0/RC01/AssetInformation/assetKind> rdf:type owl:ObjectProperty ;
     rdfs:label "has asset kind"^^xsd:string ;
     rdfs:domain aas:AssetInformation ;
@@ -250,7 +250,7 @@ aas:AssetInformation rdf:type owl:Class ;
     rdfs:comment "Denotes whether the Asset is of kind \"Type\" or \"Instance\"."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetInformation/globalAssetId
+###  https://admin-shell.io/aas/3/0/RC01/AssetInformation/globalAssetId
 <https://admin-shell.io/aas/3/0/RC01/AssetInformation/globalAssetId> rdf:type owl:ObjectProperty ;
     rdfs:label "has global asset ID"^^xsd:string ;
     rdfs:domain aas:AssetInformation ;
@@ -258,7 +258,7 @@ aas:AssetInformation rdf:type owl:Class ;
     rdfs:comment "Reference to either an Asset object or a global reference to the asset the AAS is representing.\n\nThis attribute is required as soon as the AAS is exchanged via partners in the life cycle of the asset. In a first phase of the life cycle the asset might not yet have a global ID but already an internal identifier. The internal identifier would be modelled via 'specificAssetIds'."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetInformation/specificAssetIds
+###  https://admin-shell.io/aas/3/0/RC01/AssetInformation/specificAssetIds
 <https://admin-shell.io/aas/3/0/RC01/AssetInformation/specificAssetIds> rdf:type owl:ObjectProperty ;
     rdfs:label "has specific asset ids"^^xsd:string ;
     rdfs:domain aas:AssetInformation ;
@@ -266,7 +266,7 @@ aas:AssetInformation rdf:type owl:Class ;
     rdfs:comment "Additional domain-specific, typically proprietary, Identifier for the asset.\n\nFor example, serial number."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetInformation/billOfMaterial
+###  https://admin-shell.io/aas/3/0/RC01/AssetInformation/billOfMaterial
 <https://admin-shell.io/aas/3/0/RC01/AssetInformation/billOfMaterial> rdf:type owl:ObjectProperty ;
     rdfs:label "has bill of material"^^xsd:string ;
     rdfs:domain aas:AssetInformation ;
@@ -274,7 +274,7 @@ aas:AssetInformation rdf:type owl:Class ;
     rdfs:comment "A reference to a Submodel that defines the bill of material of the asset represented by the AAS.\n\nThe submodels contain a set of entities describing the material used to compose the composite I4.0 Component."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetInformation/defaultThumbnail
+###  https://admin-shell.io/aas/3/0/RC01/AssetInformation/defaultThumbnail
 <https://admin-shell.io/aas/3/0/RC01/AssetInformation/defaultThumbnail> rdf:type owl:ObjectProperty ;
     rdfs:label "has default thumbnail"^^xsd:string ;
     rdfs:domain aas:AssetInformation ;
@@ -282,36 +282,36 @@ aas:AssetInformation rdf:type owl:Class ;
     rdfs:comment "Thumbnail of the asset represented by the asset administration shell.\n\nUsed as default."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetKind
+###  https://admin-shell.io/aas/3/0/RC01/AssetKind
 aas:AssetKind rdf:type owl:Class ;
     rdfs:label "Asset Kind"^^xsd:string ;
     rdfs:comment "Enumeration for denoting whether an element is a type or an instance."@en ;
     owl:oneOf (
-        <https://admin-shell.io/aas/3/0/RC01/AssetKind/Type>
-        <https://admin-shell.io/aas/3/0/RC01/AssetKind/Instance>
+        <https://admin-shell.io/aas/3/0/RC01/AssetKind/TYPE>
+        <https://admin-shell.io/aas/3/0/RC01/AssetKind/INSTANCE>
     ) ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetKind/Type
-<https://admin-shell.io/aas/3/0/RC01/AssetKind/Type> rdf:type aas:AssetKind ;
+###  https://admin-shell.io/aas/3/0/RC01/AssetKind/TYPE
+<https://admin-shell.io/aas/3/0/RC01/AssetKind/TYPE> rdf:type aas:AssetKind ;
     rdfs:label "Type"^^xsd:string ;
     rdfs:comment "hardware or software element which specifies the common attributes shared by all instances of the type\n\n[SOURCE: IEC TR 62390:2005-01, 3.1.25]"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/AssetKind/Instance
-<https://admin-shell.io/aas/3/0/RC01/AssetKind/Instance> rdf:type aas:AssetKind ;
+###  https://admin-shell.io/aas/3/0/RC01/AssetKind/INSTANCE
+<https://admin-shell.io/aas/3/0/RC01/AssetKind/INSTANCE> rdf:type aas:AssetKind ;
     rdfs:label "Instance"^^xsd:string ;
     rdfs:comment "concrete, clearly identifiable component of a certain type\n\nNOTE:\nIt becomes an individual entity of a type, for example a device, by defining specific property values.\n\nNOTE:\nIn an object oriented view, an instance denotes an object of a class (of a type).\n\n[SOURCE: IEC 62890:2016, 3.1.16] 65/617/CDV"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/BasicEvent
+###  https://admin-shell.io/aas/3/0/RC01/BasicEvent
 aas:BasicEvent rdf:type owl:Class ;
     rdfs:subClassOf aas:Event ;
     rdfs:comment "A basic event."@en ;
     rdfs:label "Basic Event"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/BasicEvent/observed
+###  https://admin-shell.io/aas/3/0/RC01/BasicEvent/observed
 <https://admin-shell.io/aas/3/0/RC01/BasicEvent/observed> rdf:type owl:ObjectProperty ;
     rdfs:label "has observed"^^xsd:string ;
     rdfs:domain aas:BasicEvent ;
@@ -319,14 +319,14 @@ aas:BasicEvent rdf:type owl:Class ;
     rdfs:comment "Reference to a referable, e.g. a data element or a submodel, that is being observed."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Blob
+###  https://admin-shell.io/aas/3/0/RC01/Blob
 aas:Blob rdf:type owl:Class ;
     rdfs:subClassOf aas:DataElement ;
     rdfs:comment "A BLOB is a data element that represents a file that is contained with its source code in the value attribute."@en ;
     rdfs:label "Blob"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Blob/mimeType
+###  https://admin-shell.io/aas/3/0/RC01/Blob/mimeType
 <https://admin-shell.io/aas/3/0/RC01/Blob/mimeType> rdf:type owl:DatatypeProperty ;
     rdfs:label "has mime type"^^xsd:string ;
     rdfs:domain aas:Blob ;
@@ -334,7 +334,7 @@ aas:Blob rdf:type owl:Class ;
     rdfs:comment "MIME type of the content of the BLOB.\n\nThe MIME type states which file extensions the file can have. Valid values are e.g. “application/json”, “application/xls”, ”image/jpg” The allowed values are defined as in RFC2046."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Blob/value
+###  https://admin-shell.io/aas/3/0/RC01/Blob/value
 <https://admin-shell.io/aas/3/0/RC01/Blob/value> rdf:type owl:DatatypeProperty ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:Blob ;
@@ -342,14 +342,14 @@ aas:Blob rdf:type owl:Class ;
     rdfs:comment "The value of the BLOB instance of a blob data element.\n\nNOTE:\nIn contrast to the file property the file content is stored directly as value in the Blob data element.\n\nConstraint AASd-057: The semanticId of a File or Blob submodel element shall only reference a ConceptDescription with the category DOCUMENT."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/BlobCertificate
+###  https://admin-shell.io/aas/3/0/RC01/BlobCertificate
 aas:BlobCertificate rdf:type owl:Class ;
     rdfs:subClassOf aas:Certificate ;
     rdfs:comment "Certificate provided as BLOB"@en ;
     rdfs:label "Blob Certificate"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/BlobCertificate/blobCertificate
+###  https://admin-shell.io/aas/3/0/RC01/BlobCertificate/blobCertificate
 <https://admin-shell.io/aas/3/0/RC01/BlobCertificate/blobCertificate> rdf:type owl:ObjectProperty ;
     rdfs:label "has blob certificate"^^xsd:string ;
     rdfs:domain aas:BlobCertificate ;
@@ -357,7 +357,7 @@ aas:BlobCertificate rdf:type owl:Class ;
     rdfs:comment "Certificate as BLOB."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/BlobCertificate/lastCertificate
+###  https://admin-shell.io/aas/3/0/RC01/BlobCertificate/lastCertificate
 <https://admin-shell.io/aas/3/0/RC01/BlobCertificate/lastCertificate> rdf:type owl:DatatypeProperty ;
     rdfs:label "has last certificate"^^xsd:string ;
     rdfs:domain aas:BlobCertificate ;
@@ -365,7 +365,7 @@ aas:BlobCertificate rdf:type owl:Class ;
     rdfs:comment "Denotes whether this certificate is the certificated that fast added last."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/BlobCertificate/containedExtension
+###  https://admin-shell.io/aas/3/0/RC01/BlobCertificate/containedExtension
 <https://admin-shell.io/aas/3/0/RC01/BlobCertificate/containedExtension> rdf:type owl:ObjectProperty ;
     rdfs:label "has contained extension"^^xsd:string ;
     rdfs:domain aas:BlobCertificate ;
@@ -373,20 +373,20 @@ aas:BlobCertificate rdf:type owl:Class ;
     rdfs:comment "Extensions contained in the certificate."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Capability
+###  https://admin-shell.io/aas/3/0/RC01/Capability
 aas:Capability rdf:type owl:Class ;
     rdfs:subClassOf aas:SubmodelElement ;
     rdfs:comment "A capability is the implementation-independent description of the potential of an asset to achieve a certain effect in the physical or virtual world."@en ;
     rdfs:label "Capability"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Certificate
+###  https://admin-shell.io/aas/3/0/RC01/Certificate
 aas:Certificate rdf:type owl:Class ;
     rdfs:comment "Certificate"@en ;
     rdfs:label "Certificate"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Certificate/policyAdministrationPoint
+###  https://admin-shell.io/aas/3/0/RC01/Certificate/policyAdministrationPoint
 <https://admin-shell.io/aas/3/0/RC01/Certificate/policyAdministrationPoint> rdf:type owl:ObjectProperty ;
     rdfs:label "has policy administration point"^^xsd:string ;
     rdfs:domain aas:Certificate ;
@@ -394,7 +394,7 @@ aas:Certificate rdf:type owl:Class ;
     rdfs:comment "The access control administration policy point of the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ConceptDescription
+###  https://admin-shell.io/aas/3/0/RC01/ConceptDescription
 aas:ConceptDescription rdf:type owl:Class ;
     rdfs:subClassOf aas:Identifiable ;
     rdfs:subClassOf aas:HasDataSpecification ;
@@ -402,7 +402,7 @@ aas:ConceptDescription rdf:type owl:Class ;
     rdfs:label "Concept Description"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ConceptDescription/isCaseOf
+###  https://admin-shell.io/aas/3/0/RC01/ConceptDescription/isCaseOf
 <https://admin-shell.io/aas/3/0/RC01/ConceptDescription/isCaseOf> rdf:type owl:ObjectProperty ;
     rdfs:label "has is case of"^^xsd:string ;
     rdfs:domain aas:ConceptDescription ;
@@ -410,27 +410,27 @@ aas:ConceptDescription rdf:type owl:Class ;
     rdfs:comment "Reference to an external definition the concept is compatible to or was derived from.\n\nNOTE:\nCompare to is-case-of relationship in ISO 13584-32 & IEC EN 61360\""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Constraint
+###  https://admin-shell.io/aas/3/0/RC01/Constraint
 aas:Constraint rdf:type owl:Class ;
     rdfs:comment "A constraint is used to further qualify or restrict an element."@en ;
     rdfs:label "Constraint"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataElement
+###  https://admin-shell.io/aas/3/0/RC01/DataElement
 aas:DataElement rdf:type owl:Class ;
     rdfs:subClassOf aas:SubmodelElement ;
     rdfs:comment "A data element is a submodel element that is not further composed out of other submodel elements.\n\nA data element is a submodel element that has a value. The type of value differs for different subtypes of data elements.\n\nNOTE:\nA controlled value is a value whose meaning is given in an external source (see “ISO/TS 29002-10)\n\nConstraint AASd-090: For data elements DataElement/category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE. Exception: File and Blob data elements."@en ;
     rdfs:label "Data Element"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360
 aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:subClassOf aas:DataSpecificationContent ;
     rdfs:comment "Content of data specification template for concept descriptions conformant to IEC 61360. Although the IEC61360 attributes listed in this template are defined for properties and values and value lists only it is also possible to use the template for other definition This is shown in the tables Table 7, Table 8, Table 9 and Table 10.\n\nConstraint AASd-075: For all ConceptDescriptions using data specification template IEC61360 (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0\n) values for the attributes not being marked as mandatory or optional in tables Table 7, Table 8, Table 9 and Table 10.depending on its category are ignored and handled as undefined."@en ;
     rdfs:label "Data Specification IEC 61360"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/preferredName
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/preferredName
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/preferredName> rdf:type owl:ObjectProperty ;
     rdfs:label "has preferred name"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
@@ -438,7 +438,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:comment "Preferred name Constraint AASd-076: For all ConceptDescriptions using data specification template IEC61360 (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0\n) at least a preferred name in English shall be defined."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/shortName
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/shortName
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/shortName> rdf:type owl:ObjectProperty ;
     rdfs:label "has short name"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
@@ -446,7 +446,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:comment "Short name"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/unit
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/unit
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/unit> rdf:type owl:DatatypeProperty ;
     rdfs:label "has unit"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
@@ -454,7 +454,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:comment "Unit"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/unitId
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/unitId
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/unitId> rdf:type owl:ObjectProperty ;
     rdfs:label "has unit ID"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
@@ -462,7 +462,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:comment "Unique unit id"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/sourceOfDefinition
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/sourceOfDefinition
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/sourceOfDefinition> rdf:type owl:DatatypeProperty ;
     rdfs:label "has source of definition"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
@@ -470,7 +470,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:comment "Source of definition"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/symbol
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/symbol
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/symbol> rdf:type owl:DatatypeProperty ;
     rdfs:label "has symbol"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
@@ -478,7 +478,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:comment "Symbol"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/dataType
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/dataType
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/dataType> rdf:type owl:ObjectProperty ;
     rdfs:label "has data type"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
@@ -486,7 +486,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:comment "Data Type\n\nConstraint AASd-070: For a ConceptDescription with category PROPERTY or VALUE using data specification template IEC61360 (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0\n) - DataSpecificationIEC61360/dataType is mandatory and shall be defined.\n\nConstraint AASd-071: For a ConceptDescription with category REFERENCE using data specification template IEC61360 (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0\n) - DataSpecificationIEC61360/dataType is STRING by default.\n\nConstraint AASd-072: For a ConceptDescription with category DOCUMENT using data specification template IEC61360 (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0\n) - DataSpecificationIEC61360/dataType shall be one of the following values: STRING or URL.\n\nConstraint AASd-073: For a ConceptDescription with category QUALIFIER using data specification template IEC61360 (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0\n) - DataSpecificationIEC61360/dataType is mandatory and shall be defined."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/definition
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/definition
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/definition> rdf:type owl:ObjectProperty ;
     rdfs:label "has definition"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
@@ -494,7 +494,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:comment "Definition in different languages\n\nConstraint AASd-074: For all ConceptDescriptions except for ConceptDescriptions of category VALUE using data specification template IEC61360 (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0\n) - DataSpecificationIEC61360/definition is mandatory and shall be defined at least in English."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueFormat
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueFormat
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueFormat> rdf:type owl:DatatypeProperty ;
     rdfs:label "has value format"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
@@ -502,7 +502,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:comment "Value Format"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueList
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueList
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueList> rdf:type owl:ObjectProperty ;
     rdfs:label "has value list"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
@@ -510,7 +510,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:comment "List of allowed values"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/value
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/value
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/value> rdf:type owl:DatatypeProperty ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
@@ -518,7 +518,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:comment "Value"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueId
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueId
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueId> rdf:type owl:ObjectProperty ;
     rdfs:label "has value ID"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
@@ -526,7 +526,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:comment "Unique value id"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/levelType
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/levelType
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/levelType> rdf:type owl:ObjectProperty ;
     rdfs:label "has level type"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
@@ -534,18 +534,18 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
     rdfs:comment "Set of levels."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationContent
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationContent
 aas:DataSpecificationContent rdf:type owl:Class ;
     rdfs:label "Data Specification Content"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit
 aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:subClassOf aas:DataSpecificationContent ;
     rdfs:label "Data Specification Physical Unit"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/unitName
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/unitName
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/unitName> rdf:type owl:DatatypeProperty ;
     rdfs:label "has unit name"^^xsd:string ;
     rdfs:domain aas:DataSpecificationPhysicalUnit ;
@@ -553,7 +553,7 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:comment "TODO"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/unitSymbol
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/unitSymbol
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/unitSymbol> rdf:type owl:DatatypeProperty ;
     rdfs:label "has unit symbol"^^xsd:string ;
     rdfs:domain aas:DataSpecificationPhysicalUnit ;
@@ -561,7 +561,7 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:comment "TODO"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/definition
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/definition
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/definition> rdf:type owl:ObjectProperty ;
     rdfs:label "has definition"^^xsd:string ;
     rdfs:domain aas:DataSpecificationPhysicalUnit ;
@@ -569,7 +569,7 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:comment "TODO"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/siNotation
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/siNotation
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/siNotation> rdf:type owl:DatatypeProperty ;
     rdfs:label "has si notation"^^xsd:string ;
     rdfs:domain aas:DataSpecificationPhysicalUnit ;
@@ -577,7 +577,7 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:comment "TODO"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/dinNotation
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/dinNotation
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/dinNotation> rdf:type owl:DatatypeProperty ;
     rdfs:label "has din notation"^^xsd:string ;
     rdfs:domain aas:DataSpecificationPhysicalUnit ;
@@ -585,7 +585,7 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:comment "TODO"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/eceName
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/eceName
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/eceName> rdf:type owl:DatatypeProperty ;
     rdfs:label "has ece name"^^xsd:string ;
     rdfs:domain aas:DataSpecificationPhysicalUnit ;
@@ -593,7 +593,7 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:comment "TODO"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/eceCode
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/eceCode
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/eceCode> rdf:type owl:DatatypeProperty ;
     rdfs:label "has ece code"^^xsd:string ;
     rdfs:domain aas:DataSpecificationPhysicalUnit ;
@@ -601,7 +601,7 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:comment "TODO"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/nistName
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/nistName
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/nistName> rdf:type owl:DatatypeProperty ;
     rdfs:label "has nist name"^^xsd:string ;
     rdfs:domain aas:DataSpecificationPhysicalUnit ;
@@ -609,7 +609,7 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:comment "TODO"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/sourceOfDefinition
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/sourceOfDefinition
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/sourceOfDefinition> rdf:type owl:DatatypeProperty ;
     rdfs:label "has source of definition"^^xsd:string ;
     rdfs:domain aas:DataSpecificationPhysicalUnit ;
@@ -617,7 +617,7 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:comment "TODO"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/conversionFactor
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/conversionFactor
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/conversionFactor> rdf:type owl:DatatypeProperty ;
     rdfs:label "has conversion factor"^^xsd:string ;
     rdfs:domain aas:DataSpecificationPhysicalUnit ;
@@ -625,7 +625,7 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:comment "TODO"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/registrationAuthorityId
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/registrationAuthorityId
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/registrationAuthorityId> rdf:type owl:DatatypeProperty ;
     rdfs:label "has registration authority ID"^^xsd:string ;
     rdfs:domain aas:DataSpecificationPhysicalUnit ;
@@ -633,7 +633,7 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:comment "TODO"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/supplier
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/supplier
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/supplier> rdf:type owl:DatatypeProperty ;
     rdfs:label "has supplier"^^xsd:string ;
     rdfs:domain aas:DataSpecificationPhysicalUnit ;
@@ -641,382 +641,382 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:comment "TODO"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360
 aas:DataTypeIec61360 rdf:type owl:Class ;
     rdfs:label "Data Type IEC 61360"^^xsd:string ;
     owl:oneOf (
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Date>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/String>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/StringTranslatable>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/IntegerMeasure>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/IntegerCount>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/IntegerCurrency>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RealMeasure>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RealCount>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RealCurrency>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Boolean>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Url>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Rational>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RationalMeasure>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Time>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Timestamp>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/DATE>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/STRING>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/STRING_TRANSLATABLE>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/INTEGER_MEASURE>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/INTEGER_COUNT>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/INTEGER_CURRENCY>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/REAL_MEASURE>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/REAL_COUNT>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/REAL_CURRENCY>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/BOOLEAN>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/URL>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RATIONAL>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RATIONAL_MEASURE>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/TIME>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/TIMESTAMP>
     ) ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Date
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Date> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/DATE
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/DATE> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "Date"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/String
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/String> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/STRING
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/STRING> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "String"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/StringTranslatable
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/StringTranslatable> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/STRING_TRANSLATABLE
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/STRING_TRANSLATABLE> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "String Translatable"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/IntegerMeasure
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/IntegerMeasure> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/INTEGER_MEASURE
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/INTEGER_MEASURE> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "Integer Measure"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/IntegerCount
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/IntegerCount> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/INTEGER_COUNT
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/INTEGER_COUNT> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "Integer Count"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/IntegerCurrency
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/IntegerCurrency> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/INTEGER_CURRENCY
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/INTEGER_CURRENCY> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "Integer Currency"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RealMeasure
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RealMeasure> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/REAL_MEASURE
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/REAL_MEASURE> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "Real Measure"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RealCount
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RealCount> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/REAL_COUNT
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/REAL_COUNT> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "Real Count"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RealCurrency
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RealCurrency> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/REAL_CURRENCY
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/REAL_CURRENCY> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "Real Currency"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Boolean
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Boolean> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/BOOLEAN
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/BOOLEAN> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "Boolean"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Url
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Url> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/URL
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/URL> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "URL"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Rational
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Rational> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RATIONAL
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RATIONAL> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "Rational"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RationalMeasure
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RationalMeasure> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RATIONAL_MEASURE
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/RATIONAL_MEASURE> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "Rational Measure"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Time
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Time> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/TIME
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/TIME> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "Time"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Timestamp
-<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/Timestamp> rdf:type aas:DataTypeIec61360 ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/TIMESTAMP
+<https://admin-shell.io/aas/3/0/RC01/DataTypeIec61360/TIMESTAMP> rdf:type aas:DataTypeIec61360 ;
     rdfs:label "Timestamp"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef
 aas:DataTypeDef rdf:type owl:Class ;
     rdfs:label "Data Type Def"^^xsd:string ;
     owl:oneOf (
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/AnyUri>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Base64Binary>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Boolean>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Date>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Datetime>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DatetimeStamp>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Decimal>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Integer>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Long>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Int>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Short>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Byte>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NonNegativeInteger>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/PositiveInteger>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UnsignedLong>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UnsignedInt>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UnsignedShort>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UnsignedByte>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NonPositiveInteger>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NegativeInteger>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Double>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Duration>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DayTimeDuration>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/YearMonthDuration>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Float>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GDay>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GMonth>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GMonthDay>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GYear>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GYearMonth>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/HexBinary>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Notation>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/QName>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/String>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NormalizedString>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Token>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Language>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Name>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NCName>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Entity>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Id>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Idref>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NMToken>
-        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Time>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/ANY_URI>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/BASE64_BINARY>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/BOOLEAN>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DATE>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DATETIME>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DATETIME_STAMP>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DECIMAL>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/INTEGER>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/LONG>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/INT>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/SHORT>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/BYTE>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NON_NEGATIVE_INTEGER>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/POSITIVE_INTEGER>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UNSIGNED_LONG>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UNSIGNED_INT>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UNSIGNED_SHORT>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UNSIGNED_BYTE>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NON_POSITIVE_INTEGER>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NEGATIVE_INTEGER>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DOUBLE>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DURATION>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DAY_TIME_DURATION>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/YEAR_MONTH_DURATION>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/FLOAT>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_DAY>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_MONTH>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_MONTH_DAY>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_YEAR>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_YEAR_MONTH>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/HEX_BINARY>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NOTATION>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Q_NAME>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/STRING>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NORMALIZED_STRING>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/TOKEN>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/LANGUAGE>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NAME>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/N_C_NAME>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/ENTITY>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/ID>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/IDREF>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/N_M_TOKEN>
+        <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/TIME>
     ) ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/AnyUri
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/AnyUri> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/ANY_URI
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/ANY_URI> rdf:type aas:DataTypeDef ;
     rdfs:label "Any Uri"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Base64Binary
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Base64Binary> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/BASE64_BINARY
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/BASE64_BINARY> rdf:type aas:DataTypeDef ;
     rdfs:label "Base64 Binary"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Boolean
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Boolean> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/BOOLEAN
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/BOOLEAN> rdf:type aas:DataTypeDef ;
     rdfs:label "Boolean"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Date
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Date> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DATE
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DATE> rdf:type aas:DataTypeDef ;
     rdfs:label "Date"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Datetime
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Datetime> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DATETIME
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DATETIME> rdf:type aas:DataTypeDef ;
     rdfs:label "Datetime"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DatetimeStamp
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DatetimeStamp> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DATETIME_STAMP
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DATETIME_STAMP> rdf:type aas:DataTypeDef ;
     rdfs:label "Datetime Stamp"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Decimal
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Decimal> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DECIMAL
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DECIMAL> rdf:type aas:DataTypeDef ;
     rdfs:label "Decimal"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Integer
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Integer> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/INTEGER
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/INTEGER> rdf:type aas:DataTypeDef ;
     rdfs:label "Integer"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Long
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Long> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/LONG
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/LONG> rdf:type aas:DataTypeDef ;
     rdfs:label "Long"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Int
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Int> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/INT
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/INT> rdf:type aas:DataTypeDef ;
     rdfs:label "Int"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Short
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Short> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/SHORT
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/SHORT> rdf:type aas:DataTypeDef ;
     rdfs:label "Short"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Byte
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Byte> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/BYTE
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/BYTE> rdf:type aas:DataTypeDef ;
     rdfs:label "Byte"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NonNegativeInteger
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NonNegativeInteger> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NON_NEGATIVE_INTEGER
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NON_NEGATIVE_INTEGER> rdf:type aas:DataTypeDef ;
     rdfs:label "Non Negative Integer"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/PositiveInteger
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/PositiveInteger> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/POSITIVE_INTEGER
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/POSITIVE_INTEGER> rdf:type aas:DataTypeDef ;
     rdfs:label "Positive Integer"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UnsignedLong
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UnsignedLong> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UNSIGNED_LONG
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UNSIGNED_LONG> rdf:type aas:DataTypeDef ;
     rdfs:label "Unsigned Long"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UnsignedInt
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UnsignedInt> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UNSIGNED_INT
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UNSIGNED_INT> rdf:type aas:DataTypeDef ;
     rdfs:label "Unsigned Int"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UnsignedShort
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UnsignedShort> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UNSIGNED_SHORT
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UNSIGNED_SHORT> rdf:type aas:DataTypeDef ;
     rdfs:label "Unsigned Short"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UnsignedByte
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UnsignedByte> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UNSIGNED_BYTE
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/UNSIGNED_BYTE> rdf:type aas:DataTypeDef ;
     rdfs:label "Unsigned Byte"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NonPositiveInteger
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NonPositiveInteger> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NON_POSITIVE_INTEGER
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NON_POSITIVE_INTEGER> rdf:type aas:DataTypeDef ;
     rdfs:label "Non Positive Integer"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NegativeInteger
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NegativeInteger> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NEGATIVE_INTEGER
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NEGATIVE_INTEGER> rdf:type aas:DataTypeDef ;
     rdfs:label "Negative Integer"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Double
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Double> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DOUBLE
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DOUBLE> rdf:type aas:DataTypeDef ;
     rdfs:label "Double"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Duration
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Duration> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DURATION
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DURATION> rdf:type aas:DataTypeDef ;
     rdfs:label "Duration"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DayTimeDuration
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DayTimeDuration> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DAY_TIME_DURATION
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/DAY_TIME_DURATION> rdf:type aas:DataTypeDef ;
     rdfs:label "Day Time Duration"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/YearMonthDuration
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/YearMonthDuration> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/YEAR_MONTH_DURATION
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/YEAR_MONTH_DURATION> rdf:type aas:DataTypeDef ;
     rdfs:label "Year Month Duration"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Float
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Float> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/FLOAT
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/FLOAT> rdf:type aas:DataTypeDef ;
     rdfs:label "Float"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GDay
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GDay> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_DAY
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_DAY> rdf:type aas:DataTypeDef ;
     rdfs:label "G Day"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GMonth
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GMonth> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_MONTH
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_MONTH> rdf:type aas:DataTypeDef ;
     rdfs:label "G Month"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GMonthDay
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GMonthDay> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_MONTH_DAY
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_MONTH_DAY> rdf:type aas:DataTypeDef ;
     rdfs:label "G Month Day"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GYear
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GYear> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_YEAR
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_YEAR> rdf:type aas:DataTypeDef ;
     rdfs:label "G Year"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GYearMonth
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/GYearMonth> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_YEAR_MONTH
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/G_YEAR_MONTH> rdf:type aas:DataTypeDef ;
     rdfs:label "G Year Month"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/HexBinary
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/HexBinary> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/HEX_BINARY
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/HEX_BINARY> rdf:type aas:DataTypeDef ;
     rdfs:label "Hex Binary"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Notation
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Notation> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NOTATION
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NOTATION> rdf:type aas:DataTypeDef ;
     rdfs:label "Notation"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/QName
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/QName> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Q_NAME
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Q_NAME> rdf:type aas:DataTypeDef ;
     rdfs:label "Q Name"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/String
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/String> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/STRING
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/STRING> rdf:type aas:DataTypeDef ;
     rdfs:label "String"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NormalizedString
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NormalizedString> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NORMALIZED_STRING
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NORMALIZED_STRING> rdf:type aas:DataTypeDef ;
     rdfs:label "Normalized String"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Token
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Token> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/TOKEN
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/TOKEN> rdf:type aas:DataTypeDef ;
     rdfs:label "Token"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Language
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Language> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/LANGUAGE
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/LANGUAGE> rdf:type aas:DataTypeDef ;
     rdfs:label "Language"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Name
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Name> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NAME
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NAME> rdf:type aas:DataTypeDef ;
     rdfs:label "Name"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NCName
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NCName> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/N_C_NAME
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/N_C_NAME> rdf:type aas:DataTypeDef ;
     rdfs:label "N C Name"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Entity
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Entity> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/ENTITY
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/ENTITY> rdf:type aas:DataTypeDef ;
     rdfs:label "Entity"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Id
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Id> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/ID
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/ID> rdf:type aas:DataTypeDef ;
     rdfs:label "ID"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Idref
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Idref> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/IDREF
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/IDREF> rdf:type aas:DataTypeDef ;
     rdfs:label "Idref"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NMToken
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/NMToken> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/N_M_TOKEN
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/N_M_TOKEN> rdf:type aas:DataTypeDef ;
     rdfs:label "N M Token"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Time
-<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/Time> rdf:type aas:DataTypeDef ;
+###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/TIME
+<https://admin-shell.io/aas/3/0/RC01/DataTypeDef/TIME> rdf:type aas:DataTypeDef ;
     rdfs:label "Time"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Entity
+###  https://admin-shell.io/aas/3/0/RC01/Entity
 aas:Entity rdf:type owl:Class ;
     rdfs:subClassOf aas:SubmodelElement ;
     rdfs:comment "An entity is a submodel element that is used to model entities.\n\nConstraint AASd-056: If the semanticId of a Entity submodel element references a ConceptDescription then the ConceptDescription/category shall be one of following values: ENTITY. The ConceptDescription describes the elements assigned to the entity via Entity/statement."@en ;
     rdfs:label "Entity"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Entity/entityType
+###  https://admin-shell.io/aas/3/0/RC01/Entity/entityType
 <https://admin-shell.io/aas/3/0/RC01/Entity/entityType> rdf:type owl:ObjectProperty ;
     rdfs:label "has entity type"^^xsd:string ;
     rdfs:domain aas:Entity ;
@@ -1024,7 +1024,7 @@ aas:Entity rdf:type owl:Class ;
     rdfs:comment "Describes whether the entity is a co- managed entity or a self-managed entity."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Entity/statements
+###  https://admin-shell.io/aas/3/0/RC01/Entity/statements
 <https://admin-shell.io/aas/3/0/RC01/Entity/statements> rdf:type owl:ObjectProperty ;
     rdfs:label "has statements"^^xsd:string ;
     rdfs:domain aas:Entity ;
@@ -1032,7 +1032,7 @@ aas:Entity rdf:type owl:Class ;
     rdfs:comment "Describes statements applicable to the entity by a set of submodel elements, typically with a qualified value."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Entity/globalAssetId
+###  https://admin-shell.io/aas/3/0/RC01/Entity/globalAssetId
 <https://admin-shell.io/aas/3/0/RC01/Entity/globalAssetId> rdf:type owl:ObjectProperty ;
     rdfs:label "has global asset ID"^^xsd:string ;
     rdfs:domain aas:Entity ;
@@ -1040,7 +1040,7 @@ aas:Entity rdf:type owl:Class ;
     rdfs:comment "Reference to the asset the entity is representing. Constraint AASd-014: Either the attribute globalAssetId or specificAssetId of an Entity must be set if Entity/entityType is set to “SelfManagedEntity”. They are not existing otherwise."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetIds
+###  https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetIds
 <https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetIds> rdf:type owl:ObjectProperty ;
     rdfs:label "has specific asset ids"^^xsd:string ;
     rdfs:domain aas:Entity ;
@@ -1048,77 +1048,77 @@ aas:Entity rdf:type owl:Class ;
     rdfs:comment "Reference to an identifier key value pair representing a specific identifier of the asset represented by the asset administration shell. See Constraint AASd-014"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/EntityType
+###  https://admin-shell.io/aas/3/0/RC01/EntityType
 aas:EntityType rdf:type owl:Class ;
     rdfs:label "Entity Type"^^xsd:string ;
     rdfs:comment "Enumeration for denoting whether an entity is a self-managed entity or a co-managed entity."@en ;
     owl:oneOf (
-        <https://admin-shell.io/aas/3/0/RC01/EntityType/CoManagedEntity>
-        <https://admin-shell.io/aas/3/0/RC01/EntityType/SelfManagedEntity>
+        <https://admin-shell.io/aas/3/0/RC01/EntityType/CO_MANAGED_ENTITY>
+        <https://admin-shell.io/aas/3/0/RC01/EntityType/SELF_MANAGED_ENTITY>
     ) ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/EntityType/CoManagedEntity
-<https://admin-shell.io/aas/3/0/RC01/EntityType/CoManagedEntity> rdf:type aas:EntityType ;
+###  https://admin-shell.io/aas/3/0/RC01/EntityType/CO_MANAGED_ENTITY
+<https://admin-shell.io/aas/3/0/RC01/EntityType/CO_MANAGED_ENTITY> rdf:type aas:EntityType ;
     rdfs:label "Co Managed Entity"^^xsd:string ;
     rdfs:comment "For co-managed entities there is no separate AAS. Co-managed entities need to be part of a self-managed entity."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/EntityType/SelfManagedEntity
-<https://admin-shell.io/aas/3/0/RC01/EntityType/SelfManagedEntity> rdf:type aas:EntityType ;
+###  https://admin-shell.io/aas/3/0/RC01/EntityType/SELF_MANAGED_ENTITY
+<https://admin-shell.io/aas/3/0/RC01/EntityType/SELF_MANAGED_ENTITY> rdf:type aas:EntityType ;
     rdfs:label "Self Managed Entity"^^xsd:string ;
     rdfs:comment "Self-Managed Entities have their own AAS but can be part of the bill of material of a composite self-managed entity. The asset of an I4.0 Component is a self-managed entity per definition.\""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Environment
+###  https://admin-shell.io/aas/3/0/RC01/Environment
 aas:Environment rdf:type owl:Class ;
     rdfs:comment "Model the environment as the entry point for referencing and serialization."@en ;
     rdfs:label "Environment"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Environment/assetAdministrationShells
+###  https://admin-shell.io/aas/3/0/RC01/Environment/assetAdministrationShells
 <https://admin-shell.io/aas/3/0/RC01/Environment/assetAdministrationShells> rdf:type owl:ObjectProperty ;
     rdfs:label "has asset administration shells"^^xsd:string ;
     rdfs:domain aas:Environment ;
     rdfs:range aas:AssetAdministrationShell ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Environment/assets
+###  https://admin-shell.io/aas/3/0/RC01/Environment/assets
 <https://admin-shell.io/aas/3/0/RC01/Environment/assets> rdf:type owl:ObjectProperty ;
     rdfs:label "has assets"^^xsd:string ;
     rdfs:domain aas:Environment ;
     rdfs:range aas:Asset ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Environment/submodels
+###  https://admin-shell.io/aas/3/0/RC01/Environment/submodels
 <https://admin-shell.io/aas/3/0/RC01/Environment/submodels> rdf:type owl:ObjectProperty ;
     rdfs:label "has submodels"^^xsd:string ;
     rdfs:domain aas:Environment ;
     rdfs:range aas:Submodel ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Environment/conceptDescriptions
+###  https://admin-shell.io/aas/3/0/RC01/Environment/conceptDescriptions
 <https://admin-shell.io/aas/3/0/RC01/Environment/conceptDescriptions> rdf:type owl:ObjectProperty ;
     rdfs:label "has concept descriptions"^^xsd:string ;
     rdfs:domain aas:Environment ;
     rdfs:range aas:ConceptDescription ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Event
+###  https://admin-shell.io/aas/3/0/RC01/Event
 aas:Event rdf:type owl:Class ;
     rdfs:subClassOf aas:SubmodelElement ;
     rdfs:comment "An event."@en ;
     rdfs:label "Event"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Extension
+###  https://admin-shell.io/aas/3/0/RC01/Extension
 aas:Extension rdf:type owl:Class ;
     rdfs:subClassOf aas:HasSemantics ;
     rdfs:comment "Single extension of an element."@en ;
     rdfs:label "Extension"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Extension/name
+###  https://admin-shell.io/aas/3/0/RC01/Extension/name
 <https://admin-shell.io/aas/3/0/RC01/Extension/name> rdf:type owl:DatatypeProperty ;
     rdfs:label "has name"^^xsd:string ;
     rdfs:domain aas:Extension ;
@@ -1126,7 +1126,7 @@ aas:Extension rdf:type owl:Class ;
     rdfs:comment "Name of the extension.\n\nConstraint AASd-077: The name of an extension within HasExtensions needs to be unique."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Extension/valueType
+###  https://admin-shell.io/aas/3/0/RC01/Extension/valueType
 <https://admin-shell.io/aas/3/0/RC01/Extension/valueType> rdf:type owl:ObjectProperty ;
     rdfs:label "has value type"^^xsd:string ;
     rdfs:domain aas:Extension ;
@@ -1134,7 +1134,7 @@ aas:Extension rdf:type owl:Class ;
     rdfs:comment "Type of the value of the extension.\n\nDefault: xsd:string"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Extension/value
+###  https://admin-shell.io/aas/3/0/RC01/Extension/value
 <https://admin-shell.io/aas/3/0/RC01/Extension/value> rdf:type owl:DatatypeProperty ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:Extension ;
@@ -1142,7 +1142,7 @@ aas:Extension rdf:type owl:Class ;
     rdfs:comment "Value of the extension"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Extension/refersTo
+###  https://admin-shell.io/aas/3/0/RC01/Extension/refersTo
 <https://admin-shell.io/aas/3/0/RC01/Extension/refersTo> rdf:type owl:ObjectProperty ;
     rdfs:label "has refers to"^^xsd:string ;
     rdfs:domain aas:Extension ;
@@ -1150,14 +1150,14 @@ aas:Extension rdf:type owl:Class ;
     rdfs:comment "Reference to an element the extension refers to."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/File
+###  https://admin-shell.io/aas/3/0/RC01/File
 aas:File rdf:type owl:Class ;
     rdfs:subClassOf aas:DataElement ;
     rdfs:comment "A File is a data element that represents an address to a file. The value is an URI that can represent an absolute or relative path.\n\nSee Constraint AASd-057"@en ;
     rdfs:label "File"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/File/mimeType
+###  https://admin-shell.io/aas/3/0/RC01/File/mimeType
 <https://admin-shell.io/aas/3/0/RC01/File/mimeType> rdf:type owl:DatatypeProperty ;
     rdfs:label "has mime type"^^xsd:string ;
     rdfs:domain aas:File ;
@@ -1165,7 +1165,7 @@ aas:File rdf:type owl:Class ;
     rdfs:comment "MIME  type of the content of the BLOB.\n\nThe  MIME  type states which file extensions the file can have."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/File/value
+###  https://admin-shell.io/aas/3/0/RC01/File/value
 <https://admin-shell.io/aas/3/0/RC01/File/value> rdf:type owl:DatatypeProperty ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:File ;
@@ -1173,14 +1173,14 @@ aas:File rdf:type owl:Class ;
     rdfs:comment "Path and name of the referenced file (with file extension). The path can be absolute or relative."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Formula
+###  https://admin-shell.io/aas/3/0/RC01/Formula
 aas:Formula rdf:type owl:Class ;
     rdfs:subClassOf aas:Constraint ;
     rdfs:comment "A formula is used to describe constraints by a logical expression."@en ;
     rdfs:label "Formula"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Formula/dependsOn
+###  https://admin-shell.io/aas/3/0/RC01/Formula/dependsOn
 <https://admin-shell.io/aas/3/0/RC01/Formula/dependsOn> rdf:type owl:ObjectProperty ;
     rdfs:label "has depends on"^^xsd:string ;
     rdfs:domain aas:Formula ;
@@ -1188,13 +1188,13 @@ aas:Formula rdf:type owl:Class ;
     rdfs:comment "A formula may depend on referable or even external global elements that are used in the logical expression.\n\nThe value of the referenced elements needs to be accessible so that it can be evaluated in the formula to true or false in the corresponding logical expression it is used in."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/HasDataSpecification
+###  https://admin-shell.io/aas/3/0/RC01/HasDataSpecification
 aas:HasDataSpecification rdf:type owl:Class ;
     rdfs:comment "Element that can be extended by using data specification templates.\n\nA data specification template defines a named set of additional attributes an element may or shall have. The data specifications used are explicitly specified with their global ID."@en ;
     rdfs:label "Has Data Specification"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/HasDataSpecification/dataSpecifications
+###  https://admin-shell.io/aas/3/0/RC01/HasDataSpecification/dataSpecifications
 <https://admin-shell.io/aas/3/0/RC01/HasDataSpecification/dataSpecifications> rdf:type owl:ObjectProperty ;
     rdfs:label "has data specifications"^^xsd:string ;
     rdfs:domain aas:HasDataSpecification ;
@@ -1202,13 +1202,13 @@ aas:HasDataSpecification rdf:type owl:Class ;
     rdfs:comment "Global reference to the data specification template used by the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/HasExtensions
+###  https://admin-shell.io/aas/3/0/RC01/HasExtensions
 aas:HasExtensions rdf:type owl:Class ;
     rdfs:comment "Element that can be extended by proprietary extensions.\n\nNote: Extensions are proprietary, i.e. they do not support global interoperability."@en ;
     rdfs:label "Has Extensions"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/HasExtensions/extension
+###  https://admin-shell.io/aas/3/0/RC01/HasExtensions/extension
 <https://admin-shell.io/aas/3/0/RC01/HasExtensions/extension> rdf:type owl:ObjectProperty ;
     rdfs:label "has extension"^^xsd:string ;
     rdfs:domain aas:HasExtensions ;
@@ -1216,13 +1216,13 @@ aas:HasExtensions rdf:type owl:Class ;
     rdfs:comment "An extension of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/HasKind
+###  https://admin-shell.io/aas/3/0/RC01/HasKind
 aas:HasKind rdf:type owl:Class ;
     rdfs:comment "An element with a kind is an element that can either represent a template or an instance.\n\nDefault for an element is that it is representing an instance."@en ;
     rdfs:label "Has Kind"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/HasKind/kind
+###  https://admin-shell.io/aas/3/0/RC01/HasKind/kind
 <https://admin-shell.io/aas/3/0/RC01/HasKind/kind> rdf:type owl:ObjectProperty ;
     rdfs:label "has kind"^^xsd:string ;
     rdfs:domain aas:HasKind ;
@@ -1230,13 +1230,13 @@ aas:HasKind rdf:type owl:Class ;
     rdfs:comment "Kind of the element: either type or instance.\n\nDefault Value = Instance"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/HasSemantics
+###  https://admin-shell.io/aas/3/0/RC01/HasSemantics
 aas:HasSemantics rdf:type owl:Class ;
     rdfs:comment "Element that can have a semantic definition."@en ;
     rdfs:label "Has Semantics"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/HasSemantics/semanticId
+###  https://admin-shell.io/aas/3/0/RC01/HasSemantics/semanticId
 <https://admin-shell.io/aas/3/0/RC01/HasSemantics/semanticId> rdf:type owl:ObjectProperty ;
     rdfs:label "has semantic ID"^^xsd:string ;
     rdfs:domain aas:HasSemantics ;
@@ -1244,14 +1244,14 @@ aas:HasSemantics rdf:type owl:Class ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Identifiable
+###  https://admin-shell.io/aas/3/0/RC01/Identifiable
 aas:Identifiable rdf:type owl:Class ;
     rdfs:subClassOf aas:Referable ;
     rdfs:comment "An element that has a globally unique identifier."@en ;
     rdfs:label "Identifiable"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Identifiable/administration
+###  https://admin-shell.io/aas/3/0/RC01/Identifiable/administration
 <https://admin-shell.io/aas/3/0/RC01/Identifiable/administration> rdf:type owl:ObjectProperty ;
     rdfs:label "has administration"^^xsd:string ;
     rdfs:domain aas:Identifiable ;
@@ -1259,7 +1259,7 @@ aas:Identifiable rdf:type owl:Class ;
     rdfs:comment "Administrative information of an identifiable element.\n\nNOTE:\nSome of the administrative information like the version number might need to be part of the identification."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Identifiable/identification
+###  https://admin-shell.io/aas/3/0/RC01/Identifiable/identification
 <https://admin-shell.io/aas/3/0/RC01/Identifiable/identification> rdf:type owl:ObjectProperty ;
     rdfs:label "has identification"^^xsd:string ;
     rdfs:domain aas:Identifiable ;
@@ -1267,45 +1267,45 @@ aas:Identifiable rdf:type owl:Class ;
     rdfs:comment "The globally unique identification of the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/IdentifiableElements
+###  https://admin-shell.io/aas/3/0/RC01/IdentifiableElements
 aas:IdentifiableElements rdf:type owl:Class ;
     rdfs:label "Identifiable Elements"^^xsd:string ;
     rdfs:comment "Enumeration of all identifiable elements within an asset administration shell."@en ;
     owl:oneOf (
-        <https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/Asset>
-        <https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/AssetAdministrationShell>
-        <https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/ConceptDescription>
-        <https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/Submodel>
+        <https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/ASSET>
+        <https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/ASSET_ADMINISTRATION_SHELL>
+        <https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/CONCEPT_DESCRIPTION>
+        <https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/SUBMODEL>
     ) ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/Asset
-<https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/Asset> rdf:type aas:IdentifiableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/ASSET
+<https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/ASSET> rdf:type aas:IdentifiableElements ;
     rdfs:label "Asset"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/AssetAdministrationShell
-<https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/AssetAdministrationShell> rdf:type aas:IdentifiableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/ASSET_ADMINISTRATION_SHELL
+<https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/ASSET_ADMINISTRATION_SHELL> rdf:type aas:IdentifiableElements ;
     rdfs:label "Asset Administration Shell"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/ConceptDescription
-<https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/ConceptDescription> rdf:type aas:IdentifiableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/CONCEPT_DESCRIPTION
+<https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/CONCEPT_DESCRIPTION> rdf:type aas:IdentifiableElements ;
     rdfs:label "Concept Description"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/Submodel
-<https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/Submodel> rdf:type aas:IdentifiableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/SUBMODEL
+<https://admin-shell.io/aas/3/0/RC01/IdentifiableElements/SUBMODEL> rdf:type aas:IdentifiableElements ;
     rdfs:label "Submodel"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Identifier
+###  https://admin-shell.io/aas/3/0/RC01/Identifier
 aas:Identifier rdf:type owl:Class ;
     rdfs:comment "Used to uniquely identify an entity by using an identifier."@en ;
     rdfs:label "Identifier"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Identifier/idType
+###  https://admin-shell.io/aas/3/0/RC01/Identifier/idType
 <https://admin-shell.io/aas/3/0/RC01/Identifier/idType> rdf:type owl:ObjectProperty ;
     rdfs:label "has ID type"^^xsd:string ;
     rdfs:domain aas:Identifier ;
@@ -1313,7 +1313,7 @@ aas:Identifier rdf:type owl:Class ;
     rdfs:comment "Type of the  Identifier, e.g. IRI, IRDI etc. The supported Identifier types are defined in the enumeration 'IdentifierType'."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Identifier/id
+###  https://admin-shell.io/aas/3/0/RC01/Identifier/id
 <https://admin-shell.io/aas/3/0/RC01/Identifier/id> rdf:type owl:DatatypeProperty ;
     rdfs:label "has ID"^^xsd:string ;
     rdfs:domain aas:Identifier ;
@@ -1321,14 +1321,14 @@ aas:Identifier rdf:type owl:Class ;
     rdfs:comment "Globally unique identifier of the element.\n\nIts type is defined in 'idType'."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair
+###  https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair
 aas:IdentifierKeyValuePair rdf:type owl:Class ;
     rdfs:subClassOf aas:HasSemantics ;
     rdfs:comment "An IdentifierKeyValuePair describes a generic identifier as key-value pair."@en ;
     rdfs:label "Identifier Key Value Pair"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair/key
+###  https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair/key
 <https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair/key> rdf:type owl:DatatypeProperty ;
     rdfs:label "has key"^^xsd:string ;
     rdfs:domain aas:IdentifierKeyValuePair ;
@@ -1336,7 +1336,7 @@ aas:IdentifierKeyValuePair rdf:type owl:Class ;
     rdfs:comment "Key of the identifier"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair/value
+###  https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair/value
 <https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair/value> rdf:type owl:DatatypeProperty ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:IdentifierKeyValuePair ;
@@ -1344,7 +1344,7 @@ aas:IdentifierKeyValuePair rdf:type owl:Class ;
     rdfs:comment "The value of the identifier with the corresponding key."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair/externalSubjectId
+###  https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair/externalSubjectId
 <https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair/externalSubjectId> rdf:type owl:ObjectProperty ;
     rdfs:label "has external subject ID"^^xsd:string ;
     rdfs:domain aas:IdentifierKeyValuePair ;
@@ -1352,50 +1352,50 @@ aas:IdentifierKeyValuePair rdf:type owl:Class ;
     rdfs:comment "The (external) subject the key belongs to or has meaning to."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/IdentifierType
+###  https://admin-shell.io/aas/3/0/RC01/IdentifierType
 aas:IdentifierType rdf:type owl:Class ;
     rdfs:label "Identifier Type"^^xsd:string ;
     rdfs:comment "Enumeration of different types of Identifiers for global identification"@en ;
     owl:oneOf (
-        <https://admin-shell.io/aas/3/0/RC01/IdentifierType/Irdi>
-        <https://admin-shell.io/aas/3/0/RC01/IdentifierType/Iri>
-        <https://admin-shell.io/aas/3/0/RC01/IdentifierType/Custom>
+        <https://admin-shell.io/aas/3/0/RC01/IdentifierType/IRDI>
+        <https://admin-shell.io/aas/3/0/RC01/IdentifierType/IRI>
+        <https://admin-shell.io/aas/3/0/RC01/IdentifierType/CUSTOM>
     ) ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/IdentifierType/Irdi
-<https://admin-shell.io/aas/3/0/RC01/IdentifierType/Irdi> rdf:type aas:IdentifierType ;
+###  https://admin-shell.io/aas/3/0/RC01/IdentifierType/IRDI
+<https://admin-shell.io/aas/3/0/RC01/IdentifierType/IRDI> rdf:type aas:IdentifierType ;
     rdfs:label "IRDI"^^xsd:string ;
     rdfs:comment "IRDI according to ISO29002-5 as an Identifier scheme for properties and classifications."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/IdentifierType/Iri
-<https://admin-shell.io/aas/3/0/RC01/IdentifierType/Iri> rdf:type aas:IdentifierType ;
+###  https://admin-shell.io/aas/3/0/RC01/IdentifierType/IRI
+<https://admin-shell.io/aas/3/0/RC01/IdentifierType/IRI> rdf:type aas:IdentifierType ;
     rdfs:label "IRI"^^xsd:string ;
     rdfs:comment "IRI according to Rfc 3987. Every URIis an IRI"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/IdentifierType/Custom
-<https://admin-shell.io/aas/3/0/RC01/IdentifierType/Custom> rdf:type aas:IdentifierType ;
+###  https://admin-shell.io/aas/3/0/RC01/IdentifierType/CUSTOM
+<https://admin-shell.io/aas/3/0/RC01/IdentifierType/CUSTOM> rdf:type aas:IdentifierType ;
     rdfs:label "Custom"^^xsd:string ;
     rdfs:comment "Custom identifiers like GUIDs (globally unique identifiers)"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Key
+###  https://admin-shell.io/aas/3/0/RC01/Key
 aas:Key rdf:type owl:Class ;
     rdfs:comment "A key is a reference to an element by its id."@en ;
     rdfs:label "Key"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Key/type
+###  https://admin-shell.io/aas/3/0/RC01/Key/type
 <https://admin-shell.io/aas/3/0/RC01/Key/type> rdf:type owl:ObjectProperty ;
     rdfs:label "has type"^^xsd:string ;
     rdfs:domain aas:Key ;
     rdfs:range aas:KeyElements ;
-    rdfs:comment "Denote which kind of entity is referenced.\n\nIn case type = 'GlobalReference' then the key represents a global unique id.\n\nIn case type = 'FragmentId' the key represents a bookmark or a similar local identifier within its parent element as specified by the key that precedes this key.\n\nIn all other cases the key references a model element of the same or of another AAS. The name of the model element is explicitly listed."@en ;
+    rdfs:comment "Denote which kind of entity is referenced.\n\nIn case type = 'GLOBAL_REFERENCE' then the key represents a global unique id.\n\nIn case type = 'FRAGMENT_ID' the key represents a bookmark or a similar local identifier within its parent element as specified by the key that precedes this key.\n\nIn all other cases the key references a model element of the same or of another AAS. The name of the model element is explicitly listed."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Key/value
+###  https://admin-shell.io/aas/3/0/RC01/Key/value
 <https://admin-shell.io/aas/3/0/RC01/Key/value> rdf:type owl:DatatypeProperty ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:Key ;
@@ -1403,7 +1403,7 @@ aas:Key rdf:type owl:Class ;
     rdfs:comment "The key value, for example an IRDI if the 'idType' is IRDI."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Key/idType
+###  https://admin-shell.io/aas/3/0/RC01/Key/idType
 <https://admin-shell.io/aas/3/0/RC01/Key/idType> rdf:type owl:ObjectProperty ;
     rdfs:label "has ID type"^^xsd:string ;
     rdfs:domain aas:Key ;
@@ -1411,302 +1411,302 @@ aas:Key rdf:type owl:Class ;
     rdfs:comment "Type of the key value.\n\nConstraint AASd-080: In case Key/type == GlobalReference idType shall not be any LocalKeyType (IdShort, FragmentId).\n\nConstraint AASd-081: In case Key/type==AssetAdministrationShell Key/idType shall not be any LocalKeyType (IdShort, FragmentId)."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements
 aas:KeyElements rdf:type owl:Class ;
 rdfs:subClassOf aas:ReferableElements ;
     rdfs:label "Key Elements"^^xsd:string ;
     rdfs:comment "Enumeration of different key value types within a key."@en ;
     owl:oneOf (
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/GlobalReference>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/FragmentReference>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/AccessPermissionRule>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/AnnotatedRelationshipElement>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/Asset>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/AssetAdministrationShell>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/BasicEvent>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/Blob>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/Capability>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/ConceptDescription>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/ConceptDictionary>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/DataElement>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/Entity>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/Event>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/File>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/MultiLanguageProperty>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/Operation>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/Property>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/Range>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/ReferenceElement>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/RelationshipElement>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/Submodel>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/SubmodelElement>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/SubmodelElementCollection>
-        <https://admin-shell.io/aas/3/0/RC01/KeyElements/View>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/GLOBAL_REFERENCE>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/FRAGMENT_REFERENCE>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/ACCESS_PERMISSION_RULE>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/ANNOTATED_RELATIONSHIP_ELEMENT>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/ASSET>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/ASSET_ADMINISTRATION_SHELL>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/BASIC_EVENT>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/BLOB>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/CAPABILITY>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/CONCEPT_DESCRIPTION>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/CONCEPT_DICTIONARY>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/DATA_ELEMENT>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/ENTITY>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/EVENT>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/FILE>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/MULTI_LANGUAGE_PROPERTY>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/OPERATION>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/PROPERTY>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/RANGE>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/REFERENCE_ELEMENT>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/RELATIONSHIP_ELEMENT>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/SUBMODEL>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/SUBMODEL_ELEMENT>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/SUBMODEL_ELEMENT_COLLECTION>
+        <https://admin-shell.io/aas/3/0/RC01/KeyElements/VIEW>
     ) ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/GlobalReference
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/GlobalReference> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/GLOBAL_REFERENCE
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/GLOBAL_REFERENCE> rdf:type aas:KeyElements ;
     rdfs:label "Global Reference"^^xsd:string ;
     rdfs:comment "reference to an element not belonging to an asset administration shell"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/FragmentReference
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/FragmentReference> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/FRAGMENT_REFERENCE
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/FRAGMENT_REFERENCE> rdf:type aas:KeyElements ;
     rdfs:label "Fragment Reference"^^xsd:string ;
     rdfs:comment "unique reference to an element within a file.\n\nThe file itself is assumed to be part of an asset administration shell."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/AccessPermissionRule
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/AccessPermissionRule> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/ACCESS_PERMISSION_RULE
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/ACCESS_PERMISSION_RULE> rdf:type aas:KeyElements ;
     rdfs:label "Access Permission Rule"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/AnnotatedRelationshipElement
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/AnnotatedRelationshipElement> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/ANNOTATED_RELATIONSHIP_ELEMENT
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/ANNOTATED_RELATIONSHIP_ELEMENT> rdf:type aas:KeyElements ;
     rdfs:label "Annotated Relationship Element"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/Asset
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/Asset> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/ASSET
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/ASSET> rdf:type aas:KeyElements ;
     rdfs:label "Asset"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/AssetAdministrationShell
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/AssetAdministrationShell> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/ASSET_ADMINISTRATION_SHELL
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/ASSET_ADMINISTRATION_SHELL> rdf:type aas:KeyElements ;
     rdfs:label "Asset Administration Shell"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/BasicEvent
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/BasicEvent> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/BASIC_EVENT
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/BASIC_EVENT> rdf:type aas:KeyElements ;
     rdfs:label "Basic Event"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/Blob
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/Blob> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/BLOB
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/BLOB> rdf:type aas:KeyElements ;
     rdfs:label "Blob"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/Capability
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/Capability> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/CAPABILITY
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/CAPABILITY> rdf:type aas:KeyElements ;
     rdfs:label "Capability"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/ConceptDescription
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/ConceptDescription> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/CONCEPT_DESCRIPTION
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/CONCEPT_DESCRIPTION> rdf:type aas:KeyElements ;
     rdfs:label "Concept Description"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/ConceptDictionary
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/ConceptDictionary> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/CONCEPT_DICTIONARY
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/CONCEPT_DICTIONARY> rdf:type aas:KeyElements ;
     rdfs:label "Concept Dictionary"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/DataElement
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/DataElement> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/DATA_ELEMENT
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/DATA_ELEMENT> rdf:type aas:KeyElements ;
     rdfs:label "Data Element"^^xsd:string ;
-    rdfs:comment "Data element.\n\nNOTE:\nData Element is abstract, i.e. if a key uses 'DataElement' the reference may be a Property, a File etc."@en ;
+    rdfs:comment "Data element.\n\nNOTE:\nData Element is abstract, i.e. if a key uses 'DATA_ELEMENT' the reference may be a Property, a File etc."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/Entity
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/Entity> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/ENTITY
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/ENTITY> rdf:type aas:KeyElements ;
     rdfs:label "Entity"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/Event
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/Event> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/EVENT
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/EVENT> rdf:type aas:KeyElements ;
     rdfs:label "Event"^^xsd:string ;
     rdfs:comment "Event.\n\nNOTE:\nEvent is abstract."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/File
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/File> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/FILE
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/FILE> rdf:type aas:KeyElements ;
     rdfs:label "File"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/MultiLanguageProperty
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/MultiLanguageProperty> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/MULTI_LANGUAGE_PROPERTY
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/MULTI_LANGUAGE_PROPERTY> rdf:type aas:KeyElements ;
     rdfs:label "Multi Language Property"^^xsd:string ;
     rdfs:comment "Property with a value that can be provided in multiple languages"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/Operation
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/Operation> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/OPERATION
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/OPERATION> rdf:type aas:KeyElements ;
     rdfs:label "Operation"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/Property
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/Property> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/PROPERTY
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/PROPERTY> rdf:type aas:KeyElements ;
     rdfs:label "Property"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/Range
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/Range> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/RANGE
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/RANGE> rdf:type aas:KeyElements ;
     rdfs:label "Range"^^xsd:string ;
     rdfs:comment "Range with min and max"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/ReferenceElement
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/ReferenceElement> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/REFERENCE_ELEMENT
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/REFERENCE_ELEMENT> rdf:type aas:KeyElements ;
     rdfs:label "Reference Element"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/RelationshipElement
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/RelationshipElement> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/RELATIONSHIP_ELEMENT
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/RELATIONSHIP_ELEMENT> rdf:type aas:KeyElements ;
     rdfs:label "Relationship Element"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/Submodel
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/Submodel> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/SUBMODEL
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/SUBMODEL> rdf:type aas:KeyElements ;
     rdfs:label "Submodel"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/SubmodelElement
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/SubmodelElement> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/SUBMODEL_ELEMENT
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/SUBMODEL_ELEMENT> rdf:type aas:KeyElements ;
     rdfs:label "Submodel Element"^^xsd:string ;
-    rdfs:comment "Submodel Element\n\nNOTE:\nSubmodel Element is abstract, i.e. if a key uses 'SubmodelElement' the reference may be a Property, a 'SubmodelElementCollection', an Operation etc."@en ;
+    rdfs:comment "Submodel Element\n\nNOTE:\nSubmodel Element is abstract, i.e. if a key uses 'SUBMODEL_ELEMENT' the reference may be a Property, a 'SubmodelElementCollection', an Operation etc."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/SubmodelElementCollection
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/SubmodelElementCollection> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/SUBMODEL_ELEMENT_COLLECTION
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/SUBMODEL_ELEMENT_COLLECTION> rdf:type aas:KeyElements ;
     rdfs:label "Submodel Element Collection"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyElements/View
-<https://admin-shell.io/aas/3/0/RC01/KeyElements/View> rdf:type aas:KeyElements ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyElements/VIEW
+<https://admin-shell.io/aas/3/0/RC01/KeyElements/VIEW> rdf:type aas:KeyElements ;
     rdfs:label "View"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyType
+###  https://admin-shell.io/aas/3/0/RC01/KeyType
 aas:KeyType rdf:type owl:Class ;
 rdfs:subClassOf aas:LocalKeyType ;
 rdfs:subClassOf aas:IdentifierType ;
     rdfs:label "Key Type"^^xsd:string ;
     rdfs:comment "Enumeration of different key value types within a key."@en ;
     owl:oneOf (
-        <https://admin-shell.io/aas/3/0/RC01/KeyType/IdShort>
-        <https://admin-shell.io/aas/3/0/RC01/KeyType/FragmentId>
-        <https://admin-shell.io/aas/3/0/RC01/KeyType/Irdi>
-        <https://admin-shell.io/aas/3/0/RC01/KeyType/Iri>
-        <https://admin-shell.io/aas/3/0/RC01/KeyType/Custom>
+        <https://admin-shell.io/aas/3/0/RC01/KeyType/ID_SHORT>
+        <https://admin-shell.io/aas/3/0/RC01/KeyType/FRAGMENT_ID>
+        <https://admin-shell.io/aas/3/0/RC01/KeyType/IRDI>
+        <https://admin-shell.io/aas/3/0/RC01/KeyType/IRI>
+        <https://admin-shell.io/aas/3/0/RC01/KeyType/CUSTOM>
     ) ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyType/IdShort
-<https://admin-shell.io/aas/3/0/RC01/KeyType/IdShort> rdf:type aas:KeyType ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyType/ID_SHORT
+<https://admin-shell.io/aas/3/0/RC01/KeyType/ID_SHORT> rdf:type aas:KeyType ;
     rdfs:label "ID Short"^^xsd:string ;
     rdfs:comment "idShort of a referable element"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyType/FragmentId
-<https://admin-shell.io/aas/3/0/RC01/KeyType/FragmentId> rdf:type aas:KeyType ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyType/FRAGMENT_ID
+<https://admin-shell.io/aas/3/0/RC01/KeyType/FRAGMENT_ID> rdf:type aas:KeyType ;
     rdfs:label "Fragment ID"^^xsd:string ;
     rdfs:comment "Identifier of a fragment within a file"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyType/Irdi
-<https://admin-shell.io/aas/3/0/RC01/KeyType/Irdi> rdf:type aas:KeyType ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyType/IRDI
+<https://admin-shell.io/aas/3/0/RC01/KeyType/IRDI> rdf:type aas:KeyType ;
     rdfs:label "IRDI"^^xsd:string ;
     rdfs:comment "IRDI according to ISO29002-5 as an Identifier scheme for properties and classifications."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyType/Iri
-<https://admin-shell.io/aas/3/0/RC01/KeyType/Iri> rdf:type aas:KeyType ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyType/IRI
+<https://admin-shell.io/aas/3/0/RC01/KeyType/IRI> rdf:type aas:KeyType ;
     rdfs:label "IRI"^^xsd:string ;
     rdfs:comment "IRI according to Rfc 3987. Every URI is an IRI."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/KeyType/Custom
-<https://admin-shell.io/aas/3/0/RC01/KeyType/Custom> rdf:type aas:KeyType ;
+###  https://admin-shell.io/aas/3/0/RC01/KeyType/CUSTOM
+<https://admin-shell.io/aas/3/0/RC01/KeyType/CUSTOM> rdf:type aas:KeyType ;
     rdfs:label "Custom"^^xsd:string ;
     rdfs:comment "Custom identifiers like GUIDs (globally unique identifiers)"@en ;
 .
 
 # The class LangStringSet is implicitly defined in RDF through rdf:langString.
 
-### https://admin-shell.io/aas/3/0/RC01/LevelType
+###  https://admin-shell.io/aas/3/0/RC01/LevelType
 aas:LevelType rdf:type owl:Class ;
     rdfs:label "Level Type"^^xsd:string ;
     owl:oneOf (
-        <https://admin-shell.io/aas/3/0/RC01/LevelType/Min>
-        <https://admin-shell.io/aas/3/0/RC01/LevelType/Max>
-        <https://admin-shell.io/aas/3/0/RC01/LevelType/Nom>
-        <https://admin-shell.io/aas/3/0/RC01/LevelType/Type>
+        <https://admin-shell.io/aas/3/0/RC01/LevelType/MIN>
+        <https://admin-shell.io/aas/3/0/RC01/LevelType/MAX>
+        <https://admin-shell.io/aas/3/0/RC01/LevelType/NOM>
+        <https://admin-shell.io/aas/3/0/RC01/LevelType/TYP>
     ) ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/LevelType/Min
-<https://admin-shell.io/aas/3/0/RC01/LevelType/Min> rdf:type aas:LevelType ;
+###  https://admin-shell.io/aas/3/0/RC01/LevelType/MIN
+<https://admin-shell.io/aas/3/0/RC01/LevelType/MIN> rdf:type aas:LevelType ;
     rdfs:label "Min"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/LevelType/Max
-<https://admin-shell.io/aas/3/0/RC01/LevelType/Max> rdf:type aas:LevelType ;
+###  https://admin-shell.io/aas/3/0/RC01/LevelType/MAX
+<https://admin-shell.io/aas/3/0/RC01/LevelType/MAX> rdf:type aas:LevelType ;
     rdfs:label "Max"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/LevelType/Nom
-<https://admin-shell.io/aas/3/0/RC01/LevelType/Nom> rdf:type aas:LevelType ;
+###  https://admin-shell.io/aas/3/0/RC01/LevelType/NOM
+<https://admin-shell.io/aas/3/0/RC01/LevelType/NOM> rdf:type aas:LevelType ;
     rdfs:label "Nom"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/LevelType/Type
-<https://admin-shell.io/aas/3/0/RC01/LevelType/Type> rdf:type aas:LevelType ;
-    rdfs:label "Type"^^xsd:string ;
+###  https://admin-shell.io/aas/3/0/RC01/LevelType/TYP
+<https://admin-shell.io/aas/3/0/RC01/LevelType/TYP> rdf:type aas:LevelType ;
+    rdfs:label "Typ"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/LocalKeyType
+###  https://admin-shell.io/aas/3/0/RC01/LocalKeyType
 aas:LocalKeyType rdf:type owl:Class ;
     rdfs:label "Local Key Type"^^xsd:string ;
     rdfs:comment "Enumeration of different key value types within a key."@en ;
     owl:oneOf (
-        <https://admin-shell.io/aas/3/0/RC01/LocalKeyType/IdShort>
-        <https://admin-shell.io/aas/3/0/RC01/LocalKeyType/FragmentId>
+        <https://admin-shell.io/aas/3/0/RC01/LocalKeyType/ID_SHORT>
+        <https://admin-shell.io/aas/3/0/RC01/LocalKeyType/FRAGMENT_ID>
     ) ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/LocalKeyType/IdShort
-<https://admin-shell.io/aas/3/0/RC01/LocalKeyType/IdShort> rdf:type aas:LocalKeyType ;
+###  https://admin-shell.io/aas/3/0/RC01/LocalKeyType/ID_SHORT
+<https://admin-shell.io/aas/3/0/RC01/LocalKeyType/ID_SHORT> rdf:type aas:LocalKeyType ;
     rdfs:label "ID Short"^^xsd:string ;
     rdfs:comment "idShort of a referable element"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/LocalKeyType/FragmentId
-<https://admin-shell.io/aas/3/0/RC01/LocalKeyType/FragmentId> rdf:type aas:LocalKeyType ;
+###  https://admin-shell.io/aas/3/0/RC01/LocalKeyType/FRAGMENT_ID
+<https://admin-shell.io/aas/3/0/RC01/LocalKeyType/FRAGMENT_ID> rdf:type aas:LocalKeyType ;
     rdfs:label "Fragment ID"^^xsd:string ;
     rdfs:comment "Identifier of a fragment within a file"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ModelingKind
+###  https://admin-shell.io/aas/3/0/RC01/ModelingKind
 aas:ModelingKind rdf:type owl:Class ;
     rdfs:label "Modeling Kind"^^xsd:string ;
     rdfs:comment "Enumeration for denoting whether an element is a template or an instance."@en ;
     owl:oneOf (
-        <https://admin-shell.io/aas/3/0/RC01/ModelingKind/Template>
-        <https://admin-shell.io/aas/3/0/RC01/ModelingKind/Instance>
+        <https://admin-shell.io/aas/3/0/RC01/ModelingKind/TEMPLATE>
+        <https://admin-shell.io/aas/3/0/RC01/ModelingKind/INSTANCE>
     ) ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ModelingKind/Template
-<https://admin-shell.io/aas/3/0/RC01/ModelingKind/Template> rdf:type aas:ModelingKind ;
+###  https://admin-shell.io/aas/3/0/RC01/ModelingKind/TEMPLATE
+<https://admin-shell.io/aas/3/0/RC01/ModelingKind/TEMPLATE> rdf:type aas:ModelingKind ;
     rdfs:label "Template"^^xsd:string ;
     rdfs:comment "Software element which specifies the common attributes shared by all instances of the template.\n\n[SOURCE: IEC TR 62390:2005-01, 3.1.25] modified"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ModelingKind/Instance
-<https://admin-shell.io/aas/3/0/RC01/ModelingKind/Instance> rdf:type aas:ModelingKind ;
+###  https://admin-shell.io/aas/3/0/RC01/ModelingKind/INSTANCE
+<https://admin-shell.io/aas/3/0/RC01/ModelingKind/INSTANCE> rdf:type aas:ModelingKind ;
     rdfs:label "Instance"^^xsd:string ;
     rdfs:comment "Concrete, clearly identifiable component of a certain template.\n\nNOTE:\nIt becomes an individual entity of a  template,  for example a device model, by defining specific property values.\n\nNOTE:\nIn an object oriented view,  an instance denotes an object of a template (class).\n\n[SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV]  modified"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty
+###  https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty
 aas:MultiLanguageProperty rdf:type owl:Class ;
     rdfs:subClassOf aas:DataElement ;
     rdfs:comment "A property is a data element that has a multi-language value.\n\nConstraint AASd-052b: If the semanticId of a MultiLanguageProperty references a ConceptDescription then the ConceptDescription/category shall be one of following values: PROPERTY.\n\nConstraint AASd-012: If both, the MultiLanguageProperty/value and the MultiLanguageProperty/valueId are present then for each string in a specific language the meaning must be the same as specified in MultiLanguageProperty/valueId.\n\nConstraint AASd-067: If the semanticId of a MultiLanguageProperty references a ConceptDescription then DataSpecificationIEC61360/dataType shall be STRING_TRANSLATABLE.\n\nSee Constraint AASd-065"@en ;
     rdfs:label "Multi Language Property"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/value
+###  https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/value
 <https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/value> rdf:type owl:ObjectProperty ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:MultiLanguageProperty ;
@@ -1714,7 +1714,7 @@ aas:MultiLanguageProperty rdf:type owl:Class ;
     rdfs:comment "The value of the property instance. See Constraint AASd-012 See Constraint AASd-065\""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/valueId
+###  https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/valueId
 <https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/valueId> rdf:type owl:ObjectProperty ;
     rdfs:label "has value ID"^^xsd:string ;
     rdfs:domain aas:MultiLanguageProperty ;
@@ -1722,13 +1722,13 @@ aas:MultiLanguageProperty rdf:type owl:Class ;
     rdfs:comment "Reference to the global unique id of a coded value. See Constraint AASd-012 See Constraint AASd-065\""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ObjectAttributes
+###  https://admin-shell.io/aas/3/0/RC01/ObjectAttributes
 aas:ObjectAttributes rdf:type owl:Class ;
     rdfs:comment "A set of data elements that describe object attributes. These attributes need to refer to a data element within an existing submodel."@en ;
     rdfs:label "Object Attributes"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ObjectAttributes/objectAttributes
+###  https://admin-shell.io/aas/3/0/RC01/ObjectAttributes/objectAttributes
 <https://admin-shell.io/aas/3/0/RC01/ObjectAttributes/objectAttributes> rdf:type owl:ObjectProperty ;
     rdfs:label "has object attributes"^^xsd:string ;
     rdfs:domain aas:ObjectAttributes ;
@@ -1736,14 +1736,14 @@ aas:ObjectAttributes rdf:type owl:Class ;
     rdfs:comment "Reference to a data element that further classifies an object."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Operation
+###  https://admin-shell.io/aas/3/0/RC01/Operation
 aas:Operation rdf:type owl:Class ;
     rdfs:subClassOf aas:SubmodelElement ;
     rdfs:comment "An operation is a submodel element with input and output variables.\n\nConstraint AASd-060: If the semanticId of a Operation submodel element references a ConceptDescription then the category of the ConceptDescription shall be one of the following values: FUNCTION."@en ;
     rdfs:label "Operation"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Operation/inputVariables
+###  https://admin-shell.io/aas/3/0/RC01/Operation/inputVariables
 <https://admin-shell.io/aas/3/0/RC01/Operation/inputVariables> rdf:type owl:ObjectProperty ;
     rdfs:label "has input variables"^^xsd:string ;
     rdfs:domain aas:Operation ;
@@ -1751,7 +1751,7 @@ aas:Operation rdf:type owl:Class ;
     rdfs:comment "Input parameter of the operation."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Operation/outputVariables
+###  https://admin-shell.io/aas/3/0/RC01/Operation/outputVariables
 <https://admin-shell.io/aas/3/0/RC01/Operation/outputVariables> rdf:type owl:ObjectProperty ;
     rdfs:label "has output variables"^^xsd:string ;
     rdfs:domain aas:Operation ;
@@ -1759,7 +1759,7 @@ aas:Operation rdf:type owl:Class ;
     rdfs:comment "Output parameter of the operation."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Operation/inoutputVariables
+###  https://admin-shell.io/aas/3/0/RC01/Operation/inoutputVariables
 <https://admin-shell.io/aas/3/0/RC01/Operation/inoutputVariables> rdf:type owl:ObjectProperty ;
     rdfs:label "has inoutput variables"^^xsd:string ;
     rdfs:domain aas:Operation ;
@@ -1767,13 +1767,13 @@ aas:Operation rdf:type owl:Class ;
     rdfs:comment "Parameter that is input and output of the operation."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/OperationVariable
+###  https://admin-shell.io/aas/3/0/RC01/OperationVariable
 aas:OperationVariable rdf:type owl:Class ;
     rdfs:comment "An operation variable is a submodel element that is used as input or output variable of an operation."@en ;
     rdfs:label "Operation Variable"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/OperationVariable/value
+###  https://admin-shell.io/aas/3/0/RC01/OperationVariable/value
 <https://admin-shell.io/aas/3/0/RC01/OperationVariable/value> rdf:type owl:ObjectProperty ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:OperationVariable ;
@@ -1781,13 +1781,13 @@ aas:OperationVariable rdf:type owl:Class ;
     rdfs:comment "Describes the needed argument for an operation via a submodel element of kind=Template. Constraint AASd-008: The submodel element value of an operation variable shall be of kind=Template."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Permission
+###  https://admin-shell.io/aas/3/0/RC01/Permission
 aas:Permission rdf:type owl:Class ;
     rdfs:comment "Description of a single permission."@en ;
     rdfs:label "Permission"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Permission/permission
+###  https://admin-shell.io/aas/3/0/RC01/Permission/permission
 <https://admin-shell.io/aas/3/0/RC01/Permission/permission> rdf:type owl:ObjectProperty ;
     rdfs:label "has permission"^^xsd:string ;
     rdfs:domain aas:Permission ;
@@ -1795,7 +1795,7 @@ aas:Permission rdf:type owl:Class ;
     rdfs:comment "Reference to a property that defines the semantics of the permission.\n\nConstraint AASs-010: The property referenced in Permission/permission shall have the category “CONSTANT”. Constraint AASs-011: The property referenced in Permission/permission shall be part of the submodel that is referenced within the “selectablePermissions” attribute of “AccessControl”.\""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Permission/kindOfPermission
+###  https://admin-shell.io/aas/3/0/RC01/Permission/kindOfPermission
 <https://admin-shell.io/aas/3/0/RC01/Permission/kindOfPermission> rdf:type owl:ObjectProperty ;
     rdfs:label "has kind of permission"^^xsd:string ;
     rdfs:domain aas:Permission ;
@@ -1803,49 +1803,49 @@ aas:Permission rdf:type owl:Class ;
     rdfs:comment "Description of the kind of permission. Possible kind of permission also include the denial of the permission.\n\nValues: * Allow * Deny * NotApplicable * Undefined\""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PermissionKind
+###  https://admin-shell.io/aas/3/0/RC01/PermissionKind
 aas:PermissionKind rdf:type owl:Class ;
     rdfs:label "Permission Kind"^^xsd:string ;
     rdfs:comment "Enumeration of the kind of permissions that is given to the assignment of a permission to a subject."@en ;
     owl:oneOf (
-        <https://admin-shell.io/aas/3/0/RC01/PermissionKind/Allow>
-        <https://admin-shell.io/aas/3/0/RC01/PermissionKind/Deny>
-        <https://admin-shell.io/aas/3/0/RC01/PermissionKind/NotApplicable>
-        <https://admin-shell.io/aas/3/0/RC01/PermissionKind/Undefined>
+        <https://admin-shell.io/aas/3/0/RC01/PermissionKind/ALLOW>
+        <https://admin-shell.io/aas/3/0/RC01/PermissionKind/DENY>
+        <https://admin-shell.io/aas/3/0/RC01/PermissionKind/NOT_APPLICABLE>
+        <https://admin-shell.io/aas/3/0/RC01/PermissionKind/UNDEFINED>
     ) ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PermissionKind/Allow
-<https://admin-shell.io/aas/3/0/RC01/PermissionKind/Allow> rdf:type aas:PermissionKind ;
+###  https://admin-shell.io/aas/3/0/RC01/PermissionKind/ALLOW
+<https://admin-shell.io/aas/3/0/RC01/PermissionKind/ALLOW> rdf:type aas:PermissionKind ;
     rdfs:label "Allow"^^xsd:string ;
     rdfs:comment "Allow the permission given to the subject."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PermissionKind/Deny
-<https://admin-shell.io/aas/3/0/RC01/PermissionKind/Deny> rdf:type aas:PermissionKind ;
+###  https://admin-shell.io/aas/3/0/RC01/PermissionKind/DENY
+<https://admin-shell.io/aas/3/0/RC01/PermissionKind/DENY> rdf:type aas:PermissionKind ;
     rdfs:label "Deny"^^xsd:string ;
     rdfs:comment "Explicitly deny the permission given to the subject."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PermissionKind/NotApplicable
-<https://admin-shell.io/aas/3/0/RC01/PermissionKind/NotApplicable> rdf:type aas:PermissionKind ;
+###  https://admin-shell.io/aas/3/0/RC01/PermissionKind/NOT_APPLICABLE
+<https://admin-shell.io/aas/3/0/RC01/PermissionKind/NOT_APPLICABLE> rdf:type aas:PermissionKind ;
     rdfs:label "Not Applicable"^^xsd:string ;
     rdfs:comment "The permission is not applicable to the subject."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PermissionKind/Undefined
-<https://admin-shell.io/aas/3/0/RC01/PermissionKind/Undefined> rdf:type aas:PermissionKind ;
+###  https://admin-shell.io/aas/3/0/RC01/PermissionKind/UNDEFINED
+<https://admin-shell.io/aas/3/0/RC01/PermissionKind/UNDEFINED> rdf:type aas:PermissionKind ;
     rdfs:label "Undefined"^^xsd:string ;
     rdfs:comment "It is undefined whether the permission is allowed, not applicable or denied to the subject."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject
+###  https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject
 aas:PermissionsPerObject rdf:type owl:Class ;
     rdfs:comment "Table that defines access permissions for a specified object. The object is any referable element in the AAS. Additionally, object attributes can be defined that further specify the kind of object the permissions apply to."@en ;
     rdfs:label "Permissions Per Object"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject/object
+###  https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject/object
 <https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject/object> rdf:type owl:ObjectProperty ;
     rdfs:label "has object"^^xsd:string ;
     rdfs:domain aas:PermissionsPerObject ;
@@ -1853,7 +1853,7 @@ aas:PermissionsPerObject rdf:type owl:Class ;
     rdfs:comment "Element to which permission shall be assigned."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject/targetObjectAttributes
+###  https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject/targetObjectAttributes
 <https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject/targetObjectAttributes> rdf:type owl:ObjectProperty ;
     rdfs:label "has target object attributes"^^xsd:string ;
     rdfs:domain aas:PermissionsPerObject ;
@@ -1861,7 +1861,7 @@ aas:PermissionsPerObject rdf:type owl:Class ;
     rdfs:comment "Target object attributes that need to be fulfilled so that the access permissions apply to the accessing subject."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject/permissions
+###  https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject/permissions
 <https://admin-shell.io/aas/3/0/RC01/PermissionsPerObject/permissions> rdf:type owl:ObjectProperty ;
     rdfs:label "has permissions"^^xsd:string ;
     rdfs:domain aas:PermissionsPerObject ;
@@ -1869,13 +1869,13 @@ aas:PermissionsPerObject rdf:type owl:Class ;
     rdfs:comment "Permissions assigned to the object. The permissions hold for all subjects as specified in the access permission rule.\""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PolicyAdministrationPoint
+###  https://admin-shell.io/aas/3/0/RC01/PolicyAdministrationPoint
 aas:PolicyAdministrationPoint rdf:type owl:Class ;
     rdfs:comment "Definition of a security policy administration point (PAP)."@en ;
     rdfs:label "Policy Administration Point"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PolicyAdministrationPoint/externalAccessControl
+###  https://admin-shell.io/aas/3/0/RC01/PolicyAdministrationPoint/externalAccessControl
 <https://admin-shell.io/aas/3/0/RC01/PolicyAdministrationPoint/externalAccessControl> rdf:type owl:DatatypeProperty ;
     rdfs:label "has external access control"^^xsd:string ;
     rdfs:domain aas:PolicyAdministrationPoint ;
@@ -1883,7 +1883,7 @@ aas:PolicyAdministrationPoint rdf:type owl:Class ;
     rdfs:comment "If 'externalAccessControl' True then an Endpoint to an external access control defining a policy administration point to be used by the AAS needs to be configured."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PolicyAdministrationPoint/localAccessControl
+###  https://admin-shell.io/aas/3/0/RC01/PolicyAdministrationPoint/localAccessControl
 <https://admin-shell.io/aas/3/0/RC01/PolicyAdministrationPoint/localAccessControl> rdf:type owl:ObjectProperty ;
     rdfs:label "has local access control"^^xsd:string ;
     rdfs:domain aas:PolicyAdministrationPoint ;
@@ -1891,13 +1891,13 @@ aas:PolicyAdministrationPoint rdf:type owl:Class ;
     rdfs:comment "The policy administration point of access control as realized by the AAS itself.\n\nConstraint AASs-009: Either there is an external policy administration point endpoint defined (PolicyAdministrationPoint/externalPolicyDecisionPoints=true) or the AAS has its own access control."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PolicyDecisionPoint
+###  https://admin-shell.io/aas/3/0/RC01/PolicyDecisionPoint
 aas:PolicyDecisionPoint rdf:type owl:Class ;
     rdfs:comment "Defines the security policy decision points (PDP)."@en ;
     rdfs:label "Policy Decision Point"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PolicyDecisionPoint/externalPolicyDecisionPoints
+###  https://admin-shell.io/aas/3/0/RC01/PolicyDecisionPoint/externalPolicyDecisionPoints
 <https://admin-shell.io/aas/3/0/RC01/PolicyDecisionPoint/externalPolicyDecisionPoints> rdf:type owl:DatatypeProperty ;
     rdfs:label "has external policy decision points"^^xsd:string ;
     rdfs:domain aas:PolicyDecisionPoint ;
@@ -1905,13 +1905,13 @@ aas:PolicyDecisionPoint rdf:type owl:Class ;
     rdfs:comment "If externalPolicyDecisionPoints True then Endpoints to external available decision points taking into consideration for access control for the AAS need to be configured."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoints
+###  https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoints
 aas:PolicyEnforcementPoints rdf:type owl:Class ;
     rdfs:comment "Defines the security policy enforcement points (PEP)."@en ;
     rdfs:label "Policy Enforcement Points"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoints/externalPolicyEnforcementPoint
+###  https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoints/externalPolicyEnforcementPoint
 <https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoints/externalPolicyEnforcementPoint> rdf:type owl:DatatypeProperty ;
     rdfs:label "has external policy enforcement point"^^xsd:string ;
     rdfs:domain aas:PolicyEnforcementPoints ;
@@ -1919,13 +1919,13 @@ aas:PolicyEnforcementPoints rdf:type owl:Class ;
     rdfs:comment "If externalPolicyEnforcementPoint True then an Endpoint to external available enforcement point taking needs to be configured for the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PolicyInformationPoints
+###  https://admin-shell.io/aas/3/0/RC01/PolicyInformationPoints
 aas:PolicyInformationPoints rdf:type owl:Class ;
     rdfs:comment "Defines the security policy information points (PIP). Serves as the retrieval source of attributes, or the data required for policy evaluation to provide the information needed by the policy decision point to make the decisions."@en ;
     rdfs:label "Policy Information Points"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PolicyInformationPoints/externalInformationPoints
+###  https://admin-shell.io/aas/3/0/RC01/PolicyInformationPoints/externalInformationPoints
 <https://admin-shell.io/aas/3/0/RC01/PolicyInformationPoints/externalInformationPoints> rdf:type owl:DatatypeProperty ;
     rdfs:label "has external information points"^^xsd:string ;
     rdfs:domain aas:PolicyInformationPoints ;
@@ -1933,7 +1933,7 @@ aas:PolicyInformationPoints rdf:type owl:Class ;
     rdfs:comment "If externalInformationPoints True then at least one Endpoint to external available information needs to be configured for the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/PolicyInformationPoints/internalInformationPoints
+###  https://admin-shell.io/aas/3/0/RC01/PolicyInformationPoints/internalInformationPoints
 <https://admin-shell.io/aas/3/0/RC01/PolicyInformationPoints/internalInformationPoints> rdf:type owl:ObjectProperty ;
     rdfs:label "has internal information points"^^xsd:string ;
     rdfs:domain aas:PolicyInformationPoints ;
@@ -1941,14 +1941,14 @@ aas:PolicyInformationPoints rdf:type owl:Class ;
     rdfs:comment "Reference to a  Submodel defining information used by security access permission rules."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Property
+###  https://admin-shell.io/aas/3/0/RC01/Property
 aas:Property rdf:type owl:Class ;
     rdfs:subClassOf aas:DataElement ;
     rdfs:comment "A property is a data element that has a single value.\n\nConstraint AASd-007: If both, the Property/value and the Property/valueId are present then the value of Property/value needs to be identical to the value of the referenced coded value in Property/valueId.\n\nConstraint AASd-052a: If the semanticId of a Property references a ConceptDescription then the ConceptDescription/category shall be one of following values: VALUE, PROPERTY.\n\nConstraint AASd-065: If the semanticId of a Property or MultiLanguageProperty references a ConceptDescription with the category VALUE then the value of the property is identical to DataSpecificationIEC61360/value and the valueId of the property is identical to DataSpecificationIEC61360/valueId.\n\nConstraint AASd-066: If the semanticId of a Property or MultiLanguageProperty references a ConceptDescription with the category PROPERTY and DataSpecificationIEC61360/valueList is defined the value and valueId of the property is identical to one of the value reference pair types references in the value list, i.e. ValueReferencePairType/value or ValueReferencePairType/valueId, resp."@en ;
     rdfs:label "Property"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Property/valueType
+###  https://admin-shell.io/aas/3/0/RC01/Property/valueType
 <https://admin-shell.io/aas/3/0/RC01/Property/valueType> rdf:type owl:ObjectProperty ;
     rdfs:label "has value type"^^xsd:string ;
     rdfs:domain aas:Property ;
@@ -1956,7 +1956,7 @@ aas:Property rdf:type owl:Class ;
     rdfs:comment "Data type of the value"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Property/value
+###  https://admin-shell.io/aas/3/0/RC01/Property/value
 <https://admin-shell.io/aas/3/0/RC01/Property/value> rdf:type owl:DatatypeProperty ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:Property ;
@@ -1964,7 +1964,7 @@ aas:Property rdf:type owl:Class ;
     rdfs:comment "The value of the property instance.\n\nSee Constraint AASd-065 See Constraint AASd-007"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Property/valueId
+###  https://admin-shell.io/aas/3/0/RC01/Property/valueId
 <https://admin-shell.io/aas/3/0/RC01/Property/valueId> rdf:type owl:ObjectProperty ;
     rdfs:label "has value ID"^^xsd:string ;
     rdfs:domain aas:Property ;
@@ -1972,13 +1972,13 @@ aas:Property rdf:type owl:Class ;
     rdfs:comment "Reference to the global unique id of a coded value.\n\nSee Constraint AASd-065 See Constraint AASd-007"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Qualifiable
+###  https://admin-shell.io/aas/3/0/RC01/Qualifiable
 aas:Qualifiable rdf:type owl:Class ;
     rdfs:comment "The value of a qualifiable element may be further qualified by one or more qualifiers or complex formulas."@en ;
     rdfs:label "Qualifiable"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Qualifiable/qualifiers
+###  https://admin-shell.io/aas/3/0/RC01/Qualifiable/qualifiers
 <https://admin-shell.io/aas/3/0/RC01/Qualifiable/qualifiers> rdf:type owl:ObjectProperty ;
     rdfs:label "has qualifiers"^^xsd:string ;
     rdfs:domain aas:Qualifiable ;
@@ -1986,7 +1986,7 @@ aas:Qualifiable rdf:type owl:Class ;
     rdfs:comment "Additional qualification of a qualifiable element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Qualifier
+###  https://admin-shell.io/aas/3/0/RC01/Qualifier
 aas:Qualifier rdf:type owl:Class ;
     rdfs:subClassOf aas:Constraint ;
     rdfs:subClassOf aas:HasSemantics ;
@@ -1994,7 +1994,7 @@ aas:Qualifier rdf:type owl:Class ;
     rdfs:label "Qualifier"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Qualifier/type
+###  https://admin-shell.io/aas/3/0/RC01/Qualifier/type
 <https://admin-shell.io/aas/3/0/RC01/Qualifier/type> rdf:type owl:DatatypeProperty ;
     rdfs:label "has type"^^xsd:string ;
     rdfs:domain aas:Qualifier ;
@@ -2002,7 +2002,7 @@ aas:Qualifier rdf:type owl:Class ;
     rdfs:comment "The qualifier type describes the type of the qualifier that is applied to the element."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Qualifier/valueType
+###  https://admin-shell.io/aas/3/0/RC01/Qualifier/valueType
 <https://admin-shell.io/aas/3/0/RC01/Qualifier/valueType> rdf:type owl:ObjectProperty ;
     rdfs:label "has value type"^^xsd:string ;
     rdfs:domain aas:Qualifier ;
@@ -2010,7 +2010,7 @@ aas:Qualifier rdf:type owl:Class ;
     rdfs:comment "Data type of the qualifier value."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Qualifier/value
+###  https://admin-shell.io/aas/3/0/RC01/Qualifier/value
 <https://admin-shell.io/aas/3/0/RC01/Qualifier/value> rdf:type owl:DatatypeProperty ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:Qualifier ;
@@ -2018,7 +2018,7 @@ aas:Qualifier rdf:type owl:Class ;
     rdfs:comment "The qualifier value is the value of the qualifier."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Qualifier/valueId
+###  https://admin-shell.io/aas/3/0/RC01/Qualifier/valueId
 <https://admin-shell.io/aas/3/0/RC01/Qualifier/valueId> rdf:type owl:ObjectProperty ;
     rdfs:label "has value ID"^^xsd:string ;
     rdfs:domain aas:Qualifier ;
@@ -2026,14 +2026,14 @@ aas:Qualifier rdf:type owl:Class ;
     rdfs:comment "Reference to the global unique ID of a coded value."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Range
+###  https://admin-shell.io/aas/3/0/RC01/Range
 aas:Range rdf:type owl:Class ;
     rdfs:subClassOf aas:DataElement ;
     rdfs:comment "A range data element is a data element that defines a range with min and max.\n\nConstraint AASd-053: If the semanticId of a Range submodel element references a ConceptDescription then the ConceptDescription/category shall be one of following values: PROPERTY.\n\nConstraint AASd-068: If the semanticId of a Range submodel element references a ConceptDescription then DataSpecificationIEC61360/dataType shall be a numerical one, i.e. REAL_* or RATIONAL_*.\n\nConstraint AASd-069: If the semanticId of a Range references a ConceptDescription then DataSpecificationIEC61360/levelType shall be identical to the set {Min, Max}."@en ;
     rdfs:label "Range"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Range/valueType
+###  https://admin-shell.io/aas/3/0/RC01/Range/valueType
 <https://admin-shell.io/aas/3/0/RC01/Range/valueType> rdf:type owl:ObjectProperty ;
     rdfs:label "has value type"^^xsd:string ;
     rdfs:domain aas:Range ;
@@ -2041,7 +2041,7 @@ aas:Range rdf:type owl:Class ;
     rdfs:comment "Data type of the min und max"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Range/min
+###  https://admin-shell.io/aas/3/0/RC01/Range/min
 <https://admin-shell.io/aas/3/0/RC01/Range/min> rdf:type owl:DatatypeProperty ;
     rdfs:label "has min"^^xsd:string ;
     rdfs:domain aas:Range ;
@@ -2049,7 +2049,7 @@ aas:Range rdf:type owl:Class ;
     rdfs:comment "The minimum value of the range. If the min value is missing, then the value is assumed to be negative infinite."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Range/max
+###  https://admin-shell.io/aas/3/0/RC01/Range/max
 <https://admin-shell.io/aas/3/0/RC01/Range/max> rdf:type owl:DatatypeProperty ;
     rdfs:label "has max"^^xsd:string ;
     rdfs:domain aas:Range ;
@@ -2057,14 +2057,14 @@ aas:Range rdf:type owl:Class ;
     rdfs:comment "The maximum value of the range. If the max value is missing,  then the value is assumed to be positive infinite."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Referable
+###  https://admin-shell.io/aas/3/0/RC01/Referable
 aas:Referable rdf:type owl:Class ;
     rdfs:subClassOf aas:HasExtensions ;
     rdfs:comment "An element that is referable by its 'idShort'.\n\nThis identifier is not globally unique. This identifier is unique within the name space of the element."@en ;
     rdfs:label "Referable"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Referable/idShort
+###  https://admin-shell.io/aas/3/0/RC01/Referable/idShort
 <https://admin-shell.io/aas/3/0/RC01/Referable/idShort> rdf:type owl:DatatypeProperty ;
     rdfs:label "has ID short"^^xsd:string ;
     rdfs:domain aas:Referable ;
@@ -2072,7 +2072,7 @@ aas:Referable rdf:type owl:Class ;
     rdfs:comment "In case of identifiable this attribute is a short name of the element. In case of referable this ID is an identifying string of the element within its name space.\n\nNOTE:\nIn case the element is a property and the property has a semantic definition ('HasSemantics') conformant to IEC61360 the idShort is typically identical to the short name in English."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Referable/displayName
+###  https://admin-shell.io/aas/3/0/RC01/Referable/displayName
 <https://admin-shell.io/aas/3/0/RC01/Referable/displayName> rdf:type owl:ObjectProperty ;
     rdfs:label "has display name"^^xsd:string ;
     rdfs:domain aas:Referable ;
@@ -2080,7 +2080,7 @@ aas:Referable rdf:type owl:Class ;
     rdfs:comment "Display name. Can be provided in several languages.\n\nIf no display name is defined in the language requested by the application, then the display name is selected in the following order if available:\n\n* the preferred name in the requested language of the concept description defining the semantics of the element\n* If there is a default language list defined in the application, then the corresponding preferred name in the language is chosen according to this order.\n* the English preferred name of the concept description defining the semantics of the element\n* the short name of the concept description-the idShort of the element"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Referable/category
+###  https://admin-shell.io/aas/3/0/RC01/Referable/category
 <https://admin-shell.io/aas/3/0/RC01/Referable/category> rdf:type owl:DatatypeProperty ;
     rdfs:label "has category"^^xsd:string ;
     rdfs:domain aas:Referable ;
@@ -2088,7 +2088,7 @@ aas:Referable rdf:type owl:Class ;
     rdfs:comment "The category is a value that gives further meta information w.r.t. to the class of the element. It affects the expected existence of attributes and the applicability of constraints.\n\nNOTE:\nThe category is not identical to the semantic definition ('HasSemantics') of an element. The category e.g. could denote that the element is a measurement value whereas the semantic definition of the element would denote that it is the measured temperature."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Referable/description
+###  https://admin-shell.io/aas/3/0/RC01/Referable/description
 <https://admin-shell.io/aas/3/0/RC01/Referable/description> rdf:type owl:ObjectProperty ;
     rdfs:label "has description"^^xsd:string ;
     rdfs:domain aas:Referable ;
@@ -2096,163 +2096,163 @@ aas:Referable rdf:type owl:Class ;
     rdfs:comment "Description or comments on the element.\n\nThe description can be provided in several languages. If no description is defined, then the definition of the concept description that defines the semantics of the element is used. Additional information can be provided, e.g., if the element is qualified and which qualifier types can be expected in which context or which additional data specification templates are provided."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements
 aas:ReferableElements rdf:type owl:Class ;
 rdfs:subClassOf aas:IdentifiableElements ;
     rdfs:label "Referable Elements"^^xsd:string ;
     rdfs:comment "Enumeration of all referable elements within an asset administration shell"@en ;
     owl:oneOf (
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/AccessPermissionRule>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/AnnotatedRelationshipElement>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/Asset>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/AssetAdministrationShell>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/BasicEvent>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/Blob>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/Capability>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/ConceptDescription>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/ConceptDictionary>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/DataElement>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/Entity>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/Event>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/File>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/MultiLanguageProperty>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/Operation>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/Property>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/Range>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/ReferenceElement>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/RelationshipElement>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/Submodel>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/SubmodelElement>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/SubmodelElementCollection>
-        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/View>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/ACCESS_PERMISSION_RULE>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/ANNOTATED_RELATIONSHIP_ELEMENT>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/ASSET>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/ASSET_ADMINISTRATION_SHELL>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/BASIC_EVENT>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/BLOB>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/CAPABILITY>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/CONCEPT_DESCRIPTION>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/CONCEPT_DICTIONARY>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/DATA_ELEMENT>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/ENTITY>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/EVENT>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/FILE>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/MULTI_LANGUAGE_PROPERTY>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/OPERATION>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/PROPERTY>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/RANGE>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/REFERENCE_ELEMENT>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/RELATIONSHIP_ELEMENT>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/SUBMODEL>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/SUBMODEL_ELEMENT>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/SUBMODEL_ELEMENT_COLLECTION>
+        <https://admin-shell.io/aas/3/0/RC01/ReferableElements/VIEW>
     ) ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/AccessPermissionRule
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/AccessPermissionRule> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/ACCESS_PERMISSION_RULE
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/ACCESS_PERMISSION_RULE> rdf:type aas:ReferableElements ;
     rdfs:label "Access Permission Rule"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/AnnotatedRelationshipElement
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/AnnotatedRelationshipElement> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/ANNOTATED_RELATIONSHIP_ELEMENT
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/ANNOTATED_RELATIONSHIP_ELEMENT> rdf:type aas:ReferableElements ;
     rdfs:label "Annotated Relationship Element"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/Asset
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/Asset> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/ASSET
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/ASSET> rdf:type aas:ReferableElements ;
     rdfs:label "Asset"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/AssetAdministrationShell
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/AssetAdministrationShell> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/ASSET_ADMINISTRATION_SHELL
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/ASSET_ADMINISTRATION_SHELL> rdf:type aas:ReferableElements ;
     rdfs:label "Asset Administration Shell"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/BasicEvent
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/BasicEvent> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/BASIC_EVENT
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/BASIC_EVENT> rdf:type aas:ReferableElements ;
     rdfs:label "Basic Event"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/Blob
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/Blob> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/BLOB
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/BLOB> rdf:type aas:ReferableElements ;
     rdfs:label "Blob"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/Capability
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/Capability> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/CAPABILITY
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/CAPABILITY> rdf:type aas:ReferableElements ;
     rdfs:label "Capability"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/ConceptDescription
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/ConceptDescription> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/CONCEPT_DESCRIPTION
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/CONCEPT_DESCRIPTION> rdf:type aas:ReferableElements ;
     rdfs:label "Concept Description"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/ConceptDictionary
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/ConceptDictionary> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/CONCEPT_DICTIONARY
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/CONCEPT_DICTIONARY> rdf:type aas:ReferableElements ;
     rdfs:label "Concept Dictionary"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/DataElement
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/DataElement> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/DATA_ELEMENT
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/DATA_ELEMENT> rdf:type aas:ReferableElements ;
     rdfs:label "Data Element"^^xsd:string ;
-    rdfs:comment "Data element.\n\nNOTE:\nData Element is abstract, i.e. if a key uses 'DataElement' the reference may be a Property, a File etc."@en ;
+    rdfs:comment "Data element.\n\nNOTE:\nData Element is abstract, i.e. if a key uses 'DATA_ELEMENT' the reference may be a Property, a File etc."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/Entity
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/Entity> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/ENTITY
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/ENTITY> rdf:type aas:ReferableElements ;
     rdfs:label "Entity"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/Event
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/Event> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/EVENT
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/EVENT> rdf:type aas:ReferableElements ;
     rdfs:label "Event"^^xsd:string ;
     rdfs:comment "Event.\n\nNOTE:\nEvent is abstract."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/File
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/File> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/FILE
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/FILE> rdf:type aas:ReferableElements ;
     rdfs:label "File"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/MultiLanguageProperty
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/MultiLanguageProperty> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/MULTI_LANGUAGE_PROPERTY
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/MULTI_LANGUAGE_PROPERTY> rdf:type aas:ReferableElements ;
     rdfs:label "Multi Language Property"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/Operation
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/Operation> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/OPERATION
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/OPERATION> rdf:type aas:ReferableElements ;
     rdfs:label "Operation"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/Property
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/Property> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/PROPERTY
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/PROPERTY> rdf:type aas:ReferableElements ;
     rdfs:label "Property"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/Range
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/Range> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/RANGE
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/RANGE> rdf:type aas:ReferableElements ;
     rdfs:label "Range"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/ReferenceElement
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/ReferenceElement> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/REFERENCE_ELEMENT
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/REFERENCE_ELEMENT> rdf:type aas:ReferableElements ;
     rdfs:label "Reference Element"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/RelationshipElement
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/RelationshipElement> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/RELATIONSHIP_ELEMENT
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/RELATIONSHIP_ELEMENT> rdf:type aas:ReferableElements ;
     rdfs:label "Relationship Element"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/Submodel
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/Submodel> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/SUBMODEL
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/SUBMODEL> rdf:type aas:ReferableElements ;
     rdfs:label "Submodel"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/SubmodelElement
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/SubmodelElement> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/SUBMODEL_ELEMENT
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/SUBMODEL_ELEMENT> rdf:type aas:ReferableElements ;
     rdfs:label "Submodel Element"^^xsd:string ;
-    rdfs:comment "Submodel Element\n\nNOTE:\nSubmodel Element is abstract, i.e. if a key uses 'SubmodelElement' the reference may be a Property, a 'SubmodelElementCollection', an Operation etc."@en ;
+    rdfs:comment "Submodel Element\n\nNOTE:\nSubmodel Element is abstract, i.e. if a key uses 'SUBMODEL_ELEMENT' the reference may be a Property, a 'SubmodelElementCollection', an Operation etc."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/SubmodelElementCollection
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/SubmodelElementCollection> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/SUBMODEL_ELEMENT_COLLECTION
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/SUBMODEL_ELEMENT_COLLECTION> rdf:type aas:ReferableElements ;
     rdfs:label "Submodel Element Collection"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferableElements/View
-<https://admin-shell.io/aas/3/0/RC01/ReferableElements/View> rdf:type aas:ReferableElements ;
+###  https://admin-shell.io/aas/3/0/RC01/ReferableElements/VIEW
+<https://admin-shell.io/aas/3/0/RC01/ReferableElements/VIEW> rdf:type aas:ReferableElements ;
     rdfs:label "View"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Reference
+###  https://admin-shell.io/aas/3/0/RC01/Reference
 aas:Reference rdf:type owl:Class ;
     rdfs:comment "Reference to either a model element of the same or another AAs or to an external entity.\n\nA reference is an ordered list of keys, each key referencing an element. The complete list of keys may for example be concatenated to a path that then gives unique access to an element or entity."@en ;
     rdfs:label "Reference"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Reference/keys
+###  https://admin-shell.io/aas/3/0/RC01/Reference/keys
 <https://admin-shell.io/aas/3/0/RC01/Reference/keys> rdf:type owl:ObjectProperty ;
     rdfs:label "has keys"^^xsd:string ;
     rdfs:domain aas:Reference ;
@@ -2260,14 +2260,14 @@ aas:Reference rdf:type owl:Class ;
     rdfs:comment "Unique references in their name space."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferenceElement
+###  https://admin-shell.io/aas/3/0/RC01/ReferenceElement
 aas:ReferenceElement rdf:type owl:Class ;
     rdfs:subClassOf aas:DataElement ;
     rdfs:comment "A reference element is a data element that defines a logical reference to another element within the same or another AAS or a reference to an external object or entity."@en ;
     rdfs:label "Reference Element"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ReferenceElement/value
+###  https://admin-shell.io/aas/3/0/RC01/ReferenceElement/value
 <https://admin-shell.io/aas/3/0/RC01/ReferenceElement/value> rdf:type owl:ObjectProperty ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:ReferenceElement ;
@@ -2275,14 +2275,14 @@ aas:ReferenceElement rdf:type owl:Class ;
     rdfs:comment "Reference to any other referable element of the same of any other AAS or a reference to an external object or entity.\n\nConstraint AASd-054: If the semanticId of a ReferenceElement submodel element references a ConceptDescription then the ConceptDescription/category shall be one of following values: REFERENCE."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/RelationshipElement
+###  https://admin-shell.io/aas/3/0/RC01/RelationshipElement
 aas:RelationshipElement rdf:type owl:Class ;
     rdfs:subClassOf aas:SubmodelElement ;
     rdfs:comment "A relationship element is used to define a relationship between two referable elements.\n\nConstraint AASd-055: If the semanticId of a RelationshipElement or an AnnotatedRelationshipElement submodel element references a ConceptDescription then the ConceptDescription/category shall be one of following values: RELATIONSHIP."@en ;
     rdfs:label "Relationship Element"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/RelationshipElement/first
+###  https://admin-shell.io/aas/3/0/RC01/RelationshipElement/first
 <https://admin-shell.io/aas/3/0/RC01/RelationshipElement/first> rdf:type owl:ObjectProperty ;
     rdfs:label "has first"^^xsd:string ;
     rdfs:domain aas:RelationshipElement ;
@@ -2290,7 +2290,7 @@ aas:RelationshipElement rdf:type owl:Class ;
     rdfs:comment "Reference to the first element in the relationship taking the role of the subject."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/RelationshipElement/second
+###  https://admin-shell.io/aas/3/0/RC01/RelationshipElement/second
 <https://admin-shell.io/aas/3/0/RC01/RelationshipElement/second> rdf:type owl:ObjectProperty ;
     rdfs:label "has second"^^xsd:string ;
     rdfs:domain aas:RelationshipElement ;
@@ -2298,13 +2298,13 @@ aas:RelationshipElement rdf:type owl:Class ;
     rdfs:comment "Reference to the second element in the relationship taking the role of the object."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Security
+###  https://admin-shell.io/aas/3/0/RC01/Security
 aas:Security rdf:type owl:Class ;
     rdfs:comment "Container for security relevant information of the AAS."@en ;
     rdfs:label "Security"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Security/accessControlPolicyPoints
+###  https://admin-shell.io/aas/3/0/RC01/Security/accessControlPolicyPoints
 <https://admin-shell.io/aas/3/0/RC01/Security/accessControlPolicyPoints> rdf:type owl:ObjectProperty ;
     rdfs:label "has access control policy points"^^xsd:string ;
     rdfs:domain aas:Security ;
@@ -2312,7 +2312,7 @@ aas:Security rdf:type owl:Class ;
     rdfs:comment "Access control policy points of the AAS."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Security/certificates
+###  https://admin-shell.io/aas/3/0/RC01/Security/certificates
 <https://admin-shell.io/aas/3/0/RC01/Security/certificates> rdf:type owl:ObjectProperty ;
     rdfs:label "has certificates"^^xsd:string ;
     rdfs:domain aas:Security ;
@@ -2320,7 +2320,7 @@ aas:Security rdf:type owl:Class ;
     rdfs:comment "Authenticating Certificates of the AAS and its submodels etc."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Security/requiredCertificatesExtension
+###  https://admin-shell.io/aas/3/0/RC01/Security/requiredCertificatesExtension
 <https://admin-shell.io/aas/3/0/RC01/Security/requiredCertificatesExtension> rdf:type owl:ObjectProperty ;
     rdfs:label "has required certificates extension"^^xsd:string ;
     rdfs:domain aas:Security ;
@@ -2328,13 +2328,13 @@ aas:Security rdf:type owl:Class ;
     rdfs:comment "Certificate extensions as required by the AAS"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/SubjectAttributes
+###  https://admin-shell.io/aas/3/0/RC01/SubjectAttributes
 aas:SubjectAttributes rdf:type owl:Class ;
     rdfs:comment "A set of data elements that further classifies a specific subject."@en ;
     rdfs:label "Subject Attributes"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/SubjectAttributes/subjectAttributes
+###  https://admin-shell.io/aas/3/0/RC01/SubjectAttributes/subjectAttributes
 <https://admin-shell.io/aas/3/0/RC01/SubjectAttributes/subjectAttributes> rdf:type owl:ObjectProperty ;
     rdfs:label "has subject attributes"^^xsd:string ;
     rdfs:domain aas:SubjectAttributes ;
@@ -2342,7 +2342,7 @@ aas:SubjectAttributes rdf:type owl:Class ;
     rdfs:comment "A data element that further classifies a specific subject.\n\nConstraint AASs-015: The data element SubjectAttributes/subjectAttribute shall be part of the submodel that is referenced within the “selectableSubjectAttributes” attribute of “AccessControl”.\""@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Submodel
+###  https://admin-shell.io/aas/3/0/RC01/Submodel
 aas:Submodel rdf:type owl:Class ;
     rdfs:subClassOf aas:Identifiable ;
     rdfs:subClassOf aas:HasKind ;
@@ -2353,7 +2353,7 @@ aas:Submodel rdf:type owl:Class ;
     rdfs:label "Submodel"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/Submodel/submodelElements
+###  https://admin-shell.io/aas/3/0/RC01/Submodel/submodelElements
 <https://admin-shell.io/aas/3/0/RC01/Submodel/submodelElements> rdf:type owl:ObjectProperty ;
     rdfs:label "has submodel elements"^^xsd:string ;
     rdfs:domain aas:Submodel ;
@@ -2361,7 +2361,7 @@ aas:Submodel rdf:type owl:Class ;
     rdfs:comment "A submodel consists of zero or more submodel elements."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/SubmodelElement
+###  https://admin-shell.io/aas/3/0/RC01/SubmodelElement
 aas:SubmodelElement rdf:type owl:Class ;
     rdfs:subClassOf aas:Referable ;
     rdfs:subClassOf aas:HasKind ;
@@ -2372,14 +2372,14 @@ aas:SubmodelElement rdf:type owl:Class ;
     rdfs:label "Submodel Element"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection
+###  https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection
 aas:SubmodelElementCollection rdf:type owl:Class ;
     rdfs:subClassOf aas:SubmodelElement ;
     rdfs:comment "A submodel element collection is a set or list of submodel elements.\n\nConstraint AASd-059: If the semanticId of a SubmodelElementCollection references a ConceptDescription then the category of the ConceptDescription shall be COLLECTION or ENTITY.\n\nConstraint AASd-092: If the semanticId of a SubmodelElementCollection with SubmodelElementCollection/allowDuplicates == false references a ConceptDescription then the ConceptDescription/category shall be ENTITY.\n\nConstraint AASd-093: If the semanticId of a SubmodelElementCollection with SubmodelElementCollection/allowDuplicates == true references a ConceptDescription then the ConceptDescription/category shall be COLLECTION.\n\nExample: A set of documents is referencing a concept description of category COLLECTION. A document within this collection is described as a SubmodelElementCollection referencing a concept description of category ENTITY.\n\nNOTE:\nThis means that no generic semanticId can be assigned to an element within a submodel element collection with allowDuplicates == false: every element within the entity needs a clear and unique semantics."@en ;
     rdfs:label "Submodel Element Collection"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/values
+###  https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/values
 <https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/values> rdf:type owl:ObjectProperty ;
     rdfs:label "has values"^^xsd:string ;
     rdfs:domain aas:SubmodelElementCollection ;
@@ -2387,7 +2387,7 @@ aas:SubmodelElementCollection rdf:type owl:Class ;
     rdfs:comment "Submodel element contained in the collection."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/ordered
+###  https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/ordered
 <https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/ordered> rdf:type owl:DatatypeProperty ;
     rdfs:label "has ordered"^^xsd:string ;
     rdfs:domain aas:SubmodelElementCollection ;
@@ -2395,7 +2395,7 @@ aas:SubmodelElementCollection rdf:type owl:Class ;
     rdfs:comment "If ordered=false, then the elements in the collection are not ordered. If ordered=true, then the elements in the collection are ordered. Default = false\n\nNOTE:\nAn ordered submodel element collection is typically implemented as an indexed array."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/allowDuplicates
+###  https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/allowDuplicates
 <https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/allowDuplicates> rdf:type owl:DatatypeProperty ;
     rdfs:label "has allow duplicates"^^xsd:string ;
     rdfs:domain aas:SubmodelElementCollection ;
@@ -2403,13 +2403,13 @@ aas:SubmodelElementCollection rdf:type owl:Class ;
     rdfs:comment "If allowDuplicates==true, then it is allowed that the collection contains several elements with the same semantics (i.e. the same semanticId). Constraint AASd-026: If allowDuplicates==false then it is not allowed that the collection contains several elements with the same semantics (i.e. the same semanticId). Default = false"@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ValueList
+###  https://admin-shell.io/aas/3/0/RC01/ValueList
 aas:ValueList rdf:type owl:Class ;
     rdfs:comment "A set of value reference pairs."@en ;
     rdfs:label "Value List"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ValueList/valueReferencePairTypes
+###  https://admin-shell.io/aas/3/0/RC01/ValueList/valueReferencePairTypes
 <https://admin-shell.io/aas/3/0/RC01/ValueList/valueReferencePairTypes> rdf:type owl:ObjectProperty ;
     rdfs:label "has value reference pair types"^^xsd:string ;
     rdfs:domain aas:ValueList ;
@@ -2417,13 +2417,13 @@ aas:ValueList rdf:type owl:Class ;
     rdfs:comment "A pair of a value together with its global unique id."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ValueReferencePair
+###  https://admin-shell.io/aas/3/0/RC01/ValueReferencePair
 aas:ValueReferencePair rdf:type owl:Class ;
     rdfs:comment "A value reference pair within a value list. Each value has a global unique id defining its semantic."@en ;
     rdfs:label "Value Reference Pair"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ValueReferencePair/value
+###  https://admin-shell.io/aas/3/0/RC01/ValueReferencePair/value
 <https://admin-shell.io/aas/3/0/RC01/ValueReferencePair/value> rdf:type owl:DatatypeProperty ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:ValueReferencePair ;
@@ -2431,7 +2431,7 @@ aas:ValueReferencePair rdf:type owl:Class ;
     rdfs:comment "The value of the referenced concept definition of the value in valueId."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/ValueReferencePair/valueId
+###  https://admin-shell.io/aas/3/0/RC01/ValueReferencePair/valueId
 <https://admin-shell.io/aas/3/0/RC01/ValueReferencePair/valueId> rdf:type owl:ObjectProperty ;
     rdfs:label "has value ID"^^xsd:string ;
     rdfs:domain aas:ValueReferencePair ;
@@ -2439,7 +2439,7 @@ aas:ValueReferencePair rdf:type owl:Class ;
     rdfs:comment "Global unique id of the value."@en ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/View
+###  https://admin-shell.io/aas/3/0/RC01/View
 aas:View rdf:type owl:Class ;
     rdfs:subClassOf aas:Referable ;
     rdfs:subClassOf aas:HasSemantics ;
@@ -2448,7 +2448,7 @@ aas:View rdf:type owl:Class ;
     rdfs:label "View"^^xsd:string ;
 .
 
-### https://admin-shell.io/aas/3/0/RC01/View/containedElements
+###  https://admin-shell.io/aas/3/0/RC01/View/containedElements
 <https://admin-shell.io/aas/3/0/RC01/View/containedElements> rdf:type owl:ObjectProperty ;
     rdfs:label "has contained elements"^^xsd:string ;
     rdfs:domain aas:View ;
