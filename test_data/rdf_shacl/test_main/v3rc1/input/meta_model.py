@@ -2332,7 +2332,7 @@ class Level_type(Enum):
     Min = "Min"
     Max = "Max"
     Nom = "Nom"
-    Type = "Type"
+    Typ = "Typ"
 
 
 @reference_in_the_book(section=(4, 7, 8, 2), index=2)
