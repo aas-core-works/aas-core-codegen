@@ -19,12 +19,12 @@ class Test_string_literal(unittest.TestCase):
 
     def test_multi_line_no_escape(self) -> None:
         self.assertEqual(
-            '"""some\nthing"""', rdf_shacl_common.string_literal("some\nthing")
+            r'"some\nthing"', rdf_shacl_common.string_literal("some\nthing")
         )
 
     def test_multi_line_escape(self) -> None:
         self.assertEqual(
-            '"""some\nthi\\"ng"""', rdf_shacl_common.string_literal('some\nthi"ng')
+            r'"some\nthi\"ng"', rdf_shacl_common.string_literal('some\nthi"ng')
         )
 
 

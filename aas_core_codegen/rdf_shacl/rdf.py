@@ -150,7 +150,8 @@ def _define_owl_class_for_class(
 
     for inheritance in cls.inheritances:
         writer.write(
-            f"{I}rdfs:subClassOf aas:{rdf_shacl_naming.class_name(inheritance.name)}\n"
+            f"{I}rdfs:subClassOf "
+            f"aas:{rdf_shacl_naming.class_name(inheritance.name)} ;\n"
         )
 
     if cls.description is not None:
@@ -186,26 +187,29 @@ def _define_property(
     cls_name = rdf_shacl_naming.class_name(cls.name)
     rdfs_domain = f"aas:{cls_name}"
 
-    prop_name = None  # type: Optional[Identifier]
-    prop_label = None  # type: Optional[Stripped]
     rdf_type = None  # type: Optional[str]
 
     missing_implementation = False
 
     if isinstance(type_anno, intermediate.OurTypeAnnotation):
-        prop_name = rdf_shacl_naming.property_name(prop.name)
-        prop_label = rdf_shacl_naming.property_label(prop.name)
-        rdf_type = "owl:ObjectProperty"
+        if isinstance(
+            type_anno.symbol,
+            (
+                intermediate.Enumeration,
+                intermediate.AbstractClass,
+                intermediate.ConcreteClass,
+            ),
+        ):
+            rdf_type = "owl:ObjectProperty"
+        elif isinstance(type_anno.symbol, intermediate.ConstrainedPrimitive):
+            rdf_type = "owl:DatatypeProperty"
+        else:
+            assert_never(type_anno.symbol)
 
     elif isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-        prop_name = rdf_shacl_naming.property_name(prop.name)
-        prop_label = rdf_shacl_naming.property_label(prop.name)
         rdf_type = "owl:DatatypeProperty"
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        prop_name = rdf_shacl_naming.property_name(prop.name)
-        prop_label = rdf_shacl_naming.property_label(prop.name)
-
         type_anno_items = rdf_shacl_common.beneath_optional(type_anno.items)
 
         if isinstance(type_anno_items, intermediate.OurTypeAnnotation):
@@ -229,10 +233,10 @@ def _define_property(
             f"{prop=}, {type_anno=}, {cls=}",
         )
 
-    assert prop_name is not None
-    assert prop_label is not None
     assert rdf_type is not None
 
+    prop_name = rdf_shacl_naming.property_name(prop.name)
+    prop_label = Stripped(f"has {rdf_shacl_naming.property_label(prop.name)}")
     rdfs_range = rdf_shacl_common.rdfs_range_for_type_annotation(
         type_annotation=type_anno, class_to_rdfs_range=class_to_rdfs_range
     )
@@ -339,7 +343,7 @@ def generate(
     assert preamble is not None
     blocks = [preamble]  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
+    for symbol in sorted(symbol_table.symbols, key=lambda symbol: symbol.name):
         if isinstance(symbol, intermediate.Enumeration):
             block, error = _define_for_enumeration(
                 enumeration=symbol, url_prefix=url_prefix

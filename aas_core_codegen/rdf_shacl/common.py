@@ -23,11 +23,8 @@ def string_literal(text: str) -> Stripped:
     if len(text) == 0:
         return Stripped('""')
 
-    escaped = text.replace('"', '\\"')
-    if "\n" in escaped:
-        return Stripped(f'"""{escaped}"""')
-    else:
-        return Stripped(f'"{escaped}"')
+    escaped = text.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+    return Stripped(f'"{escaped}"')
 
 
 ClassToRdfsRange = MutableMapping[intermediate.ClassUnion, Stripped]
