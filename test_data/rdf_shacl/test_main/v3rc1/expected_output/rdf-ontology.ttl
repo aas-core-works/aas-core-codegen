@@ -102,9 +102,9 @@ aas:AccessControlPolicyPoints rdf:type owl:Class ;
     rdfs:comment "The access control policy decision point of the AAS."@en ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoint
-<https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoint> rdf:type owl:ObjectProperty ;
-    rdfs:label "has policy enforcement point"^^xsd:string ;
+###  https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoints
+<https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoints> rdf:type owl:ObjectProperty ;
+    rdfs:label "has policy enforcement points"^^xsd:string ;
     rdfs:domain aas:AccessControlPolicyPoints ;
     rdfs:range aas:PolicyEnforcementPoints ;
     rdfs:comment "The access control policy enforcement point of the AAS."@en ;

@@ -2438,7 +2438,7 @@ aas:AccessControlPolicyPointsShape  a sh:NodeShape ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoint> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoints> ;
         sh:class aas:PolicyEnforcementPoints ;
         sh:minCount 1 ;
         sh:maxCount 1 ;

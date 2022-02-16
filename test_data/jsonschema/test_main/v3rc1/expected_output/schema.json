@@ -1502,7 +1502,7 @@
             "policyDecisionPoint": {
               "$ref": "#/definitions/PolicyDecisionPoint"
             },
-            "policyEnforcementPoint": {
+            "policyEnforcementPoints": {
               "$ref": "#/definitions/PolicyEnforcementPoints"
             },
             "policyInformationPoints": {
@@ -1512,7 +1512,7 @@
           "required": [
             "policyAdministrationPoint",
             "policyDecisionPoint",
-            "policyEnforcementPoint"
+            "policyEnforcementPoints"
           ]
         }
       ]
