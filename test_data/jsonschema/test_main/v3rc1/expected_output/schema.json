@@ -24,9 +24,6 @@
         }
       ]
     },
-    "ValueDataType": {
-      "type": "string"
-    },
     "HasSemantics": {
       "allOf": [
         {
@@ -54,7 +51,7 @@
               "$ref": "#/definitions/DataTypeDef"
             },
             "value": {
-              "$ref": "#/definitions/ValueDataType"
+              "type": "string"
             },
             "refersTo": {
               "$ref": "#/definitions/Reference"
@@ -252,7 +249,7 @@
               "$ref": "#/definitions/DataTypeDef"
             },
             "value": {
-              "$ref": "#/definitions/ValueDataType"
+              "type": "string"
             },
             "valueID": {
               "$ref": "#/definitions/Reference"
@@ -569,7 +566,7 @@
               "$ref": "#/definitions/DataTypeDef"
             },
             "value": {
-              "$ref": "#/definitions/ValueDataType"
+              "type": "string"
             },
             "valueID": {
               "$ref": "#/definitions/Reference"
@@ -611,10 +608,10 @@
               "$ref": "#/definitions/DataTypeDef"
             },
             "min": {
-              "$ref": "#/definitions/ValueDataType"
+              "type": "string"
             },
             "max": {
-              "$ref": "#/definitions/ValueDataType"
+              "type": "string"
             }
           },
           "required": [
@@ -1103,7 +1100,7 @@
           "type": "object",
           "properties": {
             "value": {
-              "$ref": "#/definitions/ValueDataType"
+              "type": "string"
             },
             "valueID": {
               "$ref": "#/definitions/Reference"
@@ -1170,7 +1167,7 @@
               "$ref": "#/definitions/ValueList"
             },
             "value": {
-              "$ref": "#/definitions/ValueDataType"
+              "type": "string"
             },
             "valueID": {
               "$ref": "#/definitions/Reference"

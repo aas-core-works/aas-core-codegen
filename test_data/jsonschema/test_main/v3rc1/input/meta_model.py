@@ -151,11 +151,12 @@ def is_MIME_type(text: str) -> bool:
 @verification
 @implementation_specific
 def value_and_data_type_match(
-        value: "Value_data_type",
+        value: str,
         data_type: "Data_type_def"
 ) -> bool:
     """Check that the actual type of :paramref:`value` matches :paramref:`data_type`."""
     raise NotImplementedError()
+
 
 # endregion
 
@@ -171,12 +172,8 @@ class Non_empty_string(str, DBC):
 class MIME_typed(Non_empty_string, DBC):
     """Represent a string that follows the pattern of a MIME type."""
 
+
 # endregion
-
-@implementation_specific
-class Value_data_type:
-    """Represent an XML primitive type."""
-
 
 @abstract
 @reference_in_the_book(section=(4, 7, 2, 7))
@@ -216,7 +213,7 @@ class Extension(Has_semantics):
     Default: xsd:string
     """
 
-    value: Optional["Value_data_type"]
+    value: Optional[str]
     """
     Value of the extension
     """
@@ -231,7 +228,7 @@ class Extension(Has_semantics):
             name: Non_empty_string,
             semantic_ID: Optional["Reference"] = None,
             value_type: Optional["Data_type_def"] = None,
-            value: Optional["Value_data_type"] = None,
+            value: Optional[str] = None,
             refers_to: Optional["Reference"] = None,
     ) -> None:
         Has_semantics.__init__(self, semantic_ID=semantic_ID)
@@ -616,7 +613,7 @@ class Qualifier(Constraint, Has_semantics):
     Data type of the qualifier value.
     """
 
-    value: Optional["Value_data_type"]
+    value: Optional[str]
     """
     The qualifier value is the value of the qualifier.
     """
@@ -630,7 +627,7 @@ class Qualifier(Constraint, Has_semantics):
             self,
             type: Non_empty_string,
             value_type: "Data_type_def",
-            value: Optional["Value_data_type"] = None,
+            value: Optional[str] = None,
             value_ID: Optional["Reference"] = None,
             semantic_ID: Optional["Reference"] = None,
     ) -> None:
@@ -1214,7 +1211,7 @@ class Property(Data_element):
     Data type of the value
     """
 
-    value: Optional["Value_data_type"]
+    value: Optional[str]
     """
     The value of the property instance.
 
@@ -1242,7 +1239,7 @@ class Property(Data_element):
             semantic_ID: Optional["Reference"] = None,
             qualifiers: Optional[List[Constraint]] = None,
             data_specifications: Optional[List["Reference"]] = None,
-            value: Optional["Value_data_type"] = None,
+            value: Optional[str] = None,
             value_ID: Optional["Reference"] = None,
     ) -> None:
         Data_element.__init__(
@@ -1351,13 +1348,13 @@ class Range(Data_element):
     Data type of the min und max
     """
 
-    min: Optional["Value_data_type"]
+    min: Optional[str]
     """
     The minimum value of the range.
     If the min value is missing, then the value is assumed to be negative infinite.
     """
 
-    max: Optional["Value_data_type"]
+    max: Optional[str]
     """
     The maximum value of the range.
     If the max value is missing,  then the value is assumed to be positive infinite.
@@ -1375,8 +1372,8 @@ class Range(Data_element):
             semantic_ID: Optional["Reference"] = None,
             qualifiers: Optional[List[Constraint]] = None,
             data_specifications: Optional[List["Reference"]] = None,
-            min: Optional["Value_data_type"] = None,
-            max: Optional["Value_data_type"] = None,
+            min: Optional[str] = None,
+            max: Optional[str] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -2345,7 +2342,7 @@ class Value_reference_pair(DBC):
     defining its semantic.
     """
 
-    value: "Value_data_type"
+    value: str
     """
     The value of the referenced concept definition of the value in valueId.
     """
@@ -2355,7 +2352,7 @@ class Value_reference_pair(DBC):
     Global unique id of the value.
     """
 
-    def __init__(self, value: "Value_data_type", value_ID: "Reference") -> None:
+    def __init__(self, value: str, value_ID: "Reference") -> None:
         self.value = value
         self.value_ID = value_ID
 
@@ -2476,7 +2473,7 @@ class Data_specification_IEC_61360(Data_specification_content):
     List of allowed values
     """
 
-    value: Optional["Value_data_type"]
+    value: Optional[str]
     """
     Value
     """
@@ -2503,7 +2500,7 @@ class Data_specification_IEC_61360(Data_specification_content):
             definition: Optional["Lang_string_set"] = None,
             value_format: Optional[Non_empty_string] = None,
             value_list: Optional["Value_list"] = None,
-            value: Optional["Value_data_type"] = None,
+            value: Optional[str] = None,
             value_ID: Optional["Reference"] = None,
             level_type: Optional["Level_type"] = None,
     ) -> None:
