@@ -103,13 +103,13 @@ def enumeration_literal(identifier: Identifier) -> Stripped:
     Generate the enumeration literal for its intermediate ``identifier``.
 
     >>> enumeration_literal(Identifier('something'))
-    'SOMETHING'
+    'Something'
 
     >>> enumeration_literal(Identifier("something_to_URL"))
-    'SOMETHING_TO_URL'
+    'SomethingToUrl'
     """
     parts = identifier.split("_")
-    return Stripped("_".join(part.upper() for part in parts))
+    return Stripped("".join(part.capitalize() for part in parts))
 
 
 def enumeration_literal_label(identifier: Identifier) -> Stripped:
