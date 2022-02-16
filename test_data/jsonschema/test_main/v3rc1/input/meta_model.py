@@ -3024,7 +3024,7 @@ class Access_control_policy_points(DBC):
     The access control policy decision point of the AAS.
     """
 
-    policy_enforcement_point: "Policy_enforcement_points"
+    policy_enforcement_points: "Policy_enforcement_points"
     """
     The access control policy enforcement point of the AAS.
     """
@@ -3038,12 +3038,12 @@ class Access_control_policy_points(DBC):
             self,
             policy_administration_point: "Policy_administration_point",
             policy_decision_point: "Policy_decision_point",
-            policy_enforcement_point: "Policy_enforcement_points",
+            policy_enforcement_points: "Policy_enforcement_points",
             policy_information_points: Optional["Policy_information_points"] = None,
     ) -> None:
         self.policy_administration_point = policy_administration_point
         self.policy_decision_point = policy_decision_point
-        self.policy_enforcement_point = policy_enforcement_point
+        self.policy_enforcement_points = policy_enforcement_points
         self.policy_information_points = policy_information_points
 
 
