@@ -13,18 +13,18 @@ def class_name(identifier: Identifier) -> Identifier:
     'Something'
 
     >>> class_name(Identifier("something_to_URL"))
-    'SomethingToUrl'
+    'SomethingToURL'
     """
     parts = identifier.split("_")
 
-    if len(parts) == 1:
-        return Identifier(parts[0].capitalize())
+    cased = []  # type: List[str]
+    for part in parts:
+        if part in naming.UPPERCASE_ABBREVIATION_SET:
+            cased.append(part.upper())
+        else:
+            cased.append(part.capitalize())
 
-    return Identifier(
-        "{}{}".format(
-            parts[0].capitalize(), "".join(part.capitalize() for part in parts[1:])
-        )
-    )
+    return Identifier("".join(cased))
 
 
 _LOWERCASE_WORDS_IN_LABEL = {"to", "in"}
@@ -62,18 +62,21 @@ def property_name(identifier: Identifier) -> Identifier:
     'something'
 
     >>> property_name(Identifier("something_to_URL"))
-    'somethingToUrl'
+    'somethingToURL'
     """
     parts = identifier.split("_")
 
-    if len(parts) == 1:
-        return Identifier(parts[0].lower())
+    cased = []  # type: List[str]
+    for i, part in enumerate(parts):
+        if i == 0:
+            cased.append(part.lower())
+        else:
+            if part in naming.UPPERCASE_ABBREVIATION_SET:
+                cased.append(part.upper())
+            else:
+                cased.append(part.capitalize())
 
-    return Identifier(
-        "{}{}".format(
-            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
-        )
-    )
+    return Identifier("".join(cased))
 
 
 def property_label(identifier: Identifier) -> Stripped:
@@ -103,13 +106,13 @@ def enumeration_literal(identifier: Identifier) -> Stripped:
     Generate the enumeration literal for its intermediate ``identifier``.
 
     >>> enumeration_literal(Identifier('something'))
-    'SOMETHING'
+    'Something'
 
     >>> enumeration_literal(Identifier("something_to_URL"))
-    'SOMETHING_TO_URL'
+    'SomethingToUrl'
     """
     parts = identifier.split("_")
-    return Stripped("_".join(part.upper() for part in parts))
+    return Stripped("".join(part.capitalize() for part in parts))
 
 
 def enumeration_literal_label(identifier: Identifier) -> Stripped:
