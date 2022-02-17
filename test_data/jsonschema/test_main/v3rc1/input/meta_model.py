@@ -2732,12 +2732,13 @@ class Permission(DBC):
 
 
 @reference_in_the_book(section=(5, 3, 5), index=5)
+@invariant(lambda self: len(self.subject_attributes) >= 1)
 class Subject_attributes:
     """
     A set of data elements that further classifies a specific subject.
     """
 
-    subject_attributes: List["Data_element"]
+    subject_attributes: List["Reference"]
     """
     A data element that further classifies a specific subject.
 
@@ -2746,7 +2747,7 @@ class Subject_attributes:
     attribute of “AccessControl”."
     """
 
-    def __init__(self, subject_attributes: List["Data_element"]) -> None:
+    def __init__(self, subject_attributes: List["Reference"]) -> None:
         self.subject_attributes = subject_attributes
 
 
