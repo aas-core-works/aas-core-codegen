@@ -206,7 +206,7 @@
       ]
     },
     "Constraint_abstract": {
-      "anyOf": [
+      "oneOf": [
         {
           "$ref": "#/definitions/Formula"
         },
@@ -415,7 +415,7 @@
       ]
     },
     "SubmodelElement_abstract": {
-      "anyOf": [
+      "oneOf": [
         {
           "$ref": "#/definitions/RelationshipElement"
         },
@@ -508,7 +508,7 @@
       "$ref": "#/definitions/SubmodelElement"
     },
     "DataElement_abstract": {
-      "anyOf": [
+      "oneOf": [
         {
           "$ref": "#/definitions/Blob"
         },
@@ -1176,7 +1176,7 @@
       ]
     },
     "Certificate_abstract": {
-      "anyOf": [
+      "oneOf": [
         {
           "$ref": "#/definitions/BlobCertificate"
         }

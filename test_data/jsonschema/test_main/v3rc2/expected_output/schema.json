@@ -179,7 +179,7 @@
       ]
     },
     "Constraint_abstract": {
-      "anyOf": [
+      "oneOf": [
         {
           "$ref": "#/definitions/Formula"
         },
@@ -389,7 +389,7 @@
       ]
     },
     "SubmodelElement_abstract": {
-      "anyOf": [
+      "oneOf": [
         {
           "$ref": "#/definitions/AnnotatedRelationshipElement"
         },
@@ -506,7 +506,7 @@
       "$ref": "#/definitions/SubmodelElement"
     },
     "DataElement_abstract": {
-      "anyOf": [
+      "oneOf": [
         {
           "$ref": "#/definitions/Blob"
         },
@@ -832,7 +832,7 @@
       ]
     },
     "Reference_abstract": {
-      "anyOf": [
+      "oneOf": [
         {
           "$ref": "#/definitions/GlobalReference"
         },

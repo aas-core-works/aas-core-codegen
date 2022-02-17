@@ -460,12 +460,12 @@ def _define_for_class(
     if len(cls.concrete_descendants) > 0 and id(cls) in ids_of_classes_in_properties:
         model_type_abstract = f"{model_type}_abstract"
 
-        any_of = [
+        one_of = [
             {"$ref": f"#/definitions/{naming.json_model_type(descendant.name)}"}
             for descendant in cls.concrete_descendants
         ]  # type: List[MutableMapping[str, Any]]
 
-        result[model_type_abstract] = {"anyOf": any_of}
+        result[model_type_abstract] = {"oneOf": one_of}
 
     # endregion
 
