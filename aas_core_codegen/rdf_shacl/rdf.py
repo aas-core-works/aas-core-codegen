@@ -343,7 +343,10 @@ def generate(
     assert preamble is not None
     blocks = [preamble]  # type: List[Stripped]
 
-    for symbol in sorted(symbol_table.symbols, key=lambda symbol: symbol.name):
+    for symbol in sorted(
+        symbol_table.symbols,
+        key=lambda symbol: rdf_shacl_naming.class_name(symbol.name),
+    ):
         if isinstance(symbol, intermediate.Enumeration):
             block, error = _define_for_enumeration(
                 enumeration=symbol, url_prefix=url_prefix

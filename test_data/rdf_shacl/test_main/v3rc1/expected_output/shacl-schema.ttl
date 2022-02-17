@@ -1978,88 +1978,88 @@ aas:ValueListShape  a sh:NodeShape ;
     ] ;
 .
 
-aas:DataSpecificationIec61360Shape  a sh:NodeShape ;
-    sh:targetClass aas:DataSpecificationIec61360 ;
+aas:DataSpecificationIEC61360Shape  a sh:NodeShape ;
+    sh:targetClass aas:DataSpecificationIEC61360 ;
     rdfs:subClassOf DataSpecificationContent ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/preferredName> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/preferredName> ;
         sh:datatype rdf:langString ;
         sh:minCount 0 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/shortName> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/shortName> ;
         sh:datatype rdf:langString ;
         sh:minCount 0 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/unit> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/unit> ;
         sh:datatype xsd:string ;
         sh:minCount 0 ;
         sh:minLength 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/unitId> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/unitId> ;
         sh:class aas:Reference ;
         sh:minCount 0 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/sourceOfDefinition> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/sourceOfDefinition> ;
         sh:datatype xsd:string ;
         sh:minCount 0 ;
         sh:minLength 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/symbol> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/symbol> ;
         sh:datatype xsd:string ;
         sh:minCount 0 ;
         sh:minLength 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/dataType> ;
-        sh:class aas:DataTypeIec61360 ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/dataType> ;
+        sh:class aas:DataTypeIEC61360 ;
         sh:minCount 0 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/definition> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/definition> ;
         sh:datatype rdf:langString ;
         sh:minCount 0 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueFormat> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/valueFormat> ;
         sh:datatype xsd:string ;
         sh:minCount 0 ;
         sh:minLength 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueList> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/valueList> ;
         sh:class aas:ValueList ;
         sh:minCount 0 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/value> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/value> ;
         sh:datatype xsd:string ;
         sh:minCount 0 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueId> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/valueId> ;
         sh:class aas:Reference ;
         sh:minCount 0 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/levelType> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/levelType> ;
         sh:class aas:LevelType ;
         sh:minCount 0 ;
     ] ;
