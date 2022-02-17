@@ -40,7 +40,7 @@ Interface = _types.Interface
 SymbolTable = _types.SymbolTable
 
 map_descendability = _types.map_descendability
-collect_ids_of_classes_in_properties = _types.collect_ids_of_classes_in_properties
+collect_ids_of_symbols_in_properties = _types.collect_ids_of_symbols_in_properties
 
 translate = _translate.translate
 errors_if_contracts_for_functions_or_methods_defined = (
