@@ -1497,7 +1497,7 @@ aas:EntityShape  a sh:NodeShape ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetIds> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetId> ;
         sh:class aas:IdentifierKeyValuePair ;
         sh:minCount 0 ;
     ] ;
@@ -2398,11 +2398,11 @@ aas:PolicyInformationPointsShape  a sh:NodeShape ;
     ] ;
 .
 
-aas:PolicyEnforcementPointsShape  a sh:NodeShape ;
-    sh:targetClass aas:PolicyEnforcementPoints ;
+aas:PolicyEnforcementPointShape  a sh:NodeShape ;
+    sh:targetClass aas:PolicyEnforcementPoint ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoints/externalPolicyEnforcementPoint> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoint/externalPolicyEnforcementPoint> ;
         sh:datatype xsd:boolean ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
@@ -2438,8 +2438,8 @@ aas:AccessControlPolicyPointsShape  a sh:NodeShape ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoints> ;
-        sh:class aas:PolicyEnforcementPoints ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoint> ;
+        sh:class aas:PolicyEnforcementPoint ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
     ] ;
@@ -2468,35 +2468,35 @@ aas:SecurityShape  a sh:NodeShape ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/Security/requiredCertificatesExtension> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/Security/requiredCertificateExtensions> ;
         sh:class aas:Reference ;
         sh:minCount 0 ;
     ] ;
 .
 
-aas:EnvironmentShape  a sh:NodeShape ;
-    sh:targetClass aas:Environment ;
+aas:AssetAdministrationShellEnvironmentShape  a sh:NodeShape ;
+    sh:targetClass aas:AssetAdministrationShellEnvironment ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/Environment/assetAdministrationShells> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShellEnvironment/assetAdministrationShells> ;
         sh:class aas:AssetAdministrationShell ;
         sh:minCount 0 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/Environment/assets> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShellEnvironment/assets> ;
         sh:class aas:Asset ;
         sh:minCount 0 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/Environment/submodels> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShellEnvironment/submodels> ;
         sh:class aas:Submodel ;
         sh:minCount 0 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/Environment/conceptDescriptions> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShellEnvironment/conceptDescriptions> ;
         sh:class aas:ConceptDescription ;
         sh:minCount 0 ;
     ] ;
