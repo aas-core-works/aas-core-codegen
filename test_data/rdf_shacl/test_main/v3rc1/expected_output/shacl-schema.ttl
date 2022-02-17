@@ -2229,8 +2229,8 @@ aas:SubjectAttributesShape  a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC01/SubjectAttributes/subjectAttributes> ;
-        sh:class aas:DataElement ;
-        sh:minCount 0 ;
+        sh:class aas:Reference ;
+        sh:minCount 1 ;
     ] ;
 .
 

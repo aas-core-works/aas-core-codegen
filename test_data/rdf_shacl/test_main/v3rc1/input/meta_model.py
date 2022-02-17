@@ -997,7 +997,6 @@ class Submodel_element(
 #
 #  🠒 We really need to think hard how we resolve the references. Should this class be
 #  implementation-specific?
-@abstract
 @reference_in_the_book(section=(4, 7, 8, 14))
 class Relationship_element(Submodel_element):
     """
@@ -1708,7 +1707,6 @@ class Entity(Submodel_element):
         self.specific_asset_IDs = specific_asset_IDs
 
 
-@abstract
 @reference_in_the_book(section=(4, 7, 8, 7))
 class Event(Submodel_element):
     """
@@ -2734,12 +2732,13 @@ class Permission(DBC):
 
 
 @reference_in_the_book(section=(5, 3, 5), index=5)
+@invariant(lambda self: len(self.subject_attributes) >= 1)
 class Subject_attributes:
     """
     A set of data elements that further classifies a specific subject.
     """
 
-    subject_attributes: List["Data_element"]
+    subject_attributes: List["Reference"]
     """
     A data element that further classifies a specific subject.
 
@@ -2748,7 +2747,7 @@ class Subject_attributes:
     attribute of “AccessControl”."
     """
 
-    def __init__(self, subject_attributes: List["Data_element"]) -> None:
+    def __init__(self, subject_attributes: List["Reference"]) -> None:
         self.subject_attributes = subject_attributes
 
 

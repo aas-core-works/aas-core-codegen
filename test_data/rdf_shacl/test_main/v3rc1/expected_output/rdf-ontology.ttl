@@ -2338,7 +2338,7 @@ aas:SubjectAttributes rdf:type owl:Class ;
 <https://admin-shell.io/aas/3/0/RC01/SubjectAttributes/subjectAttributes> rdf:type owl:ObjectProperty ;
     rdfs:label "has subject attributes"^^xsd:string ;
     rdfs:domain aas:SubjectAttributes ;
-    rdfs:range aas:DataElement ;
+    rdfs:range aas:Reference ;
     rdfs:comment "A data element that further classifies a specific subject.\n\nConstraint AASs-015: The data element SubjectAttributes/subjectAttribute shall be part of the submodel that is referenced within the “selectableSubjectAttributes” attribute of “AccessControl”.\""@en ;
 .
 

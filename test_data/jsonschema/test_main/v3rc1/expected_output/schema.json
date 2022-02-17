@@ -507,28 +507,6 @@
     "DataElement": {
       "$ref": "#/definitions/SubmodelElement"
     },
-    "DataElement_abstract": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/Blob"
-        },
-        {
-          "$ref": "#/definitions/File"
-        },
-        {
-          "$ref": "#/definitions/MultiLanguageProperty"
-        },
-        {
-          "$ref": "#/definitions/Property"
-        },
-        {
-          "$ref": "#/definitions/Range"
-        },
-        {
-          "$ref": "#/definitions/ReferenceElement"
-        }
-      ]
-    },
     "Property": {
       "allOf": [
         {
@@ -1201,8 +1179,9 @@
         "subjectAttributes": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/DataElement_abstract"
-          }
+            "$ref": "#/definitions/Reference"
+          },
+          "minItems": 1
         }
       },
       "required": [
