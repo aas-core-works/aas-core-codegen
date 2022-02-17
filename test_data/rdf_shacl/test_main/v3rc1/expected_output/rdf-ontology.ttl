@@ -252,7 +252,7 @@ aas:AssetInformation rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/AssetInformation/globalAssetId
 <https://admin-shell.io/aas/3/0/RC01/AssetInformation/globalAssetId> rdf:type owl:ObjectProperty ;
-    rdfs:label "has global asset ID"^^xsd:string ;
+    rdfs:label "has global asset id"^^xsd:string ;
     rdfs:domain aas:AssetInformation ;
     rdfs:range aas:Reference ;
     rdfs:comment "Reference to either an Asset object or a global reference to the asset the AAS is representing.\n\nThis attribute is required as soon as the AAS is exchanged via partners in the life cycle of the asset. In a first phase of the life cycle the asset might not yet have a global ID but already an internal identifier. The internal identifier would be modelled via 'specificAssetIds'."@en ;
@@ -456,7 +456,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/unitId
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/unitId> rdf:type owl:ObjectProperty ;
-    rdfs:label "has unit ID"^^xsd:string ;
+    rdfs:label "has unit id"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
     rdfs:range aas:Reference ;
     rdfs:comment "Unique unit id"@en ;
@@ -520,7 +520,7 @@ aas:DataSpecificationIec61360 rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueId
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIec61360/valueId> rdf:type owl:ObjectProperty ;
-    rdfs:label "has value ID"^^xsd:string ;
+    rdfs:label "has value id"^^xsd:string ;
     rdfs:domain aas:DataSpecificationIec61360 ;
     rdfs:range aas:Reference ;
     rdfs:comment "Unique value id"@en ;
@@ -627,7 +627,7 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/registrationAuthorityId
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/registrationAuthorityId> rdf:type owl:DatatypeProperty ;
-    rdfs:label "has registration authority ID"^^xsd:string ;
+    rdfs:label "has registration authority id"^^xsd:string ;
     rdfs:domain aas:DataSpecificationPhysicalUnit ;
     rdfs:range xsd:string ;
     rdfs:comment "TODO"@en ;
@@ -991,7 +991,7 @@ aas:DataTypeDef rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/ID
 <https://admin-shell.io/aas/3/0/RC01/DataTypeDef/ID> rdf:type aas:DataTypeDef ;
-    rdfs:label "ID"^^xsd:string ;
+    rdfs:label "Id"^^xsd:string ;
 .
 
 ###  https://admin-shell.io/aas/3/0/RC01/DataTypeDef/IDREF
@@ -1034,7 +1034,7 @@ aas:Entity rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/Entity/globalAssetId
 <https://admin-shell.io/aas/3/0/RC01/Entity/globalAssetId> rdf:type owl:ObjectProperty ;
-    rdfs:label "has global asset ID"^^xsd:string ;
+    rdfs:label "has global asset id"^^xsd:string ;
     rdfs:domain aas:Entity ;
     rdfs:range aas:Reference ;
     rdfs:comment "Reference to the asset the entity is representing. Constraint AASd-014: Either the attribute globalAssetId or specificAssetId of an Entity must be set if Entity/entityType is set to “SelfManagedEntity”. They are not existing otherwise."@en ;
@@ -1238,7 +1238,7 @@ aas:HasSemantics rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/HasSemantics/semanticId
 <https://admin-shell.io/aas/3/0/RC01/HasSemantics/semanticId> rdf:type owl:ObjectProperty ;
-    rdfs:label "has semantic ID"^^xsd:string ;
+    rdfs:label "has semantic id"^^xsd:string ;
     rdfs:domain aas:HasSemantics ;
     rdfs:range aas:Reference ;
     rdfs:comment "Identifier of the semantic definition of the element. It is called semantic ID of the element."@en ;
@@ -1307,7 +1307,7 @@ aas:Identifier rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/Identifier/idType
 <https://admin-shell.io/aas/3/0/RC01/Identifier/idType> rdf:type owl:ObjectProperty ;
-    rdfs:label "has ID type"^^xsd:string ;
+    rdfs:label "has id type"^^xsd:string ;
     rdfs:domain aas:Identifier ;
     rdfs:range aas:IdentifierType ;
     rdfs:comment "Type of the  Identifier, e.g. IRI, IRDI etc. The supported Identifier types are defined in the enumeration 'IdentifierType'."@en ;
@@ -1315,7 +1315,7 @@ aas:Identifier rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/Identifier/id
 <https://admin-shell.io/aas/3/0/RC01/Identifier/id> rdf:type owl:DatatypeProperty ;
-    rdfs:label "has ID"^^xsd:string ;
+    rdfs:label "has id"^^xsd:string ;
     rdfs:domain aas:Identifier ;
     rdfs:range xsd:string ;
     rdfs:comment "Globally unique identifier of the element.\n\nIts type is defined in 'idType'."@en ;
@@ -1346,7 +1346,7 @@ aas:IdentifierKeyValuePair rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair/externalSubjectId
 <https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair/externalSubjectId> rdf:type owl:ObjectProperty ;
-    rdfs:label "has external subject ID"^^xsd:string ;
+    rdfs:label "has external subject id"^^xsd:string ;
     rdfs:domain aas:IdentifierKeyValuePair ;
     rdfs:range aas:Reference ;
     rdfs:comment "The (external) subject the key belongs to or has meaning to."@en ;
@@ -1405,7 +1405,7 @@ aas:Key rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/Key/idType
 <https://admin-shell.io/aas/3/0/RC01/Key/idType> rdf:type owl:ObjectProperty ;
-    rdfs:label "has ID type"^^xsd:string ;
+    rdfs:label "has id type"^^xsd:string ;
     rdfs:domain aas:Key ;
     rdfs:range aas:KeyType ;
     rdfs:comment "Type of the key value.\n\nConstraint AASd-080: In case Key/type == GlobalReference idType shall not be any LocalKeyType (IdShort, FragmentId).\n\nConstraint AASd-081: In case Key/type==AssetAdministrationShell Key/idType shall not be any LocalKeyType (IdShort, FragmentId)."@en ;
@@ -1594,13 +1594,13 @@ rdfs:subClassOf aas:IdentifierType ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/KeyType/ID_SHORT
 <https://admin-shell.io/aas/3/0/RC01/KeyType/ID_SHORT> rdf:type aas:KeyType ;
-    rdfs:label "ID Short"^^xsd:string ;
+    rdfs:label "Id Short"^^xsd:string ;
     rdfs:comment "idShort of a referable element"@en ;
 .
 
 ###  https://admin-shell.io/aas/3/0/RC01/KeyType/FRAGMENT_ID
 <https://admin-shell.io/aas/3/0/RC01/KeyType/FRAGMENT_ID> rdf:type aas:KeyType ;
-    rdfs:label "Fragment ID"^^xsd:string ;
+    rdfs:label "Fragment Id"^^xsd:string ;
     rdfs:comment "Identifier of a fragment within a file"@en ;
 .
 
@@ -1667,13 +1667,13 @@ aas:LocalKeyType rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/LocalKeyType/ID_SHORT
 <https://admin-shell.io/aas/3/0/RC01/LocalKeyType/ID_SHORT> rdf:type aas:LocalKeyType ;
-    rdfs:label "ID Short"^^xsd:string ;
+    rdfs:label "Id Short"^^xsd:string ;
     rdfs:comment "idShort of a referable element"@en ;
 .
 
 ###  https://admin-shell.io/aas/3/0/RC01/LocalKeyType/FRAGMENT_ID
 <https://admin-shell.io/aas/3/0/RC01/LocalKeyType/FRAGMENT_ID> rdf:type aas:LocalKeyType ;
-    rdfs:label "Fragment ID"^^xsd:string ;
+    rdfs:label "Fragment Id"^^xsd:string ;
     rdfs:comment "Identifier of a fragment within a file"@en ;
 .
 
@@ -1716,7 +1716,7 @@ aas:MultiLanguageProperty rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/valueId
 <https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/valueId> rdf:type owl:ObjectProperty ;
-    rdfs:label "has value ID"^^xsd:string ;
+    rdfs:label "has value id"^^xsd:string ;
     rdfs:domain aas:MultiLanguageProperty ;
     rdfs:range aas:Reference ;
     rdfs:comment "Reference to the global unique id of a coded value. See Constraint AASd-012 See Constraint AASd-065\""@en ;
@@ -1966,7 +1966,7 @@ aas:Property rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/Property/valueId
 <https://admin-shell.io/aas/3/0/RC01/Property/valueId> rdf:type owl:ObjectProperty ;
-    rdfs:label "has value ID"^^xsd:string ;
+    rdfs:label "has value id"^^xsd:string ;
     rdfs:domain aas:Property ;
     rdfs:range aas:Reference ;
     rdfs:comment "Reference to the global unique id of a coded value.\n\nSee Constraint AASd-065 See Constraint AASd-007"@en ;
@@ -2020,7 +2020,7 @@ aas:Qualifier rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/Qualifier/valueId
 <https://admin-shell.io/aas/3/0/RC01/Qualifier/valueId> rdf:type owl:ObjectProperty ;
-    rdfs:label "has value ID"^^xsd:string ;
+    rdfs:label "has value id"^^xsd:string ;
     rdfs:domain aas:Qualifier ;
     rdfs:range aas:Reference ;
     rdfs:comment "Reference to the global unique ID of a coded value."@en ;
@@ -2066,7 +2066,7 @@ aas:Referable rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/Referable/idShort
 <https://admin-shell.io/aas/3/0/RC01/Referable/idShort> rdf:type owl:DatatypeProperty ;
-    rdfs:label "has ID short"^^xsd:string ;
+    rdfs:label "has id short"^^xsd:string ;
     rdfs:domain aas:Referable ;
     rdfs:range xsd:string ;
     rdfs:comment "In case of identifiable this attribute is a short name of the element. In case of referable this ID is an identifying string of the element within its name space.\n\nNOTE:\nIn case the element is a property and the property has a semantic definition ('HasSemantics') conformant to IEC61360 the idShort is typically identical to the short name in English."@en ;
@@ -2433,7 +2433,7 @@ aas:ValueReferencePair rdf:type owl:Class ;
 
 ###  https://admin-shell.io/aas/3/0/RC01/ValueReferencePair/valueId
 <https://admin-shell.io/aas/3/0/RC01/ValueReferencePair/valueId> rdf:type owl:ObjectProperty ;
-    rdfs:label "has value ID"^^xsd:string ;
+    rdfs:label "has value id"^^xsd:string ;
     rdfs:domain aas:ValueReferencePair ;
     rdfs:range aas:Reference ;
     rdfs:comment "Global unique id of the value."@en ;
