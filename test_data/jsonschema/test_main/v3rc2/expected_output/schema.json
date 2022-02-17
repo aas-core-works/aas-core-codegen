@@ -90,8 +90,14 @@
             },
             "description": {
               "$ref": "#/definitions/LangStringSet"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
             }
-          }
+          },
+          "required": [
+            "modelType"
+          ]
         }
       ]
     },
@@ -162,7 +168,15 @@
       ]
     },
     "Constraint": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
+        }
+      },
+      "required": [
+        "modelType"
+      ]
     },
     "Constraint_abstract": {
       "anyOf": [
@@ -182,10 +196,14 @@
           "items": {
             "$ref": "#/definitions/Constraint_abstract"
           }
+        },
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
         }
       },
       "required": [
-        "qualifiers"
+        "qualifiers",
+        "modelType"
       ]
     },
     "Qualifier": {
@@ -803,7 +821,15 @@
       ]
     },
     "Reference": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
+        }
+      },
+      "required": [
+        "modelType"
+      ]
     },
     "Reference_abstract": {
       "anyOf": [
@@ -1299,6 +1325,48 @@
         "assetAdministrationShells",
         "submodels",
         "conceptDescriptions"
+      ]
+    },
+    "ModelTypes": {
+      "type": "string",
+      "enum": [
+        "Extension",
+        "AdministrativeInformation",
+        "Qualifier",
+        "Formula",
+        "AssetAdministrationShell",
+        "IdentifierKeyValuePair",
+        "Submodel",
+        "SubmodelElementList",
+        "SubmodelElementStruct",
+        "Property",
+        "MultiLanguageProperty",
+        "Range",
+        "ReferenceElement",
+        "Blob",
+        "File",
+        "AnnotatedRelationshipElement",
+        "Entity",
+        "BasicEvent",
+        "Operation",
+        "Capability",
+        "ConceptDescription",
+        "View",
+        "GlobalReference",
+        "ModelReference",
+        "DataSpecificationIec61360",
+        "DataSpecificationPhysicalUnit"
+      ]
+    },
+    "ModelType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/ModelTypes"
+        }
+      },
+      "required": [
+        "name"
       ]
     }
   }

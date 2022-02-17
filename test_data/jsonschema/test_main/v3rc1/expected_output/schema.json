@@ -85,10 +85,14 @@
             },
             "description": {
               "$ref": "#/definitions/LangStringSet"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
-            "idShort"
+            "idShort",
+            "modelType"
           ]
         }
       ]
@@ -191,7 +195,15 @@
       }
     },
     "Constraint": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
+        }
+      },
+      "required": [
+        "modelType"
+      ]
     },
     "Constraint_abstract": {
       "anyOf": [
@@ -405,7 +417,13 @@
     "SubmodelElement_abstract": {
       "anyOf": [
         {
+          "$ref": "#/definitions/RelationshipElement"
+        },
+        {
           "$ref": "#/definitions/AnnotatedRelationshipElement"
+        },
+        {
+          "$ref": "#/definitions/Event"
         },
         {
           "$ref": "#/definitions/BasicEvent"
@@ -1147,10 +1165,14 @@
       "properties": {
         "policyAdministrationPoint": {
           "$ref": "#/definitions/PolicyAdministrationPoint"
+        },
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
         }
       },
       "required": [
-        "policyAdministrationPoint"
+        "policyAdministrationPoint",
+        "modelType"
       ]
     },
     "Certificate_abstract": {
@@ -1451,6 +1473,50 @@
         "assets",
         "submodels",
         "conceptDescriptions"
+      ]
+    },
+    "ModelTypes": {
+      "type": "string",
+      "enum": [
+        "Extension",
+        "AdministrativeInformation",
+        "Qualifier",
+        "Formula",
+        "AssetAdministrationShell",
+        "Asset",
+        "IdentifierKeyValuePair",
+        "Submodel",
+        "RelationshipElement",
+        "SubmodelElementCollection",
+        "Property",
+        "MultiLanguageProperty",
+        "Range",
+        "ReferenceElement",
+        "Blob",
+        "File",
+        "AnnotatedRelationshipElement",
+        "Entity",
+        "Event",
+        "BasicEvent",
+        "Operation",
+        "Capability",
+        "ConceptDescription",
+        "View",
+        "DataSpecificationIEC61360",
+        "DataSpecificationPhysicalUnit",
+        "BlobCertificate",
+        "AccessPermissionRule"
+      ]
+    },
+    "ModelType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/ModelTypes"
+        }
+      },
+      "required": [
+        "name"
       ]
     }
   }
