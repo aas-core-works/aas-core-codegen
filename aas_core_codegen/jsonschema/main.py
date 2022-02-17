@@ -420,10 +420,12 @@ def _define_for_class(
     assert properties is not None
     assert required is not None
 
+    definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
+    if len(cls.inheritances) == 0:
+        definition["type"] = "object"
+
     if len(properties) > 0:
-        definition = collections.OrderedDict(
-            [("type", "object"), ("properties", properties)]
-        )
+        definition["properties"] = properties
 
         if len(required) > 0:
             definition["required"] = required

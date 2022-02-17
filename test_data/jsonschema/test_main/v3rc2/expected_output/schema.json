@@ -38,7 +38,6 @@
           "$ref": "#/definitions/HasSemantics"
         },
         {
-          "type": "object",
           "properties": {
             "name": {
               "$ref": "#/definitions/NonEmptyString"
@@ -79,7 +78,6 @@
           "$ref": "#/definitions/HasExtensions"
         },
         {
-          "type": "object",
           "properties": {
             "idShort": {
               "$ref": "#/definitions/NonEmptyString"
@@ -103,7 +101,6 @@
           "$ref": "#/definitions/Referable"
         },
         {
-          "type": "object",
           "properties": {
             "id": {
               "$ref": "#/definitions/NonEmptyString"
@@ -153,7 +150,6 @@
           "$ref": "#/definitions/HasDataSpecification"
         },
         {
-          "type": "object",
           "properties": {
             "version": {
               "$ref": "#/definitions/NonEmptyString"
@@ -201,7 +197,6 @@
           "$ref": "#/definitions/HasSemantics"
         },
         {
-          "type": "object",
           "properties": {
             "type": {
               "$ref": "#/definitions/NonEmptyString"
@@ -229,7 +224,6 @@
           "$ref": "#/definitions/Constraint"
         },
         {
-          "type": "object",
           "properties": {
             "dependsOn": {
               "type": "array",
@@ -253,7 +247,6 @@
           "$ref": "#/definitions/HasDataSpecification"
         },
         {
-          "type": "object",
           "properties": {
             "derivedFrom": {
               "$ref": "#/definitions/Reference_abstract"
@@ -308,7 +301,6 @@
           "$ref": "#/definitions/HasSemantics"
         },
         {
-          "type": "object",
           "properties": {
             "key": {
               "$ref": "#/definitions/NonEmptyString"
@@ -345,7 +337,6 @@
           "$ref": "#/definitions/HasDataSpecification"
         },
         {
-          "type": "object",
           "properties": {
             "submodelElements": {
               "type": "array",
@@ -428,7 +419,6 @@
           "$ref": "#/definitions/SubmodelElement"
         },
         {
-          "type": "object",
           "properties": {
             "first": {
               "$ref": "#/definitions/Reference_abstract"
@@ -450,7 +440,6 @@
           "$ref": "#/definitions/SubmodelElement"
         },
         {
-          "type": "object",
           "properties": {
             "submodelElementTypeValues": {
               "$ref": "#/definitions/SubmodelElements"
@@ -481,7 +470,6 @@
           "$ref": "#/definitions/SubmodelElement"
         },
         {
-          "type": "object",
           "properties": {
             "values": {
               "type": "array",
@@ -527,7 +515,6 @@
           "$ref": "#/definitions/DataElement"
         },
         {
-          "type": "object",
           "properties": {
             "valueType": {
               "$ref": "#/definitions/DataTypeDef"
@@ -551,7 +538,6 @@
           "$ref": "#/definitions/DataElement"
         },
         {
-          "type": "object",
           "properties": {
             "translatable": {
               "$ref": "#/definitions/LangStringSet"
@@ -569,7 +555,6 @@
           "$ref": "#/definitions/DataElement"
         },
         {
-          "type": "object",
           "properties": {
             "valueType": {
               "$ref": "#/definitions/DataTypeDef"
@@ -593,7 +578,6 @@
           "$ref": "#/definitions/DataElement"
         },
         {
-          "type": "object",
           "properties": {
             "reference": {
               "$ref": "#/definitions/Reference_abstract"
@@ -608,7 +592,6 @@
           "$ref": "#/definitions/DataElement"
         },
         {
-          "type": "object",
           "properties": {
             "mimeType": {
               "$ref": "#/definitions/MimeTyped",
@@ -630,7 +613,6 @@
           "$ref": "#/definitions/DataElement"
         },
         {
-          "type": "object",
           "properties": {
             "mimeType": {
               "$ref": "#/definitions/MimeTyped",
@@ -652,7 +634,6 @@
           "$ref": "#/definitions/RelationshipElement"
         },
         {
-          "type": "object",
           "properties": {
             "annotation": {
               "type": "array",
@@ -680,7 +661,6 @@
           "$ref": "#/definitions/SubmodelElement"
         },
         {
-          "type": "object",
           "properties": {
             "entityType": {
               "$ref": "#/definitions/EntityType"
@@ -714,7 +694,6 @@
           "$ref": "#/definitions/Event"
         },
         {
-          "type": "object",
           "properties": {
             "observed": {
               "$ref": "#/definitions/Reference_abstract"
@@ -732,7 +711,6 @@
           "$ref": "#/definitions/SubmodelElement"
         },
         {
-          "type": "object",
           "properties": {
             "inputVariables": {
               "type": "array",
@@ -784,7 +762,6 @@
           "$ref": "#/definitions/HasDataSpecification"
         },
         {
-          "type": "object",
           "properties": {
             "isCaseOf": {
               "type": "array",
@@ -811,7 +788,6 @@
           "$ref": "#/definitions/HasDataSpecification"
         },
         {
-          "type": "object",
           "properties": {
             "containedElements": {
               "type": "array",
@@ -845,7 +821,6 @@
           "$ref": "#/definitions/Reference"
         },
         {
-          "type": "object",
           "properties": {
             "values": {
               "type": "array",
@@ -867,7 +842,6 @@
           "$ref": "#/definitions/Reference"
         },
         {
-          "type": "object",
           "properties": {
             "keys": {
               "type": "array",
@@ -1208,7 +1182,6 @@
           "$ref": "#/definitions/DataSpecificationContent"
         },
         {
-          "type": "object",
           "properties": {
             "preferredName": {
               "$ref": "#/definitions/LangStringSet"
@@ -1259,7 +1232,6 @@
           "$ref": "#/definitions/DataSpecificationContent"
         },
         {
-          "type": "object",
           "properties": {
             "unitName": {
               "$ref": "#/definitions/NonEmptyString"
