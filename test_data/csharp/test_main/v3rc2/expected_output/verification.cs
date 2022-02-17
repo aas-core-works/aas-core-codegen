@@ -2905,12 +2905,12 @@ namespace AasCore.Aas3
                         $"{context}/Qualifiers/{i}");
                 }
 
-                if (that.Translatable != null)
+                if (that.Value != null)
                 {
                     if (Errors.Full()) return;
                     Visit(
-                        that.Translatable,
-                        $"{context}/Translatable");
+                        that.Value,
+                        $"{context}/Value");
                 }
 
                 if (that.ValueId != null)
@@ -3045,12 +3045,12 @@ namespace AasCore.Aas3
                         $"{context}/Qualifiers/{i}");
                 }
 
-                if (that.Reference != null)
+                if (that.Value != null)
                 {
                     if (Errors.Full()) return;
                     Visit(
-                        that.Reference,
-                        $"{context}/Reference");
+                        that.Value,
+                        $"{context}/Value");
                 }
             }
 
