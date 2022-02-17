@@ -3,6 +3,20 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.4 (2022-02-17)
+==================
+
+* Approximate RDF to aas-specs (#49)
+* Fix RDF schema generation (#48)
+* Generte RDF and SHACL schemas (#46)
+* Introduce topologically sorted symbols in the table (#45)
+* Upgrade docutils to 0.18.1 (#43)
+* Remove ``RefTypeAnnotation`` from the IR (#39)
+* Make jsonization in C# two-pass (#37)
+* Fix double curly brackets in C# verification (#36)
+* Infer type of enumeration literals in invariants (#32)
+* Allow enumeration literals to be arbitrary strings (#31)
+
 0.0.3 (2022-01-22)
 ==================
 
