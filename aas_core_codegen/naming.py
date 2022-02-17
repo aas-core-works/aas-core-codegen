@@ -16,7 +16,13 @@ def json_property(identifier: Identifier) -> Identifier:
     'something'
 
     >>> json_property(Identifier("something_to_URL"))
-    'somethingToURL'
+    'somethingToUrl'
+
+    >>> json_property(Identifier("global_asset_ID"))
+    'globalAssetId'
+
+    >>> json_property(Identifier("specific_asset_IDs"))
+    'specificAssetIds'
     """
     parts = identifier.split("_")
 
@@ -25,10 +31,7 @@ def json_property(identifier: Identifier) -> Identifier:
 
     cased_parts = [parts[0].lower()]  # type: List[str]
     for part in parts[1:]:
-        if part.upper() in UPPERCASE_ABBREVIATION_SET:
-            cased_parts.append(part.upper())
-        else:
-            cased_parts.append(part.capitalize())
+        cased_parts.append(part.capitalize())
 
     return Identifier("".join(cased_parts))
 

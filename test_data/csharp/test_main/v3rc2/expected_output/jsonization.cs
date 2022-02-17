@@ -423,7 +423,7 @@ namespace AasCore.Aas3
 
                             switch (propertyName)
                             {
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -482,7 +482,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -2628,7 +2628,7 @@ namespace AasCore.Aas3
 
                             switch (propertyName)
                             {
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -2648,7 +2648,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "valueID":
+                                case "valueId":
                                     theValueId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -2694,7 +2694,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -2716,7 +2716,7 @@ namespace AasCore.Aas3
 
                 if (that.ValueId != null)
                 {
-                    writer.WritePropertyName("valueID");
+                    writer.WritePropertyName("valueId");
                     Json.JsonSerializer.Serialize(
                         writer, that.ValueId);
                 }
@@ -3065,12 +3065,12 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<AssetKind>(
                                             ref reader));
                                     break;
-                                case "globalAssetID":
+                                case "globalAssetId":
                                     theGlobalAssetId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
                                     break;
-                                case "specificAssetID":
+                                case "specificAssetId":
                                     theSpecificAssetId =  (
                                         Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
                                             ref reader));
@@ -3118,14 +3118,14 @@ namespace AasCore.Aas3
 
                 if (that.GlobalAssetId != null)
                 {
-                    writer.WritePropertyName("globalAssetID");
+                    writer.WritePropertyName("globalAssetId");
                     Json.JsonSerializer.Serialize(
                         writer, that.GlobalAssetId);
                 }
 
                 if (that.SpecificAssetId != null)
                 {
-                    writer.WritePropertyName("specificAssetID");
+                    writer.WritePropertyName("specificAssetId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SpecificAssetId);
                 }
@@ -3221,7 +3221,7 @@ namespace AasCore.Aas3
 
                             switch (propertyName)
                             {
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -3236,7 +3236,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "externalSubjectID":
+                                case "externalSubjectId":
                                     theExternalSubjectId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -3275,7 +3275,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -3290,7 +3290,7 @@ namespace AasCore.Aas3
 
                 if (that.ExternalSubjectId != null)
                 {
-                    writer.WritePropertyName("externalSubjectID");
+                    writer.WritePropertyName("externalSubjectId");
                     Json.JsonSerializer.Serialize(
                         writer, that.ExternalSubjectId);
                 }
@@ -3364,7 +3364,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -3466,7 +3466,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -4013,7 +4013,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -4033,7 +4033,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
                                             ref reader));
                                     break;
-                                case "semanticIDValues":
+                                case "semanticIdValues":
                                     theSemanticIdValues =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -4127,7 +4127,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -4146,7 +4146,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticIdValues != null)
                 {
-                    writer.WritePropertyName("semanticIDValues");
+                    writer.WritePropertyName("semanticIdValues");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticIdValues);
                 }
@@ -4246,7 +4246,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -4345,7 +4345,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -4635,7 +4635,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -4655,7 +4655,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "valueID":
+                                case "valueId":
                                     theValueId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -4744,7 +4744,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -4766,7 +4766,7 @@ namespace AasCore.Aas3
 
                 if (that.ValueId != null)
                 {
-                    writer.WritePropertyName("valueID");
+                    writer.WritePropertyName("valueId");
                     Json.JsonSerializer.Serialize(
                         writer, that.ValueId);
                 }
@@ -4861,7 +4861,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -4876,7 +4876,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<LangStringSet>(
                                             ref reader));
                                     break;
-                                case "valueID":
+                                case "valueId":
                                     theValueId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -4965,7 +4965,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -4983,7 +4983,7 @@ namespace AasCore.Aas3
 
                 if (that.ValueId != null)
                 {
-                    writer.WritePropertyName("valueID");
+                    writer.WritePropertyName("valueId");
                     Json.JsonSerializer.Serialize(
                         writer, that.ValueId);
                 }
@@ -5082,7 +5082,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -5191,7 +5191,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -5307,7 +5307,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -5406,7 +5406,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -5514,7 +5514,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -5618,7 +5618,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -5730,7 +5730,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -5834,7 +5834,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -5948,7 +5948,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -6057,7 +6057,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -6214,7 +6214,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -6234,12 +6234,12 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
                                             ref reader));
                                     break;
-                                case "globalAssetID":
+                                case "globalAssetId":
                                     theGlobalAssetId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
                                     break;
-                                case "specificAssetID":
+                                case "specificAssetId":
                                     theSpecificAssetId =  (
                                         Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
                                             ref reader));
@@ -6328,7 +6328,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -6347,14 +6347,14 @@ namespace AasCore.Aas3
 
                 if (that.GlobalAssetId != null)
                 {
-                    writer.WritePropertyName("globalAssetID");
+                    writer.WritePropertyName("globalAssetId");
                     Json.JsonSerializer.Serialize(
                         writer, that.GlobalAssetId);
                 }
 
                 if (that.SpecificAssetId != null)
                 {
-                    writer.WritePropertyName("specificAssetID");
+                    writer.WritePropertyName("specificAssetId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SpecificAssetId);
                 }
@@ -6557,7 +6557,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -6656,7 +6656,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -6761,7 +6761,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -6870,7 +6870,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -7054,7 +7054,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<ModelingKind>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -7148,7 +7148,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -7424,7 +7424,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<LangStringSet>(
                                             ref reader));
                                     break;
-                                case "semanticID":
+                                case "semanticId":
                                     theSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -7511,7 +7511,7 @@ namespace AasCore.Aas3
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticID");
+                    writer.WritePropertyName("semanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.SemanticId);
                 }
@@ -7770,7 +7770,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<List<Key>>(
                                             ref reader));
                                     break;
-                                case "referredSemanticID":
+                                case "referredSemanticId":
                                     theReferredSemanticId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -7820,7 +7820,7 @@ namespace AasCore.Aas3
 
                 if (that.ReferredSemanticId != null)
                 {
-                    writer.WritePropertyName("referredSemanticID");
+                    writer.WritePropertyName("referredSemanticId");
                     Json.JsonSerializer.Serialize(
                         writer, that.ReferredSemanticId);
                 }
@@ -8579,7 +8579,7 @@ namespace AasCore.Aas3
                                 theValue ?? throw new Json.JsonException(
                                     "Required property is missing: value"),
                                 theValueId ?? throw new Json.JsonException(
-                                    "Required property is missing: valueID"));
+                                    "Required property is missing: valueId"));
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
@@ -8593,7 +8593,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "valueID":
+                                case "valueId":
                                     theValueId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -8634,7 +8634,7 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, that.Value);
 
-                writer.WritePropertyName("valueID");
+                writer.WritePropertyName("valueId");
                 Json.JsonSerializer.Serialize(
                     writer, that.ValueId);
 
@@ -8788,7 +8788,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "unitID":
+                                case "unitId":
                                     theUnitId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -8828,7 +8828,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "valueID":
+                                case "valueId":
                                     theValueId =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
@@ -8893,7 +8893,7 @@ namespace AasCore.Aas3
 
                 if (that.UnitId != null)
                 {
-                    writer.WritePropertyName("unitID");
+                    writer.WritePropertyName("unitId");
                     Json.JsonSerializer.Serialize(
                         writer, that.UnitId);
                 }
@@ -8949,7 +8949,7 @@ namespace AasCore.Aas3
 
                 if (that.ValueId != null)
                 {
-                    writer.WritePropertyName("valueID");
+                    writer.WritePropertyName("valueId");
                     Json.JsonSerializer.Serialize(
                         writer, that.ValueId);
                 }
@@ -9068,7 +9068,7 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "registrationAuthorityID":
+                                case "registrationAuthorityId":
                                     theRegistrationAuthorityId =  (
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
@@ -9182,7 +9182,7 @@ namespace AasCore.Aas3
 
                 if (that.RegistrationAuthorityId != null)
                 {
-                    writer.WritePropertyName("registrationAuthorityID");
+                    writer.WritePropertyName("registrationAuthorityId");
                     Json.JsonSerializer.Serialize(
                         writer, that.RegistrationAuthorityId);
                 }

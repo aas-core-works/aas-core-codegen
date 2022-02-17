@@ -435,7 +435,12 @@ def _define_for_class(
     model_type = naming.json_model_type(cls.name)
 
     result = collections.OrderedDict()  # type: MutableMapping[str, Any]
-    result[model_type] = {"allOf": all_of} if len(all_of) > 0 else {"type": "object"}
+    if len(all_of) == 0:
+        result[model_type] = {"type": "object"}
+    elif len(all_of) == 1:
+        result[model_type] = all_of[0]
+    else:
+        result[model_type] = {"allOf": all_of}
 
     # region Define the abstract part
 
