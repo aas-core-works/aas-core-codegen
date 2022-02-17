@@ -520,7 +520,7 @@ def _generate(
         verifications=symbol_table.verification_functions
     )
 
-    ids_of_classes_in_properties = intermediate.collect_ids_of_symbols_in_properties(
+    ids_of_symbols_in_properties = intermediate.collect_ids_of_symbols_in_properties(
         symbol_table=symbol_table
     )
 
@@ -569,9 +569,15 @@ def _generate(
                 continue
         else:
             if isinstance(symbol, intermediate.Enumeration):
+                if id(symbol) not in ids_of_symbols_in_properties:
+                    continue
+
                 extension = _define_for_enumeration(enumeration=symbol)
 
             elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+                if id(symbol) not in ids_of_symbols_in_properties:
+                    continue
+
                 extension, definition_errors = _define_for_constrained_primitive(
                     constrained_primitive=symbol,
                     pattern_verifications_by_name=pattern_verifications_by_name,
@@ -584,7 +590,7 @@ def _generate(
             elif isinstance(symbol, intermediate.Class):
                 extension, definition_errors = _define_for_class(
                     cls=symbol,
-                    ids_of_classes_in_properties=ids_of_classes_in_properties,
+                    ids_of_classes_in_properties=ids_of_symbols_in_properties,
                     pattern_verifications_by_name=pattern_verifications_by_name,
                 )
 
