@@ -5,7 +5,7 @@
   "type": "object",
   "allOf": [
     {
-      "$ref": "#/definitions/Environment"
+      "$ref": "#/definitions/AssetAdministrationShellEnvironment"
     }
   ],
   "definitions": {
@@ -61,8 +61,11 @@
     "HasExtensions": {
       "type": "object",
       "properties": {
-        "extension": {
-          "$ref": "#/definitions/Extension"
+        "extensions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Extension"
+          }
         }
       }
     },
@@ -923,18 +926,10 @@
       ]
     },
     "LangStringSet": {
-      "type": "object",
-      "properties": {
-        "langStrings": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/LangString"
-          }
-        }
-      },
-      "required": [
-        "langStrings"
-      ]
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/LangString"
+      }
     },
     "DataSpecificationContent": {
       "type": "object"
