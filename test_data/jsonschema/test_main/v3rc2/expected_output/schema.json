@@ -901,41 +901,6 @@
         "value"
       ]
     },
-    "IdentifiableElements": {
-      "type": "string",
-      "enum": [
-        "AssetAdministrationShell",
-        "ConceptDescription",
-        "Submodel"
-      ]
-    },
-    "ReferableElements": {
-      "type": "string",
-      "enum": [
-        "AccessPermissionRule",
-        "AnnotatedRelationshipElement",
-        "Asset",
-        "AssetAdministrationShell",
-        "BasicEvent",
-        "Blob",
-        "Capability",
-        "ConceptDescription",
-        "DataElement",
-        "Entity",
-        "Event",
-        "File",
-        "MultiLanguageProperty",
-        "Operation",
-        "Property",
-        "Range",
-        "ReferenceElement",
-        "RelationshipElement",
-        "Submodel",
-        "SubmodelElement",
-        "SubmodelElementList",
-        "SubmodelElementStruct"
-      ]
-    },
     "KeyElements": {
       "type": "string",
       "enum": [
@@ -989,74 +954,6 @@
         "SubmodelElement",
         "SubmodelElementList",
         "SubmodelElementStruct"
-      ]
-    },
-    "BuildInListTypes": {
-      "type": "string",
-      "enum": [
-        "ENTITIES",
-        "IDREFS",
-        "NMTOKENS"
-      ]
-    },
-    "DecimalBuildInTypes": {
-      "type": "string",
-      "enum": [
-        "integer",
-        "long",
-        "int",
-        "short",
-        "byte",
-        "NonNegativeInteger",
-        "positiveInteger",
-        "unsignedInteger",
-        "unsignedLong",
-        "unsignedInt",
-        "unsignedShort",
-        "unsignedByte",
-        "nonPositiveInteger",
-        "negativeInteger"
-      ]
-    },
-    "DurationBuildInTypes": {
-      "type": "string",
-      "enum": [
-        "dayTimeDuration",
-        "yearMonthDuration"
-      ]
-    },
-    "PrimitiveTypes": {
-      "type": "string",
-      "enum": [
-        "anyURI",
-        "base64Binary",
-        "boolean",
-        "date",
-        "dateTime",
-        "decimal",
-        "double",
-        "duration",
-        "float",
-        "gDay",
-        "gMonth",
-        "gMonthDay",
-        "heyBinary",
-        "NOTATION",
-        "QName",
-        "string",
-        "time"
-      ]
-    },
-    "StringBuildInTypes": {
-      "type": "string",
-      "enum": [
-        "normalizedString",
-        "token",
-        "Language",
-        "NCName",
-        "ENTITY",
-        "ID",
-        "IDREF"
       ]
     },
     "DataTypeDef": {

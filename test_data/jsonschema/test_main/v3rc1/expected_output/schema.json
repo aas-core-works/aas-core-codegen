@@ -842,43 +842,6 @@
         "idType"
       ]
     },
-    "IdentifiableElements": {
-      "type": "string",
-      "enum": [
-        "Asset",
-        "AssetAdministrationShell",
-        "ConceptDescription",
-        "Submodel"
-      ]
-    },
-    "ReferableElements": {
-      "type": "string",
-      "enum": [
-        "AccessPermissionRule",
-        "AnnotatedRelationshipElement",
-        "Asset",
-        "AssetAdministrationShell",
-        "BasicEvent",
-        "Blob",
-        "Capability",
-        "ConceptDescription",
-        "ConceptDictionary",
-        "DataElement",
-        "Entity",
-        "Event",
-        "File",
-        "MultiLanguageProperty",
-        "Operation",
-        "Property",
-        "Range",
-        "ReferenceElement",
-        "RelationshipElement",
-        "Submodel",
-        "SubmodelElement",
-        "SubmodelElementCollection",
-        "View"
-      ]
-    },
     "KeyElements": {
       "type": "string",
       "enum": [
@@ -907,13 +870,6 @@
         "SubmodelElement",
         "SubmodelElementCollection",
         "View"
-      ]
-    },
-    "LocalKeyType": {
-      "type": "string",
-      "enum": [
-        "IdShort",
-        "FragmentId"
       ]
     },
     "KeyType": {
