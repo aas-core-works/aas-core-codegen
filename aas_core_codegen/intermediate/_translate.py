@@ -77,7 +77,7 @@ from aas_core_codegen.intermediate._types import (
     ClassUnion,
     VerificationUnion,
     UnderstoodMethod,
-    collect_ids_of_classes_in_properties,
+    collect_ids_of_symbols_in_properties,
     SymbolExceptEnumeration,
 )
 from aas_core_codegen.parse import tree as parse_tree
@@ -2201,7 +2201,7 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
 
     # region Check ``with_model_type`` for classes with at least one concrete descendant
 
-    classes_in_properties = collect_ids_of_classes_in_properties(
+    symbols_in_properties = collect_ids_of_symbols_in_properties(
         symbol_table=symbol_table
     )
 
@@ -2209,7 +2209,7 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
         if not isinstance(symbol, Class):
             continue
 
-        if id(symbol) in classes_in_properties:
+        if id(symbol) in symbols_in_properties:
             if len(symbol.concrete_descendants) >= 1:
                 if not symbol.serialization.with_model_type:
                     descendants_str = ", ".join(

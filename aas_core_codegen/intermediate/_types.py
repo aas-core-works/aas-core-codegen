@@ -1614,9 +1614,9 @@ class _ConstructorArgumentOfClass:
         self.cls = cls
 
 
-def collect_ids_of_classes_in_properties(symbol_table: SymbolTable) -> Set[int]:
+def collect_ids_of_symbols_in_properties(symbol_table: SymbolTable) -> Set[int]:
     """
-    Collect the IDs of the classes occurring in type annotations of the properties.
+    Collect the IDs of the symbols occurring in type annotations of the properties.
 
     The IDs refer to IDs of the Python objects in this context.
     """

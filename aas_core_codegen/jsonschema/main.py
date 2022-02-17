@@ -520,7 +520,7 @@ def _generate(
         verifications=symbol_table.verification_functions
     )
 
-    ids_of_classes_in_properties = intermediate.collect_ids_of_classes_in_properties(
+    ids_of_classes_in_properties = intermediate.collect_ids_of_symbols_in_properties(
         symbol_table=symbol_table
     )
 
