@@ -374,6 +374,12 @@ def _define_properties_and_required(
             assert type_definition is not None
             properties[prop_name] = type_definition
 
+    if cls.serialization.with_model_type and not any(
+        inheritance.serialization.with_model_type for inheritance in cls.inheritances
+    ):
+        properties["modelType"] = {"$ref": "#/definitions/ModelType"}
+        required.append(Identifier("modelType"))
+
     if len(errors) > 0:
         return None, None, errors
 
@@ -608,6 +614,36 @@ def _generate(
 
     if len(errors) > 0:
         return None, errors
+
+    definitions["ModelTypes"] = collections.OrderedDict(
+        [
+            ("type", "string"),
+            (
+                "enum",
+                [
+                    naming.json_model_type(symbol.name)
+                    for symbol in symbol_table.symbols
+                    if isinstance(symbol, intermediate.ConcreteClass)
+                    and len(symbol.inheritances) > 0
+                ],
+            ),
+        ]
+    )
+
+    definitions["ModelType"] = collections.OrderedDict(
+        [
+            ("type", "object"),
+            (
+                "properties",
+                collections.OrderedDict(
+                    [
+                        ("name", {"$ref": "#/definitions/ModelTypes"}),
+                    ]
+                ),
+            ),
+            ("required", ["name"]),
+        ]
+    )
 
     schema["definitions"] = definitions
 

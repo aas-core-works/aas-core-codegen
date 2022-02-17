@@ -997,7 +997,6 @@ class Submodel_element(
 #
 #  🠒 We really need to think hard how we resolve the references. Should this class be
 #  implementation-specific?
-@abstract
 @reference_in_the_book(section=(4, 7, 8, 14))
 class Relationship_element(Submodel_element):
     """
@@ -1708,7 +1707,6 @@ class Entity(Submodel_element):
         self.specific_asset_IDs = specific_asset_IDs
 
 
-@abstract
 @reference_in_the_book(section=(4, 7, 8, 7))
 class Event(Submodel_element):
     """
