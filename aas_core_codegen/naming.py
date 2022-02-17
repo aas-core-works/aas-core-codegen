@@ -5,7 +5,7 @@ from icontract import ensure
 
 from aas_core_codegen.common import Identifier
 
-UPPERCASE_ABBREVIATION_SET = {"IRI", "IRDI", "IEC", "ID", "URL"}
+UPPERCASE_ABBREVIATION_SET = {"IRI", "IRDI", "IEC", "URL"}
 
 
 def json_property(identifier: Identifier) -> Identifier:
