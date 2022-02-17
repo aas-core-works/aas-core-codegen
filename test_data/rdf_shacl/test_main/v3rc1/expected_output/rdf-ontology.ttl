@@ -1208,9 +1208,9 @@ aas:HasExtensions rdf:type owl:Class ;
     rdfs:label "Has Extensions"^^xsd:string ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC01/HasExtensions/extension
-<https://admin-shell.io/aas/3/0/RC01/HasExtensions/extension> rdf:type owl:ObjectProperty ;
-    rdfs:label "has extension"^^xsd:string ;
+###  https://admin-shell.io/aas/3/0/RC01/HasExtensions/extensions
+<https://admin-shell.io/aas/3/0/RC01/HasExtensions/extensions> rdf:type owl:ObjectProperty ;
+    rdfs:label "has extensions"^^xsd:string ;
     rdfs:domain aas:HasExtensions ;
     rdfs:range aas:Extension ;
     rdfs:comment "An extension of the element."@en ;
