@@ -38,7 +38,6 @@
           "$ref": "#/definitions/HasSemantics"
         },
         {
-          "type": "object",
           "properties": {
             "name": {
               "$ref": "#/definitions/NonEmptyString"
@@ -73,7 +72,6 @@
           "$ref": "#/definitions/HasExtensions"
         },
         {
-          "type": "object",
           "properties": {
             "idShort": {
               "$ref": "#/definitions/NonEmptyString",
@@ -101,7 +99,6 @@
           "$ref": "#/definitions/Referable"
         },
         {
-          "type": "object",
           "properties": {
             "administration": {
               "$ref": "#/definitions/AdministrativeInformation"
@@ -171,7 +168,6 @@
           "$ref": "#/definitions/HasDataSpecification"
         },
         {
-          "type": "object",
           "properties": {
             "version": {
               "$ref": "#/definitions/NonEmptyString"
@@ -216,7 +212,6 @@
           "$ref": "#/definitions/HasSemantics"
         },
         {
-          "type": "object",
           "properties": {
             "type": {
               "$ref": "#/definitions/NonEmptyString"
@@ -244,7 +239,6 @@
           "$ref": "#/definitions/Constraint"
         },
         {
-          "type": "object",
           "properties": {
             "dependsOn": {
               "type": "array",
@@ -265,7 +259,6 @@
           "$ref": "#/definitions/HasDataSpecification"
         },
         {
-          "type": "object",
           "properties": {
             "derivedFrom": {
               "$ref": "#/definitions/Reference"
@@ -344,7 +337,6 @@
           "$ref": "#/definitions/HasSemantics"
         },
         {
-          "type": "object",
           "properties": {
             "key": {
               "$ref": "#/definitions/NonEmptyString"
@@ -380,7 +372,6 @@
           "$ref": "#/definitions/HasDataSpecification"
         },
         {
-          "type": "object",
           "properties": {
             "submodelElements": {
               "type": "array",
@@ -457,7 +448,6 @@
           "$ref": "#/definitions/SubmodelElement"
         },
         {
-          "type": "object",
           "properties": {
             "first": {
               "$ref": "#/definitions/Reference"
@@ -479,7 +469,6 @@
           "$ref": "#/definitions/SubmodelElement"
         },
         {
-          "type": "object",
           "properties": {
             "values": {
               "type": "array",
@@ -528,7 +517,6 @@
           "$ref": "#/definitions/DataElement"
         },
         {
-          "type": "object",
           "properties": {
             "valueType": {
               "$ref": "#/definitions/DataTypeDef"
@@ -552,7 +540,6 @@
           "$ref": "#/definitions/DataElement"
         },
         {
-          "type": "object",
           "properties": {
             "value": {
               "$ref": "#/definitions/LangStringSet"
@@ -570,7 +557,6 @@
           "$ref": "#/definitions/DataElement"
         },
         {
-          "type": "object",
           "properties": {
             "valueType": {
               "$ref": "#/definitions/DataTypeDef"
@@ -594,7 +580,6 @@
           "$ref": "#/definitions/DataElement"
         },
         {
-          "type": "object",
           "properties": {
             "value": {
               "$ref": "#/definitions/Reference"
@@ -609,7 +594,6 @@
           "$ref": "#/definitions/DataElement"
         },
         {
-          "type": "object",
           "properties": {
             "mimeType": {
               "$ref": "#/definitions/MimeTyped"
@@ -630,7 +614,6 @@
           "$ref": "#/definitions/DataElement"
         },
         {
-          "type": "object",
           "properties": {
             "mimeType": {
               "$ref": "#/definitions/MimeTyped"
@@ -651,7 +634,6 @@
           "$ref": "#/definitions/RelationshipElement"
         },
         {
-          "type": "object",
           "properties": {
             "annotation": {
               "type": "array",
@@ -676,7 +658,6 @@
           "$ref": "#/definitions/SubmodelElement"
         },
         {
-          "type": "object",
           "properties": {
             "entityType": {
               "$ref": "#/definitions/EntityType"
@@ -712,7 +693,6 @@
           "$ref": "#/definitions/Event"
         },
         {
-          "type": "object",
           "properties": {
             "observed": {
               "$ref": "#/definitions/Reference"
@@ -730,7 +710,6 @@
           "$ref": "#/definitions/SubmodelElement"
         },
         {
-          "type": "object",
           "properties": {
             "inputVariables": {
               "type": "array",
@@ -777,7 +756,6 @@
           "$ref": "#/definitions/HasDataSpecification"
         },
         {
-          "type": "object",
           "properties": {
             "isCaseOf": {
               "type": "array",
@@ -801,7 +779,6 @@
           "$ref": "#/definitions/HasDataSpecification"
         },
         {
-          "type": "object",
           "properties": {
             "containedElements": {
               "type": "array",
@@ -1074,7 +1051,6 @@
           "$ref": "#/definitions/DataSpecificationContent"
         },
         {
-          "type": "object",
           "properties": {
             "preferredName": {
               "$ref": "#/definitions/LangStringSet"
@@ -1125,7 +1101,6 @@
           "$ref": "#/definitions/DataSpecificationContent"
         },
         {
-          "type": "object",
           "properties": {
             "unitName": {
               "$ref": "#/definitions/NonEmptyString"
@@ -1191,7 +1166,6 @@
           "$ref": "#/definitions/Certificate"
         },
         {
-          "type": "object",
           "properties": {
             "blobCertificate": {
               "$ref": "#/definitions/Blob"
@@ -1286,7 +1260,6 @@
           "$ref": "#/definitions/Qualifiable"
         },
         {
-          "type": "object",
           "properties": {
             "targetSubjectAttributes": {
               "$ref": "#/definitions/SubjectAttributes"
