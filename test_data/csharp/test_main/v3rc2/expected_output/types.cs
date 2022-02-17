@@ -2925,7 +2925,7 @@ namespace AasCore.Aas3
         /// See Constraint AASd-012
         /// See Constraint AASd-065"
         /// </summary>
-        public LangStringSet? Translatable { get; set; }
+        public LangStringSet? Value { get; set; }
 
         /// <summary>
         /// Reference to the global unique id of a coded value.
@@ -2970,9 +2970,9 @@ namespace AasCore.Aas3
                 yield return anItem;
             }
 
-            if (Translatable != null)
+            if (Value != null)
             {
-                yield return Translatable;
+                yield return Value;
             }
 
             if (ValueId != null)
@@ -3052,12 +3052,12 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Translatable != null)
+            if (Value != null)
             {
-                yield return Translatable;
+                yield return Value;
 
                 // Recurse
-                foreach (var anItem in Translatable.Descend())
+                foreach (var anItem in Value.Descend())
                 {
                     yield return anItem;
                 }
@@ -3122,7 +3122,7 @@ namespace AasCore.Aas3
             IReference? semanticId = null,
             List<IConstraint>? qualifiers = null,
             List<IReference>? dataSpecifications = null,
-            LangStringSet? translatable = null,
+            LangStringSet? value = null,
             IReference? valueId = null)
         {
             Extensions = (extensions != null)
@@ -3140,7 +3140,7 @@ namespace AasCore.Aas3
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
                 : new List<IReference>();
-            Translatable = translatable;
+            Value = value;
             ValueId = valueId;
         }
     }
@@ -3579,7 +3579,7 @@ namespace AasCore.Aas3
         /// Reference to any other referable element of the same of any other AAS or a
         /// reference to an external object or entity.
         /// </summary>
-        public IReference? Reference { get; set; }
+        public IReference? Value { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -3617,9 +3617,9 @@ namespace AasCore.Aas3
                 yield return anItem;
             }
 
-            if (Reference != null)
+            if (Value != null)
             {
-                yield return Reference;
+                yield return Value;
             }
         }
 
@@ -3694,12 +3694,12 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (Reference != null)
+            if (Value != null)
             {
-                yield return Reference;
+                yield return Value;
 
                 // Recurse
-                foreach (var anItem in Reference.Descend())
+                foreach (var anItem in Value.Descend())
                 {
                     yield return anItem;
                 }
@@ -3753,7 +3753,7 @@ namespace AasCore.Aas3
             IReference? semanticId = null,
             List<IConstraint>? qualifiers = null,
             List<IReference>? dataSpecifications = null,
-            IReference? reference = null)
+            IReference? value = null)
         {
             Extensions = (extensions != null)
                 ? extensions
@@ -3770,7 +3770,7 @@ namespace AasCore.Aas3
             DataSpecifications = (dataSpecifications != null)
                 ? dataSpecifications
                 : new List<IReference>();
-            Reference = reference;
+            Value = value;
         }
     }
 
@@ -3902,7 +3902,7 @@ namespace AasCore.Aas3
         /// In contrast to the file property the file content is stored directly as value
         /// in the Blob data element.
         /// </remarks>
-        public byte[]? Content { get; set; }
+        public byte[]? Value { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -4061,7 +4061,7 @@ namespace AasCore.Aas3
             IReference? semanticId = null,
             List<IConstraint>? qualifiers = null,
             List<IReference>? dataSpecifications = null,
-            byte[]? content = null)
+            byte[]? value = null)
         {
             Extensions = (extensions != null)
                 ? extensions
@@ -4079,7 +4079,7 @@ namespace AasCore.Aas3
                 ? dataSpecifications
                 : new List<IReference>();
             MimeType = mimeType;
-            Content = content;
+            Value = value;
         }
     }
 

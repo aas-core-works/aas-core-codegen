@@ -4798,7 +4798,7 @@ namespace AasCore.Aas3
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
                 List<IReference>? theDataSpecifications = null;
-                LangStringSet? theTranslatable = null;
+                LangStringSet? theValue = null;
                 IReference? theValueId = null;
 
                 while (reader.Read())
@@ -4816,7 +4816,7 @@ namespace AasCore.Aas3
                                 theSemanticId,
                                 theQualifiers,
                                 theDataSpecifications,
-                                theTranslatable,
+                                theValue,
                                 theValueId);
 
                         case Json.JsonTokenType.PropertyName:
@@ -4871,8 +4871,8 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<List<IConstraint>>(
                                             ref reader));
                                     break;
-                                case "translatable":
-                                    theTranslatable =  (
+                                case "value":
+                                    theValue =  (
                                         Json.JsonSerializer.Deserialize<LangStringSet>(
                                             ref reader));
                                     break;
@@ -4974,11 +4974,11 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, that.Qualifiers);
 
-                if (that.Translatable != null)
+                if (that.Value != null)
                 {
-                    writer.WritePropertyName("translatable");
+                    writer.WritePropertyName("value");
                     Json.JsonSerializer.Serialize(
-                        writer, that.Translatable);
+                        writer, that.Value);
                 }
 
                 if (that.ValueId != null)
@@ -5245,7 +5245,7 @@ namespace AasCore.Aas3
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
                 List<IReference>? theDataSpecifications = null;
-                IReference? theReference = null;
+                IReference? theValue = null;
 
                 while (reader.Read())
                 {
@@ -5263,7 +5263,7 @@ namespace AasCore.Aas3
                                 theSemanticId,
                                 theQualifiers,
                                 theDataSpecifications,
-                                theReference);
+                                theValue);
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
@@ -5317,8 +5317,8 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<List<IConstraint>>(
                                             ref reader));
                                     break;
-                                case "reference":
-                                    theReference =  (
+                                case "value":
+                                    theValue =  (
                                         Json.JsonSerializer.Deserialize<IReference>(
                                             ref reader));
                                     break;
@@ -5415,11 +5415,11 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, that.Qualifiers);
 
-                if (that.Reference != null)
+                if (that.Value != null)
                 {
-                    writer.WritePropertyName("reference");
+                    writer.WritePropertyName("value");
                     Json.JsonSerializer.Serialize(
-                        writer, that.Reference);
+                        writer, that.Value);
                 }
 
                 writer.WriteEndObject();
@@ -5450,7 +5450,7 @@ namespace AasCore.Aas3
                 IReference? theSemanticId = null;
                 List<IConstraint>? theQualifiers = null;
                 List<IReference>? theDataSpecifications = null;
-                byte[]? theContent = null;
+                byte[]? theValue = null;
 
                 while (reader.Read())
                 {
@@ -5470,7 +5470,7 @@ namespace AasCore.Aas3
                                 theSemanticId,
                                 theQualifiers,
                                 theDataSpecifications,
-                                theContent);
+                                theValue);
 
                         case Json.JsonTokenType.PropertyName:
                             string propertyName = reader.GetString()
@@ -5529,8 +5529,8 @@ namespace AasCore.Aas3
                                         Json.JsonSerializer.Deserialize<string>(
                                             ref reader));
                                     break;
-                                case "content":
-                                    theContent =  (
+                                case "value":
+                                    theValue =  (
                                         Json.JsonSerializer.Deserialize<byte[]>(
                                             ref reader));
                                     break;
@@ -5631,11 +5631,11 @@ namespace AasCore.Aas3
                 Json.JsonSerializer.Serialize(
                     writer, that.MimeType);
 
-                if (that.Content != null)
+                if (that.Value != null)
                 {
-                    writer.WritePropertyName("content");
+                    writer.WritePropertyName("value");
                     Json.JsonSerializer.Serialize(
-                        writer, that.Content);
+                        writer, that.Value);
                 }
 
                 writer.WriteEndObject();
