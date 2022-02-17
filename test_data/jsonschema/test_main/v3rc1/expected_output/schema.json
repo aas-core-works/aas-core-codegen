@@ -667,11 +667,8 @@
             "globalAssetId": {
               "$ref": "#/definitions/Reference"
             },
-            "specificAssetIds": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/IdentifierKeyValuePair"
-              }
+            "specificAssetId": {
+              "$ref": "#/definitions/IdentifierKeyValuePair"
             }
           },
           "required": [
@@ -1299,7 +1296,7 @@
         "externalInformationPoints"
       ]
     },
-    "PolicyEnforcementPoints": {
+    "PolicyEnforcementPoint": {
       "type": "object",
       "properties": {
         "externalPolicyEnforcementPoint": {
@@ -1330,8 +1327,8 @@
         "policyDecisionPoint": {
           "$ref": "#/definitions/PolicyDecisionPoint"
         },
-        "policyEnforcementPoints": {
-          "$ref": "#/definitions/PolicyEnforcementPoints"
+        "policyEnforcementPoint": {
+          "$ref": "#/definitions/PolicyEnforcementPoint"
         },
         "policyInformationPoints": {
           "$ref": "#/definitions/PolicyInformationPoints"
@@ -1340,7 +1337,7 @@
       "required": [
         "policyAdministrationPoint",
         "policyDecisionPoint",
-        "policyEnforcementPoints"
+        "policyEnforcementPoint"
       ]
     },
     "Security": {
@@ -1355,7 +1352,7 @@
             "$ref": "#/definitions/Certificate_abstract"
           }
         },
-        "requiredCertificatesExtension": {
+        "requiredCertificateExtensions": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Reference"
@@ -1375,7 +1372,7 @@
         "Undefined"
       ]
     },
-    "Environment": {
+    "AssetAdministrationShellEnvironment": {
       "type": "object",
       "properties": {
         "assetAdministrationShells": {

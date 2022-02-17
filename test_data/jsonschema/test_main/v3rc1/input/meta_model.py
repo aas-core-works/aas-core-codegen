@@ -1665,7 +1665,7 @@ class Entity(Submodel_element):
     not existing otherwise.
     """
 
-    specific_asset_IDs: Optional[List["Identifier_key_value_pair"]]
+    specific_asset_ID: Optional["Identifier_key_value_pair"]
     """
     Reference to an identifier key value pair representing a specific identifier
     of the asset represented by the asset administration shell.
@@ -1686,7 +1686,7 @@ class Entity(Submodel_element):
         data_specifications: Optional[List["Reference"]] = None,
         statements: Optional[List["Submodel_element"]] = None,
         global_asset_ID: Optional["Reference"] = None,
-        specific_asset_IDs: Optional[List["Identifier_key_value_pair"]] = None,
+        specific_asset_ID: Optional["Identifier_key_value_pair"] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -1704,7 +1704,7 @@ class Entity(Submodel_element):
         self.statements = statements
         self.entity_type = entity_type
         self.global_asset_ID = global_asset_ID
-        self.specific_asset_IDs = specific_asset_IDs
+        self.specific_asset_ID = specific_asset_ID
 
 
 @reference_in_the_book(section=(4, 7, 8, 7))
@@ -2976,7 +2976,7 @@ class Policy_information_points(DBC):
 
 
 @reference_in_the_book(section=(5, 3, 4), index=3)
-class Policy_enforcement_points(DBC):
+class Policy_enforcement_point(DBC):
     """
     Defines the security policy enforcement points (PEP).
     """
@@ -3024,7 +3024,7 @@ class Access_control_policy_points(DBC):
     The access control policy decision point of the AAS.
     """
 
-    policy_enforcement_points: "Policy_enforcement_points"
+    policy_enforcement_point: "Policy_enforcement_point"
     """
     The access control policy enforcement point of the AAS.
     """
@@ -3038,12 +3038,12 @@ class Access_control_policy_points(DBC):
         self,
         policy_administration_point: "Policy_administration_point",
         policy_decision_point: "Policy_decision_point",
-        policy_enforcement_points: "Policy_enforcement_points",
+        policy_enforcement_point: "Policy_enforcement_point",
         policy_information_points: Optional["Policy_information_points"] = None,
     ) -> None:
         self.policy_administration_point = policy_administration_point
         self.policy_decision_point = policy_decision_point
-        self.policy_enforcement_points = policy_enforcement_points
+        self.policy_enforcement_point = policy_enforcement_point
         self.policy_information_points = policy_information_points
 
 
@@ -3063,7 +3063,7 @@ class Security(DBC):
     Authenticating Certificates of the AAS and its submodels etc.
     """
 
-    required_certificates_extension: Optional[List["Reference"]]
+    required_certificate_extensions: Optional[List["Reference"]]
     """
     Certificate extensions as required by the AAS
     """
@@ -3072,11 +3072,11 @@ class Security(DBC):
         self,
         access_control_policy_points: "Access_control_policy_points",
         certificates: Optional[List["Certificate"]] = None,
-        required_certificates_extension: Optional[List["Reference"]] = None,
+        required_certificate_extensions: Optional[List["Reference"]] = None,
     ) -> None:
         self.access_control_policy_points = access_control_policy_points
         self.certificates = certificates
-        self.required_certificates_extension = required_certificates_extension
+        self.required_certificate_extensions = required_certificate_extensions
 
 
 @reference_in_the_book(section=(5, 3, 5), index=6)
@@ -3111,7 +3111,7 @@ class Permission_kind(Enum):
 # TODO: make this environment implementation-specific in the final implementation.
 #  + Sketch what methods it should implement.
 #  + Sketch what invariants it should implement.
-class Environment:
+class Asset_administration_shell_environment:
     """Model the environment as the entry point for referencing and serialization."""
 
     asset_administration_shells: List[Asset_administration_shell]

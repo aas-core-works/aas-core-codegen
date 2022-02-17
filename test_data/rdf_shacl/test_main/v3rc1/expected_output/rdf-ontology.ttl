@@ -102,11 +102,11 @@ aas:AccessControlPolicyPoints rdf:type owl:Class ;
     rdfs:comment "The access control policy decision point of the AAS."@en ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoints
-<https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoints> rdf:type owl:ObjectProperty ;
-    rdfs:label "has policy enforcement points"^^xsd:string ;
+###  https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoint
+<https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoint> rdf:type owl:ObjectProperty ;
+    rdfs:label "has policy enforcement point"^^xsd:string ;
     rdfs:domain aas:AccessControlPolicyPoints ;
-    rdfs:range aas:PolicyEnforcementPoints ;
+    rdfs:range aas:PolicyEnforcementPoint ;
     rdfs:comment "The access control policy enforcement point of the AAS."@en ;
 .
 
@@ -234,6 +234,40 @@ aas:AssetAdministrationShell rdf:type owl:Class ;
     rdfs:domain aas:AssetAdministrationShell ;
     rdfs:range aas:View ;
     rdfs:comment "Stakeholder-specific views defined for the AAS.\n\nIf needed, stakeholder specific views can be defined on the elements of the AAS."@en ;
+.
+
+###  https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShellEnvironment
+aas:AssetAdministrationShellEnvironment rdf:type owl:Class ;
+    rdfs:comment "Model the environment as the entry point for referencing and serialization."@en ;
+    rdfs:label "Asset Administration Shell Environment"^^xsd:string ;
+.
+
+###  https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShellEnvironment/assetAdministrationShells
+<https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShellEnvironment/assetAdministrationShells> rdf:type owl:ObjectProperty ;
+    rdfs:label "has asset administration shells"^^xsd:string ;
+    rdfs:domain aas:AssetAdministrationShellEnvironment ;
+    rdfs:range aas:AssetAdministrationShell ;
+.
+
+###  https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShellEnvironment/assets
+<https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShellEnvironment/assets> rdf:type owl:ObjectProperty ;
+    rdfs:label "has assets"^^xsd:string ;
+    rdfs:domain aas:AssetAdministrationShellEnvironment ;
+    rdfs:range aas:Asset ;
+.
+
+###  https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShellEnvironment/submodels
+<https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShellEnvironment/submodels> rdf:type owl:ObjectProperty ;
+    rdfs:label "has submodels"^^xsd:string ;
+    rdfs:domain aas:AssetAdministrationShellEnvironment ;
+    rdfs:range aas:Submodel ;
+.
+
+###  https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShellEnvironment/conceptDescriptions
+<https://admin-shell.io/aas/3/0/RC01/AssetAdministrationShellEnvironment/conceptDescriptions> rdf:type owl:ObjectProperty ;
+    rdfs:label "has concept descriptions"^^xsd:string ;
+    rdfs:domain aas:AssetAdministrationShellEnvironment ;
+    rdfs:range aas:ConceptDescription ;
 .
 
 ###  https://admin-shell.io/aas/3/0/RC01/AssetInformation
@@ -1040,9 +1074,9 @@ aas:Entity rdf:type owl:Class ;
     rdfs:comment "Reference to the asset the entity is representing. Constraint AASd-014: Either the attribute globalAssetId or specificAssetId of an Entity must be set if Entity/entityType is set to “SelfManagedEntity”. They are not existing otherwise."@en ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetIds
-<https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetIds> rdf:type owl:ObjectProperty ;
-    rdfs:label "has specific asset ids"^^xsd:string ;
+###  https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetId
+<https://admin-shell.io/aas/3/0/RC01/Entity/specificAssetId> rdf:type owl:ObjectProperty ;
+    rdfs:label "has specific asset id"^^xsd:string ;
     rdfs:domain aas:Entity ;
     rdfs:range aas:IdentifierKeyValuePair ;
     rdfs:comment "Reference to an identifier key value pair representing a specific identifier of the asset represented by the asset administration shell. See Constraint AASd-014"@en ;
@@ -1068,40 +1102,6 @@ aas:EntityType rdf:type owl:Class ;
 <https://admin-shell.io/aas/3/0/RC01/EntityType/SELF_MANAGED_ENTITY> rdf:type aas:EntityType ;
     rdfs:label "Self Managed Entity"^^xsd:string ;
     rdfs:comment "Self-Managed Entities have their own AAS but can be part of the bill of material of a composite self-managed entity. The asset of an I4.0 Component is a self-managed entity per definition.\""@en ;
-.
-
-###  https://admin-shell.io/aas/3/0/RC01/Environment
-aas:Environment rdf:type owl:Class ;
-    rdfs:comment "Model the environment as the entry point for referencing and serialization."@en ;
-    rdfs:label "Environment"^^xsd:string ;
-.
-
-###  https://admin-shell.io/aas/3/0/RC01/Environment/assetAdministrationShells
-<https://admin-shell.io/aas/3/0/RC01/Environment/assetAdministrationShells> rdf:type owl:ObjectProperty ;
-    rdfs:label "has asset administration shells"^^xsd:string ;
-    rdfs:domain aas:Environment ;
-    rdfs:range aas:AssetAdministrationShell ;
-.
-
-###  https://admin-shell.io/aas/3/0/RC01/Environment/assets
-<https://admin-shell.io/aas/3/0/RC01/Environment/assets> rdf:type owl:ObjectProperty ;
-    rdfs:label "has assets"^^xsd:string ;
-    rdfs:domain aas:Environment ;
-    rdfs:range aas:Asset ;
-.
-
-###  https://admin-shell.io/aas/3/0/RC01/Environment/submodels
-<https://admin-shell.io/aas/3/0/RC01/Environment/submodels> rdf:type owl:ObjectProperty ;
-    rdfs:label "has submodels"^^xsd:string ;
-    rdfs:domain aas:Environment ;
-    rdfs:range aas:Submodel ;
-.
-
-###  https://admin-shell.io/aas/3/0/RC01/Environment/conceptDescriptions
-<https://admin-shell.io/aas/3/0/RC01/Environment/conceptDescriptions> rdf:type owl:ObjectProperty ;
-    rdfs:label "has concept descriptions"^^xsd:string ;
-    rdfs:domain aas:Environment ;
-    rdfs:range aas:ConceptDescription ;
 .
 
 ###  https://admin-shell.io/aas/3/0/RC01/Event
@@ -1905,16 +1905,16 @@ aas:PolicyDecisionPoint rdf:type owl:Class ;
     rdfs:comment "If externalPolicyDecisionPoints True then Endpoints to external available decision points taking into consideration for access control for the AAS need to be configured."@en ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoints
-aas:PolicyEnforcementPoints rdf:type owl:Class ;
+###  https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoint
+aas:PolicyEnforcementPoint rdf:type owl:Class ;
     rdfs:comment "Defines the security policy enforcement points (PEP)."@en ;
-    rdfs:label "Policy Enforcement Points"^^xsd:string ;
+    rdfs:label "Policy Enforcement Point"^^xsd:string ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoints/externalPolicyEnforcementPoint
-<https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoints/externalPolicyEnforcementPoint> rdf:type owl:DatatypeProperty ;
+###  https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoint/externalPolicyEnforcementPoint
+<https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoint/externalPolicyEnforcementPoint> rdf:type owl:DatatypeProperty ;
     rdfs:label "has external policy enforcement point"^^xsd:string ;
-    rdfs:domain aas:PolicyEnforcementPoints ;
+    rdfs:domain aas:PolicyEnforcementPoint ;
     rdfs:range xsd:boolean ;
     rdfs:comment "If externalPolicyEnforcementPoint True then an Endpoint to external available enforcement point taking needs to be configured for the AAS."@en ;
 .
@@ -2320,9 +2320,9 @@ aas:Security rdf:type owl:Class ;
     rdfs:comment "Authenticating Certificates of the AAS and its submodels etc."@en ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC01/Security/requiredCertificatesExtension
-<https://admin-shell.io/aas/3/0/RC01/Security/requiredCertificatesExtension> rdf:type owl:ObjectProperty ;
-    rdfs:label "has required certificates extension"^^xsd:string ;
+###  https://admin-shell.io/aas/3/0/RC01/Security/requiredCertificateExtensions
+<https://admin-shell.io/aas/3/0/RC01/Security/requiredCertificateExtensions> rdf:type owl:ObjectProperty ;
+    rdfs:label "has required certificate extensions"^^xsd:string ;
     rdfs:domain aas:Security ;
     rdfs:range aas:Reference ;
     rdfs:comment "Certificate extensions as required by the AAS"@en ;
