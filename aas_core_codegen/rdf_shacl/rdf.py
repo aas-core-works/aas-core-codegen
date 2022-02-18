@@ -68,11 +68,6 @@ def _define_for_enumeration(
         )
     )
 
-    if len(enumeration.is_superset_of) > 0:
-        for subset_enum in enumeration.is_superset_of:
-            subset_enum_name = rdf_shacl_naming.class_name(subset_enum.name)
-            writer.write(f"\nrdfs:subClassOf aas:{subset_enum_name} ;")
-
     writer.write(
         f"\n{I}rdfs:label {rdf_shacl_common.string_literal(cls_label)}^^xsd:string ;"
     )
@@ -154,6 +149,11 @@ def _define_owl_class_for_class(
             f"aas:{rdf_shacl_naming.class_name(inheritance.name)} ;\n"
         )
 
+    cls_label = rdf_shacl_naming.class_label(cls.name)
+    writer.write(
+        f"{I}rdfs:label {rdf_shacl_common.string_literal(cls_label)}^^xsd:string ;\n"
+    )
+
     if cls.description is not None:
         comment, error = _generate_comment(cls.description)
         if error is not None:
@@ -163,11 +163,6 @@ def _define_owl_class_for_class(
         writer.write(
             f"{I}rdfs:comment {rdf_shacl_common.string_literal(comment)}@en ;\n"
         )
-
-    cls_label = rdf_shacl_naming.class_label(cls.name)
-    writer.write(
-        f"{I}rdfs:label {rdf_shacl_common.string_literal(cls_label)}^^xsd:string ;\n"
-    )
 
     writer.write(".")
     return Stripped(writer.getvalue()), None
