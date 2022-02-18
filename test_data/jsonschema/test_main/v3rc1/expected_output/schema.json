@@ -77,8 +77,14 @@
         {
           "properties": {
             "idShort": {
-              "$ref": "#/definitions/NonEmptyString",
-              "pattern": "^[a-zA-Z][a-zA-Z_0-9]*$"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/NonEmptyString"
+                },
+                {
+                  "pattern": "^[a-zA-Z][a-zA-Z_0-9]*$"
+                }
+              ]
             },
             "displayName": {
               "$ref": "#/definitions/LangStringSet"
