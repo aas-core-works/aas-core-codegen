@@ -127,6 +127,9 @@ def _define_type(
                 [("$ref", f"#/definitions/{model_type}")]
             )
 
+            all_of = [type_definition]  # type: List[MutableMapping[str, Any]]
+
+            constraints = collections.OrderedDict()  # type: MutableMapping[str, Any]
             if (
                 type_annotation.symbol.constrainee
                 in (
@@ -136,31 +139,34 @@ def _define_type(
                 and len_constraint is not None
             ):
                 if len_constraint.min_value is not None:
-                    type_definition["minLength"] = len_constraint.min_value
+                    constraints["minLength"] = len_constraint.min_value
 
                 if len_constraint.max_value is not None:
-                    type_definition["maxLength"] = len_constraint.max_value
+                    constraints["maxLength"] = len_constraint.max_value
+
+            if len(constraints) > 0:
+                all_of.append(constraints)
 
             if (
                 type_annotation.symbol.constrainee is intermediate.PrimitiveType.STR
                 and pattern_constraints is not None
                 and len(pattern_constraints) > 0
             ):
-                if len(pattern_constraints) == 1:
-                    type_definition["pattern"] = pattern_constraints[0].pattern
-                else:
-                    all_of = [type_definition]  # type: List[MutableMapping[str, Any]]
-
-                    for pattern_constraint in pattern_constraints:
-                        all_of.append(
-                            collections.OrderedDict(
-                                [("pattern", pattern_constraint.pattern)]
-                            )
+                for pattern_constraint in pattern_constraints:
+                    all_of.append(
+                        collections.OrderedDict(
+                            [("pattern", pattern_constraint.pattern)]
                         )
+                    )
 
-                    type_definition = collections.OrderedDict([("allOf", all_of)])
+            assert (
+                len(all_of) >= 1
+            ), "Expected at least the reference to constrained primitive"
 
-            return type_definition, None
+            if len(all_of) == 1:
+                return all_of[0], None
+            else:
+                return collections.OrderedDict([("allOf", all_of)]), None
 
         elif isinstance(type_annotation.symbol, intermediate.Class):
             if type_annotation.symbol.interface is not None:
