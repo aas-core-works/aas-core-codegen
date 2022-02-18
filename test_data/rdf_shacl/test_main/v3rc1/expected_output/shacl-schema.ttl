@@ -796,7 +796,7 @@ aas:SubmodelElementCollectionShape  a sh:NodeShape ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/values> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/value> ;
         sh:class aas:SubmodelElement ;
         sh:minCount 0 ;
     ] ;

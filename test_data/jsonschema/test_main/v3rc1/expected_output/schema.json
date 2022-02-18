@@ -491,7 +491,7 @@
         },
         {
           "properties": {
-            "values": {
+            "value": {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/SubmodelElement_abstract"

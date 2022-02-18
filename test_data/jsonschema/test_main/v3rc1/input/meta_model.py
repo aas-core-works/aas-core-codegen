@@ -1076,7 +1076,7 @@ class Submodel_element_collection(Submodel_element):
        the entity needs a clear and unique semantics.
     """
 
-    values: Optional[List["Submodel_element"]]
+    value: Optional[List["Submodel_element"]]
     """
     Submodel element contained in the collection.
     """
@@ -1113,7 +1113,7 @@ class Submodel_element_collection(Submodel_element):
         semantic_ID: Optional["Reference"] = None,
         qualifiers: Optional[List["Constraint"]] = None,
         data_specifications: Optional[List["Reference"]] = None,
-        values: Optional[List["Submodel_element"]] = None,
+        value: Optional[List["Submodel_element"]] = None,
         ordered: Optional[bool] = None,
         allow_duplicates: Optional[bool] = None,
     ) -> None:
@@ -1130,7 +1130,7 @@ class Submodel_element_collection(Submodel_element):
             data_specifications=data_specifications,
         )
 
-        self.values = values
+        self.value = value
         self.ordered = ordered
         self.allow_duplicates = allow_duplicates
 

@@ -2373,9 +2373,9 @@ aas:SubmodelElementCollection rdf:type owl:Class ;
     rdfs:comment "A submodel element collection is a set or list of submodel elements.\n\nConstraint AASd-059: If the semanticId of a SubmodelElementCollection references a ConceptDescription then the category of the ConceptDescription shall be COLLECTION or ENTITY.\n\nConstraint AASd-092: If the semanticId of a SubmodelElementCollection with SubmodelElementCollection/allowDuplicates == false references a ConceptDescription then the ConceptDescription/category shall be ENTITY.\n\nConstraint AASd-093: If the semanticId of a SubmodelElementCollection with SubmodelElementCollection/allowDuplicates == true references a ConceptDescription then the ConceptDescription/category shall be COLLECTION.\n\nExample: A set of documents is referencing a concept description of category COLLECTION. A document within this collection is described as a SubmodelElementCollection referencing a concept description of category ENTITY.\n\nNOTE:\nThis means that no generic semanticId can be assigned to an element within a submodel element collection with allowDuplicates == false: every element within the entity needs a clear and unique semantics."@en ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/values
-<https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/values> rdf:type owl:ObjectProperty ;
-    rdfs:label "has values"^^xsd:string ;
+###  https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/value
+<https://admin-shell.io/aas/3/0/RC01/SubmodelElementCollection/value> rdf:type owl:ObjectProperty ;
+    rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:SubmodelElementCollection ;
     rdfs:range aas:SubmodelElement ;
     rdfs:comment "Submodel element contained in the collection."@en ;
