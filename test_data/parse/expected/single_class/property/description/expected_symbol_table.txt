@@ -33,6 +33,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[],
       serialization=None,
+      reference_in_the_book=None,
       description=Description(
         document=...,
         node=...),

@@ -11,6 +11,7 @@ SymbolTable(
             node=...),
           parsed=...)],
       is_superset_of=[],
+      reference_in_the_book=None,
       description=Description(
         document=...,
         node=...),

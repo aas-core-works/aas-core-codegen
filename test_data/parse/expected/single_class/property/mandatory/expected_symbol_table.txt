@@ -15,6 +15,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[],
       serialization=None,
+      reference_in_the_book=None,
       description=None,
       node=...,
       properties_by_name=...,

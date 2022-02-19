@@ -16,6 +16,7 @@ UnverifiedSymbolTable(
           value='LiteralWithoutDoc',
           description=None,
           node=...)],
+      reference_in_the_book=None,
       description=Description(
         document=...,
         node=...),

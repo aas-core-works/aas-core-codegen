@@ -54,6 +54,7 @@ from aas_core_codegen.parse._types import (
     UnderstoodMethod,
     ConstructorToBeUnderstood,
     FunctionUnion,
+    ReferenceInTheBook,
 )
 
 
@@ -1271,6 +1272,123 @@ def _class_decorator_to_serialization(
     lambda decorator:
     isinstance(decorator.func, ast.Name)
     and isinstance(decorator.func.ctx, ast.Load)
+    and decorator.func.id == 'reference_in_the_book'
+)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+# fmt: on
+def _class_decorator_to_reference_in_the_book(
+    decorator: ast.Call,
+) -> Tuple[Optional[ReferenceInTheBook], Optional[Error]]:
+    """Translate a decorator to general serialization settings."""
+    section_node = None  # type: Optional[ast.AST]
+    index_node = None  # type: Optional[ast.AST]
+    fragment_node = None  # type: Optional[ast.AST]
+
+    if len(decorator.args) >= 1:
+        section_node = decorator.args[0]
+
+    if len(decorator.args) >= 2:
+        index_node = decorator.args[1]
+
+    if len(decorator.args) >= 3:
+        fragment_node = decorator.args[2]
+
+    if len(decorator.keywords) > 0:
+        for kwarg in decorator.keywords:
+            if kwarg.arg == "section":
+                section_node = kwarg.value
+            elif kwarg.arg == "index":
+                index_node = kwarg.value
+            elif kwarg.arg == "fragment":
+                fragment_node = kwarg.value
+            else:
+                return (
+                    None,
+                    Error(
+                        decorator,
+                        f"Handling of the keyword argument {kwarg.arg!r} "
+                        f"for the reference_in_the_book decorator has not been "
+                        f"implemented",
+                    ),
+                )
+
+    section = None  # type: Optional[Tuple[int, ...]]
+    index = None  # type: Optional[int]
+    fragment = None  # type: Optional[str]
+
+    if section_node is not None:
+        section_parts = []  # type: List[int]
+        if not isinstance(section_node, ast.Tuple):
+            return None, Error(
+                section_node,
+                f"Expected a tuple as a section, " f"but got: {ast.dump(section_node)}",
+            )
+
+        for i, elt in enumerate(section_node.elts):
+            if not isinstance(elt, ast.Constant):
+                return None, Error(
+                    elt,
+                    f"Expected a constant as part of the section, "
+                    f"but got at position {i+1}: {ast.dump(elt)}",
+                )
+
+            if not isinstance(elt.value, int):
+                return None, Error(
+                    elt,
+                    f"Expected integers as section numbers, "
+                    f"but got a {type(elt.value)} at position {i+1}: {elt.value}",
+                )
+
+            section_parts.append(elt.value)
+
+        section = tuple(section_parts)
+
+    if index_node is not None:
+        if not isinstance(index_node, ast.Constant):
+            return None, Error(
+                index_node,
+                f"Expected a constant as the index, "
+                f"but got: {ast.dump(index_node)}",
+            )
+
+        if not isinstance(index_node.value, int):
+            return None, Error(
+                index_node,
+                f"Expected an integer as the index, "
+                f"but got a {type(index_node.value)}: {index_node.value}",
+            )
+
+        index = index_node.value
+
+    if fragment_node is not None:
+        if not isinstance(fragment_node, ast.Constant):
+            return None, Error(
+                fragment_node,
+                f"Expected a constant as the fragment, "
+                f"but got: {ast.dump(fragment_node)}",
+            )
+
+        if not isinstance(fragment_node.value, str):
+            return None, Error(
+                fragment_node,
+                f"Expected a string as the fragment, "
+                f"but got a {type(fragment_node.value)}: {fragment_node.value}",
+            )
+
+        fragment = fragment_node.value
+
+    assert section is not None
+    if index is None:
+        index = 0
+
+    return ReferenceInTheBook(section=section, index=index, fragment=fragment), None
+
+
+# fmt: off
+@require(
+    lambda decorator:
+    isinstance(decorator.func, ast.Name)
+    and isinstance(decorator.func.ctx, ast.Load)
     and decorator.func.id == 'invariant'
 )
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -1366,6 +1484,7 @@ _ClassDecoratorUnion = Union[
     _ClassMarker,
     _IsSupersetOf,
     Serialization,
+    ReferenceInTheBook,
     Invariant,
 ]
 
@@ -1403,6 +1522,8 @@ def _parse_class_decorator(
             return _class_decorator_to_is_superset_of(decorator=decorator)
         elif decorator.func.id == "serialization":
             return _class_decorator_to_serialization(decorator=decorator)
+        elif decorator.func.id == "reference_in_the_book":
+            return _class_decorator_to_reference_in_the_book(decorator=decorator)
         elif decorator.func.id == "invariant":
             return _class_decorator_to_invariant(decorator=decorator, atok=atok)
         else:
@@ -1425,35 +1546,38 @@ def _enum_to_symbol(
 ) -> Tuple[Optional[Enumeration], Optional[Error]]:
     """Interpret a class which defines an enumeration."""
     is_superset_of = None  # type: Optional[Sequence[Identifier]]
+    reference_in_the_book = None  # type: Optional[ReferenceInTheBook]
 
     for decorator_node in node.decorator_list:
-        if (
-            isinstance(decorator_node, ast.Call)
-            and isinstance(decorator_node.func, ast.Name)
-            and decorator_node.func.id == "reference_in_the_book"
-        ):
-            # We ignore the references in the book at the moment.
-            continue
-
         decorator, error = _parse_class_decorator(decorator=decorator_node, atok=atok)
         if error is not None:
             return None, error
         assert decorator is not None
 
-        if not isinstance(decorator, _IsSupersetOf):
+        if isinstance(decorator, _IsSupersetOf):
+            if is_superset_of is not None:
+                return None, Error(
+                    decorator_node,
+                    "Double definitions of ``is_superset_of`` are not allowed",
+                )
+
+            is_superset_of = decorator.enums
+
+        elif isinstance(decorator, ReferenceInTheBook):
+            if reference_in_the_book is not None:
+                return None, Error(
+                    decorator_node,
+                    "Unexpected double reference_in_the_book markers",
+                )
+
+            reference_in_the_book = decorator
+
+        else:
             return None, Error(
                 node,
                 f"Unexpected class decorator {decorator} "
                 f"for the enumeration {node.name!r}",
             )
-
-        if is_superset_of is not None:
-            return None, Error(
-                decorator_node,
-                "Double definitions of ``is_superset_of`` are not allowed",
-            )
-
-        is_superset_of = decorator.enums
 
     if is_superset_of is None:
         is_superset_of = []
@@ -1464,6 +1588,7 @@ def _enum_to_symbol(
                 name=Identifier(node.name),
                 is_superset_of=is_superset_of,
                 literals=[],
+                reference_in_the_book=reference_in_the_book,
                 description=None,
                 node=node,
             ),
@@ -1582,6 +1707,7 @@ def _enum_to_symbol(
             name=Identifier(node.name),
             is_superset_of=is_superset_of,
             literals=enumeration_literals,
+            reference_in_the_book=reference_in_the_book,
             description=description,
             node=node,
         ),
@@ -1647,18 +1773,10 @@ def _classdef_to_symbol(
     is_abstract = False
     is_implementation_specific = False
 
+    reference_in_the_book = None  # type: Optional[ReferenceInTheBook]
     serialization = None  # type: Optional[Serialization]
 
     for decorator_node in node.decorator_list:
-        if (
-            isinstance(decorator_node, ast.Call)
-            and isinstance(decorator_node.func, ast.Name)
-            and isinstance(decorator_node.func.ctx, ast.Load)
-            and decorator_node.func.id == "reference_in_the_book"
-        ):
-            # We ignore the references in the book decorators at the moment.
-            continue
-
         decorator, error = _parse_class_decorator(decorator=decorator_node, atok=atok)
         if error is not None:
             underlying_errors.append(error)
@@ -1690,7 +1808,25 @@ def _classdef_to_symbol(
             continue
 
         elif isinstance(decorator, Serialization):
+            if serialization is not None:
+                underlying_errors.append(
+                    Error(decorator_node, "Unexpected double serialization markers")
+                )
+                continue
+
             serialization = decorator
+
+        elif isinstance(decorator, ReferenceInTheBook):
+            if reference_in_the_book is not None:
+                underlying_errors.append(
+                    Error(
+                        decorator_node,
+                        "Unexpected double reference_in_the_book markers",
+                    )
+                )
+                continue
+
+            reference_in_the_book = decorator
 
         elif isinstance(decorator, Invariant):
             invariants.append(decorator)
@@ -1835,6 +1971,7 @@ def _classdef_to_symbol(
             methods=methods,
             invariants=invariants,
             serialization=serialization,
+            reference_in_the_book=reference_in_the_book,
             description=description,
             node=node,
         ),

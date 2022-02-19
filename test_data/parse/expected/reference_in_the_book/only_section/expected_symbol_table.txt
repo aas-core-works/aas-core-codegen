@@ -6,7 +6,7 @@ UnverifiedSymbolTable(
       inheritances=[],
       properties=[],
       methods=[
-        ConstructorToBeUnderstood(
+        ImplementationSpecificMethod(
           name='__init__',
           verification=False,
           arguments=[
@@ -16,19 +16,22 @@ UnverifiedSymbolTable(
               default=None,
               node=...)],
           returns=None,
-          description=Description(
-            document=...,
-            node=...),
+          description=None,
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
           node=...,
-          arguments_by_name=...,
-          body=...)],
+          arguments_by_name=...)],
       invariants=[],
       serialization=None,
-      reference_in_the_book=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          1,
+          2,
+          3],
+        index=0,
+        fragment=None),
       description=None,
       node=...,
       properties_by_name=...,

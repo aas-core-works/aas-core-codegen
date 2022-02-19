@@ -26,6 +26,7 @@ MethodUnion = _types.MethodUnion
 FunctionUnion = _types.FunctionUnion
 Symbol = _types.Symbol
 Serialization = _types.Serialization
+ReferenceInTheBook = _types.ReferenceInTheBook
 Class = _types.Class
 AbstractClass = _types.AbstractClass
 ClassUnion = _types.ClassUnion

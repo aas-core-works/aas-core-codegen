@@ -14,6 +14,7 @@ SymbolTable(
           specified_for='Reference to ConstrainedPrimitive Non_empty_string',
           parsed=...)],
       invariant_id_set=...,
+      reference_in_the_book=None,
       description=Description(
         document=...,
         node=...),
@@ -38,6 +39,7 @@ SymbolTable(
           specified_for='Reference to ConstrainedPrimitive MIME_typed',
           parsed=...)],
       invariant_id_set=...,
+      reference_in_the_book=None,
       description=Description(
         document=...,
         node=...),
@@ -152,6 +154,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          6],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -301,6 +311,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          1],
+        index=2,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -419,6 +437,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          1],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -683,6 +709,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -983,6 +1017,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          3],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1009,6 +1051,14 @@ SymbolTable(
             node=...),
           parsed=...)],
       is_superset_of=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          4],
+        index=1,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1117,6 +1167,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          4],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1237,6 +1295,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          12],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1351,6 +1417,14 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          5],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1401,6 +1475,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          8],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1513,6 +1595,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          7],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1657,6 +1747,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          10],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1716,6 +1814,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          11],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -2006,6 +2112,13 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          3],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -2130,6 +2243,13 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          4],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -2156,6 +2276,13 @@ SymbolTable(
             node=...),
           parsed=...)],
       is_superset_of=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          4],
+        index=1,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -2273,6 +2400,13 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          4],
+        index=2,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -2598,6 +2732,13 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          5],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -3010,6 +3151,13 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          6],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -3446,6 +3594,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          14],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -3795,6 +3951,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          15],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -4078,6 +4242,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          16],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -4468,6 +4640,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          5],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -4787,6 +4967,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          11],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5092,6 +5280,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          9],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5411,6 +5607,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          12],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5688,6 +5892,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          13],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5988,6 +6200,14 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          7,
+          4],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -6288,6 +6508,14 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          7,
+          8],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -6607,6 +6835,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          1],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -6633,6 +6869,14 @@ SymbolTable(
             node=...),
           parsed=...)],
       is_superset_of=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          6],
+        index=1,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -6980,6 +7224,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          6],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -7360,6 +7612,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          7],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -7631,6 +7891,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -7966,6 +8234,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          10],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -8018,6 +8294,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          10],
+        index=1,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -8275,6 +8559,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          3],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -8523,6 +8815,13 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          8],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -8758,6 +9057,13 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          9],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -8808,6 +9114,13 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -8870,6 +9183,13 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=1,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -8956,6 +9276,13 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=2,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -9022,6 +9349,13 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=1,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -9049,6 +9383,13 @@ SymbolTable(
           description=None,
           parsed=...)],
       is_superset_of=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          11],
+        index=8,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -9180,6 +9521,13 @@ SymbolTable(
           parsed=...)],
       is_superset_of=[
         'Reference to Enumeration Identifiable_elements'],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=3,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -9327,6 +9675,13 @@ SymbolTable(
           parsed=...)],
       is_superset_of=[
         'Reference to Enumeration Referable_elements'],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=2,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -9484,6 +9839,13 @@ SymbolTable(
             node=...),
           parsed=...)],
       is_superset_of=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=7,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -9509,6 +9871,14 @@ SymbolTable(
           description=None,
           parsed=...)],
       is_superset_of=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          1],
+        index=1,
+        fragment=None),
       description=None,
       literals_by_name=...,
       literal_id_set=...,
@@ -9587,6 +9957,14 @@ SymbolTable(
           description=None,
           parsed=...)],
       is_superset_of=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          1],
+        index=2,
+        fragment=None),
       description=None,
       literals_by_name=...,
       literal_id_set=...,
@@ -9605,6 +9983,14 @@ SymbolTable(
           description=None,
           parsed=...)],
       is_superset_of=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          1],
+        index=3,
+        fragment=None),
       description=None,
       literals_by_name=...,
       literal_id_set=...,
@@ -9698,6 +10084,14 @@ SymbolTable(
           description=None,
           parsed=...)],
       is_superset_of=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          1],
+        index=4,
+        fragment=None),
       description=None,
       literals_by_name=...,
       literal_id_set=...,
@@ -9741,6 +10135,14 @@ SymbolTable(
           description=None,
           parsed=...)],
       is_superset_of=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          1],
+        index=5,
+        fragment=None),
       description=None,
       literals_by_name=...,
       literal_id_set=...,
@@ -9969,6 +10371,14 @@ SymbolTable(
         'Reference to Enumeration Duration_build_in_types',
         'Reference to Enumeration Primitive_types',
         'Reference to Enumeration String_build_in_types'],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -10001,6 +10411,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          2],
+        index=2,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -10051,6 +10469,13 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          1],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -10196,6 +10621,14 @@ SymbolTable(
             node=...),
           parsed=...)],
       is_superset_of=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          2,
+          3],
+        index=2,
+        fragment=None),
       description=None,
       literals_by_name=...,
       literal_id_set=...,
@@ -10224,6 +10657,14 @@ SymbolTable(
           description=None,
           parsed=...)],
       is_superset_of=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          2,
+          3],
+        index=5,
+        fragment=None),
       description=None,
       literals_by_name=...,
       literal_id_set=...,
@@ -10290,6 +10731,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          2,
+          3],
+        index=4,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -10350,6 +10799,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          2,
+          3],
+        index=3,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -10697,6 +11154,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          2,
+          3],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -11020,6 +11485,14 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          3,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -11126,6 +11599,7 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=None,
       description=Description(
         document=...,
         node=...),

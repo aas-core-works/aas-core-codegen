@@ -95,6 +95,7 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=None,
       description=None,
       parsed=...,
       properties_by_name=...,
@@ -255,6 +256,7 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=None,
       description=None,
       parsed=...,
       properties_by_name=...,
@@ -396,6 +398,7 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
+      reference_in_the_book=None,
       description=None,
       parsed=...,
       properties_by_name=...,
