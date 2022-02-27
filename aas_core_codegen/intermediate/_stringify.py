@@ -40,6 +40,7 @@ from aas_core_codegen.intermediate._types import (
     TypeAnnotation,
     Verification,
     UnderstoodMethod,
+    ReferenceInTheBook,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -194,6 +195,21 @@ def _stringify_serialization(
         name=that.__class__.__name__,
         properties=[
             stringify.Property("with_model_type", that.with_model_type),
+        ],
+    )
+
+    return result
+
+
+def _stringify_reference_in_the_book(
+    that: ReferenceInTheBook,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("section", list(that.section)),
+            stringify.Property("index", that.index),
+            stringify.Property("fragment", that.fragment),
         ],
     )
 
@@ -387,6 +403,9 @@ def _stringify_enumeration(
                     for parent_enum in that.is_superset_of
                 ],
             ),
+            stringify.Property(
+                "reference_in_the_book", _stringify(that.reference_in_the_book)
+            ),
             stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("literals_by_name", that.literals_by_name),
             stringify.PropertyEllipsis("literal_id_set", that.literal_id_set),
@@ -419,6 +438,9 @@ def _stringify_constrained_primitive(
             ),
             stringify.Property("invariants", list(map(_stringify, that.invariants))),
             stringify.PropertyEllipsis("invariant_id_set", that.invariant_id_set),
+            stringify.Property(
+                "reference_in_the_book", _stringify(that.reference_in_the_book)
+            ),
             stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("parsed", that.parsed),
         ],
@@ -461,6 +483,9 @@ def _stringify_a_class(that: Class) -> stringify.Entity:
             stringify.Property("constructor", _stringify(that.constructor)),
             stringify.Property("invariants", list(map(_stringify, that.invariants))),
             stringify.Property("serialization", _stringify(that.serialization)),
+            stringify.Property(
+                "reference_in_the_book", _stringify(that.reference_in_the_book)
+            ),
             stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("parsed", that.parsed),
             stringify.PropertyEllipsis("properties_by_name", that.properties_by_name),
@@ -611,6 +636,7 @@ Dumpable = Union[
     PatternVerification,
     PrimitiveTypeAnnotation,
     Property,
+    ReferenceInTheBook,
     Serialization,
     Signature,
     SignatureLike,
@@ -650,6 +676,7 @@ _DISPATCH = {
     PatternVerification: _stringify_pattern_verification,
     PrimitiveTypeAnnotation: _stringify_primitive_type_annotation,
     Property: _stringify_property,
+    ReferenceInTheBook: _stringify_reference_in_the_book,
     Serialization: _stringify_serialization,
     Signature: _stringify_signature,
     Snapshot: _stringify_snapshot,

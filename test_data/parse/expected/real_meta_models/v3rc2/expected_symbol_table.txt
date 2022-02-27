@@ -13,6 +13,7 @@ UnverifiedSymbolTable(
           body="Comparison(\n  left=FunctionCall(\n    name='len',\n    args=[\n      Name(\n        identifier='self',\n        original_node=...)],\n    original_node=...),\n  op='GE',\n  right=Constant(\n    value=1,\n    original_node=...),\n  original_node=...)",
           node=...)],
       serialization=None,
+      reference_in_the_book=None,
       description=Description(
         document=...,
         node=...),
@@ -32,6 +33,7 @@ UnverifiedSymbolTable(
           body="FunctionCall(\n  name='is_MIME_type',\n  args=[\n    Name(\n      identifier='self',\n      original_node=...)],\n  original_node=...)",
           node=...)],
       serialization=None,
+      reference_in_the_book=None,
       description=Description(
         document=...,
         node=...),
@@ -89,6 +91,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          6],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -225,6 +235,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          1],
+        index=2,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -286,6 +304,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          1],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -436,6 +462,14 @@ UnverifiedSymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -574,6 +608,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          3],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -598,6 +640,14 @@ UnverifiedSymbolTable(
             document=...,
             node=...),
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          4],
+        index=1,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -654,6 +704,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          4],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -715,6 +773,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          12],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -818,6 +884,14 @@ UnverifiedSymbolTable(
           body="Implication(\n  antecedent=IsNotNone(\n    value=Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='revision',\n      original_node=...),\n    original_node=...),\n  consequent=IsNotNone(\n    value=Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='version',\n      original_node=...),\n    original_node=...),\n  original_node=...)",
           node=...)],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          5],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -833,6 +907,14 @@ UnverifiedSymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          8],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -895,6 +977,14 @@ UnverifiedSymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          7],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1024,6 +1114,14 @@ UnverifiedSymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          10],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1086,6 +1184,14 @@ UnverifiedSymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          2,
+          11],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1285,6 +1391,13 @@ UnverifiedSymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          3],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1408,6 +1521,13 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          4],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1432,6 +1552,13 @@ UnverifiedSymbolTable(
             document=...,
             node=...),
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          4],
+        index=1,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1533,6 +1660,13 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          4],
+        index=2,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1733,6 +1867,13 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          5],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -1890,6 +2031,13 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          6],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -2075,6 +2223,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          14],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -2323,6 +2479,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          15],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -2505,6 +2669,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          16],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -2658,6 +2830,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          5],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -2872,6 +3052,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          11],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -3075,6 +3263,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          9],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -3289,6 +3485,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          12],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -3462,6 +3666,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          13],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -3655,6 +3867,14 @@ UnverifiedSymbolTable(
           body="FunctionCall(\n  name='is_MIME_type',\n  args=[\n    Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='MIME_type',\n      original_node=...)],\n  original_node=...)",
           node=...)],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          7,
+          4],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -3848,6 +4068,14 @@ UnverifiedSymbolTable(
           body="FunctionCall(\n  name='is_MIME_type',\n  args=[\n    Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='MIME_type',\n      original_node=...)],\n  original_node=...)",
           node=...)],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          7,
+          8],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -4044,6 +4272,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          1],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -4068,6 +4304,14 @@ UnverifiedSymbolTable(
             document=...,
             node=...),
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          6],
+        index=1,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -4315,6 +4559,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          6],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -4468,6 +4720,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          7],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -4632,6 +4892,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -4872,6 +5140,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          10],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -4920,6 +5196,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          10],
+        index=1,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5073,6 +5357,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          7,
+          3],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5231,6 +5523,13 @@ UnverifiedSymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          8],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5388,6 +5687,13 @@ UnverifiedSymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          9],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5403,6 +5709,13 @@ UnverifiedSymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5465,6 +5778,13 @@ UnverifiedSymbolTable(
           node=...)],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=1,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5552,6 +5872,13 @@ UnverifiedSymbolTable(
           node=...)],
       serialization=Serialization(
         with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=2,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5612,6 +5939,13 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=1,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5637,6 +5971,13 @@ UnverifiedSymbolTable(
           value='Submodel',
           description=None,
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          11],
+        index=8,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5767,6 +6108,13 @@ UnverifiedSymbolTable(
             document=...,
             node=...),
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=3,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -5913,6 +6261,13 @@ UnverifiedSymbolTable(
             document=...,
             node=...),
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=2,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -6069,6 +6424,13 @@ UnverifiedSymbolTable(
             document=...,
             node=...),
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          10],
+        index=7,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -6093,6 +6455,14 @@ UnverifiedSymbolTable(
           value='NMTOKENS',
           description=None,
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          1],
+        index=1,
+        fragment=None),
       description=None,
       node=...,
       literals_by_name=...),
@@ -6170,6 +6540,14 @@ UnverifiedSymbolTable(
           value='negativeInteger',
           description=None,
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          1],
+        index=2,
+        fragment=None),
       description=None,
       node=...,
       literals_by_name=...),
@@ -6187,6 +6565,14 @@ UnverifiedSymbolTable(
           value='yearMonthDuration',
           description=None,
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          1],
+        index=3,
+        fragment=None),
       description=None,
       node=...,
       literals_by_name=...),
@@ -6279,6 +6665,14 @@ UnverifiedSymbolTable(
           value='time',
           description=None,
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          1],
+        index=4,
+        fragment=None),
       description=None,
       node=...,
       literals_by_name=...),
@@ -6321,6 +6715,14 @@ UnverifiedSymbolTable(
           value='IDREF',
           description=None,
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          1],
+        index=5,
+        fragment=None),
       description=None,
       node=...,
       literals_by_name=...),
@@ -6548,6 +6950,14 @@ UnverifiedSymbolTable(
           value='IDREF',
           description=None,
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -6561,6 +6971,14 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          7,
+          12,
+          2],
+        index=2,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -6575,6 +6993,13 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          1],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -6718,6 +7143,14 @@ UnverifiedSymbolTable(
             document=...,
             node=...),
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          2,
+          3],
+        index=2,
+        fragment=None),
       description=None,
       node=...,
       literals_by_name=...),
@@ -6745,6 +7178,14 @@ UnverifiedSymbolTable(
           value='Type',
           description=None,
           node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          2,
+          3],
+        index=5,
+        fragment=None),
       description=None,
       node=...,
       literals_by_name=...),
@@ -6806,6 +7247,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          2,
+          3],
+        index=4,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -6867,6 +7316,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          2,
+          3],
+        index=3,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -7225,6 +7682,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          2,
+          3],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -7558,6 +8023,14 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          8,
+          3,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -7671,6 +8144,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[],
       serialization=None,
+      reference_in_the_book=None,
       description=Description(
         document=...,
         node=...),

@@ -13,6 +13,7 @@ from typing import (
     Final,
     FrozenSet,
     Set,
+    Tuple,
 )
 
 import docutils.nodes
@@ -312,6 +313,29 @@ class Serialization:
             if set, the serialization needs to include a discriminator.
         """
         self.with_model_type = with_model_type
+
+
+class ReferenceInTheBook:
+    """Represent the information indicated in the ``reference_in_the_book`` marker."""
+
+    #: Section number
+    section: Final[Tuple[int, ...]]
+
+    #: Index in the section so that the classes can be sorted deterministically
+    index: Final[int]
+
+    #: URL Fragment of the section
+    #:
+    #: The literal ``#`` needs to be prepended and the fragment needs to be URL-encoded.
+    fragment: Final[Optional[str]]
+
+    def __init__(
+        self, section: Tuple[int, ...], index: int, fragment: Optional[str]
+    ) -> None:
+        """Initialize with the given values."""
+        self.section = section
+        self.index = index
+        self.fragment = fragment
 
 
 class Invariant:
@@ -736,6 +760,9 @@ class Enumeration:
     #: this is akin to inheritance for enumerations
     is_superset_of: Final[Sequence["Enumeration"]]
 
+    #: Reference to the original specs
+    reference_in_the_book: Final[Optional[ReferenceInTheBook]]
+
     #: Description of the enumeration, if any
     description: Final[Optional[Description]]
 
@@ -750,12 +777,14 @@ class Enumeration:
         name: Identifier,
         literals: Sequence[EnumerationLiteral],
         is_superset_of: Sequence["Enumeration"],
+        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[Description],
         parsed: parse.Enumeration,
     ) -> None:
         self.name = name
         self.literals = literals
         self.is_superset_of = is_superset_of
+        self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.parsed = parsed
 
@@ -826,6 +855,9 @@ class ConstrainedPrimitive:
     #: List of class invariants
     invariants: Final[Sequence[Invariant]]
 
+    #: Reference to the original specs
+    reference_in_the_book: Final[Optional[ReferenceInTheBook]]
+
     #: Description of the class
     description: Final[Optional[Description]]
 
@@ -866,6 +898,7 @@ class ConstrainedPrimitive:
         constrainee: PrimitiveType,
         is_implementation_specific: bool,
         invariants: Sequence[Invariant],
+        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[Description],
         parsed: parse.Class,
     ) -> None:
@@ -875,6 +908,7 @@ class ConstrainedPrimitive:
         self.constrainee = constrainee
         self.is_implementation_specific = is_implementation_specific
         self.invariants = invariants
+        self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.parsed = parsed
 
@@ -991,6 +1025,9 @@ class Class(DBC):
     #: Particular serialization settings for this class
     serialization: Final[Serialization]
 
+    #: Reference to the original specs
+    reference_in_the_book: Final[Optional[ReferenceInTheBook]]
+
     #: Description of the class
     description: Final[Optional[Description]]
 
@@ -1033,6 +1070,7 @@ class Class(DBC):
         constructor: Constructor,
         invariants: Sequence[Invariant],
         serialization: Serialization,
+        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[Description],
         parsed: parse.Class,
     ) -> None:
@@ -1048,6 +1086,7 @@ class Class(DBC):
         self.constructor = constructor
         self.invariants = invariants
         self.serialization = serialization
+        self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.parsed = parsed
 
@@ -1130,6 +1169,7 @@ class AbstractClass(Class):
         constructor: Constructor,
         invariants: Sequence[Invariant],
         serialization: Serialization,
+        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[Description],
         parsed: parse.Class,
     ) -> None:
@@ -1146,6 +1186,7 @@ class AbstractClass(Class):
             constructor=constructor,
             invariants=invariants,
             serialization=serialization,
+            reference_in_the_book=reference_in_the_book,
             description=description,
             parsed=parsed,
         )

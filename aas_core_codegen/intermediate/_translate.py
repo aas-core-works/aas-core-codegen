@@ -79,6 +79,7 @@ from aas_core_codegen.intermediate._types import (
     UnderstoodMethod,
     collect_ids_of_symbols_in_properties,
     SymbolExceptEnumeration,
+    ReferenceInTheBook,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -227,6 +228,17 @@ class _PlaceholderSymbol:
         self.name = name
 
 
+def _propagate_parsed_reference_in_the_book(
+    parsed: parse.ReferenceInTheBook,
+) -> ReferenceInTheBook:
+    """Decouple the parsed reference in the book to the intermediate level."""
+    return ReferenceInTheBook(
+        section=parsed.section,
+        index=parsed.index,
+        fragment=parsed.fragment,
+    )
+
+
 def _parsed_enumeration_to_enumeration(parsed: parse.Enumeration) -> Enumeration:
     """Translate an enumeration from the meta-model to an intermediate enumeration."""
     return Enumeration(
@@ -253,6 +265,11 @@ def _parsed_enumeration_to_enumeration(parsed: parse.Enumeration) -> Enumeration
                 for identifier in parsed.is_superset_of
             ],
         ),
+        reference_in_the_book=_propagate_parsed_reference_in_the_book(
+            parsed.reference_in_the_book
+        )
+        if parsed.reference_in_the_book is not None
+        else None,
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
@@ -987,6 +1004,11 @@ def _parsed_class_to_constrained_primitive(
         constrainee=constrainee,
         is_implementation_specific=parsed.is_implementation_specific,
         invariants=invariants,
+        reference_in_the_book=_propagate_parsed_reference_in_the_book(
+            parsed.reference_in_the_book
+        )
+        if parsed.reference_in_the_book is not None
+        else None,
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None
@@ -1146,6 +1168,11 @@ def _parsed_class_to_class(
         constructor=ctor,
         invariants=invariants,
         serialization=serializations[parsed],
+        reference_in_the_book=_propagate_parsed_reference_in_the_book(
+            parsed=parsed.reference_in_the_book
+        )
+        if parsed.reference_in_the_book is not None
+        else None,
         description=(
             _parsed_description_to_description(parsed.description)
             if parsed.description is not None

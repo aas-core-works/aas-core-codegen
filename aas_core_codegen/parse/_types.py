@@ -3,7 +3,7 @@ import abc
 import ast
 import os
 import pathlib
-from typing import Sequence, Optional, Union, Final, Mapping
+from typing import Sequence, Optional, Union, Final, Mapping, Tuple
 
 import docutils.nodes
 from icontract import require, DBC, ensure, invariant
@@ -443,6 +443,29 @@ class Serialization:
         self.with_model_type = with_model_type
 
 
+class ReferenceInTheBook:
+    """Represent the information indicated in the ``reference_in_the_book`` marker."""
+
+    #: Section number
+    section: Final[Tuple[int, ...]]
+
+    #: Index in the section so that the classes can be sorted deterministically
+    index: Final[int]
+
+    #: URL Fragment of the section
+    #:
+    #: The literal ``#`` needs to be prepended and the fragment needs to be URL-encoded.
+    fragment: Final[Optional[str]]
+
+    def __init__(
+        self, section: Tuple[int, ...], index: int, fragment: Optional[str]
+    ) -> None:
+        """Initialize with the given values."""
+        self.section = section
+        self.index = index
+        self.fragment = fragment
+
+
 class Class(DBC):
     """Represent a class of the meta-model."""
 
@@ -467,6 +490,9 @@ class Class(DBC):
 
     #: Serialization settings of the class
     serialization: Final[Optional[Serialization]]
+
+    #: Reference to the original specs
+    reference_in_the_book: Final[Optional[ReferenceInTheBook]]
 
     #: Description of the class, if any given in the meta-model
     description: Final[Optional[Description]]
@@ -517,6 +543,7 @@ class Class(DBC):
         methods: Sequence[Method],
         invariants: Sequence[Invariant],
         serialization: Optional[Serialization],
+        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[Description],
         node: ast.ClassDef,
     ) -> None:
@@ -527,6 +554,7 @@ class Class(DBC):
         self.methods = methods
         self.invariants = invariants
         self.serialization = serialization
+        self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.node = node
 
@@ -611,6 +639,9 @@ class Enumeration:
     #: List of the enumeration literals
     literals: Final[Sequence[EnumerationLiteral]]
 
+    #: Reference to the original specs
+    reference_in_the_book: Final[Optional[ReferenceInTheBook]]
+
     #: Description of the enumeration, if any
     description: Final[Optional[Description]]
 
@@ -625,12 +656,14 @@ class Enumeration:
         name: Identifier,
         is_superset_of: Sequence[Identifier],
         literals: Sequence[EnumerationLiteral],
+        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[Description],
         node: ast.ClassDef,
     ) -> None:
         self.name = name
         self.is_superset_of = is_superset_of
         self.literals = literals
+        self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.node = node
 
