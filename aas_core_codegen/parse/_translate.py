@@ -6,7 +6,7 @@ import io
 import itertools
 import sys
 import textwrap
-from typing import List, Any, Optional, cast, Type, Tuple, Union, Mapping, Set
+from typing import List, Any, Optional, cast, Type, Tuple, Union, Mapping, Set, Sequence
 
 import asttokens
 import docutils.io
@@ -155,212 +155,6 @@ def check_expected_imports(atok: asttokens.ASTTokens) -> List[str]:
 
     lineno_columner = LinenoColumner(atok=atok)
     return [lineno_columner.error_message(error) for error in visitor.errors]
-
-
-@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
-def _enum_to_symbol(
-    node: ast.ClassDef, atok: asttokens.ASTTokens
-) -> Tuple[Optional[Enumeration], Optional[Error]]:
-    """Interpret a class which defines an enumeration."""
-    is_superset_of = None  # type: Optional[List[Identifier]]
-    for decorator_node in node.decorator_list:
-        if (
-            isinstance(decorator_node, ast.Call)
-            and isinstance(decorator_node.func, ast.Name)
-            and decorator_node.func.id == "is_superset_of"
-        ):
-            if is_superset_of is not None:
-                return None, Error(
-                    decorator_node,
-                    "Double definitions of ``is_superset_of`` are not allowed",
-                )
-
-            superset_arg_node = None  # type: Optional[ast.AST]
-            if len(decorator_node.args) >= 1:
-                superset_arg_node = decorator_node.args[0]
-            elif len(decorator_node.keywords) > 0:
-                for keyword in decorator_node.keywords:
-                    if keyword.arg == "enums":
-                        superset_arg_node = keyword.value
-            else:
-                pass
-
-            if superset_arg_node is None:
-                return None, Error(
-                    decorator_node,
-                    "The ``enums`` argument is missing in the ``is_superset_of`` "
-                    "decorator",
-                )
-
-            if not isinstance(superset_arg_node, ast.List):
-                return None, Error(
-                    decorator_node,
-                    "Expected the ``enums`` argument of the ``is_superset_of`` "
-                    "to be a list literal, but it is not",
-                )
-
-            is_superset_of = []
-
-            for elt in superset_arg_node.elts:
-                if not isinstance(elt, ast.Name):
-                    return None, Error(
-                        decorator_node,
-                        f"Expected all elements of the ``enums`` argument to "
-                        f"the ``is_superset_of`` to be a list literal of enum names, "
-                        f"but got: {ast.dump(elt)}",
-                    )
-
-                is_superset_of.append(Identifier(elt.id))
-
-        elif (
-            isinstance(decorator_node, ast.Call)
-            and isinstance(decorator_node.func, ast.Name)
-            and decorator_node.func.id == "reference_in_the_book"
-        ):
-            # NOTE (mristin, 2021-11-17):
-            # We ignore references at the moment. At some later point, it might
-            # make sense to integrate them in the generated code.
-            pass
-
-        else:
-            return None, Error(
-                decorator_node,
-                f"We do not know how to handle this decorator node "
-                f"for an Enum: {ast.dump(decorator_node)}",
-            )
-
-    if is_superset_of is None:
-        is_superset_of = []
-
-    if len(node.body) == 0:
-        return (
-            Enumeration(
-                name=Identifier(node.name),
-                is_superset_of=is_superset_of,
-                literals=[],
-                description=None,
-                node=node,
-            ),
-            None,
-        )
-
-    enumeration_literals = []  # type: List[EnumerationLiteral]
-
-    description = None  # type: Optional[Description]
-
-    cursor = 0
-    while cursor < len(node.body):
-        old_cursor = cursor
-
-        body_node = node.body[cursor]  # type: ast.AST
-
-        if cursor == 0 and is_string_expr(body_node):
-            assert isinstance(body_node, ast.Expr)
-            assert isinstance(body_node.value, ast.Constant)
-            description, error = _string_constant_to_description(body_node.value)
-            if error is not None:
-                return None, error
-
-            cursor += 1
-
-        elif isinstance(body_node, ast.Pass):
-            cursor += 1
-
-        elif isinstance(body_node, ast.Assign):
-            assign = body_node
-
-            if len(assign.targets) != 1:
-                return (
-                    None,
-                    Error(
-                        assign,
-                        f"Expected a single target in the assignment, "
-                        f"but got: {len(assign.targets)}",
-                    ),
-                )
-
-            if not isinstance(assign.targets[0], ast.Name):
-                return (
-                    None,
-                    Error(
-                        assign.targets[0],
-                        f"Expected a name as a target of the assignment, "
-                        f"but got: {assign.targets[0]}",
-                    ),
-                )
-
-            if not isinstance(assign.value, ast.Constant):
-                return (
-                    None,
-                    Error(
-                        assign.value,
-                        f"Expected a constant in the enumeration assignment, "
-                        f"but got: {atok.get_text(assign.value)}",
-                    ),
-                )
-
-            if not isinstance(assign.value.value, str):
-                return (
-                    None,
-                    Error(
-                        assign.value,
-                        f"Expected a string literal in the enumeration, "
-                        f"but got: {assign.value.value}",
-                    ),
-                )
-
-            literal_name = Identifier(assign.targets[0].id)
-            literal_value = assign.value.value
-
-            literal_description = None  # type: Optional[Description]
-            next_expr = node.body[cursor + 1] if cursor < len(node.body) - 1 else None
-
-            if next_expr is not None and is_string_expr(next_expr):
-                assert isinstance(next_expr, ast.Expr)
-                assert isinstance(next_expr.value, ast.Constant)
-                literal_description, error = _string_constant_to_description(
-                    next_expr.value
-                )
-
-                if error is not None:
-                    return None, error
-
-                cursor += 1
-
-            enumeration_literals.append(
-                EnumerationLiteral(
-                    name=literal_name,
-                    value=literal_value,
-                    description=literal_description,
-                    node=assign,
-                )
-            )
-
-            cursor += 1
-
-        else:
-            return (
-                None,
-                Error(
-                    node.body[cursor],
-                    f"Expected either a docstring or an assignment "
-                    f"in an enumeration, "
-                    f"but got: {atok.get_text(node.body[cursor])}",
-                ),
-            )
-
-        assert cursor > old_cursor, f"Loop invariant: {cursor=}, {old_cursor=}"
-
-    return (
-        Enumeration(
-            name=Identifier(node.name),
-            is_superset_of=is_superset_of,
-            literals=enumeration_literals,
-            description=description,
-            node=node,
-        ),
-        None,
-    )
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -1353,6 +1147,66 @@ def _class_decorator_to_marker(
     return class_marker, None
 
 
+class _IsSupersetOf:
+    """Represent the parsed supersets of an enumeration."""
+
+    def __init__(self, enums: List[Identifier]) -> None:
+        """Initialize with the given values."""
+        self.enums = enums
+
+
+# fmt: off
+@require(
+    lambda decorator:
+    isinstance(decorator.func, ast.Name)
+    and isinstance(decorator.func.ctx, ast.Load)
+    and decorator.func.id == 'is_superset_of'
+)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+# fmt: on
+def _class_decorator_to_is_superset_of(
+    decorator: ast.Call,
+) -> Tuple[Optional[_IsSupersetOf], Optional[Error]]:
+    """Translate a decorator to an Is-superset-of information."""
+    superset_arg_node = None  # type: Optional[ast.AST]
+    if len(decorator.args) >= 1:
+        superset_arg_node = decorator.args[0]
+    elif len(decorator.keywords) > 0:
+        for keyword in decorator.keywords:
+            if keyword.arg == "enums":
+                superset_arg_node = keyword.value
+    else:
+        pass
+
+    if superset_arg_node is None:
+        return None, Error(
+            decorator,
+            "The ``enums`` argument is missing in the ``is_superset_of`` " "decorator",
+        )
+
+    if not isinstance(superset_arg_node, ast.List):
+        return None, Error(
+            decorator,
+            "Expected the ``enums`` argument of the ``is_superset_of`` "
+            "to be a list literal, but it is not",
+        )
+
+    enums = []  # type: List[Identifier]
+
+    for elt in superset_arg_node.elts:
+        if not isinstance(elt, ast.Name):
+            return None, Error(
+                decorator,
+                f"Expected all elements of the ``enums`` argument to "
+                f"the ``is_superset_of`` to be a list literal of enum names, "
+                f"but got: {ast.dump(elt)}",
+            )
+
+        enums.append(Identifier(elt.id))
+
+    return _IsSupersetOf(enums=enums), None
+
+
 # fmt: off
 @require(
     lambda decorator:
@@ -1508,6 +1362,233 @@ def _class_decorator_to_invariant(
     )
 
 
+_ClassDecoratorUnion = Union[
+    _ClassMarker,
+    _IsSupersetOf,
+    Serialization,
+    Invariant,
+]
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _parse_class_decorator(
+    decorator: ast.AST, atok: asttokens.ASTTokens
+) -> Tuple[Optional[_ClassDecoratorUnion], Optional[Error]]:
+    """
+    Parse a class decorator.
+
+    The decorator needs to be further interpreted in the context of the class.
+    The class here refers to a general Python class, not the concrete or abstract
+    class of the meta-model. For example, an enumeration is also defined as a Python
+    class inheriting from ``Enum``.
+    """
+    if isinstance(decorator, ast.Name):
+        return _class_decorator_to_marker(decorator=decorator)
+    elif isinstance(decorator, ast.Call):
+        if not isinstance(decorator.func, ast.Name):
+            return None, Error(
+                decorator,
+                f"Expected a name for a decorator function, "
+                f"but got: {ast.dump(decorator.func)}",
+            )
+
+        if not isinstance(decorator.func.ctx, ast.Load):
+            return None, Error(
+                decorator,
+                f"Unexpected decorator function in "
+                f"a non-Load context: {decorator.func.ctx=}",
+            )
+
+        if decorator.func.id == "is_superset_of":
+            return _class_decorator_to_is_superset_of(decorator=decorator)
+        elif decorator.func.id == "serialization":
+            return _class_decorator_to_serialization(decorator=decorator)
+        elif decorator.func.id == "invariant":
+            return _class_decorator_to_invariant(decorator=decorator, atok=atok)
+        else:
+            return None, Error(
+                decorator,
+                f"We do not know how to handle "
+                f"the class decorator: {decorator.func.id}.",
+            )
+    else:
+        return None, Error(
+            decorator,
+            f"Handling of a non-name or a non-call class decorator "
+            f"has not been implemented: {ast.dump(decorator)}",
+        )
+
+
+@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
+def _enum_to_symbol(
+    node: ast.ClassDef, atok: asttokens.ASTTokens
+) -> Tuple[Optional[Enumeration], Optional[Error]]:
+    """Interpret a class which defines an enumeration."""
+    is_superset_of = None  # type: Optional[Sequence[Identifier]]
+
+    for decorator_node in node.decorator_list:
+        if (
+            isinstance(decorator_node, ast.Call)
+            and isinstance(decorator_node.func, ast.Name)
+            and decorator_node.func.id == "reference_in_the_book"
+        ):
+            # We ignore the references in the book at the moment.
+            continue
+
+        decorator, error = _parse_class_decorator(decorator=decorator_node, atok=atok)
+        if error is not None:
+            return None, error
+        assert decorator is not None
+
+        if not isinstance(decorator, _IsSupersetOf):
+            return None, Error(
+                node,
+                f"Unexpected class decorator {decorator} "
+                f"for the enumeration {node.name!r}",
+            )
+
+        if is_superset_of is not None:
+            return None, Error(
+                decorator_node,
+                "Double definitions of ``is_superset_of`` are not allowed",
+            )
+
+        is_superset_of = decorator.enums
+
+    if is_superset_of is None:
+        is_superset_of = []
+
+    if len(node.body) == 0:
+        return (
+            Enumeration(
+                name=Identifier(node.name),
+                is_superset_of=is_superset_of,
+                literals=[],
+                description=None,
+                node=node,
+            ),
+            None,
+        )
+
+    enumeration_literals = []  # type: List[EnumerationLiteral]
+
+    description = None  # type: Optional[Description]
+
+    cursor = 0
+    while cursor < len(node.body):
+        old_cursor = cursor
+
+        body_node = node.body[cursor]  # type: ast.AST
+
+        if cursor == 0 and is_string_expr(body_node):
+            assert isinstance(body_node, ast.Expr)
+            assert isinstance(body_node.value, ast.Constant)
+            description, error = _string_constant_to_description(body_node.value)
+            if error is not None:
+                return None, error
+
+            cursor += 1
+
+        elif isinstance(body_node, ast.Pass):
+            cursor += 1
+
+        elif isinstance(body_node, ast.Assign):
+            assign = body_node
+
+            if len(assign.targets) != 1:
+                return (
+                    None,
+                    Error(
+                        assign,
+                        f"Expected a single target in the assignment, "
+                        f"but got: {len(assign.targets)}",
+                    ),
+                )
+
+            if not isinstance(assign.targets[0], ast.Name):
+                return (
+                    None,
+                    Error(
+                        assign.targets[0],
+                        f"Expected a name as a target of the assignment, "
+                        f"but got: {assign.targets[0]}",
+                    ),
+                )
+
+            if not isinstance(assign.value, ast.Constant):
+                return (
+                    None,
+                    Error(
+                        assign.value,
+                        f"Expected a constant in the enumeration assignment, "
+                        f"but got: {atok.get_text(assign.value)}",
+                    ),
+                )
+
+            if not isinstance(assign.value.value, str):
+                return (
+                    None,
+                    Error(
+                        assign.value,
+                        f"Expected a string literal in the enumeration, "
+                        f"but got: {assign.value.value}",
+                    ),
+                )
+
+            literal_name = Identifier(assign.targets[0].id)
+            literal_value = assign.value.value
+
+            literal_description = None  # type: Optional[Description]
+            next_expr = node.body[cursor + 1] if cursor < len(node.body) - 1 else None
+
+            if next_expr is not None and is_string_expr(next_expr):
+                assert isinstance(next_expr, ast.Expr)
+                assert isinstance(next_expr.value, ast.Constant)
+                literal_description, error = _string_constant_to_description(
+                    next_expr.value
+                )
+
+                if error is not None:
+                    return None, error
+
+                cursor += 1
+
+            enumeration_literals.append(
+                EnumerationLiteral(
+                    name=literal_name,
+                    value=literal_value,
+                    description=literal_description,
+                    node=assign,
+                )
+            )
+
+            cursor += 1
+
+        else:
+            return (
+                None,
+                Error(
+                    node.body[cursor],
+                    f"Expected either a docstring or an assignment "
+                    f"in an enumeration, "
+                    f"but got: {atok.get_text(node.body[cursor])}",
+                ),
+            )
+
+        assert cursor > old_cursor, f"Loop invariant: {cursor=}, {old_cursor=}"
+
+    return (
+        Enumeration(
+            name=Identifier(node.name),
+            is_superset_of=is_superset_of,
+            literals=enumeration_literals,
+            description=description,
+            node=node,
+        ),
+        None,
+    )
+
+
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _classdef_to_symbol(
     node: ast.ClassDef, atok: asttokens.ASTTokens
@@ -1568,18 +1649,28 @@ def _classdef_to_symbol(
 
     serialization = None  # type: Optional[Serialization]
 
-    for decorator in node.decorator_list:
-        if isinstance(decorator, ast.Name):
-            class_marker, error = _class_decorator_to_marker(decorator=decorator)
-            if error is not None:
-                underlying_errors.append(error)
-                continue
+    for decorator_node in node.decorator_list:
+        if (
+            isinstance(decorator_node, ast.Call)
+            and isinstance(decorator_node.func, ast.Name)
+            and isinstance(decorator_node.func.ctx, ast.Load)
+            and decorator_node.func.id == "reference_in_the_book"
+        ):
+            # We ignore the references in the book decorators at the moment.
+            continue
 
-            if class_marker == _ClassMarker.ABSTRACT:
+        decorator, error = _parse_class_decorator(decorator=decorator_node, atok=atok)
+        if error is not None:
+            underlying_errors.append(error)
+            continue
+
+        assert decorator is not None
+        if isinstance(decorator, _ClassMarker):
+            if decorator is _ClassMarker.ABSTRACT:
                 is_abstract = True
-            elif class_marker == _ClassMarker.IMPLEMENTATION_SPECIFIC:
+            elif decorator is _ClassMarker.IMPLEMENTATION_SPECIFIC:
                 is_implementation_specific = True
-            elif class_marker == _ClassMarker.TEMPLATE:
+            elif decorator is _ClassMarker.TEMPLATE:
                 # NOTE (mristin, 2021-11-28):
                 # We ignore the template marker at this moment. However, we will most
                 # probably have to consider them in the future so we leave them in the
@@ -1587,66 +1678,25 @@ def _classdef_to_symbol(
                 pass
 
             else:
-                raise AssertionError(f"Unhandled enum: {class_marker}")
+                assert_never(decorator)
 
-        elif (
-            isinstance(decorator, ast.Call)
-            and isinstance(decorator.func, ast.Name)
-            and isinstance(decorator.func.ctx, ast.Load)
-        ):
-            if decorator.func.id == "invariant":
-                invariant, error = _class_decorator_to_invariant(
-                    decorator=decorator, atok=atok
-                )
-
-                if error is not None:
-                    underlying_errors.append(error)
-                    continue
-
-                assert invariant is not None
-
-                invariants.append(invariant)
-
-            elif decorator.func.id == "serialization":
-                if serialization is not None:
-                    underlying_errors.append(
-                        Error(
-                            decorator,
-                            "Repeated markings for serialization settings are not allowed",
-                        )
-                    )
-                    continue
-
-                serialization, error = _class_decorator_to_serialization(
-                    decorator=decorator
-                )
-
-                if error is not None:
-                    underlying_errors.append(error)
-                    continue
-
-            elif decorator.func.id == "reference_in_the_book":
-                # NOTE (mristin, 2021-11-17):
-                # We ignore references at the moment. At some later point, it might
-                # make sense to integrate them in the generated code.
-                pass
-
-            else:
-                underlying_errors.append(
-                    Error(
-                        decorator,
-                        f"Handling of a decorator has not been "
-                        f"implemented: {decorator.func.id!r}",
-                    )
-                )
-        else:
+        elif isinstance(decorator, _IsSupersetOf):
             underlying_errors.append(
                 Error(
-                    decorator,
-                    message=f"Handling of a decorator has not been "
-                    f"implemented: {ast.dump(decorator)!r}",
+                    decorator_node,
+                    "Unexpected is_superset_of on a non-enumeration class",
                 )
             )
+            continue
+
+        elif isinstance(decorator, Serialization):
+            serialization = decorator
+
+        elif isinstance(decorator, Invariant):
+            invariants.append(decorator)
+
+        else:
+            assert_never(decorator)
 
     if len(underlying_errors) > 0:
         return (
