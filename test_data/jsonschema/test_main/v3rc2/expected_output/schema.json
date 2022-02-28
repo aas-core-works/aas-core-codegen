@@ -557,7 +557,7 @@
         },
         {
           "properties": {
-            "translatable": {
+            "value": {
               "$ref": "#/definitions/LangStringSet"
             },
             "valueId": {
@@ -597,7 +597,7 @@
         },
         {
           "properties": {
-            "reference": {
+            "value": {
               "$ref": "#/definitions/Reference_abstract"
             }
           }
@@ -621,7 +621,7 @@
                 }
               ]
             },
-            "content": {
+            "value": {
               "type": "string"
             }
           },

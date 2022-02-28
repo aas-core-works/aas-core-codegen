@@ -5102,7 +5102,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='translatable',
+          name='value',
           type_annotation=OptionalTypeAnnotation(
             value=OurTypeAnnotation(
               symbol='Reference to symbol Lang_string_set',
@@ -5235,7 +5235,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='translatable',
+            name='value',
             type_annotation=OptionalTypeAnnotation(
               value=OurTypeAnnotation(
                 symbol='Reference to symbol Lang_string_set',
@@ -5275,7 +5275,7 @@ SymbolTable(
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
           "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='translatable',\n  argument='translatable',\n  default=None)",
+          "AssignArgument(\n  name='value',\n  argument='value',\n  default=None)",
           "AssignArgument(\n  name='value_ID',\n  argument='value_ID',\n  default=None)"]),
       invariants=[],
       serialization=Serialization(
@@ -5742,7 +5742,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='reference',
+          name='value',
           type_annotation=OptionalTypeAnnotation(
             value=OurTypeAnnotation(
               symbol='Reference to symbol Reference',
@@ -5859,7 +5859,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='reference',
+            name='value',
             type_annotation=OptionalTypeAnnotation(
               value=OurTypeAnnotation(
                 symbol='Reference to symbol Reference',
@@ -5888,7 +5888,7 @@ SymbolTable(
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
           "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='reference',\n  argument='reference',\n  default=None)"]),
+          "AssignArgument(\n  name='value',\n  argument='value',\n  default=None)"]),
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
@@ -6037,7 +6037,7 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Blob',
           parsed=...),
         Property(
-          name='content',
+          name='value',
           type_annotation=OptionalTypeAnnotation(
             value=PrimitiveTypeAnnotation(
               a_type='BYTEARRAY',
@@ -6161,7 +6161,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='content',
+            name='value',
             type_annotation=OptionalTypeAnnotation(
               value=PrimitiveTypeAnnotation(
                 a_type='BYTEARRAY',
@@ -6191,7 +6191,7 @@ SymbolTable(
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
           "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
           "AssignArgument(\n  name='MIME_type',\n  argument='MIME_type',\n  default=None)",
-          "AssignArgument(\n  name='content',\n  argument='content',\n  default=None)"]),
+          "AssignArgument(\n  name='value',\n  argument='value',\n  default=None)"]),
       invariants=[
         Invariant(
           description=None,

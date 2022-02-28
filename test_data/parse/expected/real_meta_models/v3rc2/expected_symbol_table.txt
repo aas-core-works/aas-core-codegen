@@ -3073,7 +3073,7 @@ UnverifiedSymbolTable(
         'Data_element'],
       properties=[
         Property(
-          name='translatable',
+          name='value',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -3229,7 +3229,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='translatable',
+              name='value',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -3506,7 +3506,7 @@ UnverifiedSymbolTable(
         'Data_element'],
       properties=[
         Property(
-          name='reference',
+          name='value',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -3644,7 +3644,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='reference',
+              name='value',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -3696,7 +3696,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='content',
+          name='value',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -3841,7 +3841,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='content',
+              name='value',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
