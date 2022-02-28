@@ -193,6 +193,28 @@ def _argument_reference_role(  # type: ignore
     return [node], []
 
 
+# noinspection PyUnusedLocal
+def _constraint_reference_role(  # type: ignore
+    role, rawtext, text, lineno, inliner, options=None, content=None
+) -> Any:
+    """Create a reference in the documentation to a constraint."""
+    # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
+    if content is None:
+        content = []
+
+    if options is None:
+        options = {}
+
+    docutils.parsers.rst.roles.set_classes(options)
+
+    reference = text
+
+    node = doc.ConstraintReference(
+        reference, rawtext, docutils.utils.unescape(text), refuri=text, **options
+    )
+    return [node], []
+
+
 # pylint: enable=unused-argument
 
 # The global registration is unfortunate since it is unpredictable and might affect
@@ -202,6 +224,9 @@ def _argument_reference_role(  # type: ignore
 docutils.parsers.rst.roles.register_local_role("class", _symbol_reference_role)
 docutils.parsers.rst.roles.register_local_role("attr", _attribute_reference_role)
 docutils.parsers.rst.roles.register_local_role("paramref", _argument_reference_role)
+docutils.parsers.rst.roles.register_local_role(
+    "constraintref", _constraint_reference_role
+)
 
 
 def _parsed_description_to_description(parsed: parse.Description) -> Description:

@@ -43,6 +43,9 @@ class DocutilsElementTransformer(Generic[T], DBC):
         elif isinstance(element, doc.ArgumentReference):
             return self.transform_argument_reference_in_doc(element)
 
+        elif isinstance(element, doc.ConstraintReference):
+            return self.transform_constraint_reference_in_doc(element)
+
         elif isinstance(element, docutils.nodes.literal):
             return self.transform_literal(element)
 
@@ -103,6 +106,14 @@ class DocutilsElementTransformer(Generic[T], DBC):
         self, element: doc.ArgumentReference
     ) -> Tuple[Optional[T], Optional[str]]:
         """Transform an argument reference into something."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_constraint_reference_in_doc(
+        self, element: doc.ConstraintReference
+    ) -> Tuple[Optional[T], Optional[str]]:
+        """Transform a reference to a constraint into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod

@@ -1127,9 +1127,9 @@ class Multi_language_property(Data_element):
     ConceptDescription then DataSpecificationIEC61360/dataType shall be
     STRING_TRANSLATABLE.
 
-    See Constraint AASd-065
+    See :constraintref:`AASd-065`
 
-    See Constraint AASd-066
+    See :constraintref:`AASd-066`
     """
 
     value: Optional["Lang_string_set"]
@@ -1365,7 +1365,7 @@ class File(Data_element):
     A File is a data element that represents an address to a file.
     The value is an URI that can represent an absolute or relative path.
 
-    See Constraint AASd-057
+    See :constraintref:`AASd-057`
 
     Constraint AASd-079: If the semanticId of a File references a
     ConceptDescription then DataSpecificationIEC61360/dataType shall be one of: FILE.
@@ -1420,7 +1420,7 @@ class Annotated_relationship_element(Relationship_element):
     An annotated relationship element is a relationship element that can be annotated
     with additional data elements.
 
-    See Constraint AASd-055
+    See :constraintref:`AASd-055`
     """
 
     annotation: List[Data_element]
@@ -1534,7 +1534,7 @@ class Entity(Submodel_element):
     Reference to an identifier key value pair representing a specific identifier
     of the asset represented by the asset administration shell.
 
-    See Constraint AASd-014
+    See :constraintref:`AASd-014`
     """
 
     def __init__(
@@ -2605,7 +2605,7 @@ class Data_specification_IEC61360(Data_specification_content):
     """
     List of allowed values
 
-    See Constraint AASd-102
+    See :constraintref:`AASd-102`
     """
 
     value: Optional[Non_empty_string]
@@ -2624,7 +2624,7 @@ class Data_specification_IEC61360(Data_specification_content):
     """
     Unique value id
 
-    See Constraint AASd-102
+    See :constraintref:`AASd-102`
     """
 
     level_type: Optional["Level_type"]
