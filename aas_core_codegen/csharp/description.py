@@ -114,6 +114,11 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
         arg_name = csharp_naming.argument_name(Identifier(element.reference))
         return f"<paramref name={xml.sax.saxutils.quoteattr(arg_name)} />", None
 
+    def transform_constraint_reference_in_doc(
+        self, element: intermediate_doc.ConstraintReference
+    ) -> Tuple[Optional[str], Optional[str]]:
+        return f"Constraint {element.reference}", None
+
     def transform_literal(
         self, element: docutils.nodes.literal
     ) -> Tuple[Optional[str], Optional[str]]:

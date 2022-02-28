@@ -102,3 +102,23 @@ class ArgumentReference(
         docutils.nodes.TextElement.__init__(
             self, rawsource, text, *children, **attributes
         )
+
+
+class ConstraintReference(
+    docutils.nodes.Inline, docutils.nodes.TextElement  # type: ignore
+):
+    """Represent a reference in the documentation to a constraint."""
+
+    def __init__(  # type: ignore
+        self,
+        reference: str,
+        rawsource="",
+        text="",
+        *children,
+        **attributes,
+    ) -> None:
+        """Initialize with ``reference`` and propagate the rest to the parent."""
+        self.reference = reference
+        docutils.nodes.TextElement.__init__(
+            self, rawsource, text, *children, **attributes
+        )

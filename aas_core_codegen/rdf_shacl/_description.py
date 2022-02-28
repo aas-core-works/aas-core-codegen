@@ -147,6 +147,11 @@ class Renderer(intermediate_rendering.DocutilsElementTransformer[List["TokenUnio
         # return them as-is.
         return [TokenText(element.reference)], None
 
+    def transform_constraint_reference_in_doc(
+        self, element: intermediate_doc.ConstraintReference
+    ) -> Tuple[Optional[List["TokenUnion"]], Optional[str]]:
+        return [TokenText(f"Constraint {element.reference}")], None
+
     def transform_literal(
         self, element: docutils.nodes.literal
     ) -> Tuple[Optional[List["TokenUnion"]], Optional[str]]:

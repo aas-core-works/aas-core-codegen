@@ -106,6 +106,44 @@ class Test_parsing_docstrings(unittest.TestCase):
         self.assertEqual(1, len(symbol_references))
         self.assertIsInstance(symbol_references[0].symbol, intermediate.Class)
 
+    def test_constraint_reference(self) -> None:
+        source = textwrap.dedent(
+            '''\
+            class Some_class:
+                """
+                This is some documentation.
+
+                Constraint AAS-001: some constraint
+
+                See :constraintref:`AAS-001`.
+                """
+
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            '''
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+
+        assert symbol_table is not None
+
+        some_class = symbol_table.must_find(Identifier("Some_class"))
+        assert isinstance(some_class, intermediate.Class)
+
+        assert some_class.description is not None
+
+        constraint_references = list(
+            some_class.description.document.findall(
+                condition=intermediate_doc.ConstraintReference
+            )
+        )
+
+        self.assertEqual(1, len(constraint_references))
+        self.assertEqual("AAS-001", constraint_references[0].reference)
+
 
 class Test_against_recorded(unittest.TestCase):
     # Set this variable to True if you want to re-record the test data,
