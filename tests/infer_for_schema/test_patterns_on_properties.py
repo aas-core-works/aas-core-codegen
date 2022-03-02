@@ -6,12 +6,15 @@ from typing import MutableMapping, List
 
 import tests.common
 from aas_core_codegen import intermediate, infer_for_schema
+from aas_core_codegen.infer_for_schema import _pattern as infer_for_schema_pattern
 from aas_core_codegen.common import Identifier
 
 
 def infer_patterns_by_properties_of_class_something(
     source: str,
-) -> MutableMapping[intermediate.Property, List[infer_for_schema.PatternConstraint]]:
+) -> MutableMapping[
+    intermediate.Property, List[infer_for_schema_pattern.PatternConstraint]
+]:
     """Translate the ``source`` into inferred constraints of the class ``Something``."""
     symbol_table, error = tests.common.translate_source_to_intermediate(source=source)
     assert error is None, tests.common.most_underlying_messages(error)
@@ -19,11 +22,13 @@ def infer_patterns_by_properties_of_class_something(
     symbol = symbol_table.must_find(Identifier("Something"))
     assert isinstance(symbol, intermediate.Class)
 
-    pattern_verifications_by_name = infer_for_schema.map_pattern_verifications_by_name(
-        verifications=symbol_table.verification_functions
+    pattern_verifications_by_name = (
+        infer_for_schema_pattern.map_pattern_verifications_by_name(
+            verifications=symbol_table.verification_functions
+        )
     )
 
-    return infer_for_schema.infer_patterns_by_class_properties(
+    return infer_for_schema_pattern.patterns_from_invariants(
         cls=symbol, pattern_verifications_by_name=pattern_verifications_by_name
     )
 

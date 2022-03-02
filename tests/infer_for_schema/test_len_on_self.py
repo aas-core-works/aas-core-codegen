@@ -8,13 +8,14 @@ from icontract import ensure
 
 import tests.common
 from aas_core_codegen import intermediate, infer_for_schema
+from aas_core_codegen.infer_for_schema import _len as infer_for_schema_len
 from aas_core_codegen.common import Identifier, Error
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def infer_constraints_on_self_of_class_something(
     source: str,
-) -> Tuple[Optional[infer_for_schema.LenConstraint], Optional[List[Error]]]:
+) -> Tuple[Optional[infer_for_schema_len.LenConstraint], Optional[List[Error]]]:
     """Translate the ``source`` into inferred constraints on the class ``Something``."""
     symbol_table, error = tests.common.translate_source_to_intermediate(source=source)
     assert error is None, tests.common.most_underlying_messages(error)
@@ -22,7 +23,9 @@ def infer_constraints_on_self_of_class_something(
     symbol = symbol_table.must_find(Identifier("Something"))
     assert isinstance(symbol, intermediate.ConstrainedPrimitive)
 
-    result = infer_for_schema.infer_len_constraint_of_self(constrained_primitive=symbol)
+    result = infer_for_schema_len.infer_len_constraint_of_self(
+        constrained_primitive=symbol
+    )
 
     return result
 

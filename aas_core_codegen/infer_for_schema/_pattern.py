@@ -112,7 +112,7 @@ def _match_constraint_on_property(
     )
 
 
-def infer_patterns_by_class_properties(
+def patterns_from_invariants(
     cls: intermediate.Class,
     pattern_verifications_by_name: PatternVerificationsByName,
 ) -> MutableMapping[intermediate.Property, List[PatternConstraint]]:

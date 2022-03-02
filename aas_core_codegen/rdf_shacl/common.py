@@ -1,16 +1,15 @@
 """Provide common functions for both RDF and SHACL generators."""
-from typing import MutableMapping, Tuple, Optional, List, Union
+from typing import MutableMapping, Tuple, Optional, List
 
 from icontract import ensure
 
 from aas_core_codegen import intermediate, specific_implementations
-from aas_core_codegen.rdf_shacl import naming as rdf_shacl_naming
 from aas_core_codegen.common import (
     Stripped,
     Error,
-    assert_union_without_excluded,
     assert_never,
 )
+from aas_core_codegen.rdf_shacl import naming as rdf_shacl_naming
 
 INDENT = "    "
 INDENT2 = INDENT * 2
@@ -127,28 +126,3 @@ PRIMITIVE_MAP = {
     intermediate.PrimitiveType.BYTEARRAY: "xsd:byte",
 }
 assert all(literal in PRIMITIVE_MAP for literal in intermediate.PrimitiveType)
-
-TypeAnnotationExceptOptional = Union[
-    intermediate.PrimitiveTypeAnnotation,
-    intermediate.OurTypeAnnotation,
-    intermediate.ListTypeAnnotation,
-]
-
-assert_union_without_excluded(
-    original_union=intermediate.TypeAnnotationUnion,
-    subset_union=TypeAnnotationExceptOptional,
-    excluded=[intermediate.OptionalTypeAnnotation],
-)
-
-
-def beneath_optional(
-    type_annotation: intermediate.TypeAnnotationUnion,
-) -> TypeAnnotationExceptOptional:
-    """Descend below ``Optional[...]`` to the underlying type."""
-    type_anno = type_annotation
-    while isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-        type_anno = type_anno.value
-
-    assert not isinstance(type_anno, intermediate.OptionalTypeAnnotation)
-
-    return type_anno

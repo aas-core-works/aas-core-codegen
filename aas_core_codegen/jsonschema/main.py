@@ -123,50 +123,20 @@ def _define_type(
             )
 
         elif isinstance(type_annotation.symbol, intermediate.ConstrainedPrimitive):
-            type_definition = collections.OrderedDict(
-                [("$ref", f"#/definitions/{model_type}")]
+            # NOTE (mristin, 2022-02-11):
+            # We in-line the constraints from the constrained primitives directly
+            # in the properties. We do not want to introduce separate definitions
+            # for them as that would make it more difficult for downstream code
+            # generators to generate meaningful code (*e.g.*, code generators for
+            # OpenAPI3).
+
+            type_definition = _define_primitive_type(
+                primitive_type=type_annotation.symbol.constrainee,
+                len_constraint=len_constraint,
+                pattern_constraints=pattern_constraints,
             )
 
-            all_of = [type_definition]  # type: List[MutableMapping[str, Any]]
-
-            constraints = collections.OrderedDict()  # type: MutableMapping[str, Any]
-            if (
-                type_annotation.symbol.constrainee
-                in (
-                    intermediate.PrimitiveType.STR,
-                    intermediate.PrimitiveType.BYTEARRAY,
-                )
-                and len_constraint is not None
-            ):
-                if len_constraint.min_value is not None:
-                    constraints["minLength"] = len_constraint.min_value
-
-                if len_constraint.max_value is not None:
-                    constraints["maxLength"] = len_constraint.max_value
-
-            if len(constraints) > 0:
-                all_of.append(constraints)
-
-            if (
-                type_annotation.symbol.constrainee is intermediate.PrimitiveType.STR
-                and pattern_constraints is not None
-                and len(pattern_constraints) > 0
-            ):
-                for pattern_constraint in pattern_constraints:
-                    all_of.append(
-                        collections.OrderedDict(
-                            [("pattern", pattern_constraint.pattern)]
-                        )
-                    )
-
-            assert (
-                len(all_of) >= 1
-            ), "Expected at least the reference to constrained primitive"
-
-            if len(all_of) == 1:
-                return all_of[0], None
-            else:
-                return collections.OrderedDict([("allOf", all_of)]), None
+            return type_definition, None
 
         elif isinstance(type_annotation.symbol, intermediate.Class):
             if type_annotation.symbol.interface is not None:
@@ -245,71 +215,6 @@ def _define_type(
         )
 
 
-def _define_for_constrained_primitive(
-    constrained_primitive: intermediate.ConstrainedPrimitive,
-    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
-) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
-    """
-    Generate the JSON definitions based on the ``constrained_primitive``.
-
-    The list of definitions is to be *extended* with the resulting mapping.
-    """
-    all_of = []  # type: List[MutableMapping[str, Any]]
-
-    # region Inheritance
-
-    for inheritance in constrained_primitive.inheritances:
-        all_of.append(
-            {"$ref": f"#/definitions/{naming.json_model_type(inheritance.name)}"}
-        )
-
-    # endregion
-
-    # region Constraints
-
-    errors = []  # type: List[Error]
-
-    (
-        len_constraint,
-        len_constraint_errors,
-    ) = infer_for_schema.infer_len_constraint_of_self(
-        constrained_primitive=constrained_primitive
-    )
-
-    if len_constraint_errors is not None:
-        errors.extend(len_constraint_errors)
-
-    if len(errors) > 0:
-        return None, errors
-
-    assert len_constraint is not None
-
-    pattern_constraints = infer_for_schema.infer_patterns_on_self(
-        constrained_primitive=constrained_primitive,
-        pattern_verifications_by_name=pattern_verifications_by_name,
-    )
-
-    type_definition = _define_primitive_type(
-        primitive_type=constrained_primitive.constrainee,
-        len_constraint=len_constraint,
-        pattern_constraints=pattern_constraints,
-    )
-
-    all_of.append(type_definition)
-
-    # endregion
-
-    model_type = naming.json_model_type(constrained_primitive.name)
-
-    result = collections.OrderedDict()  # type: MutableMapping[str, Any]
-    assert (
-        len(all_of) >= 1
-    ), "At least the type definition for the primitive type expected"
-    result[model_type] = {"allOf": all_of} if len(all_of) > 1 else all_of[0]
-
-    return result, None
-
-
 # fmt: off
 @ensure(
     lambda result:
@@ -318,7 +223,7 @@ def _define_for_constrained_primitive(
 # fmt: on
 def _define_properties_and_required(
     cls: intermediate.Class,
-    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
+    constraints_by_property: infer_for_schema.ConstraintsByProperty,
 ) -> Tuple[
     Optional[MutableMapping[str, Any]],
     Optional[List[Identifier]],
@@ -326,25 +231,6 @@ def _define_properties_and_required(
 ]:
     """Define the ``properties`` and ``required`` part for the given class ``cls``."""
     errors = []  # type: List[Error]
-
-    (
-        len_constraints_by_property,
-        len_constraints_errors,
-    ) = infer_for_schema.infer_len_constraints_by_class_properties(cls=cls)
-
-    if len_constraints_errors is not None:
-        errors.extend(len_constraints_errors)
-
-    if len(errors) > 0:
-        return None, None, errors
-
-    assert len_constraints_by_property is not None
-
-    pattern_constraints_by_property = (
-        infer_for_schema.infer_patterns_by_class_properties(
-            cls=cls, pattern_verifications_by_name=pattern_verifications_by_name
-        )
-    )
 
     properties = collections.OrderedDict()  # type: MutableMapping[str, Any]
     required = []  # type: List[Identifier]
@@ -355,8 +241,13 @@ def _define_properties_and_required(
 
         prop_name = naming.json_property(prop.name)
 
-        len_constraint = len_constraints_by_property.get(prop, None)
-        pattern_constraints = pattern_constraints_by_property.get(prop, None)
+        len_constraint = constraints_by_property.len_constraints_by_property.get(
+            prop, None
+        )
+
+        pattern_constraints = constraints_by_property.patterns_by_property.get(
+            prop, None
+        )
 
         # noinspection PyUnusedLocal
         type_anno = None  # type: Optional[intermediate.TypeAnnotation]
@@ -394,9 +285,9 @@ def _define_properties_and_required(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_for_class(
-    cls: intermediate.Class,
+    cls: intermediate.ClassUnion,
     ids_of_classes_in_properties: Set[int],
-    pattern_verifications_by_name: infer_for_schema.PatternVerificationsByName,
+    constraints_by_property: infer_for_schema.ConstraintsByProperty,
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
     Generate the JSON definitions based on the class ``cls``.
@@ -420,7 +311,7 @@ def _define_for_class(
 
     properties, required, properties_error = _define_properties_and_required(
         cls=cls,
-        pattern_verifications_by_name=pattern_verifications_by_name,
+        constraints_by_property=constraints_by_property,
     )
 
     if properties_error is not None:
@@ -522,9 +413,17 @@ def _generate(
 
     definitions = collections.OrderedDict()
 
-    pattern_verifications_by_name = infer_for_schema.map_pattern_verifications_by_name(
-        verifications=symbol_table.verification_functions
+    constraints_by_class, some_errors = infer_for_schema.infer_constraints_by_class(
+        symbol_table=symbol_table
     )
+
+    if some_errors is not None:
+        errors.extend(some_errors)
+
+    if len(errors) > 0:
+        return None, errors
+
+    assert constraints_by_class is not None
 
     ids_of_symbols_in_properties = intermediate.collect_ids_of_symbols_in_properties(
         symbol_table=symbol_table
@@ -581,23 +480,22 @@ def _generate(
                 extension = _define_for_enumeration(enumeration=symbol)
 
             elif isinstance(symbol, intermediate.ConstrainedPrimitive):
-                if id(symbol) not in ids_of_symbols_in_properties:
-                    continue
+                # NOTE (mristin, 2022-02-11):
+                # We in-line the constraints from the constrained primitives directly
+                # in the properties. We do not want to introduce separate definitions
+                # for them as that would make it more difficult for downstream code
+                # generators to generate meaningful code (*e.g.*, code generators for
+                # OpenAPI3).
 
-                extension, definition_errors = _define_for_constrained_primitive(
-                    constrained_primitive=symbol,
-                    pattern_verifications_by_name=pattern_verifications_by_name,
-                )
+                continue
 
-                if definition_errors is not None:
-                    errors.extend(definition_errors)
-                    continue
-
-            elif isinstance(symbol, intermediate.Class):
+            elif isinstance(
+                symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            ):
                 extension, definition_errors = _define_for_class(
                     cls=symbol,
                     ids_of_classes_in_properties=ids_of_symbols_in_properties,
-                    pattern_verifications_by_name=pattern_verifications_by_name,
+                    constraints_by_property=constraints_by_class[symbol],
                 )
 
                 if definition_errors is not None:

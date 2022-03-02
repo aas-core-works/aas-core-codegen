@@ -9,21 +9,6 @@
     }
   ],
   "definitions": {
-    "NonEmptyString": {
-      "type": "string",
-      "minLength": 1
-    },
-    "MimeTyped": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/NonEmptyString"
-        },
-        {
-          "type": "string",
-          "pattern": "([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+|\"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*\"))*"
-        }
-      ]
-    },
     "HasSemantics": {
       "type": "object",
       "properties": {
@@ -40,7 +25,8 @@
         {
           "properties": {
             "name": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "valueType": {
               "$ref": "#/definitions/DataTypeDef"
@@ -77,20 +63,16 @@
         {
           "properties": {
             "idShort": {
-              "allOf": [
-                {
-                  "$ref": "#/definitions/NonEmptyString"
-                },
-                {
-                  "pattern": "^[a-zA-Z][a-zA-Z_0-9]*$"
-                }
-              ]
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-zA-Z][a-zA-Z_0-9]*$"
             },
             "displayName": {
               "$ref": "#/definitions/LangStringSet"
             },
             "category": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "description": {
               "$ref": "#/definitions/LangStringSet"
@@ -133,7 +115,8 @@
           "$ref": "#/definitions/IdentifierType"
         },
         "id": {
-          "$ref": "#/definitions/NonEmptyString"
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": [
@@ -183,10 +166,12 @@
         {
           "properties": {
             "version": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "revision": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             }
           }
         }
@@ -235,7 +220,8 @@
         {
           "properties": {
             "type": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "valueType": {
               "$ref": "#/definitions/DataTypeDef"
@@ -363,10 +349,12 @@
         {
           "properties": {
             "key": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "value": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "externalSubjectId": {
               "$ref": "#/definitions/Reference"
@@ -603,7 +591,9 @@
         {
           "properties": {
             "mimeType": {
-              "$ref": "#/definitions/MimeTyped"
+              "type": "string",
+              "minLength": 1,
+              "pattern": "([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+|\"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*\"))*"
             },
             "value": {
               "type": "string"
@@ -623,7 +613,9 @@
         {
           "properties": {
             "mimeType": {
-              "$ref": "#/definitions/MimeTyped"
+              "type": "string",
+              "minLength": 1,
+              "pattern": "([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+|\"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*\"))*"
             },
             "value": {
               "type": "string"
@@ -816,7 +808,8 @@
           "$ref": "#/definitions/KeyElements"
         },
         "value": {
-          "$ref": "#/definitions/NonEmptyString"
+          "type": "string",
+          "minLength": 1
         },
         "idType": {
           "$ref": "#/definitions/KeyType"
@@ -1015,16 +1008,19 @@
               "$ref": "#/definitions/LangStringSet"
             },
             "unit": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "unitId": {
               "$ref": "#/definitions/Reference"
             },
             "sourceOfDefinition": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "symbol": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "dataType": {
               "$ref": "#/definitions/DataTypeIEC61360"
@@ -1033,7 +1029,8 @@
               "$ref": "#/definitions/LangStringSet"
             },
             "valueFormat": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "valueList": {
               "$ref": "#/definitions/ValueList"
@@ -1059,40 +1056,51 @@
         {
           "properties": {
             "unitName": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "unitSymbol": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "definition": {
               "$ref": "#/definitions/LangStringSet"
             },
             "siNotation": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "dinNotation": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "eceName": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "eceCode": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "nistName": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "sourceOfDefinition": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "conversionFactor": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "registrationAuthorityId": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             },
             "supplier": {
-              "$ref": "#/definitions/NonEmptyString"
+              "type": "string",
+              "minLength": 1
             }
           }
         }
