@@ -2419,6 +2419,7 @@ class Value_reference_pair(DBC):
         self.value_ID = value_ID
 
 
+@invariant(lambda self: len(self.value_reference_pair_types) >= 1)
 @reference_in_the_book(
     section=(4, 8, 2),
     index=1,

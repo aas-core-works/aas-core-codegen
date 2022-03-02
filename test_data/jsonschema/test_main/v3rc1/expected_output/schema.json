@@ -993,7 +993,8 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/ValueReferencePair"
-          }
+          },
+          "minItems": 1
         }
       },
       "required": [
