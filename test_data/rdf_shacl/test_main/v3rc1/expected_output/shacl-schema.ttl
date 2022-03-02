@@ -1978,7 +1978,7 @@ aas:ValueListShape  a sh:NodeShape ;
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC01/ValueList/valueReferencePairTypes> ;
         sh:class aas:ValueReferencePair ;
-        sh:minCount 0 ;
+        sh:minCount 1 ;
     ] ;
 .
 
