@@ -329,7 +329,10 @@
           "$ref": "#/definitions/Reference"
         },
         "specificAssetIds": {
-          "$ref": "#/definitions/IdentifierKeyValuePair"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IdentifierKeyValuePair"
+          }
         },
         "billOfMaterial": {
           "type": "array",
@@ -363,14 +366,16 @@
               "$ref": "#/definitions/NonEmptyString"
             },
             "value": {
-              "type": "string"
+              "$ref": "#/definitions/NonEmptyString"
             },
             "externalSubjectId": {
               "$ref": "#/definitions/Reference"
             }
           },
           "required": [
-            "key"
+            "key",
+            "value",
+            "externalSubjectId"
           ]
         }
       ]
@@ -430,9 +435,6 @@
         },
         {
           "$ref": "#/definitions/AnnotatedRelationshipElement"
-        },
-        {
-          "$ref": "#/definitions/Event"
         },
         {
           "$ref": "#/definitions/BasicEvent"
@@ -814,7 +816,7 @@
           "$ref": "#/definitions/KeyElements"
         },
         "value": {
-          "type": "string"
+          "$ref": "#/definitions/NonEmptyString"
         },
         "idType": {
           "$ref": "#/definitions/KeyType"
@@ -993,7 +995,10 @@
             "$ref": "#/definitions/ValueReferencePair"
           }
         }
-      }
+      },
+      "required": [
+        "valueReferencePairTypes"
+      ]
     },
     "DataSpecificationIEC61360": {
       "allOf": [
@@ -1262,7 +1267,6 @@
       },
       "required": [
         "defaultSubjectAttributes",
-        "selectablePermissions",
         "defaultPermissions"
       ]
     },
@@ -1297,7 +1301,7 @@
         "externalInformationPoints"
       ]
     },
-    "PolicyEnforcementPoint": {
+    "PolicyEnforcementPoints": {
       "type": "object",
       "properties": {
         "externalPolicyEnforcementPoint": {
@@ -1328,8 +1332,8 @@
         "policyDecisionPoint": {
           "$ref": "#/definitions/PolicyDecisionPoint"
         },
-        "policyEnforcementPoint": {
-          "$ref": "#/definitions/PolicyEnforcementPoint"
+        "policyEnforcementPoints": {
+          "$ref": "#/definitions/PolicyEnforcementPoints"
         },
         "policyInformationPoints": {
           "$ref": "#/definitions/PolicyInformationPoints"
@@ -1338,7 +1342,7 @@
       "required": [
         "policyAdministrationPoint",
         "policyDecisionPoint",
-        "policyEnforcementPoint"
+        "policyEnforcementPoints"
       ]
     },
     "Security": {
@@ -1429,7 +1433,6 @@
         "File",
         "AnnotatedRelationshipElement",
         "Entity",
-        "Event",
         "BasicEvent",
         "Operation",
         "Capability",

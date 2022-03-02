@@ -100,11 +100,11 @@ aas:AccessControlPolicyPoints rdf:type owl:Class ;
     rdfs:comment "The access control policy decision point of the AAS."@en ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoint
-<https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoint> rdf:type owl:ObjectProperty ;
-    rdfs:label "has policy enforcement point"^^xsd:string ;
+###  https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoints
+<https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoints> rdf:type owl:ObjectProperty ;
+    rdfs:label "has policy enforcement points"^^xsd:string ;
     rdfs:domain aas:AccessControlPolicyPoints ;
-    rdfs:range aas:PolicyEnforcementPoint ;
+    rdfs:range aas:PolicyEnforcementPoints ;
     rdfs:comment "The access control policy enforcement point of the AAS."@en ;
 .
 
@@ -1900,16 +1900,16 @@ aas:PolicyDecisionPoint rdf:type owl:Class ;
     rdfs:comment "If externalPolicyDecisionPoints True then Endpoints to external available decision points taking into consideration for access control for the AAS need to be configured."@en ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoint
-aas:PolicyEnforcementPoint rdf:type owl:Class ;
-    rdfs:label "Policy Enforcement Point"^^xsd:string ;
+###  https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoints
+aas:PolicyEnforcementPoints rdf:type owl:Class ;
+    rdfs:label "Policy Enforcement Points"^^xsd:string ;
     rdfs:comment "Defines the security policy enforcement points (PEP)."@en ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoint/externalPolicyEnforcementPoint
-<https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoint/externalPolicyEnforcementPoint> rdf:type owl:DatatypeProperty ;
+###  https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoints/externalPolicyEnforcementPoint
+<https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoints/externalPolicyEnforcementPoint> rdf:type owl:DatatypeProperty ;
     rdfs:label "has external policy enforcement point"^^xsd:string ;
-    rdfs:domain aas:PolicyEnforcementPoint ;
+    rdfs:domain aas:PolicyEnforcementPoints ;
     rdfs:range xsd:boolean ;
     rdfs:comment "If externalPolicyEnforcementPoint True then an Endpoint to external available enforcement point taking needs to be configured for the AAS."@en ;
 .

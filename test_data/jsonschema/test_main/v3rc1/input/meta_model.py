@@ -16,8 +16,12 @@ from aas_core_meta.marker import (
 
 # region Book
 
-__book_url__ = "https://www.plattform-i40.de/IP/Redaktion/DE/Downloads/Publikation/Details_of_the_Asset_Administration_Shell_Part1_V3.pdf?__blob=publicationFile&v=5"
-__book_version__ = "V3.0RC1"
+__book_url__ = (
+    "https://www.plattform-i40.de/IP/Redaktion/DE/Downloads/Publikation"
+    "/Details_of_the_Asset_Administration_Shell_Part1_V3.pdf?__blob"
+    "=publicationFile&v=5"
+)
+__book_version__ = "V3.0RC01"
 
 
 # endregion
@@ -178,7 +182,9 @@ class MIME_typed(Non_empty_string, DBC):
 
 
 @abstract
-@reference_in_the_book(section=(4, 7, 2, 7))
+@reference_in_the_book(
+    section=(4, 7, 2, 7), fragment="4.7.2.1 Extensions (HasExtensions)"
+)
 class Has_semantics(DBC):
     """
     Element that can have a semantic definition.
@@ -242,7 +248,10 @@ class Extension(Has_semantics):
 
 
 @abstract
-@reference_in_the_book(section=(4, 7, 2, 1))
+@reference_in_the_book(
+    section=(4, 7, 2, 1),
+    fragment="4.7.2.7 Semantic References Attributes (HasSemantics))",
+)
 class Has_extensions(DBC):
     """
     Element that can be extended by proprietary extensions.
@@ -471,7 +480,11 @@ class Modeling_kind(Enum):
 
 
 @abstract
-@reference_in_the_book(section=(4, 7, 2, 5), index=0)
+@reference_in_the_book(
+    section=(4, 7, 2, 5),
+    index=0,
+    fragment=("4.7.2.5 Template or Instance of Model " "Element Attributes (HasKind)"),
+)
 class Has_kind(DBC):
     """
     An element with a kind is an element that can either represent a template or an
@@ -495,7 +508,13 @@ class Has_kind(DBC):
 
 
 @abstract
-@reference_in_the_book(section=(4, 7, 2, 13))
+@reference_in_the_book(
+    section=(4, 7, 2, 13),
+    fragment=(
+        "4.7.2.13 Used Templates for Data Specification Attributes "
+        "(HasDataSpecification)"
+    ),
+)
 class Has_data_specification(DBC):
     """
     Element that can be extended by using data specification templates.
@@ -789,7 +808,7 @@ class Asset_information(DBC):
     modelled via :attr:`~specific_asset_IDs`.
     """
 
-    specific_asset_IDs: Optional["Identifier_key_value_pair"]
+    specific_asset_IDs: Optional[List["Identifier_key_value_pair"]]
     """
     Additional domain-specific, typically proprietary, Identifier for the asset.
 
@@ -816,7 +835,7 @@ class Asset_information(DBC):
         self,
         asset_kind: "Asset_kind",
         global_asset_ID: Optional["Reference"] = None,
-        specific_asset_IDs: Optional["Identifier_key_value_pair"] = None,
+        specific_asset_IDs: Optional[List["Identifier_key_value_pair"]] = None,
         bill_of_material: Optional[List["Reference"]] = None,
         default_thumbnail: Optional["File"] = None,
     ) -> None:
@@ -871,17 +890,17 @@ class Identifier_key_value_pair(Has_semantics):
     key: Non_empty_string
     """Key of the identifier"""
 
-    value: Optional[str]
+    value: "Non_empty_string"
     """The value of the identifier with the corresponding key."""
 
-    external_subject_ID: Optional["Reference"]
+    external_subject_ID: "Reference"
     """The (external) subject the key belongs to or has meaning to."""
 
     def __init__(
         self,
         key: Non_empty_string,
-        value: Optional[str] = None,
-        external_subject_ID: Optional["Reference"] = None,
+        value: Non_empty_string,
+        external_subject_ID: "Reference",
         semantic_ID: Optional["Reference"] = None,
     ) -> None:
         Has_semantics.__init__(self, semantic_ID)
@@ -1707,6 +1726,7 @@ class Entity(Submodel_element):
         self.specific_asset_ID = specific_asset_ID
 
 
+@abstract
 @reference_in_the_book(section=(4, 7, 8, 7))
 class Event(Submodel_element):
     """
@@ -1990,7 +2010,10 @@ class View(Referable, Has_semantics, Has_data_specification):
 
 
 @invariant(lambda self: len(self.keys) >= 1)
-@reference_in_the_book(section=(4, 7, 11))
+@reference_in_the_book(
+    section=(4, 7, 11),
+    fragment="4.7.11 Referencing in Asset Administration Shells",
+)
 class Reference(DBC):
     """
     Reference to either a model element of the same or another AAs or to an external
@@ -2029,7 +2052,9 @@ class Reference(DBC):
     or (self.ID_type != Key_type.ID_short and self.ID_type != Key_type.Fragment_ID),
     "Constraint AASd-081"
 )
-@reference_in_the_book(section=(4, 7, 11), index=1)
+@reference_in_the_book(
+    section=(4, 7, 11), index=1,
+    fragment="4.7.11 Referencing in Asset Administration Shells")
 # fmt: on
 class Key(DBC):
     """A key is a reference to an element by its id."""
@@ -2049,7 +2074,7 @@ class Key(DBC):
     The name of the model element is explicitly listed.
     """
 
-    value: str
+    value: Non_empty_string
     """The key value, for example an IRDI if the :attr:`~ID_type` is IRDI."""
 
     ID_type: "Key_type"
@@ -2063,13 +2088,19 @@ class Key(DBC):
     not be any LocalKeyType (IdShort, FragmentId).
     """
 
-    def __init__(self, type: "Key_elements", value: str, ID_type: "Key_type") -> None:
+    def __init__(
+        self, type: "Key_elements", value: Non_empty_string, ID_type: "Key_type"
+    ) -> None:
         self.type = type
         self.value = value
         self.ID_type = ID_type
 
 
-@reference_in_the_book(section=(4, 7, 11), index=4)
+@reference_in_the_book(
+    section=(4, 7, 11),
+    index=4,
+    fragment="4.7.11 Referencing in Asset Administration Shells",
+)
 class Identifiable_elements(Enum):
     """Enumeration of all identifiable elements within an asset administration shell."""
 
@@ -2079,7 +2110,11 @@ class Identifiable_elements(Enum):
     Submodel = "Submodel"
 
 
-@reference_in_the_book(section=(4, 7, 11), index=3)
+@reference_in_the_book(
+    section=(4, 7, 11),
+    index=3,
+    fragment="4.7.11 Referencing in Asset Administration Shells",
+)
 @is_superset_of(enums=[Identifiable_elements])
 class Referable_elements(Enum):
     """Enumeration of all referable elements within an asset administration shell"""
@@ -2136,7 +2171,11 @@ class Referable_elements(Enum):
     View = "View"
 
 
-@reference_in_the_book(section=(4, 7, 11), index=2)
+@reference_in_the_book(
+    section=(4, 7, 11),
+    index=2,
+    fragment="4.7.11 Referencing in Asset Administration Shells",
+)
 @is_superset_of(enums=[Referable_elements])
 class Key_elements(Enum):
     """Enumeration of different key value types within a key."""
@@ -2207,7 +2246,11 @@ class Key_elements(Enum):
     View = "View"
 
 
-@reference_in_the_book(section=(4, 7, 11), index=6)
+@reference_in_the_book(
+    section=(4, 7, 11),
+    index=6,
+    fragment="4.7.11 Referencing in Asset Administration Shells",
+)
 class Local_key_type(Enum):
     """Enumeration of different key value types within a key."""
 
@@ -2218,7 +2261,11 @@ class Local_key_type(Enum):
     """Identifier of a fragment within a file"""
 
 
-@reference_in_the_book(section=(4, 7, 11), index=5)
+@reference_in_the_book(
+    section=(4, 7, 11),
+    index=5,
+    fragment="4.7.11 Referencing in Asset Administration Shells",
+)
 @is_superset_of(enums=[Local_key_type, Identifier_type])
 class Key_type(Enum):
     """Enumeration of different key value types within a key."""
@@ -2242,7 +2289,7 @@ class Key_type(Enum):
     """Custom identifiers like GUIDs (globally unique identifiers)"""
 
 
-@reference_in_the_book(section=(4, 7, 13, 2))
+@reference_in_the_book(section=(4, 7, 13, 2), fragment="4.7.13.2 Data Types")
 class Data_type_def(Enum):
     Any_URI = "anyUri"
     Base64_binary = "base64Binary"
@@ -2291,7 +2338,7 @@ class Data_type_def(Enum):
 
 
 @implementation_specific
-@reference_in_the_book(section=(4, 7, 13, 2), index=2)
+@reference_in_the_book(section=(4, 7, 13, 2), index=2, fragment="4.7.13.2 Data Types")
 class Lang_string_set(DBC):
     """
     A set of strings, each annotated by the language of the string.
@@ -2301,14 +2348,21 @@ class Lang_string_set(DBC):
 
 
 @abstract
-@reference_in_the_book(section=(4, 8, 1))
+@reference_in_the_book(
+    section=(4, 8, 1),
+    fragment="4.8.1 Concept of Data Specification Templates",
+)
 class Data_specification_content(DBC):
     # No table for class in the book
     # to be implemented
     pass
 
 
-@reference_in_the_book(section=(4, 8, 2), index=3)
+@reference_in_the_book(
+    section=(4, 8, 2),
+    index=3,
+    fragment=("4.8.2 Predefined Templates for Property and Value Descriptions"),
+)
 class Data_type_IEC_61360(Enum):
     Date = "DATE"
     String = "STRING"
@@ -2327,7 +2381,11 @@ class Data_type_IEC_61360(Enum):
     Timestamp = "TIMESTAMP"
 
 
-@reference_in_the_book(section=(4, 8, 2), index=4)
+@reference_in_the_book(
+    section=(4, 8, 2),
+    index=4,
+    fragment=("4.8.2 Predefined Templates for Property and Value Descriptions"),
+)
 class Level_type(Enum):
     Min = "Min"
     Max = "Max"
@@ -2335,7 +2393,11 @@ class Level_type(Enum):
     Typ = "Typ"
 
 
-@reference_in_the_book(section=(4, 7, 8, 2), index=2)
+@reference_in_the_book(
+    section=(4, 8, 2),
+    index=2,
+    fragment=("4.8.2 Predefined Templates for Property and Value Descriptions"),
+)
 class Value_reference_pair(DBC):
     """
     A value reference pair within a value list. Each value has a global unique id
@@ -2357,24 +2419,31 @@ class Value_reference_pair(DBC):
         self.value_ID = value_ID
 
 
-@reference_in_the_book(section=(4, 7, 8, 2), index=1)
+@reference_in_the_book(
+    section=(4, 8, 2),
+    index=1,
+    fragment=("4.8.2 Predefined Templates for Property and Value Descriptions"),
+)
 class Value_list(DBC):
     """
     A set of value reference pairs.
     """
 
-    value_reference_pair_types: Optional[List["Value_reference_pair"]]
+    value_reference_pair_types: List["Value_reference_pair"]
     """
     A pair of a value together with its global unique id.
     """
 
     def __init__(
-        self, value_reference_pair_types: Optional[List["Value_reference_pair"]] = None
+        self, value_reference_pair_types: List["Value_reference_pair"]
     ) -> None:
         self.value_reference_pair_types = value_reference_pair_types
 
 
-@reference_in_the_book(section=(4, 7, 8, 2))
+@reference_in_the_book(
+    section=(4, 8, 2),
+    fragment=("4.8.2 Predefined Templates for Property and Value Descriptions"),
+)
 class Data_specification_IEC_61360(Data_specification_content):
     """
     Content of data specification template for concept descriptions conformant to
@@ -2518,7 +2587,10 @@ class Data_specification_IEC_61360(Data_specification_content):
         self.level_type = level_type
 
 
-@reference_in_the_book(section=(4, 8, 3))
+@reference_in_the_book(
+    section=(4, 8, 3),
+    fragment="4.8.3 Predefined Templates for Unit Concept Descriptions",
+)
 class Data_specification_physical_unit(Data_specification_content):
     # TODO (sadu, 2021-11-17): No table for class in the book
 
@@ -2862,7 +2934,7 @@ class Access_control(DBC):
     The submodel is of kind=Template.
     """
 
-    selectable_permissions: Reference
+    selectable_permissions: Optional[Reference]
     """
     Reference to a submodel defining which permissions can be assigned to the subjects.
 
@@ -2898,8 +2970,8 @@ class Access_control(DBC):
     def __init__(
         self,
         default_subject_attributes: Reference,
-        selectable_permissions: Reference,
         default_permissions: Reference,
+        selectable_permissions: Optional[Reference] = None,
         access_permission_rules: Optional[List["Access_permission_rule"]] = None,
         selectable_subject_attributes: Optional[Reference] = None,
         selectable_environment_attributes: Optional[Reference] = None,
@@ -2976,7 +3048,7 @@ class Policy_information_points(DBC):
 
 
 @reference_in_the_book(section=(5, 3, 4), index=3)
-class Policy_enforcement_point(DBC):
+class Policy_enforcement_points(DBC):
     """
     Defines the security policy enforcement points (PEP).
     """
@@ -3024,7 +3096,7 @@ class Access_control_policy_points(DBC):
     The access control policy decision point of the AAS.
     """
 
-    policy_enforcement_point: "Policy_enforcement_point"
+    policy_enforcement_points: "Policy_enforcement_points"
     """
     The access control policy enforcement point of the AAS.
     """
@@ -3038,12 +3110,12 @@ class Access_control_policy_points(DBC):
         self,
         policy_administration_point: "Policy_administration_point",
         policy_decision_point: "Policy_decision_point",
-        policy_enforcement_point: "Policy_enforcement_point",
+        policy_enforcement_points: "Policy_enforcement_points",
         policy_information_points: Optional["Policy_information_points"] = None,
     ) -> None:
         self.policy_administration_point = policy_administration_point
         self.policy_decision_point = policy_decision_point
-        self.policy_enforcement_point = policy_enforcement_point
+        self.policy_enforcement_points = policy_enforcement_points
         self.policy_information_points = policy_information_points
 
 

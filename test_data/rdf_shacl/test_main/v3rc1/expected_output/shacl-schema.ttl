@@ -497,13 +497,16 @@ aas:IdentifierKeyValuePairShape  a sh:NodeShape ;
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair/value> ;
         sh:datatype xsd:string ;
-        sh:minCount 0 ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:minLength 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC01/IdentifierKeyValuePair/externalSubjectId> ;
         sh:class aas:Reference ;
-        sh:minCount 0 ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
     ] ;
 .
 
@@ -1934,6 +1937,7 @@ aas:KeyShape  a sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
+        sh:minLength 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
@@ -2340,8 +2344,7 @@ aas:AccessControlShape  a sh:NodeShape ;
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC01/AccessControl/selectablePermissions> ;
         sh:class aas:Reference ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
+        sh:minCount 0 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
@@ -2398,11 +2401,11 @@ aas:PolicyInformationPointsShape  a sh:NodeShape ;
     ] ;
 .
 
-aas:PolicyEnforcementPointShape  a sh:NodeShape ;
-    sh:targetClass aas:PolicyEnforcementPoint ;
+aas:PolicyEnforcementPointsShape  a sh:NodeShape ;
+    sh:targetClass aas:PolicyEnforcementPoints ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoint/externalPolicyEnforcementPoint> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/PolicyEnforcementPoints/externalPolicyEnforcementPoint> ;
         sh:datatype xsd:boolean ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
@@ -2438,8 +2441,8 @@ aas:AccessControlPolicyPointsShape  a sh:NodeShape ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoint> ;
-        sh:class aas:PolicyEnforcementPoint ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/AccessControlPolicyPoints/policyEnforcementPoints> ;
+        sh:class aas:PolicyEnforcementPoints ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
     ] ;
