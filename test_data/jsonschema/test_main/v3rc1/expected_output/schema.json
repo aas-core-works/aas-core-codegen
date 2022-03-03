@@ -991,7 +991,10 @@
             "levelType": {
               "$ref": "#/definitions/LevelType"
             }
-          }
+          },
+          "required": [
+            "preferredName"
+          ]
         }
       ]
     },
@@ -1014,6 +1017,10 @@
               "$ref": "#/definitions/LangStringSet"
             },
             "siNotation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "siName": {
               "type": "string",
               "minLength": 1
             },
@@ -1049,7 +1056,12 @@
               "type": "string",
               "minLength": 1
             }
-          }
+          },
+          "required": [
+            "unitName",
+            "unitSymbol",
+            "definition"
+          ]
         }
       ]
     },

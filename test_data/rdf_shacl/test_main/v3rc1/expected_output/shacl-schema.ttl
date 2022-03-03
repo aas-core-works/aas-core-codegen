@@ -1989,7 +1989,8 @@ aas:DataSpecificationIEC61360Shape  a sh:NodeShape ;
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationIEC61360/preferredName> ;
         sh:datatype rdf:langString ;
-        sh:minCount 0 ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
@@ -2076,25 +2077,35 @@ aas:DataSpecificationPhysicalUnitShape  a sh:NodeShape ;
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/unitName> ;
         sh:datatype xsd:string ;
-        sh:minCount 0 ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
         sh:minLength 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/unitSymbol> ;
         sh:datatype xsd:string ;
-        sh:minCount 0 ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
         sh:minLength 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/definition> ;
         sh:datatype rdf:langString ;
-        sh:minCount 0 ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/siNotation> ;
+        sh:datatype xsd:string ;
+        sh:minCount 0 ;
+        sh:minLength 1 ;
+    ] ;
+    sh:property [
+        a sh:PropertyShape ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/siName> ;
         sh:datatype xsd:string ;
         sh:minCount 0 ;
         sh:minLength 1 ;

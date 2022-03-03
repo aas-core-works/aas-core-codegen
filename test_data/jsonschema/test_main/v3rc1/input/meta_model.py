@@ -2461,7 +2461,7 @@ class Data_specification_IEC_61360(Data_specification_content):
     handled as undefined.
     """
 
-    preferred_name: Optional["Lang_string_set"]
+    preferred_name: "Lang_string_set"
     """
     Preferred name
     Constraint AASd-076: For all ConceptDescriptions using data specification template
@@ -2559,7 +2559,7 @@ class Data_specification_IEC_61360(Data_specification_content):
 
     def __init__(
         self,
-        preferred_name: Optional["Lang_string_set"] = None,
+        preferred_name: "Lang_string_set",
         short_name: Optional["Lang_string_set"] = None,
         unit: Optional[Non_empty_string] = None,
         unit_ID: Optional["Reference"] = None,
@@ -2595,22 +2595,27 @@ class Data_specification_IEC_61360(Data_specification_content):
 class Data_specification_physical_unit(Data_specification_content):
     # TODO (sadu, 2021-11-17): No table for class in the book
 
-    unit_name: Optional[Non_empty_string]
+    unit_name: Non_empty_string
     """
     TODO
     """
 
-    unit_symbol: Optional[Non_empty_string]
+    unit_symbol: Non_empty_string
     """
     TODO
     """
 
-    definition: Optional["Lang_string_set"]
+    definition: "Lang_string_set"
     """
     TODO
     """
 
     SI_notation: Optional[Non_empty_string]
+    """
+    TODO
+    """
+
+    SI_name: Optional[Non_empty_string]
     """
     TODO
     """
@@ -2657,10 +2662,11 @@ class Data_specification_physical_unit(Data_specification_content):
 
     def __init__(
         self,
-        unit_name: Optional[Non_empty_string] = None,
-        unit_symbol: Optional[Non_empty_string] = None,
-        definition: Optional["Lang_string_set"] = None,
+        unit_name: Non_empty_string,
+        unit_symbol: Non_empty_string,
+        definition: "Lang_string_set",
         SI_notation: Optional[Non_empty_string] = None,
+        SI_name: Optional[Non_empty_string] = None,
         DIN_notation: Optional[Non_empty_string] = None,
         ECE_name: Optional[Non_empty_string] = None,
         ECE_code: Optional[Non_empty_string] = None,
@@ -2674,6 +2680,7 @@ class Data_specification_physical_unit(Data_specification_content):
         self.unit_symbol = unit_symbol
         self.definition = definition
         self.SI_notation = SI_notation
+        self.SI_name = SI_name
         self.DIN_notation = DIN_notation
         self.ECE_name = ECE_name
         self.ECE_code = ECE_code
