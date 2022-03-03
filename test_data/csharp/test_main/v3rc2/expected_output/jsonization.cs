@@ -9280,17 +9280,26 @@ namespace AasCore.Aas3
             {
                 writer.WriteStartObject();
 
-                writer.WritePropertyName("assetAdministrationShells");
-                Json.JsonSerializer.Serialize(
-                    writer, that.AssetAdministrationShells);
+                if (that.AssetAdministrationShells != null)
+                {
+                    writer.WritePropertyName("assetAdministrationShells");
+                    Json.JsonSerializer.Serialize(
+                        writer, that.AssetAdministrationShells);
+                }
 
-                writer.WritePropertyName("submodels");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Submodels);
+                if (that.Submodels != null)
+                {
+                    writer.WritePropertyName("submodels");
+                    Json.JsonSerializer.Serialize(
+                        writer, that.Submodels);
+                }
 
-                writer.WritePropertyName("conceptDescriptions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.ConceptDescriptions);
+                if (that.ConceptDescriptions != null)
+                {
+                    writer.WritePropertyName("conceptDescriptions");
+                    Json.JsonSerializer.Serialize(
+                        writer, that.ConceptDescriptions);
+                }
 
                 writer.WriteEndObject();
             }
