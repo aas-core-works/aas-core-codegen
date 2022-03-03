@@ -40,6 +40,7 @@ Signature = _types.Signature
 Interface = _types.Interface
 SymbolTable = _types.SymbolTable
 
+beneath_optional = _types.beneath_optional
 map_descendability = _types.map_descendability
 collect_ids_of_symbols_in_properties = _types.collect_ids_of_symbols_in_properties
 

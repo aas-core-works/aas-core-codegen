@@ -177,7 +177,7 @@ def _define_property(
     class_to_rdfs_range: rdf_shacl_common.ClassToRdfsRange,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of a property ``prop`` of the intermediate ``symbol``."""
-    type_anno = rdf_shacl_common.beneath_optional(prop.type_annotation)
+    type_anno = intermediate.beneath_optional(prop.type_annotation)
 
     cls_name = rdf_shacl_naming.class_name(cls.name)
     rdfs_domain = f"aas:{cls_name}"
@@ -205,7 +205,7 @@ def _define_property(
         rdf_type = "owl:DatatypeProperty"
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        type_anno_items = rdf_shacl_common.beneath_optional(type_anno.items)
+        type_anno_items = intermediate.beneath_optional(type_anno.items)
 
         if isinstance(type_anno_items, intermediate.OurTypeAnnotation):
             rdf_type = "owl:ObjectProperty"

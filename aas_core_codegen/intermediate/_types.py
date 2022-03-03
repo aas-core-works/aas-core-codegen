@@ -131,8 +131,22 @@ TypeAnnotationUnion = Union[
     OptionalTypeAnnotation,
 ]
 
+
 assert_union_of_descendants_exhaustive(
     union=TypeAnnotationUnion, base_class=TypeAnnotation
+)
+
+
+TypeAnnotationExceptOptional = Union[
+    PrimitiveTypeAnnotation,
+    OurTypeAnnotation,
+    ListTypeAnnotation,
+]
+
+assert_union_without_excluded(
+    original_union=TypeAnnotationUnion,
+    subset_union=TypeAnnotationExceptOptional,
+    excluded=[OptionalTypeAnnotation],
 )
 
 
@@ -167,6 +181,19 @@ def type_annotations_equal(
         assert_never(that)
 
     raise AssertionError("Should not have gotten here")
+
+
+def beneath_optional(
+    type_annotation: TypeAnnotationUnion,
+) -> TypeAnnotationExceptOptional:
+    """Descend below ``Optional[...]`` to the underlying type."""
+    type_anno = type_annotation
+    while isinstance(type_anno, OptionalTypeAnnotation):
+        type_anno = type_anno.value
+
+    assert not isinstance(type_anno, OptionalTypeAnnotation)
+
+    return type_anno
 
 
 class Description:

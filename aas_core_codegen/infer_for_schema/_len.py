@@ -196,6 +196,52 @@ def _match_len_constraint_on_member_or_name(
     return None
 
 
+def min_with_none(*args: Optional[int]) -> Optional[int]:
+    """
+    Compute a minimum among the arguments where None are ignored.
+
+    >>> min_with_none(2, None, 1)
+    1
+
+    >>> min_with_none(None, None)
+    """
+    # NOTE (mristin, 2022-03-2):
+    # There is no one-liner in Python for this.
+    # See: https://stackoverflow.com/questions/2295461/list-minimum-in-python-with-none
+    minimum = None  # type: Optional[int]
+    for arg in args:
+        if minimum is None:
+            minimum = arg
+        else:
+            if arg is not None:
+                minimum = min(arg, minimum)
+
+    return minimum
+
+
+def max_with_none(*args: Optional[int]) -> Optional[int]:
+    """
+    Compute a maximum among the arguments where None are ignored.
+
+    >>> max_with_none(2, None, 1)
+    2
+
+    >>> max_with_none(None, None)
+    """
+    # NOTE (mristin, 2022-03-2):
+    # There is no one-liner in Python for this.
+    # See: https://stackoverflow.com/questions/2295461/list-minimum-in-python-with-none
+    maximum = None  # type: Optional[int]
+    for arg in args:
+        if maximum is None:
+            maximum = arg
+        else:
+            if arg is not None:
+                maximum = max(arg, maximum)
+
+    return maximum
+
+
 class LenConstraint:
     """
     Represent the inferred constraint on the ``len`` of something.
@@ -218,6 +264,11 @@ class LenConstraint:
     def copy(self) -> "LenConstraint":
         """Create a copy of the self."""
         return LenConstraint(min_value=self.min_value, max_value=self.max_value)
+
+    def __str__(self) -> str:
+        return (
+            f"LenConstraint(min_value={self.min_value!r}, max_value={self.max_value!r})"
+        )
 
 
 class _LenConstraintOnProperty:
@@ -266,16 +317,10 @@ def _reduce_constraints(
 
     for constraint in constraints:
         if isinstance(constraint, _MinLength):
-            if min_len is None:
-                min_len = constraint.value
-            else:
-                min_len = max(constraint.value, min_len)
+            min_len = max_with_none(constraint.value, min_len)
 
         elif isinstance(constraint, _MaxLength):
-            if max_len is None:
-                max_len = constraint.value
-            else:
-                max_len = min(constraint.value, max_len)
+            max_len = min_with_none(constraint.value, max_len)
 
         elif isinstance(constraint, _ExactLength):
             if exact_len is not None:
@@ -318,7 +363,7 @@ def _reduce_constraints(
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def infer_len_constraints_by_class_properties(
+def len_constraints_from_invariants(
     cls: intermediate.Class,
 ) -> Tuple[
     Optional[MutableMapping[intermediate.Property, LenConstraint]],
