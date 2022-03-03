@@ -2251,6 +2251,27 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     """Perform a battery of checks on the consistency of ``symbol_table``."""
     errors = []  # type: List[Error]
 
+    # region Check that there are no duplicate symbol names
+
+    observed_names = dict()  # type: MutableMapping[Identifier, Symbol]
+    for symbol in symbol_table.symbols:
+        other_symbol = observed_names.get(symbol.name, None)
+        if other_symbol is None:
+            observed_names[symbol.name] = symbol
+        else:
+            errors.append(
+                Error(
+                    symbol.parsed.node,
+                    f"The symbol with the name {symbol.name!r} conflicts with "
+                    f"other symbol with the same name.",
+                )
+            )
+
+    if len(errors) > 0:
+        return errors
+
+    # endregion
+
     # region Check ``with_model_type`` for classes with at least one concrete descendant
 
     symbols_in_properties = collect_ids_of_symbols_in_properties(

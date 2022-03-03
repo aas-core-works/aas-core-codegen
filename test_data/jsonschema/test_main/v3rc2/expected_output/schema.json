@@ -1180,12 +1180,9 @@
     "ModelTypes": {
       "type": "string",
       "enum": [
-        "Extension",
-        "AdministrativeInformation",
         "Qualifier",
         "Formula",
         "AssetAdministrationShell",
-        "IdentifierKeyValuePair",
         "Submodel",
         "SubmodelElementList",
         "SubmodelElementStruct",
@@ -1203,9 +1200,7 @@
         "ConceptDescription",
         "View",
         "GlobalReference",
-        "ModelReference",
-        "DataSpecificationIec61360",
-        "DataSpecificationPhysicalUnit"
+        "ModelReference"
       ]
     },
     "ModelType": {

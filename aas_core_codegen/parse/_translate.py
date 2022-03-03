@@ -6,7 +6,19 @@ import io
 import itertools
 import sys
 import textwrap
-from typing import List, Any, Optional, cast, Type, Tuple, Union, Mapping, Set, Sequence
+from typing import (
+    List,
+    Any,
+    Optional,
+    cast,
+    Type,
+    Tuple,
+    Union,
+    Mapping,
+    Set,
+    Sequence,
+    MutableMapping,
+)
 
 import asttokens
 import docutils.io
@@ -2135,6 +2147,27 @@ def _verify_symbol_table(
                     f"for the code generation: {func.name!r}",
                 )
             )
+
+    # endregion
+
+    # region Check that there are no duplicate symbol names
+
+    observed_names = dict()  # type: MutableMapping[Identifier, Symbol]
+    for symbol in symbol_table.symbols:
+        other_symbol = observed_names.get(symbol.name, None)
+        if other_symbol is None:
+            observed_names[symbol.name] = symbol
+        else:
+            errors.append(
+                Error(
+                    symbol.node,
+                    f"The symbol with the name {symbol.name!r} conflicts with "
+                    f"other symbol with the same name.",
+                )
+            )
+
+    if len(errors) > 0:
+        return None, errors
 
     # endregion
 
