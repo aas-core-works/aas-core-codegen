@@ -1376,13 +1376,10 @@
     "ModelTypes": {
       "type": "string",
       "enum": [
-        "Extension",
-        "AdministrativeInformation",
         "Qualifier",
         "Formula",
         "AssetAdministrationShell",
         "Asset",
-        "IdentifierKeyValuePair",
         "Submodel",
         "RelationshipElement",
         "SubmodelElementCollection",
@@ -1399,8 +1396,6 @@
         "Capability",
         "ConceptDescription",
         "View",
-        "DataSpecificationIEC61360",
-        "DataSpecificationPhysicalUnit",
         "BlobCertificate",
         "AccessPermissionRule"
       ]

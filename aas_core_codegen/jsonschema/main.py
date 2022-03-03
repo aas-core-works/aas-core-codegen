@@ -504,19 +504,17 @@ def _generate(
     if len(errors) > 0:
         return None, errors
 
+    model_types = [
+        naming.json_model_type(symbol.name)
+        for symbol in symbol_table.symbols
+        if (
+            isinstance(symbol, intermediate.ConcreteClass)
+            and symbol.serialization.with_model_type
+        )
+    ]  # type: List[Identifier]
+
     definitions["ModelTypes"] = collections.OrderedDict(
-        [
-            ("type", "string"),
-            (
-                "enum",
-                [
-                    naming.json_model_type(symbol.name)
-                    for symbol in symbol_table.symbols
-                    if isinstance(symbol, intermediate.ConcreteClass)
-                    and len(symbol.inheritances) > 0
-                ],
-            ),
-        ]
+        [("type", "string"), ("enum", model_types)]
     )
 
     definitions["ModelType"] = collections.OrderedDict(
