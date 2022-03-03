@@ -11,7 +11,7 @@ from aas_core_codegen.rdf_shacl import (
     naming as rdf_shacl_naming,
     common as rdf_shacl_common,
 )
-from aas_core_codegen.rdf_shacl.common import INDENT as I
+from aas_core_codegen.rdf_shacl.common import INDENT as I, INDENT2 as II, INDENT3 as III
 
 
 @require(lambda prop, cls: id(prop) in cls.property_id_set)
@@ -55,15 +55,31 @@ def _define_property_shape(
     max_count = None  # type: Optional[int]
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        min_count = 0
+        if isinstance(type_anno, intermediate.ListTypeAnnotation):
+            min_count = 0
+            max_count = None
+
+        elif isinstance(
+            type_anno,
+            (intermediate.OurTypeAnnotation, intermediate.PrimitiveTypeAnnotation),
+        ):
+            min_count = 0
+            max_count = 1
+
+        else:
+            assert_never(type_anno)
+
     elif isinstance(prop.type_annotation, intermediate.ListTypeAnnotation):
         min_count = 0
+        max_count = None
+
     elif isinstance(
         prop.type_annotation,
         (intermediate.OurTypeAnnotation, intermediate.PrimitiveTypeAnnotation),
     ):
         min_count = 1
         max_count = 1
+
     else:
         return None, Error(
             prop.parsed.node,
@@ -184,6 +200,9 @@ def _define_for_class(
     errors = []  # type: List[Error]
 
     for prop in cls.properties:
+        if prop.specified_for is not cls:
+            continue
+
         prop_block, error = _define_property_shape(
             prop=prop,
             cls=cls,
@@ -210,14 +229,42 @@ def _define_for_class(
     writer.write(
         textwrap.dedent(
             f"""\
-        aas:{shape_name}  a sh:NodeShape ;
+        aas:{shape_name} a sh:NodeShape ;
         {I}sh:targetClass aas:{cls_name} ;"""
         )
     )
 
     for inheritance in cls.inheritances:
-        subclass_name = rdf_shacl_naming.class_name(inheritance.name)
-        writer.write(f"\n{I}rdfs:subClassOf {subclass_name} ;")
+        subclass_shape_name = rdf_shacl_naming.class_name(
+            Identifier(f"{inheritance.name}_shape")
+        )
+
+        writer.write(f"\n{I}rdfs:subClassOf aas:{subclass_shape_name} ;")
+
+    if isinstance(cls, intermediate.AbstractClass):
+        writer.write("\n")
+        # pylint: disable=line-too-long
+        writer.write(
+            textwrap.indent(
+                textwrap.dedent(
+                    f'''\
+                    sh:sparql [
+                    {I}a sh:SPARQLConstraint ;
+                    {I}sh:message "({shape_name}): An aas:{cls_name} is a abstract class. Please use one of the subclasses for the generation of instances."@en ;
+                    {I}sh:prefixes aas: ;
+                    {I}sh:select """
+                    {II}SELECT ?this ?type
+                    {II}WHERE {{
+                    {III}?this rdf:type ?type .
+                    {III}FILTER (?type = aas:{cls_name})
+                    {II}}}
+                    {I}""" ;
+                    ] ;'''
+                ),
+                I,
+            )
+        )
+        # pylint: enable=line-too-long
 
     for block in prop_blocks:
         writer.write("\n")
@@ -268,7 +315,10 @@ def generate(
 
     assert constraints_by_class is not None
 
-    for symbol in symbol_table.symbols:
+    for symbol in sorted(
+        symbol_table.symbols,
+        key=lambda a_symbol: rdf_shacl_naming.class_name(a_symbol.name),
+    ):
         # noinspection PyUnusedLocal
         block = None  # type: Optional[Stripped]
 

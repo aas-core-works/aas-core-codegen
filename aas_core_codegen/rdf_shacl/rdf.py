@@ -340,7 +340,7 @@ def generate(
 
     for symbol in sorted(
         symbol_table.symbols,
-        key=lambda symbol: rdf_shacl_naming.class_name(symbol.name),
+        key=lambda a_symbol: rdf_shacl_naming.class_name(a_symbol.name),
     ):
         if isinstance(symbol, intermediate.Enumeration):
             block, error = _define_for_enumeration(
