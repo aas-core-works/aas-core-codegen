@@ -35,7 +35,7 @@ setup(
     ],
     license="License :: OSI Approved :: MIT License",
     keywords="asset administration shell code generation industry 4.0 industrie i4.0",
-    packages=find_packages(exclude=["tests", "continuous_integration"]),
+    packages=find_packages(exclude=["tests", "continuous_integration", "dev_scripts"]),
     install_requires=install_requires,
     # fmt: off
     extras_require={

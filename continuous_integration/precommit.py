@@ -103,6 +103,7 @@ def main() -> int:
         reformat_targets = [
             "aas_core_codegen",
             "continuous_integration",
+            "dev_scripts",
             "tests",
             "setup.py",
         ]
@@ -126,7 +127,12 @@ def main() -> int:
 
     if Step.MYPY in selects and Step.MYPY not in skips:
         print("Mypy'ing...")
-        mypy_targets = ["aas_core_codegen", "tests", "continuous_integration"]
+        mypy_targets = [
+            "aas_core_codegen",
+            "tests",
+            "continuous_integration",
+            "dev_scripts",
+        ]
         config_file = pathlib.Path("continuous_integration") / "mypy.ini"
 
         exit_code = call_and_report(
@@ -141,7 +147,12 @@ def main() -> int:
 
     if Step.PYLINT in selects and Step.PYLINT not in skips:
         print("Pylint'ing...")
-        pylint_targets = ["aas_core_codegen", "tests", "continuous_integration"]
+        pylint_targets = [
+            "aas_core_codegen",
+            "tests",
+            "continuous_integration",
+            "dev_scripts",
+        ]
         rcfile = pathlib.Path("continuous_integration") / "pylint.rc"
 
         exit_code = call_and_report(
