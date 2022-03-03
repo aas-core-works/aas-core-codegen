@@ -183,7 +183,7 @@
         "qualifiers": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Constraint_abstract"
+            "$ref": "#/definitions/Constraint"
           }
         }
       }
@@ -197,16 +197,6 @@
       },
       "required": [
         "modelType"
-      ]
-    },
-    "Constraint_abstract": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/Formula"
-        },
-        {
-          "$ref": "#/definitions/Qualifier"
-        }
       ]
     },
     "Qualifier": {
@@ -390,7 +380,7 @@
             "submodelElements": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement_abstract"
+                "$ref": "#/definitions/SubmodelElement"
               }
             }
           }
@@ -413,49 +403,6 @@
         },
         {
           "$ref": "#/definitions/HasDataSpecification"
-        }
-      ]
-    },
-    "SubmodelElement_abstract": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/RelationshipElement"
-        },
-        {
-          "$ref": "#/definitions/AnnotatedRelationshipElement"
-        },
-        {
-          "$ref": "#/definitions/BasicEvent"
-        },
-        {
-          "$ref": "#/definitions/Blob"
-        },
-        {
-          "$ref": "#/definitions/Capability"
-        },
-        {
-          "$ref": "#/definitions/Entity"
-        },
-        {
-          "$ref": "#/definitions/File"
-        },
-        {
-          "$ref": "#/definitions/MultiLanguageProperty"
-        },
-        {
-          "$ref": "#/definitions/Operation"
-        },
-        {
-          "$ref": "#/definitions/Property"
-        },
-        {
-          "$ref": "#/definitions/Range"
-        },
-        {
-          "$ref": "#/definitions/ReferenceElement"
-        },
-        {
-          "$ref": "#/definitions/SubmodelElementCollection"
         }
       ]
     },
@@ -490,7 +437,7 @@
             "value": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement_abstract"
+                "$ref": "#/definitions/SubmodelElement"
               }
             },
             "ordered": {
@@ -664,7 +611,7 @@
             "statements": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement_abstract"
+                "$ref": "#/definitions/SubmodelElement"
               }
             },
             "globalAssetId": {
@@ -733,7 +680,7 @@
       "type": "object",
       "properties": {
         "value": {
-          "$ref": "#/definitions/SubmodelElement_abstract"
+          "$ref": "#/definitions/SubmodelElement"
         }
       },
       "required": [
@@ -1121,13 +1068,6 @@
         "modelType"
       ]
     },
-    "Certificate_abstract": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/BlobCertificate"
-        }
-      ]
-    },
     "BlobCertificate": {
       "allOf": [
         {
@@ -1363,7 +1303,7 @@
         "certificates": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Certificate_abstract"
+            "$ref": "#/definitions/Certificate"
           }
         },
         "requiredCertificateExtensions": {
