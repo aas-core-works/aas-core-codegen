@@ -2,6 +2,7 @@
 
 """Run pre-commit checks on the repository."""
 import argparse
+import difflib
 import enum
 import os
 import pathlib
@@ -9,6 +10,7 @@ import shlex
 import subprocess
 import sys
 from typing import Optional, Mapping, Sequence
+
 
 # pylint: disable=unnecessary-comprehension
 
@@ -19,6 +21,7 @@ class Step(enum.Enum):
     REFORMAT = "reformat"
     MYPY = "mypy"
     PYLINT = "pylint"
+    CHECK_TEST_META_MODELS_COINCIDE = "check-test-meta-models-coincide"
     TEST = "test"
     DOCTEST = "doctest"
     CHECK_INIT_AND_SETUP_COINCIDE = "check-init-and-setup-coincide"
@@ -148,6 +151,46 @@ def main() -> int:
             return 1
     else:
         print("Skipped pylint'ing.")
+
+    if (
+        Step.CHECK_TEST_META_MODELS_COINCIDE
+        and Step.CHECK_TEST_META_MODELS_COINCIDE not in skips
+    ):
+        groups = [
+            [
+                repo_root / "test_data/jsonschema/test_main/v3rc1/input/meta_model.py",
+                repo_root / "test_data/rdf_shacl/test_main/v3rc1/input/meta_model.py",
+            ],
+            [
+                repo_root / "test_data/csharp/test_main/v3rc2/input/meta_model.py",
+                (
+                    repo_root / "test_data/intermediate/"
+                    "expected/real_meta_models/v3rc2/meta_model.py"
+                ),
+                repo_root / "test_data/jsonschema/test_main/v3rc2/input/meta_model.py",
+                (
+                    repo_root / "test_data/parse/"
+                    "expected/real_meta_models/v3rc2/meta_model.py"
+                ),
+            ],
+        ]
+
+        for group in groups:
+            assert len(group) >= 1, "At least one path expected in a group."
+            expected = group[0].read_text(encoding="utf-8").splitlines()
+            for pth in group[1:]:
+                got = pth.read_text(encoding="utf-8").splitlines()
+                if expected != got:
+                    print(
+                        f"The files {group[0]} and {pth} do not match:", file=sys.stderr
+                    )
+                    diff = difflib.context_diff(
+                        expected, got, fromfile=str(group[0]), tofile=str(pth)
+                    )
+
+                    for line in diff:
+                        print(line, file=sys.stderr)
+                    return 1
 
     if Step.TEST in selects and Step.TEST not in skips:
         print("Testing...")
