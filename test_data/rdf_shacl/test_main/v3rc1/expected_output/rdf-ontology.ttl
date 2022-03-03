@@ -170,9 +170,9 @@ aas:AnnotatedRelationshipElement rdf:type owl:Class ;
     rdfs:comment "An annotated relationship element is a relationship element that can be annotated with additional data elements."@en ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/annotation
-<https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/annotation> rdf:type owl:ObjectProperty ;
-    rdfs:label "has annotation"^^xsd:string ;
+###  https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/annotations
+<https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/annotations> rdf:type owl:ObjectProperty ;
+    rdfs:label "has annotations"^^xsd:string ;
     rdfs:domain aas:AnnotatedRelationshipElement ;
     rdfs:range aas:Reference ;
     rdfs:comment "A reference to a data element that represents an annotation that holds for the relationship between the two elements."@en ;
@@ -397,9 +397,9 @@ aas:BlobCertificate rdf:type owl:Class ;
     rdfs:comment "Denotes whether this certificate is the certificated that fast added last."@en ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC01/BlobCertificate/containedExtension
-<https://admin-shell.io/aas/3/0/RC01/BlobCertificate/containedExtension> rdf:type owl:ObjectProperty ;
-    rdfs:label "has contained extension"^^xsd:string ;
+###  https://admin-shell.io/aas/3/0/RC01/BlobCertificate/containedExtensions
+<https://admin-shell.io/aas/3/0/RC01/BlobCertificate/containedExtensions> rdf:type owl:ObjectProperty ;
+    rdfs:label "has contained extensions"^^xsd:string ;
     rdfs:domain aas:BlobCertificate ;
     rdfs:range aas:Reference ;
     rdfs:comment "Extensions contained in the certificate."@en ;
