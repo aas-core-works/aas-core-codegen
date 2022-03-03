@@ -1413,7 +1413,7 @@ aas:AnnotatedRelationshipElementShape  a sh:NodeShape ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/annotation> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/AnnotatedRelationshipElement/annotations> ;
         sh:class aas:Reference ;
         sh:minCount 0 ;
     ] ;
@@ -2205,7 +2205,7 @@ aas:BlobCertificateShape  a sh:NodeShape ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC01/BlobCertificate/containedExtension> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC01/BlobCertificate/containedExtensions> ;
         sh:class aas:Reference ;
         sh:minCount 0 ;
     ] ;

@@ -581,7 +581,7 @@
         },
         {
           "properties": {
-            "annotation": {
+            "annotations": {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/Reference"
@@ -1093,7 +1093,7 @@
             "lastCertificate": {
               "type": "boolean"
             },
-            "containedExtension": {
+            "containedExtensions": {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/Reference"

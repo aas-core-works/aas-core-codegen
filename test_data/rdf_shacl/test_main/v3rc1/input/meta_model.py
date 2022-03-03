@@ -1579,7 +1579,7 @@ class Annotated_relationship_element(Relationship_element):
     with additional data elements.
     """
 
-    annotation: Optional[List["Reference"]]
+    annotations: Optional[List["Reference"]]
     """
     A reference to a data element that represents an annotation that holds for
     the relationship between the two elements.
@@ -1598,7 +1598,7 @@ class Annotated_relationship_element(Relationship_element):
         semantic_ID: Optional["Reference"] = None,
         qualifiers: Optional[List["Constraint"]] = None,
         data_specifications: Optional[List["Reference"]] = None,
-        annotation: Optional[List["Reference"]] = None,
+        annotations: Optional[List["Reference"]] = None,
     ) -> None:
         Relationship_element.__init__(
             self,
@@ -1615,7 +1615,7 @@ class Annotated_relationship_element(Relationship_element):
             data_specifications=data_specifications,
         )
 
-        self.annotation = annotation
+        self.annotations = annotations
 
 
 # TODO (mristin, 2021-10-27):
@@ -2737,7 +2737,7 @@ class Blob_certificate(Certificate):
     Denotes whether this certificate is the certificated that fast added last.
     """
 
-    contained_extension: Optional[List["Reference"]]
+    contained_extensions: Optional[List["Reference"]]
     """
     Extensions contained in the certificate.
     """
@@ -2747,7 +2747,7 @@ class Blob_certificate(Certificate):
         policy_administration_point: "Policy_administration_point",
         blob_certificate: "Blob",
         last_certificate: bool,
-        contained_extension: Optional[List["Reference"]] = None,
+        contained_extensions: Optional[List["Reference"]] = None,
     ) -> None:
         Certificate.__init__(
             self, policy_administration_point=policy_administration_point
@@ -2755,7 +2755,7 @@ class Blob_certificate(Certificate):
 
         self.blob_certificate = blob_certificate
         self.last_certificate = last_certificate
-        self.contained_extension = contained_extension
+        self.contained_extensions = contained_extensions
 
 
 @reference_in_the_book(section=(5, 3, 5), index=3)
