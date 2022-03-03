@@ -141,9 +141,7 @@ def _define_type(
         elif isinstance(type_annotation.symbol, intermediate.Class):
             if type_annotation.symbol.interface is not None:
                 return (
-                    collections.OrderedDict(
-                        [("$ref", f"#/definitions/{model_type}_abstract")]
-                    ),
+                    collections.OrderedDict([("$ref", f"#/definitions/{model_type}")]),
                     None,
                 )
             else:
@@ -346,25 +344,6 @@ def _define_for_class(
         result[model_type] = all_of[0]
     else:
         result[model_type] = {"allOf": all_of}
-
-    # region Define the abstract part
-
-    # NOTE (mristin, 2022-01-02):
-    # We generate the "*_abstract" definition of a class only if it is used to specify
-    # the type of one or more properties in the meta-model. Otherwise, we can ignore
-    # the abstract definition as it wouldn't be used during the validation.
-
-    if len(cls.concrete_descendants) > 0 and id(cls) in ids_of_classes_in_properties:
-        model_type_abstract = f"{model_type}_abstract"
-
-        one_of = [
-            {"$ref": f"#/definitions/{naming.json_model_type(descendant.name)}"}
-            for descendant in cls.concrete_descendants
-        ]  # type: List[MutableMapping[str, Any]]
-
-        result[model_type_abstract] = {"oneOf": one_of}
-
-    # endregion
 
     return result, None
 

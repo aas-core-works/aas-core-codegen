@@ -13,7 +13,7 @@
       "type": "object",
       "properties": {
         "semanticId": {
-          "$ref": "#/definitions/Reference_abstract"
+          "$ref": "#/definitions/Reference"
         }
       }
     },
@@ -36,7 +36,7 @@
               "minLength": 1
             },
             "refersTo": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             }
           },
           "required": [
@@ -132,7 +132,7 @@
         "dataSpecifications": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Reference_abstract"
+            "$ref": "#/definitions/Reference"
           }
         }
       },
@@ -170,23 +170,13 @@
         "modelType"
       ]
     },
-    "Constraint_abstract": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/Formula"
-        },
-        {
-          "$ref": "#/definitions/Qualifier"
-        }
-      ]
-    },
     "Qualifiable": {
       "type": "object",
       "properties": {
         "qualifiers": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Constraint_abstract"
+            "$ref": "#/definitions/Constraint"
           }
         },
         "modelType": {
@@ -220,7 +210,7 @@
               "minLength": 1
             },
             "valueId": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             }
           },
           "required": [
@@ -240,7 +230,7 @@
             "dependsOn": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Reference_abstract"
+                "$ref": "#/definitions/Reference"
               }
             }
           },
@@ -261,7 +251,7 @@
         {
           "properties": {
             "derivedFrom": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             },
             "assetInformation": {
               "$ref": "#/definitions/AssetInformation"
@@ -269,7 +259,7 @@
             "submodels": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Reference_abstract"
+                "$ref": "#/definitions/Reference"
               }
             }
           },
@@ -287,7 +277,7 @@
           "$ref": "#/definitions/AssetKind"
         },
         "globalAssetId": {
-          "$ref": "#/definitions/Reference_abstract"
+          "$ref": "#/definitions/Reference"
         },
         "specificAssetId": {
           "$ref": "#/definitions/IdentifierKeyValuePair"
@@ -323,7 +313,7 @@
               "minLength": 1
             },
             "externalSubjectId": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             }
           },
           "required": [
@@ -355,7 +345,7 @@
             "submodelElements": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement_abstract"
+                "$ref": "#/definitions/SubmodelElement"
               }
             }
           },
@@ -384,49 +374,6 @@
         }
       ]
     },
-    "SubmodelElement_abstract": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/AnnotatedRelationshipElement"
-        },
-        {
-          "$ref": "#/definitions/BasicEvent"
-        },
-        {
-          "$ref": "#/definitions/Blob"
-        },
-        {
-          "$ref": "#/definitions/Capability"
-        },
-        {
-          "$ref": "#/definitions/Entity"
-        },
-        {
-          "$ref": "#/definitions/File"
-        },
-        {
-          "$ref": "#/definitions/MultiLanguageProperty"
-        },
-        {
-          "$ref": "#/definitions/Operation"
-        },
-        {
-          "$ref": "#/definitions/Property"
-        },
-        {
-          "$ref": "#/definitions/Range"
-        },
-        {
-          "$ref": "#/definitions/ReferenceElement"
-        },
-        {
-          "$ref": "#/definitions/SubmodelElementList"
-        },
-        {
-          "$ref": "#/definitions/SubmodelElementStruct"
-        }
-      ]
-    },
     "RelationshipElement": {
       "allOf": [
         {
@@ -435,10 +382,10 @@
         {
           "properties": {
             "first": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             },
             "second": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             }
           },
           "required": [
@@ -461,11 +408,11 @@
             "values": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement_abstract"
+                "$ref": "#/definitions/SubmodelElement"
               }
             },
             "semanticIdValues": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             },
             "valueTypeValues": {
               "$ref": "#/definitions/DataTypeDef"
@@ -488,7 +435,7 @@
             "values": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement_abstract"
+                "$ref": "#/definitions/SubmodelElement"
               }
             }
           },
@@ -500,28 +447,6 @@
     },
     "DataElement": {
       "$ref": "#/definitions/SubmodelElement"
-    },
-    "DataElement_abstract": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/Blob"
-        },
-        {
-          "$ref": "#/definitions/File"
-        },
-        {
-          "$ref": "#/definitions/MultiLanguageProperty"
-        },
-        {
-          "$ref": "#/definitions/Property"
-        },
-        {
-          "$ref": "#/definitions/Range"
-        },
-        {
-          "$ref": "#/definitions/ReferenceElement"
-        }
-      ]
     },
     "Property": {
       "allOf": [
@@ -538,7 +463,7 @@
               "minLength": 1
             },
             "valueId": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             }
           },
           "required": [
@@ -558,7 +483,7 @@
               "$ref": "#/definitions/LangStringSet"
             },
             "valueId": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             }
           }
         }
@@ -597,7 +522,7 @@
         {
           "properties": {
             "value": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             }
           }
         }
@@ -676,7 +601,7 @@
             "annotation": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/DataElement_abstract"
+                "$ref": "#/definitions/DataElement"
               }
             }
           },
@@ -706,11 +631,11 @@
             "statements": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement_abstract"
+                "$ref": "#/definitions/SubmodelElement"
               }
             },
             "globalAssetId": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             },
             "specificAssetId": {
               "$ref": "#/definitions/IdentifierKeyValuePair"
@@ -734,7 +659,7 @@
         {
           "properties": {
             "observed": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             }
           },
           "required": [
@@ -781,7 +706,7 @@
       "type": "object",
       "properties": {
         "value": {
-          "$ref": "#/definitions/SubmodelElement_abstract"
+          "$ref": "#/definitions/SubmodelElement"
         }
       },
       "required": [
@@ -804,7 +729,7 @@
             "isCaseOf": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Reference_abstract"
+                "$ref": "#/definitions/Reference"
               }
             }
           },
@@ -830,7 +755,7 @@
             "containedElements": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Reference_abstract"
+                "$ref": "#/definitions/Reference"
               }
             }
           },
@@ -849,16 +774,6 @@
       },
       "required": [
         "modelType"
-      ]
-    },
-    "Reference_abstract": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/GlobalReference"
-        },
-        {
-          "$ref": "#/definitions/ModelReference"
-        }
       ]
     },
     "GlobalReference": {
@@ -897,7 +812,7 @@
               "minItems": 1
             },
             "referredSemanticId": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             }
           },
           "required": [
@@ -1099,7 +1014,7 @@
           "minLength": 1
         },
         "valueId": {
-          "$ref": "#/definitions/Reference_abstract"
+          "$ref": "#/definitions/Reference"
         }
       },
       "required": [
@@ -1139,7 +1054,7 @@
               "minLength": 1
             },
             "unitId": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             },
             "sourceOfDefinition": {
               "type": "string",
@@ -1167,7 +1082,7 @@
               "minLength": 1
             },
             "valueId": {
-              "$ref": "#/definitions/Reference_abstract"
+              "$ref": "#/definitions/Reference"
             },
             "levelType": {
               "$ref": "#/definitions/LevelType"
