@@ -609,6 +609,14 @@ aas:DataSpecificationPhysicalUnit rdf:type owl:Class ;
     rdfs:comment "TODO"@en ;
 .
 
+###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/siName
+<https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/siName> rdf:type owl:DatatypeProperty ;
+    rdfs:label "has si name"^^xsd:string ;
+    rdfs:domain aas:DataSpecificationPhysicalUnit ;
+    rdfs:range xsd:string ;
+    rdfs:comment "TODO"@en ;
+.
+
 ###  https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/dinNotation
 <https://admin-shell.io/aas/3/0/RC01/DataSpecificationPhysicalUnit/dinNotation> rdf:type owl:DatatypeProperty ;
     rdfs:label "has din notation"^^xsd:string ;
