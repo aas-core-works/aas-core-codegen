@@ -3194,13 +3194,13 @@ class Permission_kind(Enum):
 class Asset_administration_shell_environment:
     """Model the environment as the entry point for referencing and serialization."""
 
-    asset_administration_shells: List[Asset_administration_shell]
+    asset_administration_shells: Optional[List[Asset_administration_shell]]
 
-    assets: List[Asset]
+    assets: Optional[List[Asset]]
 
-    submodels: List[Submodel]
+    submodels: Optional[List[Submodel]]
 
-    concept_descriptions: List[Concept_description]
+    concept_descriptions: Optional[List[Concept_description]]
 
     def __init__(
         self,
@@ -3209,16 +3209,7 @@ class Asset_administration_shell_environment:
         submodels: Optional[List[Submodel]] = None,
         concept_descriptions: Optional[List[Concept_description]] = None,
     ) -> None:
-        self.asset_administration_shells = (
-            asset_administration_shells
-            if asset_administration_shells is not None
-            else []
-        )
-
-        self.assets = assets if assets is not None else []
-
-        self.submodels = submodels if submodels is not None else []
-
-        self.concept_descriptions = (
-            concept_descriptions if concept_descriptions is not None else []
-        )
+        self.asset_administration_shells = asset_administration_shells
+        self.assets = assets
+        self.submodels = submodels
+        self.concept_descriptions = concept_descriptions

@@ -8045,10 +8045,14 @@ UnverifiedSymbolTable(
         Property(
           name='asset_administration_shells',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Asset_administration_shell',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Asset_administration_shell',
+                    node=...)],
                 node=...)],
             node=...),
           description=None,
@@ -8056,10 +8060,14 @@ UnverifiedSymbolTable(
         Property(
           name='submodels',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Submodel',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Submodel',
+                    node=...)],
                 node=...)],
             node=...),
           description=None,
@@ -8067,10 +8075,14 @@ UnverifiedSymbolTable(
         Property(
           name='concept_descriptions',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Concept_description',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Concept_description',
+                    node=...)],
                 node=...)],
             node=...),
           description=None,

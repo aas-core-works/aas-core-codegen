@@ -3897,34 +3897,43 @@ namespace AasCore.Aas3
                 Implementation.VerifyEnvironment(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.AssetAdministrationShells.Count;
-                    i++)
+                if (that.AssetAdministrationShells != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.AssetAdministrationShells[i],
-                        $"{context}/AssetAdministrationShells/{i}");
+                    for(
+                        var i = 0;
+                        i < that.AssetAdministrationShells.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.AssetAdministrationShells[i],
+                            $"{context}/AssetAdministrationShells/{i}");
+                    }
                 }
 
-                for(var i = 0; i < that.Submodels.Count; i++)
+                if (that.Submodels != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Submodels[i],
-                        $"{context}/Submodels/{i}");
+                    for(var i = 0; i < that.Submodels.Count; i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.Submodels[i],
+                            $"{context}/Submodels/{i}");
+                    }
                 }
 
-                for(
-                    var i = 0;
-                    i < that.ConceptDescriptions.Count;
-                    i++)
+                if (that.ConceptDescriptions != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.ConceptDescriptions[i],
-                        $"{context}/ConceptDescriptions/{i}");
+                    for(
+                        var i = 0;
+                        i < that.ConceptDescriptions.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.ConceptDescriptions[i],
+                            $"{context}/ConceptDescriptions/{i}");
+                    }
                 }
             }
         }  // public class RecursiveVerifier

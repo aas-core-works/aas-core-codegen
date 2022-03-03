@@ -1170,12 +1170,7 @@
             "$ref": "#/definitions/ConceptDescription"
           }
         }
-      },
-      "required": [
-        "assetAdministrationShells",
-        "submodels",
-        "conceptDescriptions"
-      ]
+      }
     },
     "ModelTypes": {
       "type": "string",

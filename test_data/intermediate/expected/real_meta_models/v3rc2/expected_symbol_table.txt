@@ -11512,9 +11512,11 @@ SymbolTable(
       properties=[
         Property(
           name='asset_administration_shells',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Asset_administration_shell',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Asset_administration_shell',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=None,
@@ -11522,9 +11524,11 @@ SymbolTable(
           parsed=...),
         Property(
           name='submodels',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Submodel',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Submodel',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=None,
@@ -11532,9 +11536,11 @@ SymbolTable(
           parsed=...),
         Property(
           name='concept_descriptions',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Concept_description',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Concept_description',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=None,
@@ -11593,9 +11599,9 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
-          "AssignArgument(\n  name='asset_administration_shells',\n  argument='asset_administration_shells',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='submodels',\n  argument='submodels',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='concept_descriptions',\n  argument='concept_descriptions',\n  default=EmptyList(\n    node=...))"]),
+          "AssignArgument(\n  name='asset_administration_shells',\n  argument='asset_administration_shells',\n  default=None)",
+          "AssignArgument(\n  name='submodels',\n  argument='submodels',\n  default=None)",
+          "AssignArgument(\n  name='concept_descriptions',\n  argument='concept_descriptions',\n  default=None)"]),
       invariants=[],
       serialization=Serialization(
         with_model_type=False),

@@ -8506,11 +8506,11 @@ namespace AasCore.Aas3
     /// </summary>
     public class Environment : IClass
     {
-        public List<AssetAdministrationShell> AssetAdministrationShells { get; set; }
+        public List<AssetAdministrationShell>? AssetAdministrationShells { get; set; }
 
-        public List<Submodel> Submodels { get; set; }
+        public List<Submodel>? Submodels { get; set; }
 
-        public List<ConceptDescription> ConceptDescriptions { get; set; }
+        public List<ConceptDescription>? ConceptDescriptions { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -8518,19 +8518,28 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in AssetAdministrationShells)
+            if (AssetAdministrationShells != null)
             {
-                yield return anItem;
+                foreach (var anItem in AssetAdministrationShells)
+                {
+                    yield return anItem;
+                }
             }
 
-            foreach (var anItem in Submodels)
+            if (Submodels != null)
             {
-                yield return anItem;
+                foreach (var anItem in Submodels)
+                {
+                    yield return anItem;
+                }
             }
 
-            foreach (var anItem in ConceptDescriptions)
+            if (ConceptDescriptions != null)
             {
-                yield return anItem;
+                foreach (var anItem in ConceptDescriptions)
+                {
+                    yield return anItem;
+                }
             }
         }
 
@@ -8539,36 +8548,45 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in AssetAdministrationShells)
+            if (AssetAdministrationShells != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in AssetAdministrationShells)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
-            foreach (var anItem in Submodels)
+            if (Submodels != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Submodels)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
-            foreach (var anItem in ConceptDescriptions)
+            if (ConceptDescriptions != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in ConceptDescriptions)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
         }
@@ -8615,15 +8633,9 @@ namespace AasCore.Aas3
             List<Submodel>? submodels = null,
             List<ConceptDescription>? conceptDescriptions = null)
         {
-            AssetAdministrationShells = (assetAdministrationShells != null)
-                ? assetAdministrationShells
-                : new List<AssetAdministrationShell>();
-            Submodels = (submodels != null)
-                ? submodels
-                : new List<Submodel>();
-            ConceptDescriptions = (conceptDescriptions != null)
-                ? conceptDescriptions
-                : new List<ConceptDescription>();
+            AssetAdministrationShells = assetAdministrationShells;
+            Submodels = submodels;
+            ConceptDescriptions = conceptDescriptions;
         }
     }
 
