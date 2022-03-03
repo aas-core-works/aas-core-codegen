@@ -11,9 +11,11 @@ import aas_core_codegen.main
 
 
 class Test_against_recorded(unittest.TestCase):
-    # Set this variable to True if you want to re-record the test data,
-    # without any checks
-    RERECORD = False
+    RERECORD = os.environ.get("AAS_CORE_CODEGEN_RERECORD", "").lower() in (
+        "1",
+        "true",
+        "on",
+    )
 
     def test_cases(self) -> None:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
