@@ -2589,8 +2589,8 @@ namespace AasCore.Aas3
         /// The value of the property instance.
         /// </summary>
         /// <remarks>
-        /// See Constraint AASd-065
-        /// See Constraint AASd-007
+        /// See Constraint AASd-065
+        /// See Constraint AASd-007
         /// </remarks>
         public string? Value { get; set; }
 
@@ -2598,8 +2598,8 @@ namespace AasCore.Aas3
         /// Reference to the global unique id of a coded value.
         /// </summary>
         /// <remarks>
-        /// See Constraint AASd-065
-        /// See Constraint AASd-007
+        /// See Constraint AASd-065
+        /// See Constraint AASd-007
         /// </remarks>
         public IReference? ValueId { get; set; }
 
@@ -2922,15 +2922,15 @@ namespace AasCore.Aas3
 
         /// <summary>
         /// The value of the property instance.
-        /// See Constraint AASd-012
-        /// See Constraint AASd-065"
+        /// See Constraint AASd-012
+        /// See Constraint AASd-065
         /// </summary>
         public LangStringSet? Value { get; set; }
 
         /// <summary>
         /// Reference to the global unique id of a coded value.
-        /// See Constraint AASd-012
-        /// See Constraint AASd-065"
+        /// See Constraint AASd-012
+        /// See Constraint AASd-065
         /// </summary>
         public IReference? ValueId { get; set; }
 

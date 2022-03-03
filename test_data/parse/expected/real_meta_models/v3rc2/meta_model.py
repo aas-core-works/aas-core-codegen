@@ -1064,16 +1064,16 @@ class Property(Data_element):
     """
     The value of the property instance.
 
-    See Constraint AASd-065
-    See Constraint AASd-007
+    See :constraintref:`AASd-065`
+    See :constraintref:`AASd-007`
     """
 
     value_ID: Optional["Reference"]
     """
     Reference to the global unique id of a coded value.
 
-    See Constraint AASd-065
-    See Constraint AASd-007
+    See :constraintref:`AASd-065`
+    See :constraintref:`AASd-007`
     """
 
     def __init__(
@@ -1135,15 +1135,15 @@ class Multi_language_property(Data_element):
     value: Optional["Lang_string_set"]
     """
     The value of the property instance.
-    See Constraint AASd-012
-    See Constraint AASd-065"
+    See :constraintref:`AASd-012`
+    See :constraintref:`AASd-065`
     """
 
     value_ID: Optional["Reference"]
     """
     Reference to the global unique id of a coded value.
-    See Constraint AASd-012
-    See Constraint AASd-065"
+    See :constraintref:`AASd-012`
+    See :constraintref:`AASd-065`
     """
 
     def __init__(

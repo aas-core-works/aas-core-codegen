@@ -1706,7 +1706,7 @@ aas:MultiLanguageProperty rdf:type owl:Class ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:MultiLanguageProperty ;
     rdfs:range rdf:langString ;
-    rdfs:comment "The value of the property instance. See Constraint AASd-012 See Constraint AASd-065\""@en ;
+    rdfs:comment "The value of the property instance. See Constraint AASd-012 See Constraint AASd-065"@en ;
 .
 
 ###  https://admin-shell.io/aas/3/0/RC01/MultiLanguageProperty/valueId
@@ -1714,7 +1714,7 @@ aas:MultiLanguageProperty rdf:type owl:Class ;
     rdfs:label "has value id"^^xsd:string ;
     rdfs:domain aas:MultiLanguageProperty ;
     rdfs:range aas:Reference ;
-    rdfs:comment "Reference to the global unique id of a coded value. See Constraint AASd-012 See Constraint AASd-065\""@en ;
+    rdfs:comment "Reference to the global unique id of a coded value. See Constraint AASd-012 See Constraint AASd-065"@en ;
 .
 
 ###  https://admin-shell.io/aas/3/0/RC01/ObjectAttributes
@@ -1956,7 +1956,7 @@ aas:Property rdf:type owl:Class ;
     rdfs:label "has value"^^xsd:string ;
     rdfs:domain aas:Property ;
     rdfs:range xsd:string ;
-    rdfs:comment "The value of the property instance.\n\nSee Constraint AASd-065 See Constraint AASd-007"@en ;
+    rdfs:comment "The value of the property instance.\n\nSee Constraint AASd-065 See Constraint AASd-007"@en ;
 .
 
 ###  https://admin-shell.io/aas/3/0/RC01/Property/valueId
@@ -1964,7 +1964,7 @@ aas:Property rdf:type owl:Class ;
     rdfs:label "has value id"^^xsd:string ;
     rdfs:domain aas:Property ;
     rdfs:range aas:Reference ;
-    rdfs:comment "Reference to the global unique id of a coded value.\n\nSee Constraint AASd-065 See Constraint AASd-007"@en ;
+    rdfs:comment "Reference to the global unique id of a coded value.\n\nSee Constraint AASd-065 See Constraint AASd-007"@en ;
 .
 
 ###  https://admin-shell.io/aas/3/0/RC01/Qualifiable
