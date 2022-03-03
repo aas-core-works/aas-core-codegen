@@ -101,8 +101,11 @@ We follow Chris Beams' `guidelines on commit messages`_:
 
 Development Scripts
 ===================
-We need to frequently back-propagate test data from https://github.com/aas-core-works/aas-core-meta/ repository.
-To facilitate fetching and re-recording test output whenever the meta-models change, we wrote a couple of scripts in [`dev_scripts/`](https://github.com/aas-core-works/aas-core-codegen/tree/main/dev_scripts).
+We need to frequently back-propagate test data from `aas-core-meta`_ repository.
+To facilitate fetching and re-recording test output whenever the meta-models change, we wrote a couple of scripts in `dev_scripts/`_.
 
 The scripts are hopefully self-explaining.
 Please let us know if you need more information so that we can improve this documentation accordingly.
+
+.. _aas-core-meta: https://github.com/aas-core-works/aas-core-meta/
+.. _dev_scripts/: https://github.com/aas-core-works/aas-core-codegen/tree/main/dev_scripts
