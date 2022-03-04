@@ -726,10 +726,14 @@ UnverifiedSymbolTable(
         Property(
           name='data_specifications',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Reference',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Reference',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -1137,10 +1141,14 @@ UnverifiedSymbolTable(
         Property(
           name='depends_on',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Reference',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Reference',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -1258,18 +1266,23 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='ID_short',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Non_empty_string',
-                node=...),
-              default=None,
-              node=...),
-            Argument(
               name='asset_information',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Asset_information',
                 node=...),
               default=None,
+              node=...),
+            Argument(
+              name='ID_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
               node=...),
             Argument(
               name='extensions',
@@ -1715,10 +1728,15 @@ UnverifiedSymbolTable(
               node=...),
             Argument(
               name='ID_short',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Non_empty_string',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Non_empty_string',
+                    node=...)],
                 node=...),
-              default=None,
+              default=Default(
+                node=...),
               node=...),
             Argument(
               name='submodel_elements',
@@ -2896,18 +2914,23 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='ID_short',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Non_empty_string',
-                node=...),
-              default=None,
-              node=...),
-            Argument(
               name='value_type',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Data_type_def',
                 node=...),
               default=None,
+              node=...),
+            Argument(
+              name='ID_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
               node=...),
             Argument(
               name='extensions',
@@ -3329,18 +3352,23 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='ID_short',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Non_empty_string',
-                node=...),
-              default=None,
-              node=...),
-            Argument(
               name='value_type',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Data_type_def',
                 node=...),
               default=None,
+              node=...),
+            Argument(
+              name='ID_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
               node=...),
             Argument(
               name='extensions',
@@ -3530,10 +3558,15 @@ UnverifiedSymbolTable(
               node=...),
             Argument(
               name='ID_short',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Non_empty_string',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Non_empty_string',
+                    node=...)],
                 node=...),
-              default=None,
+              default=Default(
+                node=...),
               node=...),
             Argument(
               name='extensions',
@@ -3719,18 +3752,23 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='ID_short',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Non_empty_string',
-                node=...),
-              default=None,
-              node=...),
-            Argument(
               name='MIME_type',
               type_annotation=AtomicTypeAnnotation(
                 identifier='MIME_typed',
                 node=...),
               default=None,
+              node=...),
+            Argument(
+              name='ID_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
               node=...),
             Argument(
               name='extensions',
@@ -3920,18 +3958,23 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='ID_short',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Non_empty_string',
-                node=...),
-              default=None,
-              node=...),
-            Argument(
               name='MIME_type',
               type_annotation=AtomicTypeAnnotation(
                 identifier='MIME_typed',
                 node=...),
               default=None,
+              node=...),
+            Argument(
+              name='ID_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
               node=...),
             Argument(
               name='extensions',
@@ -4768,10 +4811,15 @@ UnverifiedSymbolTable(
               node=...),
             Argument(
               name='ID_short',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Non_empty_string',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Non_empty_string',
+                    node=...)],
                 node=...),
-              default=None,
+              default=Default(
+                node=...),
               node=...),
             Argument(
               name='extensions',
@@ -5410,10 +5458,15 @@ UnverifiedSymbolTable(
               node=...),
             Argument(
               name='ID_short',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Non_empty_string',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Non_empty_string',
+                    node=...)],
                 node=...),
-              default=None,
+              default=Default(
+                node=...),
               node=...),
             Argument(
               name='extensions',

@@ -1214,9 +1214,11 @@ SymbolTable(
         properties=[
           Property(
             name='data_specifications',
-            type_annotation=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Reference',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=Description(
@@ -1254,9 +1256,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -1291,7 +1295,7 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))"]),
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)"]),
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
@@ -1323,9 +1327,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -1406,7 +1412,7 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='version',\n  argument='version',\n  default=None)",
           "AssignArgument(\n  name='revision',\n  argument='revision',\n  default=None)"]),
       invariants=[
@@ -1775,9 +1781,11 @@ SymbolTable(
       properties=[
         Property(
           name='depends_on',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -1810,7 +1818,7 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
-          "AssignArgument(\n  name='depends_on',\n  argument='depends_on',\n  default=EmptyList(\n    node=...))"]),
+          "AssignArgument(\n  name='depends_on',\n  argument='depends_on',\n  default=None)"]),
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
@@ -1843,9 +1851,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -1981,18 +1991,22 @@ SymbolTable(
             default=None,
             parsed=...),
           Argument(
-            name='ID_short',
-            type_annotation=OurTypeAnnotation(
-              symbol='Reference to symbol Non_empty_string',
-              parsed=...),
-            default=None,
-            parsed=...),
-          Argument(
             name='asset_information',
             type_annotation=OurTypeAnnotation(
               symbol='Reference to symbol Asset_information',
               parsed=...),
             default=None,
+            parsed=...),
+          Argument(
+            name='ID_short',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultConstant(
+              value=None,
+              parsed=...),
             parsed=...),
           Argument(
             name='extensions',
@@ -2105,7 +2119,7 @@ SymbolTable(
           "AssignArgument(\n  name='description',\n  argument='description',\n  default=None)",
           "AssignArgument(\n  name='ID',\n  argument='ID',\n  default=None)",
           "AssignArgument(\n  name='administration',\n  argument='administration',\n  default=None)",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='derived_from',\n  argument='derived_from',\n  default=None)",
           "AssignArgument(\n  name='asset_information',\n  argument='asset_information',\n  default=None)",
           "AssignArgument(\n  name='submodels',\n  argument='submodels',\n  default=EmptyList(\n    node=...))"]),
@@ -2431,9 +2445,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -2584,10 +2600,14 @@ SymbolTable(
             parsed=...),
           Argument(
             name='ID_short',
-            type_annotation=OurTypeAnnotation(
-              symbol='Reference to symbol Non_empty_string',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
+                parsed=...),
               parsed=...),
-            default=None,
+            default=DefaultConstant(
+              value=None,
+              parsed=...),
             parsed=...),
           Argument(
             name='submodel_elements',
@@ -2727,7 +2747,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='submodel_elements',\n  argument='submodel_elements',\n  default=EmptyList(\n    node=...))"]),
       invariants=[],
       serialization=Serialization(
@@ -2783,9 +2803,11 @@ SymbolTable(
         properties=[
           Property(
             name='data_specifications',
-            type_annotation=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Reference',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=Description(
@@ -2914,9 +2936,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -3147,7 +3171,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))"]),
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)"]),
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
@@ -3182,9 +3206,11 @@ SymbolTable(
         properties=[
           Property(
             name='data_specifications',
-            type_annotation=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Reference',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=Description(
@@ -3321,9 +3347,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -3588,7 +3616,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='first',\n  argument='first',\n  default=None)",
           "AssignArgument(\n  name='second',\n  argument='second',\n  default=None)"]),
       invariants=[],
@@ -3622,9 +3650,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -3943,7 +3973,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='submodel_element_type_values',\n  argument='submodel_element_type_values',\n  default=None)",
           "AssignArgument(\n  name='values',\n  argument='values',\n  default=EmptyList(\n    node=...))",
           "AssignArgument(\n  name='semantic_ID_values',\n  argument='semantic_ID_values',\n  default=None)",
@@ -3979,9 +4009,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -4237,7 +4269,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='values',\n  argument='values',\n  default=EmptyList(\n    node=...))"]),
       invariants=[],
       serialization=Serialization(
@@ -4279,9 +4311,11 @@ SymbolTable(
         properties=[
           Property(
             name='data_specifications',
-            type_annotation=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Reference',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=Description(
@@ -4403,9 +4437,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -4636,7 +4672,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))"]),
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)"]),
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
@@ -4668,9 +4704,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -4813,18 +4851,22 @@ SymbolTable(
         name='__init__',
         arguments=[
           Argument(
-            name='ID_short',
-            type_annotation=OurTypeAnnotation(
-              symbol='Reference to symbol Non_empty_string',
-              parsed=...),
-            default=None,
-            parsed=...),
-          Argument(
             name='value_type',
             type_annotation=OurTypeAnnotation(
               symbol='Reference to symbol Data_type_def',
               parsed=...),
             default=None,
+            parsed=...),
+          Argument(
+            name='ID_short',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultConstant(
+              value=None,
+              parsed=...),
             parsed=...),
           Argument(
             name='extensions',
@@ -4960,7 +5002,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='value_type',\n  argument='value_type',\n  default=None)",
           "AssignArgument(\n  name='value',\n  argument='value',\n  default=None)",
           "AssignArgument(\n  name='value_ID',\n  argument='value_ID',\n  default=None)"]),
@@ -4995,9 +5037,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -5274,7 +5318,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='value',\n  argument='value',\n  default=None)",
           "AssignArgument(\n  name='value_ID',\n  argument='value_ID',\n  default=None)"]),
       invariants=[],
@@ -5308,9 +5352,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -5453,18 +5499,22 @@ SymbolTable(
         name='__init__',
         arguments=[
           Argument(
-            name='ID_short',
-            type_annotation=OurTypeAnnotation(
-              symbol='Reference to symbol Non_empty_string',
-              parsed=...),
-            default=None,
-            parsed=...),
-          Argument(
             name='value_type',
             type_annotation=OurTypeAnnotation(
               symbol='Reference to symbol Data_type_def',
               parsed=...),
             default=None,
+            parsed=...),
+          Argument(
+            name='ID_short',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultConstant(
+              value=None,
+              parsed=...),
             parsed=...),
           Argument(
             name='extensions',
@@ -5600,7 +5650,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='value_type',\n  argument='value_type',\n  default=None)",
           "AssignArgument(\n  name='min',\n  argument='min',\n  default=None)",
           "AssignArgument(\n  name='max',\n  argument='max',\n  default=None)"]),
@@ -5635,9 +5685,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -5759,10 +5811,14 @@ SymbolTable(
         arguments=[
           Argument(
             name='ID_short',
-            type_annotation=OurTypeAnnotation(
-              symbol='Reference to symbol Non_empty_string',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
+                parsed=...),
               parsed=...),
-            default=None,
+            default=DefaultConstant(
+              value=None,
+              parsed=...),
             parsed=...),
           Argument(
             name='extensions',
@@ -5887,7 +5943,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='value',\n  argument='value',\n  default=None)"]),
       invariants=[],
       serialization=Serialization(
@@ -5920,9 +5976,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -6053,18 +6111,22 @@ SymbolTable(
         name='__init__',
         arguments=[
           Argument(
-            name='ID_short',
-            type_annotation=OurTypeAnnotation(
-              symbol='Reference to symbol Non_empty_string',
-              parsed=...),
-            default=None,
-            parsed=...),
-          Argument(
             name='MIME_type',
             type_annotation=OurTypeAnnotation(
               symbol='Reference to symbol MIME_typed',
               parsed=...),
             default=None,
+            parsed=...),
+          Argument(
+            name='ID_short',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultConstant(
+              value=None,
+              parsed=...),
             parsed=...),
           Argument(
             name='extensions',
@@ -6189,7 +6251,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='MIME_type',\n  argument='MIME_type',\n  default=None)",
           "AssignArgument(\n  name='value',\n  argument='value',\n  default=None)"]),
       invariants=[
@@ -6228,9 +6290,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -6361,18 +6425,22 @@ SymbolTable(
         name='__init__',
         arguments=[
           Argument(
-            name='ID_short',
-            type_annotation=OurTypeAnnotation(
-              symbol='Reference to symbol Non_empty_string',
-              parsed=...),
-            default=None,
-            parsed=...),
-          Argument(
             name='MIME_type',
             type_annotation=OurTypeAnnotation(
               symbol='Reference to symbol MIME_typed',
               parsed=...),
             default=None,
+            parsed=...),
+          Argument(
+            name='ID_short',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultConstant(
+              value=None,
+              parsed=...),
             parsed=...),
           Argument(
             name='extensions',
@@ -6497,7 +6565,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='MIME_type',\n  argument='MIME_type',\n  default=None)",
           "AssignArgument(\n  name='value',\n  argument='value',\n  default=None)"]),
       invariants=[
@@ -6536,9 +6604,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -6828,7 +6898,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='first',\n  argument='first',\n  default=None)",
           "AssignArgument(\n  name='second',\n  argument='second',\n  default=None)",
           "AssignArgument(\n  name='annotation',\n  argument='annotation',\n  default=EmptyList(\n    node=...))"]),
@@ -6895,9 +6965,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -7216,7 +7288,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='statements',\n  argument='statements',\n  default=EmptyList(\n    node=...))",
           "AssignArgument(\n  name='entity_type',\n  argument='entity_type',\n  default=None)",
           "AssignArgument(\n  name='global_asset_ID',\n  argument='global_asset_ID',\n  default=None)",
@@ -7256,9 +7328,11 @@ SymbolTable(
         properties=[
           Property(
             name='data_specifications',
-            type_annotation=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Reference',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=Description(
@@ -7375,9 +7449,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -7608,7 +7684,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))"]),
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)"]),
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
@@ -7640,9 +7716,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -7769,10 +7847,14 @@ SymbolTable(
             parsed=...),
           Argument(
             name='ID_short',
-            type_annotation=OurTypeAnnotation(
-              symbol='Reference to symbol Non_empty_string',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
+                parsed=...),
               parsed=...),
-            default=None,
+            default=DefaultConstant(
+              value=None,
+              parsed=...),
             parsed=...),
           Argument(
             name='extensions',
@@ -7886,7 +7968,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='observed',\n  argument='observed',\n  default=None)"]),
       invariants=[],
       serialization=Serialization(
@@ -7919,9 +8001,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -8227,7 +8311,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='input_variables',\n  argument='input_variables',\n  default=EmptyList(\n    node=...))",
           "AssignArgument(\n  name='output_variables',\n  argument='output_variables',\n  default=EmptyList(\n    node=...))",
           "AssignArgument(\n  name='inoutput_variables',\n  argument='inoutput_variables',\n  default=EmptyList(\n    node=...))"]),
@@ -8322,9 +8406,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -8555,7 +8641,7 @@ SymbolTable(
           "AssignArgument(\n  name='kind',\n  argument='kind',\n  default=DefaultEnumLiteral(\n    node=...,\n    enum='Reference to Enumeration Modeling_kind',\n    literal='Reference to EnumerationLiteral Instance'))",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
           "AssignArgument(\n  name='qualifiers',\n  argument='qualifiers',\n  default=EmptyList(\n    node=...))",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))"]),
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)"]),
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
@@ -8588,9 +8674,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -8705,10 +8793,14 @@ SymbolTable(
             parsed=...),
           Argument(
             name='ID_short',
-            type_annotation=OurTypeAnnotation(
-              symbol='Reference to symbol Non_empty_string',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
+                parsed=...),
               parsed=...),
-            default=None,
+            default=DefaultConstant(
+              value=None,
+              parsed=...),
             parsed=...),
           Argument(
             name='extensions',
@@ -8810,7 +8902,7 @@ SymbolTable(
           "AssignArgument(\n  name='description',\n  argument='description',\n  default=None)",
           "AssignArgument(\n  name='ID',\n  argument='ID',\n  default=None)",
           "AssignArgument(\n  name='administration',\n  argument='administration',\n  default=None)",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='is_case_of',\n  argument='is_case_of',\n  default=EmptyList(\n    node=...))"]),
       invariants=[],
       serialization=Serialization(
@@ -8844,9 +8936,11 @@ SymbolTable(
       properties=[
         Property(
           name='data_specifications',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -9052,7 +9146,7 @@ SymbolTable(
           "AssignArgument(\n  name='category',\n  argument='category',\n  default=None)",
           "AssignArgument(\n  name='description',\n  argument='description',\n  default=None)",
           "AssignArgument(\n  name='semantic_ID',\n  argument='semantic_ID',\n  default=None)",
-          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=EmptyList(\n    node=...))",
+          "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='contained_elements',\n  argument='contained_elements',\n  default=EmptyList(\n    node=...))"]),
       invariants=[],
       serialization=Serialization(

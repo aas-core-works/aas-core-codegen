@@ -378,7 +378,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
     }
 
     /// <summary>
@@ -391,7 +391,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// Version of the element.
@@ -409,9 +409,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
         }
 
@@ -420,14 +423,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
         }
@@ -474,9 +480,7 @@ namespace AasCore.Aas3
             string? revision = null,
             List<IReference>? dataSpecifications = null)
         {
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             Version = version;
             Revision = revision;
         }
@@ -651,7 +655,7 @@ namespace AasCore.Aas3
         /// evaluated in the formula to true or false in the corresponding logical expression
         /// it is used in.
         /// </remarks>
-        public List<IReference> DependsOn { get; set; }
+        public List<IReference>? DependsOn { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -659,9 +663,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DependsOn)
+            if (DependsOn != null)
             {
-                yield return anItem;
+                foreach (var anItem in DependsOn)
+                {
+                    yield return anItem;
+                }
             }
         }
 
@@ -670,14 +677,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DependsOn)
+            if (DependsOn != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DependsOn)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
         }
@@ -721,9 +731,7 @@ namespace AasCore.Aas3
 
         public Formula(List<IReference>? dependsOn)
         {
-            DependsOn = (dependsOn != null)
-                ? dependsOn
-                : new List<IReference>();
+            DependsOn = dependsOn;
         }
     }
 
@@ -738,7 +746,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -855,9 +863,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -898,14 +909,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -1023,8 +1037,8 @@ namespace AasCore.Aas3
 
         public AssetAdministrationShell(
             string id,
-            string idShort,
             AssetInformation assetInformation,
+            string? idShort = null,
             List<Extension>? extensions = null,
             LangStringSet? displayName = null,
             string? category = null,
@@ -1043,9 +1057,7 @@ namespace AasCore.Aas3
             Description = description;
             Id = id;
             Administration = administration;
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             DerivedFrom = derivedFrom;
             AssetInformation = assetInformation;
             Submodels = (submodels != null)
@@ -1387,7 +1399,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// Kind of the element: either type or instance.
@@ -1508,9 +1520,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -1554,14 +1569,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -1682,7 +1700,7 @@ namespace AasCore.Aas3
 
         public Submodel(
             string id,
-            string idShort,
+            string? idShort = null,
             List<ISubmodelElement>? submodelElements = null,
             List<Extension>? extensions = null,
             LangStringSet? displayName = null,
@@ -1708,9 +1726,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             SubmodelElements = (submodelElements != null)
                 ? submodelElements
                 : new List<ISubmodelElement>();
@@ -1773,7 +1789,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -1916,9 +1932,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -1962,14 +1981,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -2115,9 +2137,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             SubmodelElementTypeValues = submodelElementTypeValues;
             Values = (values != null)
                 ? values
@@ -2142,7 +2162,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -2249,9 +2269,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -2290,14 +2313,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -2429,9 +2455,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             Values = (values != null)
                 ? values
                 : new List<ISubmodelElement>();
@@ -2484,7 +2508,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -2609,9 +2633,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -2650,14 +2677,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -2766,8 +2796,8 @@ namespace AasCore.Aas3
         }
 
         public Property(
-            string idShort,
             DataTypeDef valueType,
+            string? idShort = null,
             List<Extension>? extensions = null,
             LangStringSet? displayName = null,
             string? category = null,
@@ -2791,9 +2821,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             ValueType = valueType;
             Value = value;
             ValueId = valueId;
@@ -2824,7 +2852,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -2940,9 +2968,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -2986,14 +3017,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -3137,9 +3171,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             Value = value;
             ValueId = valueId;
         }
@@ -3165,7 +3197,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -3284,9 +3316,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -3320,14 +3355,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -3425,8 +3463,8 @@ namespace AasCore.Aas3
         }
 
         public Range(
-            string idShort,
             DataTypeDef valueType,
+            string? idShort = null,
             List<Extension>? extensions = null,
             LangStringSet? displayName = null,
             string? category = null,
@@ -3450,9 +3488,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             ValueType = valueType;
             Min = min;
             Max = max;
@@ -3479,7 +3515,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -3587,9 +3623,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -3628,14 +3667,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -3744,7 +3786,7 @@ namespace AasCore.Aas3
         }
 
         public ReferenceElement(
-            string idShort,
+            string? idShort = null,
             List<Extension>? extensions = null,
             LangStringSet? displayName = null,
             string? category = null,
@@ -3767,9 +3809,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             Value = value;
         }
     }
@@ -3791,7 +3831,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -3910,9 +3950,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -3946,14 +3989,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -4051,8 +4097,8 @@ namespace AasCore.Aas3
         }
 
         public Blob(
-            string idShort,
             string mimeType,
+            string? idShort = null,
             List<Extension>? extensions = null,
             LangStringSet? displayName = null,
             string? category = null,
@@ -4075,9 +4121,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             MimeType = mimeType;
             Value = value;
         }
@@ -4099,7 +4143,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -4213,9 +4257,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -4249,14 +4296,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -4354,8 +4404,8 @@ namespace AasCore.Aas3
         }
 
         public File(
-            string idShort,
             string mimeType,
+            string? idShort = null,
             List<Extension>? extensions = null,
             LangStringSet? displayName = null,
             string? category = null,
@@ -4378,9 +4428,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             MimeType = mimeType;
             Value = value;
         }
@@ -4400,7 +4448,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -4518,9 +4566,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -4563,14 +4614,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -4720,9 +4774,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             First = first;
             Second = second;
             Annotation = (annotation != null)
@@ -4769,7 +4821,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -4901,9 +4953,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -4952,14 +5007,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -5116,9 +5174,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             Statements = (statements != null)
                 ? statements
                 : new List<ISubmodelElement>();
@@ -5153,7 +5209,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -5261,9 +5317,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -5299,14 +5358,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -5413,7 +5475,7 @@ namespace AasCore.Aas3
 
         public BasicEvent(
             IReference observed,
-            string idShort,
+            string? idShort = null,
             List<Extension>? extensions = null,
             LangStringSet? displayName = null,
             string? category = null,
@@ -5435,9 +5497,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             Observed = observed;
         }
     }
@@ -5457,7 +5517,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -5574,9 +5634,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -5625,14 +5688,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -5788,9 +5854,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             InputVariables = (inputVariables != null)
                 ? inputVariables
                 : new List<OperationVariable>();
@@ -5897,7 +5961,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -5999,9 +6063,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -6035,14 +6102,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -6162,9 +6232,7 @@ namespace AasCore.Aas3
             Qualifiers = (qualifiers != null)
                 ? qualifiers
                 : new List<IConstraint>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
         }
     }
 
@@ -6186,7 +6254,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -6291,9 +6359,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -6327,14 +6398,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -6433,7 +6507,7 @@ namespace AasCore.Aas3
 
         public ConceptDescription(
             string id,
-            string idShort,
+            string? idShort = null,
             List<Extension>? extensions = null,
             LangStringSet? displayName = null,
             string? category = null,
@@ -6451,9 +6525,7 @@ namespace AasCore.Aas3
             Description = description;
             Id = id;
             Administration = administration;
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             IsCaseOf = (isCaseOf != null)
                 ? isCaseOf
                 : new List<IReference>();
@@ -6479,7 +6551,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<IReference> DataSpecifications { get; set; }
+        public List<IReference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// An extension of the element.
@@ -6573,9 +6645,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
             }
 
             foreach (var anItem in Extensions)
@@ -6609,14 +6684,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in DataSpecifications)
+            if (DataSpecifications != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DataSpecifications)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -6731,9 +6809,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             SemanticId = semanticId;
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
             ContainedElements = (containedElements != null)
                 ? containedElements
                 : new List<IReference>();

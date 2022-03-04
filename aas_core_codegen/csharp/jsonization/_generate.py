@@ -14,568 +14,659 @@ from aas_core_codegen.common import (
     assert_never,
     indent_but_first_line,
 )
-from aas_core_codegen.csharp import common as csharp_common, naming as csharp_naming
+from aas_core_codegen.csharp import (
+    common as csharp_common,
+    naming as csharp_naming,
+)
 from aas_core_codegen.csharp.common import (
     INDENT as I,
     INDENT2 as II,
     INDENT3 as III,
-    INDENT4 as IIII,
 )
 
 
-def _generate_json_converter_for_enumeration(
+def _generate_from_method_for_enumeration(
     enumeration: intermediate.Enumeration,
 ) -> Stripped:
-    """Generate the custom JSON converter based on the intermediate ``enumeration``."""
-    enum_name = csharp_naming.enum_name(enumeration.name)
+    """Generate the deserialization method for an enumeration."""
+    name = csharp_naming.enum_name(identifier=enumeration.name)
+
+    message_literal = csharp_common.string_literal(
+        f"Not a valid JSON representation of {name} "
+    )
 
     return Stripped(
         textwrap.dedent(
             f"""\
-        public class {enum_name}JsonConverter :
-        {I}Json.Serialization.JsonConverter<Aas.{enum_name}>
-        {{
-        {I}public override Aas.{enum_name} Read(
-        {II}ref Json.Utf8JsonReader reader,
-        {II}System.Type typeToConvert,
-        {II}Json.JsonSerializerOptions options)
-        {I}{{
-        {II}if (reader.TokenType != Json.JsonTokenType.String)
-        {II}{{
-        {III}throw new Json.JsonException();
-        {II}}}
-
-        {II}string? text = reader.GetString();
-        {II}if (text == null)
-        {II}{{
-        {III}throw new Json.JsonException();
-        {II}}}
-
-        {II}Aas.{enum_name}? value = Stringification.{enum_name}FromString(
-        {III}text);
-        {II}return value ?? throw new Json.JsonException(
-        {III}$"Invalid {enum_name}: {{text}}");
-        {I}}}
-
-        {I}public override void Write(
-        {II}Json.Utf8JsonWriter writer,
-        {II}Aas.{enum_name} value,
-        {II}Json.JsonSerializerOptions options)
-        {I}{{
-        {II}string? text = Stringification.ToString(value);
-        {II}if (text == null)
-        {II}{{
-        {III}throw new System.ArgumentException(
-        {IIII}$"Invalid {enum_name}: {{value}}");
-        {II}}}
-
-        {II}writer.WriteStringValue(text);
-        {I}}}
-        }}"""
-        )
-    )
-
-
-def _generate_read_for_interface(interface: intermediate.Interface) -> Stripped:
-    """Generate the ``Read`` method for de-serializing the ``interface``."""
-    # NOTE (mristin, 2022-02-05):
-    # We have to perform a two-pass de-serialization.
-    #
-    # First, we have to read all the properties and pick "modelType". While we are
-    # looking for the "modelType", we have to buffer the JSON representation of the
-    # object in a separate buffer as string.
-    #
-    # Second, we dispatch to the appropriate class deserialization method once we know
-    # the model type.
-
-    # NOTE (mristin, 2022-02-05):
-    # The order how we generate the blocks does not correspond to the order of
-    # the blocks in the file as we have to nest them. Hence read this code bottom-up
-    # if you want to properly understand it.
-
-    dispatch_writer = io.StringIO()
-    dispatch_writer.write(
-        textwrap.dedent(
-            f"""\
-            var secondPassReader = new Json.Utf8JsonReader(
-            {I}buffer.GetBuffer(),
-            {I}new Json.JsonReaderOptions
-            {I}{{
-            {II}AllowTrailingCommas = options.AllowTrailingCommas,
-            {II}CommentHandling = options.ReadCommentHandling,
-            {II}MaxDepth = options.MaxDepth
-            {I}}});
-            switch (modelType)
+            /// <summary>
+            /// Deserialize the enumeration {name} from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of {name}.
+            /// </exception>
+            public static Aas.{name} {name}From(
+            {I}Nodes.JsonNode node,
+            {I}string path)
             {{
-            """
+            {I}string text = Implementation.StringFrom(node, path);
+            {I}Aas.{name}? result = Stringification.{name}FromString(text);
+            {I}return result
+            {II} ?? throw new System.ArgumentException(
+            {III}{message_literal} +
+            {III}$"at: {{path}}");
+            }}  // public static Aas.{name} {name}From"""
         )
     )
 
-    for implementer in interface.implementers:
-        cls_name = csharp_naming.class_name(implementer.name)
-        json_model_type = naming.json_model_type(implementer.name)
 
-        dispatch_writer.write(
-            textwrap.indent(
-                textwrap.dedent(
-                    f"""\
-                    case {csharp_common.string_literal(json_model_type)}:
-                    {{
-                    {I}var deserialized = Json.JsonSerializer.Deserialize<Aas.{cls_name}>(
-                    {II}ref secondPassReader);
-                    {I}if (deserialized == null)
-                    {I}{{
-                    {II}throw new System.InvalidOperationException(
-                    {III}"Unexpected null {cls_name} from Deserialize call");
-                    {I}}}
-                    {I}return deserialized;
-                    }}
-                    """
-                ),
-                I,
-            )
-        )
-
-    dispatch_writer.write(
-        textwrap.indent(
-            textwrap.dedent(
-                f"""\
-                default:
-                {I}throw new Json.JsonException(
-                {II}$"Unknown model type: {{modelType}}");
-                """
-            ),
-            I,
-        )
-    )
-
-    dispatch_writer.write("}  // switch on modelType")
-
-    while_reader_body = textwrap.dedent(
-        f"""\
-// See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-if (reader.HasValueSequence)
-{{
-{II}foreach (var item in reader.ValueSequence)
-{II}{{
-{III}buffer.Write(item.Span);
-{II}}}
-}}
-else
-{{
-{I}buffer.Write(reader.ValueSpan);
-}}
-
-switch (reader.TokenType)
-{{
-{I}case Json.JsonTokenType.EndObject:
-{I}{{
-{II}{indent_but_first_line(dispatch_writer.getvalue(), II)}
-{I}}}
-{I}case Json.JsonTokenType.PropertyName:
-{I}{{
-{II}string propertyName = reader.GetString()
-{III}?? throw new System.InvalidOperationException(
-{IIII}"Unexpected null property name");
-
-{II}if (propertyName == "modelType")
-{II}{{
-{III}modelType = Json.JsonSerializer.Deserialize<string>(
-{IIII}ref reader);
-{II}}}
-{III}break;
-{I}}}
-{I}default:
-{II}throw new Json.JsonException();
-}}  // switch on token type"""
-    )
+def _generate_from_method_for_interface(
+    interface: intermediate.Interface,
+) -> Stripped:
+    """Generate the deserialization method for an interface."""
+    name = csharp_naming.interface_name(interface.name)
 
     blocks = [
         Stripped(
             textwrap.dedent(
                 f"""\
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
                 {{
-                {I}throw new Json.JsonException();
+                {I}throw new System.ArgumentException(
+                {II}"Expected Nodes.JsonObject, " +
+                {II}$"but got {{node.GetType()}} at: {{path}}");
                 }}"""
-            )
-        ),
-        Stripped("string? modelType = null;"),
-        Stripped(
-            textwrap.dedent(
-                """\
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);"""
             )
         ),
         Stripped(
             textwrap.dedent(
                 f"""\
-while (reader.Read())
-{{
-{I}{indent_but_first_line(while_reader_body, I)}
-}}  // while reader.Reader"""
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {{
+                {I}throw new System.ArgumentException(
+                {II}"Expected a model type, but none is present: " +
+                {II}$"{{path}}/modelType");
+                }}
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {{
+                {I}throw new System.ArgumentException(
+                {II}"Expected JsonValue, " +
+                {II}$"but got {{modelTypeNode.GetType()}} at: {{path}}");
+                }}
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {{
+                {I}throw new System.ArgumentException(
+                {II}"Expected a string, " +
+                {II}$"but the conversion failed from {{modelTypeValue}} " +
+                {II}$"at: {{path}}/modelType");
+                }}"""
             )
         ),
-        Stripped("throw new Json.JsonException();"),
-    ]
+    ]  # type: List[Stripped]
 
-    interface_name = csharp_naming.interface_name(interface.name)
-
-    body = "\n\n".join(blocks)
-
-    read_method = Stripped(
-        textwrap.dedent(
-            f"""\
-public override Aas.{interface_name} Read(
-{I}ref Json.Utf8JsonReader reader,
-{I}System.Type typeToConvert,
-{I}Json.JsonSerializerOptions options)
-{{
-{I}{indent_but_first_line(body, I)}
-}}"""
-        )
-    )
-
-    return read_method
-
-
-def _generate_write_for_interface(interface: intermediate.Interface) -> Stripped:
-    """Generate the ``Write`` method for serializing the ``interface``."""
-    interface_name = csharp_naming.interface_name(interface.name)
-
-    # region Switch on implementer type
+    # region Write the switch block
 
     switch_writer = io.StringIO()
     switch_writer.write(
         textwrap.dedent(
             """\
-            switch (that)
+            switch (modelType)
             {
             """
         )
     )
 
     for implementer in interface.implementers:
-        cls_name = csharp_naming.class_name(implementer.name)
-        var_name = csharp_naming.variable_name(Identifier(f"the_{implementer.name}"))
-
+        model_type = naming.json_model_type(implementer.name)
+        implementer_name = csharp_naming.class_name(implementer.name)
         switch_writer.write(
-            textwrap.indent(
-                textwrap.dedent(
-                    f"""\
-                    case {cls_name} {var_name}:
-                    {I}Json.JsonSerializer.Serialize(
-                    {II}writer, {var_name});
-                    {I}break;
-                    """
-                ),
-                I,
+            textwrap.dedent(
+                f"""\
+                {I}case {csharp_common.string_literal(model_type)}:
+                {II}return {implementer_name}From(
+                {III}node, path);
+                """
             )
         )
 
     switch_writer.write(
-        textwrap.indent(
-            textwrap.dedent(
-                f"""\
-                default:
-                {I}throw new System.ArgumentException(
-                    $"Instance `that` of type {{that.GetType()}} is " +
-                    $"not an implementer class of {interface_name}: {{that}}");"""
-            ),
-            I,
+        textwrap.dedent(
+            f"""\
+            {I}default:
+            {II}throw new System.ArgumentException(
+            {III}$"Unexpected model type for {name} at {{path}}/modelType: " +
+            {III}modelType);
+            }}"""
         )
     )
-
-    switch_writer.write("\n}")
+    blocks.append(Stripped(switch_writer.getvalue()))
 
     # endregion
 
-    # region Bundle it all together
-
     writer = io.StringIO()
+
     writer.write(
         textwrap.dedent(
             f"""\
-            public override void Write(
-            {I}Json.Utf8JsonWriter writer,
-            {I}Aas.{interface_name} that,
-            {I}Json.JsonSerializerOptions options)
+            /// <summary>
+            /// Deserialize an instance of {name} by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of {name}.
+            /// </exception>
+            public static Aas.{name} {name}From(
+            {I}Nodes.JsonNode node,
+            {I}string path)
             {{
             """
         )
     )
 
-    writer.write(switch_writer.getvalue())
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(block, I))
 
-    writer.write("\n}")
-
-    # endregion
+    writer.write(f"\n}}  // public static Aas.{name} {name}From")
 
     return Stripped(writer.getvalue())
 
 
+_PARSE_METHOD_BY_PRIMITIVE_TYPE = {
+    intermediate.PrimitiveType.BOOL: "Implementation.BoolFrom",
+    intermediate.PrimitiveType.INT: "Implementation.LongFrom",
+    intermediate.PrimitiveType.FLOAT: "Implementation.DoubleFrom",
+    intermediate.PrimitiveType.STR: "Implementation.StringFrom",
+    intermediate.PrimitiveType.BYTEARRAY: "Implementation.BytesFrom",
+}
+assert all(
+    literal in _PARSE_METHOD_BY_PRIMITIVE_TYPE for literal in intermediate.PrimitiveType
+)
+
+
+def _parse_method_for_atomic_value(
+    type_annotation: intermediate.AtomicTypeAnnotation,
+) -> Stripped:
+    """Determine the parse method for deserializing an atomic non-optional value."""
+    parse_method = None  # type: Optional[str]
+
+    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
+        parse_method = _PARSE_METHOD_BY_PRIMITIVE_TYPE[type_annotation.a_type]
+
+    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
+        symbol = type_annotation.symbol
+        if isinstance(symbol, intermediate.Enumeration):
+            enum_name = csharp_naming.enum_name(symbol.name)
+            parse_method = f"Deserialize.{enum_name}From"
+
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            parse_method = _PARSE_METHOD_BY_PRIMITIVE_TYPE[symbol.constrainee]
+
+        elif isinstance(
+            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            if symbol.interface is not None:
+                interface_name = csharp_naming.interface_name(symbol.interface.name)
+                parse_method = f"Deserialize.{interface_name}From"
+            else:
+                cls_name = csharp_naming.class_name(symbol.name)
+                parse_method = f"Deserialize.{cls_name}From"
+
+        else:
+            assert_never(symbol)
+    else:
+        assert_never(type_annotation)
+
+    return Stripped(parse_method)
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_json_converter_for_interface(
-    interface: intermediate.Interface,
+def _generate_deserialize_property(
+    prop: intermediate.Property,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the custom JSON converter based on the intermediate ``interface``."""
-    read_code = _generate_read_for_interface(interface=interface)
+    """Generate the code snippet for de-serializing the property ``prop``."""
+    # NOTE (mristin, 2022-03-10):
+    # Instead of writing here a complex but general solution with unrolling we choose
+    # to provide a simple, but limited, solution. First, the meta-model is quite
+    # limited itself at the moment, so the complexity of the general solution is not
+    # warranted. Second, we hope that there will be fewer bugs in the simple solution
+    # which is particularly important at this early adoption stage.
+    #
+    # We anticipate that in the future we will indeed need a general and complex
+    # solution. Here are just some thoughts on how to approach it:
+    # * Leave the pattern matching to produce more readable code for simple cases,
+    # * Unroll only in case of composite types and optional composite types.
 
-    write_code = _generate_write_for_interface(interface=interface)
-
-    interface_name = csharp_naming.interface_name(interface.name)
-
-    writer = io.StringIO()
-    writer.write(
-        textwrap.dedent(
-            f"""\
-        public class {interface_name}JsonConverter :
-        {I}Json.Serialization.JsonConverter<Aas.{interface_name}>
-        {{
-        {I}public override bool CanConvert(System.Type typeToConvert)
-        {I}{{
-        {II}return typeof(Aas.{interface_name}).IsAssignableFrom(typeToConvert);
-        {I}}}"""
-        )
+    type_anno = (
+        prop.type_annotation
+        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
+        else prop.type_annotation.value
     )
 
-    writer.write("\n\n")
+    if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
+        return None, Error(
+            prop.parsed.node,
+            "We currently implemented deserialization based on a very limited "
+            "pattern matching due to code simplicity. We did not handle "
+            "the case of nested optional values. Please contact "
+            "the developers if you need this functionality.",
+        )
+    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+        if isinstance(type_anno.items, intermediate.OptionalTypeAnnotation):
+            return None, Error(
+                prop.parsed.node,
+                "We currently implemented deserialization based on a very limited "
+                "pattern matching due to code simplicity. We did not handle "
+                "the case of lists of optional values. Please contact "
+                "the developers if you need this functionality.",
+            )
+        elif isinstance(type_anno.items, intermediate.ListTypeAnnotation):
+            return None, Error(
+                prop.parsed.node,
+                "We currently implemented deserialization based on a very limited "
+                "pattern matching due to code simplicity. We did not handle "
+                "the case of lists of lists. Please contact "
+                "the developers if you need this functionality.",
+            )
+        else:
+            pass
+    else:
+        pass
 
-    writer.write(textwrap.indent(read_code, I))
+    # Prefix the variables to avoid naming conflicts
+    target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
+    node_var = csharp_naming.variable_name(Identifier(f"node_{prop.name}"))
 
-    writer.write("\n\n")
+    json_name = naming.json_property(prop.name)
+    assert not csharp_common.needs_escaping(json_name)
 
-    writer.write(textwrap.indent(write_code, I))
+    json_literal = csharp_common.string_literal(json_name)
 
-    writer.write(f"\n}}  // {interface_name}JsonConverter")
+    stmts = [
+        Stripped(f"Nodes.JsonNode? {node_var} = obj[{json_literal}];")
+    ]  # type: List[Stripped]
 
-    return Stripped(writer.getvalue()), None
+    required = not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
+    target_type = csharp_common.generate_type(type_anno)
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        if isinstance(
+            type_anno.symbol,
+            (
+                intermediate.Enumeration,
+                intermediate.AbstractClass,
+                intermediate.ConcreteClass,
+            ),
+        ):
+            target_type = Stripped(f"Aas.{target_type}")
+        elif isinstance(type_anno.symbol, intermediate.ConstrainedPrimitive):
+            # We do not have to prefix the type as it will be a primitive.
+            pass
+        else:
+            assert_never(type_anno.symbol)
+
+    parse_block = None  # type: Optional[Stripped]
+    if isinstance(
+        type_anno,
+        (intermediate.PrimitiveTypeAnnotation, intermediate.OurTypeAnnotation),
+    ):
+        parse_method = _parse_method_for_atomic_value(type_anno)
+
+        if required:
+            parse_block = Stripped(
+                textwrap.dedent(
+                    f"""\
+                    {target_type} {target_var} = {parse_method}(
+                    {I}{node_var},
+                    {I}$"{{path}}/{json_name}");"""
+                )
+            )
+        else:
+            parse_block = Stripped(
+                textwrap.dedent(
+                    f"""\
+                    {target_var} = {parse_method}(
+                    {I}{node_var},
+                    {I}$"{{path}}/{json_name}");"""
+                )
+            )
+
+    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+        assert not isinstance(
+            type_anno.items,
+            (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
+        ), (
+            "We chose to implement only a very limited pattern matching; "
+            "see the note above in the code."
+        )
+
+        item_type = csharp_common.generate_type(type_anno.items)
+
+        array_var = csharp_naming.variable_name(Identifier(f"array_{prop.name}"))
+        index_var = csharp_naming.variable_name(Identifier(f"index_{prop.name}"))
+
+        parse_method = _parse_method_for_atomic_value(type_anno.items)
+
+        # If the property is required, the target_var will be defined before.
+        target_var_prefix = "var " if required else ""
+
+        parse_block = Stripped(
+            textwrap.dedent(
+                f"""\
+                Nodes.JsonArray? {array_var} = {node_var} as Nodes.JsonArray;
+                if ({array_var} == null)
+                {{
+                {I}throw new System.ArgumentException(
+                {II}$"Expected a JsonArray, but got {{{node_var}.GetType()}} " +
+                {II}$"at: {{path}}/{json_name}");
+                }}
+                {target_var_prefix}{target_var} = new List<{item_type}>(
+                {I}{array_var}.Count);
+                int {index_var} = 0;
+                foreach (Nodes.JsonNode? item in {array_var})
+                {{
+                {I}if (item == null)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {III}"Expected a non-null item, but got a null " +
+                {III}$"at: {{path}}/{json_name}/{{{index_var}}}");
+                {I}}}
+                {I}{item_type} parsedItem = {parse_method}(
+                {II}item,
+                {II}$"{{path}}/{json_name}/{{{index_var}}}");
+                {I}{target_var}.Add(parsedItem);
+                {I}{index_var}++;
+                }}"""
+            )
+        )
+    else:
+        assert_never(prop.type_annotation)
+
+    if required:
+        message_literal = csharp_common.string_literal(
+            f"Required property {json_literal} is missing "
+        )
+
+        stmts.append(
+            Stripped(
+                textwrap.dedent(
+                    f"""\
+                    if ({node_var} == null)
+                    {{
+                    {I}throw new System.ArgumentException(
+                    {II}{message_literal} +
+                    {II}$"at: {{path}}/{json_name}");
+                    }}"""
+                )
+            )
+        )
+        stmts.append(parse_block)
+    else:
+        assert not target_type.endswith(
+            "?"
+        ), "Expected the type of the target not to consider the outer Optional"
+
+        # NOTE (mristin, 2022-03-11):
+        # We can not use textwrap.dedent since we need to indent the parse_block.
+        stmts.append(
+            Stripped(
+                f"""\
+{target_type}? {target_var} = null;
+if ({node_var} != null)
+{{
+{I}{indent_but_first_line(parse_block, I)}
+}}"""
+            )
+        )
+
+    return Stripped("\n".join(stmts)), None
 
 
-def _generate_read_for_class(cls: intermediate.ConcreteClass) -> Stripped:
-    """Generate the ``Read`` method for de-serializing the class ``cls``."""
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_from_method_for_class(
+    cls: intermediate.ConcreteClass,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the deserialization method for a concrete class."""
+    errors = []  # type: List[Error]
+
+    name = csharp_naming.class_name(cls.name)
+
     blocks = [
         Stripped(
             textwrap.dedent(
                 f"""\
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
                 {{
-                {I}throw new Json.JsonException();
+                {I}throw new System.ArgumentException(
+                {II}"Expected a JsonObject, but got {{node.GetType()}} at: {{path}}");
                 }}"""
             )
         )
-    ]
+    ]  # type: List[Stripped]
 
-    # region Initializations
-
-    if len(cls.constructor.arguments) > 0:
-        initialization_lines = [
-            Stripped('// Prefix the property variables with "the" to avoid conflicts')
-        ]  # type: List[Stripped]
-
-        for arg in cls.constructor.arguments:
-            var_name = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
-            arg_type = csharp_common.generate_type(type_annotation=arg.type_annotation)
-
-            if arg_type.endswith("?"):
-                initialization_lines.append(Stripped(f"{arg_type} {var_name} = null;"))
+    if len(cls.constructor.arguments) == 0:
+        blocks.append(Stripped(f"return new Aas.{name}();"))
+    else:
+        for prop in cls.properties:
+            block, error = _generate_deserialize_property(prop=prop)
+            if error is not None:
+                errors.append(error)
             else:
-                initialization_lines.append(Stripped(f"{arg_type}? {var_name} = null;"))
+                assert block is not None
+                blocks.append(block)
 
-        blocks.append(Stripped("\n".join(initialization_lines)))
+        if len(errors) > 0:
+            return None, errors
 
-    # endregion
+        # region Pass in properties as arguments to the constructor
 
-    cls_name = csharp_naming.class_name(cls.name)
+        property_names = [prop.name for prop in cls.properties]
+        constructor_argument_names = [arg.name for arg in cls.constructor.arguments]
 
-    # region Final successful case
+        # fmt: off
+        assert (
+                set(prop.name for prop in cls.properties)
+                == set(arg.name for arg in cls.constructor.arguments)
+        ), (
+            f"Expected the properties to coincide with constructor arguments, "
+            f"but they do not for {cls.name!r}:"
+            f"{property_names=}, {constructor_argument_names=}"
+        )
+        # fmt: on
 
-    return_writer = io.StringIO()
-    if len(cls.constructor.arguments) > 0:
-        return_writer.write(f"return new Aas.{cls_name}(\n")
+        init_writer = io.StringIO()
+        init_writer.write(f"return new Aas.{name}(\n")
 
         for i, arg in enumerate(cls.constructor.arguments):
-            var_name = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
+            prop = cls.properties_by_name[arg.name]
 
-            if not isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation):
-                json_prop_name = naming.json_property(arg.name)
+            # NOTE (mristin, 2022-03-11):
+            # The argument to the constructor may be optional while the property might
+            # be required, since we can set the default value in the body of the
+            # constructor. However, we can not have an optional property and a required
+            # constructor argument as we then would not know how to create the instance.
 
-                error_msg = csharp_common.string_literal(
-                    f"Required property is missing: {json_prop_name}"
-                )
+            # fmt: off
+            assert (
+                    intermediate.type_annotations_equal(
+                        arg.type_annotation,
+                        prop.type_annotation
+                    ) or intermediate.type_annotations_equal(
+                intermediate.beneath_optional(arg.type_annotation),
+                prop.type_annotation
+            )
+            ), (
+                f"Expected type annotation for property {prop.name!r} "
+                f"and constructor argument {arg.name!r} "
+                f"of the class {cls.name!r} to have matching types, "
+                f"but they do not: "
+                f"property type is {prop.type_annotation} "
+                f"and argument type is {arg.type_annotation}. "
+                f"Hence we do not know how to generate the call to the constructor."
+            )
+            # fmt: on
 
-                return_writer.write(
-                    textwrap.indent(
-                        textwrap.dedent(
-                            f"""\
-                    {var_name} ?? throw new Json.JsonException(
-                    {I}{error_msg})"""
-                        ),
-                        I,
-                    )
-                )
-            else:
-                return_writer.write(f"{I}{var_name}")
+            arg_var = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
 
             if i < len(cls.constructor.arguments) - 1:
-                return_writer.write(",\n")
+                init_writer.write(f"{I}{arg_var},\n")
             else:
-                return_writer.write(");")
+                init_writer.write(f"{I}{arg_var});")
 
-    else:
-        return_writer.write(f"{I}return new Aas.{cls_name}();")
+        # endregion
 
-    # endregion
+        blocks.append(Stripped(init_writer.getvalue()))
 
-    # region Loop and switch
+    writer = io.StringIO()
 
-    token_case_blocks = [
-        Stripped(
-            f"""\
-case Json.JsonTokenType.EndObject:
-{I}{indent_but_first_line(return_writer.getvalue(), I)}"""
-        )
-    ]
-
-    if len(cls.properties) > 0 or cls.serialization.with_model_type:
-        property_switch_writer = io.StringIO()
-        property_switch_writer.write(
-            textwrap.dedent(
-                f"""\
-                string propertyName = reader.GetString()
-                {I}?? throw new System.InvalidOperationException(
-                {II}"Unexpected property name null");
-
-                switch (propertyName)
-                {{
-                """
-            )
-        )
-
-        for prop in cls.properties:
-            var_name = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
-
-            if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-                arg_type = csharp_common.generate_type(
-                    type_annotation=prop.type_annotation.value
-                )
-            else:
-                arg_type = csharp_common.generate_type(
-                    type_annotation=prop.type_annotation
-                )
-
-            json_prop_name = naming.json_property(prop.name)
-
-            property_switch_writer.write(
-                textwrap.indent(
-                    textwrap.dedent(
-                        f"""\
-                        case {csharp_common.string_literal(json_prop_name)}:
-                        {I}{var_name} =  (
-                        {II}Json.JsonSerializer.Deserialize<{arg_type}>(
-                        {III}ref reader));
-                        {I}break;
-                        """
-                    ),
-                    I,
-                )
-            )
-
-        if cls.serialization.with_model_type:
-            property_switch_writer.write(
-                textwrap.indent(
-                    textwrap.dedent(
-                        f"""\
-                case "modelType":
-                {I}// Ignore the property modelType as we already know the exact type
-                {I}break;
-                """
-                    ),
-                    I,
-                )
-            )
-
-        property_switch_writer.write(
-            textwrap.dedent(
-                f"""\
-            {I}default:
-            {II}// Ignore an unknown property
-            {II}if (!reader.Read())
-            {II}{{
-            {III}throw new Json.JsonException(
-            {IIII}$"Unexpected end-of-stream after the property: {{propertyName}}");
-            {II}}}
-            {II}if (!reader.TrySkip())
-            {II}{{
-            {III}throw new Json.JsonException(
-            {IIII}"Unexpected end-of-stream when skipping " +
-            {IIII}$"the value of the unknown property: {{propertyName}}");
-            {II}}}
-            {II}break;
-            }}  // switch on propertyName"""
-            )
-        )
-
-        token_case_blocks.append(
-            Stripped(
-                f"""\
-case Json.JsonTokenType.PropertyName:
-{I}{indent_but_first_line(property_switch_writer.getvalue(), I)}
-{I}break;"""
-            )
-        )
-
-    token_case_blocks.append(
-        Stripped(
-            textwrap.dedent(
-                f"""\
-                default:
-                {I}throw new Json.JsonException();"""
-            )
-        )
-    )
-
-    while_writer = io.StringIO()
-    while_writer.write(
+    writer.write(
         textwrap.dedent(
             f"""\
-            while (reader.Read())
+            /// <summary>
+            /// Deserialize an instance of {name} from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of {name}.
+            /// </exception>
+            public static Aas.{name} {name}From(
+            {I}Nodes.JsonNode node,
+            {I}string path)
             {{
-            {I}switch (reader.TokenType)
-            {I}{{
             """
         )
     )
 
-    for i, token_case_block in enumerate(token_case_blocks):
+    for i, block in enumerate(blocks):
         if i > 0:
-            while_writer.write("\n\n")
+            writer.write("\n\n")
+        writer.write(textwrap.indent(block, I))
 
-        while_writer.write(textwrap.indent(token_case_block, II))
+    writer.write(f"\n}}  // public static Aas.{name} {name}From")
 
-    while_writer.write(
-        f"\n" f"{I}}}  // switch on token type\n" f"}}  // while reader.Read"
-    )
+    return Stripped(writer.getvalue()), None
 
-    blocks.append(Stripped(while_writer.getvalue()))
 
-    blocks.append(Stripped("throw new Json.JsonException();"))
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_deserialize(
+    symbol_table: intermediate.SymbolTable,
+    spec_impls: specific_implementations.SpecificImplementations,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the deserializer with a deserialization method for each class."""
+    errors = []  # type: List[Error]
 
-    # endregion
+    blocks = []  # type: List[Stripped]
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, intermediate.Enumeration):
+            blocks.append(_generate_from_method_for_enumeration(enumeration=symbol))
 
-    # region Bundle it all together
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            continue
+
+        elif isinstance(
+            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            if symbol.interface is not None:
+                blocks.append(
+                    _generate_from_method_for_interface(interface=symbol.interface)
+                )
+
+            if isinstance(symbol, intermediate.ConcreteClass):
+                if symbol.is_implementation_specific:
+                    jsonization_key = specific_implementations.ImplementationKey(
+                        f"Jsonization/{symbol.name}_from.cs"
+                    )
+
+                    implementation = spec_impls.get(jsonization_key, None)
+                    if implementation is None:
+                        errors.append(
+                            Error(
+                                symbol.parsed.node,
+                                f"The jsonization snippet is missing "
+                                f"for the implementation-specific "
+                                f"class {symbol.name}: {jsonization_key}",
+                            )
+                        )
+                        continue
+
+                    blocks.append(spec_impls[jsonization_key])
+                else:
+                    block, cls_errors = _generate_from_method_for_class(cls=symbol)
+                    if cls_errors is not None:
+                        errors.extend(cls_errors)
+                        continue
+                    else:
+                        assert block is not None
+                        blocks.append(block)
+        else:
+            assert_never(symbol)
+
+    if len(errors) > 0:
+        return None, errors
 
     writer = io.StringIO()
+
     writer.write(
         textwrap.dedent(
-            f"""\
-        public override Aas.{cls_name} Read(
-        {I}ref Json.Utf8JsonReader reader,
-        {I}System.Type typeToConvert,
-        {I}Json.JsonSerializerOptions options)
-        {{
-        """
+            """\
+            /// <summary>
+            /// Deserialize instances of meta-model classes from JSON nodes.
+            /// </summary>
+            """
+        )
+    )
+
+    first_cls = None  # type: Optional[intermediate.ClassUnion]
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)):
+            first_cls = symbol
+            break
+
+    if first_cls is not None:
+        cls_name = None  # type: Optional[str]
+        if isinstance(first_cls, intermediate.AbstractClass):
+            cls_name = csharp_naming.interface_name(first_cls.name)
+        elif isinstance(first_cls, intermediate.ConcreteClass):
+            cls_name = csharp_naming.class_name(first_cls.name)
+        else:
+            assert_never(first_cls)
+
+        an_instance_variable = csharp_naming.variable_name(Identifier("an_instance"))
+
+        writer.write(
+            textwrap.dedent(
+                f"""\
+                /// <example>
+                /// Here is an example how to parse an instance of {cls_name}:
+                /// <code>
+                /// string someString = "... some JSON ...";
+                /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
+                /// Aas.{cls_name} {an_instance_variable} = Deserialize.{cls_name}From(
+                /// {I}node, "/some/path/to/a/file.json#/somewhere");
+                /// </code>
+                /// </example>
+                """
+            )
+        )
+
+    writer.write(
+        textwrap.dedent(
+            """\
+            public static class Deserialize
+            {
+            """
         )
     )
 
@@ -584,76 +675,365 @@ case Json.JsonTokenType.PropertyName:
             writer.write("\n\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write("\n}")
+    writer.write("\n}  // public static class Deserialize")
 
-    # endregion
-
-    return Stripped(writer.getvalue())
+    return Stripped(writer.getvalue()), None
 
 
-def _generate_write_for_class(cls: intermediate.ConcreteClass) -> Stripped:
-    """Generate the ``Write`` method for serializing the class ``cls``."""
-    blocks = [Stripped("writer.WriteStartObject();")]
+_SERIALIZE_METHOD_BY_PRIMITIVE_TYPE = {
+    intermediate.PrimitiveType.BOOL: "Nodes.JsonValue.Create",
+    intermediate.PrimitiveType.INT: "Implementation.ToJsonValue",
+    intermediate.PrimitiveType.FLOAT: "Nodes.JsonValue.Create",
+    intermediate.PrimitiveType.STR: "Nodes.JsonValue.Create",
+    intermediate.PrimitiveType.BYTEARRAY: "Nodes.JsonValue.Create(",
+}
+assert all(
+    literal in _SERIALIZE_METHOD_BY_PRIMITIVE_TYPE
+    for literal in intermediate.PrimitiveType
+)
 
-    if cls.serialization.with_model_type:
-        json_model_type = naming.json_model_type(cls.name)
-        blocks.append(
-            Stripped(
-                textwrap.dedent(
-                    f"""\
-            writer.WritePropertyName("modelType");
-            Json.JsonSerializer.Serialize(
-            {I}writer, {csharp_common.string_literal(json_model_type)});"""
-                )
-            )
+
+def _generate_serialize_primitive_value(
+    primitive_type: intermediate.PrimitiveType, source_expr: Stripped
+) -> Stripped:
+    """
+    Generate the snippet to serialize ``source_expr`` to JSON.
+
+    Source expression is expected to be of ``primitive_type``.
+    """
+    if (
+        primitive_type is intermediate.PrimitiveType.BOOL
+        or primitive_type is intermediate.PrimitiveType.FLOAT
+        or primitive_type is intermediate.PrimitiveType.STR
+    ):
+        # We can not use textwrap due to indent_but_first_line.
+        return Stripped(
+            f"""\
+Nodes.JsonValue.Create(
+{I}{indent_but_first_line(source_expr, I)})"""
         )
+    elif primitive_type is intermediate.PrimitiveType.INT:
+        # We can not use textwrap due to indent_but_first_line.
+        return Stripped(
+            f"""\
+Implementation.ToJsonValue(
+{I}{indent_but_first_line(source_expr, I)})"""
+        )
+    elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+        # We can not use textwrap due to indent_but_first_line.
+        return Stripped(
+            f"""\
+Nodes.JsonValue.Create(
+{I}System.Convert.ToBase64String(
+{II}{indent_but_first_line(source_expr, II)}))"""
+        )
+    else:
+        assert_never(primitive_type)
 
-    for prop in cls.properties:
-        prop_name = csharp_naming.property_name(prop.name)
-        json_prop_name = naming.json_property(prop.name)
 
-        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            blocks.append(
-                Stripped(
-                    textwrap.dedent(
-                        f"""\
-                writer.WritePropertyName({csharp_common.string_literal(json_prop_name)});
-                Json.JsonSerializer.Serialize(
-                {I}writer, that.{prop_name});"""
-                    )
-                )
+def _generate_serialize_atomic_value(
+    type_annotation: intermediate.AtomicTypeAnnotation, source_expr: Stripped
+) -> Stripped:
+    """Generate the snippet to serialize ``source_expr`` to JSON."""
+    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
+        return _generate_serialize_primitive_value(
+            primitive_type=type_annotation.a_type, source_expr=source_expr
+        )
+    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
+        symbol = type_annotation.symbol
+        if isinstance(symbol, intermediate.Enumeration):
+            name = csharp_naming.enum_name(symbol.name)
+
+            # We can not use textwrap due to indent_but_first_line.
+            return Stripped(
+                f"""\
+Serialize.{name}ToJsonValue(
+{I}{indent_but_first_line(source_expr, I)})"""
+            )
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            return _generate_serialize_primitive_value(
+                primitive_type=symbol.constrainee, source_expr=source_expr
+            )
+        elif isinstance(
+            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            # We can not use textwrap due to indent_but_first_line.
+            return Stripped(
+                f"""\
+Transform(
+{I}{indent_but_first_line(source_expr, I)})"""
             )
         else:
-            blocks.append(
+            assert_never(symbol)
+    else:
+        assert_never(type_annotation)
+        raise AssertionError("Unexpected execution path")
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_transform_property(
+    prop: intermediate.Property,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate the snippet to transform a property into a JSON node."""
+    # NOTE (mristin, 2022-03-10):
+    # Instead of writing here a complex but general solution with unrolling we choose
+    # to provide a simple, but limited, solution. First, the meta-model is quite
+    # limited itself at the moment, so the complexity of the general solution is not
+    # warranted. Second, we hope that there will be fewer bugs in the simple solution
+    # which is particularly important at this early adoption stage.
+    #
+    # We anticipate that in the future we will indeed need a general and complex
+    # solution. Here are just some thoughts on how to approach it:
+    # * Leave the pattern matching to produce more readable code for simple cases,
+    # * Unroll only in case of composite types and optional composite types.
+
+    type_anno = (
+        prop.type_annotation
+        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
+        else prop.type_annotation.value
+    )
+
+    if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
+        return None, Error(
+            prop.parsed.node,
+            "We currently implemented serialization based on a very limited "
+            "pattern matching due to code simplicity. We did not handle "
+            "the case of nested optional values. Please contact "
+            "the developers if you need this functionality.",
+        )
+    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+        if isinstance(type_anno.items, intermediate.OptionalTypeAnnotation):
+            return None, Error(
+                prop.parsed.node,
+                "We currently implemented serialization based on a very limited "
+                "pattern matching due to code simplicity. We did not handle "
+                "the case of lists of optional values. Please contact "
+                "the developers if you need this functionality.",
+            )
+        elif isinstance(type_anno.items, intermediate.ListTypeAnnotation):
+            return None, Error(
+                prop.parsed.node,
+                "We currently implemented serialization based on a very limited "
+                "pattern matching due to code simplicity. We did not handle "
+                "the case of lists of lists. Please contact "
+                "the developers if you need this functionality.",
+            )
+        else:
+            pass
+    else:
+        pass
+
+    stmts = []  # type: List[Stripped]
+
+    name = csharp_naming.property_name(prop.name)
+    prop_literal = csharp_common.string_literal(naming.json_property(prop.name))
+
+    # NOTE (mristin, 2022-03-12):
+    # For some unexplainable reason, C# compiler can not infer that properties which
+    # are enumerations are not null after an ``if (that.someProperty != null)``.
+    # Hence we need to add a null-coalescing for these particular cases.
+    # Otherwise, we can just stick to ``that.someProperty``.
+
+    needs_null_coalescing = (
+        isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
+        and isinstance(prop.type_annotation.value, intermediate.OurTypeAnnotation)
+        and isinstance(prop.type_annotation.value.symbol, intermediate.Enumeration)
+    )
+    if needs_null_coalescing:
+        source_expr = Stripped("value")
+    else:
+        source_expr = Stripped(f"that.{name}")
+
+    if isinstance(
+        type_anno,
+        (intermediate.PrimitiveTypeAnnotation, intermediate.OurTypeAnnotation),
+    ):
+        conversion_expr = _generate_serialize_atomic_value(
+            type_annotation=type_anno, source_expr=source_expr
+        )
+        stmts.append(Stripped(f"result[{prop_literal}] = {conversion_expr};"))
+    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+        assert not isinstance(
+            type_anno.items,
+            (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
+        ), (
+            "We chose to implement only a very limited pattern matching; "
+            "see the note above in the code."
+        )
+
+        item_type = csharp_common.generate_type(type_anno.items)
+        array_var = csharp_naming.variable_name(Identifier(f"array_{prop.name}"))
+
+        item_conversion_expr = _generate_serialize_atomic_value(
+            type_annotation=type_anno.items, source_expr=Stripped("item")
+        )
+
+        # We can not use textwrap due to indent_but_first_line.
+        stmts.append(
+            Stripped(
+                f"""\
+var {array_var} = new Nodes.JsonArray();
+foreach ({item_type} item in {source_expr})
+{{
+{I}{array_var}.Add(
+{II}{indent_but_first_line(item_conversion_expr, II)});
+}}
+result[{prop_literal}] = {array_var};"""
+            )
+        )
+    else:
+        assert_never(type_anno)
+
+    serialize_block = Stripped("\n".join(stmts))
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        if needs_null_coalescing:
+            value_type = csharp_common.generate_type(prop.type_annotation.value)
+            if isinstance(prop.type_annotation.value, intermediate.OurTypeAnnotation):
+                symbol = prop.type_annotation.value.symbol
+                if isinstance(
+                    symbol,
+                    (
+                        intermediate.Enumeration,
+                        intermediate.AbstractClass,
+                        intermediate.ConcreteClass,
+                    ),
+                ):
+                    value_type = Stripped(f"Aas.{value_type}")
+
+            return (
                 Stripped(
-                    textwrap.dedent(
-                        f"""\
-                if (that.{prop_name} != null)
-                {{
-                {I}writer.WritePropertyName({csharp_common.string_literal(json_prop_name)});
-                {I}Json.JsonSerializer.Serialize(
-                {II}writer, that.{prop_name});
-                }}"""
-                    )
-                )
+                    f"""\
+if (that.{name} != null)
+{{
+{I}// We need to help the static analyzer with a null coalescing.
+{I}{value_type} value = that.{name}
+{II}?? throw new System.InvalidOperationException();
+{I}{indent_but_first_line(serialize_block, I)}
+}}"""
+                ),
+                None,
             )
 
-    blocks.append(Stripped("writer.WriteEndObject();"))
+        else:
+            return (
+                Stripped(
+                    f"""\
+if (that.{name} != null)
+{{
+{I}{indent_but_first_line(serialize_block, I)}
+}}"""
+                ),
+                None,
+            )
+    else:
+        return serialize_block, None
 
-    # region Bundle it all together
 
-    cls_name = csharp_naming.class_name(cls.name)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_transform_for_class(
+    cls: intermediate.ConcreteClass,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the transform method to a JSON object for the given concrete class."""
+    errors = []  # type: List[Error]
+    name = csharp_naming.class_name(cls.name)
+
+    blocks = [Stripped("var result = new Nodes.JsonObject();")]  # type: List[Stripped]
+
+    for prop in cls.properties:
+        block, error = _generate_transform_property(prop=prop)
+        if error is not None:
+            errors.append(error)
+        else:
+            assert block is not None
+            blocks.append(block)
+
+    if len(errors) > 0:
+        return None, errors
+
+    blocks.append(Stripped("return result;"))
 
     writer = io.StringIO()
     writer.write(
         textwrap.dedent(
             f"""\
-        public override void Write(
-        {I}Json.Utf8JsonWriter writer,
-        {I}Aas.{cls_name} that,
-        {I}Json.JsonSerializerOptions options)
-        {{
-        """
+            public override Nodes.JsonObject Transform(Aas.{name} that)
+            {{
+            """
+        )
+    )
+
+    for i, stmt in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(stmt, I))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_transformer(
+    symbol_table: intermediate.SymbolTable,
+    spec_impls: specific_implementations.SpecificImplementations,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate a transformer which transforms instances of the meta-model to JSON."""
+    errors = []  # type: List[Error]
+
+    blocks = []  # type: List[Stripped]
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, intermediate.Enumeration):
+            continue
+
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            continue
+
+        elif isinstance(symbol, intermediate.AbstractClass):
+            # The abstract classes are directly dispatched by the transformer,
+            # so we do not need to handle them separately.
+            pass
+
+        elif isinstance(symbol, intermediate.ConcreteClass):
+            if symbol.is_implementation_specific:
+                jsonization_key = specific_implementations.ImplementationKey(
+                    f"Jsonization/transform_{symbol.name}.cs"
+                )
+
+                implementation = spec_impls.get(jsonization_key, None)
+                if implementation is None:
+                    errors.append(
+                        Error(
+                            symbol.parsed.node,
+                            f"The jsonization snippet is missing "
+                            f"for the implementation-specific "
+                            f"class {symbol.name}: {jsonization_key}",
+                        )
+                    )
+                    continue
+
+                blocks.append(spec_impls[jsonization_key])
+            else:
+                block, cls_errors = _generate_transform_for_class(cls=symbol)
+                if cls_errors is not None:
+                    errors.extend(cls_errors)
+                else:
+                    assert block is not None
+                    blocks.append(block)
+        else:
+            assert_never(symbol)
+
+    if len(errors) > 0:
+        return None, errors
+
+    writer = io.StringIO()
+    writer.write(
+        textwrap.dedent(
+            f"""\
+            internal class Transformer
+            {I}: Visitation.AbstractTransformer<Nodes.JsonObject>
+            {{
+            """
         )
     )
 
@@ -662,36 +1042,113 @@ def _generate_write_for_class(cls: intermediate.ConcreteClass) -> Stripped:
             writer.write("\n\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write("\n}")
+    writer.write("\n}  // internal class Transformer")
 
-    # endregion
-
-    return Stripped(writer.getvalue())
+    return Stripped(writer.getvalue()), None
 
 
-def _generate_json_converter_for_class(cls: intermediate.ConcreteClass) -> Stripped:
-    """Generate the custom JSON converter based on the intermediate ``cls``."""
+def _generate_serialize(
+    symbol_table: intermediate.SymbolTable,
+) -> Stripped:
+    """Generate the static serializer."""
+    blocks = [
+        Stripped("private static Transformer _transformer = new Transformer();"),
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>
+                /// Serialize an instance of the meta-model into a JSON object.
+                /// </summary>
+                public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
+                {{
+                {I}return Serialize._transformer.Transform(that);
+                }}"""
+            )
+        ),
+    ]  # type: List[Stripped]
 
-    cls_name = csharp_naming.class_name(cls.name)
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, intermediate.Enumeration):
+            name = csharp_naming.enum_name(symbol.name)
+            blocks.append(
+                Stripped(
+                    textwrap.dedent(
+                        f"""\
+                        /// <summary>
+                        /// Serialize a literal of {name} into a JSON string.
+                        /// </summary>
+                        public static Nodes.JsonValue {name}ToJsonValue(Aas.{name} that)
+                        {{
+                        {I}string? text = Stringification.ToString(that);
+                        {I}return Nodes.JsonValue.Create(text)
+                        {II}?? throw new System.ArgumentException(
+                        {III}$"Invalid {name}: {{that}}");
+                        }}"""
+                    )
+                )
+            )
 
     writer = io.StringIO()
+
     writer.write(
         textwrap.dedent(
-            f"""\
-        public class {cls_name}JsonConverter :
-        {I}Json.Serialization.JsonConverter<Aas.{cls_name}>
-        {{
-        """
+            """\
+            /// <summary>
+            /// Serialize instances of meta-model classes to JSON elements.
+            /// </summary>
+            """
         )
     )
 
-    writer.write(textwrap.indent(_generate_read_for_class(cls=cls), I))
+    first_cls = None  # type: Optional[intermediate.ClassUnion]
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)):
+            first_cls = symbol
+            break
 
-    writer.write("\n\n")
+    if first_cls is not None:
+        cls_name = None  # type: Optional[str]
+        if isinstance(first_cls, intermediate.AbstractClass):
+            cls_name = csharp_naming.interface_name(first_cls.name)
+        elif isinstance(first_cls, intermediate.ConcreteClass):
+            cls_name = csharp_naming.class_name(first_cls.name)
+        else:
+            assert_never(first_cls)
 
-    writer.write(textwrap.indent(_generate_write_for_class(cls=cls), I))
+        an_instance_variable = csharp_naming.variable_name(Identifier("an_instance"))
 
-    writer.write(f"\n}}  // {cls_name}JsonConverter")
+        writer.write(
+            textwrap.dedent(
+                f"""\
+                /// <example>
+                /// Here is an example how to serialize an instance of {cls_name}:
+                /// <code>
+                /// var {an_instance_variable} = new Aas.{cls_name}(
+                ///     // ... some constructor arguments ...
+                /// );
+                /// Json.Nodes.JsonObject element = Serialize.ToJsonObject(
+                ///     {an_instance_variable});
+                /// </code>
+                /// </example>
+                """
+            )
+        )
+
+    writer.write(
+        textwrap.dedent(
+            """\
+            public static class Serialize
+            {
+            """
+        )
+    )
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(block, I))
+
+    writer.write("\n}  // public static class Serialize")
 
     return Stripped(writer.getvalue())
 
@@ -716,179 +1173,334 @@ def generate(
     """
     errors = []  # type: List[Error]
 
+    # region Implementation
+
+    implementation_blocks = [
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>Convert <paramref name="node" /> to a boolean.</summary>
+                /// <param name="node">JSON node to be parsed</param>
+                /// <param name="path">Path to the node used in exceptions</param>
+                /// <exception cref="System.ArgumentException">
+                /// Thrown if not a valid boolean.
+                /// </exception>
+                internal static bool BoolFrom(
+                {I}Nodes.JsonNode node,
+                {I}string path)
+                {{
+                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
+                {I}if (value == null)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {III}$"Expected a JsonValue, but got {{node.GetType()}} " +
+                {III}$" at: {{path}}");
+                {I}}}
+                {I}bool ok = value.TryGetValue<bool>(out bool result);
+                {I}if (!ok)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {II}$"Expected a boolean, but the conversion failed " +
+                {II}$"from {{value.ToJsonString()}} " +
+                {II}$"at: {{path}}");
+                {I}}}
+                {I}return result;
+                }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>
+                /// Convert the <paramref name="node" /> to a long 64-bit integer.
+                /// </summary>
+                /// <param name="node">JSON node to be parsed</param>
+                /// <param name="path">Path to the node used in exceptions</param>
+                /// <exception cref="System.ArgumentException">
+                /// Thrown if not a valid 64-bit integer.
+                /// </exception>
+                internal static long LongFrom(
+                {I}Nodes.JsonNode node,
+                {I}string path)
+                {{
+                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
+                {I}if (value == null)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {III}$"Expected a JsonValue, but got {{node.GetType()}} " +
+                {III}$" at: {{path}}");
+                {I}}}
+                {I}bool ok = value.TryGetValue<long>(out long result);
+                {I}if (!ok)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {II}$"Expected a 64-bit long integer, but the conversion failed " +
+                {II}$"from {{value.ToJsonString()}} " +
+                {II}$"at: {{path}}");
+                {I}}}
+                {I}return result;
+                }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>
+                /// Convert the <paramref name="node" /> to a double-precision 64-bit float.
+                /// </summary>
+                /// <param name="node">JSON node to be parsed</param>
+                /// <param name="path">Path to the node used in exceptions</param>
+                /// <exception cref="System.ArgumentException">
+                /// Thrown if not a valid double-precision 64-bit float.
+                /// </exception>
+                internal static double DoubleFrom(
+                {I}Nodes.JsonNode node,
+                {I}string path)
+                {{
+                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
+                {I}if (value == null)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {III}$"Expected a JsonValue, but got {{node.GetType()}} " +
+                {III}$" at: {{path}}");
+                {I}}}
+                {I}bool ok = value.TryGetValue<double>(out double result);
+                {I}if (!ok)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {II}"Expected a 64-bit double-precision float, " +
+                {II}"but the conversion failed " +
+                {II}$"from {{value.ToJsonString()}} " +
+                {II}$"at: {{path}}");
+                {I}}}
+                {I}return result;
+                }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>
+                /// Convert the <paramref name="node" /> to a string.
+                /// </summary>
+                /// <param name="node">JSON node to be parsed</param>
+                /// <param name="path">Path to the node used in exceptions</param>
+                /// <exception cref="System.ArgumentException">
+                /// Thrown if not a valid string.
+                /// </exception>
+                internal static string StringFrom(
+                {I}Nodes.JsonNode node,
+                {I}string path)
+                {{
+                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
+                {I}if (value == null)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {III}$"Expected a JsonValue, but got {{node.GetType()}} " +
+                {III}$" at: {{path}}");
+                {I}}}
+                {I}bool ok = value.TryGetValue<string>(out string? result);
+                {I}if (!ok)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {II}$"Expected a string, but the conversion failed " +
+                {II}$"from {{value.ToJsonString()}} " +
+                {II}$"at: {{path}}");
+                {I}}}
+                {I}if (result == null)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {II}$"Expected a string, but got a null at: {{path}}");
+                {I}}}
+                {I}return result;
+                }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>
+                /// Convert the <paramref name="node" /> to bytes.
+                /// </summary>
+                /// <param name="node">JSON node to be parsed</param>
+                /// <param name="path">Path to the node used in exceptions</param>
+                /// <exception cref="System.ArgumentException">
+                /// Thrown if not a valid base64-encoded string.
+                /// </exception>
+                internal static byte[] BytesFrom(
+                {I}Nodes.JsonNode node,
+                {I}string path)
+                {{
+                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
+                {I}if (value == null)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {III}$"Expected a JsonValue, but got {{node.GetType()}} " +
+                {III}$" at: {{path}}");
+                {I}}}
+                {I}bool ok = value.TryGetValue<string>(out string? text);
+                {I}if (!ok)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {II}$"Expected a string, but the conversion failed " +
+                {II}$"from {{value.ToJsonString()}} " +
+                {II}$"at: {{path}}");
+                {I}}}
+                {I}if (text == null)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {II}$"Expected a string, but got a null at: {{path}}");
+                {I}}}
+                {I}try
+                {I}{{
+                {II}return System.Convert.FromBase64String(text);
+                {I}}}
+                {I}catch (System.FormatException exception)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {III}"Expected Base-64 encoded bytes, but the conversion failed " +
+                {III}$"because: {{exception}}; at: {{path}}");
+                {I}}}
+                }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>
+                /// Convert <paramref name="that" /> 64-bit long integer to a JSON value.
+                /// </summary>
+                /// <param name="that">value to be converted</param>
+                /// <exception name="System.ArgumentException>
+                /// Thrown if <paramref name="that"> is not within the range where it
+                /// can be losslessly converted to a double floating number.
+                /// </exception>
+                internal static Nodes.JsonValue ToJsonValue(long that)
+                {{
+                {I}// We need to check that we can perform a lossless conversion.
+                {I}if ((long)((double)that) != that)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {III}$"The number can not be losslessly represented in JSON: {{that}}");
+                {I}}}
+                {I}return Nodes.JsonValue.Create(that);
+                }}"""
+            )
+        ),
+    ]  # type: List[Stripped]
+
+    implementation_writer = io.StringIO()
+    implementation_writer.write(
+        textwrap.dedent(
+            """\
+            internal static class Implementation
+            {
+            """
+        )
+    )
+    for i, implementation_block in enumerate(implementation_blocks):
+        if i > 0:
+            implementation_writer.write("\n\n")
+        implementation_writer.write(textwrap.indent(implementation_block, I))
+    implementation_writer.write("\n}  // internal static class Implementation")
+
+    # endregion
+
+    deserialize_block, deserialize_errors = _generate_deserialize(
+        symbol_table=symbol_table, spec_impls=spec_impls
+    )
+    if deserialize_errors is not None:
+        errors.extend(deserialize_errors)
+
+    transformer_block, transformer_errors = _generate_transformer(
+        symbol_table=symbol_table, spec_impls=spec_impls
+    )
+    if transformer_errors is not None:
+        errors.extend(transformer_errors)
+
+    if len(errors) > 0:
+        return None, errors
+
+    assert deserialize_block is not None
+    assert transformer_block is not None
+
+    serialize_block = _generate_serialize(
+        symbol_table=symbol_table,
+    )
+
+    jsonization_blocks = [
+        Stripped(implementation_writer.getvalue()),
+        deserialize_block,
+        transformer_block,
+        serialize_block,
+    ]  # type: List[Stripped]
+
+    jsonization_writer = io.StringIO()
+    jsonization_writer.write(
+        textwrap.dedent(
+            f"""\
+            namespace {namespace}
+            {{
+            {I}/// <summary>
+            {I}/// Provide de/serialization of meta-model entities to/from JSON.
+            {I}/// </summary>
+            {I}/// <remarks>
+            {I}/// We can not use one-pass deserialization for JSON since the object
+            {I}/// properties do not have fixed order, and hence we can not read
+            {I}/// <c>modelType</c> property ahead of the remaining properties.
+            {I}///
+            {I}/// Mind that we pass the paths to the functions in order
+            {I}/// to provide informative exceptions in case of parsing errors.
+            {I}/// However, this comes with a <strong>SUBSTANTIAL COST</strong>!
+            {I}/// For each call to a parsing function, we have to copy the previous
+            {I}/// prefix path and append the identifier of the JSON node.
+            {I}/// Thus this can run <c>O(n^2)</c> where <c>n</c> denotes the longest
+            {I}/// path.
+            {I}///
+            {I}/// Please notify the developers if this becomes a bottleneck for
+            {I}/// you since there is a workaround, but we did not prioritize it at
+            {I}/// the moment (<em>e.g.</em>, we could back-track the path only upon
+            {I}/// exceptions).
+            {I}public static class Jsonization
+            {I}{{
+            """
+        )
+    )
+
+    for i, deserialize_block in enumerate(jsonization_blocks):
+        if i > 0:
+            jsonization_writer.write("\n\n")
+
+        jsonization_writer.write(textwrap.indent(deserialize_block, II))
+
+    jsonization_writer.write(f"\n{I}}}  // public static class Jsonization")
+    jsonization_writer.write(f"\n}}  // namespace {namespace}")
+
     # pylint: disable=line-too-long
     blocks = [
         csharp_common.WARNING,
         Stripped(
             textwrap.dedent(
                 """\
-            /*
-             * For more information about customizing JSON serialization in C#, please see:
-             * <ul>
-             * <li>https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-converters-how-to</li>
-             * <li>https://docs.microsoft.com/en-gb/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to</li>
-             * </ul>
-             */"""
+                using Json = System.Text.Json;
+                using Nodes = System.Text.Json.Nodes;
+                using System.Collections.Generic;  // can't alias"""
             )
         ),
-        Stripped(
-            textwrap.dedent(
-                f"""\
-            using Json = System.Text.Json;
-            using System.Collections.Generic;  // can't alias
-
-            using Aas = {namespace};"""
-            )
-        ),
+        Stripped(f"using Aas = {namespace};"),
+        Stripped(jsonization_writer.getvalue()),
+        csharp_common.WARNING,
     ]
 
-    jsonization_blocks = []  # type: List[Stripped]
-    converters = []  # type: List[Identifier]
-
-    for symbol in symbol_table.symbols:
-        jsonization_block = None  # type: Optional[Stripped]
-
-        if isinstance(symbol, intermediate.Enumeration):
-            jsonization_block = _generate_json_converter_for_enumeration(
-                enumeration=symbol
-            )
-
-            converters.append(
-                Identifier(f"{csharp_naming.enum_name(symbol.name)}JsonConverter")
-            )
-
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
-            # We do not de/serialize constrained primitives in any special way.
-            continue
-
-        elif isinstance(symbol, intermediate.Class):
-            # If it is an abstract class or a concrete class with descendants, provide
-            # a de/serialization of the corresponding interface first.
-
-            if symbol.interface is not None:
-                jsonization_block, error = _generate_json_converter_for_interface(
-                    interface=symbol.interface
-                )
-
-                if error is not None:
-                    errors.append(error)
-                    continue
-
-                converters.append(
-                    Identifier(
-                        f"{csharp_naming.interface_name(symbol.name)}JsonConverter"
-                    )
-                )
-
-            if isinstance(symbol, intermediate.ConcreteClass):
-                if symbol.is_implementation_specific:
-                    jsonization_key = specific_implementations.ImplementationKey(
-                        f"Jsonization/{symbol.name}_json_converter.cs"
-                    )
-
-                    implementation = spec_impls.get(jsonization_key, None)
-                    if implementation is None:
-                        errors.append(
-                            Error(
-                                symbol.parsed.node,
-                                f"The jsonization snippet is missing "
-                                f"for the implementation-specific "
-                                f"class {symbol.name}: {jsonization_key}",
-                            )
-                        )
-                        continue
-
-                    jsonization_block = spec_impls[jsonization_key]
-                else:
-                    jsonization_block = _generate_json_converter_for_class(cls=symbol)
-
-                converters.append(
-                    Identifier(f"{csharp_naming.class_name(symbol.name)}JsonConverter")
-                )
-
-        else:
-            assert_never(symbol)
-
-        assert jsonization_block is not None
-        jsonization_blocks.append(jsonization_block)
-
-    if len(converters) == 0:
-        jsonization_blocks.append(
-            Stripped(
-                textwrap.dedent(
-                    f"""\
-            public static List<Json.JsonConverter> JsonConverters()
-            {{
-            {I}return new List<Json.JsonConverter>();
-            }}"""
-                )
-            )
-        )
-    else:
-        converters_writer = io.StringIO()
-        converters_writer.write(
-            textwrap.dedent(
-                f"""\
-            /// <summary>
-            /// Create and populate a list of our custom-tailored JSON converters.
-            /// </summary>
-            public static List<Json.Serialization.JsonConverter> CreateJsonConverters()
-            {{
-            {I}return new List<Json.Serialization.JsonConverter>()
-            {I}{{
-            """
-            )
-        )
-
-        for i, converter in enumerate(converters):
-            converters_writer.write(f"{II}new {converter}()")
-
-            if i < len(converters) - 1:
-                converters_writer.write(",")
-
-            converters_writer.write("\n")
-
-        converters_writer.write(f"{I}}};\n}}")
-        jsonization_blocks.append(Stripped(converters_writer.getvalue()))
-
-    if len(errors) > 0:
-        return None, errors
-
     writer = io.StringIO()
-    # BEFORE-RELEASE (mristin, 2021-11-06): add a good docstring 🠒 add examples!
-    writer.write(
-        textwrap.dedent(
-            f"""\
-        namespace {namespace}
-        {{
-        {I}public static class Jsonization
-        {I}{{
-        """
-        )
-    )
-
-    for i, jsonization_block in enumerate(jsonization_blocks):
+    for i, block in enumerate(blocks):
         if i > 0:
             writer.write("\n\n")
 
-        writer.write(textwrap.indent(jsonization_block, II))
-
-    writer.write(f"\n{I}}}  // public static class Jsonization")
-    writer.write(f"\n}}  // namespace {namespace}")
-
-    blocks.append(Stripped(writer.getvalue()))
-
-    blocks.append(csharp_common.WARNING)
-
-    out = io.StringIO()
-    for i, block in enumerate(blocks):
-        if i > 0:
-            out.write("\n\n")
-
         assert not block.startswith("\n")
         assert not block.endswith("\n")
-        out.write(block)
+        writer.write(block)
 
-    out.write("\n")
+    writer.write("\n")
 
-    return out.getvalue(), None
+    return writer.getvalue(), None

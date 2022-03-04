@@ -81,21 +81,12 @@ def main() -> int:
                     """\
                 <Project Sdk="Microsoft.NET.Sdk">
                     <PropertyGroup>
-                        <TargetFramework>net5.0</TargetFramework>
+                        <TargetFramework>net6.0</TargetFramework>
                         <Nullable>enable</Nullable>
                         <Configurations>Debug;Release;DebugSlow</Configurations>
                         <Platforms>AnyCPU</Platforms>
                         <LangVersion>8</LangVersion>
                     </PropertyGroup>
-
-                    <ItemGroup>
-                        <!--
-                            You can exclude this dependency if you are compiling
-                            for net5.0 or netcore3.1.
-                        -->
-                        <PackageReference Include="System.Text.Json" Version="5.*" />
-                    </ItemGroup>
-
                 </Project>
                 """
                 )

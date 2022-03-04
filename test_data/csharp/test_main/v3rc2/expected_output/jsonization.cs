@@ -3,9379 +3,8577 @@
  * Do NOT edit or append.
  */
 
-/*
- * For more information about customizing JSON serialization in C#, please see:
- * <ul>
- * <li>https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-converters-how-to</li>
- * <li>https://docs.microsoft.com/en-gb/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to</li>
- * </ul>
- */
-
 using Json = System.Text.Json;
+using Nodes = System.Text.Json.Nodes;
 using System.Collections.Generic;  // can't alias
 
 using Aas = AasCore.Aas3;
 
 namespace AasCore.Aas3
 {
+    /// <summary>
+    /// Provide de/serialization of meta-model entities to/from JSON.
+    /// </summary>
+    /// <remarks>
+    /// We can not use one-pass deserialization for JSON since the object
+    /// properties do not have fixed order, and hence we can not read
+    /// <c>modelType</c> property ahead of the remaining properties.
+    ///
+    /// Mind that we pass the paths to the functions in order
+    /// to provide informative exceptions in case of parsing errors.
+    /// However, this comes with a <strong>SUBSTANTIAL COST</strong>!
+    /// For each call to a parsing function, we have to copy the previous
+    /// prefix path and append the identifier of the JSON node.
+    /// Thus this can run <c>O(n^2)</c> where <c>n</c> denotes the longest
+    /// path.
+    ///
+    /// Please notify the developers if this becomes a bottleneck for
+    /// you since there is a workaround, but we did not prioritize it at
+    /// the moment (<em>e.g.</em>, we could back-track the path only upon
+    /// exceptions).
     public static class Jsonization
     {
-        public class IHasSemanticsJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IHasSemantics>
+        internal static class Implementation
         {
-            public override bool CanConvert(System.Type typeToConvert)
+            /// <summary>Convert <paramref name="node" /> to a boolean.</summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown if not a valid boolean.
+            /// </exception>
+            internal static bool BoolFrom(
+                Nodes.JsonNode node,
+                string path)
             {
-                return typeof(Aas.IHasSemantics).IsAssignableFrom(typeToConvert);
-            }
-
-            public override Aas.IHasSemantics Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                Nodes.JsonValue? value = node as Nodes.JsonValue;
+                if (value == null)
                 {
-                    throw new Json.JsonException();
-                }
-
-                string? modelType = null;
-
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
-
-                while (reader.Read())
-                {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
-                    {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
-                    }
-                    else
-                    {
-                        buffer.Write(reader.ValueSpan);
-                    }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "AnnotatedRelationshipElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "BasicEvent":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null BasicEvent from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Blob":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Blob from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Capability":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Capability from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Entity":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Entity from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Extension":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Extension>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Extension from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "File":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null File from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "IdentifierKeyValuePair":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.IdentifierKeyValuePair>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null IdentifierKeyValuePair from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "MultiLanguageProperty":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null MultiLanguageProperty from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Operation":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Operation from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Property":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Property from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Qualifier":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Qualifier>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Qualifier from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Range":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Range from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "ReferenceElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null ReferenceElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Submodel":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Submodel from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementList":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementList from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementStruct":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementStruct from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "View":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.View>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null View from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IHasSemantics that,
-                Json.JsonSerializerOptions options)
-            {
-            switch (that)
-            {
-                case AnnotatedRelationshipElement theAnnotatedRelationshipElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theAnnotatedRelationshipElement);
-                    break;
-                case BasicEvent theBasicEvent:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBasicEvent);
-                    break;
-                case Blob theBlob:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBlob);
-                    break;
-                case Capability theCapability:
-                    Json.JsonSerializer.Serialize(
-                        writer, theCapability);
-                    break;
-                case Entity theEntity:
-                    Json.JsonSerializer.Serialize(
-                        writer, theEntity);
-                    break;
-                case Extension theExtension:
-                    Json.JsonSerializer.Serialize(
-                        writer, theExtension);
-                    break;
-                case File theFile:
-                    Json.JsonSerializer.Serialize(
-                        writer, theFile);
-                    break;
-                case IdentifierKeyValuePair theIdentifierKeyValuePair:
-                    Json.JsonSerializer.Serialize(
-                        writer, theIdentifierKeyValuePair);
-                    break;
-                case MultiLanguageProperty theMultiLanguageProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theMultiLanguageProperty);
-                    break;
-                case Operation theOperation:
-                    Json.JsonSerializer.Serialize(
-                        writer, theOperation);
-                    break;
-                case Property theProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theProperty);
-                    break;
-                case Qualifier theQualifier:
-                    Json.JsonSerializer.Serialize(
-                        writer, theQualifier);
-                    break;
-                case Range theRange:
-                    Json.JsonSerializer.Serialize(
-                        writer, theRange);
-                    break;
-                case ReferenceElement theReferenceElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theReferenceElement);
-                    break;
-                case Submodel theSubmodel:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodel);
-                    break;
-                case SubmodelElementList theSubmodelElementList:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementList);
-                    break;
-                case SubmodelElementStruct theSubmodelElementStruct:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementStruct);
-                    break;
-                case View theView:
-                    Json.JsonSerializer.Serialize(
-                        writer, theView);
-                    break;
-                default:
                     throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of IHasSemantics: {that}");
-            }
-            }
-        }  // IHasSemanticsJsonConverter
-
-        public class ExtensionJsonConverter :
-            Json.Serialization.JsonConverter<Aas.Extension>
-        {
-            public override Aas.Extension Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                        $"Expected a JsonValue, but got {node.GetType()} " +
+                        $" at: {path}");
+                }
+                bool ok = value.TryGetValue<bool>(out bool result);
+                if (!ok)
                 {
-                    throw new Json.JsonException();
+                    throw new System.ArgumentException(
+                    $"Expected a boolean, but the conversion failed " +
+                    $"from {value.ToJsonString()} " +
+                    $"at: {path}");
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Convert the <paramref name="node" /> to a long 64-bit integer.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown if not a valid 64-bit integer.
+            /// </exception>
+            internal static long LongFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonValue? value = node as Nodes.JsonValue;
+                if (value == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonValue, but got {node.GetType()} " +
+                        $" at: {path}");
+                }
+                bool ok = value.TryGetValue<long>(out long result);
+                if (!ok)
+                {
+                    throw new System.ArgumentException(
+                    $"Expected a 64-bit long integer, but the conversion failed " +
+                    $"from {value.ToJsonString()} " +
+                    $"at: {path}");
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Convert the <paramref name="node" /> to a double-precision 64-bit float.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown if not a valid double-precision 64-bit float.
+            /// </exception>
+            internal static double DoubleFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonValue? value = node as Nodes.JsonValue;
+                if (value == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonValue, but got {node.GetType()} " +
+                        $" at: {path}");
+                }
+                bool ok = value.TryGetValue<double>(out double result);
+                if (!ok)
+                {
+                    throw new System.ArgumentException(
+                    "Expected a 64-bit double-precision float, " +
+                    "but the conversion failed " +
+                    $"from {value.ToJsonString()} " +
+                    $"at: {path}");
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Convert the <paramref name="node" /> to a string.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown if not a valid string.
+            /// </exception>
+            internal static string StringFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonValue? value = node as Nodes.JsonValue;
+                if (value == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonValue, but got {node.GetType()} " +
+                        $" at: {path}");
+                }
+                bool ok = value.TryGetValue<string>(out string? result);
+                if (!ok)
+                {
+                    throw new System.ArgumentException(
+                    $"Expected a string, but the conversion failed " +
+                    $"from {value.ToJsonString()} " +
+                    $"at: {path}");
+                }
+                if (result == null)
+                {
+                    throw new System.ArgumentException(
+                    $"Expected a string, but got a null at: {path}");
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Convert the <paramref name="node" /> to bytes.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown if not a valid base64-encoded string.
+            /// </exception>
+            internal static byte[] BytesFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonValue? value = node as Nodes.JsonValue;
+                if (value == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonValue, but got {node.GetType()} " +
+                        $" at: {path}");
+                }
+                bool ok = value.TryGetValue<string>(out string? text);
+                if (!ok)
+                {
+                    throw new System.ArgumentException(
+                    $"Expected a string, but the conversion failed " +
+                    $"from {value.ToJsonString()} " +
+                    $"at: {path}");
+                }
+                if (text == null)
+                {
+                    throw new System.ArgumentException(
+                    $"Expected a string, but got a null at: {path}");
+                }
+                try
+                {
+                    return System.Convert.FromBase64String(text);
+                }
+                catch (System.FormatException exception)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Base-64 encoded bytes, but the conversion failed " +
+                        $"because: {exception}; at: {path}");
+                }
+            }
+
+            /// <summary>
+            /// Convert <paramref name="that" /> 64-bit long integer to a JSON value.
+            /// </summary>
+            /// <param name="that">value to be converted</param>
+            /// <exception name="System.ArgumentException>
+            /// Thrown if <paramref name="that"> is not within the range where it
+            /// can be losslessly converted to a double floating number.
+            /// </exception>
+            internal static Nodes.JsonValue ToJsonValue(long that)
+            {
+                // We need to check that we can perform a lossless conversion.
+                if ((long)((double)that) != that)
+                {
+                    throw new System.ArgumentException(
+                        $"The number can not be losslessly represented in JSON: {that}");
+                }
+                return Nodes.JsonValue.Create(that);
+            }
+        }  // internal static class Implementation
+
+        /// <summary>
+        /// Deserialize instances of meta-model classes from JSON nodes.
+        /// </summary>
+        /// <example>
+        /// Here is an example how to parse an instance of IHasSemantics:
+        /// <code>
+        /// string someString = "... some JSON ...";
+        /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
+        /// Aas.IHasSemantics anInstance = Deserialize.IHasSemanticsFrom(
+        ///     node, "/some/path/to/a/file.json#/somewhere");
+        /// </code>
+        /// </example>
+        public static class Deserialize
+        {
+            /// <summary>
+            /// Deserialize an instance of IHasSemantics by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IHasSemantics.
+            /// </exception>
+            public static Aas.IHasSemantics IHasSemanticsFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
                 }
 
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theName = null;
-                IReference? theSemanticId = null;
-                DataTypeDef? theValueType = null;
-                string? theValue = null;
-                IReference? theRefersTo = null;
-
-                while (reader.Read())
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
                 {
-                    switch (reader.TokenType)
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "AnnotatedRelationshipElement":
+                    return AnnotatedRelationshipElementFrom(
+                        node, path);
+                case "BasicEvent":
+                    return BasicEventFrom(
+                        node, path);
+                case "Blob":
+                    return BlobFrom(
+                        node, path);
+                case "Capability":
+                    return CapabilityFrom(
+                        node, path);
+                case "Entity":
+                    return EntityFrom(
+                        node, path);
+                case "Extension":
+                    return ExtensionFrom(
+                        node, path);
+                case "File":
+                    return FileFrom(
+                        node, path);
+                case "IdentifierKeyValuePair":
+                    return IdentifierKeyValuePairFrom(
+                        node, path);
+                case "MultiLanguageProperty":
+                    return MultiLanguagePropertyFrom(
+                        node, path);
+                case "Operation":
+                    return OperationFrom(
+                        node, path);
+                case "Property":
+                    return PropertyFrom(
+                        node, path);
+                case "Qualifier":
+                    return QualifierFrom(
+                        node, path);
+                case "Range":
+                    return RangeFrom(
+                        node, path);
+                case "ReferenceElement":
+                    return ReferenceElementFrom(
+                        node, path);
+                case "Submodel":
+                    return SubmodelFrom(
+                        node, path);
+                case "SubmodelElementList":
+                    return SubmodelElementListFrom(
+                        node, path);
+                case "SubmodelElementStruct":
+                    return SubmodelElementStructFrom(
+                        node, path);
+                case "View":
+                    return ViewFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for IHasSemantics at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.IHasSemantics IHasSemanticsFrom
+
+            /// <summary>
+            /// Deserialize an instance of Extension from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of Extension.
+            /// </exception>
+            public static Aas.Extension ExtensionFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeName = obj["name"];
+                if (nodeName == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"name\" is missing " +
+                        $"at: {path}/name");
+                }
+                string theName = Implementation.StringFrom(
+                    nodeName,
+                    $"{path}/name");
+
+                Nodes.JsonNode? nodeValueType = obj["valueType"];
+                Aas.DataTypeDef? theValueType = null;
+                if (nodeValueType != null)
+                {
+                    theValueType = Deserialize.DataTypeDefFrom(
+                        nodeValueType,
+                        $"{path}/valueType");
+                }
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                string? theValue = null;
+                if (nodeValue != null)
+                {
+                    theValue = Implementation.StringFrom(
+                        nodeValue,
+                        $"{path}/value");
+                }
+
+                Nodes.JsonNode? nodeRefersTo = obj["refersTo"];
+                Aas.IReference? theRefersTo = null;
+                if (nodeRefersTo != null)
+                {
+                    theRefersTo = Deserialize.IReferenceFrom(
+                        nodeRefersTo,
+                        $"{path}/refersTo");
+                }
+
+                return new Aas.Extension(
+                    theName,
+                    theSemanticId,
+                    theValueType,
+                    theValue,
+                    theRefersTo);
+            }  // public static Aas.Extension ExtensionFrom
+
+            /// <summary>
+            /// Deserialize an instance of IHasExtensions by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IHasExtensions.
+            /// </exception>
+            public static Aas.IHasExtensions IHasExtensionsFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "AnnotatedRelationshipElement":
+                    return AnnotatedRelationshipElementFrom(
+                        node, path);
+                case "AssetAdministrationShell":
+                    return AssetAdministrationShellFrom(
+                        node, path);
+                case "BasicEvent":
+                    return BasicEventFrom(
+                        node, path);
+                case "Blob":
+                    return BlobFrom(
+                        node, path);
+                case "Capability":
+                    return CapabilityFrom(
+                        node, path);
+                case "ConceptDescription":
+                    return ConceptDescriptionFrom(
+                        node, path);
+                case "Entity":
+                    return EntityFrom(
+                        node, path);
+                case "File":
+                    return FileFrom(
+                        node, path);
+                case "MultiLanguageProperty":
+                    return MultiLanguagePropertyFrom(
+                        node, path);
+                case "Operation":
+                    return OperationFrom(
+                        node, path);
+                case "Property":
+                    return PropertyFrom(
+                        node, path);
+                case "Range":
+                    return RangeFrom(
+                        node, path);
+                case "ReferenceElement":
+                    return ReferenceElementFrom(
+                        node, path);
+                case "Submodel":
+                    return SubmodelFrom(
+                        node, path);
+                case "SubmodelElementList":
+                    return SubmodelElementListFrom(
+                        node, path);
+                case "SubmodelElementStruct":
+                    return SubmodelElementStructFrom(
+                        node, path);
+                case "View":
+                    return ViewFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for IHasExtensions at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.IHasExtensions IHasExtensionsFrom
+
+            /// <summary>
+            /// Deserialize an instance of IReferable by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IReferable.
+            /// </exception>
+            public static Aas.IReferable IReferableFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "AnnotatedRelationshipElement":
+                    return AnnotatedRelationshipElementFrom(
+                        node, path);
+                case "AssetAdministrationShell":
+                    return AssetAdministrationShellFrom(
+                        node, path);
+                case "BasicEvent":
+                    return BasicEventFrom(
+                        node, path);
+                case "Blob":
+                    return BlobFrom(
+                        node, path);
+                case "Capability":
+                    return CapabilityFrom(
+                        node, path);
+                case "ConceptDescription":
+                    return ConceptDescriptionFrom(
+                        node, path);
+                case "Entity":
+                    return EntityFrom(
+                        node, path);
+                case "File":
+                    return FileFrom(
+                        node, path);
+                case "MultiLanguageProperty":
+                    return MultiLanguagePropertyFrom(
+                        node, path);
+                case "Operation":
+                    return OperationFrom(
+                        node, path);
+                case "Property":
+                    return PropertyFrom(
+                        node, path);
+                case "Range":
+                    return RangeFrom(
+                        node, path);
+                case "ReferenceElement":
+                    return ReferenceElementFrom(
+                        node, path);
+                case "Submodel":
+                    return SubmodelFrom(
+                        node, path);
+                case "SubmodelElementList":
+                    return SubmodelElementListFrom(
+                        node, path);
+                case "SubmodelElementStruct":
+                    return SubmodelElementStructFrom(
+                        node, path);
+                case "View":
+                    return ViewFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for IReferable at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.IReferable IReferableFrom
+
+            /// <summary>
+            /// Deserialize an instance of IIdentifiable by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IIdentifiable.
+            /// </exception>
+            public static Aas.IIdentifiable IIdentifiableFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "AssetAdministrationShell":
+                    return AssetAdministrationShellFrom(
+                        node, path);
+                case "ConceptDescription":
+                    return ConceptDescriptionFrom(
+                        node, path);
+                case "Submodel":
+                    return SubmodelFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for IIdentifiable at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.IIdentifiable IIdentifiableFrom
+
+            /// <summary>
+            /// Deserialize the enumeration ModelingKind from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of ModelingKind.
+            /// </exception>
+            public static Aas.ModelingKind ModelingKindFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.ModelingKind? result = Stringification.ModelingKindFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of ModelingKind " +
+                        $"at: {path}");
+            }  // public static Aas.ModelingKind ModelingKindFrom
+
+            /// <summary>
+            /// Deserialize an instance of IHasKind by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IHasKind.
+            /// </exception>
+            public static Aas.IHasKind IHasKindFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "AnnotatedRelationshipElement":
+                    return AnnotatedRelationshipElementFrom(
+                        node, path);
+                case "BasicEvent":
+                    return BasicEventFrom(
+                        node, path);
+                case "Blob":
+                    return BlobFrom(
+                        node, path);
+                case "Capability":
+                    return CapabilityFrom(
+                        node, path);
+                case "Entity":
+                    return EntityFrom(
+                        node, path);
+                case "File":
+                    return FileFrom(
+                        node, path);
+                case "MultiLanguageProperty":
+                    return MultiLanguagePropertyFrom(
+                        node, path);
+                case "Operation":
+                    return OperationFrom(
+                        node, path);
+                case "Property":
+                    return PropertyFrom(
+                        node, path);
+                case "Range":
+                    return RangeFrom(
+                        node, path);
+                case "ReferenceElement":
+                    return ReferenceElementFrom(
+                        node, path);
+                case "Submodel":
+                    return SubmodelFrom(
+                        node, path);
+                case "SubmodelElementList":
+                    return SubmodelElementListFrom(
+                        node, path);
+                case "SubmodelElementStruct":
+                    return SubmodelElementStructFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for IHasKind at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.IHasKind IHasKindFrom
+
+            /// <summary>
+            /// Deserialize an instance of IHasDataSpecification by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IHasDataSpecification.
+            /// </exception>
+            public static Aas.IHasDataSpecification IHasDataSpecificationFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "AdministrativeInformation":
+                    return AdministrativeInformationFrom(
+                        node, path);
+                case "AnnotatedRelationshipElement":
+                    return AnnotatedRelationshipElementFrom(
+                        node, path);
+                case "AssetAdministrationShell":
+                    return AssetAdministrationShellFrom(
+                        node, path);
+                case "BasicEvent":
+                    return BasicEventFrom(
+                        node, path);
+                case "Blob":
+                    return BlobFrom(
+                        node, path);
+                case "Capability":
+                    return CapabilityFrom(
+                        node, path);
+                case "ConceptDescription":
+                    return ConceptDescriptionFrom(
+                        node, path);
+                case "Entity":
+                    return EntityFrom(
+                        node, path);
+                case "File":
+                    return FileFrom(
+                        node, path);
+                case "MultiLanguageProperty":
+                    return MultiLanguagePropertyFrom(
+                        node, path);
+                case "Operation":
+                    return OperationFrom(
+                        node, path);
+                case "Property":
+                    return PropertyFrom(
+                        node, path);
+                case "Range":
+                    return RangeFrom(
+                        node, path);
+                case "ReferenceElement":
+                    return ReferenceElementFrom(
+                        node, path);
+                case "Submodel":
+                    return SubmodelFrom(
+                        node, path);
+                case "SubmodelElementList":
+                    return SubmodelElementListFrom(
+                        node, path);
+                case "SubmodelElementStruct":
+                    return SubmodelElementStructFrom(
+                        node, path);
+                case "View":
+                    return ViewFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for IHasDataSpecification at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.IHasDataSpecification IHasDataSpecificationFrom
+
+            /// <summary>
+            /// Deserialize an instance of AdministrativeInformation from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of AdministrativeInformation.
+            /// </exception>
+            public static Aas.AdministrativeInformation AdministrativeInformationFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.Extension(
-                                theName ?? throw new Json.JsonException(
-                                    "Required property is missing: name"),
-                                theSemanticId,
-                                theValueType,
-                                theValue,
-                                theRefersTo);
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
 
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
+                Nodes.JsonNode? nodeVersion = obj["version"];
+                string? theVersion = null;
+                if (nodeVersion != null)
+                {
+                    theVersion = Implementation.StringFrom(
+                        nodeVersion,
+                        $"{path}/version");
+                }
 
-                            switch (propertyName)
-                            {
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "name":
-                                    theName =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "valueType":
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "refersTo":
-                                    theRefersTo =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
+                Nodes.JsonNode? nodeRevision = obj["revision"];
+                string? theRevision = null;
+                if (nodeRevision != null)
+                {
+                    theRevision = Implementation.StringFrom(
+                        nodeRevision,
+                        $"{path}/revision");
+                }
 
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
+                return new Aas.AdministrativeInformation(
+                    theVersion,
+                    theRevision,
+                    theDataSpecifications);
+            }  // public static Aas.AdministrativeInformation AdministrativeInformationFrom
 
-                throw new Json.JsonException();
+            /// <summary>
+            /// Deserialize an instance of IConstraint by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IConstraint.
+            /// </exception>
+            public static Aas.IConstraint IConstraintFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "Formula":
+                    return FormulaFrom(
+                        node, path);
+                case "Qualifier":
+                    return QualifierFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for IConstraint at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.IConstraint IConstraintFrom
+
+            /// <summary>
+            /// Deserialize an instance of IQualifiable by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IQualifiable.
+            /// </exception>
+            public static Aas.IQualifiable IQualifiableFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "AnnotatedRelationshipElement":
+                    return AnnotatedRelationshipElementFrom(
+                        node, path);
+                case "BasicEvent":
+                    return BasicEventFrom(
+                        node, path);
+                case "Blob":
+                    return BlobFrom(
+                        node, path);
+                case "Capability":
+                    return CapabilityFrom(
+                        node, path);
+                case "Entity":
+                    return EntityFrom(
+                        node, path);
+                case "File":
+                    return FileFrom(
+                        node, path);
+                case "MultiLanguageProperty":
+                    return MultiLanguagePropertyFrom(
+                        node, path);
+                case "Operation":
+                    return OperationFrom(
+                        node, path);
+                case "Property":
+                    return PropertyFrom(
+                        node, path);
+                case "Range":
+                    return RangeFrom(
+                        node, path);
+                case "ReferenceElement":
+                    return ReferenceElementFrom(
+                        node, path);
+                case "Submodel":
+                    return SubmodelFrom(
+                        node, path);
+                case "SubmodelElementList":
+                    return SubmodelElementListFrom(
+                        node, path);
+                case "SubmodelElementStruct":
+                    return SubmodelElementStructFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for IQualifiable at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.IQualifiable IQualifiableFrom
+
+            /// <summary>
+            /// Deserialize an instance of Qualifier from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of Qualifier.
+            /// </exception>
+            public static Aas.Qualifier QualifierFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeType = obj["type"];
+                if (nodeType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"type\" is missing " +
+                        $"at: {path}/type");
+                }
+                string theType = Implementation.StringFrom(
+                    nodeType,
+                    $"{path}/type");
+
+                Nodes.JsonNode? nodeValueType = obj["valueType"];
+                if (nodeValueType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"valueType\" is missing " +
+                        $"at: {path}/valueType");
+                }
+                Aas.DataTypeDef theValueType = Deserialize.DataTypeDefFrom(
+                    nodeValueType,
+                    $"{path}/valueType");
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                string? theValue = null;
+                if (nodeValue != null)
+                {
+                    theValue = Implementation.StringFrom(
+                        nodeValue,
+                        $"{path}/value");
+                }
+
+                Nodes.JsonNode? nodeValueId = obj["valueId"];
+                Aas.IReference? theValueId = null;
+                if (nodeValueId != null)
+                {
+                    theValueId = Deserialize.IReferenceFrom(
+                        nodeValueId,
+                        $"{path}/valueId");
+                }
+
+                return new Aas.Qualifier(
+                    theType,
+                    theValueType,
+                    theValue,
+                    theValueId,
+                    theSemanticId);
+            }  // public static Aas.Qualifier QualifierFrom
+
+            /// <summary>
+            /// Deserialize an instance of Formula from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of Formula.
+            /// </exception>
+            public static Aas.Formula FormulaFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDependsOn = obj["dependsOn"];
+                List<IReference>? theDependsOn = null;
+                if (nodeDependsOn != null)
+                {
+                    Nodes.JsonArray? arrayDependsOn = nodeDependsOn as Nodes.JsonArray;
+                    if (arrayDependsOn == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDependsOn.GetType()} " +
+                            $"at: {path}/dependsOn");
+                    }
+                    theDependsOn = new List<IReference>(
+                        arrayDependsOn.Count);
+                    int indexDependsOn = 0;
+                    foreach (Nodes.JsonNode? item in arrayDependsOn)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dependsOn/{indexDependsOn}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dependsOn/{indexDependsOn}");
+                        theDependsOn.Add(parsedItem);
+                        indexDependsOn++;
+                    }
+                }
+
+                return new Aas.Formula(
+                    theDependsOn);
+            }  // public static Aas.Formula FormulaFrom
+
+            /// <summary>
+            /// Deserialize an instance of AssetAdministrationShell from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of AssetAdministrationShell.
+            /// </exception>
+            public static Aas.AssetAdministrationShell AssetAdministrationShellFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeId = obj["id"];
+                if (nodeId == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"id\" is missing " +
+                        $"at: {path}/id");
+                }
+                string theId = Implementation.StringFrom(
+                    nodeId,
+                    $"{path}/id");
+
+                Nodes.JsonNode? nodeAdministration = obj["administration"];
+                Aas.AdministrativeInformation? theAdministration = null;
+                if (nodeAdministration != null)
+                {
+                    theAdministration = Deserialize.AdministrativeInformationFrom(
+                        nodeAdministration,
+                        $"{path}/administration");
+                }
+
+                Nodes.JsonNode? nodeDerivedFrom = obj["derivedFrom"];
+                Aas.IReference? theDerivedFrom = null;
+                if (nodeDerivedFrom != null)
+                {
+                    theDerivedFrom = Deserialize.IReferenceFrom(
+                        nodeDerivedFrom,
+                        $"{path}/derivedFrom");
+                }
+
+                Nodes.JsonNode? nodeAssetInformation = obj["assetInformation"];
+                if (nodeAssetInformation == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"assetInformation\" is missing " +
+                        $"at: {path}/assetInformation");
+                }
+                Aas.AssetInformation theAssetInformation = Deserialize.AssetInformationFrom(
+                    nodeAssetInformation,
+                    $"{path}/assetInformation");
+
+                Nodes.JsonNode? nodeSubmodels = obj["submodels"];
+                if (nodeSubmodels == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"submodels\" is missing " +
+                        $"at: {path}/submodels");
+                }
+                Nodes.JsonArray? arraySubmodels = nodeSubmodels as Nodes.JsonArray;
+                if (arraySubmodels == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeSubmodels.GetType()} " +
+                        $"at: {path}/submodels");
+                }
+                var theSubmodels = new List<IReference>(
+                    arraySubmodels.Count);
+                int indexSubmodels = 0;
+                foreach (Nodes.JsonNode? item in arraySubmodels)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/submodels/{indexSubmodels}");
+                    }
+                    IReference parsedItem = Deserialize.IReferenceFrom(
+                        item,
+                        $"{path}/submodels/{indexSubmodels}");
+                    theSubmodels.Add(parsedItem);
+                    indexSubmodels++;
+                }
+
+                return new Aas.AssetAdministrationShell(
+                    theId,
+                    theAssetInformation,
+                    theIdShort,
+                    theExtensions,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theAdministration,
+                    theDataSpecifications,
+                    theDerivedFrom,
+                    theSubmodels);
+            }  // public static Aas.AssetAdministrationShell AssetAdministrationShellFrom
+
+            /// <summary>
+            /// Deserialize an instance of AssetInformation from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of AssetInformation.
+            /// </exception>
+            public static Aas.AssetInformation AssetInformationFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeAssetKind = obj["assetKind"];
+                if (nodeAssetKind == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"assetKind\" is missing " +
+                        $"at: {path}/assetKind");
+                }
+                Aas.AssetKind theAssetKind = Deserialize.AssetKindFrom(
+                    nodeAssetKind,
+                    $"{path}/assetKind");
+
+                Nodes.JsonNode? nodeGlobalAssetId = obj["globalAssetId"];
+                Aas.IReference? theGlobalAssetId = null;
+                if (nodeGlobalAssetId != null)
+                {
+                    theGlobalAssetId = Deserialize.IReferenceFrom(
+                        nodeGlobalAssetId,
+                        $"{path}/globalAssetId");
+                }
+
+                Nodes.JsonNode? nodeSpecificAssetId = obj["specificAssetId"];
+                Aas.IdentifierKeyValuePair? theSpecificAssetId = null;
+                if (nodeSpecificAssetId != null)
+                {
+                    theSpecificAssetId = Deserialize.IdentifierKeyValuePairFrom(
+                        nodeSpecificAssetId,
+                        $"{path}/specificAssetId");
+                }
+
+                Nodes.JsonNode? nodeDefaultThumbnail = obj["defaultThumbnail"];
+                Aas.File? theDefaultThumbnail = null;
+                if (nodeDefaultThumbnail != null)
+                {
+                    theDefaultThumbnail = Deserialize.FileFrom(
+                        nodeDefaultThumbnail,
+                        $"{path}/defaultThumbnail");
+                }
+
+                return new Aas.AssetInformation(
+                    theAssetKind,
+                    theGlobalAssetId,
+                    theSpecificAssetId,
+                    theDefaultThumbnail);
+            }  // public static Aas.AssetInformation AssetInformationFrom
+
+            /// <summary>
+            /// Deserialize the enumeration AssetKind from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of AssetKind.
+            /// </exception>
+            public static Aas.AssetKind AssetKindFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.AssetKind? result = Stringification.AssetKindFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of AssetKind " +
+                        $"at: {path}");
+            }  // public static Aas.AssetKind AssetKindFrom
+
+            /// <summary>
+            /// Deserialize an instance of IdentifierKeyValuePair from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IdentifierKeyValuePair.
+            /// </exception>
+            public static Aas.IdentifierKeyValuePair IdentifierKeyValuePairFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeKey = obj["key"];
+                if (nodeKey == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"key\" is missing " +
+                        $"at: {path}/key");
+                }
+                string theKey = Implementation.StringFrom(
+                    nodeKey,
+                    $"{path}/key");
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                if (nodeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"value\" is missing " +
+                        $"at: {path}/value");
+                }
+                string theValue = Implementation.StringFrom(
+                    nodeValue,
+                    $"{path}/value");
+
+                Nodes.JsonNode? nodeExternalSubjectId = obj["externalSubjectId"];
+                Aas.IReference? theExternalSubjectId = null;
+                if (nodeExternalSubjectId != null)
+                {
+                    theExternalSubjectId = Deserialize.IReferenceFrom(
+                        nodeExternalSubjectId,
+                        $"{path}/externalSubjectId");
+                }
+
+                return new Aas.IdentifierKeyValuePair(
+                    theKey,
+                    theValue,
+                    theExternalSubjectId,
+                    theSemanticId);
+            }  // public static Aas.IdentifierKeyValuePair IdentifierKeyValuePairFrom
+
+            /// <summary>
+            /// Deserialize an instance of Submodel from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of Submodel.
+            /// </exception>
+            public static Aas.Submodel SubmodelFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeId = obj["id"];
+                if (nodeId == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"id\" is missing " +
+                        $"at: {path}/id");
+                }
+                string theId = Implementation.StringFrom(
+                    nodeId,
+                    $"{path}/id");
+
+                Nodes.JsonNode? nodeAdministration = obj["administration"];
+                Aas.AdministrativeInformation? theAdministration = null;
+                if (nodeAdministration != null)
+                {
+                    theAdministration = Deserialize.AdministrativeInformationFrom(
+                        nodeAdministration,
+                        $"{path}/administration");
+                }
+
+                Nodes.JsonNode? nodeSubmodelElements = obj["submodelElements"];
+                if (nodeSubmodelElements == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"submodelElements\" is missing " +
+                        $"at: {path}/submodelElements");
+                }
+                Nodes.JsonArray? arraySubmodelElements = nodeSubmodelElements as Nodes.JsonArray;
+                if (arraySubmodelElements == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeSubmodelElements.GetType()} " +
+                        $"at: {path}/submodelElements");
+                }
+                var theSubmodelElements = new List<ISubmodelElement>(
+                    arraySubmodelElements.Count);
+                int indexSubmodelElements = 0;
+                foreach (Nodes.JsonNode? item in arraySubmodelElements)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/submodelElements/{indexSubmodelElements}");
+                    }
+                    ISubmodelElement parsedItem = Deserialize.ISubmodelElementFrom(
+                        item,
+                        $"{path}/submodelElements/{indexSubmodelElements}");
+                    theSubmodelElements.Add(parsedItem);
+                    indexSubmodelElements++;
+                }
+
+                return new Aas.Submodel(
+                    theId,
+                    theIdShort,
+                    theSubmodelElements,
+                    theExtensions,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theAdministration,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications);
+            }  // public static Aas.Submodel SubmodelFrom
+
+            /// <summary>
+            /// Deserialize an instance of ISubmodelElement by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of ISubmodelElement.
+            /// </exception>
+            public static Aas.ISubmodelElement ISubmodelElementFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "AnnotatedRelationshipElement":
+                    return AnnotatedRelationshipElementFrom(
+                        node, path);
+                case "BasicEvent":
+                    return BasicEventFrom(
+                        node, path);
+                case "Blob":
+                    return BlobFrom(
+                        node, path);
+                case "Capability":
+                    return CapabilityFrom(
+                        node, path);
+                case "Entity":
+                    return EntityFrom(
+                        node, path);
+                case "File":
+                    return FileFrom(
+                        node, path);
+                case "MultiLanguageProperty":
+                    return MultiLanguagePropertyFrom(
+                        node, path);
+                case "Operation":
+                    return OperationFrom(
+                        node, path);
+                case "Property":
+                    return PropertyFrom(
+                        node, path);
+                case "Range":
+                    return RangeFrom(
+                        node, path);
+                case "ReferenceElement":
+                    return ReferenceElementFrom(
+                        node, path);
+                case "SubmodelElementList":
+                    return SubmodelElementListFrom(
+                        node, path);
+                case "SubmodelElementStruct":
+                    return SubmodelElementStructFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for ISubmodelElement at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.ISubmodelElement ISubmodelElementFrom
+
+            /// <summary>
+            /// Deserialize an instance of IRelationshipElement by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IRelationshipElement.
+            /// </exception>
+            public static Aas.IRelationshipElement IRelationshipElementFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "AnnotatedRelationshipElement":
+                    return AnnotatedRelationshipElementFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for IRelationshipElement at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.IRelationshipElement IRelationshipElementFrom
+
+            /// <summary>
+            /// Deserialize an instance of SubmodelElementList from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of SubmodelElementList.
+            /// </exception>
+            public static Aas.SubmodelElementList SubmodelElementListFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeSubmodelElementTypeValues = obj["submodelElementTypeValues"];
+                if (nodeSubmodelElementTypeValues == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"submodelElementTypeValues\" is missing " +
+                        $"at: {path}/submodelElementTypeValues");
+                }
+                Aas.SubmodelElements theSubmodelElementTypeValues = Deserialize.SubmodelElementsFrom(
+                    nodeSubmodelElementTypeValues,
+                    $"{path}/submodelElementTypeValues");
+
+                Nodes.JsonNode? nodeValues = obj["values"];
+                if (nodeValues == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"values\" is missing " +
+                        $"at: {path}/values");
+                }
+                Nodes.JsonArray? arrayValues = nodeValues as Nodes.JsonArray;
+                if (arrayValues == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeValues.GetType()} " +
+                        $"at: {path}/values");
+                }
+                var theValues = new List<ISubmodelElement>(
+                    arrayValues.Count);
+                int indexValues = 0;
+                foreach (Nodes.JsonNode? item in arrayValues)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/values/{indexValues}");
+                    }
+                    ISubmodelElement parsedItem = Deserialize.ISubmodelElementFrom(
+                        item,
+                        $"{path}/values/{indexValues}");
+                    theValues.Add(parsedItem);
+                    indexValues++;
+                }
+
+                Nodes.JsonNode? nodeSemanticIdValues = obj["semanticIdValues"];
+                Aas.IReference? theSemanticIdValues = null;
+                if (nodeSemanticIdValues != null)
+                {
+                    theSemanticIdValues = Deserialize.IReferenceFrom(
+                        nodeSemanticIdValues,
+                        $"{path}/semanticIdValues");
+                }
+
+                Nodes.JsonNode? nodeValueTypeValues = obj["valueTypeValues"];
+                Aas.DataTypeDef? theValueTypeValues = null;
+                if (nodeValueTypeValues != null)
+                {
+                    theValueTypeValues = Deserialize.DataTypeDefFrom(
+                        nodeValueTypeValues,
+                        $"{path}/valueTypeValues");
+                }
+
+                return new Aas.SubmodelElementList(
+                    theSubmodelElementTypeValues,
+                    theExtensions,
+                    theIdShort,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications,
+                    theValues,
+                    theSemanticIdValues,
+                    theValueTypeValues);
+            }  // public static Aas.SubmodelElementList SubmodelElementListFrom
+
+            /// <summary>
+            /// Deserialize an instance of SubmodelElementStruct from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of SubmodelElementStruct.
+            /// </exception>
+            public static Aas.SubmodelElementStruct SubmodelElementStructFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeValues = obj["values"];
+                if (nodeValues == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"values\" is missing " +
+                        $"at: {path}/values");
+                }
+                Nodes.JsonArray? arrayValues = nodeValues as Nodes.JsonArray;
+                if (arrayValues == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeValues.GetType()} " +
+                        $"at: {path}/values");
+                }
+                var theValues = new List<ISubmodelElement>(
+                    arrayValues.Count);
+                int indexValues = 0;
+                foreach (Nodes.JsonNode? item in arrayValues)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/values/{indexValues}");
+                    }
+                    ISubmodelElement parsedItem = Deserialize.ISubmodelElementFrom(
+                        item,
+                        $"{path}/values/{indexValues}");
+                    theValues.Add(parsedItem);
+                    indexValues++;
+                }
+
+                return new Aas.SubmodelElementStruct(
+                    theExtensions,
+                    theIdShort,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications,
+                    theValues);
+            }  // public static Aas.SubmodelElementStruct SubmodelElementStructFrom
+
+            /// <summary>
+            /// Deserialize an instance of IDataElement by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IDataElement.
+            /// </exception>
+            public static Aas.IDataElement IDataElementFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "Blob":
+                    return BlobFrom(
+                        node, path);
+                case "File":
+                    return FileFrom(
+                        node, path);
+                case "MultiLanguageProperty":
+                    return MultiLanguagePropertyFrom(
+                        node, path);
+                case "Property":
+                    return PropertyFrom(
+                        node, path);
+                case "Range":
+                    return RangeFrom(
+                        node, path);
+                case "ReferenceElement":
+                    return ReferenceElementFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for IDataElement at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.IDataElement IDataElementFrom
+
+            /// <summary>
+            /// Deserialize an instance of Property from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of Property.
+            /// </exception>
+            public static Aas.Property PropertyFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeValueType = obj["valueType"];
+                if (nodeValueType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"valueType\" is missing " +
+                        $"at: {path}/valueType");
+                }
+                Aas.DataTypeDef theValueType = Deserialize.DataTypeDefFrom(
+                    nodeValueType,
+                    $"{path}/valueType");
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                string? theValue = null;
+                if (nodeValue != null)
+                {
+                    theValue = Implementation.StringFrom(
+                        nodeValue,
+                        $"{path}/value");
+                }
+
+                Nodes.JsonNode? nodeValueId = obj["valueId"];
+                Aas.IReference? theValueId = null;
+                if (nodeValueId != null)
+                {
+                    theValueId = Deserialize.IReferenceFrom(
+                        nodeValueId,
+                        $"{path}/valueId");
+                }
+
+                return new Aas.Property(
+                    theValueType,
+                    theIdShort,
+                    theExtensions,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications,
+                    theValue,
+                    theValueId);
+            }  // public static Aas.Property PropertyFrom
+
+            /// <summary>
+            /// Deserialize an instance of MultiLanguageProperty from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of MultiLanguageProperty.
+            /// </exception>
+            public static Aas.MultiLanguageProperty MultiLanguagePropertyFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                Aas.LangStringSet? theValue = null;
+                if (nodeValue != null)
+                {
+                    theValue = Deserialize.LangStringSetFrom(
+                        nodeValue,
+                        $"{path}/value");
+                }
+
+                Nodes.JsonNode? nodeValueId = obj["valueId"];
+                Aas.IReference? theValueId = null;
+                if (nodeValueId != null)
+                {
+                    theValueId = Deserialize.IReferenceFrom(
+                        nodeValueId,
+                        $"{path}/valueId");
+                }
+
+                return new Aas.MultiLanguageProperty(
+                    theIdShort,
+                    theExtensions,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications,
+                    theValue,
+                    theValueId);
+            }  // public static Aas.MultiLanguageProperty MultiLanguagePropertyFrom
+
+            /// <summary>
+            /// Deserialize an instance of Range from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of Range.
+            /// </exception>
+            public static Aas.Range RangeFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeValueType = obj["valueType"];
+                if (nodeValueType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"valueType\" is missing " +
+                        $"at: {path}/valueType");
+                }
+                Aas.DataTypeDef theValueType = Deserialize.DataTypeDefFrom(
+                    nodeValueType,
+                    $"{path}/valueType");
+
+                Nodes.JsonNode? nodeMin = obj["min"];
+                string? theMin = null;
+                if (nodeMin != null)
+                {
+                    theMin = Implementation.StringFrom(
+                        nodeMin,
+                        $"{path}/min");
+                }
+
+                Nodes.JsonNode? nodeMax = obj["max"];
+                string? theMax = null;
+                if (nodeMax != null)
+                {
+                    theMax = Implementation.StringFrom(
+                        nodeMax,
+                        $"{path}/max");
+                }
+
+                return new Aas.Range(
+                    theValueType,
+                    theIdShort,
+                    theExtensions,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications,
+                    theMin,
+                    theMax);
+            }  // public static Aas.Range RangeFrom
+
+            /// <summary>
+            /// Deserialize an instance of ReferenceElement from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of ReferenceElement.
+            /// </exception>
+            public static Aas.ReferenceElement ReferenceElementFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                Aas.IReference? theValue = null;
+                if (nodeValue != null)
+                {
+                    theValue = Deserialize.IReferenceFrom(
+                        nodeValue,
+                        $"{path}/value");
+                }
+
+                return new Aas.ReferenceElement(
+                    theIdShort,
+                    theExtensions,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications,
+                    theValue);
+            }  // public static Aas.ReferenceElement ReferenceElementFrom
+
+            /// <summary>
+            /// Deserialize an instance of Blob from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of Blob.
+            /// </exception>
+            public static Aas.Blob BlobFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeMimeType = obj["mimeType"];
+                if (nodeMimeType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"mimeType\" is missing " +
+                        $"at: {path}/mimeType");
+                }
+                string theMimeType = Implementation.StringFrom(
+                    nodeMimeType,
+                    $"{path}/mimeType");
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                byte[]? theValue = null;
+                if (nodeValue != null)
+                {
+                    theValue = Implementation.BytesFrom(
+                        nodeValue,
+                        $"{path}/value");
+                }
+
+                return new Aas.Blob(
+                    theMimeType,
+                    theIdShort,
+                    theExtensions,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications,
+                    theValue);
+            }  // public static Aas.Blob BlobFrom
+
+            /// <summary>
+            /// Deserialize an instance of File from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of File.
+            /// </exception>
+            public static Aas.File FileFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeMimeType = obj["mimeType"];
+                if (nodeMimeType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"mimeType\" is missing " +
+                        $"at: {path}/mimeType");
+                }
+                string theMimeType = Implementation.StringFrom(
+                    nodeMimeType,
+                    $"{path}/mimeType");
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                string? theValue = null;
+                if (nodeValue != null)
+                {
+                    theValue = Implementation.StringFrom(
+                        nodeValue,
+                        $"{path}/value");
+                }
+
+                return new Aas.File(
+                    theMimeType,
+                    theIdShort,
+                    theExtensions,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications,
+                    theValue);
+            }  // public static Aas.File FileFrom
+
+            /// <summary>
+            /// Deserialize an instance of AnnotatedRelationshipElement from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of AnnotatedRelationshipElement.
+            /// </exception>
+            public static Aas.AnnotatedRelationshipElement AnnotatedRelationshipElementFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeFirst = obj["first"];
+                if (nodeFirst == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"first\" is missing " +
+                        $"at: {path}/first");
+                }
+                Aas.IReference theFirst = Deserialize.IReferenceFrom(
+                    nodeFirst,
+                    $"{path}/first");
+
+                Nodes.JsonNode? nodeSecond = obj["second"];
+                if (nodeSecond == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"second\" is missing " +
+                        $"at: {path}/second");
+                }
+                Aas.IReference theSecond = Deserialize.IReferenceFrom(
+                    nodeSecond,
+                    $"{path}/second");
+
+                Nodes.JsonNode? nodeAnnotation = obj["annotation"];
+                if (nodeAnnotation == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"annotation\" is missing " +
+                        $"at: {path}/annotation");
+                }
+                Nodes.JsonArray? arrayAnnotation = nodeAnnotation as Nodes.JsonArray;
+                if (arrayAnnotation == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeAnnotation.GetType()} " +
+                        $"at: {path}/annotation");
+                }
+                var theAnnotation = new List<IDataElement>(
+                    arrayAnnotation.Count);
+                int indexAnnotation = 0;
+                foreach (Nodes.JsonNode? item in arrayAnnotation)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/annotation/{indexAnnotation}");
+                    }
+                    IDataElement parsedItem = Deserialize.IDataElementFrom(
+                        item,
+                        $"{path}/annotation/{indexAnnotation}");
+                    theAnnotation.Add(parsedItem);
+                    indexAnnotation++;
+                }
+
+                return new Aas.AnnotatedRelationshipElement(
+                    theFirst,
+                    theSecond,
+                    theExtensions,
+                    theIdShort,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications,
+                    theAnnotation);
+            }  // public static Aas.AnnotatedRelationshipElement AnnotatedRelationshipElementFrom
+
+            /// <summary>
+            /// Deserialize the enumeration EntityType from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of EntityType.
+            /// </exception>
+            public static Aas.EntityType EntityTypeFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.EntityType? result = Stringification.EntityTypeFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of EntityType " +
+                        $"at: {path}");
+            }  // public static Aas.EntityType EntityTypeFrom
+
+            /// <summary>
+            /// Deserialize an instance of Entity from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of Entity.
+            /// </exception>
+            public static Aas.Entity EntityFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeEntityType = obj["entityType"];
+                if (nodeEntityType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"entityType\" is missing " +
+                        $"at: {path}/entityType");
+                }
+                Aas.EntityType theEntityType = Deserialize.EntityTypeFrom(
+                    nodeEntityType,
+                    $"{path}/entityType");
+
+                Nodes.JsonNode? nodeStatements = obj["statements"];
+                if (nodeStatements == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"statements\" is missing " +
+                        $"at: {path}/statements");
+                }
+                Nodes.JsonArray? arrayStatements = nodeStatements as Nodes.JsonArray;
+                if (arrayStatements == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeStatements.GetType()} " +
+                        $"at: {path}/statements");
+                }
+                var theStatements = new List<ISubmodelElement>(
+                    arrayStatements.Count);
+                int indexStatements = 0;
+                foreach (Nodes.JsonNode? item in arrayStatements)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/statements/{indexStatements}");
+                    }
+                    ISubmodelElement parsedItem = Deserialize.ISubmodelElementFrom(
+                        item,
+                        $"{path}/statements/{indexStatements}");
+                    theStatements.Add(parsedItem);
+                    indexStatements++;
+                }
+
+                Nodes.JsonNode? nodeGlobalAssetId = obj["globalAssetId"];
+                Aas.IReference? theGlobalAssetId = null;
+                if (nodeGlobalAssetId != null)
+                {
+                    theGlobalAssetId = Deserialize.IReferenceFrom(
+                        nodeGlobalAssetId,
+                        $"{path}/globalAssetId");
+                }
+
+                Nodes.JsonNode? nodeSpecificAssetId = obj["specificAssetId"];
+                Aas.IdentifierKeyValuePair? theSpecificAssetId = null;
+                if (nodeSpecificAssetId != null)
+                {
+                    theSpecificAssetId = Deserialize.IdentifierKeyValuePairFrom(
+                        nodeSpecificAssetId,
+                        $"{path}/specificAssetId");
+                }
+
+                return new Aas.Entity(
+                    theEntityType,
+                    theExtensions,
+                    theIdShort,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications,
+                    theStatements,
+                    theGlobalAssetId,
+                    theSpecificAssetId);
+            }  // public static Aas.Entity EntityFrom
+
+            /// <summary>
+            /// Deserialize an instance of IEvent by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IEvent.
+            /// </exception>
+            public static Aas.IEvent IEventFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "BasicEvent":
+                    return BasicEventFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for IEvent at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.IEvent IEventFrom
+
+            /// <summary>
+            /// Deserialize an instance of BasicEvent from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of BasicEvent.
+            /// </exception>
+            public static Aas.BasicEvent BasicEventFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeObserved = obj["observed"];
+                if (nodeObserved == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"observed\" is missing " +
+                        $"at: {path}/observed");
+                }
+                Aas.IReference theObserved = Deserialize.IReferenceFrom(
+                    nodeObserved,
+                    $"{path}/observed");
+
+                return new Aas.BasicEvent(
+                    theObserved,
+                    theIdShort,
+                    theExtensions,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications);
+            }  // public static Aas.BasicEvent BasicEventFrom
+
+            /// <summary>
+            /// Deserialize an instance of Operation from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of Operation.
+            /// </exception>
+            public static Aas.Operation OperationFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeInputVariables = obj["inputVariables"];
+                if (nodeInputVariables == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"inputVariables\" is missing " +
+                        $"at: {path}/inputVariables");
+                }
+                Nodes.JsonArray? arrayInputVariables = nodeInputVariables as Nodes.JsonArray;
+                if (arrayInputVariables == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeInputVariables.GetType()} " +
+                        $"at: {path}/inputVariables");
+                }
+                var theInputVariables = new List<OperationVariable>(
+                    arrayInputVariables.Count);
+                int indexInputVariables = 0;
+                foreach (Nodes.JsonNode? item in arrayInputVariables)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/inputVariables/{indexInputVariables}");
+                    }
+                    OperationVariable parsedItem = Deserialize.OperationVariableFrom(
+                        item,
+                        $"{path}/inputVariables/{indexInputVariables}");
+                    theInputVariables.Add(parsedItem);
+                    indexInputVariables++;
+                }
+
+                Nodes.JsonNode? nodeOutputVariables = obj["outputVariables"];
+                if (nodeOutputVariables == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"outputVariables\" is missing " +
+                        $"at: {path}/outputVariables");
+                }
+                Nodes.JsonArray? arrayOutputVariables = nodeOutputVariables as Nodes.JsonArray;
+                if (arrayOutputVariables == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeOutputVariables.GetType()} " +
+                        $"at: {path}/outputVariables");
+                }
+                var theOutputVariables = new List<OperationVariable>(
+                    arrayOutputVariables.Count);
+                int indexOutputVariables = 0;
+                foreach (Nodes.JsonNode? item in arrayOutputVariables)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/outputVariables/{indexOutputVariables}");
+                    }
+                    OperationVariable parsedItem = Deserialize.OperationVariableFrom(
+                        item,
+                        $"{path}/outputVariables/{indexOutputVariables}");
+                    theOutputVariables.Add(parsedItem);
+                    indexOutputVariables++;
+                }
+
+                Nodes.JsonNode? nodeInoutputVariables = obj["inoutputVariables"];
+                if (nodeInoutputVariables == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"inoutputVariables\" is missing " +
+                        $"at: {path}/inoutputVariables");
+                }
+                Nodes.JsonArray? arrayInoutputVariables = nodeInoutputVariables as Nodes.JsonArray;
+                if (arrayInoutputVariables == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeInoutputVariables.GetType()} " +
+                        $"at: {path}/inoutputVariables");
+                }
+                var theInoutputVariables = new List<OperationVariable>(
+                    arrayInoutputVariables.Count);
+                int indexInoutputVariables = 0;
+                foreach (Nodes.JsonNode? item in arrayInoutputVariables)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/inoutputVariables/{indexInoutputVariables}");
+                    }
+                    OperationVariable parsedItem = Deserialize.OperationVariableFrom(
+                        item,
+                        $"{path}/inoutputVariables/{indexInoutputVariables}");
+                    theInoutputVariables.Add(parsedItem);
+                    indexInoutputVariables++;
+                }
+
+                return new Aas.Operation(
+                    theExtensions,
+                    theIdShort,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications,
+                    theInputVariables,
+                    theOutputVariables,
+                    theInoutputVariables);
+            }  // public static Aas.Operation OperationFrom
+
+            /// <summary>
+            /// Deserialize an instance of OperationVariable from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of OperationVariable.
+            /// </exception>
+            public static Aas.OperationVariable OperationVariableFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                if (nodeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"value\" is missing " +
+                        $"at: {path}/value");
+                }
+                Aas.ISubmodelElement theValue = Deserialize.ISubmodelElementFrom(
+                    nodeValue,
+                    $"{path}/value");
+
+                return new Aas.OperationVariable(
+                    theValue);
+            }  // public static Aas.OperationVariable OperationVariableFrom
+
+            /// <summary>
+            /// Deserialize an instance of Capability from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of Capability.
+            /// </exception>
+            public static Aas.Capability CapabilityFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = Deserialize.ModelingKindFrom(
+                        nodeKind,
+                        $"{path}/kind");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"qualifiers\" is missing " +
+                        $"at: {path}/qualifiers");
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()} " +
+                        $"at: {path}/qualifiers");
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/qualifiers/{indexQualifiers}");
+                    }
+                    IConstraint parsedItem = Deserialize.IConstraintFrom(
+                        item,
+                        $"{path}/qualifiers/{indexQualifiers}");
+                    theQualifiers.Add(parsedItem);
+                    indexQualifiers++;
+                }
+
+                return new Aas.Capability(
+                    theExtensions,
+                    theIdShort,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers,
+                    theDataSpecifications);
+            }  // public static Aas.Capability CapabilityFrom
+
+            /// <summary>
+            /// Deserialize an instance of ConceptDescription from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of ConceptDescription.
+            /// </exception>
+            public static Aas.ConceptDescription ConceptDescriptionFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeId = obj["id"];
+                if (nodeId == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"id\" is missing " +
+                        $"at: {path}/id");
+                }
+                string theId = Implementation.StringFrom(
+                    nodeId,
+                    $"{path}/id");
+
+                Nodes.JsonNode? nodeAdministration = obj["administration"];
+                Aas.AdministrativeInformation? theAdministration = null;
+                if (nodeAdministration != null)
+                {
+                    theAdministration = Deserialize.AdministrativeInformationFrom(
+                        nodeAdministration,
+                        $"{path}/administration");
+                }
+
+                Nodes.JsonNode? nodeIsCaseOf = obj["isCaseOf"];
+                if (nodeIsCaseOf == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"isCaseOf\" is missing " +
+                        $"at: {path}/isCaseOf");
+                }
+                Nodes.JsonArray? arrayIsCaseOf = nodeIsCaseOf as Nodes.JsonArray;
+                if (arrayIsCaseOf == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeIsCaseOf.GetType()} " +
+                        $"at: {path}/isCaseOf");
+                }
+                var theIsCaseOf = new List<IReference>(
+                    arrayIsCaseOf.Count);
+                int indexIsCaseOf = 0;
+                foreach (Nodes.JsonNode? item in arrayIsCaseOf)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/isCaseOf/{indexIsCaseOf}");
+                    }
+                    IReference parsedItem = Deserialize.IReferenceFrom(
+                        item,
+                        $"{path}/isCaseOf/{indexIsCaseOf}");
+                    theIsCaseOf.Add(parsedItem);
+                    indexIsCaseOf++;
+                }
+
+                return new Aas.ConceptDescription(
+                    theId,
+                    theIdShort,
+                    theExtensions,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theAdministration,
+                    theIsCaseOf,
+                    theDataSpecifications);
+            }  // public static Aas.ConceptDescription ConceptDescriptionFrom
+
+            /// <summary>
+            /// Deserialize an instance of View from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of View.
+            /// </exception>
+            public static Aas.View ViewFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()} " +
+                            $"at: {path}/dataSpecifications");
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/dataSpecifications/{indexDataSpecifications}");
+                        }
+                        IReference parsedItem = Deserialize.IReferenceFrom(
+                            item,
+                            $"{path}/dataSpecifications/{indexDataSpecifications}");
+                        theDataSpecifications.Add(parsedItem);
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"extensions\" is missing " +
+                        $"at: {path}/extensions");
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()} " +
+                        $"at: {path}/extensions");
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/extensions/{indexExtensions}");
+                    }
+                    Extension parsedItem = Deserialize.ExtensionFrom(
+                        item,
+                        $"{path}/extensions/{indexExtensions}");
+                    theExtensions.Add(parsedItem);
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = Implementation.StringFrom(
+                        nodeIdShort,
+                        $"{path}/idShort");
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = Deserialize.LangStringSetFrom(
+                        nodeDisplayName,
+                        $"{path}/displayName");
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = Implementation.StringFrom(
+                        nodeCategory,
+                        $"{path}/category");
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = Deserialize.LangStringSetFrom(
+                        nodeDescription,
+                        $"{path}/description");
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = Deserialize.IReferenceFrom(
+                        nodeSemanticId,
+                        $"{path}/semanticId");
+                }
+
+                Nodes.JsonNode? nodeContainedElements = obj["containedElements"];
+                if (nodeContainedElements == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"containedElements\" is missing " +
+                        $"at: {path}/containedElements");
+                }
+                Nodes.JsonArray? arrayContainedElements = nodeContainedElements as Nodes.JsonArray;
+                if (arrayContainedElements == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeContainedElements.GetType()} " +
+                        $"at: {path}/containedElements");
+                }
+                var theContainedElements = new List<IReference>(
+                    arrayContainedElements.Count);
+                int indexContainedElements = 0;
+                foreach (Nodes.JsonNode? item in arrayContainedElements)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/containedElements/{indexContainedElements}");
+                    }
+                    IReference parsedItem = Deserialize.IReferenceFrom(
+                        item,
+                        $"{path}/containedElements/{indexContainedElements}");
+                    theContainedElements.Add(parsedItem);
+                    indexContainedElements++;
+                }
+
+                return new Aas.View(
+                    theExtensions,
+                    theIdShort,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theSemanticId,
+                    theDataSpecifications,
+                    theContainedElements);
+            }  // public static Aas.View ViewFrom
+
+            /// <summary>
+            /// Deserialize an instance of IReference by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IReference.
+            /// </exception>
+            public static Aas.IReference IReferenceFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "GlobalReference":
+                    return GlobalReferenceFrom(
+                        node, path);
+                case "ModelReference":
+                    return ModelReferenceFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for IReference at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.IReference IReferenceFrom
+
+            /// <summary>
+            /// Deserialize an instance of GlobalReference from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of GlobalReference.
+            /// </exception>
+            public static Aas.GlobalReference GlobalReferenceFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeValues = obj["values"];
+                if (nodeValues == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"values\" is missing " +
+                        $"at: {path}/values");
+                }
+                Nodes.JsonArray? arrayValues = nodeValues as Nodes.JsonArray;
+                if (arrayValues == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeValues.GetType()} " +
+                        $"at: {path}/values");
+                }
+                var theValues = new List<string>(
+                    arrayValues.Count);
+                int indexValues = 0;
+                foreach (Nodes.JsonNode? item in arrayValues)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/values/{indexValues}");
+                    }
+                    string parsedItem = Implementation.StringFrom(
+                        item,
+                        $"{path}/values/{indexValues}");
+                    theValues.Add(parsedItem);
+                    indexValues++;
+                }
+
+                return new Aas.GlobalReference(
+                    theValues);
+            }  // public static Aas.GlobalReference GlobalReferenceFrom
+
+            /// <summary>
+            /// Deserialize an instance of ModelReference from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of ModelReference.
+            /// </exception>
+            public static Aas.ModelReference ModelReferenceFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeKeys = obj["keys"];
+                if (nodeKeys == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"keys\" is missing " +
+                        $"at: {path}/keys");
+                }
+                Nodes.JsonArray? arrayKeys = nodeKeys as Nodes.JsonArray;
+                if (arrayKeys == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeKeys.GetType()} " +
+                        $"at: {path}/keys");
+                }
+                var theKeys = new List<Key>(
+                    arrayKeys.Count);
+                int indexKeys = 0;
+                foreach (Nodes.JsonNode? item in arrayKeys)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/keys/{indexKeys}");
+                    }
+                    Key parsedItem = Deserialize.KeyFrom(
+                        item,
+                        $"{path}/keys/{indexKeys}");
+                    theKeys.Add(parsedItem);
+                    indexKeys++;
+                }
+
+                Nodes.JsonNode? nodeReferredSemanticId = obj["referredSemanticId"];
+                Aas.IReference? theReferredSemanticId = null;
+                if (nodeReferredSemanticId != null)
+                {
+                    theReferredSemanticId = Deserialize.IReferenceFrom(
+                        nodeReferredSemanticId,
+                        $"{path}/referredSemanticId");
+                }
+
+                return new Aas.ModelReference(
+                    theKeys,
+                    theReferredSemanticId);
+            }  // public static Aas.ModelReference ModelReferenceFrom
+
+            /// <summary>
+            /// Deserialize an instance of Key from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of Key.
+            /// </exception>
+            public static Aas.Key KeyFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeType = obj["type"];
+                if (nodeType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"type\" is missing " +
+                        $"at: {path}/type");
+                }
+                Aas.KeyElements theType = Deserialize.KeyElementsFrom(
+                    nodeType,
+                    $"{path}/type");
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                if (nodeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"value\" is missing " +
+                        $"at: {path}/value");
+                }
+                string theValue = Implementation.StringFrom(
+                    nodeValue,
+                    $"{path}/value");
+
+                return new Aas.Key(
+                    theType,
+                    theValue);
+            }  // public static Aas.Key KeyFrom
+
+            /// <summary>
+            /// Deserialize the enumeration IdentifiableElements from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IdentifiableElements.
+            /// </exception>
+            public static Aas.IdentifiableElements IdentifiableElementsFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.IdentifiableElements? result = Stringification.IdentifiableElementsFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of IdentifiableElements " +
+                        $"at: {path}");
+            }  // public static Aas.IdentifiableElements IdentifiableElementsFrom
+
+            /// <summary>
+            /// Deserialize the enumeration ReferableElements from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of ReferableElements.
+            /// </exception>
+            public static Aas.ReferableElements ReferableElementsFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.ReferableElements? result = Stringification.ReferableElementsFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of ReferableElements " +
+                        $"at: {path}");
+            }  // public static Aas.ReferableElements ReferableElementsFrom
+
+            /// <summary>
+            /// Deserialize the enumeration KeyElements from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of KeyElements.
+            /// </exception>
+            public static Aas.KeyElements KeyElementsFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.KeyElements? result = Stringification.KeyElementsFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of KeyElements " +
+                        $"at: {path}");
+            }  // public static Aas.KeyElements KeyElementsFrom
+
+            /// <summary>
+            /// Deserialize the enumeration SubmodelElements from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of SubmodelElements.
+            /// </exception>
+            public static Aas.SubmodelElements SubmodelElementsFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.SubmodelElements? result = Stringification.SubmodelElementsFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of SubmodelElements " +
+                        $"at: {path}");
+            }  // public static Aas.SubmodelElements SubmodelElementsFrom
+
+            /// <summary>
+            /// Deserialize the enumeration BuildInListTypes from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of BuildInListTypes.
+            /// </exception>
+            public static Aas.BuildInListTypes BuildInListTypesFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.BuildInListTypes? result = Stringification.BuildInListTypesFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of BuildInListTypes " +
+                        $"at: {path}");
+            }  // public static Aas.BuildInListTypes BuildInListTypesFrom
+
+            /// <summary>
+            /// Deserialize the enumeration DecimalBuildInTypes from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of DecimalBuildInTypes.
+            /// </exception>
+            public static Aas.DecimalBuildInTypes DecimalBuildInTypesFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.DecimalBuildInTypes? result = Stringification.DecimalBuildInTypesFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of DecimalBuildInTypes " +
+                        $"at: {path}");
+            }  // public static Aas.DecimalBuildInTypes DecimalBuildInTypesFrom
+
+            /// <summary>
+            /// Deserialize the enumeration DurationBuildInTypes from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of DurationBuildInTypes.
+            /// </exception>
+            public static Aas.DurationBuildInTypes DurationBuildInTypesFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.DurationBuildInTypes? result = Stringification.DurationBuildInTypesFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of DurationBuildInTypes " +
+                        $"at: {path}");
+            }  // public static Aas.DurationBuildInTypes DurationBuildInTypesFrom
+
+            /// <summary>
+            /// Deserialize the enumeration PrimitiveTypes from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of PrimitiveTypes.
+            /// </exception>
+            public static Aas.PrimitiveTypes PrimitiveTypesFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.PrimitiveTypes? result = Stringification.PrimitiveTypesFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of PrimitiveTypes " +
+                        $"at: {path}");
+            }  // public static Aas.PrimitiveTypes PrimitiveTypesFrom
+
+            /// <summary>
+            /// Deserialize the enumeration StringBuildInTypes from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of StringBuildInTypes.
+            /// </exception>
+            public static Aas.StringBuildInTypes StringBuildInTypesFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.StringBuildInTypes? result = Stringification.StringBuildInTypesFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of StringBuildInTypes " +
+                        $"at: {path}");
+            }  // public static Aas.StringBuildInTypes StringBuildInTypesFrom
+
+            /// <summary>
+            /// Deserialize the enumeration DataTypeDef from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of DataTypeDef.
+            /// </exception>
+            public static Aas.DataTypeDef DataTypeDefFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.DataTypeDef? result = Stringification.DataTypeDefFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of DataTypeDef " +
+                        $"at: {path}");
+            }  // public static Aas.DataTypeDef DataTypeDefFrom
+
+            public static Aas.LangStringSet LangStringSetFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                throw new System.NotImplementedException("TODO");
             }
 
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.Extension that,
-                Json.JsonSerializerOptions options)
+            /// <summary>
+            /// Deserialize an instance of IDataSpecificationContent by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of IDataSpecificationContent.
+            /// </exception>
+            public static Aas.IDataSpecificationContent IDataSpecificationContentFrom(
+                Nodes.JsonNode node,
+                string path)
             {
-                writer.WriteStartObject();
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected Nodes.JsonObject, " +
+                        $"but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a model type, but none is present: " +
+                        $"{path}/modelType");
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()} at: {path}");
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue} " +
+                        $"at: {path}/modelType");
+                }
+
+                switch (modelType)
+                {
+                case "DataSpecificationIec61360":
+                    return DataSpecificationIec61360From(
+                        node, path);
+                case "DataSpecificationPhysicalUnit":
+                    return DataSpecificationPhysicalUnitFrom(
+                        node, path);
+                    default:
+                        throw new System.ArgumentException(
+                            $"Unexpected model type for IDataSpecificationContent at {path}/modelType: " +
+                            modelType);
+                }
+            }  // public static Aas.IDataSpecificationContent IDataSpecificationContentFrom
+
+            /// <summary>
+            /// Deserialize the enumeration DataTypeIec61360 from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of DataTypeIec61360.
+            /// </exception>
+            public static Aas.DataTypeIec61360 DataTypeIec61360From(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.DataTypeIec61360? result = Stringification.DataTypeIec61360FromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of DataTypeIec61360 " +
+                        $"at: {path}");
+            }  // public static Aas.DataTypeIec61360 DataTypeIec61360From
+
+            /// <summary>
+            /// Deserialize the enumeration LevelType from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of LevelType.
+            /// </exception>
+            public static Aas.LevelType LevelTypeFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                string text = Implementation.StringFrom(node, path);
+                Aas.LevelType? result = Stringification.LevelTypeFromString(text);
+                return result
+                     ?? throw new System.ArgumentException(
+                        "Not a valid JSON representation of LevelType " +
+                        $"at: {path}");
+            }  // public static Aas.LevelType LevelTypeFrom
+
+            /// <summary>
+            /// Deserialize an instance of ValueReferencePair from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of ValueReferencePair.
+            /// </exception>
+            public static Aas.ValueReferencePair ValueReferencePairFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                if (nodeValue == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"value\" is missing " +
+                        $"at: {path}/value");
+                }
+                string theValue = Implementation.StringFrom(
+                    nodeValue,
+                    $"{path}/value");
+
+                Nodes.JsonNode? nodeValueId = obj["valueId"];
+                if (nodeValueId == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"valueId\" is missing " +
+                        $"at: {path}/valueId");
+                }
+                Aas.IReference theValueId = Deserialize.IReferenceFrom(
+                    nodeValueId,
+                    $"{path}/valueId");
+
+                return new Aas.ValueReferencePair(
+                    theValue,
+                    theValueId);
+            }  // public static Aas.ValueReferencePair ValueReferencePairFrom
+
+            /// <summary>
+            /// Deserialize an instance of ValueList from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of ValueList.
+            /// </exception>
+            public static Aas.ValueList ValueListFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeValueReferencePairs = obj["valueReferencePairs"];
+                if (nodeValueReferencePairs == null)
+                {
+                    throw new System.ArgumentException(
+                        "Required property \"valueReferencePairs\" is missing " +
+                        $"at: {path}/valueReferencePairs");
+                }
+                Nodes.JsonArray? arrayValueReferencePairs = nodeValueReferencePairs as Nodes.JsonArray;
+                if (arrayValueReferencePairs == null)
+                {
+                    throw new System.ArgumentException(
+                        $"Expected a JsonArray, but got {nodeValueReferencePairs.GetType()} " +
+                        $"at: {path}/valueReferencePairs");
+                }
+                var theValueReferencePairs = new List<ValueReferencePair>(
+                    arrayValueReferencePairs.Count);
+                int indexValueReferencePairs = 0;
+                foreach (Nodes.JsonNode? item in arrayValueReferencePairs)
+                {
+                    if (item == null)
+                    {
+                        throw new System.ArgumentException(
+                            "Expected a non-null item, but got a null " +
+                            $"at: {path}/valueReferencePairs/{indexValueReferencePairs}");
+                    }
+                    ValueReferencePair parsedItem = Deserialize.ValueReferencePairFrom(
+                        item,
+                        $"{path}/valueReferencePairs/{indexValueReferencePairs}");
+                    theValueReferencePairs.Add(parsedItem);
+                    indexValueReferencePairs++;
+                }
+
+                return new Aas.ValueList(
+                    theValueReferencePairs);
+            }  // public static Aas.ValueList ValueListFrom
+
+            /// <summary>
+            /// Deserialize an instance of DataSpecificationIec61360 from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of DataSpecificationIec61360.
+            /// </exception>
+            public static Aas.DataSpecificationIec61360 DataSpecificationIec61360From(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodePreferredName = obj["preferredName"];
+                Aas.LangStringSet? thePreferredName = null;
+                if (nodePreferredName != null)
+                {
+                    thePreferredName = Deserialize.LangStringSetFrom(
+                        nodePreferredName,
+                        $"{path}/preferredName");
+                }
+
+                Nodes.JsonNode? nodeShortName = obj["shortName"];
+                Aas.LangStringSet? theShortName = null;
+                if (nodeShortName != null)
+                {
+                    theShortName = Deserialize.LangStringSetFrom(
+                        nodeShortName,
+                        $"{path}/shortName");
+                }
+
+                Nodes.JsonNode? nodeUnit = obj["unit"];
+                string? theUnit = null;
+                if (nodeUnit != null)
+                {
+                    theUnit = Implementation.StringFrom(
+                        nodeUnit,
+                        $"{path}/unit");
+                }
+
+                Nodes.JsonNode? nodeUnitId = obj["unitId"];
+                Aas.IReference? theUnitId = null;
+                if (nodeUnitId != null)
+                {
+                    theUnitId = Deserialize.IReferenceFrom(
+                        nodeUnitId,
+                        $"{path}/unitId");
+                }
+
+                Nodes.JsonNode? nodeSourceOfDefinition = obj["sourceOfDefinition"];
+                string? theSourceOfDefinition = null;
+                if (nodeSourceOfDefinition != null)
+                {
+                    theSourceOfDefinition = Implementation.StringFrom(
+                        nodeSourceOfDefinition,
+                        $"{path}/sourceOfDefinition");
+                }
+
+                Nodes.JsonNode? nodeSymbol = obj["symbol"];
+                string? theSymbol = null;
+                if (nodeSymbol != null)
+                {
+                    theSymbol = Implementation.StringFrom(
+                        nodeSymbol,
+                        $"{path}/symbol");
+                }
+
+                Nodes.JsonNode? nodeDataType = obj["dataType"];
+                Aas.DataTypeIec61360? theDataType = null;
+                if (nodeDataType != null)
+                {
+                    theDataType = Deserialize.DataTypeIec61360From(
+                        nodeDataType,
+                        $"{path}/dataType");
+                }
+
+                Nodes.JsonNode? nodeDefinition = obj["definition"];
+                Aas.LangStringSet? theDefinition = null;
+                if (nodeDefinition != null)
+                {
+                    theDefinition = Deserialize.LangStringSetFrom(
+                        nodeDefinition,
+                        $"{path}/definition");
+                }
+
+                Nodes.JsonNode? nodeValueFormat = obj["valueFormat"];
+                string? theValueFormat = null;
+                if (nodeValueFormat != null)
+                {
+                    theValueFormat = Implementation.StringFrom(
+                        nodeValueFormat,
+                        $"{path}/valueFormat");
+                }
+
+                Nodes.JsonNode? nodeValueList = obj["valueList"];
+                Aas.ValueList? theValueList = null;
+                if (nodeValueList != null)
+                {
+                    theValueList = Deserialize.ValueListFrom(
+                        nodeValueList,
+                        $"{path}/valueList");
+                }
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                string? theValue = null;
+                if (nodeValue != null)
+                {
+                    theValue = Implementation.StringFrom(
+                        nodeValue,
+                        $"{path}/value");
+                }
+
+                Nodes.JsonNode? nodeValueId = obj["valueId"];
+                Aas.IReference? theValueId = null;
+                if (nodeValueId != null)
+                {
+                    theValueId = Deserialize.IReferenceFrom(
+                        nodeValueId,
+                        $"{path}/valueId");
+                }
+
+                Nodes.JsonNode? nodeLevelType = obj["levelType"];
+                Aas.LevelType? theLevelType = null;
+                if (nodeLevelType != null)
+                {
+                    theLevelType = Deserialize.LevelTypeFrom(
+                        nodeLevelType,
+                        $"{path}/levelType");
+                }
+
+                return new Aas.DataSpecificationIec61360(
+                    thePreferredName,
+                    theShortName,
+                    theUnit,
+                    theUnitId,
+                    theSourceOfDefinition,
+                    theSymbol,
+                    theDataType,
+                    theDefinition,
+                    theValueFormat,
+                    theValueList,
+                    theValue,
+                    theValueId,
+                    theLevelType);
+            }  // public static Aas.DataSpecificationIec61360 DataSpecificationIec61360From
+
+            /// <summary>
+            /// Deserialize an instance of DataSpecificationPhysicalUnit from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of DataSpecificationPhysicalUnit.
+            /// </exception>
+            public static Aas.DataSpecificationPhysicalUnit DataSpecificationPhysicalUnitFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeUnitName = obj["unitName"];
+                string? theUnitName = null;
+                if (nodeUnitName != null)
+                {
+                    theUnitName = Implementation.StringFrom(
+                        nodeUnitName,
+                        $"{path}/unitName");
+                }
+
+                Nodes.JsonNode? nodeUnitSymbol = obj["unitSymbol"];
+                string? theUnitSymbol = null;
+                if (nodeUnitSymbol != null)
+                {
+                    theUnitSymbol = Implementation.StringFrom(
+                        nodeUnitSymbol,
+                        $"{path}/unitSymbol");
+                }
+
+                Nodes.JsonNode? nodeDefinition = obj["definition"];
+                Aas.LangStringSet? theDefinition = null;
+                if (nodeDefinition != null)
+                {
+                    theDefinition = Deserialize.LangStringSetFrom(
+                        nodeDefinition,
+                        $"{path}/definition");
+                }
+
+                Nodes.JsonNode? nodeSiNotation = obj["siNotation"];
+                string? theSiNotation = null;
+                if (nodeSiNotation != null)
+                {
+                    theSiNotation = Implementation.StringFrom(
+                        nodeSiNotation,
+                        $"{path}/siNotation");
+                }
+
+                Nodes.JsonNode? nodeDinNotation = obj["dinNotation"];
+                string? theDinNotation = null;
+                if (nodeDinNotation != null)
+                {
+                    theDinNotation = Implementation.StringFrom(
+                        nodeDinNotation,
+                        $"{path}/dinNotation");
+                }
+
+                Nodes.JsonNode? nodeEceName = obj["eceName"];
+                string? theEceName = null;
+                if (nodeEceName != null)
+                {
+                    theEceName = Implementation.StringFrom(
+                        nodeEceName,
+                        $"{path}/eceName");
+                }
+
+                Nodes.JsonNode? nodeEceCode = obj["eceCode"];
+                string? theEceCode = null;
+                if (nodeEceCode != null)
+                {
+                    theEceCode = Implementation.StringFrom(
+                        nodeEceCode,
+                        $"{path}/eceCode");
+                }
+
+                Nodes.JsonNode? nodeNistName = obj["nistName"];
+                string? theNistName = null;
+                if (nodeNistName != null)
+                {
+                    theNistName = Implementation.StringFrom(
+                        nodeNistName,
+                        $"{path}/nistName");
+                }
+
+                Nodes.JsonNode? nodeSourceOfDefinition = obj["sourceOfDefinition"];
+                string? theSourceOfDefinition = null;
+                if (nodeSourceOfDefinition != null)
+                {
+                    theSourceOfDefinition = Implementation.StringFrom(
+                        nodeSourceOfDefinition,
+                        $"{path}/sourceOfDefinition");
+                }
+
+                Nodes.JsonNode? nodeConversionFactor = obj["conversionFactor"];
+                string? theConversionFactor = null;
+                if (nodeConversionFactor != null)
+                {
+                    theConversionFactor = Implementation.StringFrom(
+                        nodeConversionFactor,
+                        $"{path}/conversionFactor");
+                }
+
+                Nodes.JsonNode? nodeRegistrationAuthorityId = obj["registrationAuthorityId"];
+                string? theRegistrationAuthorityId = null;
+                if (nodeRegistrationAuthorityId != null)
+                {
+                    theRegistrationAuthorityId = Implementation.StringFrom(
+                        nodeRegistrationAuthorityId,
+                        $"{path}/registrationAuthorityId");
+                }
+
+                Nodes.JsonNode? nodeSupplier = obj["supplier"];
+                string? theSupplier = null;
+                if (nodeSupplier != null)
+                {
+                    theSupplier = Implementation.StringFrom(
+                        nodeSupplier,
+                        $"{path}/supplier");
+                }
+
+                return new Aas.DataSpecificationPhysicalUnit(
+                    theUnitName,
+                    theUnitSymbol,
+                    theDefinition,
+                    theSiNotation,
+                    theDinNotation,
+                    theEceName,
+                    theEceCode,
+                    theNistName,
+                    theSourceOfDefinition,
+                    theConversionFactor,
+                    theRegistrationAuthorityId,
+                    theSupplier);
+            }  // public static Aas.DataSpecificationPhysicalUnit DataSpecificationPhysicalUnitFrom
+
+            /// <summary>
+            /// Deserialize an instance of Environment from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="path">Path to the node used in exceptions</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="node" /> is not a valid JSON representation
+            /// of Environment.
+            /// </exception>
+            public static Aas.Environment EnvironmentFrom(
+                Nodes.JsonNode node,
+                string path)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    throw new System.ArgumentException(
+                        "Expected a JsonObject, but got {node.GetType()} at: {path}");
+                }
+
+                Nodes.JsonNode? nodeAssetAdministrationShells = obj["assetAdministrationShells"];
+                List<AssetAdministrationShell>? theAssetAdministrationShells = null;
+                if (nodeAssetAdministrationShells != null)
+                {
+                    Nodes.JsonArray? arrayAssetAdministrationShells = nodeAssetAdministrationShells as Nodes.JsonArray;
+                    if (arrayAssetAdministrationShells == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeAssetAdministrationShells.GetType()} " +
+                            $"at: {path}/assetAdministrationShells");
+                    }
+                    theAssetAdministrationShells = new List<AssetAdministrationShell>(
+                        arrayAssetAdministrationShells.Count);
+                    int indexAssetAdministrationShells = 0;
+                    foreach (Nodes.JsonNode? item in arrayAssetAdministrationShells)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/assetAdministrationShells/{indexAssetAdministrationShells}");
+                        }
+                        AssetAdministrationShell parsedItem = Deserialize.AssetAdministrationShellFrom(
+                            item,
+                            $"{path}/assetAdministrationShells/{indexAssetAdministrationShells}");
+                        theAssetAdministrationShells.Add(parsedItem);
+                        indexAssetAdministrationShells++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeSubmodels = obj["submodels"];
+                List<Submodel>? theSubmodels = null;
+                if (nodeSubmodels != null)
+                {
+                    Nodes.JsonArray? arraySubmodels = nodeSubmodels as Nodes.JsonArray;
+                    if (arraySubmodels == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeSubmodels.GetType()} " +
+                            $"at: {path}/submodels");
+                    }
+                    theSubmodels = new List<Submodel>(
+                        arraySubmodels.Count);
+                    int indexSubmodels = 0;
+                    foreach (Nodes.JsonNode? item in arraySubmodels)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/submodels/{indexSubmodels}");
+                        }
+                        Submodel parsedItem = Deserialize.SubmodelFrom(
+                            item,
+                            $"{path}/submodels/{indexSubmodels}");
+                        theSubmodels.Add(parsedItem);
+                        indexSubmodels++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeConceptDescriptions = obj["conceptDescriptions"];
+                List<ConceptDescription>? theConceptDescriptions = null;
+                if (nodeConceptDescriptions != null)
+                {
+                    Nodes.JsonArray? arrayConceptDescriptions = nodeConceptDescriptions as Nodes.JsonArray;
+                    if (arrayConceptDescriptions == null)
+                    {
+                        throw new System.ArgumentException(
+                            $"Expected a JsonArray, but got {nodeConceptDescriptions.GetType()} " +
+                            $"at: {path}/conceptDescriptions");
+                    }
+                    theConceptDescriptions = new List<ConceptDescription>(
+                        arrayConceptDescriptions.Count);
+                    int indexConceptDescriptions = 0;
+                    foreach (Nodes.JsonNode? item in arrayConceptDescriptions)
+                    {
+                        if (item == null)
+                        {
+                            throw new System.ArgumentException(
+                                "Expected a non-null item, but got a null " +
+                                $"at: {path}/conceptDescriptions/{indexConceptDescriptions}");
+                        }
+                        ConceptDescription parsedItem = Deserialize.ConceptDescriptionFrom(
+                            item,
+                            $"{path}/conceptDescriptions/{indexConceptDescriptions}");
+                        theConceptDescriptions.Add(parsedItem);
+                        indexConceptDescriptions++;
+                    }
+                }
+
+                return new Aas.Environment(
+                    theAssetAdministrationShells,
+                    theSubmodels,
+                    theConceptDescriptions);
+            }  // public static Aas.Environment EnvironmentFrom
+        }  // public static class Deserialize
+
+        internal class Transformer
+            : Visitation.AbstractTransformer<Nodes.JsonObject>
+        {
+            public override Nodes.JsonObject Transform(Aas.Extension that)
+            {
+                var result = new Nodes.JsonObject();
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("name");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Name);
+                result["name"] = Nodes.JsonValue.Create(
+                    that.Name);
 
                 if (that.ValueType != null)
                 {
-                    writer.WritePropertyName("valueType");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ValueType);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.DataTypeDef value = that.ValueType
+                        ?? throw new System.InvalidOperationException();
+                    result["valueType"] = Serialize.DataTypeDefToJsonValue(
+                        value);
                 }
 
                 if (that.Value != null)
                 {
-                    writer.WritePropertyName("value");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Value);
+                    result["value"] = Nodes.JsonValue.Create(
+                        that.Value);
                 }
 
                 if (that.RefersTo != null)
                 {
-                    writer.WritePropertyName("refersTo");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.RefersTo);
+                    result["refersTo"] = Transform(
+                        that.RefersTo);
                 }
 
-                writer.WriteEndObject();
-            }
-        }  // ExtensionJsonConverter
-
-        public class IHasExtensionsJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IHasExtensions>
-        {
-            public override bool CanConvert(System.Type typeToConvert)
-            {
-                return typeof(Aas.IHasExtensions).IsAssignableFrom(typeToConvert);
+                return result;
             }
 
-            public override Aas.IHasExtensions Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.AdministrativeInformation that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                var result = new Nodes.JsonObject();
+
+                if (that.DataSpecifications != null)
                 {
-                    throw new Json.JsonException();
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
                 }
-
-                string? modelType = null;
-
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
-
-                while (reader.Read())
-                {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
-                    {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
-                    }
-                    else
-                    {
-                        buffer.Write(reader.ValueSpan);
-                    }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "AnnotatedRelationshipElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "AssetAdministrationShell":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AssetAdministrationShell>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null AssetAdministrationShell from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "BasicEvent":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null BasicEvent from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Blob":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Blob from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Capability":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Capability from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "ConceptDescription":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ConceptDescription>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null ConceptDescription from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Entity":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Entity from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "File":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null File from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "MultiLanguageProperty":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null MultiLanguageProperty from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Operation":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Operation from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Property":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Property from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Range":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Range from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "ReferenceElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null ReferenceElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Submodel":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Submodel from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementList":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementList from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementStruct":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementStruct from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "View":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.View>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null View from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IHasExtensions that,
-                Json.JsonSerializerOptions options)
-            {
-            switch (that)
-            {
-                case AnnotatedRelationshipElement theAnnotatedRelationshipElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theAnnotatedRelationshipElement);
-                    break;
-                case AssetAdministrationShell theAssetAdministrationShell:
-                    Json.JsonSerializer.Serialize(
-                        writer, theAssetAdministrationShell);
-                    break;
-                case BasicEvent theBasicEvent:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBasicEvent);
-                    break;
-                case Blob theBlob:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBlob);
-                    break;
-                case Capability theCapability:
-                    Json.JsonSerializer.Serialize(
-                        writer, theCapability);
-                    break;
-                case ConceptDescription theConceptDescription:
-                    Json.JsonSerializer.Serialize(
-                        writer, theConceptDescription);
-                    break;
-                case Entity theEntity:
-                    Json.JsonSerializer.Serialize(
-                        writer, theEntity);
-                    break;
-                case File theFile:
-                    Json.JsonSerializer.Serialize(
-                        writer, theFile);
-                    break;
-                case MultiLanguageProperty theMultiLanguageProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theMultiLanguageProperty);
-                    break;
-                case Operation theOperation:
-                    Json.JsonSerializer.Serialize(
-                        writer, theOperation);
-                    break;
-                case Property theProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theProperty);
-                    break;
-                case Range theRange:
-                    Json.JsonSerializer.Serialize(
-                        writer, theRange);
-                    break;
-                case ReferenceElement theReferenceElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theReferenceElement);
-                    break;
-                case Submodel theSubmodel:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodel);
-                    break;
-                case SubmodelElementList theSubmodelElementList:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementList);
-                    break;
-                case SubmodelElementStruct theSubmodelElementStruct:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementStruct);
-                    break;
-                case View theView:
-                    Json.JsonSerializer.Serialize(
-                        writer, theView);
-                    break;
-                default:
-                    throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of IHasExtensions: {that}");
-            }
-            }
-        }  // IHasExtensionsJsonConverter
-
-        public class IReferableJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IReferable>
-        {
-            public override bool CanConvert(System.Type typeToConvert)
-            {
-                return typeof(Aas.IReferable).IsAssignableFrom(typeToConvert);
-            }
-
-            public override Aas.IReferable Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? modelType = null;
-
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
-
-                while (reader.Read())
-                {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
-                    {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
-                    }
-                    else
-                    {
-                        buffer.Write(reader.ValueSpan);
-                    }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "AnnotatedRelationshipElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "AssetAdministrationShell":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AssetAdministrationShell>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null AssetAdministrationShell from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "BasicEvent":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null BasicEvent from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Blob":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Blob from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Capability":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Capability from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "ConceptDescription":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ConceptDescription>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null ConceptDescription from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Entity":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Entity from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "File":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null File from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "MultiLanguageProperty":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null MultiLanguageProperty from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Operation":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Operation from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Property":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Property from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Range":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Range from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "ReferenceElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null ReferenceElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Submodel":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Submodel from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementList":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementList from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementStruct":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementStruct from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "View":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.View>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null View from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IReferable that,
-                Json.JsonSerializerOptions options)
-            {
-            switch (that)
-            {
-                case AnnotatedRelationshipElement theAnnotatedRelationshipElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theAnnotatedRelationshipElement);
-                    break;
-                case AssetAdministrationShell theAssetAdministrationShell:
-                    Json.JsonSerializer.Serialize(
-                        writer, theAssetAdministrationShell);
-                    break;
-                case BasicEvent theBasicEvent:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBasicEvent);
-                    break;
-                case Blob theBlob:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBlob);
-                    break;
-                case Capability theCapability:
-                    Json.JsonSerializer.Serialize(
-                        writer, theCapability);
-                    break;
-                case ConceptDescription theConceptDescription:
-                    Json.JsonSerializer.Serialize(
-                        writer, theConceptDescription);
-                    break;
-                case Entity theEntity:
-                    Json.JsonSerializer.Serialize(
-                        writer, theEntity);
-                    break;
-                case File theFile:
-                    Json.JsonSerializer.Serialize(
-                        writer, theFile);
-                    break;
-                case MultiLanguageProperty theMultiLanguageProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theMultiLanguageProperty);
-                    break;
-                case Operation theOperation:
-                    Json.JsonSerializer.Serialize(
-                        writer, theOperation);
-                    break;
-                case Property theProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theProperty);
-                    break;
-                case Range theRange:
-                    Json.JsonSerializer.Serialize(
-                        writer, theRange);
-                    break;
-                case ReferenceElement theReferenceElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theReferenceElement);
-                    break;
-                case Submodel theSubmodel:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodel);
-                    break;
-                case SubmodelElementList theSubmodelElementList:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementList);
-                    break;
-                case SubmodelElementStruct theSubmodelElementStruct:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementStruct);
-                    break;
-                case View theView:
-                    Json.JsonSerializer.Serialize(
-                        writer, theView);
-                    break;
-                default:
-                    throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of IReferable: {that}");
-            }
-            }
-        }  // IReferableJsonConverter
-
-        public class IIdentifiableJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IIdentifiable>
-        {
-            public override bool CanConvert(System.Type typeToConvert)
-            {
-                return typeof(Aas.IIdentifiable).IsAssignableFrom(typeToConvert);
-            }
-
-            public override Aas.IIdentifiable Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? modelType = null;
-
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
-
-                while (reader.Read())
-                {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
-                    {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
-                    }
-                    else
-                    {
-                        buffer.Write(reader.ValueSpan);
-                    }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "AssetAdministrationShell":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AssetAdministrationShell>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null AssetAdministrationShell from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "ConceptDescription":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ConceptDescription>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null ConceptDescription from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Submodel":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Submodel from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IIdentifiable that,
-                Json.JsonSerializerOptions options)
-            {
-            switch (that)
-            {
-                case AssetAdministrationShell theAssetAdministrationShell:
-                    Json.JsonSerializer.Serialize(
-                        writer, theAssetAdministrationShell);
-                    break;
-                case ConceptDescription theConceptDescription:
-                    Json.JsonSerializer.Serialize(
-                        writer, theConceptDescription);
-                    break;
-                case Submodel theSubmodel:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodel);
-                    break;
-                default:
-                    throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of IIdentifiable: {that}");
-            }
-            }
-        }  // IIdentifiableJsonConverter
-
-        public class ModelingKindJsonConverter :
-            Json.Serialization.JsonConverter<Aas.ModelingKind>
-        {
-            public override Aas.ModelingKind Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.ModelingKind? value = Stringification.ModelingKindFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid ModelingKind: {text}");
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.ModelingKind value,
-                Json.JsonSerializerOptions options)
-            {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid ModelingKind: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class IHasKindJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IHasKind>
-        {
-            public override bool CanConvert(System.Type typeToConvert)
-            {
-                return typeof(Aas.IHasKind).IsAssignableFrom(typeToConvert);
-            }
-
-            public override Aas.IHasKind Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? modelType = null;
-
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
-
-                while (reader.Read())
-                {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
-                    {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
-                    }
-                    else
-                    {
-                        buffer.Write(reader.ValueSpan);
-                    }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "AnnotatedRelationshipElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "BasicEvent":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null BasicEvent from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Blob":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Blob from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Capability":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Capability from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Entity":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Entity from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "File":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null File from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "MultiLanguageProperty":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null MultiLanguageProperty from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Operation":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Operation from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Property":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Property from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Range":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Range from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "ReferenceElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null ReferenceElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Submodel":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Submodel from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementList":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementList from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementStruct":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementStruct from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IHasKind that,
-                Json.JsonSerializerOptions options)
-            {
-            switch (that)
-            {
-                case AnnotatedRelationshipElement theAnnotatedRelationshipElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theAnnotatedRelationshipElement);
-                    break;
-                case BasicEvent theBasicEvent:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBasicEvent);
-                    break;
-                case Blob theBlob:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBlob);
-                    break;
-                case Capability theCapability:
-                    Json.JsonSerializer.Serialize(
-                        writer, theCapability);
-                    break;
-                case Entity theEntity:
-                    Json.JsonSerializer.Serialize(
-                        writer, theEntity);
-                    break;
-                case File theFile:
-                    Json.JsonSerializer.Serialize(
-                        writer, theFile);
-                    break;
-                case MultiLanguageProperty theMultiLanguageProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theMultiLanguageProperty);
-                    break;
-                case Operation theOperation:
-                    Json.JsonSerializer.Serialize(
-                        writer, theOperation);
-                    break;
-                case Property theProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theProperty);
-                    break;
-                case Range theRange:
-                    Json.JsonSerializer.Serialize(
-                        writer, theRange);
-                    break;
-                case ReferenceElement theReferenceElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theReferenceElement);
-                    break;
-                case Submodel theSubmodel:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodel);
-                    break;
-                case SubmodelElementList theSubmodelElementList:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementList);
-                    break;
-                case SubmodelElementStruct theSubmodelElementStruct:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementStruct);
-                    break;
-                default:
-                    throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of IHasKind: {that}");
-            }
-            }
-        }  // IHasKindJsonConverter
-
-        public class IHasDataSpecificationJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IHasDataSpecification>
-        {
-            public override bool CanConvert(System.Type typeToConvert)
-            {
-                return typeof(Aas.IHasDataSpecification).IsAssignableFrom(typeToConvert);
-            }
-
-            public override Aas.IHasDataSpecification Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? modelType = null;
-
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
-
-                while (reader.Read())
-                {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
-                    {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
-                    }
-                    else
-                    {
-                        buffer.Write(reader.ValueSpan);
-                    }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "AdministrativeInformation":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AdministrativeInformation>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null AdministrativeInformation from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "AnnotatedRelationshipElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "AssetAdministrationShell":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AssetAdministrationShell>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null AssetAdministrationShell from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "BasicEvent":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null BasicEvent from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Blob":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Blob from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Capability":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Capability from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "ConceptDescription":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ConceptDescription>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null ConceptDescription from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Entity":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Entity from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "File":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null File from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "MultiLanguageProperty":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null MultiLanguageProperty from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Operation":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Operation from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Property":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Property from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Range":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Range from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "ReferenceElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null ReferenceElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Submodel":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Submodel from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementList":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementList from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementStruct":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementStruct from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "View":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.View>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null View from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IHasDataSpecification that,
-                Json.JsonSerializerOptions options)
-            {
-            switch (that)
-            {
-                case AdministrativeInformation theAdministrativeInformation:
-                    Json.JsonSerializer.Serialize(
-                        writer, theAdministrativeInformation);
-                    break;
-                case AnnotatedRelationshipElement theAnnotatedRelationshipElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theAnnotatedRelationshipElement);
-                    break;
-                case AssetAdministrationShell theAssetAdministrationShell:
-                    Json.JsonSerializer.Serialize(
-                        writer, theAssetAdministrationShell);
-                    break;
-                case BasicEvent theBasicEvent:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBasicEvent);
-                    break;
-                case Blob theBlob:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBlob);
-                    break;
-                case Capability theCapability:
-                    Json.JsonSerializer.Serialize(
-                        writer, theCapability);
-                    break;
-                case ConceptDescription theConceptDescription:
-                    Json.JsonSerializer.Serialize(
-                        writer, theConceptDescription);
-                    break;
-                case Entity theEntity:
-                    Json.JsonSerializer.Serialize(
-                        writer, theEntity);
-                    break;
-                case File theFile:
-                    Json.JsonSerializer.Serialize(
-                        writer, theFile);
-                    break;
-                case MultiLanguageProperty theMultiLanguageProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theMultiLanguageProperty);
-                    break;
-                case Operation theOperation:
-                    Json.JsonSerializer.Serialize(
-                        writer, theOperation);
-                    break;
-                case Property theProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theProperty);
-                    break;
-                case Range theRange:
-                    Json.JsonSerializer.Serialize(
-                        writer, theRange);
-                    break;
-                case ReferenceElement theReferenceElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theReferenceElement);
-                    break;
-                case Submodel theSubmodel:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodel);
-                    break;
-                case SubmodelElementList theSubmodelElementList:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementList);
-                    break;
-                case SubmodelElementStruct theSubmodelElementStruct:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementStruct);
-                    break;
-                case View theView:
-                    Json.JsonSerializer.Serialize(
-                        writer, theView);
-                    break;
-                default:
-                    throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of IHasDataSpecification: {that}");
-            }
-            }
-        }  // IHasDataSpecificationJsonConverter
-
-        public class AdministrativeInformationJsonConverter :
-            Json.Serialization.JsonConverter<Aas.AdministrativeInformation>
-        {
-            public override Aas.AdministrativeInformation Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theVersion = null;
-                string? theRevision = null;
-                List<IReference>? theDataSpecifications = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.AdministrativeInformation(
-                                theVersion,
-                                theRevision,
-                                theDataSpecifications);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "version":
-                                    theVersion =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "revision":
-                                    theRevision =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.AdministrativeInformation that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
 
                 if (that.Version != null)
                 {
-                    writer.WritePropertyName("version");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Version);
+                    result["version"] = Nodes.JsonValue.Create(
+                        that.Version);
                 }
 
                 if (that.Revision != null)
                 {
-                    writer.WritePropertyName("revision");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Revision);
+                    result["revision"] = Nodes.JsonValue.Create(
+                        that.Revision);
                 }
 
-                writer.WriteEndObject();
-            }
-        }  // AdministrativeInformationJsonConverter
-
-        public class IConstraintJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IConstraint>
-        {
-            public override bool CanConvert(System.Type typeToConvert)
-            {
-                return typeof(Aas.IConstraint).IsAssignableFrom(typeToConvert);
+                return result;
             }
 
-            public override Aas.IConstraint Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.Qualifier that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? modelType = null;
-
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
-
-                while (reader.Read())
-                {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
-                    {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
-                    }
-                    else
-                    {
-                        buffer.Write(reader.ValueSpan);
-                    }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "Formula":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Formula>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Formula from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Qualifier":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Qualifier>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Qualifier from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IConstraint that,
-                Json.JsonSerializerOptions options)
-            {
-            switch (that)
-            {
-                case Formula theFormula:
-                    Json.JsonSerializer.Serialize(
-                        writer, theFormula);
-                    break;
-                case Qualifier theQualifier:
-                    Json.JsonSerializer.Serialize(
-                        writer, theQualifier);
-                    break;
-                default:
-                    throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of IConstraint: {that}");
-            }
-            }
-        }  // IConstraintJsonConverter
-
-        public class IQualifiableJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IQualifiable>
-        {
-            public override bool CanConvert(System.Type typeToConvert)
-            {
-                return typeof(Aas.IQualifiable).IsAssignableFrom(typeToConvert);
-            }
-
-            public override Aas.IQualifiable Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? modelType = null;
-
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
-
-                while (reader.Read())
-                {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
-                    {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
-                    }
-                    else
-                    {
-                        buffer.Write(reader.ValueSpan);
-                    }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "AnnotatedRelationshipElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "BasicEvent":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null BasicEvent from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Blob":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Blob from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Capability":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Capability from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Entity":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Entity from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "File":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null File from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "MultiLanguageProperty":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null MultiLanguageProperty from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Operation":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Operation from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Property":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Property from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Range":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Range from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "ReferenceElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null ReferenceElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Submodel":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Submodel>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Submodel from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementList":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementList from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementStruct":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementStruct from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IQualifiable that,
-                Json.JsonSerializerOptions options)
-            {
-            switch (that)
-            {
-                case AnnotatedRelationshipElement theAnnotatedRelationshipElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theAnnotatedRelationshipElement);
-                    break;
-                case BasicEvent theBasicEvent:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBasicEvent);
-                    break;
-                case Blob theBlob:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBlob);
-                    break;
-                case Capability theCapability:
-                    Json.JsonSerializer.Serialize(
-                        writer, theCapability);
-                    break;
-                case Entity theEntity:
-                    Json.JsonSerializer.Serialize(
-                        writer, theEntity);
-                    break;
-                case File theFile:
-                    Json.JsonSerializer.Serialize(
-                        writer, theFile);
-                    break;
-                case MultiLanguageProperty theMultiLanguageProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theMultiLanguageProperty);
-                    break;
-                case Operation theOperation:
-                    Json.JsonSerializer.Serialize(
-                        writer, theOperation);
-                    break;
-                case Property theProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theProperty);
-                    break;
-                case Range theRange:
-                    Json.JsonSerializer.Serialize(
-                        writer, theRange);
-                    break;
-                case ReferenceElement theReferenceElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theReferenceElement);
-                    break;
-                case Submodel theSubmodel:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodel);
-                    break;
-                case SubmodelElementList theSubmodelElementList:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementList);
-                    break;
-                case SubmodelElementStruct theSubmodelElementStruct:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementStruct);
-                    break;
-                default:
-                    throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of IQualifiable: {that}");
-            }
-            }
-        }  // IQualifiableJsonConverter
-
-        public class QualifierJsonConverter :
-            Json.Serialization.JsonConverter<Aas.Qualifier>
-        {
-            public override Aas.Qualifier Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theType = null;
-                DataTypeDef? theValueType = null;
-                string? theValue = null;
-                IReference? theValueId = null;
-                IReference? theSemanticId = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.Qualifier(
-                                theType ?? throw new Json.JsonException(
-                                    "Required property is missing: type"),
-                                theValueType ?? throw new Json.JsonException(
-                                    "Required property is missing: valueType"),
-                                theValue,
-                                theValueId,
-                                theSemanticId);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "type":
-                                    theType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "valueType":
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "valueId":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.Qualifier that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "Qualifier");
+                var result = new Nodes.JsonObject();
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("type");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Type);
+                result["type"] = Nodes.JsonValue.Create(
+                    that.Type);
 
-                writer.WritePropertyName("valueType");
-                Json.JsonSerializer.Serialize(
-                    writer, that.ValueType);
+                result["valueType"] = Serialize.DataTypeDefToJsonValue(
+                    that.ValueType);
 
                 if (that.Value != null)
                 {
-                    writer.WritePropertyName("value");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Value);
+                    result["value"] = Nodes.JsonValue.Create(
+                        that.Value);
                 }
 
                 if (that.ValueId != null)
                 {
-                    writer.WritePropertyName("valueId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ValueId);
+                    result["valueId"] = Transform(
+                        that.ValueId);
                 }
 
-                writer.WriteEndObject();
+                return result;
             }
-        }  // QualifierJsonConverter
 
-        public class FormulaJsonConverter :
-            Json.Serialization.JsonConverter<Aas.Formula>
-        {
-            public override Aas.Formula Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.Formula that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
+                var result = new Nodes.JsonObject();
 
-                // Prefix the property variables with "the" to avoid conflicts
-                List<IReference>? theDependsOn = null;
-
-                while (reader.Read())
+                if (that.DependsOn != null)
                 {
-                    switch (reader.TokenType)
+                    var arrayDependsOn = new Nodes.JsonArray();
+                    foreach (IReference item in that.DependsOn)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.Formula(
-                                theDependsOn);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dependsOn":
-                                    theDependsOn =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.Formula that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "Formula");
-
-                writer.WritePropertyName("dependsOn");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DependsOn);
-
-                writer.WriteEndObject();
-            }
-        }  // FormulaJsonConverter
-
-        public class AssetAdministrationShellJsonConverter :
-            Json.Serialization.JsonConverter<Aas.AssetAdministrationShell>
-        {
-            public override Aas.AssetAdministrationShell Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
+                        arrayDependsOn.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dependsOn"] = arrayDependsOn;
                 }
 
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theId = null;
-                string? theIdShort = null;
-                AssetInformation? theAssetInformation = null;
-                List<Extension>? theExtensions = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                AdministrativeInformation? theAdministration = null;
-                List<IReference>? theDataSpecifications = null;
-                IReference? theDerivedFrom = null;
-                List<IReference>? theSubmodels = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.AssetAdministrationShell(
-                                theId ?? throw new Json.JsonException(
-                                    "Required property is missing: id"),
-                                theIdShort ?? throw new Json.JsonException(
-                                    "Required property is missing: idShort"),
-                                theAssetInformation ?? throw new Json.JsonException(
-                                    "Required property is missing: assetInformation"),
-                                theExtensions,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theAdministration,
-                                theDataSpecifications,
-                                theDerivedFrom,
-                                theSubmodels);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "id":
-                                    theId =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "administration":
-                                    theAdministration =  (
-                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
-                                            ref reader));
-                                    break;
-                                case "derivedFrom":
-                                    theDerivedFrom =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "assetInformation":
-                                    theAssetInformation =  (
-                                        Json.JsonSerializer.Deserialize<AssetInformation>(
-                                            ref reader));
-                                    break;
-                                case "submodels":
-                                    theSubmodels =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
+                return result;
             }
 
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.AssetAdministrationShell that,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.AssetAdministrationShell that)
             {
-                writer.WriteStartObject();
+                var result = new Nodes.JsonObject();
 
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "AssetAdministrationShell");
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
-                writer.WritePropertyName("id");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Id);
+                result["id"] = Nodes.JsonValue.Create(
+                    that.Id);
 
                 if (that.Administration != null)
                 {
-                    writer.WritePropertyName("administration");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Administration);
+                    result["administration"] = Transform(
+                        that.Administration);
                 }
 
                 if (that.DerivedFrom != null)
                 {
-                    writer.WritePropertyName("derivedFrom");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DerivedFrom);
+                    result["derivedFrom"] = Transform(
+                        that.DerivedFrom);
                 }
 
-                writer.WritePropertyName("assetInformation");
-                Json.JsonSerializer.Serialize(
-                    writer, that.AssetInformation);
+                result["assetInformation"] = Transform(
+                    that.AssetInformation);
 
-                writer.WritePropertyName("submodels");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Submodels);
-
-                writer.WriteEndObject();
-            }
-        }  // AssetAdministrationShellJsonConverter
-
-        public class AssetInformationJsonConverter :
-            Json.Serialization.JsonConverter<Aas.AssetInformation>
-        {
-            public override Aas.AssetInformation Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                var arraySubmodels = new Nodes.JsonArray();
+                foreach (IReference item in that.Submodels)
                 {
-                    throw new Json.JsonException();
+                    arraySubmodels.Add(
+                        Transform(
+                            item));
                 }
+                result["submodels"] = arraySubmodels;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                AssetKind? theAssetKind = null;
-                IReference? theGlobalAssetId = null;
-                IdentifierKeyValuePair? theSpecificAssetId = null;
-                File? theDefaultThumbnail = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.AssetInformation(
-                                theAssetKind ?? throw new Json.JsonException(
-                                    "Required property is missing: assetKind"),
-                                theGlobalAssetId,
-                                theSpecificAssetId,
-                                theDefaultThumbnail);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "assetKind":
-                                    theAssetKind =  (
-                                        Json.JsonSerializer.Deserialize<AssetKind>(
-                                            ref reader));
-                                    break;
-                                case "globalAssetId":
-                                    theGlobalAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "specificAssetId":
-                                    theSpecificAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
-                                            ref reader));
-                                    break;
-                                case "defaultThumbnail":
-                                    theDefaultThumbnail =  (
-                                        Json.JsonSerializer.Deserialize<File>(
-                                            ref reader));
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
+                return result;
             }
 
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.AssetInformation that,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.AssetInformation that)
             {
-                writer.WriteStartObject();
+                var result = new Nodes.JsonObject();
 
-                writer.WritePropertyName("assetKind");
-                Json.JsonSerializer.Serialize(
-                    writer, that.AssetKind);
+                result["assetKind"] = Serialize.AssetKindToJsonValue(
+                    that.AssetKind);
 
                 if (that.GlobalAssetId != null)
                 {
-                    writer.WritePropertyName("globalAssetId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.GlobalAssetId);
+                    result["globalAssetId"] = Transform(
+                        that.GlobalAssetId);
                 }
 
                 if (that.SpecificAssetId != null)
                 {
-                    writer.WritePropertyName("specificAssetId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SpecificAssetId);
+                    result["specificAssetId"] = Transform(
+                        that.SpecificAssetId);
                 }
 
                 if (that.DefaultThumbnail != null)
                 {
-                    writer.WritePropertyName("defaultThumbnail");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DefaultThumbnail);
+                    result["defaultThumbnail"] = Transform(
+                        that.DefaultThumbnail);
                 }
 
-                writer.WriteEndObject();
-            }
-        }  // AssetInformationJsonConverter
-
-        public class AssetKindJsonConverter :
-            Json.Serialization.JsonConverter<Aas.AssetKind>
-        {
-            public override Aas.AssetKind Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.AssetKind? value = Stringification.AssetKindFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid AssetKind: {text}");
+                return result;
             }
 
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.AssetKind value,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.IdentifierKeyValuePair that)
             {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid AssetKind: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class IdentifierKeyValuePairJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IdentifierKeyValuePair>
-        {
-            public override Aas.IdentifierKeyValuePair Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theKey = null;
-                string? theValue = null;
-                IReference? theExternalSubjectId = null;
-                IReference? theSemanticId = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.IdentifierKeyValuePair(
-                                theKey ?? throw new Json.JsonException(
-                                    "Required property is missing: key"),
-                                theValue ?? throw new Json.JsonException(
-                                    "Required property is missing: value"),
-                                theExternalSubjectId,
-                                theSemanticId);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "key":
-                                    theKey =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "externalSubjectId":
-                                    theExternalSubjectId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IdentifierKeyValuePair that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
+                var result = new Nodes.JsonObject();
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("key");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Key);
+                result["key"] = Nodes.JsonValue.Create(
+                    that.Key);
 
-                writer.WritePropertyName("value");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Value);
+                result["value"] = Nodes.JsonValue.Create(
+                    that.Value);
 
                 if (that.ExternalSubjectId != null)
                 {
-                    writer.WritePropertyName("externalSubjectId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ExternalSubjectId);
+                    result["externalSubjectId"] = Transform(
+                        that.ExternalSubjectId);
                 }
 
-                writer.WriteEndObject();
+                return result;
             }
-        }  // IdentifierKeyValuePairJsonConverter
 
-        public class SubmodelJsonConverter :
-            Json.Serialization.JsonConverter<Aas.Submodel>
-        {
-            public override Aas.Submodel Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.Submodel that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
+                var result = new Nodes.JsonObject();
 
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theId = null;
-                string? theIdShort = null;
-                List<ISubmodelElement>? theSubmodelElements = null;
-                List<Extension>? theExtensions = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                AdministrativeInformation? theAdministration = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-
-                while (reader.Read())
+                if (that.DataSpecifications != null)
                 {
-                    switch (reader.TokenType)
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.Submodel(
-                                theId ?? throw new Json.JsonException(
-                                    "Required property is missing: id"),
-                                theIdShort ?? throw new Json.JsonException(
-                                    "Required property is missing: idShort"),
-                                theSubmodelElements,
-                                theExtensions,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theAdministration,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "id":
-                                    theId =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "administration":
-                                    theAdministration =  (
-                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
-                                            ref reader));
-                                    break;
-                                case "submodelElements":
-                                    theSubmodelElements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.Submodel that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "Submodel");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
                 if (that.Kind != null)
                 {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
 
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
-                writer.WritePropertyName("id");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Id);
+                result["id"] = Nodes.JsonValue.Create(
+                    that.Id);
 
                 if (that.Administration != null)
                 {
-                    writer.WritePropertyName("administration");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Administration);
+                    result["administration"] = Transform(
+                        that.Administration);
                 }
 
-                writer.WritePropertyName("submodelElements");
-                Json.JsonSerializer.Serialize(
-                    writer, that.SubmodelElements);
-
-                writer.WriteEndObject();
-            }
-        }  // SubmodelJsonConverter
-
-        public class ISubmodelElementJsonConverter :
-            Json.Serialization.JsonConverter<Aas.ISubmodelElement>
-        {
-            public override bool CanConvert(System.Type typeToConvert)
-            {
-                return typeof(Aas.ISubmodelElement).IsAssignableFrom(typeToConvert);
-            }
-
-            public override Aas.ISubmodelElement Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                var arraySubmodelElements = new Nodes.JsonArray();
+                foreach (ISubmodelElement item in that.SubmodelElements)
                 {
-                    throw new Json.JsonException();
+                    arraySubmodelElements.Add(
+                        Transform(
+                            item));
+                }
+                result["submodelElements"] = arraySubmodelElements;
+
+                return result;
+            }
+
+            public override Nodes.JsonObject Transform(Aas.SubmodelElementList that)
+            {
+                var result = new Nodes.JsonObject();
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
                 }
 
-                string? modelType = null;
-
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
-
-                while (reader.Read())
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
                 {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
-                    {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
-                    }
-                    else
-                    {
-                        buffer.Write(reader.ValueSpan);
-                    }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "AnnotatedRelationshipElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "BasicEvent":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null BasicEvent from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Blob":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Blob from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Capability":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Capability>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Capability from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Entity":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Entity>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Entity from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "File":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null File from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "MultiLanguageProperty":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null MultiLanguageProperty from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Operation":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Operation>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Operation from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Property":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Property from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Range":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Range from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "ReferenceElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null ReferenceElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementList":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementList>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementList from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "SubmodelElementStruct":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.SubmodelElementStruct>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null SubmodelElementStruct from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.ISubmodelElement that,
-                Json.JsonSerializerOptions options)
-            {
-            switch (that)
-            {
-                case AnnotatedRelationshipElement theAnnotatedRelationshipElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theAnnotatedRelationshipElement);
-                    break;
-                case BasicEvent theBasicEvent:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBasicEvent);
-                    break;
-                case Blob theBlob:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBlob);
-                    break;
-                case Capability theCapability:
-                    Json.JsonSerializer.Serialize(
-                        writer, theCapability);
-                    break;
-                case Entity theEntity:
-                    Json.JsonSerializer.Serialize(
-                        writer, theEntity);
-                    break;
-                case File theFile:
-                    Json.JsonSerializer.Serialize(
-                        writer, theFile);
-                    break;
-                case MultiLanguageProperty theMultiLanguageProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theMultiLanguageProperty);
-                    break;
-                case Operation theOperation:
-                    Json.JsonSerializer.Serialize(
-                        writer, theOperation);
-                    break;
-                case Property theProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theProperty);
-                    break;
-                case Range theRange:
-                    Json.JsonSerializer.Serialize(
-                        writer, theRange);
-                    break;
-                case ReferenceElement theReferenceElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theReferenceElement);
-                    break;
-                case SubmodelElementList theSubmodelElementList:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementList);
-                    break;
-                case SubmodelElementStruct theSubmodelElementStruct:
-                    Json.JsonSerializer.Serialize(
-                        writer, theSubmodelElementStruct);
-                    break;
-                default:
-                    throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of ISubmodelElement: {that}");
-            }
-            }
-        }  // ISubmodelElementJsonConverter
-
-        public class IRelationshipElementJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IRelationshipElement>
-        {
-            public override bool CanConvert(System.Type typeToConvert)
-            {
-                return typeof(Aas.IRelationshipElement).IsAssignableFrom(typeToConvert);
-            }
-
-            public override Aas.IRelationshipElement Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
                 }
-
-                string? modelType = null;
-
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
-
-                while (reader.Read())
-                {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
-                    {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
-                    }
-                    else
-                    {
-                        buffer.Write(reader.ValueSpan);
-                    }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "AnnotatedRelationshipElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.AnnotatedRelationshipElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null AnnotatedRelationshipElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IRelationshipElement that,
-                Json.JsonSerializerOptions options)
-            {
-            switch (that)
-            {
-                case AnnotatedRelationshipElement theAnnotatedRelationshipElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theAnnotatedRelationshipElement);
-                    break;
-                default:
-                    throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of IRelationshipElement: {that}");
-            }
-            }
-        }  // IRelationshipElementJsonConverter
-
-        public class SubmodelElementListJsonConverter :
-            Json.Serialization.JsonConverter<Aas.SubmodelElementList>
-        {
-            public override Aas.SubmodelElementList Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                // Prefix the property variables with "the" to avoid conflicts
-                SubmodelElements? theSubmodelElementTypeValues = null;
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                List<ISubmodelElement>? theValues = null;
-                IReference? theSemanticIdValues = null;
-                DataTypeDef? theValueTypeValues = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.SubmodelElementList(
-                                theSubmodelElementTypeValues ?? throw new Json.JsonException(
-                                    "Required property is missing: submodelElementTypeValues"),
-                                theExtensions,
-                                theIdShort,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications,
-                                theValues,
-                                theSemanticIdValues,
-                                theValueTypeValues);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "submodelElementTypeValues":
-                                    theSubmodelElementTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<SubmodelElements>(
-                                            ref reader));
-                                    break;
-                                case "values":
-                                    theValues =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "semanticIdValues":
-                                    theSemanticIdValues =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "valueTypeValues":
-                                    theValueTypeValues =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.SubmodelElementList that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "SubmodelElementList");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
                 if (that.Kind != null)
                 {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
 
-                writer.WritePropertyName("submodelElementTypeValues");
-                Json.JsonSerializer.Serialize(
-                    writer, that.SubmodelElementTypeValues);
+                result["submodelElementTypeValues"] = Serialize.SubmodelElementsToJsonValue(
+                    that.SubmodelElementTypeValues);
 
-                writer.WritePropertyName("values");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Values);
+                var arrayValues = new Nodes.JsonArray();
+                foreach (ISubmodelElement item in that.Values)
+                {
+                    arrayValues.Add(
+                        Transform(
+                            item));
+                }
+                result["values"] = arrayValues;
 
                 if (that.SemanticIdValues != null)
                 {
-                    writer.WritePropertyName("semanticIdValues");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticIdValues);
+                    result["semanticIdValues"] = Transform(
+                        that.SemanticIdValues);
                 }
 
                 if (that.ValueTypeValues != null)
                 {
-                    writer.WritePropertyName("valueTypeValues");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ValueTypeValues);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.DataTypeDef value = that.ValueTypeValues
+                        ?? throw new System.InvalidOperationException();
+                    result["valueTypeValues"] = Serialize.DataTypeDefToJsonValue(
+                        value);
                 }
 
-                writer.WriteEndObject();
+                return result;
             }
-        }  // SubmodelElementListJsonConverter
 
-        public class SubmodelElementStructJsonConverter :
-            Json.Serialization.JsonConverter<Aas.SubmodelElementStruct>
-        {
-            public override Aas.SubmodelElementStruct Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.SubmodelElementStruct that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
+                var result = new Nodes.JsonObject();
 
-                // Prefix the property variables with "the" to avoid conflicts
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                List<ISubmodelElement>? theValues = null;
-
-                while (reader.Read())
+                if (that.DataSpecifications != null)
                 {
-                    switch (reader.TokenType)
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.SubmodelElementStruct(
-                                theExtensions,
-                                theIdShort,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications,
-                                theValues);
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "values":
-                                    theValues =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.SubmodelElementStruct that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "SubmodelElementStruct");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
                 if (that.Kind != null)
                 {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
-
-                writer.WritePropertyName("values");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Values);
-
-                writer.WriteEndObject();
-            }
-        }  // SubmodelElementStructJsonConverter
-
-        public class IDataElementJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IDataElement>
-        {
-            public override bool CanConvert(System.Type typeToConvert)
-            {
-                return typeof(Aas.IDataElement).IsAssignableFrom(typeToConvert);
-            }
-
-            public override Aas.IDataElement Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
                 {
-                    throw new Json.JsonException();
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
                 }
+                result["qualifiers"] = arrayQualifiers;
 
-                string? modelType = null;
-
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
-
-                while (reader.Read())
+                var arrayValues = new Nodes.JsonArray();
+                foreach (ISubmodelElement item in that.Values)
                 {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
+                    arrayValues.Add(
+                        Transform(
+                            item));
+                }
+                result["values"] = arrayValues;
+
+                return result;
+            }
+
+            public override Nodes.JsonObject Transform(Aas.Property that)
+            {
+                var result = new Nodes.JsonObject();
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
                     }
-                    else
-                    {
-                        buffer.Write(reader.ValueSpan);
-                    }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "Blob":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Blob>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Blob from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "File":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.File>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null File from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "MultiLanguageProperty":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.MultiLanguageProperty>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null MultiLanguageProperty from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Property":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Property>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Property from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "Range":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.Range>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null Range from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "ReferenceElement":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ReferenceElement>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null ReferenceElement from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IDataElement that,
-                Json.JsonSerializerOptions options)
-            {
-            switch (that)
-            {
-                case Blob theBlob:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBlob);
-                    break;
-                case File theFile:
-                    Json.JsonSerializer.Serialize(
-                        writer, theFile);
-                    break;
-                case MultiLanguageProperty theMultiLanguageProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theMultiLanguageProperty);
-                    break;
-                case Property theProperty:
-                    Json.JsonSerializer.Serialize(
-                        writer, theProperty);
-                    break;
-                case Range theRange:
-                    Json.JsonSerializer.Serialize(
-                        writer, theRange);
-                    break;
-                case ReferenceElement theReferenceElement:
-                    Json.JsonSerializer.Serialize(
-                        writer, theReferenceElement);
-                    break;
-                default:
-                    throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of IDataElement: {that}");
-            }
-            }
-        }  // IDataElementJsonConverter
-
-        public class PropertyJsonConverter :
-            Json.Serialization.JsonConverter<Aas.Property>
-        {
-            public override Aas.Property Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
+                    result["dataSpecifications"] = arrayDataSpecifications;
                 }
 
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theIdShort = null;
-                DataTypeDef? theValueType = null;
-                List<Extension>? theExtensions = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                string? theValue = null;
-                IReference? theValueId = null;
-
-                while (reader.Read())
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
                 {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.Property(
-                                theIdShort ?? throw new Json.JsonException(
-                                    "Required property is missing: idShort"),
-                                theValueType ?? throw new Json.JsonException(
-                                    "Required property is missing: valueType"),
-                                theExtensions,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications,
-                                theValue,
-                                theValueId);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "valueType":
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "valueId":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.Property that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "Property");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
                 if (that.Kind != null)
                 {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
 
-                writer.WritePropertyName("valueType");
-                Json.JsonSerializer.Serialize(
-                    writer, that.ValueType);
+                result["valueType"] = Serialize.DataTypeDefToJsonValue(
+                    that.ValueType);
 
                 if (that.Value != null)
                 {
-                    writer.WritePropertyName("value");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Value);
+                    result["value"] = Nodes.JsonValue.Create(
+                        that.Value);
                 }
 
                 if (that.ValueId != null)
                 {
-                    writer.WritePropertyName("valueId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ValueId);
+                    result["valueId"] = Transform(
+                        that.ValueId);
                 }
 
-                writer.WriteEndObject();
+                return result;
             }
-        }  // PropertyJsonConverter
 
-        public class MultiLanguagePropertyJsonConverter :
-            Json.Serialization.JsonConverter<Aas.MultiLanguageProperty>
-        {
-            public override Aas.MultiLanguageProperty Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.MultiLanguageProperty that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
+                var result = new Nodes.JsonObject();
 
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theIdShort = null;
-                List<Extension>? theExtensions = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                LangStringSet? theValue = null;
-                IReference? theValueId = null;
-
-                while (reader.Read())
+                if (that.DataSpecifications != null)
                 {
-                    switch (reader.TokenType)
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.MultiLanguageProperty(
-                                theIdShort,
-                                theExtensions,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications,
-                                theValue,
-                                theValueId);
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "valueId":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.MultiLanguageProperty that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "MultiLanguageProperty");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
                 if (that.Kind != null)
                 {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
 
                 if (that.Value != null)
                 {
-                    writer.WritePropertyName("value");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Value);
+                    result["value"] = Transform(
+                        that.Value);
                 }
 
                 if (that.ValueId != null)
                 {
-                    writer.WritePropertyName("valueId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ValueId);
+                    result["valueId"] = Transform(
+                        that.ValueId);
                 }
 
-                writer.WriteEndObject();
+                return result;
             }
-        }  // MultiLanguagePropertyJsonConverter
 
-        public class RangeJsonConverter :
-            Json.Serialization.JsonConverter<Aas.Range>
-        {
-            public override Aas.Range Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.Range that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
+                var result = new Nodes.JsonObject();
 
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theIdShort = null;
-                DataTypeDef? theValueType = null;
-                List<Extension>? theExtensions = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                string? theMin = null;
-                string? theMax = null;
-
-                while (reader.Read())
+                if (that.DataSpecifications != null)
                 {
-                    switch (reader.TokenType)
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.Range(
-                                theIdShort ?? throw new Json.JsonException(
-                                    "Required property is missing: idShort"),
-                                theValueType ?? throw new Json.JsonException(
-                                    "Required property is missing: valueType"),
-                                theExtensions,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications,
-                                theMin,
-                                theMax);
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "valueType":
-                                    theValueType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeDef>(
-                                            ref reader));
-                                    break;
-                                case "min":
-                                    theMin =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "max":
-                                    theMax =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.Range that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "Range");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
                 if (that.Kind != null)
                 {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
 
-                writer.WritePropertyName("valueType");
-                Json.JsonSerializer.Serialize(
-                    writer, that.ValueType);
+                result["valueType"] = Serialize.DataTypeDefToJsonValue(
+                    that.ValueType);
 
                 if (that.Min != null)
                 {
-                    writer.WritePropertyName("min");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Min);
+                    result["min"] = Nodes.JsonValue.Create(
+                        that.Min);
                 }
 
                 if (that.Max != null)
                 {
-                    writer.WritePropertyName("max");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Max);
+                    result["max"] = Nodes.JsonValue.Create(
+                        that.Max);
                 }
 
-                writer.WriteEndObject();
+                return result;
             }
-        }  // RangeJsonConverter
 
-        public class ReferenceElementJsonConverter :
-            Json.Serialization.JsonConverter<Aas.ReferenceElement>
-        {
-            public override Aas.ReferenceElement Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.ReferenceElement that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
+                var result = new Nodes.JsonObject();
 
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theIdShort = null;
-                List<Extension>? theExtensions = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                IReference? theValue = null;
-
-                while (reader.Read())
+                if (that.DataSpecifications != null)
                 {
-                    switch (reader.TokenType)
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.ReferenceElement(
-                                theIdShort ?? throw new Json.JsonException(
-                                    "Required property is missing: idShort"),
-                                theExtensions,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications,
-                                theValue);
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.ReferenceElement that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "ReferenceElement");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
                 if (that.Kind != null)
                 {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
 
                 if (that.Value != null)
                 {
-                    writer.WritePropertyName("value");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Value);
+                    result["value"] = Transform(
+                        that.Value);
                 }
 
-                writer.WriteEndObject();
+                return result;
             }
-        }  // ReferenceElementJsonConverter
 
-        public class BlobJsonConverter :
-            Json.Serialization.JsonConverter<Aas.Blob>
-        {
-            public override Aas.Blob Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.Blob that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
+                var result = new Nodes.JsonObject();
 
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theIdShort = null;
-                string? theMimeType = null;
-                List<Extension>? theExtensions = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                byte[]? theValue = null;
-
-                while (reader.Read())
+                if (that.DataSpecifications != null)
                 {
-                    switch (reader.TokenType)
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.Blob(
-                                theIdShort ?? throw new Json.JsonException(
-                                    "Required property is missing: idShort"),
-                                theMimeType ?? throw new Json.JsonException(
-                                    "Required property is missing: mimeType"),
-                                theExtensions,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications,
-                                theValue);
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "mimeType":
-                                    theMimeType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<byte[]>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.Blob that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "Blob");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
                 if (that.Kind != null)
                 {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
 
-                writer.WritePropertyName("mimeType");
-                Json.JsonSerializer.Serialize(
-                    writer, that.MimeType);
+                result["mimeType"] = Nodes.JsonValue.Create(
+                    that.MimeType);
 
                 if (that.Value != null)
                 {
-                    writer.WritePropertyName("value");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Value);
+                    result["value"] = Nodes.JsonValue.Create(
+                        System.Convert.ToBase64String(
+                            that.Value));
                 }
 
-                writer.WriteEndObject();
+                return result;
             }
-        }  // BlobJsonConverter
 
-        public class FileJsonConverter :
-            Json.Serialization.JsonConverter<Aas.File>
-        {
-            public override Aas.File Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.File that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
+                var result = new Nodes.JsonObject();
 
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theIdShort = null;
-                string? theMimeType = null;
-                List<Extension>? theExtensions = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                string? theValue = null;
-
-                while (reader.Read())
+                if (that.DataSpecifications != null)
                 {
-                    switch (reader.TokenType)
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.File(
-                                theIdShort ?? throw new Json.JsonException(
-                                    "Required property is missing: idShort"),
-                                theMimeType ?? throw new Json.JsonException(
-                                    "Required property is missing: mimeType"),
-                                theExtensions,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications,
-                                theValue);
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "mimeType":
-                                    theMimeType =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.File that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "File");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
                 if (that.Kind != null)
                 {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
 
-                writer.WritePropertyName("mimeType");
-                Json.JsonSerializer.Serialize(
-                    writer, that.MimeType);
+                result["mimeType"] = Nodes.JsonValue.Create(
+                    that.MimeType);
 
                 if (that.Value != null)
                 {
-                    writer.WritePropertyName("value");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Value);
+                    result["value"] = Nodes.JsonValue.Create(
+                        that.Value);
                 }
 
-                writer.WriteEndObject();
+                return result;
             }
-        }  // FileJsonConverter
 
-        public class AnnotatedRelationshipElementJsonConverter :
-            Json.Serialization.JsonConverter<Aas.AnnotatedRelationshipElement>
-        {
-            public override Aas.AnnotatedRelationshipElement Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.AnnotatedRelationshipElement that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
+                var result = new Nodes.JsonObject();
 
-                // Prefix the property variables with "the" to avoid conflicts
-                IReference? theFirst = null;
-                IReference? theSecond = null;
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                List<IDataElement>? theAnnotation = null;
-
-                while (reader.Read())
+                if (that.DataSpecifications != null)
                 {
-                    switch (reader.TokenType)
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.AnnotatedRelationshipElement(
-                                theFirst ?? throw new Json.JsonException(
-                                    "Required property is missing: first"),
-                                theSecond ?? throw new Json.JsonException(
-                                    "Required property is missing: second"),
-                                theExtensions,
-                                theIdShort,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications,
-                                theAnnotation);
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "first":
-                                    theFirst =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "second":
-                                    theSecond =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "annotation":
-                                    theAnnotation =  (
-                                        Json.JsonSerializer.Deserialize<List<IDataElement>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.AnnotatedRelationshipElement that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "AnnotatedRelationshipElement");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
                 if (that.Kind != null)
                 {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
-
-                writer.WritePropertyName("first");
-                Json.JsonSerializer.Serialize(
-                    writer, that.First);
-
-                writer.WritePropertyName("second");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Second);
-
-                writer.WritePropertyName("annotation");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Annotation);
-
-                writer.WriteEndObject();
-            }
-        }  // AnnotatedRelationshipElementJsonConverter
-
-        public class EntityTypeJsonConverter :
-            Json.Serialization.JsonConverter<Aas.EntityType>
-        {
-            public override Aas.EntityType Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
                 {
-                    throw new Json.JsonException();
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
                 }
+                result["qualifiers"] = arrayQualifiers;
 
-                string? text = reader.GetString();
-                if (text == null)
+                result["first"] = Transform(
+                    that.First);
+
+                result["second"] = Transform(
+                    that.Second);
+
+                var arrayAnnotation = new Nodes.JsonArray();
+                foreach (IDataElement item in that.Annotation)
                 {
-                    throw new Json.JsonException();
+                    arrayAnnotation.Add(
+                        Transform(
+                            item));
                 }
+                result["annotation"] = arrayAnnotation;
 
-                Aas.EntityType? value = Stringification.EntityTypeFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid EntityType: {text}");
+                return result;
             }
 
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.EntityType value,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.Entity that)
             {
-                string? text = Stringification.ToString(value);
-                if (text == null)
+                var result = new Nodes.JsonObject();
+
+                if (that.DataSpecifications != null)
                 {
-                    throw new System.ArgumentException(
-                        $"Invalid EntityType: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class EntityJsonConverter :
-            Json.Serialization.JsonConverter<Aas.Entity>
-        {
-            public override Aas.Entity Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                // Prefix the property variables with "the" to avoid conflicts
-                EntityType? theEntityType = null;
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                List<ISubmodelElement>? theStatements = null;
-                IReference? theGlobalAssetId = null;
-                IdentifierKeyValuePair? theSpecificAssetId = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.Entity(
-                                theEntityType ?? throw new Json.JsonException(
-                                    "Required property is missing: entityType"),
-                                theExtensions,
-                                theIdShort,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications,
-                                theStatements,
-                                theGlobalAssetId,
-                                theSpecificAssetId);
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "entityType":
-                                    theEntityType =  (
-                                        Json.JsonSerializer.Deserialize<EntityType>(
-                                            ref reader));
-                                    break;
-                                case "statements":
-                                    theStatements =  (
-                                        Json.JsonSerializer.Deserialize<List<ISubmodelElement>>(
-                                            ref reader));
-                                    break;
-                                case "globalAssetId":
-                                    theGlobalAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "specificAssetId":
-                                    theSpecificAssetId =  (
-                                        Json.JsonSerializer.Deserialize<IdentifierKeyValuePair>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.Entity that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "Entity");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
                 if (that.Kind != null)
                 {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
 
-                writer.WritePropertyName("entityType");
-                Json.JsonSerializer.Serialize(
-                    writer, that.EntityType);
+                result["entityType"] = Serialize.EntityTypeToJsonValue(
+                    that.EntityType);
 
-                writer.WritePropertyName("statements");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Statements);
+                var arrayStatements = new Nodes.JsonArray();
+                foreach (ISubmodelElement item in that.Statements)
+                {
+                    arrayStatements.Add(
+                        Transform(
+                            item));
+                }
+                result["statements"] = arrayStatements;
 
                 if (that.GlobalAssetId != null)
                 {
-                    writer.WritePropertyName("globalAssetId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.GlobalAssetId);
+                    result["globalAssetId"] = Transform(
+                        that.GlobalAssetId);
                 }
 
                 if (that.SpecificAssetId != null)
                 {
-                    writer.WritePropertyName("specificAssetId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SpecificAssetId);
+                    result["specificAssetId"] = Transform(
+                        that.SpecificAssetId);
                 }
 
-                writer.WriteEndObject();
-            }
-        }  // EntityJsonConverter
-
-        public class IEventJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IEvent>
-        {
-            public override bool CanConvert(System.Type typeToConvert)
-            {
-                return typeof(Aas.IEvent).IsAssignableFrom(typeToConvert);
+                return result;
             }
 
-            public override Aas.IEvent Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.BasicEvent that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                var result = new Nodes.JsonObject();
+
+                if (that.DataSpecifications != null)
                 {
-                    throw new Json.JsonException();
-                }
-
-                string? modelType = null;
-
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
-
-                while (reader.Read())
-                {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
                     }
-                    else
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
+
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
+
+                if (that.IdShort != null)
+                {
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
+                }
+
+                if (that.DisplayName != null)
+                {
+                    result["displayName"] = Transform(
+                        that.DisplayName);
+                }
+
+                if (that.Category != null)
+                {
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
+                }
+
+                if (that.Description != null)
+                {
+                    result["description"] = Transform(
+                        that.Description);
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
+                }
+
+                if (that.SemanticId != null)
+                {
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
+                }
+
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
+
+                result["observed"] = Transform(
+                    that.Observed);
+
+                return result;
+            }
+
+            public override Nodes.JsonObject Transform(Aas.Operation that)
+            {
+                var result = new Nodes.JsonObject();
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                        buffer.Write(reader.ValueSpan);
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
                     }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "BasicEvent":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.BasicEvent>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null BasicEvent from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IEvent that,
-                Json.JsonSerializerOptions options)
-            {
-            switch (that)
-            {
-                case BasicEvent theBasicEvent:
-                    Json.JsonSerializer.Serialize(
-                        writer, theBasicEvent);
-                    break;
-                default:
-                    throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of IEvent: {that}");
-            }
-            }
-        }  // IEventJsonConverter
-
-        public class BasicEventJsonConverter :
-            Json.Serialization.JsonConverter<Aas.BasicEvent>
-        {
-            public override Aas.BasicEvent Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
+                    result["dataSpecifications"] = arrayDataSpecifications;
                 }
 
-                // Prefix the property variables with "the" to avoid conflicts
-                IReference? theObserved = null;
-                string? theIdShort = null;
-                List<Extension>? theExtensions = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-
-                while (reader.Read())
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
                 {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.BasicEvent(
-                                theObserved ?? throw new Json.JsonException(
-                                    "Required property is missing: observed"),
-                                theIdShort ?? throw new Json.JsonException(
-                                    "Required property is missing: idShort"),
-                                theExtensions,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "observed":
-                                    theObserved =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.BasicEvent that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "BasicEvent");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
                 if (that.Kind != null)
                 {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
 
-                writer.WritePropertyName("observed");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Observed);
+                var arrayInputVariables = new Nodes.JsonArray();
+                foreach (OperationVariable item in that.InputVariables)
+                {
+                    arrayInputVariables.Add(
+                        Transform(
+                            item));
+                }
+                result["inputVariables"] = arrayInputVariables;
 
-                writer.WriteEndObject();
+                var arrayOutputVariables = new Nodes.JsonArray();
+                foreach (OperationVariable item in that.OutputVariables)
+                {
+                    arrayOutputVariables.Add(
+                        Transform(
+                            item));
+                }
+                result["outputVariables"] = arrayOutputVariables;
+
+                var arrayInoutputVariables = new Nodes.JsonArray();
+                foreach (OperationVariable item in that.InoutputVariables)
+                {
+                    arrayInoutputVariables.Add(
+                        Transform(
+                            item));
+                }
+                result["inoutputVariables"] = arrayInoutputVariables;
+
+                return result;
             }
-        }  // BasicEventJsonConverter
 
-        public class OperationJsonConverter :
-            Json.Serialization.JsonConverter<Aas.Operation>
-        {
-            public override Aas.Operation Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.OperationVariable that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
+                var result = new Nodes.JsonObject();
 
-                // Prefix the property variables with "the" to avoid conflicts
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-                List<OperationVariable>? theInputVariables = null;
-                List<OperationVariable>? theOutputVariables = null;
-                List<OperationVariable>? theInoutputVariables = null;
+                result["value"] = Transform(
+                    that.Value);
 
-                while (reader.Read())
+                return result;
+            }
+
+            public override Nodes.JsonObject Transform(Aas.Capability that)
+            {
+                var result = new Nodes.JsonObject();
+
+                if (that.DataSpecifications != null)
                 {
-                    switch (reader.TokenType)
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.Operation(
-                                theExtensions,
-                                theIdShort,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications,
-                                theInputVariables,
-                                theOutputVariables,
-                                theInoutputVariables);
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "inputVariables":
-                                    theInputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "outputVariables":
-                                    theOutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "inoutputVariables":
-                                    theInoutputVariables =  (
-                                        Json.JsonSerializer.Deserialize<List<OperationVariable>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.Operation that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "Operation");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
                 if (that.Kind != null)
                 {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
 
-                writer.WritePropertyName("inputVariables");
-                Json.JsonSerializer.Serialize(
-                    writer, that.InputVariables);
-
-                writer.WritePropertyName("outputVariables");
-                Json.JsonSerializer.Serialize(
-                    writer, that.OutputVariables);
-
-                writer.WritePropertyName("inoutputVariables");
-                Json.JsonSerializer.Serialize(
-                    writer, that.InoutputVariables);
-
-                writer.WriteEndObject();
+                return result;
             }
-        }  // OperationJsonConverter
 
-        public class OperationVariableJsonConverter :
-            Json.Serialization.JsonConverter<Aas.OperationVariable>
-        {
-            public override Aas.OperationVariable Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.ConceptDescription that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
+                var result = new Nodes.JsonObject();
 
-                // Prefix the property variables with "the" to avoid conflicts
-                ISubmodelElement? theValue = null;
-
-                while (reader.Read())
+                if (that.DataSpecifications != null)
                 {
-                    switch (reader.TokenType)
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.OperationVariable(
-                                theValue ?? throw new Json.JsonException(
-                                    "Required property is missing: value"));
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<ISubmodelElement>(
-                                            ref reader));
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.OperationVariable that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("value");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Value);
-
-                writer.WriteEndObject();
-            }
-        }  // OperationVariableJsonConverter
-
-        public class CapabilityJsonConverter :
-            Json.Serialization.JsonConverter<Aas.Capability>
-        {
-            public override Aas.Capability Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
                 }
 
-                // Prefix the property variables with "the" to avoid conflicts
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                ModelingKind? theKind = null;
-                IReference? theSemanticId = null;
-                List<IConstraint>? theQualifiers = null;
-                List<IReference>? theDataSpecifications = null;
-
-                while (reader.Read())
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
                 {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.Capability(
-                                theExtensions,
-                                theIdShort,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theKind,
-                                theSemanticId,
-                                theQualifiers,
-                                theDataSpecifications);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "kind":
-                                    theKind =  (
-                                        Json.JsonSerializer.Deserialize<ModelingKind>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "qualifiers":
-                                    theQualifiers =  (
-                                        Json.JsonSerializer.Deserialize<List<IConstraint>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.Capability that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "Capability");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
-                if (that.Kind != null)
-                {
-                    writer.WritePropertyName("kind");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Kind);
-                }
-
-                if (that.SemanticId != null)
-                {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
-                }
-
-                writer.WritePropertyName("qualifiers");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Qualifiers);
-
-                writer.WriteEndObject();
-            }
-        }  // CapabilityJsonConverter
-
-        public class ConceptDescriptionJsonConverter :
-            Json.Serialization.JsonConverter<Aas.ConceptDescription>
-        {
-            public override Aas.ConceptDescription Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theId = null;
-                string? theIdShort = null;
-                List<Extension>? theExtensions = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                AdministrativeInformation? theAdministration = null;
-                List<IReference>? theIsCaseOf = null;
-                List<IReference>? theDataSpecifications = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.ConceptDescription(
-                                theId ?? throw new Json.JsonException(
-                                    "Required property is missing: id"),
-                                theIdShort ?? throw new Json.JsonException(
-                                    "Required property is missing: idShort"),
-                                theExtensions,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theAdministration,
-                                theIsCaseOf,
-                                theDataSpecifications);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "id":
-                                    theId =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "administration":
-                                    theAdministration =  (
-                                        Json.JsonSerializer.Deserialize<AdministrativeInformation>(
-                                            ref reader));
-                                    break;
-                                case "isCaseOf":
-                                    theIsCaseOf =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.ConceptDescription that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "ConceptDescription");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
-
-                if (that.IdShort != null)
-                {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
-                }
-
-                if (that.DisplayName != null)
-                {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
-                }
-
-                if (that.Category != null)
-                {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
-                }
-
-                if (that.Description != null)
-                {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
-                }
-
-                writer.WritePropertyName("id");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Id);
+                result["id"] = Nodes.JsonValue.Create(
+                    that.Id);
 
                 if (that.Administration != null)
                 {
-                    writer.WritePropertyName("administration");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Administration);
+                    result["administration"] = Transform(
+                        that.Administration);
                 }
 
-                writer.WritePropertyName("isCaseOf");
-                Json.JsonSerializer.Serialize(
-                    writer, that.IsCaseOf);
+                var arrayIsCaseOf = new Nodes.JsonArray();
+                foreach (IReference item in that.IsCaseOf)
+                {
+                    arrayIsCaseOf.Add(
+                        Transform(
+                            item));
+                }
+                result["isCaseOf"] = arrayIsCaseOf;
 
-                writer.WriteEndObject();
+                return result;
             }
-        }  // ConceptDescriptionJsonConverter
 
-        public class ViewJsonConverter :
-            Json.Serialization.JsonConverter<Aas.View>
-        {
-            public override Aas.View Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.View that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
+                var result = new Nodes.JsonObject();
 
-                // Prefix the property variables with "the" to avoid conflicts
-                List<Extension>? theExtensions = null;
-                string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                string? theCategory = null;
-                LangStringSet? theDescription = null;
-                IReference? theSemanticId = null;
-                List<IReference>? theDataSpecifications = null;
-                List<IReference>? theContainedElements = null;
-
-                while (reader.Read())
+                if (that.DataSpecifications != null)
                 {
-                    switch (reader.TokenType)
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
                     {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.View(
-                                theExtensions,
-                                theIdShort,
-                                theDisplayName,
-                                theCategory,
-                                theDescription,
-                                theSemanticId,
-                                theDataSpecifications,
-                                theContainedElements);
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "dataSpecifications":
-                                    theDataSpecifications =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "extensions":
-                                    theExtensions =  (
-                                        Json.JsonSerializer.Deserialize<List<Extension>>(
-                                            ref reader));
-                                    break;
-                                case "idShort":
-                                    theIdShort =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "displayName":
-                                    theDisplayName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "category":
-                                    theCategory =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "description":
-                                    theDescription =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "semanticId":
-                                    theSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "containedElements":
-                                    theContainedElements =  (
-                                        Json.JsonSerializer.Deserialize<List<IReference>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.View that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "View");
-
-                writer.WritePropertyName("dataSpecifications");
-                Json.JsonSerializer.Serialize(
-                    writer, that.DataSpecifications);
-
-                writer.WritePropertyName("extensions");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Extensions);
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
 
                 if (that.IdShort != null)
                 {
-                    writer.WritePropertyName("idShort");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.IdShort);
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    writer.WritePropertyName("displayName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DisplayName);
+                    result["displayName"] = Transform(
+                        that.DisplayName);
                 }
 
                 if (that.Category != null)
                 {
-                    writer.WritePropertyName("category");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Category);
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
                 }
 
                 if (that.Description != null)
                 {
-                    writer.WritePropertyName("description");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Description);
+                    result["description"] = Transform(
+                        that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    writer.WritePropertyName("semanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SemanticId);
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
                 }
 
-                writer.WritePropertyName("containedElements");
-                Json.JsonSerializer.Serialize(
-                    writer, that.ContainedElements);
-
-                writer.WriteEndObject();
-            }
-        }  // ViewJsonConverter
-
-        public class IReferenceJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IReference>
-        {
-            public override bool CanConvert(System.Type typeToConvert)
-            {
-                return typeof(Aas.IReference).IsAssignableFrom(typeToConvert);
-            }
-
-            public override Aas.IReference Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                var arrayContainedElements = new Nodes.JsonArray();
+                foreach (IReference item in that.ContainedElements)
                 {
-                    throw new Json.JsonException();
+                    arrayContainedElements.Add(
+                        Transform(
+                            item));
                 }
+                result["containedElements"] = arrayContainedElements;
 
-                string? modelType = null;
+                return result;
+            }
 
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
+            public override Nodes.JsonObject Transform(Aas.GlobalReference that)
+            {
+                var result = new Nodes.JsonObject();
 
-                while (reader.Read())
+                var arrayValues = new Nodes.JsonArray();
+                foreach (string item in that.Values)
                 {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
-                    {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
-                    }
-                    else
-                    {
-                        buffer.Write(reader.ValueSpan);
-                    }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "GlobalReference":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.GlobalReference>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null GlobalReference from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "ModelReference":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.ModelReference>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null ModelReference from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IReference that,
-                Json.JsonSerializerOptions options)
-            {
-            switch (that)
-            {
-                case GlobalReference theGlobalReference:
-                    Json.JsonSerializer.Serialize(
-                        writer, theGlobalReference);
-                    break;
-                case ModelReference theModelReference:
-                    Json.JsonSerializer.Serialize(
-                        writer, theModelReference);
-                    break;
-                default:
-                    throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of IReference: {that}");
-            }
-            }
-        }  // IReferenceJsonConverter
-
-        public class GlobalReferenceJsonConverter :
-            Json.Serialization.JsonConverter<Aas.GlobalReference>
-        {
-            public override Aas.GlobalReference Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
+                    arrayValues.Add(
+                        Nodes.JsonValue.Create(
+                            item));
                 }
+                result["values"] = arrayValues;
 
-                // Prefix the property variables with "the" to avoid conflicts
-                List<string>? theValues = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.GlobalReference(
-                                theValues ?? throw new Json.JsonException(
-                                    "Required property is missing: values"));
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "values":
-                                    theValues =  (
-                                        Json.JsonSerializer.Deserialize<List<string>>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
+                return result;
             }
 
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.GlobalReference that,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.ModelReference that)
             {
-                writer.WriteStartObject();
+                var result = new Nodes.JsonObject();
 
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "GlobalReference");
-
-                writer.WritePropertyName("values");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Values);
-
-                writer.WriteEndObject();
-            }
-        }  // GlobalReferenceJsonConverter
-
-        public class ModelReferenceJsonConverter :
-            Json.Serialization.JsonConverter<Aas.ModelReference>
-        {
-            public override Aas.ModelReference Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                var arrayKeys = new Nodes.JsonArray();
+                foreach (Key item in that.Keys)
                 {
-                    throw new Json.JsonException();
+                    arrayKeys.Add(
+                        Transform(
+                            item));
                 }
-
-                // Prefix the property variables with "the" to avoid conflicts
-                List<Key>? theKeys = null;
-                IReference? theReferredSemanticId = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.ModelReference(
-                                theKeys ?? throw new Json.JsonException(
-                                    "Required property is missing: keys"),
-                                theReferredSemanticId);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "keys":
-                                    theKeys =  (
-                                        Json.JsonSerializer.Deserialize<List<Key>>(
-                                            ref reader));
-                                    break;
-                                case "referredSemanticId":
-                                    theReferredSemanticId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "modelType":
-                                    // Ignore the property modelType as we already know the exact type
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.ModelReference that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("modelType");
-                Json.JsonSerializer.Serialize(
-                    writer, "ModelReference");
-
-                writer.WritePropertyName("keys");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Keys);
+                result["keys"] = arrayKeys;
 
                 if (that.ReferredSemanticId != null)
                 {
-                    writer.WritePropertyName("referredSemanticId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ReferredSemanticId);
+                    result["referredSemanticId"] = Transform(
+                        that.ReferredSemanticId);
                 }
 
-                writer.WriteEndObject();
+                return result;
             }
-        }  // ModelReferenceJsonConverter
 
-        public class KeyJsonConverter :
-            Json.Serialization.JsonConverter<Aas.Key>
-        {
-            public override Aas.Key Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.Key that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
+                var result = new Nodes.JsonObject();
 
-                // Prefix the property variables with "the" to avoid conflicts
-                KeyElements? theType = null;
-                string? theValue = null;
+                result["type"] = Serialize.KeyElementsToJsonValue(
+                    that.Type);
 
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.Key(
-                                theType ?? throw new Json.JsonException(
-                                    "Required property is missing: type"),
-                                theValue ?? throw new Json.JsonException(
-                                    "Required property is missing: value"));
+                result["value"] = Nodes.JsonValue.Create(
+                    that.Value);
 
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "type":
-                                    theType =  (
-                                        Json.JsonSerializer.Deserialize<KeyElements>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
+                return result;
             }
 
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.Key that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("type");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Type);
-
-                writer.WritePropertyName("value");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Value);
-
-                writer.WriteEndObject();
-            }
-        }  // KeyJsonConverter
-
-        public class IdentifiableElementsJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IdentifiableElements>
-        {
-            public override Aas.IdentifiableElements Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.IdentifiableElements? value = Stringification.IdentifiableElementsFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid IdentifiableElements: {text}");
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IdentifiableElements value,
-                Json.JsonSerializerOptions options)
-            {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid IdentifiableElements: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class ReferableElementsJsonConverter :
-            Json.Serialization.JsonConverter<Aas.ReferableElements>
-        {
-            public override Aas.ReferableElements Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.ReferableElements? value = Stringification.ReferableElementsFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid ReferableElements: {text}");
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.ReferableElements value,
-                Json.JsonSerializerOptions options)
-            {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid ReferableElements: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class KeyElementsJsonConverter :
-            Json.Serialization.JsonConverter<Aas.KeyElements>
-        {
-            public override Aas.KeyElements Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.KeyElements? value = Stringification.KeyElementsFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid KeyElements: {text}");
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.KeyElements value,
-                Json.JsonSerializerOptions options)
-            {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid KeyElements: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class SubmodelElementsJsonConverter :
-            Json.Serialization.JsonConverter<Aas.SubmodelElements>
-        {
-            public override Aas.SubmodelElements Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.SubmodelElements? value = Stringification.SubmodelElementsFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid SubmodelElements: {text}");
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.SubmodelElements value,
-                Json.JsonSerializerOptions options)
-            {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid SubmodelElements: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class BuildInListTypesJsonConverter :
-            Json.Serialization.JsonConverter<Aas.BuildInListTypes>
-        {
-            public override Aas.BuildInListTypes Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.BuildInListTypes? value = Stringification.BuildInListTypesFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid BuildInListTypes: {text}");
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.BuildInListTypes value,
-                Json.JsonSerializerOptions options)
-            {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid BuildInListTypes: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class DecimalBuildInTypesJsonConverter :
-            Json.Serialization.JsonConverter<Aas.DecimalBuildInTypes>
-        {
-            public override Aas.DecimalBuildInTypes Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.DecimalBuildInTypes? value = Stringification.DecimalBuildInTypesFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid DecimalBuildInTypes: {text}");
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.DecimalBuildInTypes value,
-                Json.JsonSerializerOptions options)
-            {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid DecimalBuildInTypes: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class DurationBuildInTypesJsonConverter :
-            Json.Serialization.JsonConverter<Aas.DurationBuildInTypes>
-        {
-            public override Aas.DurationBuildInTypes Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.DurationBuildInTypes? value = Stringification.DurationBuildInTypesFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid DurationBuildInTypes: {text}");
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.DurationBuildInTypes value,
-                Json.JsonSerializerOptions options)
-            {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid DurationBuildInTypes: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class PrimitiveTypesJsonConverter :
-            Json.Serialization.JsonConverter<Aas.PrimitiveTypes>
-        {
-            public override Aas.PrimitiveTypes Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.PrimitiveTypes? value = Stringification.PrimitiveTypesFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid PrimitiveTypes: {text}");
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.PrimitiveTypes value,
-                Json.JsonSerializerOptions options)
-            {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid PrimitiveTypes: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class StringBuildInTypesJsonConverter :
-            Json.Serialization.JsonConverter<Aas.StringBuildInTypes>
-        {
-            public override Aas.StringBuildInTypes Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.StringBuildInTypes? value = Stringification.StringBuildInTypesFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid StringBuildInTypes: {text}");
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.StringBuildInTypes value,
-                Json.JsonSerializerOptions options)
-            {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid StringBuildInTypes: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class DataTypeDefJsonConverter :
-            Json.Serialization.JsonConverter<Aas.DataTypeDef>
-        {
-            public override Aas.DataTypeDef Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.DataTypeDef? value = Stringification.DataTypeDefFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid DataTypeDef: {text}");
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.DataTypeDef value,
-                Json.JsonSerializerOptions options)
-            {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid DataTypeDef: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class LangStringSetJsonConverter :
-            System.Text.Json.Serialization.JsonConverter<Aas.LangStringSet>
-        {
-            public override Aas.LangStringSet Read(
-                ref System.Text.Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                System.Text.Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.LangStringSet that)
             {
                 throw new System.NotImplementedException("TODO");
             }
 
-            public override void Write(
-                System.Text.Json.Utf8JsonWriter writer,
-                Aas.LangStringSet value,
-                System.Text.Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.ValueReferencePair that)
             {
-                throw new System.NotImplementedException("TODO");
-            }
-        }
+                var result = new Nodes.JsonObject();
 
-        public class IDataSpecificationContentJsonConverter :
-            Json.Serialization.JsonConverter<Aas.IDataSpecificationContent>
-        {
-            public override bool CanConvert(System.Type typeToConvert)
-            {
-                return typeof(Aas.IDataSpecificationContent).IsAssignableFrom(typeToConvert);
+                result["value"] = Nodes.JsonValue.Create(
+                    that.Value);
+
+                result["valueId"] = Transform(
+                    that.ValueId);
+
+                return result;
             }
 
-            public override Aas.IDataSpecificationContent Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.ValueList that)
             {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
+                var result = new Nodes.JsonObject();
+
+                var arrayValueReferencePairs = new Nodes.JsonArray();
+                foreach (ValueReferencePair item in that.ValueReferencePairs)
                 {
-                    throw new Json.JsonException();
+                    arrayValueReferencePairs.Add(
+                        Transform(
+                            item));
                 }
+                result["valueReferencePairs"] = arrayValueReferencePairs;
 
-                string? modelType = null;
-
-                // The initialization at 512 bytes is arbitrary, but plausible.
-                using var buffer = new System.IO.MemoryStream(512);
-
-                while (reader.Read())
-                {
-                    // See https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.valuespan#remarks
-                    if (reader.HasValueSequence)
-                    {
-                            foreach (var item in reader.ValueSequence)
-                            {
-                                buffer.Write(item.Span);
-                            }
-                    }
-                    else
-                    {
-                        buffer.Write(reader.ValueSpan);
-                    }
-
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                        {
-                            var secondPassReader = new Json.Utf8JsonReader(
-                                buffer.GetBuffer(),
-                                new Json.JsonReaderOptions
-                                {
-                                    AllowTrailingCommas = options.AllowTrailingCommas,
-                                    CommentHandling = options.ReadCommentHandling,
-                                    MaxDepth = options.MaxDepth
-                                });
-                            switch (modelType)
-                            {
-                                case "DataSpecificationIec61360":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.DataSpecificationIec61360>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null DataSpecificationIec61360 from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                case "DataSpecificationPhysicalUnit":
-                                {
-                                    var deserialized = Json.JsonSerializer.Deserialize<Aas.DataSpecificationPhysicalUnit>(
-                                        ref secondPassReader);
-                                    if (deserialized == null)
-                                    {
-                                        throw new System.InvalidOperationException(
-                                            "Unexpected null DataSpecificationPhysicalUnit from Deserialize call");
-                                    }
-                                    return deserialized;
-                                }
-                                default:
-                                    throw new Json.JsonException(
-                                        $"Unknown model type: {modelType}");
-                            }  // switch on modelType
-                        }
-                        case Json.JsonTokenType.PropertyName:
-                        {
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected null property name");
-
-                            if (propertyName == "modelType")
-                            {
-                                modelType = Json.JsonSerializer.Deserialize<string>(
-                                    ref reader);
-                            }
-                                break;
-                        }
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Reader
-
-                throw new Json.JsonException();
+                return result;
             }
 
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.IDataSpecificationContent that,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.DataSpecificationIec61360 that)
             {
-            switch (that)
-            {
-                case DataSpecificationIec61360 theDataSpecificationIec61360:
-                    Json.JsonSerializer.Serialize(
-                        writer, theDataSpecificationIec61360);
-                    break;
-                case DataSpecificationPhysicalUnit theDataSpecificationPhysicalUnit:
-                    Json.JsonSerializer.Serialize(
-                        writer, theDataSpecificationPhysicalUnit);
-                    break;
-                default:
-                    throw new System.ArgumentException(
-                    $"Instance `that` of type {that.GetType()} is " +
-                    $"not an implementer class of IDataSpecificationContent: {that}");
-            }
-            }
-        }  // IDataSpecificationContentJsonConverter
-
-        public class DataTypeIec61360JsonConverter :
-            Json.Serialization.JsonConverter<Aas.DataTypeIec61360>
-        {
-            public override Aas.DataTypeIec61360 Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.DataTypeIec61360? value = Stringification.DataTypeIec61360FromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid DataTypeIec61360: {text}");
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.DataTypeIec61360 value,
-                Json.JsonSerializerOptions options)
-            {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid DataTypeIec61360: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class LevelTypeJsonConverter :
-            Json.Serialization.JsonConverter<Aas.LevelType>
-        {
-            public override Aas.LevelType Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.String)
-                {
-                    throw new Json.JsonException();
-                }
-
-                string? text = reader.GetString();
-                if (text == null)
-                {
-                    throw new Json.JsonException();
-                }
-
-                Aas.LevelType? value = Stringification.LevelTypeFromString(
-                    text);
-                return value ?? throw new Json.JsonException(
-                    $"Invalid LevelType: {text}");
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.LevelType value,
-                Json.JsonSerializerOptions options)
-            {
-                string? text = Stringification.ToString(value);
-                if (text == null)
-                {
-                    throw new System.ArgumentException(
-                        $"Invalid LevelType: {value}");
-                }
-
-                writer.WriteStringValue(text);
-            }
-        }
-
-        public class ValueReferencePairJsonConverter :
-            Json.Serialization.JsonConverter<Aas.ValueReferencePair>
-        {
-            public override Aas.ValueReferencePair Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theValue = null;
-                IReference? theValueId = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.ValueReferencePair(
-                                theValue ?? throw new Json.JsonException(
-                                    "Required property is missing: value"),
-                                theValueId ?? throw new Json.JsonException(
-                                    "Required property is missing: valueId"));
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "valueId":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.ValueReferencePair that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("value");
-                Json.JsonSerializer.Serialize(
-                    writer, that.Value);
-
-                writer.WritePropertyName("valueId");
-                Json.JsonSerializer.Serialize(
-                    writer, that.ValueId);
-
-                writer.WriteEndObject();
-            }
-        }  // ValueReferencePairJsonConverter
-
-        public class ValueListJsonConverter :
-            Json.Serialization.JsonConverter<Aas.ValueList>
-        {
-            public override Aas.ValueList Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                // Prefix the property variables with "the" to avoid conflicts
-                List<ValueReferencePair>? theValueReferencePairs = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.ValueList(
-                                theValueReferencePairs);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "valueReferencePairs":
-                                    theValueReferencePairs =  (
-                                        Json.JsonSerializer.Deserialize<List<ValueReferencePair>>(
-                                            ref reader));
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.ValueList that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("valueReferencePairs");
-                Json.JsonSerializer.Serialize(
-                    writer, that.ValueReferencePairs);
-
-                writer.WriteEndObject();
-            }
-        }  // ValueListJsonConverter
-
-        public class DataSpecificationIec61360JsonConverter :
-            Json.Serialization.JsonConverter<Aas.DataSpecificationIec61360>
-        {
-            public override Aas.DataSpecificationIec61360 Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                // Prefix the property variables with "the" to avoid conflicts
-                LangStringSet? thePreferredName = null;
-                LangStringSet? theShortName = null;
-                string? theUnit = null;
-                IReference? theUnitId = null;
-                string? theSourceOfDefinition = null;
-                string? theSymbol = null;
-                DataTypeIec61360? theDataType = null;
-                LangStringSet? theDefinition = null;
-                string? theValueFormat = null;
-                ValueList? theValueList = null;
-                string? theValue = null;
-                IReference? theValueId = null;
-                LevelType? theLevelType = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.DataSpecificationIec61360(
-                                thePreferredName,
-                                theShortName,
-                                theUnit,
-                                theUnitId,
-                                theSourceOfDefinition,
-                                theSymbol,
-                                theDataType,
-                                theDefinition,
-                                theValueFormat,
-                                theValueList,
-                                theValue,
-                                theValueId,
-                                theLevelType);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "preferredName":
-                                    thePreferredName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "shortName":
-                                    theShortName =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "unit":
-                                    theUnit =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "unitId":
-                                    theUnitId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "sourceOfDefinition":
-                                    theSourceOfDefinition =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "symbol":
-                                    theSymbol =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "dataType":
-                                    theDataType =  (
-                                        Json.JsonSerializer.Deserialize<DataTypeIec61360>(
-                                            ref reader));
-                                    break;
-                                case "definition":
-                                    theDefinition =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "valueFormat":
-                                    theValueFormat =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "valueList":
-                                    theValueList =  (
-                                        Json.JsonSerializer.Deserialize<ValueList>(
-                                            ref reader));
-                                    break;
-                                case "value":
-                                    theValue =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "valueId":
-                                    theValueId =  (
-                                        Json.JsonSerializer.Deserialize<IReference>(
-                                            ref reader));
-                                    break;
-                                case "levelType":
-                                    theLevelType =  (
-                                        Json.JsonSerializer.Deserialize<LevelType>(
-                                            ref reader));
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
-            }
-
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.DataSpecificationIec61360 that,
-                Json.JsonSerializerOptions options)
-            {
-                writer.WriteStartObject();
+                var result = new Nodes.JsonObject();
 
                 if (that.PreferredName != null)
                 {
-                    writer.WritePropertyName("preferredName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.PreferredName);
+                    result["preferredName"] = Transform(
+                        that.PreferredName);
                 }
 
                 if (that.ShortName != null)
                 {
-                    writer.WritePropertyName("shortName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ShortName);
+                    result["shortName"] = Transform(
+                        that.ShortName);
                 }
 
                 if (that.Unit != null)
                 {
-                    writer.WritePropertyName("unit");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Unit);
+                    result["unit"] = Nodes.JsonValue.Create(
+                        that.Unit);
                 }
 
                 if (that.UnitId != null)
                 {
-                    writer.WritePropertyName("unitId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.UnitId);
+                    result["unitId"] = Transform(
+                        that.UnitId);
                 }
 
                 if (that.SourceOfDefinition != null)
                 {
-                    writer.WritePropertyName("sourceOfDefinition");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SourceOfDefinition);
+                    result["sourceOfDefinition"] = Nodes.JsonValue.Create(
+                        that.SourceOfDefinition);
                 }
 
                 if (that.Symbol != null)
                 {
-                    writer.WritePropertyName("symbol");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Symbol);
+                    result["symbol"] = Nodes.JsonValue.Create(
+                        that.Symbol);
                 }
 
                 if (that.DataType != null)
                 {
-                    writer.WritePropertyName("dataType");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DataType);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.DataTypeIec61360 value = that.DataType
+                        ?? throw new System.InvalidOperationException();
+                    result["dataType"] = Serialize.DataTypeIec61360ToJsonValue(
+                        value);
                 }
 
                 if (that.Definition != null)
                 {
-                    writer.WritePropertyName("definition");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Definition);
+                    result["definition"] = Transform(
+                        that.Definition);
                 }
 
                 if (that.ValueFormat != null)
                 {
-                    writer.WritePropertyName("valueFormat");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ValueFormat);
+                    result["valueFormat"] = Nodes.JsonValue.Create(
+                        that.ValueFormat);
                 }
 
                 if (that.ValueList != null)
                 {
-                    writer.WritePropertyName("valueList");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ValueList);
+                    result["valueList"] = Transform(
+                        that.ValueList);
                 }
 
                 if (that.Value != null)
                 {
-                    writer.WritePropertyName("value");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Value);
+                    result["value"] = Nodes.JsonValue.Create(
+                        that.Value);
                 }
 
                 if (that.ValueId != null)
                 {
-                    writer.WritePropertyName("valueId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ValueId);
+                    result["valueId"] = Transform(
+                        that.ValueId);
                 }
 
                 if (that.LevelType != null)
                 {
-                    writer.WritePropertyName("levelType");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.LevelType);
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.LevelType value = that.LevelType
+                        ?? throw new System.InvalidOperationException();
+                    result["levelType"] = Serialize.LevelTypeToJsonValue(
+                        value);
                 }
 
-                writer.WriteEndObject();
-            }
-        }  // DataSpecificationIec61360JsonConverter
-
-        public class DataSpecificationPhysicalUnitJsonConverter :
-            Json.Serialization.JsonConverter<Aas.DataSpecificationPhysicalUnit>
-        {
-            public override Aas.DataSpecificationPhysicalUnit Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                // Prefix the property variables with "the" to avoid conflicts
-                string? theUnitName = null;
-                string? theUnitSymbol = null;
-                LangStringSet? theDefinition = null;
-                string? theSiNotation = null;
-                string? theDinNotation = null;
-                string? theEceName = null;
-                string? theEceCode = null;
-                string? theNistName = null;
-                string? theSourceOfDefinition = null;
-                string? theConversionFactor = null;
-                string? theRegistrationAuthorityId = null;
-                string? theSupplier = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.DataSpecificationPhysicalUnit(
-                                theUnitName,
-                                theUnitSymbol,
-                                theDefinition,
-                                theSiNotation,
-                                theDinNotation,
-                                theEceName,
-                                theEceCode,
-                                theNistName,
-                                theSourceOfDefinition,
-                                theConversionFactor,
-                                theRegistrationAuthorityId,
-                                theSupplier);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "unitName":
-                                    theUnitName =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "unitSymbol":
-                                    theUnitSymbol =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "definition":
-                                    theDefinition =  (
-                                        Json.JsonSerializer.Deserialize<LangStringSet>(
-                                            ref reader));
-                                    break;
-                                case "siNotation":
-                                    theSiNotation =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "dinNotation":
-                                    theDinNotation =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "eceName":
-                                    theEceName =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "eceCode":
-                                    theEceCode =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "nistName":
-                                    theNistName =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "sourceOfDefinition":
-                                    theSourceOfDefinition =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "conversionFactor":
-                                    theConversionFactor =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "registrationAuthorityId":
-                                    theRegistrationAuthorityId =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                case "supplier":
-                                    theSupplier =  (
-                                        Json.JsonSerializer.Deserialize<string>(
-                                            ref reader));
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
+                return result;
             }
 
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.DataSpecificationPhysicalUnit that,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.DataSpecificationPhysicalUnit that)
             {
-                writer.WriteStartObject();
+                var result = new Nodes.JsonObject();
 
                 if (that.UnitName != null)
                 {
-                    writer.WritePropertyName("unitName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.UnitName);
+                    result["unitName"] = Nodes.JsonValue.Create(
+                        that.UnitName);
                 }
 
                 if (that.UnitSymbol != null)
                 {
-                    writer.WritePropertyName("unitSymbol");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.UnitSymbol);
+                    result["unitSymbol"] = Nodes.JsonValue.Create(
+                        that.UnitSymbol);
                 }
 
                 if (that.Definition != null)
                 {
-                    writer.WritePropertyName("definition");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Definition);
+                    result["definition"] = Transform(
+                        that.Definition);
                 }
 
                 if (that.SiNotation != null)
                 {
-                    writer.WritePropertyName("siNotation");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SiNotation);
+                    result["siNotation"] = Nodes.JsonValue.Create(
+                        that.SiNotation);
                 }
 
                 if (that.DinNotation != null)
                 {
-                    writer.WritePropertyName("dinNotation");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.DinNotation);
+                    result["dinNotation"] = Nodes.JsonValue.Create(
+                        that.DinNotation);
                 }
 
                 if (that.EceName != null)
                 {
-                    writer.WritePropertyName("eceName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.EceName);
+                    result["eceName"] = Nodes.JsonValue.Create(
+                        that.EceName);
                 }
 
                 if (that.EceCode != null)
                 {
-                    writer.WritePropertyName("eceCode");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.EceCode);
+                    result["eceCode"] = Nodes.JsonValue.Create(
+                        that.EceCode);
                 }
 
                 if (that.NistName != null)
                 {
-                    writer.WritePropertyName("nistName");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.NistName);
+                    result["nistName"] = Nodes.JsonValue.Create(
+                        that.NistName);
                 }
 
                 if (that.SourceOfDefinition != null)
                 {
-                    writer.WritePropertyName("sourceOfDefinition");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.SourceOfDefinition);
+                    result["sourceOfDefinition"] = Nodes.JsonValue.Create(
+                        that.SourceOfDefinition);
                 }
 
                 if (that.ConversionFactor != null)
                 {
-                    writer.WritePropertyName("conversionFactor");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ConversionFactor);
+                    result["conversionFactor"] = Nodes.JsonValue.Create(
+                        that.ConversionFactor);
                 }
 
                 if (that.RegistrationAuthorityId != null)
                 {
-                    writer.WritePropertyName("registrationAuthorityId");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.RegistrationAuthorityId);
+                    result["registrationAuthorityId"] = Nodes.JsonValue.Create(
+                        that.RegistrationAuthorityId);
                 }
 
                 if (that.Supplier != null)
                 {
-                    writer.WritePropertyName("supplier");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Supplier);
+                    result["supplier"] = Nodes.JsonValue.Create(
+                        that.Supplier);
                 }
 
-                writer.WriteEndObject();
-            }
-        }  // DataSpecificationPhysicalUnitJsonConverter
-
-        public class EnvironmentJsonConverter :
-            Json.Serialization.JsonConverter<Aas.Environment>
-        {
-            public override Aas.Environment Read(
-                ref Json.Utf8JsonReader reader,
-                System.Type typeToConvert,
-                Json.JsonSerializerOptions options)
-            {
-                if (reader.TokenType != Json.JsonTokenType.StartObject)
-                {
-                    throw new Json.JsonException();
-                }
-
-                // Prefix the property variables with "the" to avoid conflicts
-                List<AssetAdministrationShell>? theAssetAdministrationShells = null;
-                List<Submodel>? theSubmodels = null;
-                List<ConceptDescription>? theConceptDescriptions = null;
-
-                while (reader.Read())
-                {
-                    switch (reader.TokenType)
-                    {
-                        case Json.JsonTokenType.EndObject:
-                            return new Aas.Environment(
-                                theAssetAdministrationShells,
-                                theSubmodels,
-                                theConceptDescriptions);
-
-                        case Json.JsonTokenType.PropertyName:
-                            string propertyName = reader.GetString()
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected property name null");
-
-                            switch (propertyName)
-                            {
-                                case "assetAdministrationShells":
-                                    theAssetAdministrationShells =  (
-                                        Json.JsonSerializer.Deserialize<List<AssetAdministrationShell>>(
-                                            ref reader));
-                                    break;
-                                case "submodels":
-                                    theSubmodels =  (
-                                        Json.JsonSerializer.Deserialize<List<Submodel>>(
-                                            ref reader));
-                                    break;
-                                case "conceptDescriptions":
-                                    theConceptDescriptions =  (
-                                        Json.JsonSerializer.Deserialize<List<ConceptDescription>>(
-                                            ref reader));
-                                    break;
-                                default:
-                                    // Ignore an unknown property
-                                    if (!reader.Read())
-                                    {
-                                        throw new Json.JsonException(
-                                            $"Unexpected end-of-stream after the property: {propertyName}");
-                                    }
-                                    if (!reader.TrySkip())
-                                    {
-                                        throw new Json.JsonException(
-                                            "Unexpected end-of-stream when skipping " +
-                                            $"the value of the unknown property: {propertyName}");
-                                    }
-                                    break;
-                            }  // switch on propertyName
-                            break;
-
-                        default:
-                            throw new Json.JsonException();
-                    }  // switch on token type
-                }  // while reader.Read
-
-                throw new Json.JsonException();
+                return result;
             }
 
-            public override void Write(
-                Json.Utf8JsonWriter writer,
-                Aas.Environment that,
-                Json.JsonSerializerOptions options)
+            public override Nodes.JsonObject Transform(Aas.Environment that)
             {
-                writer.WriteStartObject();
+                var result = new Nodes.JsonObject();
 
                 if (that.AssetAdministrationShells != null)
                 {
-                    writer.WritePropertyName("assetAdministrationShells");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.AssetAdministrationShells);
+                    var arrayAssetAdministrationShells = new Nodes.JsonArray();
+                    foreach (AssetAdministrationShell item in that.AssetAdministrationShells)
+                    {
+                        arrayAssetAdministrationShells.Add(
+                            Transform(
+                                item));
+                    }
+                    result["assetAdministrationShells"] = arrayAssetAdministrationShells;
                 }
 
                 if (that.Submodels != null)
                 {
-                    writer.WritePropertyName("submodels");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.Submodels);
+                    var arraySubmodels = new Nodes.JsonArray();
+                    foreach (Submodel item in that.Submodels)
+                    {
+                        arraySubmodels.Add(
+                            Transform(
+                                item));
+                    }
+                    result["submodels"] = arraySubmodels;
                 }
 
                 if (that.ConceptDescriptions != null)
                 {
-                    writer.WritePropertyName("conceptDescriptions");
-                    Json.JsonSerializer.Serialize(
-                        writer, that.ConceptDescriptions);
+                    var arrayConceptDescriptions = new Nodes.JsonArray();
+                    foreach (ConceptDescription item in that.ConceptDescriptions)
+                    {
+                        arrayConceptDescriptions.Add(
+                            Transform(
+                                item));
+                    }
+                    result["conceptDescriptions"] = arrayConceptDescriptions;
                 }
 
-                writer.WriteEndObject();
+                return result;
             }
-        }  // EnvironmentJsonConverter
+        }  // internal class Transformer
 
         /// <summary>
-        /// Create and populate a list of our custom-tailored JSON converters.
+        /// Serialize instances of meta-model classes to JSON elements.
         /// </summary>
-        public static List<Json.Serialization.JsonConverter> CreateJsonConverters()
+        /// <example>
+        /// Here is an example how to serialize an instance of IHasSemantics:
+        /// <code>
+        /// var anInstance = new Aas.IHasSemantics(
+        ///     // ... some constructor arguments ...
+        /// );
+        /// Json.Nodes.JsonObject element = Serialize.ToJsonObject(
+        ///     anInstance);
+        /// </code>
+        /// </example>
+        public static class Serialize
         {
-            return new List<Json.Serialization.JsonConverter>()
+            private static Transformer _transformer = new Transformer();
+
+            /// <summary>
+            /// Serialize an instance of the meta-model into a JSON object.
+            /// </summary>
+            public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
             {
-                new IHasSemanticsJsonConverter(),
-                new ExtensionJsonConverter(),
-                new IHasExtensionsJsonConverter(),
-                new IReferableJsonConverter(),
-                new IIdentifiableJsonConverter(),
-                new ModelingKindJsonConverter(),
-                new IHasKindJsonConverter(),
-                new IHasDataSpecificationJsonConverter(),
-                new AdministrativeInformationJsonConverter(),
-                new IConstraintJsonConverter(),
-                new IQualifiableJsonConverter(),
-                new QualifierJsonConverter(),
-                new FormulaJsonConverter(),
-                new AssetAdministrationShellJsonConverter(),
-                new AssetInformationJsonConverter(),
-                new AssetKindJsonConverter(),
-                new IdentifierKeyValuePairJsonConverter(),
-                new SubmodelJsonConverter(),
-                new ISubmodelElementJsonConverter(),
-                new IRelationshipElementJsonConverter(),
-                new SubmodelElementListJsonConverter(),
-                new SubmodelElementStructJsonConverter(),
-                new IDataElementJsonConverter(),
-                new PropertyJsonConverter(),
-                new MultiLanguagePropertyJsonConverter(),
-                new RangeJsonConverter(),
-                new ReferenceElementJsonConverter(),
-                new BlobJsonConverter(),
-                new FileJsonConverter(),
-                new AnnotatedRelationshipElementJsonConverter(),
-                new EntityTypeJsonConverter(),
-                new EntityJsonConverter(),
-                new IEventJsonConverter(),
-                new BasicEventJsonConverter(),
-                new OperationJsonConverter(),
-                new OperationVariableJsonConverter(),
-                new CapabilityJsonConverter(),
-                new ConceptDescriptionJsonConverter(),
-                new ViewJsonConverter(),
-                new IReferenceJsonConverter(),
-                new GlobalReferenceJsonConverter(),
-                new ModelReferenceJsonConverter(),
-                new KeyJsonConverter(),
-                new IdentifiableElementsJsonConverter(),
-                new ReferableElementsJsonConverter(),
-                new KeyElementsJsonConverter(),
-                new SubmodelElementsJsonConverter(),
-                new BuildInListTypesJsonConverter(),
-                new DecimalBuildInTypesJsonConverter(),
-                new DurationBuildInTypesJsonConverter(),
-                new PrimitiveTypesJsonConverter(),
-                new StringBuildInTypesJsonConverter(),
-                new DataTypeDefJsonConverter(),
-                new LangStringSetJsonConverter(),
-                new IDataSpecificationContentJsonConverter(),
-                new DataTypeIec61360JsonConverter(),
-                new LevelTypeJsonConverter(),
-                new ValueReferencePairJsonConverter(),
-                new ValueListJsonConverter(),
-                new DataSpecificationIec61360JsonConverter(),
-                new DataSpecificationPhysicalUnitJsonConverter(),
-                new EnvironmentJsonConverter()
-            };
-        }
+                return Serialize._transformer.Transform(that);
+            }
+
+            /// <summary>
+            /// Serialize a literal of ModelingKind into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue ModelingKindToJsonValue(Aas.ModelingKind that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid ModelingKind: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of AssetKind into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue AssetKindToJsonValue(Aas.AssetKind that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid AssetKind: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of EntityType into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue EntityTypeToJsonValue(Aas.EntityType that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid EntityType: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of IdentifiableElements into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue IdentifiableElementsToJsonValue(Aas.IdentifiableElements that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid IdentifiableElements: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of ReferableElements into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue ReferableElementsToJsonValue(Aas.ReferableElements that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid ReferableElements: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of KeyElements into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue KeyElementsToJsonValue(Aas.KeyElements that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid KeyElements: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of SubmodelElements into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue SubmodelElementsToJsonValue(Aas.SubmodelElements that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid SubmodelElements: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of BuildInListTypes into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue BuildInListTypesToJsonValue(Aas.BuildInListTypes that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid BuildInListTypes: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of DecimalBuildInTypes into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue DecimalBuildInTypesToJsonValue(Aas.DecimalBuildInTypes that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid DecimalBuildInTypes: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of DurationBuildInTypes into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue DurationBuildInTypesToJsonValue(Aas.DurationBuildInTypes that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid DurationBuildInTypes: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of PrimitiveTypes into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue PrimitiveTypesToJsonValue(Aas.PrimitiveTypes that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid PrimitiveTypes: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of StringBuildInTypes into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue StringBuildInTypesToJsonValue(Aas.StringBuildInTypes that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid StringBuildInTypes: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of DataTypeDef into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue DataTypeDefToJsonValue(Aas.DataTypeDef that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid DataTypeDef: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of DataTypeIec61360 into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue DataTypeIec61360ToJsonValue(Aas.DataTypeIec61360 that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid DataTypeIec61360: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of LevelType into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue LevelTypeToJsonValue(Aas.LevelType that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid LevelType: {that}");
+            }
+        }  // public static class Serialize
     }  // public static class Jsonization
 }  // namespace AasCore.Aas3
 

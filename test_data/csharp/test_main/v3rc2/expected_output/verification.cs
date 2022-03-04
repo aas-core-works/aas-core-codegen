@@ -2367,15 +2367,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyAdministrativeInformation(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
             }
 
@@ -2416,12 +2419,15 @@ namespace AasCore.Aas3
                 Implementation.VerifyFormula(
                     that, context, Errors);
 
-                for(var i = 0; i < that.DependsOn.Count; i++)
+                if (that.DependsOn != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DependsOn[i],
-                        $"{context}/DependsOn/{i}");
+                    for(var i = 0; i < that.DependsOn.Count; i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DependsOn[i],
+                            $"{context}/DependsOn/{i}");
+                    }
                 }
             }
 
@@ -2435,15 +2441,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyAssetAdministrationShell(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -2572,15 +2581,18 @@ namespace AasCore.Aas3
                 Implementation.VerifySubmodel(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 if (that.SemanticId != null)
@@ -2653,15 +2665,18 @@ namespace AasCore.Aas3
                 Implementation.VerifySubmodelElementList(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -2731,15 +2746,18 @@ namespace AasCore.Aas3
                 Implementation.VerifySubmodelElementStruct(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -2801,15 +2819,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyProperty(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -2871,15 +2892,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyMultiLanguageProperty(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -2949,15 +2973,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyRange(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -3011,15 +3038,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyReferenceElement(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -3081,15 +3111,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyBlob(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -3143,15 +3176,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyFile(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -3205,15 +3241,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyAnnotatedRelationshipElement(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -3285,15 +3324,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyEntity(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -3371,15 +3413,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyBasicEvent(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -3438,15 +3483,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyOperation(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -3546,15 +3594,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyCapability(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -3608,15 +3659,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyConceptDescription(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
@@ -3670,15 +3724,18 @@ namespace AasCore.Aas3
                 Implementation.VerifyView(
                     that, context, Errors);
 
-                for(
-                    var i = 0;
-                    i < that.DataSpecifications.Count;
-                    i++)
+                if (that.DataSpecifications != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DataSpecifications[i],
-                        $"{context}/DataSpecifications/{i}");
+                    for(
+                        var i = 0;
+                        i < that.DataSpecifications.Count;
+                        i++)
+                    {
+                        if (Errors.Full()) return;
+                        Visit(
+                            that.DataSpecifications[i],
+                            $"{context}/DataSpecifications/{i}");
+                    }
                 }
 
                 for(var i = 0; i < that.Extensions.Count; i++)
