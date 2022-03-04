@@ -77,6 +77,9 @@ def _define_primitive_type(
         if len_constraint.max_value is not None:
             type_definition["maxLength"] = len_constraint.max_value
 
+    if primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+        type_definition["contentEncoding"] = "base64"
+
     if (
         primitive_type == intermediate.PrimitiveType.STR
         and pattern_constraints is not None

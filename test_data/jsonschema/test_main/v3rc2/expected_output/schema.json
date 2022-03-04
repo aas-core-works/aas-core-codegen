@@ -550,7 +550,8 @@
               ]
             },
             "value": {
-              "type": "string"
+              "type": "string",
+              "contentEncoding": "base64"
             }
           },
           "required": [
