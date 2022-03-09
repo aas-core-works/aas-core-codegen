@@ -13,6 +13,23 @@ using Visitation = AasCore.Aas3.Visitation;
 
 namespace AasCore.Aas3
 {
+    /// <summary>
+    /// Verify that the instances of the meta-model satisfy the invariants.
+    /// </summary>
+    /// <remarks>
+    /// Mind that we pass the paths to the functions in order
+    /// to provide informative exceptions in case of invariant violations.
+    /// However, this comes with a <strong>SUBSTANTIAL COST</strong>!
+    /// For each call to a parsing function, we have to copy the previous
+    /// prefix path and append the identifier of the element under
+    /// verification. Thus this can run <c>O(n^2)</c> where <c>n</c> denotes
+    /// the longest path to an element.
+    ///
+    /// Please notify the developers if this becomes a bottleneck for
+    /// you since there is a workaround, but we did not prioritize it at
+    /// the moment (<em>e.g.</em>, we could back-track the path only upon
+    /// exceptions).
+    /// </remarks>
     public static class Verification
     {
         /// <summary>
