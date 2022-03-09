@@ -1879,8 +1879,33 @@ def generate(
         return None, errors
 
     verification_writer = io.StringIO()
-    verification_writer.write(f"namespace {namespace}\n{{\n")
-    verification_writer.write(f"{I}public static class Verification\n" f"{I}{{\n")
+    verification_writer.write(
+        textwrap.dedent(
+            f"""\
+            namespace {namespace}
+            {{
+            {I}/// <summary>
+            {I}/// Verify that the instances of the meta-model satisfy the invariants.
+            {I}/// </summary>
+            {I}/// <remarks>
+            {I}/// Mind that we pass the paths to the functions in order
+            {I}/// to provide informative exceptions in case of invariant violations.
+            {I}/// However, this comes with a <strong>SUBSTANTIAL COST</strong>!
+            {I}/// For each call to a parsing function, we have to copy the previous
+            {I}/// prefix path and append the identifier of the element under
+            {I}/// verification. Thus this can run <c>O(n^2)</c> where <c>n</c> denotes
+            {I}/// the longest path to an element.
+            {I}///
+            {I}/// Please notify the developers if this becomes a bottleneck for
+            {I}/// you since there is a workaround, but we did not prioritize it at
+            {I}/// the moment (<em>e.g.</em>, we could back-track the path only upon
+            {I}/// exceptions).
+            {I}/// </remarks>
+            {I}public static class Verification
+            {I}{{
+            """
+        )
+    )
 
     for i, verification_block in enumerate(verification_blocks):
         if i > 0:
