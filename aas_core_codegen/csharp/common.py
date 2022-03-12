@@ -41,10 +41,37 @@ def string_literal(text: str) -> str:
     return '"{}"'.format("".join(escaped))
 
 
+def needs_escaping(text: str) -> bool:
+    """Check whether the ``text`` contains a character that needs escaping."""
+    for character in text:
+        if character == "\a":
+            return True
+        elif character == "\b":
+            return True
+        elif character == "\f":
+            return True
+        elif character == "\n":
+            return True
+        elif character == "\r":
+            return True
+        elif character == "\t":
+            return True
+        elif character == "\v":
+            return True
+        elif character == '"':
+            return True
+        elif character == "\\":
+            return True
+        else:
+            pass
+
+    return False
+
+
 PRIMITIVE_TYPE_MAP = {
     intermediate.PrimitiveType.BOOL: Stripped("bool"),
-    intermediate.PrimitiveType.INT: Stripped("int"),
-    intermediate.PrimitiveType.FLOAT: Stripped("float"),
+    intermediate.PrimitiveType.INT: Stripped("long"),
+    intermediate.PrimitiveType.FLOAT: Stripped("double"),
     intermediate.PrimitiveType.STR: Stripped("string"),
     intermediate.PrimitiveType.BYTEARRAY: Stripped("byte[]"),
 }

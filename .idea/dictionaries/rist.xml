@@ -18,6 +18,7 @@
       <w>dedented</w>
       <w>descendability</w>
       <w>descendable</w>
+      <w>deserializing</w>
       <w>doctree</w>
       <w>dotnet</w>
       <w>dumpable</w>
@@ -45,6 +46,8 @@
       <w>lengthable</w>
       <w>lineno</w>
       <w>linq</w>
+      <w>lossless</w>
+      <w>losslessly</w>
       <w>mristin</w>
       <w>mtch</w>
       <w>mypy</w>

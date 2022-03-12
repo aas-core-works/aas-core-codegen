@@ -232,6 +232,66 @@ def _generate_itransformer(symbol_table: intermediate.SymbolTable) -> Stripped:
     return Stripped(writer.getvalue())
 
 
+def _generate_abstract_transformer(symbol_table: intermediate.SymbolTable) -> Stripped:
+    """Generate the most abstract transformer that merely double-dispatches."""
+    blocks = [
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                public T Transform(IClass that)
+                {{
+                {I}return that.Transform(this);
+                }}"""
+            )
+        )
+    ]  # type: List[Stripped]
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, intermediate.Enumeration):
+            continue
+
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            # Constrained primitives are modeled as their constrainees in C#,
+            # so we do not transform them.
+            continue
+
+        elif isinstance(symbol, intermediate.AbstractClass):
+            # Abstract classes are modeled as interfaces in C#, so we do not transform
+            # them.
+            continue
+
+        elif isinstance(symbol, intermediate.ConcreteClass):
+            cls_name = csharp_naming.class_name(symbol.name)
+            blocks.append(Stripped(f"public abstract T Transform({cls_name} that);"))
+
+        else:
+            assert_never(symbol)
+
+    writer = io.StringIO()
+    writer.write(
+        textwrap.dedent(
+            """\
+            /// <summary>
+            /// Perform double-dispatch to transform recursively
+            /// the instances into something else.
+            /// </summary>
+            /// <typeparam name="T">The type of the transformation result</typeparam>
+            public abstract class AbstractTransformer<T> : ITransformer<T>
+            {
+            """
+        )
+    )
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(block, I))
+
+    writer.write("\n}  // public abstract class AbstractTransformer")
+
+    return Stripped(writer.getvalue())
+
+
 def _generate_itransformer_with_context(
     symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
@@ -267,8 +327,8 @@ def _generate_itransformer_with_context(
             /// Define the interface for a transformer which recursively transforms
             /// the instances into something else while the context is passed along.
             /// </summary>
+            /// <typeparam name="C">Type of the transformation context</typeparam>
             /// <typeparam name="T">The type of the transformation result</typeparam>
-            /// <typeparam name="C">Context type</typeparam>
             public interface ITransformerWithContext<C, T>
             {
                 public T Transform(IClass that, C context);
@@ -282,6 +342,72 @@ def _generate_itransformer_with_context(
         writer.write(textwrap.indent(block, I))
 
     writer.write("\n}  // public interface ITransformerWithContext")
+
+    return Stripped(writer.getvalue())
+
+
+def _generate_abstract_transformer_with_context(
+    symbol_table: intermediate.SymbolTable,
+) -> Stripped:
+    """Generate the most abstract transformer that merely double-dispatches."""
+    blocks = [
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                public T Transform(IClass that, C context)
+                {{
+                {I}return that.Transform(this, context);
+                }}"""
+            )
+        )
+    ]  # type: List[Stripped]
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, intermediate.Enumeration):
+            continue
+
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            # Constrained primitives are modeled as their constrainees in C#,
+            # so we do not transform them.
+            continue
+
+        elif isinstance(symbol, intermediate.AbstractClass):
+            # Abstract classes are modeled as interfaces in C#, so we do not transform
+            # them.
+            continue
+
+        elif isinstance(symbol, intermediate.ConcreteClass):
+            cls_name = csharp_naming.class_name(symbol.name)
+            blocks.append(
+                Stripped(f"public abstract T Transform({cls_name} that, C context);")
+            )
+
+        else:
+            assert_never(symbol)
+
+    writer = io.StringIO()
+    writer.write(
+        textwrap.dedent(
+            f"""\
+            /// <summary>
+            /// Perform double-dispatch to transform recursively
+            /// the instances into something else.
+            /// </summary>
+            /// <typeparam name="C">The type of the transformation context</typeparam>
+            /// <typeparam name="T">The type of the transformation result</typeparam>
+            public abstract class AbstractTransformerWithContext<C, T>
+            {I}: ITransformerWithContext<C, T>
+            {{
+            """
+        )
+    )
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(block, I))
+
+    writer.write("\n}  // public abstract class AbstractTransformerWithContext")
 
     return Stripped(writer.getvalue())
 
@@ -312,7 +438,9 @@ def generate(
         _generate_ivisitor(symbol_table=symbol_table),
         _generate_ivisitor_with_context(symbol_table=symbol_table),
         _generate_itransformer(symbol_table=symbol_table),
+        _generate_abstract_transformer(symbol_table=symbol_table),
         _generate_itransformer_with_context(symbol_table=symbol_table),
+        _generate_abstract_transformer_with_context(symbol_table=symbol_table),
     ]
 
     for i, visitation_block in enumerate(visitation_blocks):

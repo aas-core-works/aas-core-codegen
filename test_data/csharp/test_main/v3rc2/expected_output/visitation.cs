@@ -134,11 +134,90 @@ namespace AasCore.Aas3
         }  // public interface ITransformer
 
         /// <summary>
+        /// Perform double-dispatch to transform recursively
+        /// the instances into something else.
+        /// </summary>
+        /// <typeparam name="T">The type of the transformation result</typeparam>
+        public abstract class AbstractTransformer<T> : ITransformer<T>
+        {
+            public T Transform(IClass that)
+            {
+                return that.Transform(this);
+            }
+
+            public abstract T Transform(Extension that);
+
+            public abstract T Transform(AdministrativeInformation that);
+
+            public abstract T Transform(Qualifier that);
+
+            public abstract T Transform(Formula that);
+
+            public abstract T Transform(AssetAdministrationShell that);
+
+            public abstract T Transform(AssetInformation that);
+
+            public abstract T Transform(IdentifierKeyValuePair that);
+
+            public abstract T Transform(Submodel that);
+
+            public abstract T Transform(SubmodelElementList that);
+
+            public abstract T Transform(SubmodelElementStruct that);
+
+            public abstract T Transform(Property that);
+
+            public abstract T Transform(MultiLanguageProperty that);
+
+            public abstract T Transform(Range that);
+
+            public abstract T Transform(ReferenceElement that);
+
+            public abstract T Transform(Blob that);
+
+            public abstract T Transform(File that);
+
+            public abstract T Transform(AnnotatedRelationshipElement that);
+
+            public abstract T Transform(Entity that);
+
+            public abstract T Transform(BasicEvent that);
+
+            public abstract T Transform(Operation that);
+
+            public abstract T Transform(OperationVariable that);
+
+            public abstract T Transform(Capability that);
+
+            public abstract T Transform(ConceptDescription that);
+
+            public abstract T Transform(View that);
+
+            public abstract T Transform(GlobalReference that);
+
+            public abstract T Transform(ModelReference that);
+
+            public abstract T Transform(Key that);
+
+            public abstract T Transform(LangStringSet that);
+
+            public abstract T Transform(ValueReferencePair that);
+
+            public abstract T Transform(ValueList that);
+
+            public abstract T Transform(DataSpecificationIec61360 that);
+
+            public abstract T Transform(DataSpecificationPhysicalUnit that);
+
+            public abstract T Transform(Environment that);
+        }  // public abstract class AbstractTransformer
+
+        /// <summary>
         /// Define the interface for a transformer which recursively transforms
         /// the instances into something else while the context is passed along.
         /// </summary>
+        /// <typeparam name="C">Type of the transformation context</typeparam>
         /// <typeparam name="T">The type of the transformation result</typeparam>
-        /// <typeparam name="C">Context type</typeparam>
         public interface ITransformerWithContext<C, T>
         {
             public T Transform(IClass that, C context);
@@ -176,6 +255,87 @@ namespace AasCore.Aas3
             public T Transform(DataSpecificationPhysicalUnit that, C context);
             public T Transform(Environment that, C context);
         }  // public interface ITransformerWithContext
+
+        /// <summary>
+        /// Perform double-dispatch to transform recursively
+        /// the instances into something else.
+        /// </summary>
+        /// <typeparam name="C">The type of the transformation context</typeparam>
+        /// <typeparam name="T">The type of the transformation result</typeparam>
+        public abstract class AbstractTransformerWithContext<C, T>
+            : ITransformerWithContext<C, T>
+        {
+            public T Transform(IClass that, C context)
+            {
+                return that.Transform(this, context);
+            }
+
+            public abstract T Transform(Extension that, C context);
+
+            public abstract T Transform(AdministrativeInformation that, C context);
+
+            public abstract T Transform(Qualifier that, C context);
+
+            public abstract T Transform(Formula that, C context);
+
+            public abstract T Transform(AssetAdministrationShell that, C context);
+
+            public abstract T Transform(AssetInformation that, C context);
+
+            public abstract T Transform(IdentifierKeyValuePair that, C context);
+
+            public abstract T Transform(Submodel that, C context);
+
+            public abstract T Transform(SubmodelElementList that, C context);
+
+            public abstract T Transform(SubmodelElementStruct that, C context);
+
+            public abstract T Transform(Property that, C context);
+
+            public abstract T Transform(MultiLanguageProperty that, C context);
+
+            public abstract T Transform(Range that, C context);
+
+            public abstract T Transform(ReferenceElement that, C context);
+
+            public abstract T Transform(Blob that, C context);
+
+            public abstract T Transform(File that, C context);
+
+            public abstract T Transform(AnnotatedRelationshipElement that, C context);
+
+            public abstract T Transform(Entity that, C context);
+
+            public abstract T Transform(BasicEvent that, C context);
+
+            public abstract T Transform(Operation that, C context);
+
+            public abstract T Transform(OperationVariable that, C context);
+
+            public abstract T Transform(Capability that, C context);
+
+            public abstract T Transform(ConceptDescription that, C context);
+
+            public abstract T Transform(View that, C context);
+
+            public abstract T Transform(GlobalReference that, C context);
+
+            public abstract T Transform(ModelReference that, C context);
+
+            public abstract T Transform(Key that, C context);
+
+            public abstract T Transform(LangStringSet that, C context);
+
+            public abstract T Transform(ValueReferencePair that, C context);
+
+            public abstract T Transform(ValueList that, C context);
+
+            public abstract T Transform(DataSpecificationIec61360 that, C context);
+
+            public abstract T Transform(DataSpecificationPhysicalUnit that, C context);
+
+            public abstract T Transform(Environment that, C context);
+        }  // public abstract class AbstractTransformerWithContext
     }  // public static class Visitation
 }  // namespace AasCore.Aas3
 

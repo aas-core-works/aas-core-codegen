@@ -28,6 +28,12 @@ def render(node: Node) -> str:
 
     >>> render(Node(text='parent', children=[Node(text='child', children=[])]))
     'parent\\n{\\n    child\\n}'
+
+    >>> render(Node(text='parent', children=[
+    ...     Node(text='child1', children=[]),
+    ...     Node(text='child2', children=[]),
+    ... ]))
+    'parent\\n{\\n    child1\\n\\n    child2\\n}'
     """
     if len(node.children) == 0:
         return node.text

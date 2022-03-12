@@ -357,7 +357,7 @@ class Has_data_specification(DBC):
     with their global ID.
     """
 
-    data_specifications: List["Reference"]
+    data_specifications: Optional[List["Reference"]]
     """
     Global reference to the data specification template used by the element.
     """
@@ -371,9 +371,7 @@ class Has_data_specification(DBC):
     #  shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0.
 
     def __init__(self, data_specifications: Optional[List["Reference"]] = None) -> None:
-        self.data_specifications = (
-            data_specifications if data_specifications is not None else []
-        )
+        self.data_specifications = data_specifications
 
 
 # fmt: off
@@ -503,7 +501,7 @@ class Formula(Constraint):
     A formula is used to describe constraints by a logical expression.
     """
 
-    depends_on: List["Reference"]
+    depends_on: Optional[List["Reference"]]
     """
     A formula may depend on referable or even external global elements that are used in
     the logical expression.
@@ -514,7 +512,7 @@ class Formula(Constraint):
     """
 
     def __init__(self, depends_on: Optional[List["Reference"]]) -> None:
-        self.depends_on = depends_on if depends_on is not None else []
+        self.depends_on = depends_on
 
 
 @reference_in_the_book(section=(6, 7, 3))
@@ -548,8 +546,8 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
     def __init__(
         self,
         ID: Non_empty_string,
-        ID_short: Non_empty_string,
         asset_information: "Asset_information",
+        ID_short: Optional[Non_empty_string] = None,
         extensions: Optional[List["Extension"]] = None,
         display_name: Optional["Lang_string_set"] = None,
         category: Optional[Non_empty_string] = None,
@@ -717,7 +715,7 @@ class Submodel(
     def __init__(
         self,
         ID: Non_empty_string,
-        ID_short: Non_empty_string,
+        ID_short: Optional[Non_empty_string] = None,
         submodel_elements: Optional[List["Submodel_element"]] = None,
         extensions: Optional[List["Extension"]] = None,
         display_name: Optional["Lang_string_set"] = None,
@@ -1078,8 +1076,8 @@ class Property(Data_element):
 
     def __init__(
         self,
-        ID_short: Non_empty_string,
         value_type: "Data_type_def",
+        ID_short: Optional[Non_empty_string] = None,
         extensions: Optional[List["Extension"]] = None,
         display_name: Optional["Lang_string_set"] = None,
         category: Optional[Non_empty_string] = None,
@@ -1213,8 +1211,8 @@ class Range(Data_element):
 
     def __init__(
         self,
-        ID_short: Non_empty_string,
         value_type: "Data_type_def",
+        ID_short: Optional[Non_empty_string] = None,
         extensions: Optional[List["Extension"]] = None,
         display_name: Optional["Lang_string_set"] = None,
         category: Optional[Non_empty_string] = None,
@@ -1268,7 +1266,7 @@ class Reference_element(Data_element):
 
     def __init__(
         self,
-        ID_short: Non_empty_string,
+        ID_short: Optional[Non_empty_string] = None,
         extensions: Optional[List["Extension"]] = None,
         display_name: Optional["Lang_string_set"] = None,
         category: Optional[Non_empty_string] = None,
@@ -1329,8 +1327,8 @@ class Blob(Data_element):
 
     def __init__(
         self,
-        ID_short: Non_empty_string,
         MIME_type: MIME_typed,
+        ID_short: Optional[Non_empty_string] = None,
         extensions: Optional[List["Extension"]] = None,
         display_name: Optional["Lang_string_set"] = None,
         category: Optional[Non_empty_string] = None,
@@ -1385,8 +1383,8 @@ class File(Data_element):
 
     def __init__(
         self,
-        ID_short: Non_empty_string,
         MIME_type: MIME_typed,
+        ID_short: Optional[Non_empty_string] = None,
         extensions: Optional[List["Extension"]] = None,
         display_name: Optional["Lang_string_set"] = None,
         category: Optional[Non_empty_string] = None,
@@ -1624,7 +1622,7 @@ class Basic_Event(Event):
     def __init__(
         self,
         observed: "Reference",
-        ID_short: Non_empty_string,
+        ID_short: Optional[Non_empty_string] = None,
         extensions: Optional[List["Extension"]] = None,
         display_name: Optional["Lang_string_set"] = None,
         category: Optional[Non_empty_string] = None,
@@ -1790,7 +1788,7 @@ class Concept_description(Identifiable, Has_data_specification):
     def __init__(
         self,
         ID: Non_empty_string,
-        ID_short: Non_empty_string,
+        ID_short: Optional[Non_empty_string] = None,
         extensions: Optional[List["Extension"]] = None,
         display_name: Optional["Lang_string_set"] = None,
         category: Optional[Non_empty_string] = None,

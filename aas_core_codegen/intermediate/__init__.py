@@ -4,6 +4,7 @@ from aas_core_codegen.intermediate import _types, _translate, _stringify
 
 TypeAnnotation = _types.TypeAnnotation
 TypeAnnotationUnion = _types.TypeAnnotationUnion
+AtomicTypeAnnotation = _types.AtomicTypeAnnotation
 PrimitiveType = _types.PrimitiveType
 PrimitiveTypeAnnotation = _types.PrimitiveTypeAnnotation
 OurTypeAnnotation = _types.OurTypeAnnotation
@@ -40,6 +41,7 @@ Signature = _types.Signature
 Interface = _types.Interface
 SymbolTable = _types.SymbolTable
 
+type_annotations_equal = _types.type_annotations_equal
 beneath_optional = _types.beneath_optional
 map_descendability = _types.map_descendability
 collect_ids_of_symbols_in_properties = _types.collect_ids_of_symbols_in_properties

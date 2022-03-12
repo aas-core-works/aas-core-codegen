@@ -135,10 +135,7 @@
             "$ref": "#/definitions/Reference"
           }
         }
-      },
-      "required": [
-        "dataSpecifications"
-      ]
+      }
     },
     "AdministrativeInformation": {
       "allOf": [
@@ -233,10 +230,7 @@
                 "$ref": "#/definitions/Reference"
               }
             }
-          },
-          "required": [
-            "dependsOn"
-          ]
+          }
         }
       ]
     },

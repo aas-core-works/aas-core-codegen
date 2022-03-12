@@ -149,6 +149,14 @@ assert_union_without_excluded(
     excluded=[OptionalTypeAnnotation],
 )
 
+AtomicTypeAnnotation = Union[PrimitiveTypeAnnotation, OurTypeAnnotation]
+
+assert_union_without_excluded(
+    original_union=TypeAnnotationUnion,
+    subset_union=AtomicTypeAnnotation,
+    excluded=[ListTypeAnnotation, OptionalTypeAnnotation],
+)
+
 
 def type_annotations_equal(
     that: TypeAnnotationUnion, other: TypeAnnotationUnion
