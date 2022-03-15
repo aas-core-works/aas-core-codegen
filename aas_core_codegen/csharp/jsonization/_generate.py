@@ -22,6 +22,7 @@ from aas_core_codegen.csharp.common import (
     INDENT as I,
     INDENT2 as II,
     INDENT3 as III,
+    INDENT4 as IIII,
 )
 
 
@@ -42,22 +43,31 @@ def _generate_from_method_for_enumeration(
             /// Deserialize the enumeration {name} from the <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
-            /// <param name="path">Path to the node used in exceptions</param>
-            /// <exception cref="System.ArgumentException">
-            /// Thrown when <paramref name="node" /> is not a valid JSON representation
-            /// of {name}.
-            /// </exception>
-            public static Aas.{name} {name}From(
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.{name}? {name}From(
             {I}Nodes.JsonNode node,
-            {I}string path)
+            {I}out Jsonization.Error? error)
             {{
-            {I}string text = Implementation.StringFrom(node, path);
+            {I}error = null;
+            {I}string? text = DeserializeImplementation.StringFrom(
+            {II}node, out error);
+            {I}if (error != null)
+            {I}{{
+            {II}return null;
+            {I}}}
+            {I}if (text == null)
+            {I}{{
+            {II}throw new System.InvalidOperationException(
+            {III}"Unexpected text null if error null");
+            {I}}}
             {I}Aas.{name}? result = Stringification.{name}FromString(text);
-            {I}return result
-            {II} ?? throw new System.ArgumentException(
-            {III}{message_literal} +
-            {III}$"at: {{path}}");
-            }}  // public static Aas.{name} {name}From"""
+            {I}if (result == null)
+            {I}{{
+            {II}error = new Jsonization.Error(
+            {III}{message_literal});
+            {I}}}
+            {I}return result;
+            }}  // internal static {name}From"""
         )
     )
 
@@ -69,15 +79,16 @@ def _generate_from_method_for_interface(
     name = csharp_naming.interface_name(interface.name)
 
     blocks = [
+        Stripped("error = null;"),
         Stripped(
             textwrap.dedent(
                 f"""\
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {{
-                {I}throw new System.ArgumentException(
-                {II}"Expected Nodes.JsonObject, " +
-                {II}$"but got {{node.GetType()}} at: {{path}}");
+                {I}error = new Jsonization.Error(
+                {II}"Expected Nodes.JsonObject, but got {{node.GetType()}}");
+                {I}return null;
                 }}"""
             )
         ),
@@ -87,24 +98,25 @@ def _generate_from_method_for_interface(
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {{
-                {I}throw new System.ArgumentException(
-                {II}"Expected a model type, but none is present: " +
-                {II}$"{{path}}/modelType");
+                {I}error = new Jsonization.Error(
+                {II}"Expected a model type, but none is present");
+                {I}return null;
                 }}
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {{
-                {I}throw new System.ArgumentException(
+                {I}error = new Jsonization.Error(
                 {II}"Expected JsonValue, " +
-                {II}$"but got {{modelTypeNode.GetType()}} at: {{path}}");
+                {II}$"but got {{modelTypeNode.GetType()}}");
+                {I}return null;
                 }}
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {{
-                {I}throw new System.ArgumentException(
+                {I}error = new Jsonization.Error(
                 {II}"Expected a string, " +
-                {II}$"but the conversion failed from {{modelTypeValue}} " +
-                {II}$"at: {{path}}/modelType");
+                {II}$"but the conversion failed from {{modelTypeValue}}");
+                {I}return null;
                 }}"""
             )
         ),
@@ -130,7 +142,7 @@ def _generate_from_method_for_interface(
                 f"""\
                 {I}case {csharp_common.string_literal(model_type)}:
                 {II}return {implementer_name}From(
-                {III}node, path);
+                {III}node, out error);
                 """
             )
         )
@@ -139,9 +151,9 @@ def _generate_from_method_for_interface(
         textwrap.dedent(
             f"""\
             {I}default:
-            {II}throw new System.ArgumentException(
-            {III}$"Unexpected model type for {name} at {{path}}/modelType: " +
-            {III}modelType);
+            {II}error = new Jsonization.Error(
+            {III}$"Unexpected model type for {name}: {{modelType}}");
+            {II}return null;
             }}"""
         )
     )
@@ -159,14 +171,10 @@ def _generate_from_method_for_interface(
             /// based on <c>modelType</c> property of the <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
-            /// <param name="path">Path to the node used in exceptions</param>
-            /// <exception cref="System.ArgumentException">
-            /// Thrown when <paramref name="node" /> is not a valid JSON representation
-            /// of {name}.
-            /// </exception>
-            public static Aas.{name} {name}From(
+            /// <param name="error">Error, if any, during the deserialization</param>
+            public static Aas.{name}? {name}From(
             {I}Nodes.JsonNode node,
-            {I}string path)
+            {I}out Jsonization.Error? error)
             {{
             """
         )
@@ -183,11 +191,11 @@ def _generate_from_method_for_interface(
 
 
 _PARSE_METHOD_BY_PRIMITIVE_TYPE = {
-    intermediate.PrimitiveType.BOOL: "Implementation.BoolFrom",
-    intermediate.PrimitiveType.INT: "Implementation.LongFrom",
-    intermediate.PrimitiveType.FLOAT: "Implementation.DoubleFrom",
-    intermediate.PrimitiveType.STR: "Implementation.StringFrom",
-    intermediate.PrimitiveType.BYTEARRAY: "Implementation.BytesFrom",
+    intermediate.PrimitiveType.BOOL: "DeserializeImplementation.BoolFrom",
+    intermediate.PrimitiveType.INT: "DeserializeImplementation.LongFrom",
+    intermediate.PrimitiveType.FLOAT: "DeserializeImplementation.DoubleFrom",
+    intermediate.PrimitiveType.STR: "DeserializeImplementation.StringFrom",
+    intermediate.PrimitiveType.BYTEARRAY: "DeserializeImplementation.BytesFrom",
 }
 assert all(
     literal in _PARSE_METHOD_BY_PRIMITIVE_TYPE for literal in intermediate.PrimitiveType
@@ -207,7 +215,7 @@ def _parse_method_for_atomic_value(
         symbol = type_annotation.symbol
         if isinstance(symbol, intermediate.Enumeration):
             enum_name = csharp_naming.enum_name(symbol.name)
-            parse_method = f"Deserialize.{enum_name}From"
+            parse_method = f"DeserializeImplementation.{enum_name}From"
 
         elif isinstance(symbol, intermediate.ConstrainedPrimitive):
             parse_method = _PARSE_METHOD_BY_PRIMITIVE_TYPE[symbol.constrainee]
@@ -217,10 +225,10 @@ def _parse_method_for_atomic_value(
         ):
             if symbol.interface is not None:
                 interface_name = csharp_naming.interface_name(symbol.interface.name)
-                parse_method = f"Deserialize.{interface_name}From"
+                parse_method = f"DeserializeImplementation.{interface_name}From"
             else:
                 cls_name = csharp_naming.class_name(symbol.name)
-                parse_method = f"Deserialize.{cls_name}From"
+                parse_method = f"DeserializeImplementation.{cls_name}From"
 
         else:
             assert_never(symbol)
@@ -321,24 +329,29 @@ def _generate_deserialize_property(
     ):
         parse_method = _parse_method_for_atomic_value(type_anno)
 
-        if required:
-            parse_block = Stripped(
-                textwrap.dedent(
-                    f"""\
-                    {target_type} {target_var} = {parse_method}(
-                    {I}{node_var},
-                    {I}$"{{path}}/{json_name}");"""
-                )
+        # When the property is optional, we already define the ``target_var`` and
+        # set it to null by default.
+        define_target_var_prefix = f"{target_type}? " if required else ""
+
+        parse_block = Stripped(
+            textwrap.dedent(
+                f"""\
+                {define_target_var_prefix}{target_var} = {parse_method}(
+                {I}{node_var},
+                {I}out error);
+                if (error != null)
+                {{
+                {I}error.PathSegments.AddFirst(
+                {II}{json_literal});
+                {I}return null;
+                }}
+                if ({target_var} == null)
+                {{
+                {I}throw new System.InvalidOperationException(
+                {II}"Unexpected {target_var} null when error is also null");
+                }}"""
             )
-        else:
-            parse_block = Stripped(
-                textwrap.dedent(
-                    f"""\
-                    {target_var} = {parse_method}(
-                    {I}{node_var},
-                    {I}$"{{path}}/{json_name}");"""
-                )
-            )
+        )
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         assert not isinstance(
@@ -365,9 +378,11 @@ def _generate_deserialize_property(
                 Nodes.JsonArray? {array_var} = {node_var} as Nodes.JsonArray;
                 if ({array_var} == null)
                 {{
-                {I}throw new System.ArgumentException(
-                {II}$"Expected a JsonArray, but got {{{node_var}.GetType()}} " +
-                {II}$"at: {{path}}/{json_name}");
+                {I}error = new Jsonization.Error(
+                {II}$"Expected a JsonArray, but got {{{node_var}.GetType()}}");
+                {I}error.PathSegments.AddFirst(
+                {II}{json_literal});
+                {I}return null;
                 }}
                 {target_var_prefix}{target_var} = new List<{item_type}>(
                 {I}{array_var}.Count);
@@ -376,14 +391,26 @@ def _generate_deserialize_property(
                 {{
                 {I}if (item == null)
                 {I}{{
-                {II}throw new System.ArgumentException(
-                {III}"Expected a non-null item, but got a null " +
-                {III}$"at: {{path}}/{json_name}/{{{index_var}}}");
+                {II}error = new Jsonization.Error(
+                {III}"Expected a non-null item, but got a null");
+                {II}error.PathSegments.AddFirst(
+                {III}{index_var}.ToString());
+                {II}error.PathSegments.AddFirst(
+                {III}{json_literal});
                 {I}}}
-                {I}{item_type} parsedItem = {parse_method}(
-                {II}item,
-                {II}$"{{path}}/{json_name}/{{{index_var}}}");
-                {I}{target_var}.Add(parsedItem);
+                {I}{item_type}? parsedItem = {parse_method}(
+                {II}item ?? throw new System.InvalidOperationException(),
+                {II}out error);
+                {I}if (error != null)
+                {I}{{
+                {II}error.PathSegments.AddFirst(
+                {III}{index_var}.ToString());
+                {II}return null;
+                {I}}}
+                {I}{target_var}.Add(
+                {II}parsedItem
+                {III}?? throw new System.InvalidOperationException(
+                {IIII}"Unexpected result null when error is null"));
                 {I}{index_var}++;
                 }}"""
             )
@@ -402,9 +429,9 @@ def _generate_deserialize_property(
                     f"""\
                     if ({node_var} == null)
                     {{
-                    {I}throw new System.ArgumentException(
-                    {II}{message_literal} +
-                    {II}$"at: {{path}}/{json_name}");
+                    {I}error = new Jsonization.Error(
+                    {II}{message_literal});
+                    {I}return null;
                     }}"""
                 )
             )
@@ -441,17 +468,19 @@ def _generate_from_method_for_class(
     name = csharp_naming.class_name(cls.name)
 
     blocks = [
+        Stripped("error = null;"),
         Stripped(
             textwrap.dedent(
                 f"""\
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {{
-                {I}throw new System.ArgumentException(
-                {II}"Expected a JsonObject, but got {{node.GetType()}} at: {{path}}");
+                {I}error = new Jsonization.Error(
+                {II}$"Expected a JsonObject, but got {{node.GetType()}}");
+                {I}return null;
                 }}"""
             )
-        )
+        ),
     ]  # type: List[Stripped]
 
     if len(cls.constructor.arguments) == 0:
@@ -518,10 +547,24 @@ def _generate_from_method_for_class(
 
             arg_var = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
 
+            init_writer.write(f"{I}{arg_var}")
+            if not isinstance(
+                prop.type_annotation, intermediate.OptionalTypeAnnotation
+            ):
+                init_writer.write("\n")
+
+                # Dedention could not work here due to prefix indention at the very
+                # beginning.
+                init_writer.write(
+                    f"""\
+{II} ?? throw new System.InvalidOperationException(
+{III}"Unexpected null, had to be handled before")"""
+                )
+
             if i < len(cls.constructor.arguments) - 1:
-                init_writer.write(f"{I}{arg_var},\n")
+                init_writer.write(",\n")
             else:
-                init_writer.write(f"{I}{arg_var});")
+                init_writer.write(");")
 
         # endregion
 
@@ -536,14 +579,10 @@ def _generate_from_method_for_class(
             /// Deserialize an instance of {name} from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
-            /// <param name="path">Path to the node used in exceptions</param>
-            /// <exception cref="System.ArgumentException">
-            /// Thrown when <paramref name="node" /> is not a valid JSON representation
-            /// of {name}.
-            /// </exception>
-            public static Aas.{name} {name}From(
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.{name}? {name}From(
             {I}Nodes.JsonNode node,
-            {I}string path)
+            {I}out Jsonization.Error? error)
             {{
             """
         )
@@ -554,20 +593,203 @@ def _generate_from_method_for_class(
             writer.write("\n\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write(f"\n}}  // public static Aas.{name} {name}From")
+    writer.write(f"\n}}  // internal static {name}From")
 
     return Stripped(writer.getvalue()), None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_deserialize(
+def _generate_deserialize_impl(
     symbol_table: intermediate.SymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
-    """Generate the deserializer with a deserialization method for each class."""
+    """Generate the implementation of the deserialization."""
     errors = []  # type: List[Error]
 
-    blocks = []  # type: List[Stripped]
+    blocks = [
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>Convert <paramref name="node" /> to a boolean.</summary>
+                /// <param name="node">JSON node to be parsed</param>
+                /// <param name="error">Error, if any, during the deserialization</param>
+                internal static bool? BoolFrom(
+                {I}Nodes.JsonNode node,
+                {I}out Jsonization.Error? error)
+                {{
+                {I}error = null;
+                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
+                {I}if (value == null)
+                {I}{{
+                {II}error = new Jsonization.Error(
+                {III}$"Expected a JsonValue, but got {{node.GetType()}}");
+                {II}return null;
+                {I}}}
+                {I}bool ok = value.TryGetValue<bool>(out bool result);
+                {I}if (!ok)
+                {I}{{
+                {II}error = new Jsonization.Error(
+                {III}$"Expected a boolean, but the conversion failed " +
+                {III}$"from {{value.ToJsonString()}}");
+                {II}return null;
+                {I}}}
+                {I}return result;
+                }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>
+                /// Convert the <paramref name="node" /> to a long 64-bit integer.
+                /// </summary>
+                /// <param name="node">JSON node to be parsed</param>
+                /// <param name="error">Error, if any, during the deserialization</param>
+                internal static long? LongFrom(
+                {I}Nodes.JsonNode node,
+                {I}out Jsonization.Error? error)
+                {{
+                {I}error = null;
+                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
+                {I}if (value == null)
+                {I}{{
+                {II}error = new Jsonization.Error(
+                {III}$"Expected a JsonValue, but got {{node.GetType()}}");
+                {II}return null;
+                {I}}}
+                {I}bool ok = value.TryGetValue<long>(out long result);
+                {I}if (!ok)
+                {I}{{
+                {II}error = new Jsonization.Error(
+                {III}$"Expected a 64-bit long integer, but the conversion failed " +
+                {III}$"from {{value.ToJsonString()}}");
+                {II}return null;
+                {I}}}
+                {I}return result;
+                }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>
+                /// Convert the <paramref name="node" /> to a double-precision 64-bit float.
+                /// </summary>
+                /// <param name="node">JSON node to be parsed</param>
+                /// <param name="error">Error, if any, during the deserialization</param>
+                internal static double? DoubleFrom(
+                {I}Nodes.JsonNode node,
+                {I}out Jsonization.Error? error)
+                {{
+                {I}error = null;
+                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
+                {I}if (value == null)
+                {I}{{
+                {II}error = new Jsonization.Error(
+                {III}$"Expected a JsonValue, but got {{node.GetType()}}");
+                {II}return null;
+                {I}}}
+                {I}bool ok = value.TryGetValue<double>(out double result);
+                {I}if (!ok)
+                {I}{{
+                {II}error = new Jsonization.Error(
+                {III}"Expected a 64-bit double-precision float, " +
+                {III}"but the conversion failed " +
+                {III}$"from {{value.ToJsonString()}}");
+                {II}return null;
+                {I}}}
+                {I}return result;
+                }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>
+                /// Convert the <paramref name="node" /> to a string.
+                /// </summary>
+                /// <param name="node">JSON node to be parsed</param>
+                /// <param name="error">Error, if any, during the deserialization</param>
+                internal static string? StringFrom(
+                {I}Nodes.JsonNode node,
+                {I}out Jsonization.Error? error)
+                {{
+                {I}error = null;
+                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
+                {I}if (value == null)
+                {I}{{
+                {II}error = new Jsonization.Error(
+                {III}$"Expected a JsonValue, but got {{node.GetType()}}");
+                {II}return null;
+                {I}}}
+                {I}bool ok = value.TryGetValue<string>(out string? result);
+                {I}if (!ok)
+                {I}{{
+                {II}error = new Jsonization.Error(
+                {III}$"Expected a string, but the conversion failed " +
+                {III}$"from {{value.ToJsonString()}}");
+                {II}return null;
+                {I}}}
+                {I}if (result == null)
+                {I}{{
+                {II}error = new Jsonization.Error(
+                {III}"Expected a string, but got a null");
+                {II}return null;
+                {I}}}
+                {I}return result;
+                }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>
+                /// Convert the <paramref name="node" /> to bytes.
+                /// </summary>
+                /// <param name="node">JSON node to be parsed</param>
+                /// <param name="error">Error, if any, during the deserialization</param>
+                internal static byte[]? BytesFrom(
+                {I}Nodes.JsonNode node,
+                {I}out Jsonization.Error? error)
+                {{
+                {I}error = null;
+                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
+                {I}if (value == null)
+                {I}{{
+                {II}error = new Jsonization.Error(
+                {III}$"Expected a JsonValue, but got {{node.GetType()}}");
+                {II}return null;
+                {I}}}
+                {I}bool ok = value.TryGetValue<string>(out string? text);
+                {I}if (!ok)
+                {I}{{
+                {II}error = new Jsonization.Error(
+                {III}$"Expected a string, but the conversion failed " +
+                {III}$"from {{value.ToJsonString()}}");
+                {II}return null;
+                {I}}}
+                {I}if (text == null)
+                {I}{{
+                {II}error = new Jsonization.Error(
+                {III}"Expected a string, but got a null");
+                {II}return null;
+                {I}}}
+                {I}try
+                {I}{{
+                {II}return System.Convert.FromBase64String(text);
+                {I}}}
+                {I}catch (System.FormatException exception)
+                {I}{{
+                {II}error = new Jsonization.Error(
+                {III}"Expected Base-64 encoded bytes, but the conversion failed " +
+                {III}$"because: {{exception}}");
+                {II}return null;
+                {I}}}
+                }}"""
+            )
+        ),
+    ]  # type: List[Stripped]
+
     for symbol in symbol_table.symbols:
         if isinstance(symbol, intermediate.Enumeration):
             blocks.append(_generate_from_method_for_enumeration(enumeration=symbol))
@@ -622,6 +844,114 @@ def _generate_deserialize(
         textwrap.dedent(
             """\
             /// <summary>
+            /// Implement the deserialization of meta-model classes from JSON nodes.
+            /// </summary>
+            /// <remarks>
+            /// The implementation propagates an <see cref="Error" /> instead of relying
+            /// on exceptions. Under the assumption that incorrect data is much less
+            /// frequent than correct data, this makes the deserialization more
+            /// efficient.
+            ///
+            /// However, we do not want to force the client to deal with
+            /// the <see cref="Error" /> class as this is not intuitive. Therefore
+            /// we distinguish the implementation, realized in
+            /// <see cref="DeserializeImplementation" />, and the facade given in
+            /// <see cref="Deserialize" /> class.
+            internal static class DeserializeImplementation
+            {
+            """
+        )
+    )
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(block, I))
+
+    writer.write("\n}  // public static class DeserializeImplementation")
+
+    return Stripped(writer.getvalue()), None
+
+
+def _generate_deserialize_from(name: str) -> Stripped:
+    """Generate the facade deserialization method for the symbol with C# ``name``."""
+    return Stripped(
+        textwrap.dedent(
+            f"""\
+            /// <summary>
+            /// Deserialize an instance of {name} from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of {name}.
+            /// </exception>
+            public static Aas.{name} {name}From(
+            {I}Nodes.JsonNode node)
+            {{
+            {I}Aas.{name}? result = DeserializeImplementation.{name}From(
+            {II}node,
+            {II}out Jsonization.Error? error);
+            {I}if (error != null)
+            {I}{{
+            {II}throw new Jsonization.Exception(
+            {III}string.Join("/", error.PathSegments),
+            {III}error.Cause);
+            {I}}}
+            {I}return result
+            {II}?? throw new System.InvalidOperationException(
+            {III}"Unexpected output null when error is null");
+            }}"""
+        )
+    )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_deserialize(
+    symbol_table: intermediate.SymbolTable,
+    spec_impls: specific_implementations.SpecificImplementations,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the deserializer with a deserialization method for each class."""
+    errors = []  # type: List[Error]
+
+    blocks = []  # type: List[Stripped]
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, intermediate.Enumeration):
+            blocks.append(
+                _generate_deserialize_from(name=csharp_naming.enum_name(symbol.name))
+            )
+
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            continue
+
+        elif isinstance(
+            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            if symbol.interface is not None:
+                blocks.append(
+                    _generate_deserialize_from(
+                        name=csharp_naming.interface_name(symbol.interface.name)
+                    )
+                )
+
+            if isinstance(symbol, intermediate.ConcreteClass):
+                blocks.append(
+                    _generate_deserialize_from(
+                        name=csharp_naming.class_name(symbol.name)
+                    )
+                )
+        else:
+            assert_never(symbol)
+
+    if len(errors) > 0:
+        return None, errors
+
+    writer = io.StringIO()
+
+    writer.write(
+        textwrap.dedent(
+            """\
+            /// <summary>
             /// Deserialize instances of meta-model classes from JSON nodes.
             /// </summary>
             """
@@ -654,7 +984,7 @@ def _generate_deserialize(
                 /// string someString = "... some JSON ...";
                 /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
                 /// Aas.{cls_name} {an_instance_variable} = Deserialize.{cls_name}From(
-                /// {I}node, "/some/path/to/a/file.json#/somewhere");
+                /// {I}node);
                 /// </code>
                 /// </example>
                 """
@@ -680,19 +1010,6 @@ def _generate_deserialize(
     return Stripped(writer.getvalue()), None
 
 
-_SERIALIZE_METHOD_BY_PRIMITIVE_TYPE = {
-    intermediate.PrimitiveType.BOOL: "Nodes.JsonValue.Create",
-    intermediate.PrimitiveType.INT: "Implementation.ToJsonValue",
-    intermediate.PrimitiveType.FLOAT: "Nodes.JsonValue.Create",
-    intermediate.PrimitiveType.STR: "Nodes.JsonValue.Create",
-    intermediate.PrimitiveType.BYTEARRAY: "Nodes.JsonValue.Create(",
-}
-assert all(
-    literal in _SERIALIZE_METHOD_BY_PRIMITIVE_TYPE
-    for literal in intermediate.PrimitiveType
-)
-
-
 def _generate_serialize_primitive_value(
     primitive_type: intermediate.PrimitiveType, source_expr: Stripped
 ) -> Stripped:
@@ -716,7 +1033,7 @@ Nodes.JsonValue.Create(
         # We can not use textwrap due to indent_but_first_line.
         return Stripped(
             f"""\
-Implementation.ToJsonValue(
+Transformer.ToJsonValue(
 {I}{indent_but_first_line(source_expr, I)})"""
         )
     elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
@@ -980,7 +1297,31 @@ def _generate_transformer(
     """Generate a transformer which transforms instances of the meta-model to JSON."""
     errors = []  # type: List[Error]
 
-    blocks = []  # type: List[Stripped]
+    blocks = [
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>
+                /// Convert <paramref name="that" /> 64-bit long integer to a JSON value.
+                /// </summary>
+                /// <param name="that">value to be converted</param>
+                /// <exception name="System.ArgumentException>
+                /// Thrown if <paramref name="that"> is not within the range where it
+                /// can be losslessly converted to a double floating number.
+                /// </exception>
+                private static Nodes.JsonValue ToJsonValue(long that)
+                {{
+                {I}// We need to check that we can perform a lossless conversion.
+                {I}if ((long)((double)that) != that)
+                {I}{{
+                {II}throw new System.ArgumentException(
+                {III}$"The number can not be losslessly represented in JSON: {{that}}");
+                {I}}}
+                {I}return Nodes.JsonValue.Create(that);
+                }}"""
+            )
+        ),
+    ]  # type: List[Stripped]
 
     for symbol in symbol_table.symbols:
         if isinstance(symbol, intermediate.Enumeration):
@@ -1126,8 +1467,9 @@ def _generate_serialize(
                 /// var {an_instance_variable} = new Aas.{cls_name}(
                 ///     // ... some constructor arguments ...
                 /// );
-                /// Json.Nodes.JsonObject element = Serialize.ToJsonObject(
-                ///     {an_instance_variable});
+                /// System.Text.Json.Nodes.JsonObject element = (
+                /// {I}Serialize.ToJsonObject(
+                /// {II}{an_instance_variable}));
                 /// </code>
                 /// </example>
                 """
@@ -1173,238 +1515,11 @@ def generate(
     """
     errors = []  # type: List[Error]
 
-    # region Implementation
-
-    implementation_blocks = [
-        Stripped(
-            textwrap.dedent(
-                f"""\
-                /// <summary>Convert <paramref name="node" /> to a boolean.</summary>
-                /// <param name="node">JSON node to be parsed</param>
-                /// <param name="path">Path to the node used in exceptions</param>
-                /// <exception cref="System.ArgumentException">
-                /// Thrown if not a valid boolean.
-                /// </exception>
-                internal static bool BoolFrom(
-                {I}Nodes.JsonNode node,
-                {I}string path)
-                {{
-                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
-                {I}if (value == null)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {III}$"Expected a JsonValue, but got {{node.GetType()}} " +
-                {III}$" at: {{path}}");
-                {I}}}
-                {I}bool ok = value.TryGetValue<bool>(out bool result);
-                {I}if (!ok)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {II}$"Expected a boolean, but the conversion failed " +
-                {II}$"from {{value.ToJsonString()}} " +
-                {II}$"at: {{path}}");
-                {I}}}
-                {I}return result;
-                }}"""
-            )
-        ),
-        Stripped(
-            textwrap.dedent(
-                f"""\
-                /// <summary>
-                /// Convert the <paramref name="node" /> to a long 64-bit integer.
-                /// </summary>
-                /// <param name="node">JSON node to be parsed</param>
-                /// <param name="path">Path to the node used in exceptions</param>
-                /// <exception cref="System.ArgumentException">
-                /// Thrown if not a valid 64-bit integer.
-                /// </exception>
-                internal static long LongFrom(
-                {I}Nodes.JsonNode node,
-                {I}string path)
-                {{
-                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
-                {I}if (value == null)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {III}$"Expected a JsonValue, but got {{node.GetType()}} " +
-                {III}$" at: {{path}}");
-                {I}}}
-                {I}bool ok = value.TryGetValue<long>(out long result);
-                {I}if (!ok)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {II}$"Expected a 64-bit long integer, but the conversion failed " +
-                {II}$"from {{value.ToJsonString()}} " +
-                {II}$"at: {{path}}");
-                {I}}}
-                {I}return result;
-                }}"""
-            )
-        ),
-        Stripped(
-            textwrap.dedent(
-                f"""\
-                /// <summary>
-                /// Convert the <paramref name="node" /> to a double-precision 64-bit float.
-                /// </summary>
-                /// <param name="node">JSON node to be parsed</param>
-                /// <param name="path">Path to the node used in exceptions</param>
-                /// <exception cref="System.ArgumentException">
-                /// Thrown if not a valid double-precision 64-bit float.
-                /// </exception>
-                internal static double DoubleFrom(
-                {I}Nodes.JsonNode node,
-                {I}string path)
-                {{
-                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
-                {I}if (value == null)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {III}$"Expected a JsonValue, but got {{node.GetType()}} " +
-                {III}$" at: {{path}}");
-                {I}}}
-                {I}bool ok = value.TryGetValue<double>(out double result);
-                {I}if (!ok)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {II}"Expected a 64-bit double-precision float, " +
-                {II}"but the conversion failed " +
-                {II}$"from {{value.ToJsonString()}} " +
-                {II}$"at: {{path}}");
-                {I}}}
-                {I}return result;
-                }}"""
-            )
-        ),
-        Stripped(
-            textwrap.dedent(
-                f"""\
-                /// <summary>
-                /// Convert the <paramref name="node" /> to a string.
-                /// </summary>
-                /// <param name="node">JSON node to be parsed</param>
-                /// <param name="path">Path to the node used in exceptions</param>
-                /// <exception cref="System.ArgumentException">
-                /// Thrown if not a valid string.
-                /// </exception>
-                internal static string StringFrom(
-                {I}Nodes.JsonNode node,
-                {I}string path)
-                {{
-                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
-                {I}if (value == null)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {III}$"Expected a JsonValue, but got {{node.GetType()}} " +
-                {III}$" at: {{path}}");
-                {I}}}
-                {I}bool ok = value.TryGetValue<string>(out string? result);
-                {I}if (!ok)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {II}$"Expected a string, but the conversion failed " +
-                {II}$"from {{value.ToJsonString()}} " +
-                {II}$"at: {{path}}");
-                {I}}}
-                {I}if (result == null)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {II}$"Expected a string, but got a null at: {{path}}");
-                {I}}}
-                {I}return result;
-                }}"""
-            )
-        ),
-        Stripped(
-            textwrap.dedent(
-                f"""\
-                /// <summary>
-                /// Convert the <paramref name="node" /> to bytes.
-                /// </summary>
-                /// <param name="node">JSON node to be parsed</param>
-                /// <param name="path">Path to the node used in exceptions</param>
-                /// <exception cref="System.ArgumentException">
-                /// Thrown if not a valid base64-encoded string.
-                /// </exception>
-                internal static byte[] BytesFrom(
-                {I}Nodes.JsonNode node,
-                {I}string path)
-                {{
-                {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
-                {I}if (value == null)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {III}$"Expected a JsonValue, but got {{node.GetType()}} " +
-                {III}$" at: {{path}}");
-                {I}}}
-                {I}bool ok = value.TryGetValue<string>(out string? text);
-                {I}if (!ok)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {II}$"Expected a string, but the conversion failed " +
-                {II}$"from {{value.ToJsonString()}} " +
-                {II}$"at: {{path}}");
-                {I}}}
-                {I}if (text == null)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {II}$"Expected a string, but got a null at: {{path}}");
-                {I}}}
-                {I}try
-                {I}{{
-                {II}return System.Convert.FromBase64String(text);
-                {I}}}
-                {I}catch (System.FormatException exception)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {III}"Expected Base-64 encoded bytes, but the conversion failed " +
-                {III}$"because: {{exception}}; at: {{path}}");
-                {I}}}
-                }}"""
-            )
-        ),
-        Stripped(
-            textwrap.dedent(
-                f"""\
-                /// <summary>
-                /// Convert <paramref name="that" /> 64-bit long integer to a JSON value.
-                /// </summary>
-                /// <param name="that">value to be converted</param>
-                /// <exception name="System.ArgumentException>
-                /// Thrown if <paramref name="that"> is not within the range where it
-                /// can be losslessly converted to a double floating number.
-                /// </exception>
-                internal static Nodes.JsonValue ToJsonValue(long that)
-                {{
-                {I}// We need to check that we can perform a lossless conversion.
-                {I}if ((long)((double)that) != that)
-                {I}{{
-                {II}throw new System.ArgumentException(
-                {III}$"The number can not be losslessly represented in JSON: {{that}}");
-                {I}}}
-                {I}return Nodes.JsonValue.Create(that);
-                }}"""
-            )
-        ),
-    ]  # type: List[Stripped]
-
-    implementation_writer = io.StringIO()
-    implementation_writer.write(
-        textwrap.dedent(
-            """\
-            internal static class Implementation
-            {
-            """
-        )
+    deserialize_impl_block, deserialize_impl_errors = _generate_deserialize_impl(
+        symbol_table=symbol_table, spec_impls=spec_impls
     )
-    for i, implementation_block in enumerate(implementation_blocks):
-        if i > 0:
-            implementation_writer.write("\n\n")
-        implementation_writer.write(textwrap.indent(implementation_block, I))
-    implementation_writer.write("\n}  // internal static class Implementation")
-
-    # endregion
+    if deserialize_impl_errors is not None:
+        errors.extend(deserialize_impl_errors)
 
     deserialize_block, deserialize_errors = _generate_deserialize(
         symbol_table=symbol_table, spec_impls=spec_impls
@@ -1421,6 +1536,7 @@ def generate(
     if len(errors) > 0:
         return None, errors
 
+    assert deserialize_impl_block is not None
     assert deserialize_block is not None
     assert transformer_block is not None
 
@@ -1428,8 +1544,48 @@ def generate(
         symbol_table=symbol_table,
     )
 
+    error_block = Stripped(
+        textwrap.dedent(
+            f"""\
+            /// <summary>
+            /// Represent an error during the deserialization.
+            /// </summary>
+            internal class Error
+            {{
+            {I}internal LinkedList<string> PathSegments = new LinkedList<string>();
+            {I}internal readonly string Cause;
+            {I}internal Error(string cause)
+            {I}{{
+            {II}Cause = cause;
+            {I}}}
+            }}"""
+        )
+    )
+
+    exception_block = Stripped(
+        textwrap.dedent(
+            f"""\
+                /// <summary>
+                /// Represent a critical error during the deserialization.
+                /// </summary>
+                public class Exception : System.Exception
+                {{
+                {I}public readonly string Path;
+                {I}public readonly string Cause;
+                {I}public Exception(string path, string cause)
+                {II}: base($"{{cause}} at: {{path}}")
+                {I}{{
+                {II}Path = path;
+                {II}Cause = cause;
+                {I}}}
+                }}"""
+        )
+    )
+
     jsonization_blocks = [
-        Stripped(implementation_writer.getvalue()),
+        error_block,
+        deserialize_impl_block,
+        exception_block,
         deserialize_block,
         transformer_block,
         serialize_block,
@@ -1448,19 +1604,7 @@ def generate(
             {I}/// We can not use one-pass deserialization for JSON since the object
             {I}/// properties do not have fixed order, and hence we can not read
             {I}/// <c>modelType</c> property ahead of the remaining properties.
-            {I}///
-            {I}/// Mind that we pass the paths to the functions in order
-            {I}/// to provide informative exceptions in case of parsing errors.
-            {I}/// However, this comes with a <strong>SUBSTANTIAL COST</strong>!
-            {I}/// For each call to a parsing function, we have to copy the previous
-            {I}/// prefix path and append the identifier of the JSON node.
-            {I}/// Thus this can run <c>O(n^2)</c> where <c>n</c> denotes the longest
-            {I}/// path.
-            {I}///
-            {I}/// Please notify the developers if this becomes a bottleneck for
-            {I}/// you since there is a workaround, but we did not prioritize it at
-            {I}/// the moment (<em>e.g.</em>, we could back-track the path only upon
-            {I}/// exceptions).
+            {I}/// </remarks>
             {I}public static class Jsonization
             {I}{{
             """
@@ -1482,7 +1626,6 @@ def generate(
         Stripped(
             textwrap.dedent(
                 """\
-                using Json = System.Text.Json;
                 using Nodes = System.Text.Json.Nodes;
                 using System.Collections.Generic;  // can't alias"""
             )
