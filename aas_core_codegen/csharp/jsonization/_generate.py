@@ -341,7 +341,7 @@ def _generate_deserialize_property(
                 {I}out error);
                 if (error != null)
                 {{
-                {I}error.PathSegments.AddFirst(
+                {I}error._pathSegments.AddFirst(
                 {II}new Reporting.NameSegment(
                 {III}{json_literal}));
                 {I}return null;
@@ -381,7 +381,7 @@ def _generate_deserialize_property(
                 {{
                 {I}error = new Reporting.Error(
                 {II}$"Expected a JsonArray, but got {{{node_var}.GetType()}}");
-                {I}error.PathSegments.AddFirst(
+                {I}error._pathSegments.AddFirst(
                 {II}new Reporting.NameSegment(
                 {III}{json_literal}));
                 {I}return null;
@@ -395,10 +395,10 @@ def _generate_deserialize_property(
                 {I}{{
                 {II}error = new Reporting.Error(
                 {III}"Expected a non-null item, but got a null");
-                {II}error.PathSegments.AddFirst(
+                {II}error._pathSegments.AddFirst(
                 {III}new Reporting.IndexSegment(
                 {IIII}{index_var}));
-                {II}error.PathSegments.AddFirst(
+                {II}error._pathSegments.AddFirst(
                 {III}new Reporting.NameSegment(
                 {IIII}{json_literal}));
                 {I}}}
@@ -407,10 +407,10 @@ def _generate_deserialize_property(
                 {II}out error);
                 {I}if (error != null)
                 {I}{{
-                {II}error.PathSegments.AddFirst(
+                {II}error._pathSegments.AddFirst(
                 {III}new Reporting.IndexSegment(
                 {IIII}{index_var}));
-                {II}error.PathSegments.AddFirst(
+                {II}error._pathSegments.AddFirst(
                 {III}new Reporting.NameSegment(
                 {IIII}{json_literal}));
                 {II}return null;

@@ -5,10 +5,9 @@
 
 using Regex = System.Text.RegularExpressions.Regex;
 using System.Collections.Generic;  // can't alias
-using System.Collections.ObjectModel;  // can't alias
-using System.Linq;  // can't alias"
 
 using Aas = AasCore.Aas3;
+using Reporting = AasCore.Aas3.Reporting;
 using Visitation = AasCore.Aas3.Visitation;
 
 namespace AasCore.Aas3
@@ -16,112 +15,22 @@ namespace AasCore.Aas3
     /// <summary>
     /// Verify that the instances of the meta-model satisfy the invariants.
     /// </summary>
-    /// <remarks>
-    /// Mind that we pass the paths to the functions in order
-    /// to provide informative exceptions in case of invariant violations.
-    /// However, this comes with a <strong>SUBSTANTIAL COST</strong>!
-    /// For each call to a parsing function, we have to copy the previous
-    /// prefix path and append the identifier of the element under
-    /// verification. Thus this can run <c>O(n^2)</c> where <c>n</c> denotes
-    /// the longest path to an element.
-    ///
-    /// Please notify the developers if this becomes a bottleneck for
-    /// you since there is a workaround, but we did not prioritize it at
-    /// the moment (<em>e.g.</em>, we could back-track the path only upon
-    /// exceptions).
-    /// </remarks>
+    /// <example>
+    /// Here is an example how to verify an instance of IHasSemantics:
+    /// <code>
+    /// var anInstance = new Aas.IHasSemantics(
+    ///     // ... some constructor arguments ...
+    /// );
+    /// foreach (var error in Verification.Verify(anInstance))
+    /// {
+    ///     System.Console.Writeln(
+    ///         $"{error.Cause} at: " +
+    ///         Reporting.GenerateJsonPath(error.PathSegments));
+    /// }
+    /// </code>
+    /// </example>
     public static class Verification
     {
-        /// <summary>
-        /// Represent a verification error traceable to an entity or a property.
-        /// </summary>
-        public class Error
-        {
-            /// <summary>
-            /// JSON-like path to the related object (an entity or a property)
-            /// </summary>
-            public readonly string Path;
-
-            /// <summary>
-            /// Cause or description of the error
-            /// </summary>
-            public readonly string Message;
-
-            public Error(string path, string message)
-            {
-                Path = path;
-                Message = message;
-            }
-        }
-
-        /// <summary>
-        /// Contain multiple errors observed during a verification.
-        /// </summary>
-        public class Errors
-        {
-            /// <summary>
-            /// The maximum capacity of the container
-            /// </summary>
-            public readonly int Capacity;
-
-            /// <summary>
-            /// Contained error items
-            /// </summary>
-            private readonly List<Verification.Error> _entries;
-
-            /// <summary>
-            /// Initialize the container with the given <paramref name="capacity" />.
-            /// </summary>
-            public Errors(int capacity)
-            {
-                if (capacity <= 0)
-                {
-                    throw new System.ArgumentException(
-                        $"Expected a strictly positive capacity, but got: {capacity}");
-                }
-
-                Capacity = capacity;
-                _entries = new List<Verification.Error>(Capacity);
-            }
-
-            /// <summary>
-            /// Add the error to the container if the capacity has not been reached.
-            /// </summary>
-            public void Add(Verification.Error error)
-            {
-                if(_entries.Count <= Capacity)
-                {
-                    _entries.Add(error);
-                }
-            }
-
-            /// <summary>
-            /// True if the capacity has been reached.
-            /// </summary>
-            public bool Full()
-            {
-                return _entries.Count == Capacity;
-            }
-
-            /// <summary>
-            /// Retrieve the contained error entries.
-            /// </summary>
-            /// <remarks>
-            /// If you want to add a new error, use <see cref="Add" />.
-            /// </remarks>
-            public ReadOnlyCollection<Verification.Error> Entries()
-            {
-                var result = this._entries.AsReadOnly();
-                if (result.Count > Capacity)
-                {
-                    throw new System.InvalidOperationException(
-                        $"Post-condition violated: " +
-                        $"result.Count (== {result.Count}) > Capacity (== {Capacity})");
-                }
-                return result;
-            }
-        }
-
         private static Regex _constructIsMimeType()
         {
             var tchar = "[!#$%&'*+\\-.^_`|~0-9a-zA-Z]";
@@ -156,3861 +65,3769 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
-        /// Verify the instances of the model classes non-recursively.
+        /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
-        /// <remarks>
-        /// The methods provided by this class are re-used in the verification
-        /// visitors.
-        /// </remarks>
-        private static class Implementation
+        internal static class EnumValueSet
         {
-            /// <summary>
-            /// Hash allowed enum values for efficient validation of enums.
-            /// </summary>
-            private static class EnumValueSet
+            internal static HashSet<int> ForModelingKind = new HashSet<int>
             {
-                public static HashSet<int> ForModelingKind = new HashSet<int>
-                {
-                    (int)Aas.ModelingKind.Template,
-                    (int)Aas.ModelingKind.Instance
-                };
+                (int)Aas.ModelingKind.Template,
+                (int)Aas.ModelingKind.Instance
+            };
 
-                public static HashSet<int> ForAssetKind = new HashSet<int>
-                {
-                    (int)Aas.AssetKind.Type,
-                    (int)Aas.AssetKind.Instance
-                };
-
-                public static HashSet<int> ForEntityType = new HashSet<int>
-                {
-                    (int)Aas.EntityType.CoManagedEntity,
-                    (int)Aas.EntityType.SelfManagedEntity
-                };
-
-                public static HashSet<int> ForIdentifiableElements = new HashSet<int>
-                {
-                    (int)Aas.IdentifiableElements.AssetAdministrationShell,
-                    (int)Aas.IdentifiableElements.ConceptDescription,
-                    (int)Aas.IdentifiableElements.Submodel
-                };
-
-                public static HashSet<int> ForReferableElements = new HashSet<int>
-                {
-                    (int)Aas.ReferableElements.AccessPermissionRule,
-                    (int)Aas.ReferableElements.AnnotatedRelationshipElement,
-                    (int)Aas.ReferableElements.Asset,
-                    (int)Aas.ReferableElements.AssetAdministrationShell,
-                    (int)Aas.ReferableElements.BasicEvent,
-                    (int)Aas.ReferableElements.Blob,
-                    (int)Aas.ReferableElements.Capability,
-                    (int)Aas.ReferableElements.ConceptDescription,
-                    (int)Aas.ReferableElements.DataElement,
-                    (int)Aas.ReferableElements.Entity,
-                    (int)Aas.ReferableElements.Event,
-                    (int)Aas.ReferableElements.File,
-                    (int)Aas.ReferableElements.MultiLanguageProperty,
-                    (int)Aas.ReferableElements.Operation,
-                    (int)Aas.ReferableElements.Property,
-                    (int)Aas.ReferableElements.Range,
-                    (int)Aas.ReferableElements.ReferenceElement,
-                    (int)Aas.ReferableElements.RelationshipElement,
-                    (int)Aas.ReferableElements.Submodel,
-                    (int)Aas.ReferableElements.SubmodelElement,
-                    (int)Aas.ReferableElements.SubmodelElementList,
-                    (int)Aas.ReferableElements.SubmodelElementStruct
-                };
-
-                public static HashSet<int> ForKeyElements = new HashSet<int>
-                {
-                    (int)Aas.KeyElements.FragmentReference,
-                    (int)Aas.KeyElements.AccessPermissionRule,
-                    (int)Aas.KeyElements.AnnotatedRelationshipElement,
-                    (int)Aas.KeyElements.Asset,
-                    (int)Aas.KeyElements.AssetAdministrationShell,
-                    (int)Aas.KeyElements.BasicEvent,
-                    (int)Aas.KeyElements.Blob,
-                    (int)Aas.KeyElements.Capability,
-                    (int)Aas.KeyElements.ConceptDescription,
-                    (int)Aas.KeyElements.DataElement,
-                    (int)Aas.KeyElements.Entity,
-                    (int)Aas.KeyElements.Event,
-                    (int)Aas.KeyElements.File,
-                    (int)Aas.KeyElements.MultiLanguageProperty,
-                    (int)Aas.KeyElements.Operation,
-                    (int)Aas.KeyElements.Property,
-                    (int)Aas.KeyElements.Range,
-                    (int)Aas.KeyElements.GlobalReference,
-                    (int)Aas.KeyElements.ReferenceElement,
-                    (int)Aas.KeyElements.RelationshipElement,
-                    (int)Aas.KeyElements.Submodel,
-                    (int)Aas.KeyElements.SubmodelElement,
-                    (int)Aas.KeyElements.SubmodelElementList,
-                    (int)Aas.KeyElements.SubmodelElementStruct
-                };
-
-                public static HashSet<int> ForSubmodelElements = new HashSet<int>
-                {
-                    (int)Aas.SubmodelElements.AnnotatedRelationshipElement,
-                    (int)Aas.SubmodelElements.Asset,
-                    (int)Aas.SubmodelElements.AssetAdministrationShell,
-                    (int)Aas.SubmodelElements.BasicEvent,
-                    (int)Aas.SubmodelElements.Blob,
-                    (int)Aas.SubmodelElements.Capability,
-                    (int)Aas.SubmodelElements.ConceptDescription,
-                    (int)Aas.SubmodelElements.DataElement,
-                    (int)Aas.SubmodelElements.Entity,
-                    (int)Aas.SubmodelElements.Event,
-                    (int)Aas.SubmodelElements.File,
-                    (int)Aas.SubmodelElements.MultiLanguageProperty,
-                    (int)Aas.SubmodelElements.Operation,
-                    (int)Aas.SubmodelElements.Property,
-                    (int)Aas.SubmodelElements.Range,
-                    (int)Aas.SubmodelElements.ReferenceElement,
-                    (int)Aas.SubmodelElements.RelationshipElement,
-                    (int)Aas.SubmodelElements.Submodel,
-                    (int)Aas.SubmodelElements.SubmodelElement,
-                    (int)Aas.SubmodelElements.SubmodelElementList,
-                    (int)Aas.SubmodelElements.SubmodelElementStruct
-                };
-
-                public static HashSet<int> ForBuildInListTypes = new HashSet<int>
-                {
-                    (int)Aas.BuildInListTypes.Entities,
-                    (int)Aas.BuildInListTypes.IdRefs,
-                    (int)Aas.BuildInListTypes.NMTokens
-                };
-
-                public static HashSet<int> ForDecimalBuildInTypes = new HashSet<int>
-                {
-                    (int)Aas.DecimalBuildInTypes.Integer,
-                    (int)Aas.DecimalBuildInTypes.Long,
-                    (int)Aas.DecimalBuildInTypes.Int,
-                    (int)Aas.DecimalBuildInTypes.Short,
-                    (int)Aas.DecimalBuildInTypes.Byte,
-                    (int)Aas.DecimalBuildInTypes.NonNegativeInteger,
-                    (int)Aas.DecimalBuildInTypes.PositiveInteger,
-                    (int)Aas.DecimalBuildInTypes.UnsignedInteger,
-                    (int)Aas.DecimalBuildInTypes.UnsignedLong,
-                    (int)Aas.DecimalBuildInTypes.UnsignedInt,
-                    (int)Aas.DecimalBuildInTypes.UnsignedShort,
-                    (int)Aas.DecimalBuildInTypes.UnsignedByte,
-                    (int)Aas.DecimalBuildInTypes.NonPositiveInteger,
-                    (int)Aas.DecimalBuildInTypes.NegativeInteger
-                };
-
-                public static HashSet<int> ForDurationBuildInTypes = new HashSet<int>
-                {
-                    (int)Aas.DurationBuildInTypes.DayTimeDuration,
-                    (int)Aas.DurationBuildInTypes.YearMonthDuration
-                };
-
-                public static HashSet<int> ForPrimitiveTypes = new HashSet<int>
-                {
-                    (int)Aas.PrimitiveTypes.AnyUri,
-                    (int)Aas.PrimitiveTypes.Base64Binary,
-                    (int)Aas.PrimitiveTypes.Boolean,
-                    (int)Aas.PrimitiveTypes.Date,
-                    (int)Aas.PrimitiveTypes.DateTime,
-                    (int)Aas.PrimitiveTypes.Decimal,
-                    (int)Aas.PrimitiveTypes.Double,
-                    (int)Aas.PrimitiveTypes.Duration,
-                    (int)Aas.PrimitiveTypes.Float,
-                    (int)Aas.PrimitiveTypes.GDay,
-                    (int)Aas.PrimitiveTypes.GMonth,
-                    (int)Aas.PrimitiveTypes.GMonthDay,
-                    (int)Aas.PrimitiveTypes.HeyBinary,
-                    (int)Aas.PrimitiveTypes.Notation,
-                    (int)Aas.PrimitiveTypes.QName,
-                    (int)Aas.PrimitiveTypes.String,
-                    (int)Aas.PrimitiveTypes.Time
-                };
-
-                public static HashSet<int> ForStringBuildInTypes = new HashSet<int>
-                {
-                    (int)Aas.StringBuildInTypes.NormalizedString,
-                    (int)Aas.StringBuildInTypes.Token,
-                    (int)Aas.StringBuildInTypes.Language,
-                    (int)Aas.StringBuildInTypes.NCName,
-                    (int)Aas.StringBuildInTypes.Entity,
-                    (int)Aas.StringBuildInTypes.Id,
-                    (int)Aas.StringBuildInTypes.Idref
-                };
-
-                public static HashSet<int> ForDataTypeDef = new HashSet<int>
-                {
-                    (int)Aas.DataTypeDef.Entities,
-                    (int)Aas.DataTypeDef.IdRefs,
-                    (int)Aas.DataTypeDef.NMTokens,
-                    (int)Aas.DataTypeDef.Integer,
-                    (int)Aas.DataTypeDef.Long,
-                    (int)Aas.DataTypeDef.Int,
-                    (int)Aas.DataTypeDef.Short,
-                    (int)Aas.DataTypeDef.Byte,
-                    (int)Aas.DataTypeDef.NonNegativeInteger,
-                    (int)Aas.DataTypeDef.PositiveInteger,
-                    (int)Aas.DataTypeDef.UnsignedInteger,
-                    (int)Aas.DataTypeDef.UnsignedLong,
-                    (int)Aas.DataTypeDef.UnsignedInt,
-                    (int)Aas.DataTypeDef.UnsignedShort,
-                    (int)Aas.DataTypeDef.UnsignedByte,
-                    (int)Aas.DataTypeDef.NonPositiveInteger,
-                    (int)Aas.DataTypeDef.NegativeInteger,
-                    (int)Aas.DataTypeDef.DayTimeDuration,
-                    (int)Aas.DataTypeDef.YearMonthDuration,
-                    (int)Aas.DataTypeDef.AnyUri,
-                    (int)Aas.DataTypeDef.Base64Binary,
-                    (int)Aas.DataTypeDef.Boolean,
-                    (int)Aas.DataTypeDef.Date,
-                    (int)Aas.DataTypeDef.DateTime,
-                    (int)Aas.DataTypeDef.Decimal,
-                    (int)Aas.DataTypeDef.Double,
-                    (int)Aas.DataTypeDef.Duration,
-                    (int)Aas.DataTypeDef.Float,
-                    (int)Aas.DataTypeDef.GDay,
-                    (int)Aas.DataTypeDef.GMonth,
-                    (int)Aas.DataTypeDef.GMonthDay,
-                    (int)Aas.DataTypeDef.HeyBinary,
-                    (int)Aas.DataTypeDef.Notation,
-                    (int)Aas.DataTypeDef.QName,
-                    (int)Aas.DataTypeDef.String,
-                    (int)Aas.DataTypeDef.Time,
-                    (int)Aas.DataTypeDef.NormalizedString,
-                    (int)Aas.DataTypeDef.Token,
-                    (int)Aas.DataTypeDef.Language,
-                    (int)Aas.DataTypeDef.NCName,
-                    (int)Aas.DataTypeDef.Entity,
-                    (int)Aas.DataTypeDef.Id,
-                    (int)Aas.DataTypeDef.Idref
-                };
-
-                public static HashSet<int> ForDataTypeIec61360 = new HashSet<int>
-                {
-                    (int)Aas.DataTypeIec61360.Date,
-                    (int)Aas.DataTypeIec61360.String,
-                    (int)Aas.DataTypeIec61360.StringTranslatable,
-                    (int)Aas.DataTypeIec61360.IntegerMeasure,
-                    (int)Aas.DataTypeIec61360.IntegerCount,
-                    (int)Aas.DataTypeIec61360.IntegerCurrency,
-                    (int)Aas.DataTypeIec61360.RealMeasure,
-                    (int)Aas.DataTypeIec61360.RealCount,
-                    (int)Aas.DataTypeIec61360.RealCurrency,
-                    (int)Aas.DataTypeIec61360.Boolean,
-                    (int)Aas.DataTypeIec61360.Iri,
-                    (int)Aas.DataTypeIec61360.Irdi,
-                    (int)Aas.DataTypeIec61360.Rational,
-                    (int)Aas.DataTypeIec61360.RationalMeasure,
-                    (int)Aas.DataTypeIec61360.Time,
-                    (int)Aas.DataTypeIec61360.Timestamp,
-                    (int)Aas.DataTypeIec61360.File,
-                    (int)Aas.DataTypeIec61360.Html,
-                    (int)Aas.DataTypeIec61360.Blob
-                };
-
-                public static HashSet<int> ForLevelType = new HashSet<int>
-                {
-                    (int)Aas.LevelType.Min,
-                    (int)Aas.LevelType.Max,
-                    (int)Aas.LevelType.Nom,
-                    (int)Aas.LevelType.Type
-                };
-            }  // private static class EnumValueSet
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyNonEmptyString (
-                string that,
-                string path,
-                Verification.Errors errors)
+            internal static HashSet<int> ForAssetKind = new HashSet<int>
             {
-                if (!(that.Length >= 1))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "that.Length >= 1"));
-                }
-            }
+                (int)Aas.AssetKind.Type,
+                (int)Aas.AssetKind.Instance
+            };
 
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyMimeTyped (
-                string that,
-                string path,
-                Verification.Errors errors)
+            internal static HashSet<int> ForEntityType = new HashSet<int>
             {
-                if (!(that.Length >= 1))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "that.Length >= 1"));
-                }
+                (int)Aas.EntityType.CoManagedEntity,
+                (int)Aas.EntityType.SelfManagedEntity
+            };
 
-                if (!Verification.IsMimeType(that))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Verification.IsMimeType(that)"));
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyExtension (
-                Aas.Extension that,
-                string path,
-                Verification.Errors errors)
+            internal static HashSet<int> ForIdentifiableElements = new HashSet<int>
             {
-                if (errors.Full()) return;
+                (int)Aas.IdentifiableElements.AssetAdministrationShell,
+                (int)Aas.IdentifiableElements.ConceptDescription,
+                (int)Aas.IdentifiableElements.Submodel
+            };
 
-                Verification.Implementation.VerifyNonEmptyString(
-                    that.Name,
-                    $"{path}/Name",
-                    errors);
+            internal static HashSet<int> ForReferableElements = new HashSet<int>
+            {
+                (int)Aas.ReferableElements.AccessPermissionRule,
+                (int)Aas.ReferableElements.AnnotatedRelationshipElement,
+                (int)Aas.ReferableElements.Asset,
+                (int)Aas.ReferableElements.AssetAdministrationShell,
+                (int)Aas.ReferableElements.BasicEvent,
+                (int)Aas.ReferableElements.Blob,
+                (int)Aas.ReferableElements.Capability,
+                (int)Aas.ReferableElements.ConceptDescription,
+                (int)Aas.ReferableElements.DataElement,
+                (int)Aas.ReferableElements.Entity,
+                (int)Aas.ReferableElements.Event,
+                (int)Aas.ReferableElements.File,
+                (int)Aas.ReferableElements.MultiLanguageProperty,
+                (int)Aas.ReferableElements.Operation,
+                (int)Aas.ReferableElements.Property,
+                (int)Aas.ReferableElements.Range,
+                (int)Aas.ReferableElements.ReferenceElement,
+                (int)Aas.ReferableElements.RelationshipElement,
+                (int)Aas.ReferableElements.Submodel,
+                (int)Aas.ReferableElements.SubmodelElement,
+                (int)Aas.ReferableElements.SubmodelElementList,
+                (int)Aas.ReferableElements.SubmodelElementStruct
+            };
 
-                if (errors.Full()) return;
+            internal static HashSet<int> ForKeyElements = new HashSet<int>
+            {
+                (int)Aas.KeyElements.FragmentReference,
+                (int)Aas.KeyElements.AccessPermissionRule,
+                (int)Aas.KeyElements.AnnotatedRelationshipElement,
+                (int)Aas.KeyElements.Asset,
+                (int)Aas.KeyElements.AssetAdministrationShell,
+                (int)Aas.KeyElements.BasicEvent,
+                (int)Aas.KeyElements.Blob,
+                (int)Aas.KeyElements.Capability,
+                (int)Aas.KeyElements.ConceptDescription,
+                (int)Aas.KeyElements.DataElement,
+                (int)Aas.KeyElements.Entity,
+                (int)Aas.KeyElements.Event,
+                (int)Aas.KeyElements.File,
+                (int)Aas.KeyElements.MultiLanguageProperty,
+                (int)Aas.KeyElements.Operation,
+                (int)Aas.KeyElements.Property,
+                (int)Aas.KeyElements.Range,
+                (int)Aas.KeyElements.GlobalReference,
+                (int)Aas.KeyElements.ReferenceElement,
+                (int)Aas.KeyElements.RelationshipElement,
+                (int)Aas.KeyElements.Submodel,
+                (int)Aas.KeyElements.SubmodelElement,
+                (int)Aas.KeyElements.SubmodelElementList,
+                (int)Aas.KeyElements.SubmodelElementStruct
+            };
 
-                if (that.ValueType != null)
+            internal static HashSet<int> ForSubmodelElements = new HashSet<int>
+            {
+                (int)Aas.SubmodelElements.AnnotatedRelationshipElement,
+                (int)Aas.SubmodelElements.Asset,
+                (int)Aas.SubmodelElements.AssetAdministrationShell,
+                (int)Aas.SubmodelElements.BasicEvent,
+                (int)Aas.SubmodelElements.Blob,
+                (int)Aas.SubmodelElements.Capability,
+                (int)Aas.SubmodelElements.ConceptDescription,
+                (int)Aas.SubmodelElements.DataElement,
+                (int)Aas.SubmodelElements.Entity,
+                (int)Aas.SubmodelElements.Event,
+                (int)Aas.SubmodelElements.File,
+                (int)Aas.SubmodelElements.MultiLanguageProperty,
+                (int)Aas.SubmodelElements.Operation,
+                (int)Aas.SubmodelElements.Property,
+                (int)Aas.SubmodelElements.Range,
+                (int)Aas.SubmodelElements.ReferenceElement,
+                (int)Aas.SubmodelElements.RelationshipElement,
+                (int)Aas.SubmodelElements.Submodel,
+                (int)Aas.SubmodelElements.SubmodelElement,
+                (int)Aas.SubmodelElements.SubmodelElementList,
+                (int)Aas.SubmodelElements.SubmodelElementStruct
+            };
+
+            internal static HashSet<int> ForBuildInListTypes = new HashSet<int>
+            {
+                (int)Aas.BuildInListTypes.Entities,
+                (int)Aas.BuildInListTypes.IdRefs,
+                (int)Aas.BuildInListTypes.NMTokens
+            };
+
+            internal static HashSet<int> ForDecimalBuildInTypes = new HashSet<int>
+            {
+                (int)Aas.DecimalBuildInTypes.Integer,
+                (int)Aas.DecimalBuildInTypes.Long,
+                (int)Aas.DecimalBuildInTypes.Int,
+                (int)Aas.DecimalBuildInTypes.Short,
+                (int)Aas.DecimalBuildInTypes.Byte,
+                (int)Aas.DecimalBuildInTypes.NonNegativeInteger,
+                (int)Aas.DecimalBuildInTypes.PositiveInteger,
+                (int)Aas.DecimalBuildInTypes.UnsignedInteger,
+                (int)Aas.DecimalBuildInTypes.UnsignedLong,
+                (int)Aas.DecimalBuildInTypes.UnsignedInt,
+                (int)Aas.DecimalBuildInTypes.UnsignedShort,
+                (int)Aas.DecimalBuildInTypes.UnsignedByte,
+                (int)Aas.DecimalBuildInTypes.NonPositiveInteger,
+                (int)Aas.DecimalBuildInTypes.NegativeInteger
+            };
+
+            internal static HashSet<int> ForDurationBuildInTypes = new HashSet<int>
+            {
+                (int)Aas.DurationBuildInTypes.DayTimeDuration,
+                (int)Aas.DurationBuildInTypes.YearMonthDuration
+            };
+
+            internal static HashSet<int> ForPrimitiveTypes = new HashSet<int>
+            {
+                (int)Aas.PrimitiveTypes.AnyUri,
+                (int)Aas.PrimitiveTypes.Base64Binary,
+                (int)Aas.PrimitiveTypes.Boolean,
+                (int)Aas.PrimitiveTypes.Date,
+                (int)Aas.PrimitiveTypes.DateTime,
+                (int)Aas.PrimitiveTypes.Decimal,
+                (int)Aas.PrimitiveTypes.Double,
+                (int)Aas.PrimitiveTypes.Duration,
+                (int)Aas.PrimitiveTypes.Float,
+                (int)Aas.PrimitiveTypes.GDay,
+                (int)Aas.PrimitiveTypes.GMonth,
+                (int)Aas.PrimitiveTypes.GMonthDay,
+                (int)Aas.PrimitiveTypes.HeyBinary,
+                (int)Aas.PrimitiveTypes.Notation,
+                (int)Aas.PrimitiveTypes.QName,
+                (int)Aas.PrimitiveTypes.String,
+                (int)Aas.PrimitiveTypes.Time
+            };
+
+            internal static HashSet<int> ForStringBuildInTypes = new HashSet<int>
+            {
+                (int)Aas.StringBuildInTypes.NormalizedString,
+                (int)Aas.StringBuildInTypes.Token,
+                (int)Aas.StringBuildInTypes.Language,
+                (int)Aas.StringBuildInTypes.NCName,
+                (int)Aas.StringBuildInTypes.Entity,
+                (int)Aas.StringBuildInTypes.Id,
+                (int)Aas.StringBuildInTypes.Idref
+            };
+
+            internal static HashSet<int> ForDataTypeDef = new HashSet<int>
+            {
+                (int)Aas.DataTypeDef.Entities,
+                (int)Aas.DataTypeDef.IdRefs,
+                (int)Aas.DataTypeDef.NMTokens,
+                (int)Aas.DataTypeDef.Integer,
+                (int)Aas.DataTypeDef.Long,
+                (int)Aas.DataTypeDef.Int,
+                (int)Aas.DataTypeDef.Short,
+                (int)Aas.DataTypeDef.Byte,
+                (int)Aas.DataTypeDef.NonNegativeInteger,
+                (int)Aas.DataTypeDef.PositiveInteger,
+                (int)Aas.DataTypeDef.UnsignedInteger,
+                (int)Aas.DataTypeDef.UnsignedLong,
+                (int)Aas.DataTypeDef.UnsignedInt,
+                (int)Aas.DataTypeDef.UnsignedShort,
+                (int)Aas.DataTypeDef.UnsignedByte,
+                (int)Aas.DataTypeDef.NonPositiveInteger,
+                (int)Aas.DataTypeDef.NegativeInteger,
+                (int)Aas.DataTypeDef.DayTimeDuration,
+                (int)Aas.DataTypeDef.YearMonthDuration,
+                (int)Aas.DataTypeDef.AnyUri,
+                (int)Aas.DataTypeDef.Base64Binary,
+                (int)Aas.DataTypeDef.Boolean,
+                (int)Aas.DataTypeDef.Date,
+                (int)Aas.DataTypeDef.DateTime,
+                (int)Aas.DataTypeDef.Decimal,
+                (int)Aas.DataTypeDef.Double,
+                (int)Aas.DataTypeDef.Duration,
+                (int)Aas.DataTypeDef.Float,
+                (int)Aas.DataTypeDef.GDay,
+                (int)Aas.DataTypeDef.GMonth,
+                (int)Aas.DataTypeDef.GMonthDay,
+                (int)Aas.DataTypeDef.HeyBinary,
+                (int)Aas.DataTypeDef.Notation,
+                (int)Aas.DataTypeDef.QName,
+                (int)Aas.DataTypeDef.String,
+                (int)Aas.DataTypeDef.Time,
+                (int)Aas.DataTypeDef.NormalizedString,
+                (int)Aas.DataTypeDef.Token,
+                (int)Aas.DataTypeDef.Language,
+                (int)Aas.DataTypeDef.NCName,
+                (int)Aas.DataTypeDef.Entity,
+                (int)Aas.DataTypeDef.Id,
+                (int)Aas.DataTypeDef.Idref
+            };
+
+            internal static HashSet<int> ForDataTypeIec61360 = new HashSet<int>
+            {
+                (int)Aas.DataTypeIec61360.Date,
+                (int)Aas.DataTypeIec61360.String,
+                (int)Aas.DataTypeIec61360.StringTranslatable,
+                (int)Aas.DataTypeIec61360.IntegerMeasure,
+                (int)Aas.DataTypeIec61360.IntegerCount,
+                (int)Aas.DataTypeIec61360.IntegerCurrency,
+                (int)Aas.DataTypeIec61360.RealMeasure,
+                (int)Aas.DataTypeIec61360.RealCount,
+                (int)Aas.DataTypeIec61360.RealCurrency,
+                (int)Aas.DataTypeIec61360.Boolean,
+                (int)Aas.DataTypeIec61360.Iri,
+                (int)Aas.DataTypeIec61360.Irdi,
+                (int)Aas.DataTypeIec61360.Rational,
+                (int)Aas.DataTypeIec61360.RationalMeasure,
+                (int)Aas.DataTypeIec61360.Time,
+                (int)Aas.DataTypeIec61360.Timestamp,
+                (int)Aas.DataTypeIec61360.File,
+                (int)Aas.DataTypeIec61360.Html,
+                (int)Aas.DataTypeIec61360.Blob
+            };
+
+            internal static HashSet<int> ForLevelType = new HashSet<int>
+            {
+                (int)Aas.LevelType.Min,
+                (int)Aas.LevelType.Max,
+                (int)Aas.LevelType.Nom,
+                (int)Aas.LevelType.Type
+            };
+        }  // internal static class EnumValueSet
+
+        private static readonly Verification.Transformer _transformer = (
+            new Verification.Transformer());
+
+        private class Transformer
+            : Visitation.AbstractTransformer<IEnumerable<Reporting.Error>>
+        {
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Extension that)
+            {
+                if (that.SemanticId != null)
                 {
-                    if (!Verification.Implementation.EnumValueSet.ForDataTypeDef.Contains(
-                            (int)that.ValueType))
+                    foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/ValueType",
-                                $"Invalid {nameof(Aas.DataTypeDef)}: {that.ValueType}"));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
                     }
                 }
 
-                if (errors.Full()) return;
+                foreach (var error in Verification.VerifyNonEmptyString(that.Name))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "name"));
+                    yield return error;
+                }
+
+                if (that.ValueType != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.DataTypeDef value = that.ValueType
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyDataTypeDef(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "valueType"));
+                        yield return error;
+                    }
+                }
 
                 if (that.Value != null)
                 {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Value,
-                        $"{path}/Value",
-                        errors);
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "value"));
+                        yield return error;
+                    }
+                }
+
+                if (that.RefersTo != null)
+                {
+                    foreach (var error in Verification.Verify(that.RefersTo))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "refersTo"));
+                        yield return error;
+                    }
                 }
             }
 
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyAdministrativeInformation (
-                Aas.AdministrativeInformation that,
-                string path,
-                Verification.Errors errors)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.AdministrativeInformation that)
             {
                 if (!(
                     !(that.Revision != null)
                     || (that.Version != null)))
                 {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Constraint AASd-005\n" +
-                            "!(that.Revision != null)\n" +
-                            "|| (that.Version != null)"));
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-005\n" +
+                        "!(that.Revision != null)\n" +
+                        "|| (that.Version != null)");
                 }
-
-                if (errors.Full()) return;
-
-                if (that.Version != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Version,
-                        $"{path}/Version",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Revision != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Revision,
-                        $"{path}/Revision",
-                        errors);
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyQualifier (
-                Aas.Qualifier that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                Verification.Implementation.VerifyNonEmptyString(
-                    that.Type,
-                    $"{path}/Type",
-                    errors);
-
-                if (errors.Full()) return;
-
-                if (!Verification.Implementation.EnumValueSet.ForDataTypeDef.Contains(
-                        (int)that.ValueType))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            $"{path}/ValueType",
-                            $"Invalid {nameof(Aas.DataTypeDef)}: {that.ValueType}"));
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Value != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Value,
-                        $"{path}/Value",
-                        errors);
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyFormula (
-                Aas.Formula that,
-                string path,
-                Verification.Errors errors)
-            {
-                // There is no verification specified.
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyAssetAdministrationShell (
-                Aas.AssetAdministrationShell that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                Verification.Implementation.VerifyNonEmptyString(
-                    that.Id,
-                    $"{path}/Id",
-                    errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyAssetInformation (
-                Aas.AssetInformation that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (!Verification.Implementation.EnumValueSet.ForAssetKind.Contains(
-                        (int)that.AssetKind))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            $"{path}/AssetKind",
-                            $"Invalid {nameof(Aas.AssetKind)}: {that.AssetKind}"));
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyIdentifierKeyValuePair (
-                Aas.IdentifierKeyValuePair that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                Verification.Implementation.VerifyNonEmptyString(
-                    that.Key,
-                    $"{path}/Key",
-                    errors);
-
-                if (errors.Full()) return;
-
-                Verification.Implementation.VerifyNonEmptyString(
-                    that.Value,
-                    $"{path}/Value",
-                    errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifySubmodel (
-                Aas.Submodel that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                Verification.Implementation.VerifyNonEmptyString(
-                    that.Id,
-                    $"{path}/Id",
-                    errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifySubmodelElementList (
-                Aas.SubmodelElementList that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-
-                if (errors.Full()) return;
-
-                if (!Verification.Implementation.EnumValueSet.ForSubmodelElements.Contains(
-                        (int)that.SubmodelElementTypeValues))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            $"{path}/SubmodelElementTypeValues",
-                            $"Invalid {nameof(Aas.SubmodelElements)}: {that.SubmodelElementTypeValues}"));
-                }
-
-                if (errors.Full()) return;
-
-                if (that.ValueTypeValues != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForDataTypeDef.Contains(
-                            (int)that.ValueTypeValues))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/ValueTypeValues",
-                                $"Invalid {nameof(Aas.DataTypeDef)}: {that.ValueTypeValues}"));
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifySubmodelElementStruct (
-                Aas.SubmodelElementStruct that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyProperty (
-                Aas.Property that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-
-                if (errors.Full()) return;
-
-                if (!Verification.Implementation.EnumValueSet.ForDataTypeDef.Contains(
-                        (int)that.ValueType))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            $"{path}/ValueType",
-                            $"Invalid {nameof(Aas.DataTypeDef)}: {that.ValueType}"));
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Value != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Value,
-                        $"{path}/Value",
-                        errors);
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyMultiLanguageProperty (
-                Aas.MultiLanguageProperty that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyRange (
-                Aas.Range that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-
-                if (errors.Full()) return;
-
-                if (!Verification.Implementation.EnumValueSet.ForDataTypeDef.Contains(
-                        (int)that.ValueType))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            $"{path}/ValueType",
-                            $"Invalid {nameof(Aas.DataTypeDef)}: {that.ValueType}"));
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Min != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Min,
-                        $"{path}/Min",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Max != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Max,
-                        $"{path}/Max",
-                        errors);
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyReferenceElement (
-                Aas.ReferenceElement that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyBlob (
-                Aas.Blob that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (!Verification.IsMimeType(that.MimeType))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Verification.IsMimeType(that.MimeType)"));
-                }
-
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-
-                if (errors.Full()) return;
-
-                Verification.Implementation.VerifyMimeTyped(
-                    that.MimeType,
-                    $"{path}/MimeType",
-                    errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyFile (
-                Aas.File that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (!Verification.IsMimeType(that.MimeType))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "Verification.IsMimeType(that.MimeType)"));
-                }
-
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-
-                if (errors.Full()) return;
-
-                Verification.Implementation.VerifyMimeTyped(
-                    that.MimeType,
-                    $"{path}/MimeType",
-                    errors);
-
-                if (errors.Full()) return;
-
-                if (that.Value != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Value,
-                        $"{path}/Value",
-                        errors);
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyAnnotatedRelationshipElement (
-                Aas.AnnotatedRelationshipElement that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyEntity (
-                Aas.Entity that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-
-                if (errors.Full()) return;
-
-                if (!Verification.Implementation.EnumValueSet.ForEntityType.Contains(
-                        (int)that.EntityType))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            $"{path}/EntityType",
-                            $"Invalid {nameof(Aas.EntityType)}: {that.EntityType}"));
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyBasicEvent (
-                Aas.BasicEvent that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyOperation (
-                Aas.Operation that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyOperationVariable (
-                Aas.OperationVariable that,
-                string path,
-                Verification.Errors errors)
-            {
-                // There is no verification specified.
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyCapability (
-                Aas.Capability that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Kind != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForModelingKind.Contains(
-                            (int)that.Kind))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/Kind",
-                                $"Invalid {nameof(Aas.ModelingKind)}: {that.Kind}"));
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyConceptDescription (
-                Aas.ConceptDescription that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                Verification.Implementation.VerifyNonEmptyString(
-                    that.Id,
-                    $"{path}/Id",
-                    errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyView (
-                Aas.View that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.IdShort != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.IdShort,
-                        $"{path}/IdShort",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Category != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Category,
-                        $"{path}/Category",
-                        errors);
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyGlobalReference (
-                Aas.GlobalReference that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (!(that.Values.Count >= 1))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "that.Values.Count >= 1"));
-                }
-
-                if (errors.Full()) return;
-
-                foreach (var anItem in that.Values)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        anItem,
-                        $"{path}/Values/{anItem}",
-                        errors);
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyModelReference (
-                Aas.ModelReference that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (!(that.Keys.Count >= 1))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            path,
-                            "Invariant violated:\n" +
-                            "that.Keys.Count >= 1"));
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyKey (
-                Aas.Key that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (!Verification.Implementation.EnumValueSet.ForKeyElements.Contains(
-                        (int)that.Type))
-                {
-                    errors.Add(
-                        new Verification.Error(
-                            $"{path}/Type",
-                            $"Invalid {nameof(Aas.KeyElements)}: {that.Type}"));
-                }
-
-                if (errors.Full()) return;
-
-                Verification.Implementation.VerifyNonEmptyString(
-                    that.Value,
-                    $"{path}/Value",
-                    errors);
-            }
-
-            /// <summary>
-            /// Verify the given <paramref name="langStringSet" /> and
-            /// append any errors to <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes the <paramref name="langString" />.
-            /// </summary>
-            public static void VerifyLangStringSet (
-                LangStringSet that,
-                string path,
-                Errors errors)
-            {
-                throw new System.NotImplementedException("TODO");
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyValueReferencePair (
-                Aas.ValueReferencePair that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                Verification.Implementation.VerifyNonEmptyString(
-                    that.Value,
-                    $"{path}/Value",
-                    errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyValueList (
-                Aas.ValueList that,
-                string path,
-                Verification.Errors errors)
-            {
-                // There is no verification specified.
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyDataSpecificationIec61360 (
-                Aas.DataSpecificationIec61360 that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.Unit != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Unit,
-                        $"{path}/Unit",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.SourceOfDefinition != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.SourceOfDefinition,
-                        $"{path}/SourceOfDefinition",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Symbol != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Symbol,
-                        $"{path}/Symbol",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.DataType != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForDataTypeIec61360.Contains(
-                            (int)that.DataType))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/DataType",
-                                $"Invalid {nameof(Aas.DataTypeIec61360)}: {that.DataType}"));
-                    }
-                }
-
-                if (errors.Full()) return;
-
-                if (that.ValueFormat != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.ValueFormat,
-                        $"{path}/ValueFormat",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Value != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Value,
-                        $"{path}/Value",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.LevelType != null)
-                {
-                    if (!Verification.Implementation.EnumValueSet.ForLevelType.Contains(
-                            (int)that.LevelType))
-                    {
-                        errors.Add(
-                            new Verification.Error(
-                                $"{path}/LevelType",
-                                $"Invalid {nameof(Aas.LevelType)}: {that.LevelType}"));
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyDataSpecificationPhysicalUnit (
-                Aas.DataSpecificationPhysicalUnit that,
-                string path,
-                Verification.Errors errors)
-            {
-                if (errors.Full()) return;
-
-                if (that.UnitName != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.UnitName,
-                        $"{path}/UnitName",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.UnitSymbol != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.UnitSymbol,
-                        $"{path}/UnitSymbol",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.SiNotation != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.SiNotation,
-                        $"{path}/SiNotation",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.DinNotation != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.DinNotation,
-                        $"{path}/DinNotation",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.EceName != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.EceName,
-                        $"{path}/EceName",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.EceCode != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.EceCode,
-                        $"{path}/EceCode",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.NistName != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.NistName,
-                        $"{path}/NistName",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.SourceOfDefinition != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.SourceOfDefinition,
-                        $"{path}/SourceOfDefinition",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.ConversionFactor != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.ConversionFactor,
-                        $"{path}/ConversionFactor",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.RegistrationAuthorityId != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.RegistrationAuthorityId,
-                        $"{path}/RegistrationAuthorityId",
-                        errors);
-                }
-
-                if (errors.Full()) return;
-
-                if (that.Supplier != null)
-                {
-                    Verification.Implementation.VerifyNonEmptyString(
-                        that.Supplier,
-                        $"{path}/Supplier",
-                        errors);
-                }
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> and append any errors to
-            /// <paramref name="Errors" />.
-            ///
-            /// The <paramref name="path" /> localizes <paramref name="that" />.
-            /// </summary>
-            public static void VerifyEnvironment (
-                Aas.Environment that,
-                string path,
-                Verification.Errors errors)
-            {
-                // There is no verification specified.
-            }
-        }  // private static class Implementation
-
-        /// <summary>
-        /// Verify the instances of the model classes non-recursively.
-        /// </summary>
-        public class NonRecursiveVerifier :
-            Visitation.IVisitorWithContext<string>
-        {
-            public readonly Verification.Errors Errors;
-
-            /// <summary>
-            /// Initialize the visitor with the given <paramref name="errors" />.
-            ///
-            /// The errors observed during the visitation will be appended to
-            /// the <paramref name="errors" />.
-            /// </summary>
-            NonRecursiveVerifier(Verification.Errors errors)
-            {
-                Errors = errors;
-            }
-
-            public void Visit(Aas.IClass that, string context)
-            {
-                that.Accept(this, context);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.Extension that, string context)
-            {
-                Implementation.VerifyExtension(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.AdministrativeInformation that, string context)
-            {
-                Implementation.VerifyAdministrativeInformation(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.Qualifier that, string context)
-            {
-                Implementation.VerifyQualifier(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.Formula that, string context)
-            {
-                Implementation.VerifyFormula(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.AssetAdministrationShell that, string context)
-            {
-                Implementation.VerifyAssetAdministrationShell(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.AssetInformation that, string context)
-            {
-                Implementation.VerifyAssetInformation(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.IdentifierKeyValuePair that, string context)
-            {
-                Implementation.VerifyIdentifierKeyValuePair(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.Submodel that, string context)
-            {
-                Implementation.VerifySubmodel(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.SubmodelElementList that, string context)
-            {
-                Implementation.VerifySubmodelElementList(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.SubmodelElementStruct that, string context)
-            {
-                Implementation.VerifySubmodelElementStruct(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.Property that, string context)
-            {
-                Implementation.VerifyProperty(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.MultiLanguageProperty that, string context)
-            {
-                Implementation.VerifyMultiLanguageProperty(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.Range that, string context)
-            {
-                Implementation.VerifyRange(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.ReferenceElement that, string context)
-            {
-                Implementation.VerifyReferenceElement(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.Blob that, string context)
-            {
-                Implementation.VerifyBlob(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.File that, string context)
-            {
-                Implementation.VerifyFile(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.AnnotatedRelationshipElement that, string context)
-            {
-                Implementation.VerifyAnnotatedRelationshipElement(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.Entity that, string context)
-            {
-                Implementation.VerifyEntity(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.BasicEvent that, string context)
-            {
-                Implementation.VerifyBasicEvent(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.Operation that, string context)
-            {
-                Implementation.VerifyOperation(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.OperationVariable that, string context)
-            {
-                Implementation.VerifyOperationVariable(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.Capability that, string context)
-            {
-                Implementation.VerifyCapability(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.ConceptDescription that, string context)
-            {
-                Implementation.VerifyConceptDescription(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.View that, string context)
-            {
-                Implementation.VerifyView(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.GlobalReference that, string context)
-            {
-                Implementation.VerifyGlobalReference(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.ModelReference that, string context)
-            {
-                Implementation.VerifyModelReference(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.Key that, string context)
-            {
-                Implementation.VerifyKey(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.LangStringSet that, string context)
-            {
-                Implementation.VerifyLangStringSet(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.ValueReferencePair that, string context)
-            {
-                Implementation.VerifyValueReferencePair(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.ValueList that, string context)
-            {
-                Implementation.VerifyValueList(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.DataSpecificationIec61360 that, string context)
-            {
-                Implementation.VerifyDataSpecificationIec61360(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.DataSpecificationPhysicalUnit that, string context)
-            {
-                Implementation.VerifyDataSpecificationPhysicalUnit(
-                    that, context, Errors);
-            }
-
-            /// <summary>
-            /// Verify <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Aas.Environment that, string context)
-            {
-                Implementation.VerifyEnvironment(
-                    that, context, Errors);
-            }
-        }  // public class NonRecursiveVerifier
-
-        /// <summary>
-        /// Verify the instances of the model classes recursively.
-        /// </summary>
-        public class RecursiveVerifier :
-            Visitation.IVisitorWithContext<string>
-        {
-            public readonly Errors Errors;
-
-            /// <summary>
-            /// Initialize the visitor with the given <paramref name="errors" />.
-            ///
-            /// The errors observed during the visitation will be appended to
-            /// the <paramref name="errors" />.
-            /// </summary>
-            RecursiveVerifier(Errors errors)
-            {
-                Errors = errors;
-            }
-
-            public void Visit(IClass that, string context)
-            {
-                that.Accept(this, context);
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Extension that, string context)
-            {
-                Implementation.VerifyExtension(
-                    that, context, Errors);
-
-                if (that.SemanticId != null)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
-                }
-
-                if (that.RefersTo != null)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.RefersTo,
-                        $"{context}/RefersTo");
-                }
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(AdministrativeInformation that, string context)
-            {
-                Implementation.VerifyAdministrativeInformation(
-                    that, context, Errors);
 
                 if (that.DataSpecifications != null)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                if (that.Version != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Version))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "version"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Revision != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Revision))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "revision"));
+                        yield return error;
                     }
                 }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Qualifier that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Qualifier that)
             {
-                Implementation.VerifyQualifier(
-                    that, context, Errors);
-
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
+                    foreach (var error in Verification.Verify(that.SemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
+                    }
+                }
+
+                foreach (var error in Verification.VerifyNonEmptyString(that.Type))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "type"));
+                    yield return error;
+                }
+
+                foreach (var error in Verification.VerifyDataTypeDef(that.ValueType))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "valueType"));
+                    yield return error;
+                }
+
+                if (that.Value != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "value"));
+                        yield return error;
+                    }
                 }
 
                 if (that.ValueId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.ValueId,
-                        $"{context}/ValueId");
+                    foreach (var error in Verification.Verify(that.ValueId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "valueId"));
+                        yield return error;
+                    }
                 }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Formula that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Formula that)
             {
-                Implementation.VerifyFormula(
-                    that, context, Errors);
-
                 if (that.DependsOn != null)
                 {
-                    for(var i = 0; i < that.DependsOn.Count; i++)
+                    int indexDependsOn = 0;
+                    foreach (var item in that.DependsOn)
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DependsOn[i],
-                            $"{context}/DependsOn/{i}");
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDependsOn));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dependsOn"));
+                            yield return error;
+                        }
+                        indexDependsOn++;
                     }
                 }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(AssetAdministrationShell that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.AssetAdministrationShell that)
             {
-                Implementation.VerifyAssetAdministrationShell(
-                    that, context, Errors);
-
                 if (that.DataSpecifications != null)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                foreach (var error in Verification.VerifyNonEmptyString(that.Id))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "id"));
+                    yield return error;
                 }
 
                 if (that.Administration != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Administration,
-                        $"{context}/Administration");
+                    foreach (var error in Verification.Verify(that.Administration))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "administration"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DerivedFrom != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DerivedFrom,
-                        $"{context}/DerivedFrom");
+                    foreach (var error in Verification.Verify(that.DerivedFrom))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "derivedFrom"));
+                        yield return error;
+                    }
                 }
 
-                if (Errors.Full()) return;
-                Visit(
-                    that.AssetInformation,
-                    $"{context}/AssetInformation");
-
-                for(var i = 0; i < that.Submodels.Count; i++)
+                foreach (var error in Verification.Verify(that.AssetInformation))
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Submodels[i],
-                        $"{context}/Submodels/{i}");
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "assetInformation"));
+                    yield return error;
+                }
+
+                int indexSubmodels = 0;
+                foreach (var item in that.Submodels)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexSubmodels));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "submodels"));
+                        yield return error;
+                    }
+                    indexSubmodels++;
                 }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(AssetInformation that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.AssetInformation that)
             {
-                Implementation.VerifyAssetInformation(
-                    that, context, Errors);
+                foreach (var error in Verification.VerifyAssetKind(that.AssetKind))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "assetKind"));
+                    yield return error;
+                }
 
                 if (that.GlobalAssetId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.GlobalAssetId,
-                        $"{context}/GlobalAssetId");
+                    foreach (var error in Verification.Verify(that.GlobalAssetId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "globalAssetId"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SpecificAssetId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SpecificAssetId,
-                        $"{context}/SpecificAssetId");
+                    foreach (var error in Verification.Verify(that.SpecificAssetId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "specificAssetId"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DefaultThumbnail != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DefaultThumbnail,
-                        $"{context}/DefaultThumbnail");
+                    foreach (var error in Verification.Verify(that.DefaultThumbnail))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "defaultThumbnail"));
+                        yield return error;
+                    }
                 }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(IdentifierKeyValuePair that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.IdentifierKeyValuePair that)
             {
-                Implementation.VerifyIdentifierKeyValuePair(
-                    that, context, Errors);
-
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
+                    foreach (var error in Verification.Verify(that.SemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
+                    }
+                }
+
+                foreach (var error in Verification.VerifyNonEmptyString(that.Key))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "key"));
+                    yield return error;
+                }
+
+                foreach (var error in Verification.VerifyNonEmptyString(that.Value))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "value"));
+                    yield return error;
                 }
 
                 if (that.ExternalSubjectId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.ExternalSubjectId,
-                        $"{context}/ExternalSubjectId");
+                    foreach (var error in Verification.Verify(that.ExternalSubjectId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "externalSubjectId"));
+                        yield return error;
+                    }
                 }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Submodel that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Submodel that)
             {
-                Implementation.VerifySubmodel(
-                    that, context, Errors);
-
                 if (that.DataSpecifications != null)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
                     }
                 }
 
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
+                    foreach (var error in Verification.Verify(that.SemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
+                    }
                 }
 
-                for(var i = 0; i < that.Qualifiers.Count; i++)
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                foreach (var error in Verification.VerifyNonEmptyString(that.Id))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "id"));
+                    yield return error;
                 }
 
                 if (that.Administration != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Administration,
-                        $"{context}/Administration");
-                }
-
-                for(
-                    var i = 0;
-                    i < that.SubmodelElements.Count;
-                    i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SubmodelElements[i],
-                        $"{context}/SubmodelElements/{i}");
-                }
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(SubmodelElementList that, string context)
-            {
-                Implementation.VerifySubmodelElementList(
-                    that, context, Errors);
-
-                if (that.DataSpecifications != null)
-                {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    foreach (var error in Verification.Verify(that.Administration))
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "administration"));
+                        yield return error;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                int indexSubmodelElements = 0;
+                foreach (var item in that.SubmodelElements)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexSubmodelElements));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "submodelElements"));
+                        yield return error;
+                    }
+                    indexSubmodelElements++;
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.SubmodelElementList that)
+            {
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
+                    foreach (var error in Verification.Verify(that.SemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
+                    }
                 }
 
-                for(var i = 0; i < that.Qualifiers.Count; i++)
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
                 }
 
-                for(var i = 0; i < that.Values.Count; i++)
+                foreach (
+                        var error in Verification.VerifySubmodelElements(
+                            that.SubmodelElementTypeValues))
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Values[i],
-                        $"{context}/Values/{i}");
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "submodelElementTypeValues"));
+                    yield return error;
+                }
+
+                int indexValues = 0;
+                foreach (var item in that.Values)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexValues));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "values"));
+                        yield return error;
+                    }
+                    indexValues++;
                 }
 
                 if (that.SemanticIdValues != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticIdValues,
-                        $"{context}/SemanticIdValues");
-                }
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(SubmodelElementStruct that, string context)
-            {
-                Implementation.VerifySubmodelElementStruct(
-                    that, context, Errors);
-
-                if (that.DataSpecifications != null)
-                {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    foreach (var error in Verification.Verify(that.SemanticIdValues))
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticIdValues"));
+                        yield return error;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                if (that.ValueTypeValues != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.DataTypeDef value = that.ValueTypeValues
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyDataTypeDef(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "valueTypeValues"));
+                        yield return error;
+                    }
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.SubmodelElementStruct that)
+            {
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
-                }
-
-                for(var i = 0; i < that.Qualifiers.Count; i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
-                }
-
-                for(var i = 0; i < that.Values.Count; i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Values[i],
-                        $"{context}/Values/{i}");
-                }
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Property that, string context)
-            {
-                Implementation.VerifyProperty(
-                    that, context, Errors);
-
-                if (that.DataSpecifications != null)
-                {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
+                }
+
+                int indexValues = 0;
+                foreach (var item in that.Values)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexValues));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "values"));
+                        yield return error;
+                    }
+                    indexValues++;
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Property that)
+            {
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
-                }
-
-                if (that.Description != null)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
-                }
-
-                if (that.SemanticId != null)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
-                }
-
-                for(var i = 0; i < that.Qualifiers.Count; i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
-                }
-
-                if (that.ValueId != null)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.ValueId,
-                        $"{context}/ValueId");
-                }
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(MultiLanguageProperty that, string context)
-            {
-                Implementation.VerifyMultiLanguageProperty(
-                    that, context, Errors);
-
-                if (that.DataSpecifications != null)
-                {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                if (that.Category != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
-                }
-
-                if (that.DisplayName != null)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
+                    foreach (var error in Verification.Verify(that.SemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
+                    }
                 }
 
-                for(var i = 0; i < that.Qualifiers.Count; i++)
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
+                }
+
+                foreach (var error in Verification.VerifyDataTypeDef(that.ValueType))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "valueType"));
+                    yield return error;
                 }
 
                 if (that.Value != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Value,
-                        $"{context}/Value");
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "value"));
+                        yield return error;
+                    }
                 }
 
                 if (that.ValueId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.ValueId,
-                        $"{context}/ValueId");
+                    foreach (var error in Verification.Verify(that.ValueId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "valueId"));
+                        yield return error;
+                    }
                 }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Range that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.MultiLanguageProperty that)
             {
-                Implementation.VerifyRange(
-                    that, context, Errors);
-
                 if (that.DataSpecifications != null)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
-                }
-
-                if (that.Description != null)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
-                }
-
-                if (that.SemanticId != null)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
-                }
-
-                for(var i = 0; i < that.Qualifiers.Count; i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
-                }
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(ReferenceElement that, string context)
-            {
-                Implementation.VerifyReferenceElement(
-                    that, context, Errors);
-
-                if (that.DataSpecifications != null)
-                {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                if (that.Category != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
-                }
-
-                if (that.DisplayName != null)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
+                    foreach (var error in Verification.Verify(that.SemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
+                    }
                 }
 
-                for(var i = 0; i < that.Qualifiers.Count; i++)
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
                 }
 
                 if (that.Value != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Value,
-                        $"{context}/Value");
-                }
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Blob that, string context)
-            {
-                Implementation.VerifyBlob(
-                    that, context, Errors);
-
-                if (that.DataSpecifications != null)
-                {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    foreach (var error in Verification.Verify(that.Value))
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "value"));
+                        yield return error;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                if (that.ValueId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(that.ValueId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "valueId"));
+                        yield return error;
+                    }
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Range that)
+            {
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
-                }
-
-                for(var i = 0; i < that.Qualifiers.Count; i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
-                }
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(File that, string context)
-            {
-                Implementation.VerifyFile(
-                    that, context, Errors);
-
-                if (that.DataSpecifications != null)
-                {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
+                }
+
+                foreach (var error in Verification.VerifyDataTypeDef(that.ValueType))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "valueType"));
+                    yield return error;
+                }
+
+                if (that.Min != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Min))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "min"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Max != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Max))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "max"));
+                        yield return error;
+                    }
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.ReferenceElement that)
+            {
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
-                }
-
-                for(var i = 0; i < that.Qualifiers.Count; i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
-                }
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(AnnotatedRelationshipElement that, string context)
-            {
-                Implementation.VerifyAnnotatedRelationshipElement(
-                    that, context, Errors);
-
-                if (that.DataSpecifications != null)
-                {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
+                }
+
+                if (that.Value != null)
+                {
+                    foreach (var error in Verification.Verify(that.Value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "value"));
+                        yield return error;
+                    }
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Blob that)
+            {
+                if (!Verification.IsMimeType(that.MimeType))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Verification.IsMimeType(that.MimeType)");
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
-                }
-
-                for(var i = 0; i < that.Qualifiers.Count; i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
-                }
-
-                if (Errors.Full()) return;
-                Visit(
-                    that.First,
-                    $"{context}/First");
-
-                if (Errors.Full()) return;
-                Visit(
-                    that.Second,
-                    $"{context}/Second");
-
-                for(var i = 0; i < that.Annotation.Count; i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Annotation[i],
-                        $"{context}/Annotation/{i}");
-                }
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Entity that, string context)
-            {
-                Implementation.VerifyEntity(
-                    that, context, Errors);
-
-                if (that.DataSpecifications != null)
-                {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
+                }
+
+                foreach (var error in Verification.VerifyMimeTyped(that.MimeType))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "mimeType"));
+                    yield return error;
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.File that)
+            {
+                if (!Verification.IsMimeType(that.MimeType))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Verification.IsMimeType(that.MimeType)");
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
+                    foreach (var error in Verification.Verify(that.SemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
+                    }
                 }
 
-                for(var i = 0; i < that.Qualifiers.Count; i++)
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
                 }
 
-                for(var i = 0; i < that.Statements.Count; i++)
+                foreach (var error in Verification.VerifyMimeTyped(that.MimeType))
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Statements[i],
-                        $"{context}/Statements/{i}");
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "mimeType"));
+                    yield return error;
+                }
+
+                if (that.Value != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "value"));
+                        yield return error;
+                    }
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.AnnotatedRelationshipElement that)
+            {
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
+                }
+
+                if (that.DisplayName != null)
+                {
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Description != null)
+                {
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
+                }
+
+                if (that.SemanticId != null)
+                {
+                    foreach (var error in Verification.Verify(that.SemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
+                    }
+                }
+
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
+                }
+
+                foreach (var error in Verification.Verify(that.First))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "first"));
+                    yield return error;
+                }
+
+                foreach (var error in Verification.Verify(that.Second))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "second"));
+                    yield return error;
+                }
+
+                int indexAnnotation = 0;
+                foreach (var item in that.Annotation)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexAnnotation));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "annotation"));
+                        yield return error;
+                    }
+                    indexAnnotation++;
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Entity that)
+            {
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
+                }
+
+                if (that.DisplayName != null)
+                {
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Description != null)
+                {
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
+                }
+
+                if (that.SemanticId != null)
+                {
+                    foreach (var error in Verification.Verify(that.SemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
+                    }
+                }
+
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
+                }
+
+                foreach (var error in Verification.VerifyEntityType(that.EntityType))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "entityType"));
+                    yield return error;
+                }
+
+                int indexStatements = 0;
+                foreach (var item in that.Statements)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexStatements));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "statements"));
+                        yield return error;
+                    }
+                    indexStatements++;
                 }
 
                 if (that.GlobalAssetId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.GlobalAssetId,
-                        $"{context}/GlobalAssetId");
+                    foreach (var error in Verification.Verify(that.GlobalAssetId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "globalAssetId"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SpecificAssetId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SpecificAssetId,
-                        $"{context}/SpecificAssetId");
+                    foreach (var error in Verification.Verify(that.SpecificAssetId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "specificAssetId"));
+                        yield return error;
+                    }
                 }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(BasicEvent that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.BasicEvent that)
             {
-                Implementation.VerifyBasicEvent(
-                    that, context, Errors);
-
                 if (that.DataSpecifications != null)
                 {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
-                }
-
-                for(var i = 0; i < that.Qualifiers.Count; i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
-                }
-
-                if (Errors.Full()) return;
-                Visit(
-                    that.Observed,
-                    $"{context}/Observed");
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Operation that, string context)
-            {
-                Implementation.VerifyOperation(
-                    that, context, Errors);
-
-                if (that.DataSpecifications != null)
-                {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
+                }
+
+                foreach (var error in Verification.Verify(that.Observed))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "observed"));
+                    yield return error;
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Operation that)
+            {
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
-                }
-
-                for(var i = 0; i < that.Qualifiers.Count; i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
-                }
-
-                for(var i = 0; i < that.InputVariables.Count; i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.InputVariables[i],
-                        $"{context}/InputVariables/{i}");
-                }
-
-                for(
-                    var i = 0;
-                    i < that.OutputVariables.Count;
-                    i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.OutputVariables[i],
-                        $"{context}/OutputVariables/{i}");
-                }
-
-                for(
-                    var i = 0;
-                    i < that.InoutputVariables.Count;
-                    i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.InoutputVariables[i],
-                        $"{context}/InoutputVariables/{i}");
-                }
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(OperationVariable that, string context)
-            {
-                Implementation.VerifyOperationVariable(
-                    that, context, Errors);
-
-                if (Errors.Full()) return;
-                Visit(
-                    that.Value,
-                    $"{context}/Value");
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Capability that, string context)
-            {
-                Implementation.VerifyCapability(
-                    that, context, Errors);
-
-                if (that.DataSpecifications != null)
-                {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
+                }
+
+                int indexInputVariables = 0;
+                foreach (var item in that.InputVariables)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexInputVariables));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "inputVariables"));
+                        yield return error;
+                    }
+                    indexInputVariables++;
+                }
+
+                int indexOutputVariables = 0;
+                foreach (var item in that.OutputVariables)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexOutputVariables));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "outputVariables"));
+                        yield return error;
+                    }
+                    indexOutputVariables++;
+                }
+
+                int indexInoutputVariables = 0;
+                foreach (var item in that.InoutputVariables)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexInoutputVariables));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "inoutputVariables"));
+                        yield return error;
+                    }
+                    indexInoutputVariables++;
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.OperationVariable that)
+            {
+                foreach (var error in Verification.Verify(that.Value))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "value"));
+                    yield return error;
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Capability that)
+            {
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
-                }
-
-                for(var i = 0; i < that.Qualifiers.Count; i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Qualifiers[i],
-                        $"{context}/Qualifiers/{i}");
-                }
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(ConceptDescription that, string context)
-            {
-                Implementation.VerifyConceptDescription(
-                    that, context, Errors);
-
-                if (that.DataSpecifications != null)
-                {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.ConceptDescription that)
+            {
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                foreach (var error in Verification.VerifyNonEmptyString(that.Id))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "id"));
+                    yield return error;
                 }
 
                 if (that.Administration != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Administration,
-                        $"{context}/Administration");
-                }
-
-                for(var i = 0; i < that.IsCaseOf.Count; i++)
-                {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.IsCaseOf[i],
-                        $"{context}/IsCaseOf/{i}");
-                }
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(View that, string context)
-            {
-                Implementation.VerifyView(
-                    that, context, Errors);
-
-                if (that.DataSpecifications != null)
-                {
-                    for(
-                        var i = 0;
-                        i < that.DataSpecifications.Count;
-                        i++)
+                    foreach (var error in Verification.Verify(that.Administration))
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.DataSpecifications[i],
-                            $"{context}/DataSpecifications/{i}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "administration"));
+                        yield return error;
                     }
                 }
 
-                for(var i = 0; i < that.Extensions.Count; i++)
+                int indexIsCaseOf = 0;
+                foreach (var item in that.IsCaseOf)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Extensions[i],
-                        $"{context}/Extensions/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexIsCaseOf));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "isCaseOf"));
+                        yield return error;
+                    }
+                    indexIsCaseOf++;
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.View that)
+            {
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.DisplayName,
-                        $"{context}/DisplayName");
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Description != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Description,
-                        $"{context}/Description");
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
                 }
 
                 if (that.SemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.SemanticId,
-                        $"{context}/SemanticId");
+                    foreach (var error in Verification.Verify(that.SemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
+                    }
                 }
 
-                for(
-                    var i = 0;
-                    i < that.ContainedElements.Count;
-                    i++)
+                int indexContainedElements = 0;
+                foreach (var item in that.ContainedElements)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.ContainedElements[i],
-                        $"{context}/ContainedElements/{i}");
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexContainedElements));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "containedElements"));
+                        yield return error;
+                    }
+                    indexContainedElements++;
                 }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(GlobalReference that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.GlobalReference that)
             {
-                Implementation.VerifyGlobalReference(
-                    that, context, Errors);
+                if (!(that.Values.Count >= 1))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "that.Values.Count >= 1");
+                }
 
-                // The recursion ends here.
+                int indexValues = 0;
+                foreach (var item in that.Values)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexValues));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "values"));
+                        yield return error;
+                    }
+                    indexValues++;
+                }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(ModelReference that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.ModelReference that)
             {
-                Implementation.VerifyModelReference(
-                    that, context, Errors);
-
-                for(var i = 0; i < that.Keys.Count; i++)
+                if (!(that.Keys.Count >= 1))
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Keys[i],
-                        $"{context}/Keys/{i}");
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "that.Keys.Count >= 1");
+                }
+
+                int indexKeys = 0;
+                foreach (var item in that.Keys)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexKeys));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "keys"));
+                        yield return error;
+                    }
+                    indexKeys++;
                 }
 
                 if (that.ReferredSemanticId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.ReferredSemanticId,
-                        $"{context}/ReferredSemanticId");
+                    foreach (var error in Verification.Verify(that.ReferredSemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "referredSemanticId"));
+                        yield return error;
+                    }
                 }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Key that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Key that)
             {
-                Implementation.VerifyKey(
-                    that, context, Errors);
+                foreach (var error in Verification.VerifyKeyElements(that.Type))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "type"));
+                    yield return error;
+                }
 
-                // The recursion ends here.
+                foreach (var error in Verification.VerifyNonEmptyString(that.Value))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "value"));
+                    yield return error;
+                }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="langStringSet" /> and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(LangStringSet that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.LangStringSet that)
             {
                 throw new System.NotImplementedException("TODO");
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(ValueReferencePair that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.ValueReferencePair that)
             {
-                Implementation.VerifyValueReferencePair(
-                    that, context, Errors);
-
-                if (Errors.Full()) return;
-                Visit(
-                    that.ValueId,
-                    $"{context}/ValueId");
-            }
-
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(ValueList that, string context)
-            {
-                Implementation.VerifyValueList(
-                    that, context, Errors);
-
-                for(
-                    var i = 0;
-                    i < that.ValueReferencePairs.Count;
-                    i++)
+                foreach (var error in Verification.VerifyNonEmptyString(that.Value))
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.ValueReferencePairs[i],
-                        $"{context}/ValueReferencePairs/{i}");
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "value"));
+                    yield return error;
+                }
+
+                foreach (var error in Verification.Verify(that.ValueId))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "valueId"));
+                    yield return error;
                 }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(DataSpecificationIec61360 that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.ValueList that)
             {
-                Implementation.VerifyDataSpecificationIec61360(
-                    that, context, Errors);
+                int indexValueReferencePairs = 0;
+                foreach (var item in that.ValueReferencePairs)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexValueReferencePairs));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "valueReferencePairs"));
+                        yield return error;
+                    }
+                    indexValueReferencePairs++;
+                }
+            }
 
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.DataSpecificationIec61360 that)
+            {
                 if (that.PreferredName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.PreferredName,
-                        $"{context}/PreferredName");
+                    foreach (var error in Verification.Verify(that.PreferredName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "preferredName"));
+                        yield return error;
+                    }
                 }
 
                 if (that.ShortName != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.ShortName,
-                        $"{context}/ShortName");
+                    foreach (var error in Verification.Verify(that.ShortName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "shortName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Unit != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Unit))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "unit"));
+                        yield return error;
+                    }
                 }
 
                 if (that.UnitId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.UnitId,
-                        $"{context}/UnitId");
+                    foreach (var error in Verification.Verify(that.UnitId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "unitId"));
+                        yield return error;
+                    }
+                }
+
+                if (that.SourceOfDefinition != null)
+                {
+                    foreach (
+                            var error in Verification.VerifyNonEmptyString(
+                                that.SourceOfDefinition))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "sourceOfDefinition"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Symbol != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Symbol))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "symbol"));
+                        yield return error;
+                    }
+                }
+
+                if (that.DataType != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.DataTypeIec61360 value = that.DataType
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyDataTypeIec61360(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataType"));
+                        yield return error;
+                    }
                 }
 
                 if (that.Definition != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Definition,
-                        $"{context}/Definition");
+                    foreach (var error in Verification.Verify(that.Definition))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "definition"));
+                        yield return error;
+                    }
+                }
+
+                if (that.ValueFormat != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.ValueFormat))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "valueFormat"));
+                        yield return error;
+                    }
                 }
 
                 if (that.ValueList != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.ValueList,
-                        $"{context}/ValueList");
+                    foreach (var error in Verification.Verify(that.ValueList))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "valueList"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Value != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "value"));
+                        yield return error;
+                    }
                 }
 
                 if (that.ValueId != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.ValueId,
-                        $"{context}/ValueId");
+                    foreach (var error in Verification.Verify(that.ValueId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "valueId"));
+                        yield return error;
+                    }
+                }
+
+                if (that.LevelType != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.LevelType value = that.LevelType
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyLevelType(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "levelType"));
+                        yield return error;
+                    }
                 }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(DataSpecificationPhysicalUnit that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.DataSpecificationPhysicalUnit that)
             {
-                Implementation.VerifyDataSpecificationPhysicalUnit(
-                    that, context, Errors);
+                if (that.UnitName != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.UnitName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "unitName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.UnitSymbol != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.UnitSymbol))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "unitSymbol"));
+                        yield return error;
+                    }
+                }
 
                 if (that.Definition != null)
                 {
-                    if (Errors.Full()) return;
-                    Visit(
-                        that.Definition,
-                        $"{context}/Definition");
+                    foreach (var error in Verification.Verify(that.Definition))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "definition"));
+                        yield return error;
+                    }
+                }
+
+                if (that.SiNotation != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.SiNotation))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "siNotation"));
+                        yield return error;
+                    }
+                }
+
+                if (that.DinNotation != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.DinNotation))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dinNotation"));
+                        yield return error;
+                    }
+                }
+
+                if (that.EceName != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.EceName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "eceName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.EceCode != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.EceCode))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "eceCode"));
+                        yield return error;
+                    }
+                }
+
+                if (that.NistName != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.NistName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "nistName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.SourceOfDefinition != null)
+                {
+                    foreach (
+                            var error in Verification.VerifyNonEmptyString(
+                                that.SourceOfDefinition))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "sourceOfDefinition"));
+                        yield return error;
+                    }
+                }
+
+                if (that.ConversionFactor != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.ConversionFactor))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "conversionFactor"));
+                        yield return error;
+                    }
+                }
+
+                if (that.RegistrationAuthorityId != null)
+                {
+                    foreach (
+                            var error in Verification.VerifyNonEmptyString(
+                                that.RegistrationAuthorityId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "registrationAuthorityId"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Supplier != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Supplier))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "supplier"));
+                        yield return error;
+                    }
                 }
             }
 
-            /// <summary>
-            /// Verify recursively <paramref name="that" /> instance and
-            /// append any error to <see cref="Errors" />
-            /// where <paramref name="context" /> is used to localize the error.
-            /// </summary>
-            public void Visit(Environment that, string context)
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Environment that)
             {
-                Implementation.VerifyEnvironment(
-                    that, context, Errors);
-
                 if (that.AssetAdministrationShells != null)
                 {
-                    for(
-                        var i = 0;
-                        i < that.AssetAdministrationShells.Count;
-                        i++)
+                    int indexAssetAdministrationShells = 0;
+                    foreach (var item in that.AssetAdministrationShells)
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.AssetAdministrationShells[i],
-                            $"{context}/AssetAdministrationShells/{i}");
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexAssetAdministrationShells));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "assetAdministrationShells"));
+                            yield return error;
+                        }
+                        indexAssetAdministrationShells++;
                     }
                 }
 
                 if (that.Submodels != null)
                 {
-                    for(var i = 0; i < that.Submodels.Count; i++)
+                    int indexSubmodels = 0;
+                    foreach (var item in that.Submodels)
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.Submodels[i],
-                            $"{context}/Submodels/{i}");
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexSubmodels));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "submodels"));
+                            yield return error;
+                        }
+                        indexSubmodels++;
                     }
                 }
 
                 if (that.ConceptDescriptions != null)
                 {
-                    for(
-                        var i = 0;
-                        i < that.ConceptDescriptions.Count;
-                        i++)
+                    int indexConceptDescriptions = 0;
+                    foreach (var item in that.ConceptDescriptions)
                     {
-                        if (Errors.Full()) return;
-                        Visit(
-                            that.ConceptDescriptions[i],
-                            $"{context}/ConceptDescriptions/{i}");
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexConceptDescriptions));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "conceptDescriptions"));
+                            yield return error;
+                        }
+                        indexConceptDescriptions++;
                     }
                 }
             }
-        }  // public class RecursiveVerifier
+        }  // private class Transformer
+
+        /// <summary>
+        /// Verify the constraints of <paramref name="that" /> recursively.
+        /// </summary>
+        /// <param name="that">
+        /// The instance of the meta-model to be verified
+        /// </param>
+        public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+        {
+            foreach (var error in _transformer.Transform(that))
+            {
+                yield return error;
+            }
+        }
+
+        /// <summary>
+        /// Verify the constraints of <paramref name="that" />.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyNonEmptyString (
+            string that)
+        {
+            if (!(that.Length >= 1))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "that.Length >= 1");
+            }
+        }
+
+        /// <summary>
+        /// Verify the constraints of <paramref name="that" />.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyMimeTyped (
+            string that)
+        {
+            if (!(that.Length >= 1))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "that.Length >= 1");
+            }
+
+            if (!Verification.IsMimeType(that))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "Verification.IsMimeType(that)");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyModelingKind(
+            Aas.ModelingKind that)
+        {
+            if (!EnumValueSet.ForModelingKind.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid ModelingKind: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyAssetKind(
+            Aas.AssetKind that)
+        {
+            if (!EnumValueSet.ForAssetKind.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid AssetKind: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyEntityType(
+            Aas.EntityType that)
+        {
+            if (!EnumValueSet.ForEntityType.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid EntityType: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyIdentifiableElements(
+            Aas.IdentifiableElements that)
+        {
+            if (!EnumValueSet.ForIdentifiableElements.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid IdentifiableElements: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyReferableElements(
+            Aas.ReferableElements that)
+        {
+            if (!EnumValueSet.ForReferableElements.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid ReferableElements: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyKeyElements(
+            Aas.KeyElements that)
+        {
+            if (!EnumValueSet.ForKeyElements.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid KeyElements: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifySubmodelElements(
+            Aas.SubmodelElements that)
+        {
+            if (!EnumValueSet.ForSubmodelElements.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid SubmodelElements: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyBuildInListTypes(
+            Aas.BuildInListTypes that)
+        {
+            if (!EnumValueSet.ForBuildInListTypes.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid BuildInListTypes: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyDecimalBuildInTypes(
+            Aas.DecimalBuildInTypes that)
+        {
+            if (!EnumValueSet.ForDecimalBuildInTypes.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid DecimalBuildInTypes: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyDurationBuildInTypes(
+            Aas.DurationBuildInTypes that)
+        {
+            if (!EnumValueSet.ForDurationBuildInTypes.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid DurationBuildInTypes: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyPrimitiveTypes(
+            Aas.PrimitiveTypes that)
+        {
+            if (!EnumValueSet.ForPrimitiveTypes.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid PrimitiveTypes: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyStringBuildInTypes(
+            Aas.StringBuildInTypes that)
+        {
+            if (!EnumValueSet.ForStringBuildInTypes.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid StringBuildInTypes: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyDataTypeDef(
+            Aas.DataTypeDef that)
+        {
+            if (!EnumValueSet.ForDataTypeDef.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid DataTypeDef: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyDataTypeIec61360(
+            Aas.DataTypeIec61360 that)
+        {
+            if (!EnumValueSet.ForDataTypeIec61360.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid DataTypeIec61360: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyLevelType(
+            Aas.LevelType that)
+        {
+            if (!EnumValueSet.ForLevelType.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid LevelType: {that}");
+            }
+        }
     }  // public static class Verification
 }  // namespace AasCore.Aas3
 
