@@ -5,6 +5,7 @@
 
 using Regex = System.Text.RegularExpressions.Regex;
 using System.Collections.Generic;  // can't alias
+using System.Linq;  // can't alias
 
 using Aas = AasCore.Aas3;
 using Reporting = AasCore.Aas3.Reporting;
@@ -62,6 +63,14 @@ namespace AasCore.Aas3
         public static bool IsMimeType(string text)
         {
             return _regexIsMimeType.IsMatch(text);
+        }
+
+        public static bool IsModelReferenceTo(
+            Aas.ModelReference reference,
+            Aas.KeyElements expected_type
+        )
+        {
+            throw new System.NotImplementedException("TODO");
         }
 
         /// <summary>
@@ -515,6 +524,30 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.AssetAdministrationShell that)
             {
+                if (!(
+                    !(that.DerivedFrom != null)
+                    || Verification.IsModelReferenceTo(that.DerivedFrom, KeyElements.Submodel)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "derived_from points to an Asset Administration Shell\n" +
+                        "!(that.DerivedFrom != null)\n" +
+                        "|| Verification.IsModelReferenceTo(that.DerivedFrom, KeyElements.Submodel)");
+                }
+
+                if (!(
+                    !(that.Submodels != null)
+                    || (that.Submodels.All(
+                        submodel => Verification.IsModelReferenceTo(submodel, KeyElements.Submodel)))))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Submodel references point to a submodel\n" +
+                        "!(that.Submodels != null)\n" +
+                        "|| (that.Submodels.All(\n" +
+                        "    submodel => Verification.IsModelReferenceTo(submodel, KeyElements.Submodel)))");
+                }
+
                 if (that.DataSpecifications != null)
                 {
                     int indexDataSpecifications = 0;
@@ -632,20 +665,23 @@ namespace AasCore.Aas3
                     yield return error;
                 }
 
-                int indexSubmodels = 0;
-                foreach (var item in that.Submodels)
+                if (that.Submodels != null)
                 {
-                    foreach (var error in Verification.Verify(item))
+                    int indexSubmodels = 0;
+                    foreach (var item in that.Submodels)
                     {
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexSubmodels));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "submodels"));
-                        yield return error;
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexSubmodels));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "submodels"));
+                            yield return error;
+                        }
+                        indexSubmodels++;
                     }
-                    indexSubmodels++;
                 }
             }
 

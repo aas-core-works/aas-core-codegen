@@ -840,7 +840,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// The reference to the AAS the AAS was derived from.
         /// </summary>
-        public IReference? DerivedFrom { get; set; }
+        public ModelReference? DerivedFrom { get; set; }
 
         /// <summary>
         /// Meta-information about the asset the AAS is representing.
@@ -855,7 +855,7 @@ namespace AasCore.Aas3
         /// The asset of an AAS is typically described by one or more submodels. Temporarily
         /// no submodel might be assigned to the AAS.
         /// </remarks>
-        public List<IReference> Submodels { get; set; }
+        public List<ModelReference>? Submodels { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -898,9 +898,12 @@ namespace AasCore.Aas3
 
             yield return AssetInformation;
 
-            foreach (var anItem in Submodels)
+            if (Submodels != null)
             {
-                yield return anItem;
+                foreach (var anItem in Submodels)
+                {
+                    yield return anItem;
+                }
             }
         }
 
@@ -986,14 +989,17 @@ namespace AasCore.Aas3
                 yield return anItem;
             }
 
-            foreach (var anItem in Submodels)
+            if (Submodels != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Submodels)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
         }
@@ -1045,8 +1051,8 @@ namespace AasCore.Aas3
             LangStringSet? description = null,
             AdministrativeInformation? administration = null,
             List<IReference>? dataSpecifications = null,
-            IReference? derivedFrom = null,
-            List<IReference>? submodels = null)
+            ModelReference? derivedFrom = null,
+            List<ModelReference>? submodels = null)
         {
             Extensions = (extensions != null)
                 ? extensions
@@ -1060,9 +1066,7 @@ namespace AasCore.Aas3
             DataSpecifications = dataSpecifications;
             DerivedFrom = derivedFrom;
             AssetInformation = assetInformation;
-            Submodels = (submodels != null)
-                ? submodels
-                : new List<IReference>();
+            Submodels = submodels;
         }
     }
 

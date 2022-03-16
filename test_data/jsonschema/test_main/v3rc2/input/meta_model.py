@@ -48,6 +48,18 @@ def is_MIME_type(text: str) -> bool:
     return match(media_type, text) is not None
 
 
+@verification
+@implementation_specific
+def is_model_reference_to(
+        reference: "Model_reference",
+        expected_type: "Key_elements"
+) -> bool:
+    """Check that the target of the model reference matches the expected ``target``."""
+    # This implementation is only for reference. It needs to be adapted for each
+    # implementation separately.
+    return len(reference.keys) == 0 or reference.keys[-1].type == expected_type
+
+
 # endregion
 
 # region Constrained primitive types
@@ -117,12 +129,12 @@ class Extension(Has_semantics):
     """
 
     def __init__(
-        self,
-        name: Non_empty_string,
-        semantic_ID: Optional["Reference"] = None,
-        value_type: Optional["Data_type_def"] = None,
-        value: Optional[Non_empty_string] = None,
-        refers_to: Optional["Reference"] = None,
+            self,
+            name: Non_empty_string,
+            semantic_ID: Optional["Reference"] = None,
+            value_type: Optional["Data_type_def"] = None,
+            value: Optional[Non_empty_string] = None,
+            refers_to: Optional["Reference"] = None,
     ) -> None:
         Has_semantics.__init__(self, semantic_ID=semantic_ID)
 
@@ -236,12 +248,12 @@ class Referable(Has_extensions):
     """
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        ID_short: Optional[Non_empty_string] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
+            self,
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
     ) -> None:
         Has_extensions.__init__(self, extensions=extensions)
 
@@ -270,14 +282,14 @@ class Identifiable(Referable):
     """
 
     def __init__(
-        self,
-        ID: Non_empty_string,
-        extensions: Optional[List["Extension"]] = None,
-        ID_short: Optional[Non_empty_string] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        administration: Optional["Administrative_information"] = None,
+            self,
+            ID: Non_empty_string,
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            administration: Optional["Administrative_information"] = None,
     ) -> None:
         Referable.__init__(
             self,
@@ -394,10 +406,10 @@ class Administrative_information(Has_data_specification):
     """Revision of the element."""
 
     def __init__(
-        self,
-        version: Optional[Non_empty_string] = None,
-        revision: Optional[Non_empty_string] = None,
-        data_specifications: Optional[List["Reference"]] = None,
+            self,
+            version: Optional[Non_empty_string] = None,
+            revision: Optional[Non_empty_string] = None,
+            data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Has_data_specification.__init__(self, data_specifications=data_specifications)
 
@@ -479,12 +491,12 @@ class Qualifier(Constraint, Has_semantics):
     """
 
     def __init__(
-        self,
-        type: Non_empty_string,
-        value_type: "Data_type_def",
-        value: Optional[Non_empty_string] = None,
-        value_ID: Optional["Reference"] = None,
-        semantic_ID: Optional["Reference"] = None,
+            self,
+            type: Non_empty_string,
+            value_type: "Data_type_def",
+            value: Optional[Non_empty_string] = None,
+            value_ID: Optional["Reference"] = None,
+            semantic_ID: Optional["Reference"] = None,
     ) -> None:
         Has_semantics.__init__(self, semantic_ID=semantic_ID)
 
@@ -515,12 +527,29 @@ class Formula(Constraint):
         self.depends_on = depends_on
 
 
+# fmt: off
 @reference_in_the_book(section=(6, 7, 3))
 @serialization(with_model_type=True)
+@invariant(
+    lambda self:
+    not (self.submodels is not None)
+    or all(
+        is_model_reference_to(submodel, Key_elements.Submodel)
+        for submodel in self.submodels
+    ),
+    "Submodel references point to a submodel"
+)
+@invariant(
+    lambda self:
+    not (self.derived_from is not None)
+    or is_model_reference_to(self.derived_from, Key_elements.Submodel),
+    "derived_from points to an Asset Administration Shell"
+)
+# fmt: on
 class Asset_administration_shell(Identifiable, Has_data_specification):
     """Structure a digital representation of an asset."""
 
-    derived_from: Optional["Reference"]
+    derived_from: Optional["Model_reference"]
     """The reference to the AAS the AAS was derived from."""
 
     # NOTE sadu, Manuel (2021-11-17)
@@ -530,7 +559,7 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
     asset_information: "Asset_information"
     """Meta-information about the asset the AAS is representing."""
 
-    submodels: List["Reference"]
+    submodels: Optional[List["Model_reference"]]
     """
     References to submodels of the AAS.
 
@@ -544,18 +573,18 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
     # views: Optional[List['View']]
 
     def __init__(
-        self,
-        ID: Non_empty_string,
-        asset_information: "Asset_information",
-        ID_short: Optional[Non_empty_string] = None,
-        extensions: Optional[List["Extension"]] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        administration: Optional["Administrative_information"] = None,
-        data_specifications: Optional[List["Reference"]] = None,
-        derived_from: Optional["Reference"] = None,
-        submodels: Optional[List["Reference"]] = None,
+            self,
+            ID: Non_empty_string,
+            asset_information: "Asset_information",
+            ID_short: Optional[Non_empty_string] = None,
+            extensions: Optional[List["Extension"]] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            administration: Optional["Administrative_information"] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            derived_from: Optional["Model_reference"] = None,
+            submodels: Optional[List["Model_reference"]] = None,
     ) -> None:
         Identifiable.__init__(
             self,
@@ -572,7 +601,7 @@ class Asset_administration_shell(Identifiable, Has_data_specification):
 
         self.derived_from = derived_from
         self.asset_information = asset_information
-        self.submodels = submodels if submodels is not None else []
+        self.submodels = submodels
 
 
 @reference_in_the_book(section=(6, 7, 4))
@@ -618,11 +647,11 @@ class Asset_information(DBC):
     """
 
     def __init__(
-        self,
-        asset_kind: "Asset_kind",
-        global_asset_ID: Optional["Reference"] = None,
-        specific_asset_ID: Optional["Identifier_key_value_pair"] = None,
-        default_thumbnail: Optional["File"] = None,
+            self,
+            asset_kind: "Asset_kind",
+            global_asset_ID: Optional["Reference"] = None,
+            specific_asset_ID: Optional["Identifier_key_value_pair"] = None,
+            default_thumbnail: Optional["File"] = None,
     ) -> None:
         self.asset_kind = asset_kind
         self.global_asset_ID = global_asset_ID
@@ -684,11 +713,11 @@ class Identifier_key_value_pair(Has_semantics):
     """The (external) subject the key belongs to or has meaning to."""
 
     def __init__(
-        self,
-        key: Non_empty_string,
-        value: Non_empty_string,
-        external_subject_ID: Optional["Reference"] = None,
-        semantic_ID: Optional["Reference"] = None,
+            self,
+            key: Non_empty_string,
+            value: Non_empty_string,
+            external_subject_ID: Optional["Reference"] = None,
+            semantic_ID: Optional["Reference"] = None,
     ) -> None:
         Has_semantics.__init__(self, semantic_ID)
         self.key = key
@@ -713,19 +742,19 @@ class Submodel(
     """A submodel consists of zero or more submodel elements."""
 
     def __init__(
-        self,
-        ID: Non_empty_string,
-        ID_short: Optional[Non_empty_string] = None,
-        submodel_elements: Optional[List["Submodel_element"]] = None,
-        extensions: Optional[List["Extension"]] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        administration: Optional["Administrative_information"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List["Constraint"]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
+            self,
+            ID: Non_empty_string,
+            ID_short: Optional[Non_empty_string] = None,
+            submodel_elements: Optional[List["Submodel_element"]] = None,
+            extensions: Optional[List["Extension"]] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            administration: Optional["Administrative_information"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List["Constraint"]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         # TODO (Nico & Marko, 2021-09-24):
         #  How should we implement Constraint AASd-062 (page 64 in V3RC1)?
@@ -769,16 +798,16 @@ class Submodel_element(
     """
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        ID_short: Optional[Non_empty_string] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List["Constraint"]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
+            self,
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List["Constraint"]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Referable.__init__(
             self,
@@ -828,18 +857,18 @@ class Relationship_element(Submodel_element):
     """
 
     def __init__(
-        self,
-        first: "Reference",
-        second: "Reference",
-        extensions: Optional[List["Extension"]] = None,
-        ID_short: Optional[Non_empty_string] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List["Constraint"]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
+            self,
+            first: "Reference",
+            second: "Reference",
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List["Constraint"]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -908,20 +937,20 @@ class Submodel_element_list(Submodel_element):
     """
 
     def __init__(
-        self,
-        submodel_element_type_values: "Submodel_elements",
-        extensions: Optional[List["Extension"]] = None,
-        ID_short: Optional[Non_empty_string] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List["Constraint"]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
-        values: Optional[List["Submodel_element"]] = None,
-        semantic_ID_values: Optional["Reference"] = None,
-        value_type_values: Optional["Data_type_def"] = None,
+            self,
+            submodel_element_type_values: "Submodel_elements",
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List["Constraint"]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            values: Optional[List["Submodel_element"]] = None,
+            semantic_ID_values: Optional["Reference"] = None,
+            value_type_values: Optional["Data_type_def"] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -958,17 +987,17 @@ class Submodel_element_struct(Submodel_element):
     """
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        ID_short: Optional[Non_empty_string] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List["Constraint"]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
-        values: Optional[List["Submodel_element"]] = None,
+            self,
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List["Constraint"]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            values: Optional[List["Submodel_element"]] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -1002,16 +1031,16 @@ class Data_element(Submodel_element):
     """
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        ID_short: Optional[Non_empty_string] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List[Constraint]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
+            self,
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List[Constraint]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -1075,19 +1104,19 @@ class Property(Data_element):
     """
 
     def __init__(
-        self,
-        value_type: "Data_type_def",
-        ID_short: Optional[Non_empty_string] = None,
-        extensions: Optional[List["Extension"]] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List[Constraint]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
-        value: Optional[Non_empty_string] = None,
-        value_ID: Optional["Reference"] = None,
+            self,
+            value_type: "Data_type_def",
+            ID_short: Optional[Non_empty_string] = None,
+            extensions: Optional[List["Extension"]] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List[Constraint]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            value: Optional[Non_empty_string] = None,
+            value_ID: Optional["Reference"] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1145,18 +1174,18 @@ class Multi_language_property(Data_element):
     """
 
     def __init__(
-        self,
-        ID_short: Optional[Non_empty_string] = None,
-        extensions: Optional[List["Extension"]] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List[Constraint]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
-        value: Optional["Lang_string_set"] = None,
-        value_ID: Optional["Reference"] = None,
+            self,
+            ID_short: Optional[Non_empty_string] = None,
+            extensions: Optional[List["Extension"]] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List[Constraint]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            value: Optional["Lang_string_set"] = None,
+            value_ID: Optional["Reference"] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1210,19 +1239,19 @@ class Range(Data_element):
     """
 
     def __init__(
-        self,
-        value_type: "Data_type_def",
-        ID_short: Optional[Non_empty_string] = None,
-        extensions: Optional[List["Extension"]] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List[Constraint]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
-        min: Optional[Non_empty_string] = None,
-        max: Optional[Non_empty_string] = None,
+            self,
+            value_type: "Data_type_def",
+            ID_short: Optional[Non_empty_string] = None,
+            extensions: Optional[List["Extension"]] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List[Constraint]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            min: Optional[Non_empty_string] = None,
+            max: Optional[Non_empty_string] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1265,17 +1294,17 @@ class Reference_element(Data_element):
     """
 
     def __init__(
-        self,
-        ID_short: Optional[Non_empty_string] = None,
-        extensions: Optional[List["Extension"]] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List[Constraint]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
-        value: Optional["Reference"] = None,
+            self,
+            ID_short: Optional[Non_empty_string] = None,
+            extensions: Optional[List["Extension"]] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List[Constraint]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            value: Optional["Reference"] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1326,18 +1355,18 @@ class Blob(Data_element):
     """
 
     def __init__(
-        self,
-        MIME_type: MIME_typed,
-        ID_short: Optional[Non_empty_string] = None,
-        extensions: Optional[List["Extension"]] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List[Constraint]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
-        value: Optional[bytearray] = None,
+            self,
+            MIME_type: MIME_typed,
+            ID_short: Optional[Non_empty_string] = None,
+            extensions: Optional[List["Extension"]] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List[Constraint]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            value: Optional[bytearray] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1382,18 +1411,18 @@ class File(Data_element):
     """
 
     def __init__(
-        self,
-        MIME_type: MIME_typed,
-        ID_short: Optional[Non_empty_string] = None,
-        extensions: Optional[List["Extension"]] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List[Constraint]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
-        value: Optional[Non_empty_string] = None,
+            self,
+            MIME_type: MIME_typed,
+            ID_short: Optional[Non_empty_string] = None,
+            extensions: Optional[List["Extension"]] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List[Constraint]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            value: Optional[Non_empty_string] = None,
     ) -> None:
         Data_element.__init__(
             self,
@@ -1428,19 +1457,19 @@ class Annotated_relationship_element(Relationship_element):
     """
 
     def __init__(
-        self,
-        first: "Reference",
-        second: "Reference",
-        extensions: Optional[List["Extension"]] = None,
-        ID_short: Optional[Non_empty_string] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List[Constraint]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
-        annotation: Optional[List[Data_element]] = None,
+            self,
+            first: "Reference",
+            second: "Reference",
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List[Constraint]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            annotation: Optional[List[Data_element]] = None,
     ) -> None:
         Relationship_element.__init__(
             self,
@@ -1536,20 +1565,20 @@ class Entity(Submodel_element):
     """
 
     def __init__(
-        self,
-        entity_type: "Entity_type",
-        extensions: Optional[List["Extension"]] = None,
-        ID_short: Optional[Non_empty_string] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List["Constraint"]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
-        statements: Optional[List["Submodel_element"]] = None,
-        global_asset_ID: Optional["Reference"] = None,
-        specific_asset_ID: Optional["Identifier_key_value_pair"] = None,
+            self,
+            entity_type: "Entity_type",
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List["Constraint"]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            statements: Optional[List["Submodel_element"]] = None,
+            global_asset_ID: Optional["Reference"] = None,
+            specific_asset_ID: Optional["Identifier_key_value_pair"] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -1582,16 +1611,16 @@ class Event(Submodel_element):
     """
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        ID_short: Optional[Non_empty_string] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional[Modeling_kind] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List[Constraint]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
+            self,
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional[Modeling_kind] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List[Constraint]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -1620,17 +1649,17 @@ class Basic_Event(Event):
     """
 
     def __init__(
-        self,
-        observed: "Reference",
-        ID_short: Optional[Non_empty_string] = None,
-        extensions: Optional[List["Extension"]] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional[Modeling_kind] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List[Constraint]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
+            self,
+            observed: "Reference",
+            ID_short: Optional[Non_empty_string] = None,
+            extensions: Optional[List["Extension"]] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional[Modeling_kind] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List[Constraint]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Event.__init__(
             self,
@@ -1674,19 +1703,19 @@ class Operation(Submodel_element):
     """
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        ID_short: Optional[Non_empty_string] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List["Constraint"]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
-        input_variables: Optional[List["Operation_variable"]] = None,
-        output_variables: Optional[List["Operation_variable"]] = None,
-        inoutput_variables: Optional[List["Operation_variable"]] = None,
+            self,
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List["Constraint"]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            input_variables: Optional[List["Operation_variable"]] = None,
+            output_variables: Optional[List["Operation_variable"]] = None,
+            inoutput_variables: Optional[List["Operation_variable"]] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -1739,16 +1768,16 @@ class Capability(Submodel_element):
     """
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        ID_short: Optional[Non_empty_string] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        kind: Optional["Modeling_kind"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        qualifiers: Optional[List["Constraint"]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
+            self,
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List["Constraint"]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Submodel_element.__init__(
             self,
@@ -1786,16 +1815,16 @@ class Concept_description(Identifiable, Has_data_specification):
     """
 
     def __init__(
-        self,
-        ID: Non_empty_string,
-        ID_short: Optional[Non_empty_string] = None,
-        extensions: Optional[List["Extension"]] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        administration: Optional["Administrative_information"] = None,
-        is_case_of: Optional[List["Reference"]] = None,
-        data_specifications: Optional[List["Reference"]] = None,
+            self,
+            ID: Non_empty_string,
+            ID_short: Optional[Non_empty_string] = None,
+            extensions: Optional[List["Extension"]] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            administration: Optional["Administrative_information"] = None,
+            is_case_of: Optional[List["Reference"]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
     ) -> None:
         Identifiable.__init__(
             self,
@@ -1834,15 +1863,15 @@ class View(Referable, Has_semantics, Has_data_specification):
     """
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        ID_short: Optional[Non_empty_string] = None,
-        display_name: Optional["Lang_string_set"] = None,
-        category: Optional[Non_empty_string] = None,
-        description: Optional["Lang_string_set"] = None,
-        semantic_ID: Optional["Reference"] = None,
-        data_specifications: Optional[List["Reference"]] = None,
-        contained_elements: Optional[List["Reference"]] = None,
+            self,
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            contained_elements: Optional[List["Reference"]] = None,
     ) -> None:
         Referable.__init__(
             self,
@@ -1910,7 +1939,7 @@ class Model_reference(Reference):
     """
 
     def __init__(
-        self, keys: List["Key"], referred_semantic_ID: Optional["Reference"] = None
+            self, keys: List["Key"], referred_semantic_ID: Optional["Reference"] = None
     ) -> None:
         self.keys = keys
         self.referred_semantic_ID = referred_semantic_ID
@@ -2505,7 +2534,7 @@ class Value_list(DBC):
     """
 
     def __init__(
-        self, value_reference_pairs: Optional[List["Value_reference_pair"]] = None
+            self, value_reference_pairs: Optional[List["Value_reference_pair"]] = None
     ) -> None:
         self.value_reference_pairs = (
             value_reference_pairs if value_reference_pairs is not None else []
@@ -2631,20 +2660,20 @@ class Data_specification_IEC61360(Data_specification_content):
     """
 
     def __init__(
-        self,
-        preferred_name: Optional["Lang_string_set"] = None,
-        short_name: Optional["Lang_string_set"] = None,
-        unit: Optional[Non_empty_string] = None,
-        unit_ID: Optional["Reference"] = None,
-        source_of_definition: Optional[Non_empty_string] = None,
-        symbol: Optional[Non_empty_string] = None,
-        data_type: Optional["Data_type_IEC61360"] = None,
-        definition: Optional["Lang_string_set"] = None,
-        value_format: Optional[Non_empty_string] = None,
-        value_list: Optional["Value_list"] = None,
-        value: Optional[Non_empty_string] = None,
-        value_ID: Optional["Reference"] = None,
-        level_type: Optional["Level_type"] = None,
+            self,
+            preferred_name: Optional["Lang_string_set"] = None,
+            short_name: Optional["Lang_string_set"] = None,
+            unit: Optional[Non_empty_string] = None,
+            unit_ID: Optional["Reference"] = None,
+            source_of_definition: Optional[Non_empty_string] = None,
+            symbol: Optional[Non_empty_string] = None,
+            data_type: Optional["Data_type_IEC61360"] = None,
+            definition: Optional["Lang_string_set"] = None,
+            value_format: Optional[Non_empty_string] = None,
+            value_list: Optional["Value_list"] = None,
+            value: Optional[Non_empty_string] = None,
+            value_ID: Optional["Reference"] = None,
+            level_type: Optional["Level_type"] = None,
     ) -> None:
         self.preferred_name = preferred_name
         self.short_name = short_name
@@ -2729,19 +2758,19 @@ class Data_specification_physical_unit(Data_specification_content):
     """
 
     def __init__(
-        self,
-        unit_name: Optional[Non_empty_string] = None,
-        unit_symbol: Optional[Non_empty_string] = None,
-        definition: Optional["Lang_string_set"] = None,
-        SI_notation: Optional[Non_empty_string] = None,
-        DIN_notation: Optional[Non_empty_string] = None,
-        ECE_name: Optional[Non_empty_string] = None,
-        ECE_code: Optional[Non_empty_string] = None,
-        NIST_name: Optional[Non_empty_string] = None,
-        source_of_definition: Optional[Non_empty_string] = None,
-        conversion_factor: Optional[Non_empty_string] = None,
-        registration_authority_ID: Optional[Non_empty_string] = None,
-        supplier: Optional[Non_empty_string] = None,
+            self,
+            unit_name: Optional[Non_empty_string] = None,
+            unit_symbol: Optional[Non_empty_string] = None,
+            definition: Optional["Lang_string_set"] = None,
+            SI_notation: Optional[Non_empty_string] = None,
+            DIN_notation: Optional[Non_empty_string] = None,
+            ECE_name: Optional[Non_empty_string] = None,
+            ECE_code: Optional[Non_empty_string] = None,
+            NIST_name: Optional[Non_empty_string] = None,
+            source_of_definition: Optional[Non_empty_string] = None,
+            conversion_factor: Optional[Non_empty_string] = None,
+            registration_authority_ID: Optional[Non_empty_string] = None,
+            supplier: Optional[Non_empty_string] = None,
     ) -> None:
         self.unit_name = unit_name
         self.unit_symbol = unit_symbol
@@ -2778,10 +2807,11 @@ class Environment:
     concept_descriptions: Optional[List[Concept_description]]
 
     def __init__(
-        self,
-        asset_administration_shells: Optional[List[Asset_administration_shell]] = None,
-        submodels: Optional[List[Submodel]] = None,
-        concept_descriptions: Optional[List[Concept_description]] = None,
+            self,
+            asset_administration_shells: Optional[
+                List[Asset_administration_shell]] = None,
+            submodels: Optional[List[Submodel]] = None,
+            concept_descriptions: Optional[List[Concept_description]] = None,
     ) -> None:
         self.asset_administration_shells = asset_administration_shells
         self.submodels = submodels

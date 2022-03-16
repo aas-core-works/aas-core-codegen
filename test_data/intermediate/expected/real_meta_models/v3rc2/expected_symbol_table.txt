@@ -1949,7 +1949,7 @@ SymbolTable(
           name='derived_from',
           type_annotation=OptionalTypeAnnotation(
             value=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+              symbol='Reference to symbol Model_reference',
               parsed=...),
             parsed=...),
           description=Description(
@@ -1969,9 +1969,11 @@ SymbolTable(
           parsed=...),
         Property(
           name='submodels',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Model_reference',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=Description(
@@ -2082,7 +2084,7 @@ SymbolTable(
             name='derived_from',
             type_annotation=OptionalTypeAnnotation(
               value=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
+                symbol='Reference to symbol Model_reference',
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -2094,7 +2096,7 @@ SymbolTable(
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  symbol='Reference to symbol Reference',
+                  symbol='Reference to symbol Model_reference',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -2122,8 +2124,18 @@ SymbolTable(
           "AssignArgument(\n  name='data_specifications',\n  argument='data_specifications',\n  default=None)",
           "AssignArgument(\n  name='derived_from',\n  argument='derived_from',\n  default=None)",
           "AssignArgument(\n  name='asset_information',\n  argument='asset_information',\n  default=None)",
-          "AssignArgument(\n  name='submodels',\n  argument='submodels',\n  default=EmptyList(\n    node=...))"]),
-      invariants=[],
+          "AssignArgument(\n  name='submodels',\n  argument='submodels',\n  default=None)"]),
+      invariants=[
+        Invariant(
+          description='derived_from points to an Asset Administration Shell',
+          body="Implication(\n  antecedent=IsNotNone(\n    value=Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='derived_from',\n      original_node=...),\n    original_node=...),\n  consequent=FunctionCall(\n    name='is_model_reference_to',\n    args=[\n      Member(\n        instance=Name(\n          identifier='self',\n          original_node=...),\n        name='derived_from',\n        original_node=...),\n      Member(\n        instance=Name(\n          identifier='Key_elements',\n          original_node=...),\n        name='Submodel',\n        original_node=...)],\n    original_node=...),\n  original_node=...)",
+          specified_for='Reference to ConcreteClass Asset_administration_shell',
+          parsed=...),
+        Invariant(
+          description='Submodel references point to a submodel',
+          body="Implication(\n  antecedent=IsNotNone(\n    value=Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='submodels',\n      original_node=...),\n    original_node=...),\n  consequent=All(\n    for_each=ForEach(\n      variable=Name(\n        identifier='submodel',\n        original_node=...),\n      iteration=Member(\n        instance=Name(\n          identifier='self',\n          original_node=...),\n        name='submodels',\n        original_node=...),\n      original_node=...),\n    condition=FunctionCall(\n      name='is_model_reference_to',\n      args=[\n        Name(\n          identifier='submodel',\n          original_node=...),\n        Member(\n          instance=Name(\n            identifier='Key_elements',\n            original_node=...),\n          name='Submodel',\n          original_node=...)],\n      original_node=...),\n    original_node=...),\n  original_node=...)",
+          specified_for='Reference to ConcreteClass Asset_administration_shell',
+          parsed=...)],
       serialization=Serialization(
         with_model_type=True),
       reference_in_the_book=ReferenceInTheBook(
@@ -11781,7 +11793,36 @@ SymbolTable(
         postconditions=[]),
       parsed=...,
       arguments_by_name=...,
-      pattern='([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+|"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*"))*')],
+      pattern='([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&\'*+\\-.^_`|~0-9a-zA-Z])+|"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*"))*'),
+    ImplementationSpecificVerification(
+      name='is_model_reference_to',
+      arguments=[
+        Argument(
+          name='reference',
+          type_annotation=OurTypeAnnotation(
+            symbol='Reference to symbol Model_reference',
+            parsed=...),
+          default=None,
+          parsed=...),
+        Argument(
+          name='expected_type',
+          type_annotation=OurTypeAnnotation(
+            symbol='Reference to symbol Key_elements',
+            parsed=...),
+          default=None,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=Description(
+        document=...,
+        node=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...)],
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=Description(
