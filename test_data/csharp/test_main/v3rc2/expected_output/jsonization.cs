@@ -21,11 +21,78 @@ namespace AasCore.Aas3
     public static class Jsonization
     {
         /// <summary>
+        /// Capture a path segment of a value in a model.
+        /// </summary
+        internal abstract class Segment {
+            // Intentionally empty.
+        }
+
+        internal class NameSegment : Segment {
+            internal readonly string Name;
+            internal NameSegment(string name)
+            {
+                Name = name;
+            }
+        }
+
+        internal class IndexSegment : Segment {
+            internal readonly int Index;
+            internal IndexSegment(int index)
+            {
+                Index = index;
+            }
+        }
+
+        internal static System.Text.RegularExpressions.Regex VariableNameRe = (
+            new  System.Text.RegularExpressions.Regex(
+                @"^[a-zA-Z_][a-zA-Z_0-9]*$"));
+
+        internal static string GeneratePath(
+            ICollection<Segment> segments)
+        {
+            var parts = new List<string>(segments.Count);
+            int i = 0;
+            foreach(var segment in segments)
+            {
+                string? part = null;
+                switch (segment)
+                {
+                    case NameSegment nameSegment:
+                        if (VariableNameRe.IsMatch(nameSegment.Name))
+                        {
+                            part = (i == 0) ? nameSegment.Name : $".{nameSegment.Name}";
+                        }
+                        else
+                        {
+                            string escaped = nameSegment.Name
+                                .Replace("\\", "\\\\")
+                                .Replace("\"", "\\\"")
+                                .Replace("\b", "\\b")
+                                .Replace("\f", "\\f")
+                                .Replace("\n", "\\n")
+                                .Replace("\r", "\\r")
+                                .Replace("\t", "\\t");
+                            part = $"[\"{escaped}\"]";
+                        }
+                        break;
+                    case IndexSegment indexSegment:
+                        part = $"[{indexSegment.Index}]";
+                        break;
+                    default:
+                        throw new System.InvalidOperationException(
+                            $"Unexpected segment type: {segment.GetType()}");
+                }
+                parts.Add(part);
+            }
+            return string.Join("", parts);
+        }
+
+        /// <summary>
         /// Represent an error during the deserialization.
         /// </summary>
         internal class Error
         {
-            internal LinkedList<string> PathSegments = new LinkedList<string>();
+            internal LinkedList<Segment> PathSegments = new LinkedList<Segment>();
             internal readonly string Cause;
             internal Error(string cause)
             {
@@ -346,7 +413,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -369,7 +436,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "name");
+                        new NameSegment("name"));
                     return null;
                 }
                 if (theName == null)
@@ -388,7 +455,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "valueType");
+                            new NameSegment("valueType"));
                         return null;
                     }
                     if (theValueType == null)
@@ -408,7 +475,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "value");
+                            new NameSegment("value"));
                         return null;
                     }
                     if (theValue == null)
@@ -428,7 +495,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "refersTo");
+                            new NameSegment("refersTo"));
                         return null;
                     }
                     if (theRefersTo == null)
@@ -979,7 +1046,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -992,9 +1059,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -1002,7 +1069,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -1023,7 +1092,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "version");
+                            new NameSegment("version"));
                         return null;
                     }
                     if (theVersion == null)
@@ -1043,7 +1112,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "revision");
+                            new NameSegment("revision"));
                         return null;
                     }
                     if (theRevision == null)
@@ -1242,7 +1311,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -1265,7 +1334,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "type");
+                        new NameSegment("type"));
                     return null;
                 }
                 if (theType == null)
@@ -1287,7 +1356,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "valueType");
+                        new NameSegment("valueType"));
                     return null;
                 }
                 if (theValueType == null)
@@ -1306,7 +1375,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "value");
+                            new NameSegment("value"));
                         return null;
                     }
                     if (theValue == null)
@@ -1326,7 +1395,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "valueId");
+                            new NameSegment("valueId"));
                         return null;
                     }
                     if (theValueId == null)
@@ -1377,7 +1446,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDependsOn.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dependsOn");
+                            new NameSegment("dependsOn"));
                         return null;
                     }
                     theDependsOn = new List<IReference>(
@@ -1390,9 +1459,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDependsOn.ToString());
+                                new IndexSegment(indexDependsOn));
                             error.PathSegments.AddFirst(
-                                "dependsOn");
+                                new NameSegment("dependsOn"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -1400,7 +1469,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDependsOn.ToString());
+                                new IndexSegment(indexDependsOn));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dependsOn"));
                             return null;
                         }
                         theDependsOn.Add(
@@ -1444,7 +1515,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -1457,9 +1528,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -1467,7 +1538,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -1491,7 +1564,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -1504,9 +1577,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -1514,7 +1587,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -1534,7 +1609,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -1554,7 +1629,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -1574,7 +1649,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -1594,7 +1669,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -1617,7 +1692,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "id");
+                        new NameSegment("id"));
                     return null;
                 }
                 if (theId == null)
@@ -1636,7 +1711,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "administration");
+                            new NameSegment("administration"));
                         return null;
                     }
                     if (theAdministration == null)
@@ -1656,7 +1731,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "derivedFrom");
+                            new NameSegment("derivedFrom"));
                         return null;
                     }
                     if (theDerivedFrom == null)
@@ -1679,7 +1754,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "assetInformation");
+                        new NameSegment("assetInformation"));
                     return null;
                 }
                 if (theAssetInformation == null)
@@ -1701,7 +1776,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeSubmodels.GetType()}");
                     error.PathSegments.AddFirst(
-                        "submodels");
+                        new NameSegment("submodels"));
                     return null;
                 }
                 var theSubmodels = new List<IReference>(
@@ -1714,9 +1789,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexSubmodels.ToString());
+                            new IndexSegment(indexSubmodels));
                         error.PathSegments.AddFirst(
-                            "submodels");
+                            new NameSegment("submodels"));
                     }
                     IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -1724,7 +1799,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexSubmodels.ToString());
+                            new IndexSegment(indexSubmodels));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("submodels"));
                         return null;
                     }
                     theSubmodels.Add(
@@ -1788,7 +1865,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "assetKind");
+                        new NameSegment("assetKind"));
                     return null;
                 }
                 if (theAssetKind == null)
@@ -1807,7 +1884,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "globalAssetId");
+                            new NameSegment("globalAssetId"));
                         return null;
                     }
                     if (theGlobalAssetId == null)
@@ -1827,7 +1904,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "specificAssetId");
+                            new NameSegment("specificAssetId"));
                         return null;
                     }
                     if (theSpecificAssetId == null)
@@ -1847,7 +1924,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "defaultThumbnail");
+                            new NameSegment("defaultThumbnail"));
                         return null;
                     }
                     if (theDefaultThumbnail == null)
@@ -1925,7 +2002,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -1948,7 +2025,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "key");
+                        new NameSegment("key"));
                     return null;
                 }
                 if (theKey == null)
@@ -1970,7 +2047,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "value");
+                        new NameSegment("value"));
                     return null;
                 }
                 if (theValue == null)
@@ -1989,7 +2066,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "externalSubjectId");
+                            new NameSegment("externalSubjectId"));
                         return null;
                     }
                     if (theExternalSubjectId == null)
@@ -2039,7 +2116,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -2052,9 +2129,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -2062,7 +2139,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -2083,7 +2162,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -2103,7 +2182,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -2126,7 +2205,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -2139,9 +2218,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -2149,7 +2228,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -2172,7 +2253,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -2185,9 +2266,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -2195,7 +2276,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -2215,7 +2298,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -2235,7 +2318,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -2255,7 +2338,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -2275,7 +2358,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -2298,7 +2381,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "id");
+                        new NameSegment("id"));
                     return null;
                 }
                 if (theId == null)
@@ -2317,7 +2400,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "administration");
+                            new NameSegment("administration"));
                         return null;
                     }
                     if (theAdministration == null)
@@ -2340,7 +2423,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeSubmodelElements.GetType()}");
                     error.PathSegments.AddFirst(
-                        "submodelElements");
+                        new NameSegment("submodelElements"));
                     return null;
                 }
                 var theSubmodelElements = new List<ISubmodelElement>(
@@ -2353,9 +2436,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexSubmodelElements.ToString());
+                            new IndexSegment(indexSubmodelElements));
                         error.PathSegments.AddFirst(
-                            "submodelElements");
+                            new NameSegment("submodelElements"));
                     }
                     ISubmodelElement? parsedItem = DeserializeImplementation.ISubmodelElementFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -2363,7 +2446,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexSubmodelElements.ToString());
+                            new IndexSegment(indexSubmodelElements));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("submodelElements"));
                         return null;
                     }
                     theSubmodelElements.Add(
@@ -2573,7 +2658,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -2586,9 +2671,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -2596,7 +2681,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -2620,7 +2707,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -2633,9 +2720,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -2643,7 +2730,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -2663,7 +2752,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -2683,7 +2772,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -2703,7 +2792,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -2723,7 +2812,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -2743,7 +2832,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -2763,7 +2852,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -2786,7 +2875,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -2799,9 +2888,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -2809,7 +2898,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -2832,7 +2923,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "submodelElementTypeValues");
+                        new NameSegment("submodelElementTypeValues"));
                     return null;
                 }
                 if (theSubmodelElementTypeValues == null)
@@ -2854,7 +2945,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeValues.GetType()}");
                     error.PathSegments.AddFirst(
-                        "values");
+                        new NameSegment("values"));
                     return null;
                 }
                 var theValues = new List<ISubmodelElement>(
@@ -2867,9 +2958,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexValues.ToString());
+                            new IndexSegment(indexValues));
                         error.PathSegments.AddFirst(
-                            "values");
+                            new NameSegment("values"));
                     }
                     ISubmodelElement? parsedItem = DeserializeImplementation.ISubmodelElementFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -2877,7 +2968,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexValues.ToString());
+                            new IndexSegment(indexValues));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("values"));
                         return null;
                     }
                     theValues.Add(
@@ -2897,7 +2990,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticIdValues");
+                            new NameSegment("semanticIdValues"));
                         return null;
                     }
                     if (theSemanticIdValues == null)
@@ -2917,7 +3010,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "valueTypeValues");
+                            new NameSegment("valueTypeValues"));
                         return null;
                     }
                     if (theValueTypeValues == null)
@@ -2980,7 +3073,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -2993,9 +3086,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3003,7 +3096,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -3027,7 +3122,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -3040,9 +3135,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -3050,7 +3145,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -3070,7 +3167,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -3090,7 +3187,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -3110,7 +3207,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -3130,7 +3227,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -3150,7 +3247,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -3170,7 +3267,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -3193,7 +3290,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -3206,9 +3303,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -3216,7 +3313,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -3239,7 +3338,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeValues.GetType()}");
                     error.PathSegments.AddFirst(
-                        "values");
+                        new NameSegment("values"));
                     return null;
                 }
                 var theValues = new List<ISubmodelElement>(
@@ -3252,9 +3351,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexValues.ToString());
+                            new IndexSegment(indexValues));
                         error.PathSegments.AddFirst(
-                            "values");
+                            new NameSegment("values"));
                     }
                     ISubmodelElement? parsedItem = DeserializeImplementation.ISubmodelElementFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -3262,7 +3361,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexValues.ToString());
+                            new IndexSegment(indexValues));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("values"));
                         return null;
                     }
                     theValues.Add(
@@ -3391,7 +3492,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -3404,9 +3505,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3414,7 +3515,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -3438,7 +3541,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -3451,9 +3554,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -3461,7 +3564,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -3481,7 +3586,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -3501,7 +3606,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -3521,7 +3626,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -3541,7 +3646,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -3561,7 +3666,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -3581,7 +3686,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -3604,7 +3709,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -3617,9 +3722,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -3627,7 +3732,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -3650,7 +3757,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "valueType");
+                        new NameSegment("valueType"));
                     return null;
                 }
                 if (theValueType == null)
@@ -3669,7 +3776,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "value");
+                            new NameSegment("value"));
                         return null;
                     }
                     if (theValue == null)
@@ -3689,7 +3796,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "valueId");
+                            new NameSegment("valueId"));
                         return null;
                     }
                     if (theValueId == null)
@@ -3749,7 +3856,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -3762,9 +3869,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3772,7 +3879,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -3796,7 +3905,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -3809,9 +3918,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -3819,7 +3928,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -3839,7 +3950,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -3859,7 +3970,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -3879,7 +3990,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -3899,7 +4010,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -3919,7 +4030,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -3939,7 +4050,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -3962,7 +4073,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -3975,9 +4086,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -3985,7 +4096,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -4005,7 +4118,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "value");
+                            new NameSegment("value"));
                         return null;
                     }
                     if (theValue == null)
@@ -4025,7 +4138,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "valueId");
+                            new NameSegment("valueId"));
                         return null;
                     }
                     if (theValueId == null)
@@ -4082,7 +4195,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -4095,9 +4208,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4105,7 +4218,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -4129,7 +4244,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -4142,9 +4257,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -4152,7 +4267,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -4172,7 +4289,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -4192,7 +4309,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -4212,7 +4329,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -4232,7 +4349,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -4252,7 +4369,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -4272,7 +4389,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -4295,7 +4412,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -4308,9 +4425,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -4318,7 +4435,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -4341,7 +4460,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "valueType");
+                        new NameSegment("valueType"));
                     return null;
                 }
                 if (theValueType == null)
@@ -4360,7 +4479,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "min");
+                            new NameSegment("min"));
                         return null;
                     }
                     if (theMin == null)
@@ -4380,7 +4499,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "max");
+                            new NameSegment("max"));
                         return null;
                     }
                     if (theMax == null)
@@ -4440,7 +4559,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -4453,9 +4572,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4463,7 +4582,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -4487,7 +4608,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -4500,9 +4621,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -4510,7 +4631,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -4530,7 +4653,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -4550,7 +4673,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -4570,7 +4693,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -4590,7 +4713,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -4610,7 +4733,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -4630,7 +4753,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -4653,7 +4776,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -4666,9 +4789,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -4676,7 +4799,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -4696,7 +4821,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "value");
+                            new NameSegment("value"));
                         return null;
                     }
                     if (theValue == null)
@@ -4752,7 +4877,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -4765,9 +4890,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4775,7 +4900,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -4799,7 +4926,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -4812,9 +4939,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -4822,7 +4949,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -4842,7 +4971,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -4862,7 +4991,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -4882,7 +5011,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -4902,7 +5031,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -4922,7 +5051,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -4942,7 +5071,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -4965,7 +5094,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -4978,9 +5107,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -4988,7 +5117,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -5011,7 +5142,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "mimeType");
+                        new NameSegment("mimeType"));
                     return null;
                 }
                 if (theMimeType == null)
@@ -5030,7 +5161,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "value");
+                            new NameSegment("value"));
                         return null;
                     }
                     if (theValue == null)
@@ -5089,7 +5220,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -5102,9 +5233,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5112,7 +5243,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -5136,7 +5269,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -5149,9 +5282,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -5159,7 +5292,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -5179,7 +5314,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -5199,7 +5334,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -5219,7 +5354,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -5239,7 +5374,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -5259,7 +5394,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -5279,7 +5414,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -5302,7 +5437,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -5315,9 +5450,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -5325,7 +5460,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -5348,7 +5485,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "mimeType");
+                        new NameSegment("mimeType"));
                     return null;
                 }
                 if (theMimeType == null)
@@ -5367,7 +5504,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "value");
+                            new NameSegment("value"));
                         return null;
                     }
                     if (theValue == null)
@@ -5426,7 +5563,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -5439,9 +5576,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5449,7 +5586,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -5473,7 +5612,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -5486,9 +5625,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -5496,7 +5635,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -5516,7 +5657,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -5536,7 +5677,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -5556,7 +5697,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -5576,7 +5717,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -5596,7 +5737,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -5616,7 +5757,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -5639,7 +5780,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -5652,9 +5793,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -5662,7 +5803,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -5685,7 +5828,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "first");
+                        new NameSegment("first"));
                     return null;
                 }
                 if (theFirst == null)
@@ -5707,7 +5850,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "second");
+                        new NameSegment("second"));
                     return null;
                 }
                 if (theSecond == null)
@@ -5729,7 +5872,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeAnnotation.GetType()}");
                     error.PathSegments.AddFirst(
-                        "annotation");
+                        new NameSegment("annotation"));
                     return null;
                 }
                 var theAnnotation = new List<IDataElement>(
@@ -5742,9 +5885,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexAnnotation.ToString());
+                            new IndexSegment(indexAnnotation));
                         error.PathSegments.AddFirst(
-                            "annotation");
+                            new NameSegment("annotation"));
                     }
                     IDataElement? parsedItem = DeserializeImplementation.IDataElementFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -5752,7 +5895,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexAnnotation.ToString());
+                            new IndexSegment(indexAnnotation));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("annotation"));
                         return null;
                     }
                     theAnnotation.Add(
@@ -5846,7 +5991,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -5859,9 +6004,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5869,7 +6014,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -5893,7 +6040,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -5906,9 +6053,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -5916,7 +6063,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -5936,7 +6085,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -5956,7 +6105,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -5976,7 +6125,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -5996,7 +6145,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -6016,7 +6165,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -6036,7 +6185,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -6059,7 +6208,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -6072,9 +6221,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6082,7 +6231,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -6105,7 +6256,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "entityType");
+                        new NameSegment("entityType"));
                     return null;
                 }
                 if (theEntityType == null)
@@ -6127,7 +6278,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeStatements.GetType()}");
                     error.PathSegments.AddFirst(
-                        "statements");
+                        new NameSegment("statements"));
                     return null;
                 }
                 var theStatements = new List<ISubmodelElement>(
@@ -6140,9 +6291,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexStatements.ToString());
+                            new IndexSegment(indexStatements));
                         error.PathSegments.AddFirst(
-                            "statements");
+                            new NameSegment("statements"));
                     }
                     ISubmodelElement? parsedItem = DeserializeImplementation.ISubmodelElementFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6150,7 +6301,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexStatements.ToString());
+                            new IndexSegment(indexStatements));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("statements"));
                         return null;
                     }
                     theStatements.Add(
@@ -6170,7 +6323,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "globalAssetId");
+                            new NameSegment("globalAssetId"));
                         return null;
                     }
                     if (theGlobalAssetId == null)
@@ -6190,7 +6343,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "specificAssetId");
+                            new NameSegment("specificAssetId"));
                         return null;
                     }
                     if (theSpecificAssetId == null)
@@ -6309,7 +6462,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -6322,9 +6475,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6332,7 +6485,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -6356,7 +6511,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -6369,9 +6524,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6379,7 +6534,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -6399,7 +6556,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -6419,7 +6576,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -6439,7 +6596,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -6459,7 +6616,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -6479,7 +6636,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -6499,7 +6656,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -6522,7 +6679,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -6535,9 +6692,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6545,7 +6702,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -6568,7 +6727,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "observed");
+                        new NameSegment("observed"));
                     return null;
                 }
                 if (theObserved == null)
@@ -6625,7 +6784,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -6638,9 +6797,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6648,7 +6807,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -6672,7 +6833,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -6685,9 +6846,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6695,7 +6856,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -6715,7 +6878,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -6735,7 +6898,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -6755,7 +6918,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -6775,7 +6938,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -6795,7 +6958,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -6815,7 +6978,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -6838,7 +7001,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -6851,9 +7014,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6861,7 +7024,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -6884,7 +7049,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeInputVariables.GetType()}");
                     error.PathSegments.AddFirst(
-                        "inputVariables");
+                        new NameSegment("inputVariables"));
                     return null;
                 }
                 var theInputVariables = new List<OperationVariable>(
@@ -6897,9 +7062,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexInputVariables.ToString());
+                            new IndexSegment(indexInputVariables));
                         error.PathSegments.AddFirst(
-                            "inputVariables");
+                            new NameSegment("inputVariables"));
                     }
                     OperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6907,7 +7072,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexInputVariables.ToString());
+                            new IndexSegment(indexInputVariables));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("inputVariables"));
                         return null;
                     }
                     theInputVariables.Add(
@@ -6930,7 +7097,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeOutputVariables.GetType()}");
                     error.PathSegments.AddFirst(
-                        "outputVariables");
+                        new NameSegment("outputVariables"));
                     return null;
                 }
                 var theOutputVariables = new List<OperationVariable>(
@@ -6943,9 +7110,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexOutputVariables.ToString());
+                            new IndexSegment(indexOutputVariables));
                         error.PathSegments.AddFirst(
-                            "outputVariables");
+                            new NameSegment("outputVariables"));
                     }
                     OperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6953,7 +7120,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexOutputVariables.ToString());
+                            new IndexSegment(indexOutputVariables));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("outputVariables"));
                         return null;
                     }
                     theOutputVariables.Add(
@@ -6976,7 +7145,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeInoutputVariables.GetType()}");
                     error.PathSegments.AddFirst(
-                        "inoutputVariables");
+                        new NameSegment("inoutputVariables"));
                     return null;
                 }
                 var theInoutputVariables = new List<OperationVariable>(
@@ -6989,9 +7158,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexInoutputVariables.ToString());
+                            new IndexSegment(indexInoutputVariables));
                         error.PathSegments.AddFirst(
-                            "inoutputVariables");
+                            new NameSegment("inoutputVariables"));
                     }
                     OperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6999,7 +7168,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexInoutputVariables.ToString());
+                            new IndexSegment(indexInoutputVariables));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("inoutputVariables"));
                         return null;
                     }
                     theInoutputVariables.Add(
@@ -7066,7 +7237,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "value");
+                        new NameSegment("value"));
                     return null;
                 }
                 if (theValue == null)
@@ -7110,7 +7281,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -7123,9 +7294,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7133,7 +7304,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -7157,7 +7330,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -7170,9 +7343,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7180,7 +7353,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -7200,7 +7375,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -7220,7 +7395,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -7240,7 +7415,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -7260,7 +7435,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -7280,7 +7455,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "kind");
+                            new NameSegment("kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -7300,7 +7475,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -7323,7 +7498,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        "qualifiers");
+                        new NameSegment("qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -7336,9 +7511,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
                         error.PathSegments.AddFirst(
-                            "qualifiers");
+                            new NameSegment("qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7346,7 +7521,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexQualifiers.ToString());
+                            new IndexSegment(indexQualifiers));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -7401,7 +7578,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -7414,9 +7591,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7424,7 +7601,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -7448,7 +7627,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -7461,9 +7640,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7471,7 +7650,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -7491,7 +7672,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -7511,7 +7692,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -7531,7 +7712,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -7551,7 +7732,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -7574,7 +7755,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "id");
+                        new NameSegment("id"));
                     return null;
                 }
                 if (theId == null)
@@ -7593,7 +7774,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "administration");
+                            new NameSegment("administration"));
                         return null;
                     }
                     if (theAdministration == null)
@@ -7616,7 +7797,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeIsCaseOf.GetType()}");
                     error.PathSegments.AddFirst(
-                        "isCaseOf");
+                        new NameSegment("isCaseOf"));
                     return null;
                 }
                 var theIsCaseOf = new List<IReference>(
@@ -7629,9 +7810,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexIsCaseOf.ToString());
+                            new IndexSegment(indexIsCaseOf));
                         error.PathSegments.AddFirst(
-                            "isCaseOf");
+                            new NameSegment("isCaseOf"));
                     }
                     IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7639,7 +7820,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexIsCaseOf.ToString());
+                            new IndexSegment(indexIsCaseOf));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("isCaseOf"));
                         return null;
                     }
                     theIsCaseOf.Add(
@@ -7696,7 +7879,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            "dataSpecifications");
+                            new NameSegment("dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -7709,9 +7892,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                "dataSpecifications");
+                                new NameSegment("dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7719,7 +7902,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexDataSpecifications.ToString());
+                                new IndexSegment(indexDataSpecifications));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -7743,7 +7928,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        "extensions");
+                        new NameSegment("extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -7756,9 +7941,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
                         error.PathSegments.AddFirst(
-                            "extensions");
+                            new NameSegment("extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7766,7 +7951,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexExtensions.ToString());
+                            new IndexSegment(indexExtensions));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -7786,7 +7973,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "idShort");
+                            new NameSegment("idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -7806,7 +7993,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "displayName");
+                            new NameSegment("displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -7826,7 +8013,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "category");
+                            new NameSegment("category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -7846,7 +8033,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "description");
+                            new NameSegment("description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -7866,7 +8053,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "semanticId");
+                            new NameSegment("semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -7889,7 +8076,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeContainedElements.GetType()}");
                     error.PathSegments.AddFirst(
-                        "containedElements");
+                        new NameSegment("containedElements"));
                     return null;
                 }
                 var theContainedElements = new List<IReference>(
@@ -7902,9 +8089,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexContainedElements.ToString());
+                            new IndexSegment(indexContainedElements));
                         error.PathSegments.AddFirst(
-                            "containedElements");
+                            new NameSegment("containedElements"));
                     }
                     IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7912,7 +8099,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexContainedElements.ToString());
+                            new IndexSegment(indexContainedElements));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("containedElements"));
                         return null;
                     }
                     theContainedElements.Add(
@@ -8028,7 +8217,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeValues.GetType()}");
                     error.PathSegments.AddFirst(
-                        "values");
+                        new NameSegment("values"));
                     return null;
                 }
                 var theValues = new List<string>(
@@ -8041,9 +8230,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexValues.ToString());
+                            new IndexSegment(indexValues));
                         error.PathSegments.AddFirst(
-                            "values");
+                            new NameSegment("values"));
                     }
                     string? parsedItem = DeserializeImplementation.StringFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -8051,7 +8240,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexValues.ToString());
+                            new IndexSegment(indexValues));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("values"));
                         return null;
                     }
                     theValues.Add(
@@ -8099,7 +8290,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeKeys.GetType()}");
                     error.PathSegments.AddFirst(
-                        "keys");
+                        new NameSegment("keys"));
                     return null;
                 }
                 var theKeys = new List<Key>(
@@ -8112,9 +8303,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexKeys.ToString());
+                            new IndexSegment(indexKeys));
                         error.PathSegments.AddFirst(
-                            "keys");
+                            new NameSegment("keys"));
                     }
                     Key? parsedItem = DeserializeImplementation.KeyFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -8122,7 +8313,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexKeys.ToString());
+                            new IndexSegment(indexKeys));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("keys"));
                         return null;
                     }
                     theKeys.Add(
@@ -8142,7 +8335,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "referredSemanticId");
+                            new NameSegment("referredSemanticId"));
                         return null;
                     }
                     if (theReferredSemanticId == null)
@@ -8191,7 +8384,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "type");
+                        new NameSegment("type"));
                     return null;
                 }
                 if (theType == null)
@@ -8213,7 +8406,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "value");
+                        new NameSegment("value"));
                     return null;
                 }
                 if (theValue == null)
@@ -8689,7 +8882,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "value");
+                        new NameSegment("value"));
                     return null;
                 }
                 if (theValue == null)
@@ -8711,7 +8904,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        "valueId");
+                        new NameSegment("valueId"));
                     return null;
                 }
                 if (theValueId == null)
@@ -8761,7 +8954,7 @@ namespace AasCore.Aas3
                     error = new Jsonization.Error(
                         $"Expected a JsonArray, but got {nodeValueReferencePairs.GetType()}");
                     error.PathSegments.AddFirst(
-                        "valueReferencePairs");
+                        new NameSegment("valueReferencePairs"));
                     return null;
                 }
                 var theValueReferencePairs = new List<ValueReferencePair>(
@@ -8774,9 +8967,9 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            indexValueReferencePairs.ToString());
+                            new IndexSegment(indexValueReferencePairs));
                         error.PathSegments.AddFirst(
-                            "valueReferencePairs");
+                            new NameSegment("valueReferencePairs"));
                     }
                     ValueReferencePair? parsedItem = DeserializeImplementation.ValueReferencePairFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -8784,7 +8977,9 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            indexValueReferencePairs.ToString());
+                            new IndexSegment(indexValueReferencePairs));
+                        error.PathSegments.AddFirst(
+                            new NameSegment("valueReferencePairs"));
                         return null;
                     }
                     theValueReferencePairs.Add(
@@ -8829,7 +9024,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "preferredName");
+                            new NameSegment("preferredName"));
                         return null;
                     }
                     if (thePreferredName == null)
@@ -8849,7 +9044,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "shortName");
+                            new NameSegment("shortName"));
                         return null;
                     }
                     if (theShortName == null)
@@ -8869,7 +9064,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "unit");
+                            new NameSegment("unit"));
                         return null;
                     }
                     if (theUnit == null)
@@ -8889,7 +9084,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "unitId");
+                            new NameSegment("unitId"));
                         return null;
                     }
                     if (theUnitId == null)
@@ -8909,7 +9104,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "sourceOfDefinition");
+                            new NameSegment("sourceOfDefinition"));
                         return null;
                     }
                     if (theSourceOfDefinition == null)
@@ -8929,7 +9124,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "symbol");
+                            new NameSegment("symbol"));
                         return null;
                     }
                     if (theSymbol == null)
@@ -8949,7 +9144,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "dataType");
+                            new NameSegment("dataType"));
                         return null;
                     }
                     if (theDataType == null)
@@ -8969,7 +9164,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "definition");
+                            new NameSegment("definition"));
                         return null;
                     }
                     if (theDefinition == null)
@@ -8989,7 +9184,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "valueFormat");
+                            new NameSegment("valueFormat"));
                         return null;
                     }
                     if (theValueFormat == null)
@@ -9009,7 +9204,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "valueList");
+                            new NameSegment("valueList"));
                         return null;
                     }
                     if (theValueList == null)
@@ -9029,7 +9224,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "value");
+                            new NameSegment("value"));
                         return null;
                     }
                     if (theValue == null)
@@ -9049,7 +9244,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "valueId");
+                            new NameSegment("valueId"));
                         return null;
                     }
                     if (theValueId == null)
@@ -9069,7 +9264,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "levelType");
+                            new NameSegment("levelType"));
                         return null;
                     }
                     if (theLevelType == null)
@@ -9124,7 +9319,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "unitName");
+                            new NameSegment("unitName"));
                         return null;
                     }
                     if (theUnitName == null)
@@ -9144,7 +9339,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "unitSymbol");
+                            new NameSegment("unitSymbol"));
                         return null;
                     }
                     if (theUnitSymbol == null)
@@ -9164,7 +9359,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "definition");
+                            new NameSegment("definition"));
                         return null;
                     }
                     if (theDefinition == null)
@@ -9184,7 +9379,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "siNotation");
+                            new NameSegment("siNotation"));
                         return null;
                     }
                     if (theSiNotation == null)
@@ -9204,7 +9399,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "dinNotation");
+                            new NameSegment("dinNotation"));
                         return null;
                     }
                     if (theDinNotation == null)
@@ -9224,7 +9419,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "eceName");
+                            new NameSegment("eceName"));
                         return null;
                     }
                     if (theEceName == null)
@@ -9244,7 +9439,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "eceCode");
+                            new NameSegment("eceCode"));
                         return null;
                     }
                     if (theEceCode == null)
@@ -9264,7 +9459,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "nistName");
+                            new NameSegment("nistName"));
                         return null;
                     }
                     if (theNistName == null)
@@ -9284,7 +9479,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "sourceOfDefinition");
+                            new NameSegment("sourceOfDefinition"));
                         return null;
                     }
                     if (theSourceOfDefinition == null)
@@ -9304,7 +9499,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "conversionFactor");
+                            new NameSegment("conversionFactor"));
                         return null;
                     }
                     if (theConversionFactor == null)
@@ -9324,7 +9519,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "registrationAuthorityId");
+                            new NameSegment("registrationAuthorityId"));
                         return null;
                     }
                     if (theRegistrationAuthorityId == null)
@@ -9344,7 +9539,7 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            "supplier");
+                            new NameSegment("supplier"));
                         return null;
                     }
                     if (theSupplier == null)
@@ -9398,7 +9593,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeAssetAdministrationShells.GetType()}");
                         error.PathSegments.AddFirst(
-                            "assetAdministrationShells");
+                            new NameSegment("assetAdministrationShells"));
                         return null;
                     }
                     theAssetAdministrationShells = new List<AssetAdministrationShell>(
@@ -9411,9 +9606,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexAssetAdministrationShells.ToString());
+                                new IndexSegment(indexAssetAdministrationShells));
                             error.PathSegments.AddFirst(
-                                "assetAdministrationShells");
+                                new NameSegment("assetAdministrationShells"));
                         }
                         AssetAdministrationShell? parsedItem = DeserializeImplementation.AssetAdministrationShellFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9421,7 +9616,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexAssetAdministrationShells.ToString());
+                                new IndexSegment(indexAssetAdministrationShells));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("assetAdministrationShells"));
                             return null;
                         }
                         theAssetAdministrationShells.Add(
@@ -9442,7 +9639,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeSubmodels.GetType()}");
                         error.PathSegments.AddFirst(
-                            "submodels");
+                            new NameSegment("submodels"));
                         return null;
                     }
                     theSubmodels = new List<Submodel>(
@@ -9455,9 +9652,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexSubmodels.ToString());
+                                new IndexSegment(indexSubmodels));
                             error.PathSegments.AddFirst(
-                                "submodels");
+                                new NameSegment("submodels"));
                         }
                         Submodel? parsedItem = DeserializeImplementation.SubmodelFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9465,7 +9662,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexSubmodels.ToString());
+                                new IndexSegment(indexSubmodels));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("submodels"));
                             return null;
                         }
                         theSubmodels.Add(
@@ -9486,7 +9685,7 @@ namespace AasCore.Aas3
                         error = new Jsonization.Error(
                             $"Expected a JsonArray, but got {nodeConceptDescriptions.GetType()}");
                         error.PathSegments.AddFirst(
-                            "conceptDescriptions");
+                            new NameSegment("conceptDescriptions"));
                         return null;
                     }
                     theConceptDescriptions = new List<ConceptDescription>(
@@ -9499,9 +9698,9 @@ namespace AasCore.Aas3
                             error = new Jsonization.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                indexConceptDescriptions.ToString());
+                                new IndexSegment(indexConceptDescriptions));
                             error.PathSegments.AddFirst(
-                                "conceptDescriptions");
+                                new NameSegment("conceptDescriptions"));
                         }
                         ConceptDescription? parsedItem = DeserializeImplementation.ConceptDescriptionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9509,7 +9708,9 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                indexConceptDescriptions.ToString());
+                                new IndexSegment(indexConceptDescriptions));
+                            error.PathSegments.AddFirst(
+                                new NameSegment("conceptDescriptions"));
                             return null;
                         }
                         theConceptDescriptions.Add(
@@ -9573,7 +9774,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9598,7 +9799,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9623,7 +9824,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9648,7 +9849,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9673,7 +9874,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9698,7 +9899,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9723,7 +9924,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9748,7 +9949,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9773,7 +9974,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9798,7 +9999,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9823,7 +10024,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9848,7 +10049,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9873,7 +10074,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9898,7 +10099,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9923,7 +10124,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9948,7 +10149,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9973,7 +10174,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9998,7 +10199,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10023,7 +10224,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10048,7 +10249,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10073,7 +10274,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10098,7 +10299,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10123,7 +10324,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10148,7 +10349,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10173,7 +10374,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10198,7 +10399,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10223,7 +10424,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10248,7 +10449,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10273,7 +10474,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10298,7 +10499,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10323,7 +10524,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10348,7 +10549,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10373,7 +10574,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10398,7 +10599,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10423,7 +10624,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10448,7 +10649,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10473,7 +10674,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10498,7 +10699,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10523,7 +10724,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10548,7 +10749,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10573,7 +10774,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10598,7 +10799,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10623,7 +10824,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10648,7 +10849,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10673,7 +10874,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10698,7 +10899,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10723,7 +10924,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10748,7 +10949,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10773,7 +10974,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10798,7 +10999,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10823,7 +11024,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10848,7 +11049,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10873,7 +11074,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10898,7 +11099,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10923,7 +11124,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10948,7 +11149,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10973,7 +11174,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10998,7 +11199,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11023,7 +11224,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11048,7 +11249,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11073,7 +11274,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11098,7 +11299,7 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        string.Join("/", error.PathSegments),
+                        Jsonization.GeneratePath(error.PathSegments),
                         error.Cause);
                 }
                 return result
