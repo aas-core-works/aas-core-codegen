@@ -7,6 +7,7 @@ from aas_core_codegen.csharp import (
     structure as csharp_structure,
     visitation as csharp_visitation,
     verification as csharp_verification,
+    reporting as csharp_reporting,
     stringification as csharp_stringification,
     jsonization as csharp_jsonization,
 )
@@ -184,6 +185,25 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     except Exception as exception:
         run.write_error_report(
             message=f"Failed to write the verification C# code to {pth}",
+            errors=[str(exception)],
+            stderr=stderr,
+        )
+        return 1
+
+    # endregion
+
+    # region Reporting
+
+    code = csharp_reporting.generate(namespace=namespace)
+
+    pth = context.output_dir / "reporting.cs"
+    pth.parent.mkdir(exist_ok=True)
+
+    try:
+        pth.write_text(code, encoding="utf-8")
+    except Exception as exception:
+        run.write_error_report(
+            message=f"Failed to write the reporting C# code to {pth}",
             errors=[str(exception)],
             stderr=stderr,
         )

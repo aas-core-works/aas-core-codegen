@@ -153,6 +153,8 @@ INDENT = "    "
 INDENT2 = INDENT * 2
 INDENT3 = INDENT * 3
 INDENT4 = INDENT * 4
+INDENT5 = INDENT * 5
+INDENT6 = INDENT * 6
 
 NAMESPACE_IDENTIFIER_RE = re.compile(
     r"[a-zA-Z_][a-zA-Z_0-9]*(\.[a-zA-Z_][a-zA-Z_0-9]*)"
