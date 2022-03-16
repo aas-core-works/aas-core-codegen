@@ -342,7 +342,7 @@ def _generate_deserialize_property(
                 if (error != null)
                 {{
                 {I}error.PathSegments.AddFirst(
-                {II}{json_literal});
+                {II}new NameSegment({json_literal}));
                 {I}return null;
                 }}
                 if ({target_var} == null)
@@ -381,7 +381,7 @@ def _generate_deserialize_property(
                 {I}error = new Jsonization.Error(
                 {II}$"Expected a JsonArray, but got {{{node_var}.GetType()}}");
                 {I}error.PathSegments.AddFirst(
-                {II}{json_literal});
+                {II}new NameSegment({json_literal}));
                 {I}return null;
                 }}
                 {target_var_prefix}{target_var} = new List<{item_type}>(
@@ -394,9 +394,9 @@ def _generate_deserialize_property(
                 {II}error = new Jsonization.Error(
                 {III}"Expected a non-null item, but got a null");
                 {II}error.PathSegments.AddFirst(
-                {III}{index_var}.ToString());
+                {III}new IndexSegment({index_var}));
                 {II}error.PathSegments.AddFirst(
-                {III}{json_literal});
+                {III}new NameSegment({json_literal}));
                 {I}}}
                 {I}{item_type}? parsedItem = {parse_method}(
                 {II}item ?? throw new System.InvalidOperationException(),
@@ -404,7 +404,9 @@ def _generate_deserialize_property(
                 {I}if (error != null)
                 {I}{{
                 {II}error.PathSegments.AddFirst(
-                {III}{index_var}.ToString());
+                {III}new IndexSegment({index_var}));
+                {II}error.PathSegments.AddFirst(
+                {III}new NameSegment({json_literal}));
                 {II}return null;
                 {I}}}
                 {I}{target_var}.Add(
@@ -895,7 +897,7 @@ def _generate_deserialize_from(name: str) -> Stripped:
             {I}if (error != null)
             {I}{{
             {II}throw new Jsonization.Exception(
-            {III}string.Join("/", error.PathSegments),
+            {III}Jsonization.GeneratePath(error.PathSegments),
             {III}error.Cause);
             {I}}}
             {I}return result
@@ -1544,6 +1546,104 @@ def generate(
         symbol_table=symbol_table,
     )
 
+    # The indention becomes quite unreadable, so we define this snippet outside
+    # of the context. Best you used vertical split in your editor to view the code.
+    segment_to_part_snippet = Stripped(
+        textwrap.dedent(
+            f"""\
+            string? part = null;
+            switch (segment)
+            {{
+            {I}case NameSegment nameSegment:
+            {II}if (VariableNameRe.IsMatch(nameSegment.Name))
+            {II}{{
+            {III}part = (i == 0) ? nameSegment.Name : $".{{nameSegment.Name}}";
+            {II}}}
+            {II}else
+            {II}{{
+            {III}string escaped = nameSegment.Name
+            {IIII}.Replace("\\\\", "\\\\\\\\")
+            {IIII}.Replace("\\"", "\\\\\\"")
+            {IIII}.Replace("\\b", "\\\\b")
+            {IIII}.Replace("\\f", "\\\\f")
+            {IIII}.Replace("\\n", "\\\\n")
+            {IIII}.Replace("\\r", "\\\\r")
+            {IIII}.Replace("\\t", "\\\\t");
+            {III}part = $"[\\"{{escaped}}\\"]";
+            {II}}}
+            {II}break;
+            {I}case IndexSegment indexSegment:
+            {II}part = $"[{{indexSegment.Index}}]";
+            {II}break;
+            {I}default:
+            {II}throw new System.InvalidOperationException(
+            {III}$"Unexpected segment type: {{segment.GetType()}}");
+            }}"""
+        )
+    )
+
+    generate_path_blocks = [
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                /// <summary>
+                /// Capture a path segment of a value in a model.
+                /// </summary
+                internal abstract class Segment {{
+                {I}// Intentionally empty.
+                }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                internal class NameSegment : Segment {{
+                {I}internal readonly string Name;
+                {I}internal NameSegment(string name)
+                {I}{{
+                {II}Name = name;
+                {I}}}
+                }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                internal class IndexSegment : Segment {{
+                {I}internal readonly int Index;
+                {I}internal IndexSegment(int index)
+                {I}{{
+                {II}Index = index;
+                {I}}}
+                }}"""
+            )
+        ),
+        Stripped(
+            textwrap.dedent(
+                f"""\
+                internal static System.Text.RegularExpressions.Regex VariableNameRe = (
+                {I}new  System.Text.RegularExpressions.Regex(
+                {II}@"^[a-zA-Z_][a-zA-Z_0-9]*$"));"""
+            )
+        ),
+        # We have to indent but a first line, so we can't use textwrap.dedent.
+        Stripped(
+            f"""\
+internal static string GeneratePath(
+{I}ICollection<Segment> segments)
+{{
+{I}var parts = new List<string>(segments.Count);
+{I}int i = 0;
+{I}foreach(var segment in segments)
+{I}{{
+{II}{indent_but_first_line(segment_to_part_snippet, II)}
+{II}parts.Add(part);
+{I}}}
+{I}return string.Join("", parts);
+}}"""
+        ),
+    ]
+
     error_block = Stripped(
         textwrap.dedent(
             f"""\
@@ -1552,7 +1652,7 @@ def generate(
             /// </summary>
             internal class Error
             {{
-            {I}internal LinkedList<string> PathSegments = new LinkedList<string>();
+            {I}internal LinkedList<Segment> PathSegments = new LinkedList<Segment>();
             {I}internal readonly string Cause;
             {I}internal Error(string cause)
             {I}{{
@@ -1582,14 +1682,19 @@ def generate(
         )
     )
 
-    jsonization_blocks = [
-        error_block,
-        deserialize_impl_block,
-        exception_block,
-        deserialize_block,
-        transformer_block,
-        serialize_block,
-    ]  # type: List[Stripped]
+    jsonization_blocks = []  # type: List[Stripped]
+    jsonization_blocks.extend(generate_path_blocks)
+
+    jsonization_blocks.extend(
+        [
+            error_block,
+            deserialize_impl_block,
+            exception_block,
+            deserialize_block,
+            transformer_block,
+            serialize_block,
+        ]
+    )
 
     jsonization_writer = io.StringIO()
     jsonization_writer.write(
