@@ -17,11 +17,11 @@ namespace AasCore.Aas3
         /// <summary>
         /// Capture a path segment of a value in a model.
         /// </summary
-        internal abstract class Segment {
+        public abstract class Segment {
             // Intentionally empty.
         }
 
-        internal class NameSegment : Segment {
+        public class NameSegment : Segment {
             internal readonly string Name;
             internal NameSegment(string name)
             {
@@ -29,7 +29,7 @@ namespace AasCore.Aas3
             }
         }
 
-        internal class IndexSegment : Segment {
+        public class IndexSegment : Segment {
             internal readonly int Index;
             internal IndexSegment(int index)
             {
@@ -48,7 +48,7 @@ namespace AasCore.Aas3
         /// See, for example, this page for more information on JSON path:
         /// https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html
         /// </remarks>
-        internal static string GenerateJsonPath(
+        public static string GenerateJsonPath(
             ICollection<Segment> segments)
         {
             var parts = new List<string>(segments.Count);
@@ -91,10 +91,13 @@ namespace AasCore.Aas3
         /// <summary>
         /// Represent an error during the deserialization or the verification.
         /// </summary>
-        internal class Error
+        public class Error
         {
-            internal LinkedList<Segment> PathSegments = new LinkedList<Segment>();
-            internal readonly string Cause;
+            internal LinkedList<Segment> _pathSegments = new LinkedList<Segment>();
+            public readonly string Cause;
+            public ICollection<Segment> PathSegments {
+                get { return _pathSegments; }
+            }
             internal Error(string cause)
             {
                 Cause = cause;

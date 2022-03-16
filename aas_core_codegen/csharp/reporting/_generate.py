@@ -41,7 +41,7 @@ def generate(namespace: csharp_common.NamespaceIdentifier) -> str:
                 /// <summary>
                 /// Capture a path segment of a value in a model.
                 /// </summary
-                internal abstract class Segment {{
+                public abstract class Segment {{
                 {I}// Intentionally empty.
                 }}"""
             )
@@ -49,7 +49,7 @@ def generate(namespace: csharp_common.NamespaceIdentifier) -> str:
         Stripped(
             textwrap.dedent(
                 f"""\
-                internal class NameSegment : Segment {{
+                public class NameSegment : Segment {{
                 {I}internal readonly string Name;
                 {I}internal NameSegment(string name)
                 {I}{{
@@ -61,7 +61,7 @@ def generate(namespace: csharp_common.NamespaceIdentifier) -> str:
         Stripped(
             textwrap.dedent(
                 f"""\
-                internal class IndexSegment : Segment {{
+                public class IndexSegment : Segment {{
                 {I}internal readonly int Index;
                 {I}internal IndexSegment(int index)
                 {I}{{
@@ -89,7 +89,7 @@ def generate(namespace: csharp_common.NamespaceIdentifier) -> str:
 /// See, for example, this page for more information on JSON path:
 /// https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html
 /// </remarks>
-internal static string GenerateJsonPath(
+public static string GenerateJsonPath(
 {I}ICollection<Segment> segments)
 {{
 {I}var parts = new List<string>(segments.Count);
@@ -135,10 +135,13 @@ internal static string GenerateJsonPath(
                 /// <summary>
                 /// Represent an error during the deserialization or the verification.
                 /// </summary>
-                internal class Error
+                public class Error
                 {{
-                {I}internal LinkedList<Segment> PathSegments = new LinkedList<Segment>();
-                {I}internal readonly string Cause;
+                {I}internal LinkedList<Segment> _pathSegments = new LinkedList<Segment>();
+                {I}public readonly string Cause;
+                {I}public ICollection<Segment> PathSegments {{
+                {II}get {{ return _pathSegments; }}
+                {I}}}
                 {I}internal Error(string cause)
                 {I}{{
                 {II}Cause = cause;
