@@ -46,7 +46,7 @@ def _generate_from_method_for_enumeration(
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.{name}? {name}From(
             {I}Nodes.JsonNode node,
-            {I}out Jsonization.Error? error)
+            {I}out Reporting.Error? error)
             {{
             {I}error = null;
             {I}string? text = DeserializeImplementation.StringFrom(
@@ -63,7 +63,7 @@ def _generate_from_method_for_enumeration(
             {I}Aas.{name}? result = Stringification.{name}FromString(text);
             {I}if (result == null)
             {I}{{
-            {II}error = new Jsonization.Error(
+            {II}error = new Reporting.Error(
             {III}{message_literal});
             {I}}}
             {I}return result;
@@ -86,7 +86,7 @@ def _generate_from_method_for_interface(
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {{
-                {I}error = new Jsonization.Error(
+                {I}error = new Reporting.Error(
                 {II}"Expected Nodes.JsonObject, but got {{node.GetType()}}");
                 {I}return null;
                 }}"""
@@ -98,14 +98,14 @@ def _generate_from_method_for_interface(
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {{
-                {I}error = new Jsonization.Error(
+                {I}error = new Reporting.Error(
                 {II}"Expected a model type, but none is present");
                 {I}return null;
                 }}
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {{
-                {I}error = new Jsonization.Error(
+                {I}error = new Reporting.Error(
                 {II}"Expected JsonValue, " +
                 {II}$"but got {{modelTypeNode.GetType()}}");
                 {I}return null;
@@ -113,7 +113,7 @@ def _generate_from_method_for_interface(
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {{
-                {I}error = new Jsonization.Error(
+                {I}error = new Reporting.Error(
                 {II}"Expected a string, " +
                 {II}$"but the conversion failed from {{modelTypeValue}}");
                 {I}return null;
@@ -151,7 +151,7 @@ def _generate_from_method_for_interface(
         textwrap.dedent(
             f"""\
             {I}default:
-            {II}error = new Jsonization.Error(
+            {II}error = new Reporting.Error(
             {III}$"Unexpected model type for {name}: {{modelType}}");
             {II}return null;
             }}"""
@@ -174,7 +174,7 @@ def _generate_from_method_for_interface(
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.{name}? {name}From(
             {I}Nodes.JsonNode node,
-            {I}out Jsonization.Error? error)
+            {I}out Reporting.Error? error)
             {{
             """
         )
@@ -342,7 +342,8 @@ def _generate_deserialize_property(
                 if (error != null)
                 {{
                 {I}error.PathSegments.AddFirst(
-                {II}new NameSegment({json_literal}));
+                {II}new Reporting.NameSegment(
+                {III}{json_literal}));
                 {I}return null;
                 }}
                 if ({target_var} == null)
@@ -378,10 +379,11 @@ def _generate_deserialize_property(
                 Nodes.JsonArray? {array_var} = {node_var} as Nodes.JsonArray;
                 if ({array_var} == null)
                 {{
-                {I}error = new Jsonization.Error(
+                {I}error = new Reporting.Error(
                 {II}$"Expected a JsonArray, but got {{{node_var}.GetType()}}");
                 {I}error.PathSegments.AddFirst(
-                {II}new NameSegment({json_literal}));
+                {II}new Reporting.NameSegment(
+                {III}{json_literal}));
                 {I}return null;
                 }}
                 {target_var_prefix}{target_var} = new List<{item_type}>(
@@ -391,12 +393,14 @@ def _generate_deserialize_property(
                 {{
                 {I}if (item == null)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}"Expected a non-null item, but got a null");
                 {II}error.PathSegments.AddFirst(
-                {III}new IndexSegment({index_var}));
+                {III}new Reporting.IndexSegment(
+                {IIII}{index_var}));
                 {II}error.PathSegments.AddFirst(
-                {III}new NameSegment({json_literal}));
+                {III}new Reporting.NameSegment(
+                {IIII}{json_literal}));
                 {I}}}
                 {I}{item_type}? parsedItem = {parse_method}(
                 {II}item ?? throw new System.InvalidOperationException(),
@@ -404,9 +408,11 @@ def _generate_deserialize_property(
                 {I}if (error != null)
                 {I}{{
                 {II}error.PathSegments.AddFirst(
-                {III}new IndexSegment({index_var}));
+                {III}new Reporting.IndexSegment(
+                {IIII}{index_var}));
                 {II}error.PathSegments.AddFirst(
-                {III}new NameSegment({json_literal}));
+                {III}new Reporting.NameSegment(
+                {IIII}{json_literal}));
                 {II}return null;
                 {I}}}
                 {I}{target_var}.Add(
@@ -431,7 +437,7 @@ def _generate_deserialize_property(
                     f"""\
                     if ({node_var} == null)
                     {{
-                    {I}error = new Jsonization.Error(
+                    {I}error = new Reporting.Error(
                     {II}{message_literal});
                     {I}return null;
                     }}"""
@@ -477,7 +483,7 @@ def _generate_from_method_for_class(
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {{
-                {I}error = new Jsonization.Error(
+                {I}error = new Reporting.Error(
                 {II}$"Expected a JsonObject, but got {{node.GetType()}}");
                 {I}return null;
                 }}"""
@@ -584,7 +590,7 @@ def _generate_from_method_for_class(
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.{name}? {name}From(
             {I}Nodes.JsonNode node,
-            {I}out Jsonization.Error? error)
+            {I}out Reporting.Error? error)
             {{
             """
         )
@@ -617,20 +623,20 @@ def _generate_deserialize_impl(
                 /// <param name="error">Error, if any, during the deserialization</param>
                 internal static bool? BoolFrom(
                 {I}Nodes.JsonNode node,
-                {I}out Jsonization.Error? error)
+                {I}out Reporting.Error? error)
                 {{
                 {I}error = null;
                 {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
                 {I}if (value == null)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}$"Expected a JsonValue, but got {{node.GetType()}}");
                 {II}return null;
                 {I}}}
                 {I}bool ok = value.TryGetValue<bool>(out bool result);
                 {I}if (!ok)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}$"Expected a boolean, but the conversion failed " +
                 {III}$"from {{value.ToJsonString()}}");
                 {II}return null;
@@ -649,20 +655,20 @@ def _generate_deserialize_impl(
                 /// <param name="error">Error, if any, during the deserialization</param>
                 internal static long? LongFrom(
                 {I}Nodes.JsonNode node,
-                {I}out Jsonization.Error? error)
+                {I}out Reporting.Error? error)
                 {{
                 {I}error = null;
                 {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
                 {I}if (value == null)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}$"Expected a JsonValue, but got {{node.GetType()}}");
                 {II}return null;
                 {I}}}
                 {I}bool ok = value.TryGetValue<long>(out long result);
                 {I}if (!ok)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}$"Expected a 64-bit long integer, but the conversion failed " +
                 {III}$"from {{value.ToJsonString()}}");
                 {II}return null;
@@ -681,20 +687,20 @@ def _generate_deserialize_impl(
                 /// <param name="error">Error, if any, during the deserialization</param>
                 internal static double? DoubleFrom(
                 {I}Nodes.JsonNode node,
-                {I}out Jsonization.Error? error)
+                {I}out Reporting.Error? error)
                 {{
                 {I}error = null;
                 {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
                 {I}if (value == null)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}$"Expected a JsonValue, but got {{node.GetType()}}");
                 {II}return null;
                 {I}}}
                 {I}bool ok = value.TryGetValue<double>(out double result);
                 {I}if (!ok)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}"Expected a 64-bit double-precision float, " +
                 {III}"but the conversion failed " +
                 {III}$"from {{value.ToJsonString()}}");
@@ -714,27 +720,27 @@ def _generate_deserialize_impl(
                 /// <param name="error">Error, if any, during the deserialization</param>
                 internal static string? StringFrom(
                 {I}Nodes.JsonNode node,
-                {I}out Jsonization.Error? error)
+                {I}out Reporting.Error? error)
                 {{
                 {I}error = null;
                 {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
                 {I}if (value == null)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}$"Expected a JsonValue, but got {{node.GetType()}}");
                 {II}return null;
                 {I}}}
                 {I}bool ok = value.TryGetValue<string>(out string? result);
                 {I}if (!ok)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}$"Expected a string, but the conversion failed " +
                 {III}$"from {{value.ToJsonString()}}");
                 {II}return null;
                 {I}}}
                 {I}if (result == null)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}"Expected a string, but got a null");
                 {II}return null;
                 {I}}}
@@ -752,27 +758,27 @@ def _generate_deserialize_impl(
                 /// <param name="error">Error, if any, during the deserialization</param>
                 internal static byte[]? BytesFrom(
                 {I}Nodes.JsonNode node,
-                {I}out Jsonization.Error? error)
+                {I}out Reporting.Error? error)
                 {{
                 {I}error = null;
                 {I}Nodes.JsonValue? value = node as Nodes.JsonValue;
                 {I}if (value == null)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}$"Expected a JsonValue, but got {{node.GetType()}}");
                 {II}return null;
                 {I}}}
                 {I}bool ok = value.TryGetValue<string>(out string? text);
                 {I}if (!ok)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}$"Expected a string, but the conversion failed " +
                 {III}$"from {{value.ToJsonString()}}");
                 {II}return null;
                 {I}}}
                 {I}if (text == null)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}"Expected a string, but got a null");
                 {II}return null;
                 {I}}}
@@ -782,7 +788,7 @@ def _generate_deserialize_impl(
                 {I}}}
                 {I}catch (System.FormatException exception)
                 {I}{{
-                {II}error = new Jsonization.Error(
+                {II}error = new Reporting.Error(
                 {III}"Expected Base-64 encoded bytes, but the conversion failed " +
                 {III}$"because: {{exception}}");
                 {II}return null;
@@ -893,11 +899,11 @@ def _generate_deserialize_from(name: str) -> Stripped:
             {{
             {I}Aas.{name}? result = DeserializeImplementation.{name}From(
             {II}node,
-            {II}out Jsonization.Error? error);
+            {II}out Reporting.Error? error);
             {I}if (error != null)
             {I}{{
             {II}throw new Jsonization.Exception(
-            {III}Jsonization.GeneratePath(error.PathSegments),
+            {III}Reporting.GenerateJsonPath(error.PathSegments),
             {III}error.Cause);
             {I}}}
             {I}return result
@@ -1546,122 +1552,6 @@ def generate(
         symbol_table=symbol_table,
     )
 
-    # The indention becomes quite unreadable, so we define this snippet outside
-    # of the context. Best you used vertical split in your editor to view the code.
-    segment_to_part_snippet = Stripped(
-        textwrap.dedent(
-            f"""\
-            string? part = null;
-            switch (segment)
-            {{
-            {I}case NameSegment nameSegment:
-            {II}if (VariableNameRe.IsMatch(nameSegment.Name))
-            {II}{{
-            {III}part = (i == 0) ? nameSegment.Name : $".{{nameSegment.Name}}";
-            {II}}}
-            {II}else
-            {II}{{
-            {III}string escaped = nameSegment.Name
-            {IIII}.Replace("\\\\", "\\\\\\\\")
-            {IIII}.Replace("\\"", "\\\\\\"")
-            {IIII}.Replace("\\b", "\\\\b")
-            {IIII}.Replace("\\f", "\\\\f")
-            {IIII}.Replace("\\n", "\\\\n")
-            {IIII}.Replace("\\r", "\\\\r")
-            {IIII}.Replace("\\t", "\\\\t");
-            {III}part = $"[\\"{{escaped}}\\"]";
-            {II}}}
-            {II}break;
-            {I}case IndexSegment indexSegment:
-            {II}part = $"[{{indexSegment.Index}}]";
-            {II}break;
-            {I}default:
-            {II}throw new System.InvalidOperationException(
-            {III}$"Unexpected segment type: {{segment.GetType()}}");
-            }}"""
-        )
-    )
-
-    generate_path_blocks = [
-        Stripped(
-            textwrap.dedent(
-                f"""\
-                /// <summary>
-                /// Capture a path segment of a value in a model.
-                /// </summary
-                internal abstract class Segment {{
-                {I}// Intentionally empty.
-                }}"""
-            )
-        ),
-        Stripped(
-            textwrap.dedent(
-                f"""\
-                internal class NameSegment : Segment {{
-                {I}internal readonly string Name;
-                {I}internal NameSegment(string name)
-                {I}{{
-                {II}Name = name;
-                {I}}}
-                }}"""
-            )
-        ),
-        Stripped(
-            textwrap.dedent(
-                f"""\
-                internal class IndexSegment : Segment {{
-                {I}internal readonly int Index;
-                {I}internal IndexSegment(int index)
-                {I}{{
-                {II}Index = index;
-                {I}}}
-                }}"""
-            )
-        ),
-        Stripped(
-            textwrap.dedent(
-                f"""\
-                internal static System.Text.RegularExpressions.Regex VariableNameRe = (
-                {I}new  System.Text.RegularExpressions.Regex(
-                {II}@"^[a-zA-Z_][a-zA-Z_0-9]*$"));"""
-            )
-        ),
-        # We have to indent but a first line, so we can't use textwrap.dedent.
-        Stripped(
-            f"""\
-internal static string GeneratePath(
-{I}ICollection<Segment> segments)
-{{
-{I}var parts = new List<string>(segments.Count);
-{I}int i = 0;
-{I}foreach(var segment in segments)
-{I}{{
-{II}{indent_but_first_line(segment_to_part_snippet, II)}
-{II}parts.Add(part);
-{I}}}
-{I}return string.Join("", parts);
-}}"""
-        ),
-    ]
-
-    error_block = Stripped(
-        textwrap.dedent(
-            f"""\
-            /// <summary>
-            /// Represent an error during the deserialization.
-            /// </summary>
-            internal class Error
-            {{
-            {I}internal LinkedList<Segment> PathSegments = new LinkedList<Segment>();
-            {I}internal readonly string Cause;
-            {I}internal Error(string cause)
-            {I}{{
-            {II}Cause = cause;
-            {I}}}
-            }}"""
-        )
-    )
-
     exception_block = Stripped(
         textwrap.dedent(
             f"""\
@@ -1682,19 +1572,13 @@ internal static string GeneratePath(
         )
     )
 
-    jsonization_blocks = []  # type: List[Stripped]
-    jsonization_blocks.extend(generate_path_blocks)
-
-    jsonization_blocks.extend(
-        [
-            error_block,
-            deserialize_impl_block,
-            exception_block,
-            deserialize_block,
-            transformer_block,
-            serialize_block,
-        ]
-    )
+    jsonization_blocks = [
+        deserialize_impl_block,
+        exception_block,
+        deserialize_block,
+        transformer_block,
+        serialize_block,
+    ]  # type: List[Stripped]
 
     jsonization_writer = io.StringIO()
     jsonization_writer.write(

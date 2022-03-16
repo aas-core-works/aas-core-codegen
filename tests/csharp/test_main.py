@@ -91,6 +91,7 @@ class Test_against_recorded(unittest.TestCase):
                     pathlib.Path("types.cs"),
                     pathlib.Path("visitation.cs"),
                     pathlib.Path("verification.cs"),
+                    pathlib.Path("reporting.cs"),
                     pathlib.Path("stringification.cs"),
                     pathlib.Path("jsonization.cs"),
                     # BEFORE-RELEASE (mristin, 2021-12-19):

@@ -21,86 +21,6 @@ namespace AasCore.Aas3
     public static class Jsonization
     {
         /// <summary>
-        /// Capture a path segment of a value in a model.
-        /// </summary
-        internal abstract class Segment {
-            // Intentionally empty.
-        }
-
-        internal class NameSegment : Segment {
-            internal readonly string Name;
-            internal NameSegment(string name)
-            {
-                Name = name;
-            }
-        }
-
-        internal class IndexSegment : Segment {
-            internal readonly int Index;
-            internal IndexSegment(int index)
-            {
-                Index = index;
-            }
-        }
-
-        internal static System.Text.RegularExpressions.Regex VariableNameRe = (
-            new  System.Text.RegularExpressions.Regex(
-                @"^[a-zA-Z_][a-zA-Z_0-9]*$"));
-
-        internal static string GeneratePath(
-            ICollection<Segment> segments)
-        {
-            var parts = new List<string>(segments.Count);
-            int i = 0;
-            foreach(var segment in segments)
-            {
-                string? part = null;
-                switch (segment)
-                {
-                    case NameSegment nameSegment:
-                        if (VariableNameRe.IsMatch(nameSegment.Name))
-                        {
-                            part = (i == 0) ? nameSegment.Name : $".{nameSegment.Name}";
-                        }
-                        else
-                        {
-                            string escaped = nameSegment.Name
-                                .Replace("\\", "\\\\")
-                                .Replace("\"", "\\\"")
-                                .Replace("\b", "\\b")
-                                .Replace("\f", "\\f")
-                                .Replace("\n", "\\n")
-                                .Replace("\r", "\\r")
-                                .Replace("\t", "\\t");
-                            part = $"[\"{escaped}\"]";
-                        }
-                        break;
-                    case IndexSegment indexSegment:
-                        part = $"[{indexSegment.Index}]";
-                        break;
-                    default:
-                        throw new System.InvalidOperationException(
-                            $"Unexpected segment type: {segment.GetType()}");
-                }
-                parts.Add(part);
-            }
-            return string.Join("", parts);
-        }
-
-        /// <summary>
-        /// Represent an error during the deserialization.
-        /// </summary>
-        internal class Error
-        {
-            internal LinkedList<Segment> PathSegments = new LinkedList<Segment>();
-            internal readonly string Cause;
-            internal Error(string cause)
-            {
-                Cause = cause;
-            }
-        }
-
-        /// <summary>
         /// Implement the deserialization of meta-model classes from JSON nodes.
         /// </summary>
         /// <remarks>
@@ -121,20 +41,20 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static bool? BoolFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 Nodes.JsonValue? value = node as Nodes.JsonValue;
                 if (value == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonValue, but got {node.GetType()}");
                     return null;
                 }
                 bool ok = value.TryGetValue<bool>(out bool result);
                 if (!ok)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a boolean, but the conversion failed " +
                         $"from {value.ToJsonString()}");
                     return null;
@@ -149,20 +69,20 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static long? LongFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 Nodes.JsonValue? value = node as Nodes.JsonValue;
                 if (value == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonValue, but got {node.GetType()}");
                     return null;
                 }
                 bool ok = value.TryGetValue<long>(out long result);
                 if (!ok)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a 64-bit long integer, but the conversion failed " +
                         $"from {value.ToJsonString()}");
                     return null;
@@ -177,20 +97,20 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static double? DoubleFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 Nodes.JsonValue? value = node as Nodes.JsonValue;
                 if (value == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonValue, but got {node.GetType()}");
                     return null;
                 }
                 bool ok = value.TryGetValue<double>(out double result);
                 if (!ok)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a 64-bit double-precision float, " +
                         "but the conversion failed " +
                         $"from {value.ToJsonString()}");
@@ -206,27 +126,27 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static string? StringFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 Nodes.JsonValue? value = node as Nodes.JsonValue;
                 if (value == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonValue, but got {node.GetType()}");
                     return null;
                 }
                 bool ok = value.TryGetValue<string>(out string? result);
                 if (!ok)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a string, but the conversion failed " +
                         $"from {value.ToJsonString()}");
                     return null;
                 }
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, but got a null");
                     return null;
                 }
@@ -240,27 +160,27 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static byte[]? BytesFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 Nodes.JsonValue? value = node as Nodes.JsonValue;
                 if (value == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonValue, but got {node.GetType()}");
                     return null;
                 }
                 bool ok = value.TryGetValue<string>(out string? text);
                 if (!ok)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a string, but the conversion failed " +
                         $"from {value.ToJsonString()}");
                     return null;
                 }
                 if (text == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, but got a null");
                     return null;
                 }
@@ -270,7 +190,7 @@ namespace AasCore.Aas3
                 }
                 catch (System.FormatException exception)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Base-64 encoded bytes, but the conversion failed " +
                         $"because: {exception}");
                     return null;
@@ -285,14 +205,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.IHasSemantics? IHasSemanticsFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -300,14 +220,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -315,7 +235,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -378,7 +298,7 @@ namespace AasCore.Aas3
                     return ViewFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for IHasSemantics: {modelType}");
                         return null;
                 }
@@ -391,14 +311,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.Extension? ExtensionFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -413,7 +333,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -426,7 +347,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeName = obj["name"];
                 if (nodeName == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"name\" is missing ");
                     return null;
                 }
@@ -436,7 +357,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("name"));
+                        new Reporting.NameSegment(
+                            "name"));
                     return null;
                 }
                 if (theName == null)
@@ -455,7 +377,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("valueType"));
+                            new Reporting.NameSegment(
+                                "valueType"));
                         return null;
                     }
                     if (theValueType == null)
@@ -475,7 +398,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("value"));
+                            new Reporting.NameSegment(
+                                "value"));
                         return null;
                     }
                     if (theValue == null)
@@ -495,7 +419,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("refersTo"));
+                            new Reporting.NameSegment(
+                                "refersTo"));
                         return null;
                     }
                     if (theRefersTo == null)
@@ -523,14 +448,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.IHasExtensions? IHasExtensionsFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -538,14 +463,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -553,7 +478,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -613,7 +538,7 @@ namespace AasCore.Aas3
                     return ViewFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for IHasExtensions: {modelType}");
                         return null;
                 }
@@ -627,14 +552,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.IReferable? IReferableFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -642,14 +567,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -657,7 +582,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -717,7 +642,7 @@ namespace AasCore.Aas3
                     return ViewFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for IReferable: {modelType}");
                         return null;
                 }
@@ -731,14 +656,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.IIdentifiable? IIdentifiableFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -746,14 +671,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -761,7 +686,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -779,7 +704,7 @@ namespace AasCore.Aas3
                     return SubmodelFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for IIdentifiable: {modelType}");
                         return null;
                 }
@@ -792,7 +717,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.ModelingKind? ModelingKindFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -809,7 +734,7 @@ namespace AasCore.Aas3
                 Aas.ModelingKind? result = Stringification.ModelingKindFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of ModelingKind ");
                 }
                 return result;
@@ -823,14 +748,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.IHasKind? IHasKindFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -838,14 +763,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -853,7 +778,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -904,7 +829,7 @@ namespace AasCore.Aas3
                     return SubmodelElementStructFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for IHasKind: {modelType}");
                         return null;
                 }
@@ -918,14 +843,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.IHasDataSpecification? IHasDataSpecificationFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -933,14 +858,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -948,7 +873,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -1011,7 +936,7 @@ namespace AasCore.Aas3
                     return ViewFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for IHasDataSpecification: {modelType}");
                         return null;
                 }
@@ -1024,14 +949,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.AdministrativeInformation? AdministrativeInformationFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -1043,10 +968,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -1056,12 +982,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -1069,9 +997,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -1092,7 +1022,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("version"));
+                            new Reporting.NameSegment(
+                                "version"));
                         return null;
                     }
                     if (theVersion == null)
@@ -1112,7 +1043,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("revision"));
+                            new Reporting.NameSegment(
+                                "revision"));
                         return null;
                     }
                     if (theRevision == null)
@@ -1136,14 +1068,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.IConstraint? IConstraintFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -1151,14 +1083,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -1166,7 +1098,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -1181,7 +1113,7 @@ namespace AasCore.Aas3
                     return QualifierFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for IConstraint: {modelType}");
                         return null;
                 }
@@ -1195,14 +1127,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.IQualifiable? IQualifiableFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -1210,14 +1142,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -1225,7 +1157,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -1276,7 +1208,7 @@ namespace AasCore.Aas3
                     return SubmodelElementStructFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for IQualifiable: {modelType}");
                         return null;
                 }
@@ -1289,14 +1221,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.Qualifier? QualifierFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -1311,7 +1243,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -1324,7 +1257,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeType = obj["type"];
                 if (nodeType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"type\" is missing ");
                     return null;
                 }
@@ -1334,7 +1267,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("type"));
+                        new Reporting.NameSegment(
+                            "type"));
                     return null;
                 }
                 if (theType == null)
@@ -1346,7 +1280,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeValueType = obj["valueType"];
                 if (nodeValueType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"valueType\" is missing ");
                     return null;
                 }
@@ -1356,7 +1290,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("valueType"));
+                        new Reporting.NameSegment(
+                            "valueType"));
                     return null;
                 }
                 if (theValueType == null)
@@ -1375,7 +1310,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("value"));
+                            new Reporting.NameSegment(
+                                "value"));
                         return null;
                     }
                     if (theValue == null)
@@ -1395,7 +1331,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("valueId"));
+                            new Reporting.NameSegment(
+                                "valueId"));
                         return null;
                     }
                     if (theValueId == null)
@@ -1424,14 +1361,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.Formula? FormulaFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -1443,10 +1380,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDependsOn = nodeDependsOn as Nodes.JsonArray;
                     if (arrayDependsOn == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDependsOn.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dependsOn"));
+                            new Reporting.NameSegment(
+                                "dependsOn"));
                         return null;
                     }
                     theDependsOn = new List<IReference>(
@@ -1456,12 +1394,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDependsOn));
+                                new Reporting.IndexSegment(
+                                    indexDependsOn));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dependsOn"));
+                                new Reporting.NameSegment(
+                                    "dependsOn"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -1469,9 +1409,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDependsOn));
+                                new Reporting.IndexSegment(
+                                    indexDependsOn));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dependsOn"));
+                                new Reporting.NameSegment(
+                                    "dependsOn"));
                             return null;
                         }
                         theDependsOn.Add(
@@ -1493,14 +1435,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.AssetAdministrationShell? AssetAdministrationShellFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -1512,10 +1454,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -1525,12 +1468,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -1538,9 +1483,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -1554,17 +1501,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -1574,12 +1522,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -1587,9 +1537,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -1609,7 +1561,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -1629,7 +1582,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -1649,7 +1603,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -1669,7 +1624,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -1682,7 +1638,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeId = obj["id"];
                 if (nodeId == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"id\" is missing ");
                     return null;
                 }
@@ -1692,7 +1648,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("id"));
+                        new Reporting.NameSegment(
+                            "id"));
                     return null;
                 }
                 if (theId == null)
@@ -1711,7 +1668,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("administration"));
+                            new Reporting.NameSegment(
+                                "administration"));
                         return null;
                     }
                     if (theAdministration == null)
@@ -1731,7 +1689,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("derivedFrom"));
+                            new Reporting.NameSegment(
+                                "derivedFrom"));
                         return null;
                     }
                     if (theDerivedFrom == null)
@@ -1744,7 +1703,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeAssetInformation = obj["assetInformation"];
                 if (nodeAssetInformation == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"assetInformation\" is missing ");
                     return null;
                 }
@@ -1754,7 +1713,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("assetInformation"));
+                        new Reporting.NameSegment(
+                            "assetInformation"));
                     return null;
                 }
                 if (theAssetInformation == null)
@@ -1766,17 +1726,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeSubmodels = obj["submodels"];
                 if (nodeSubmodels == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"submodels\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arraySubmodels = nodeSubmodels as Nodes.JsonArray;
                 if (arraySubmodels == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeSubmodels.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("submodels"));
+                        new Reporting.NameSegment(
+                            "submodels"));
                     return null;
                 }
                 var theSubmodels = new List<IReference>(
@@ -1786,12 +1747,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexSubmodels));
+                            new Reporting.IndexSegment(
+                                indexSubmodels));
                         error.PathSegments.AddFirst(
-                            new NameSegment("submodels"));
+                            new Reporting.NameSegment(
+                                "submodels"));
                     }
                     IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -1799,9 +1762,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexSubmodels));
+                            new Reporting.IndexSegment(
+                                indexSubmodels));
                         error.PathSegments.AddFirst(
-                            new NameSegment("submodels"));
+                            new Reporting.NameSegment(
+                                "submodels"));
                         return null;
                     }
                     theSubmodels.Add(
@@ -1840,14 +1805,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.AssetInformation? AssetInformationFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -1855,7 +1820,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeAssetKind = obj["assetKind"];
                 if (nodeAssetKind == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"assetKind\" is missing ");
                     return null;
                 }
@@ -1865,7 +1830,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("assetKind"));
+                        new Reporting.NameSegment(
+                            "assetKind"));
                     return null;
                 }
                 if (theAssetKind == null)
@@ -1884,7 +1850,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("globalAssetId"));
+                            new Reporting.NameSegment(
+                                "globalAssetId"));
                         return null;
                     }
                     if (theGlobalAssetId == null)
@@ -1904,7 +1871,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("specificAssetId"));
+                            new Reporting.NameSegment(
+                                "specificAssetId"));
                         return null;
                     }
                     if (theSpecificAssetId == null)
@@ -1924,7 +1892,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("defaultThumbnail"));
+                            new Reporting.NameSegment(
+                                "defaultThumbnail"));
                         return null;
                     }
                     if (theDefaultThumbnail == null)
@@ -1950,7 +1919,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.AssetKind? AssetKindFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -1967,7 +1936,7 @@ namespace AasCore.Aas3
                 Aas.AssetKind? result = Stringification.AssetKindFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of AssetKind ");
                 }
                 return result;
@@ -1980,14 +1949,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.IdentifierKeyValuePair? IdentifierKeyValuePairFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -2002,7 +1971,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -2015,7 +1985,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeKey = obj["key"];
                 if (nodeKey == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"key\" is missing ");
                     return null;
                 }
@@ -2025,7 +1995,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("key"));
+                        new Reporting.NameSegment(
+                            "key"));
                     return null;
                 }
                 if (theKey == null)
@@ -2037,7 +2008,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeValue = obj["value"];
                 if (nodeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"value\" is missing ");
                     return null;
                 }
@@ -2047,7 +2018,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("value"));
+                        new Reporting.NameSegment(
+                            "value"));
                     return null;
                 }
                 if (theValue == null)
@@ -2066,7 +2038,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("externalSubjectId"));
+                            new Reporting.NameSegment(
+                                "externalSubjectId"));
                         return null;
                     }
                     if (theExternalSubjectId == null)
@@ -2094,14 +2067,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.Submodel? SubmodelFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -2113,10 +2086,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -2126,12 +2100,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -2139,9 +2115,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -2162,7 +2140,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -2182,7 +2161,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -2195,17 +2175,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -2215,12 +2196,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -2228,9 +2211,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -2243,17 +2228,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -2263,12 +2249,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -2276,9 +2264,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -2298,7 +2288,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -2318,7 +2309,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -2338,7 +2330,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -2358,7 +2351,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -2371,7 +2365,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeId = obj["id"];
                 if (nodeId == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"id\" is missing ");
                     return null;
                 }
@@ -2381,7 +2375,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("id"));
+                        new Reporting.NameSegment(
+                            "id"));
                     return null;
                 }
                 if (theId == null)
@@ -2400,7 +2395,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("administration"));
+                            new Reporting.NameSegment(
+                                "administration"));
                         return null;
                     }
                     if (theAdministration == null)
@@ -2413,17 +2409,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeSubmodelElements = obj["submodelElements"];
                 if (nodeSubmodelElements == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"submodelElements\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arraySubmodelElements = nodeSubmodelElements as Nodes.JsonArray;
                 if (arraySubmodelElements == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeSubmodelElements.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("submodelElements"));
+                        new Reporting.NameSegment(
+                            "submodelElements"));
                     return null;
                 }
                 var theSubmodelElements = new List<ISubmodelElement>(
@@ -2433,12 +2430,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexSubmodelElements));
+                            new Reporting.IndexSegment(
+                                indexSubmodelElements));
                         error.PathSegments.AddFirst(
-                            new NameSegment("submodelElements"));
+                            new Reporting.NameSegment(
+                                "submodelElements"));
                     }
                     ISubmodelElement? parsedItem = DeserializeImplementation.ISubmodelElementFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -2446,9 +2445,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexSubmodelElements));
+                            new Reporting.IndexSegment(
+                                indexSubmodelElements));
                         error.PathSegments.AddFirst(
-                            new NameSegment("submodelElements"));
+                            new Reporting.NameSegment(
+                                "submodelElements"));
                         return null;
                     }
                     theSubmodelElements.Add(
@@ -2489,14 +2490,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.ISubmodelElement? ISubmodelElementFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -2504,14 +2505,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -2519,7 +2520,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -2567,7 +2568,7 @@ namespace AasCore.Aas3
                     return SubmodelElementStructFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for ISubmodelElement: {modelType}");
                         return null;
                 }
@@ -2581,14 +2582,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.IRelationshipElement? IRelationshipElementFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -2596,14 +2597,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -2611,7 +2612,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -2623,7 +2624,7 @@ namespace AasCore.Aas3
                     return AnnotatedRelationshipElementFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for IRelationshipElement: {modelType}");
                         return null;
                 }
@@ -2636,14 +2637,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.SubmodelElementList? SubmodelElementListFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -2655,10 +2656,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -2668,12 +2670,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -2681,9 +2685,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -2697,17 +2703,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -2717,12 +2724,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -2730,9 +2739,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -2752,7 +2763,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -2772,7 +2784,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -2792,7 +2805,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -2812,7 +2826,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -2832,7 +2847,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -2852,7 +2868,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -2865,17 +2882,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -2885,12 +2903,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -2898,9 +2918,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -2913,7 +2935,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeSubmodelElementTypeValues = obj["submodelElementTypeValues"];
                 if (nodeSubmodelElementTypeValues == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"submodelElementTypeValues\" is missing ");
                     return null;
                 }
@@ -2923,7 +2945,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("submodelElementTypeValues"));
+                        new Reporting.NameSegment(
+                            "submodelElementTypeValues"));
                     return null;
                 }
                 if (theSubmodelElementTypeValues == null)
@@ -2935,17 +2958,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeValues = obj["values"];
                 if (nodeValues == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"values\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayValues = nodeValues as Nodes.JsonArray;
                 if (arrayValues == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeValues.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("values"));
+                        new Reporting.NameSegment(
+                            "values"));
                     return null;
                 }
                 var theValues = new List<ISubmodelElement>(
@@ -2955,12 +2979,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexValues));
+                            new Reporting.IndexSegment(
+                                indexValues));
                         error.PathSegments.AddFirst(
-                            new NameSegment("values"));
+                            new Reporting.NameSegment(
+                                "values"));
                     }
                     ISubmodelElement? parsedItem = DeserializeImplementation.ISubmodelElementFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -2968,9 +2994,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexValues));
+                            new Reporting.IndexSegment(
+                                indexValues));
                         error.PathSegments.AddFirst(
-                            new NameSegment("values"));
+                            new Reporting.NameSegment(
+                                "values"));
                         return null;
                     }
                     theValues.Add(
@@ -2990,7 +3018,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticIdValues"));
+                            new Reporting.NameSegment(
+                                "semanticIdValues"));
                         return null;
                     }
                     if (theSemanticIdValues == null)
@@ -3010,7 +3039,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("valueTypeValues"));
+                            new Reporting.NameSegment(
+                                "valueTypeValues"));
                         return null;
                     }
                     if (theValueTypeValues == null)
@@ -3051,14 +3081,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.SubmodelElementStruct? SubmodelElementStructFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -3070,10 +3100,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -3083,12 +3114,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3096,9 +3129,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -3112,17 +3147,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -3132,12 +3168,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -3145,9 +3183,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -3167,7 +3207,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -3187,7 +3228,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -3207,7 +3249,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -3227,7 +3270,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -3247,7 +3291,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -3267,7 +3312,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -3280,17 +3326,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -3300,12 +3347,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -3313,9 +3362,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -3328,17 +3379,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeValues = obj["values"];
                 if (nodeValues == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"values\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayValues = nodeValues as Nodes.JsonArray;
                 if (arrayValues == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeValues.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("values"));
+                        new Reporting.NameSegment(
+                            "values"));
                     return null;
                 }
                 var theValues = new List<ISubmodelElement>(
@@ -3348,12 +3400,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexValues));
+                            new Reporting.IndexSegment(
+                                indexValues));
                         error.PathSegments.AddFirst(
-                            new NameSegment("values"));
+                            new Reporting.NameSegment(
+                                "values"));
                     }
                     ISubmodelElement? parsedItem = DeserializeImplementation.ISubmodelElementFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -3361,9 +3415,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexValues));
+                            new Reporting.IndexSegment(
+                                indexValues));
                         error.PathSegments.AddFirst(
-                            new NameSegment("values"));
+                            new Reporting.NameSegment(
+                                "values"));
                         return null;
                     }
                     theValues.Add(
@@ -3400,14 +3456,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.IDataElement? IDataElementFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -3415,14 +3471,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -3430,7 +3486,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -3457,7 +3513,7 @@ namespace AasCore.Aas3
                     return ReferenceElementFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for IDataElement: {modelType}");
                         return null;
                 }
@@ -3470,14 +3526,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.Property? PropertyFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -3489,10 +3545,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -3502,12 +3559,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3515,9 +3574,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -3531,17 +3592,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -3551,12 +3613,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -3564,9 +3628,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -3586,7 +3652,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -3606,7 +3673,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -3626,7 +3694,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -3646,7 +3715,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -3666,7 +3736,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -3686,7 +3757,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -3699,17 +3771,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -3719,12 +3792,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -3732,9 +3807,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -3747,7 +3824,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeValueType = obj["valueType"];
                 if (nodeValueType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"valueType\" is missing ");
                     return null;
                 }
@@ -3757,7 +3834,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("valueType"));
+                        new Reporting.NameSegment(
+                            "valueType"));
                     return null;
                 }
                 if (theValueType == null)
@@ -3776,7 +3854,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("value"));
+                            new Reporting.NameSegment(
+                                "value"));
                         return null;
                     }
                     if (theValue == null)
@@ -3796,7 +3875,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("valueId"));
+                            new Reporting.NameSegment(
+                                "valueId"));
                         return null;
                     }
                     if (theValueId == null)
@@ -3834,14 +3914,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.MultiLanguageProperty? MultiLanguagePropertyFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -3853,10 +3933,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -3866,12 +3947,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3879,9 +3962,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -3895,17 +3980,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -3915,12 +4001,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -3928,9 +4016,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -3950,7 +4040,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -3970,7 +4061,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -3990,7 +4082,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -4010,7 +4103,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -4030,7 +4124,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -4050,7 +4145,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -4063,17 +4159,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -4083,12 +4180,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -4096,9 +4195,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -4118,7 +4219,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("value"));
+                            new Reporting.NameSegment(
+                                "value"));
                         return null;
                     }
                     if (theValue == null)
@@ -4138,7 +4240,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("valueId"));
+                            new Reporting.NameSegment(
+                                "valueId"));
                         return null;
                     }
                     if (theValueId == null)
@@ -4173,14 +4276,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.Range? RangeFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -4192,10 +4295,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -4205,12 +4309,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4218,9 +4324,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -4234,17 +4342,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -4254,12 +4363,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -4267,9 +4378,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -4289,7 +4402,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -4309,7 +4423,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -4329,7 +4444,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -4349,7 +4465,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -4369,7 +4486,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -4389,7 +4507,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -4402,17 +4521,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -4422,12 +4542,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -4435,9 +4557,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -4450,7 +4574,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeValueType = obj["valueType"];
                 if (nodeValueType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"valueType\" is missing ");
                     return null;
                 }
@@ -4460,7 +4584,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("valueType"));
+                        new Reporting.NameSegment(
+                            "valueType"));
                     return null;
                 }
                 if (theValueType == null)
@@ -4479,7 +4604,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("min"));
+                            new Reporting.NameSegment(
+                                "min"));
                         return null;
                     }
                     if (theMin == null)
@@ -4499,7 +4625,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("max"));
+                            new Reporting.NameSegment(
+                                "max"));
                         return null;
                     }
                     if (theMax == null)
@@ -4537,14 +4664,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.ReferenceElement? ReferenceElementFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -4556,10 +4683,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -4569,12 +4697,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4582,9 +4712,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -4598,17 +4730,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -4618,12 +4751,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -4631,9 +4766,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -4653,7 +4790,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -4673,7 +4811,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -4693,7 +4832,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -4713,7 +4853,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -4733,7 +4874,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -4753,7 +4895,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -4766,17 +4909,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -4786,12 +4930,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -4799,9 +4945,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -4821,7 +4969,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("value"));
+                            new Reporting.NameSegment(
+                                "value"));
                         return null;
                     }
                     if (theValue == null)
@@ -4855,14 +5004,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.Blob? BlobFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -4874,10 +5023,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -4887,12 +5037,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4900,9 +5052,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -4916,17 +5070,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -4936,12 +5091,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -4949,9 +5106,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -4971,7 +5130,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -4991,7 +5151,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -5011,7 +5172,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -5031,7 +5193,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -5051,7 +5214,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -5071,7 +5235,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -5084,17 +5249,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -5104,12 +5270,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -5117,9 +5285,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -5132,7 +5302,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeMimeType = obj["mimeType"];
                 if (nodeMimeType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"mimeType\" is missing ");
                     return null;
                 }
@@ -5142,7 +5312,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("mimeType"));
+                        new Reporting.NameSegment(
+                            "mimeType"));
                     return null;
                 }
                 if (theMimeType == null)
@@ -5161,7 +5332,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("value"));
+                            new Reporting.NameSegment(
+                                "value"));
                         return null;
                     }
                     if (theValue == null)
@@ -5198,14 +5370,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.File? FileFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -5217,10 +5389,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -5230,12 +5403,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5243,9 +5418,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -5259,17 +5436,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -5279,12 +5457,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -5292,9 +5472,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -5314,7 +5496,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -5334,7 +5517,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -5354,7 +5538,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -5374,7 +5559,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -5394,7 +5580,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -5414,7 +5601,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -5427,17 +5615,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -5447,12 +5636,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -5460,9 +5651,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -5475,7 +5668,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeMimeType = obj["mimeType"];
                 if (nodeMimeType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"mimeType\" is missing ");
                     return null;
                 }
@@ -5485,7 +5678,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("mimeType"));
+                        new Reporting.NameSegment(
+                            "mimeType"));
                     return null;
                 }
                 if (theMimeType == null)
@@ -5504,7 +5698,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("value"));
+                            new Reporting.NameSegment(
+                                "value"));
                         return null;
                     }
                     if (theValue == null)
@@ -5541,14 +5736,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.AnnotatedRelationshipElement? AnnotatedRelationshipElementFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -5560,10 +5755,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -5573,12 +5769,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5586,9 +5784,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -5602,17 +5802,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -5622,12 +5823,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -5635,9 +5838,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -5657,7 +5862,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -5677,7 +5883,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -5697,7 +5904,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -5717,7 +5925,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -5737,7 +5946,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -5757,7 +5967,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -5770,17 +5981,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -5790,12 +6002,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -5803,9 +6017,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -5818,7 +6034,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeFirst = obj["first"];
                 if (nodeFirst == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"first\" is missing ");
                     return null;
                 }
@@ -5828,7 +6044,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("first"));
+                        new Reporting.NameSegment(
+                            "first"));
                     return null;
                 }
                 if (theFirst == null)
@@ -5840,7 +6057,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeSecond = obj["second"];
                 if (nodeSecond == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"second\" is missing ");
                     return null;
                 }
@@ -5850,7 +6067,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("second"));
+                        new Reporting.NameSegment(
+                            "second"));
                     return null;
                 }
                 if (theSecond == null)
@@ -5862,17 +6080,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeAnnotation = obj["annotation"];
                 if (nodeAnnotation == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"annotation\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayAnnotation = nodeAnnotation as Nodes.JsonArray;
                 if (arrayAnnotation == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeAnnotation.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("annotation"));
+                        new Reporting.NameSegment(
+                            "annotation"));
                     return null;
                 }
                 var theAnnotation = new List<IDataElement>(
@@ -5882,12 +6101,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexAnnotation));
+                            new Reporting.IndexSegment(
+                                indexAnnotation));
                         error.PathSegments.AddFirst(
-                            new NameSegment("annotation"));
+                            new Reporting.NameSegment(
+                                "annotation"));
                     }
                     IDataElement? parsedItem = DeserializeImplementation.IDataElementFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -5895,9 +6116,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexAnnotation));
+                            new Reporting.IndexSegment(
+                                indexAnnotation));
                         error.PathSegments.AddFirst(
-                            new NameSegment("annotation"));
+                            new Reporting.NameSegment(
+                                "annotation"));
                         return null;
                     }
                     theAnnotation.Add(
@@ -5939,7 +6162,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.EntityType? EntityTypeFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -5956,7 +6179,7 @@ namespace AasCore.Aas3
                 Aas.EntityType? result = Stringification.EntityTypeFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of EntityType ");
                 }
                 return result;
@@ -5969,14 +6192,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.Entity? EntityFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -5988,10 +6211,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -6001,12 +6225,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6014,9 +6240,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -6030,17 +6258,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -6050,12 +6279,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6063,9 +6294,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -6085,7 +6318,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -6105,7 +6339,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -6125,7 +6360,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -6145,7 +6381,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -6165,7 +6402,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -6185,7 +6423,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -6198,17 +6437,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -6218,12 +6458,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6231,9 +6473,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -6246,7 +6490,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeEntityType = obj["entityType"];
                 if (nodeEntityType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"entityType\" is missing ");
                     return null;
                 }
@@ -6256,7 +6500,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("entityType"));
+                        new Reporting.NameSegment(
+                            "entityType"));
                     return null;
                 }
                 if (theEntityType == null)
@@ -6268,17 +6513,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeStatements = obj["statements"];
                 if (nodeStatements == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"statements\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayStatements = nodeStatements as Nodes.JsonArray;
                 if (arrayStatements == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeStatements.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("statements"));
+                        new Reporting.NameSegment(
+                            "statements"));
                     return null;
                 }
                 var theStatements = new List<ISubmodelElement>(
@@ -6288,12 +6534,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexStatements));
+                            new Reporting.IndexSegment(
+                                indexStatements));
                         error.PathSegments.AddFirst(
-                            new NameSegment("statements"));
+                            new Reporting.NameSegment(
+                                "statements"));
                     }
                     ISubmodelElement? parsedItem = DeserializeImplementation.ISubmodelElementFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6301,9 +6549,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexStatements));
+                            new Reporting.IndexSegment(
+                                indexStatements));
                         error.PathSegments.AddFirst(
-                            new NameSegment("statements"));
+                            new Reporting.NameSegment(
+                                "statements"));
                         return null;
                     }
                     theStatements.Add(
@@ -6323,7 +6573,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("globalAssetId"));
+                            new Reporting.NameSegment(
+                                "globalAssetId"));
                         return null;
                     }
                     if (theGlobalAssetId == null)
@@ -6343,7 +6594,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("specificAssetId"));
+                            new Reporting.NameSegment(
+                                "specificAssetId"));
                         return null;
                     }
                     if (theSpecificAssetId == null)
@@ -6385,14 +6637,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.IEvent? IEventFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -6400,14 +6652,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -6415,7 +6667,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -6427,7 +6679,7 @@ namespace AasCore.Aas3
                     return BasicEventFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for IEvent: {modelType}");
                         return null;
                 }
@@ -6440,14 +6692,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.BasicEvent? BasicEventFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -6459,10 +6711,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -6472,12 +6725,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6485,9 +6740,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -6501,17 +6758,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -6521,12 +6779,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6534,9 +6794,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -6556,7 +6818,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -6576,7 +6839,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -6596,7 +6860,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -6616,7 +6881,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -6636,7 +6902,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -6656,7 +6923,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -6669,17 +6937,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -6689,12 +6958,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6702,9 +6973,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -6717,7 +6990,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeObserved = obj["observed"];
                 if (nodeObserved == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"observed\" is missing ");
                     return null;
                 }
@@ -6727,7 +7000,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("observed"));
+                        new Reporting.NameSegment(
+                            "observed"));
                     return null;
                 }
                 if (theObserved == null)
@@ -6762,14 +7036,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.Operation? OperationFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -6781,10 +7055,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -6794,12 +7069,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6807,9 +7084,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -6823,17 +7102,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -6843,12 +7123,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -6856,9 +7138,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -6878,7 +7162,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -6898,7 +7183,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -6918,7 +7204,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -6938,7 +7225,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -6958,7 +7246,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -6978,7 +7267,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -6991,17 +7281,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -7011,12 +7302,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7024,9 +7317,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -7039,17 +7334,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeInputVariables = obj["inputVariables"];
                 if (nodeInputVariables == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"inputVariables\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayInputVariables = nodeInputVariables as Nodes.JsonArray;
                 if (arrayInputVariables == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeInputVariables.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("inputVariables"));
+                        new Reporting.NameSegment(
+                            "inputVariables"));
                     return null;
                 }
                 var theInputVariables = new List<OperationVariable>(
@@ -7059,12 +7355,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexInputVariables));
+                            new Reporting.IndexSegment(
+                                indexInputVariables));
                         error.PathSegments.AddFirst(
-                            new NameSegment("inputVariables"));
+                            new Reporting.NameSegment(
+                                "inputVariables"));
                     }
                     OperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7072,9 +7370,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexInputVariables));
+                            new Reporting.IndexSegment(
+                                indexInputVariables));
                         error.PathSegments.AddFirst(
-                            new NameSegment("inputVariables"));
+                            new Reporting.NameSegment(
+                                "inputVariables"));
                         return null;
                     }
                     theInputVariables.Add(
@@ -7087,17 +7387,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeOutputVariables = obj["outputVariables"];
                 if (nodeOutputVariables == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"outputVariables\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayOutputVariables = nodeOutputVariables as Nodes.JsonArray;
                 if (arrayOutputVariables == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeOutputVariables.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("outputVariables"));
+                        new Reporting.NameSegment(
+                            "outputVariables"));
                     return null;
                 }
                 var theOutputVariables = new List<OperationVariable>(
@@ -7107,12 +7408,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexOutputVariables));
+                            new Reporting.IndexSegment(
+                                indexOutputVariables));
                         error.PathSegments.AddFirst(
-                            new NameSegment("outputVariables"));
+                            new Reporting.NameSegment(
+                                "outputVariables"));
                     }
                     OperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7120,9 +7423,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexOutputVariables));
+                            new Reporting.IndexSegment(
+                                indexOutputVariables));
                         error.PathSegments.AddFirst(
-                            new NameSegment("outputVariables"));
+                            new Reporting.NameSegment(
+                                "outputVariables"));
                         return null;
                     }
                     theOutputVariables.Add(
@@ -7135,17 +7440,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeInoutputVariables = obj["inoutputVariables"];
                 if (nodeInoutputVariables == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"inoutputVariables\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayInoutputVariables = nodeInoutputVariables as Nodes.JsonArray;
                 if (arrayInoutputVariables == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeInoutputVariables.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("inoutputVariables"));
+                        new Reporting.NameSegment(
+                            "inoutputVariables"));
                     return null;
                 }
                 var theInoutputVariables = new List<OperationVariable>(
@@ -7155,12 +7461,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexInoutputVariables));
+                            new Reporting.IndexSegment(
+                                indexInoutputVariables));
                         error.PathSegments.AddFirst(
-                            new NameSegment("inoutputVariables"));
+                            new Reporting.NameSegment(
+                                "inoutputVariables"));
                     }
                     OperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7168,9 +7476,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexInoutputVariables));
+                            new Reporting.IndexSegment(
+                                indexInoutputVariables));
                         error.PathSegments.AddFirst(
-                            new NameSegment("inoutputVariables"));
+                            new Reporting.NameSegment(
+                                "inoutputVariables"));
                         return null;
                     }
                     theInoutputVariables.Add(
@@ -7212,14 +7522,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.OperationVariable? OperationVariableFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -7227,7 +7537,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeValue = obj["value"];
                 if (nodeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"value\" is missing ");
                     return null;
                 }
@@ -7237,7 +7547,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("value"));
+                        new Reporting.NameSegment(
+                            "value"));
                     return null;
                 }
                 if (theValue == null)
@@ -7259,14 +7570,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.Capability? CapabilityFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -7278,10 +7589,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -7291,12 +7603,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7304,9 +7618,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -7320,17 +7636,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -7340,12 +7657,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7353,9 +7672,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -7375,7 +7696,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -7395,7 +7717,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -7415,7 +7738,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -7435,7 +7759,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -7455,7 +7780,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("kind"));
+                            new Reporting.NameSegment(
+                                "kind"));
                         return null;
                     }
                     if (theKind == null)
@@ -7475,7 +7801,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -7488,17 +7815,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
                 if (nodeQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"qualifiers\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
                 if (arrayQualifiers == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("qualifiers"));
+                        new Reporting.NameSegment(
+                            "qualifiers"));
                     return null;
                 }
                 var theQualifiers = new List<IConstraint>(
@@ -7508,12 +7836,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                     }
                     IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7521,9 +7851,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexQualifiers));
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
                         error.PathSegments.AddFirst(
-                            new NameSegment("qualifiers"));
+                            new Reporting.NameSegment(
+                                "qualifiers"));
                         return null;
                     }
                     theQualifiers.Add(
@@ -7556,14 +7888,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.ConceptDescription? ConceptDescriptionFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -7575,10 +7907,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -7588,12 +7921,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7601,9 +7936,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -7617,17 +7954,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -7637,12 +7975,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7650,9 +7990,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -7672,7 +8014,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -7692,7 +8035,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -7712,7 +8056,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -7732,7 +8077,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -7745,7 +8091,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeId = obj["id"];
                 if (nodeId == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"id\" is missing ");
                     return null;
                 }
@@ -7755,7 +8101,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("id"));
+                        new Reporting.NameSegment(
+                            "id"));
                     return null;
                 }
                 if (theId == null)
@@ -7774,7 +8121,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("administration"));
+                            new Reporting.NameSegment(
+                                "administration"));
                         return null;
                     }
                     if (theAdministration == null)
@@ -7787,17 +8135,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeIsCaseOf = obj["isCaseOf"];
                 if (nodeIsCaseOf == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"isCaseOf\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayIsCaseOf = nodeIsCaseOf as Nodes.JsonArray;
                 if (arrayIsCaseOf == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeIsCaseOf.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("isCaseOf"));
+                        new Reporting.NameSegment(
+                            "isCaseOf"));
                     return null;
                 }
                 var theIsCaseOf = new List<IReference>(
@@ -7807,12 +8156,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexIsCaseOf));
+                            new Reporting.IndexSegment(
+                                indexIsCaseOf));
                         error.PathSegments.AddFirst(
-                            new NameSegment("isCaseOf"));
+                            new Reporting.NameSegment(
+                                "isCaseOf"));
                     }
                     IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7820,9 +8171,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexIsCaseOf));
+                            new Reporting.IndexSegment(
+                                indexIsCaseOf));
                         error.PathSegments.AddFirst(
-                            new NameSegment("isCaseOf"));
+                            new Reporting.NameSegment(
+                                "isCaseOf"));
                         return null;
                     }
                     theIsCaseOf.Add(
@@ -7857,14 +8210,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.View? ViewFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -7876,10 +8229,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
                     if (arrayDataSpecifications == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataSpecifications"));
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
                         return null;
                     }
                     theDataSpecifications = new List<IReference>(
@@ -7889,12 +8243,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                         }
                         IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7902,9 +8258,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexDataSpecifications));
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
                             error.PathSegments.AddFirst(
-                                new NameSegment("dataSpecifications"));
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
                             return null;
                         }
                         theDataSpecifications.Add(
@@ -7918,17 +8276,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"extensions\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
                 if (arrayExtensions == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("extensions"));
+                        new Reporting.NameSegment(
+                            "extensions"));
                     return null;
                 }
                 var theExtensions = new List<Extension>(
@@ -7938,12 +8297,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                     }
                     Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -7951,9 +8312,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexExtensions));
+                            new Reporting.IndexSegment(
+                                indexExtensions));
                         error.PathSegments.AddFirst(
-                            new NameSegment("extensions"));
+                            new Reporting.NameSegment(
+                                "extensions"));
                         return null;
                     }
                     theExtensions.Add(
@@ -7973,7 +8336,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("idShort"));
+                            new Reporting.NameSegment(
+                                "idShort"));
                         return null;
                     }
                     if (theIdShort == null)
@@ -7993,7 +8357,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("displayName"));
+                            new Reporting.NameSegment(
+                                "displayName"));
                         return null;
                     }
                     if (theDisplayName == null)
@@ -8013,7 +8378,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("category"));
+                            new Reporting.NameSegment(
+                                "category"));
                         return null;
                     }
                     if (theCategory == null)
@@ -8033,7 +8399,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("description"));
+                            new Reporting.NameSegment(
+                                "description"));
                         return null;
                     }
                     if (theDescription == null)
@@ -8053,7 +8420,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("semanticId"));
+                            new Reporting.NameSegment(
+                                "semanticId"));
                         return null;
                     }
                     if (theSemanticId == null)
@@ -8066,17 +8434,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeContainedElements = obj["containedElements"];
                 if (nodeContainedElements == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"containedElements\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayContainedElements = nodeContainedElements as Nodes.JsonArray;
                 if (arrayContainedElements == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeContainedElements.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("containedElements"));
+                        new Reporting.NameSegment(
+                            "containedElements"));
                     return null;
                 }
                 var theContainedElements = new List<IReference>(
@@ -8086,12 +8455,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexContainedElements));
+                            new Reporting.IndexSegment(
+                                indexContainedElements));
                         error.PathSegments.AddFirst(
-                            new NameSegment("containedElements"));
+                            new Reporting.NameSegment(
+                                "containedElements"));
                     }
                     IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -8099,9 +8470,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexContainedElements));
+                            new Reporting.IndexSegment(
+                                indexContainedElements));
                         error.PathSegments.AddFirst(
-                            new NameSegment("containedElements"));
+                            new Reporting.NameSegment(
+                                "containedElements"));
                         return null;
                     }
                     theContainedElements.Add(
@@ -8134,14 +8507,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.IReference? IReferenceFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -8149,14 +8522,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -8164,7 +8537,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -8179,7 +8552,7 @@ namespace AasCore.Aas3
                     return ModelReferenceFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for IReference: {modelType}");
                         return null;
                 }
@@ -8192,14 +8565,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.GlobalReference? GlobalReferenceFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -8207,17 +8580,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeValues = obj["values"];
                 if (nodeValues == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"values\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayValues = nodeValues as Nodes.JsonArray;
                 if (arrayValues == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeValues.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("values"));
+                        new Reporting.NameSegment(
+                            "values"));
                     return null;
                 }
                 var theValues = new List<string>(
@@ -8227,12 +8601,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexValues));
+                            new Reporting.IndexSegment(
+                                indexValues));
                         error.PathSegments.AddFirst(
-                            new NameSegment("values"));
+                            new Reporting.NameSegment(
+                                "values"));
                     }
                     string? parsedItem = DeserializeImplementation.StringFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -8240,9 +8616,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexValues));
+                            new Reporting.IndexSegment(
+                                indexValues));
                         error.PathSegments.AddFirst(
-                            new NameSegment("values"));
+                            new Reporting.NameSegment(
+                                "values"));
                         return null;
                     }
                     theValues.Add(
@@ -8265,14 +8643,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.ModelReference? ModelReferenceFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -8280,17 +8658,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeKeys = obj["keys"];
                 if (nodeKeys == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"keys\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayKeys = nodeKeys as Nodes.JsonArray;
                 if (arrayKeys == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeKeys.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("keys"));
+                        new Reporting.NameSegment(
+                            "keys"));
                     return null;
                 }
                 var theKeys = new List<Key>(
@@ -8300,12 +8679,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexKeys));
+                            new Reporting.IndexSegment(
+                                indexKeys));
                         error.PathSegments.AddFirst(
-                            new NameSegment("keys"));
+                            new Reporting.NameSegment(
+                                "keys"));
                     }
                     Key? parsedItem = DeserializeImplementation.KeyFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -8313,9 +8694,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexKeys));
+                            new Reporting.IndexSegment(
+                                indexKeys));
                         error.PathSegments.AddFirst(
-                            new NameSegment("keys"));
+                            new Reporting.NameSegment(
+                                "keys"));
                         return null;
                     }
                     theKeys.Add(
@@ -8335,7 +8718,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("referredSemanticId"));
+                            new Reporting.NameSegment(
+                                "referredSemanticId"));
                         return null;
                     }
                     if (theReferredSemanticId == null)
@@ -8359,14 +8743,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.Key? KeyFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -8374,7 +8758,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeType = obj["type"];
                 if (nodeType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"type\" is missing ");
                     return null;
                 }
@@ -8384,7 +8768,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("type"));
+                        new Reporting.NameSegment(
+                            "type"));
                     return null;
                 }
                 if (theType == null)
@@ -8396,7 +8781,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeValue = obj["value"];
                 if (nodeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"value\" is missing ");
                     return null;
                 }
@@ -8406,7 +8791,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("value"));
+                        new Reporting.NameSegment(
+                            "value"));
                     return null;
                 }
                 if (theValue == null)
@@ -8431,7 +8817,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.IdentifiableElements? IdentifiableElementsFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -8448,7 +8834,7 @@ namespace AasCore.Aas3
                 Aas.IdentifiableElements? result = Stringification.IdentifiableElementsFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of IdentifiableElements ");
                 }
                 return result;
@@ -8461,7 +8847,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.ReferableElements? ReferableElementsFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -8478,7 +8864,7 @@ namespace AasCore.Aas3
                 Aas.ReferableElements? result = Stringification.ReferableElementsFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of ReferableElements ");
                 }
                 return result;
@@ -8491,7 +8877,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.KeyElements? KeyElementsFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -8508,7 +8894,7 @@ namespace AasCore.Aas3
                 Aas.KeyElements? result = Stringification.KeyElementsFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of KeyElements ");
                 }
                 return result;
@@ -8521,7 +8907,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.SubmodelElements? SubmodelElementsFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -8538,7 +8924,7 @@ namespace AasCore.Aas3
                 Aas.SubmodelElements? result = Stringification.SubmodelElementsFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of SubmodelElements ");
                 }
                 return result;
@@ -8551,7 +8937,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.BuildInListTypes? BuildInListTypesFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -8568,7 +8954,7 @@ namespace AasCore.Aas3
                 Aas.BuildInListTypes? result = Stringification.BuildInListTypesFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of BuildInListTypes ");
                 }
                 return result;
@@ -8581,7 +8967,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.DecimalBuildInTypes? DecimalBuildInTypesFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -8598,7 +8984,7 @@ namespace AasCore.Aas3
                 Aas.DecimalBuildInTypes? result = Stringification.DecimalBuildInTypesFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of DecimalBuildInTypes ");
                 }
                 return result;
@@ -8611,7 +8997,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.DurationBuildInTypes? DurationBuildInTypesFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -8628,7 +9014,7 @@ namespace AasCore.Aas3
                 Aas.DurationBuildInTypes? result = Stringification.DurationBuildInTypesFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of DurationBuildInTypes ");
                 }
                 return result;
@@ -8641,7 +9027,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.PrimitiveTypes? PrimitiveTypesFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -8658,7 +9044,7 @@ namespace AasCore.Aas3
                 Aas.PrimitiveTypes? result = Stringification.PrimitiveTypesFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of PrimitiveTypes ");
                 }
                 return result;
@@ -8671,7 +9057,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.StringBuildInTypes? StringBuildInTypesFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -8688,7 +9074,7 @@ namespace AasCore.Aas3
                 Aas.StringBuildInTypes? result = Stringification.StringBuildInTypesFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of StringBuildInTypes ");
                 }
                 return result;
@@ -8701,7 +9087,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.DataTypeDef? DataTypeDefFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -8718,7 +9104,7 @@ namespace AasCore.Aas3
                 Aas.DataTypeDef? result = Stringification.DataTypeDefFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of DataTypeDef ");
                 }
                 return result;
@@ -8726,7 +9112,7 @@ namespace AasCore.Aas3
 
             public static Aas.LangStringSet LangStringSetFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 throw new System.NotImplementedException("TODO");
             }
@@ -8739,14 +9125,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             public static Aas.IDataSpecificationContent? IDataSpecificationContentFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 var obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -8754,14 +9140,14 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? modelTypeNode = obj["modelType"];
                 if (modelTypeNode == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a model type, but none is present");
                     return null;
                 }
                 Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
                 if (modelTypeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected JsonValue, " +
                         $"but got {modelTypeNode.GetType()}");
                     return null;
@@ -8769,7 +9155,7 @@ namespace AasCore.Aas3
                 modelTypeValue.TryGetValue<string>(out string? modelType);
                 if (modelType == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Expected a string, " +
                         $"but the conversion failed from {modelTypeValue}");
                     return null;
@@ -8784,7 +9170,7 @@ namespace AasCore.Aas3
                     return DataSpecificationPhysicalUnitFrom(
                         node, out error);
                     default:
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Unexpected model type for IDataSpecificationContent: {modelType}");
                         return null;
                 }
@@ -8797,7 +9183,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.DataTypeIec61360? DataTypeIec61360From(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -8814,7 +9200,7 @@ namespace AasCore.Aas3
                 Aas.DataTypeIec61360? result = Stringification.DataTypeIec61360FromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of DataTypeIec61360 ");
                 }
                 return result;
@@ -8827,7 +9213,7 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.LevelType? LevelTypeFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
                 string? text = DeserializeImplementation.StringFrom(
@@ -8844,7 +9230,7 @@ namespace AasCore.Aas3
                 Aas.LevelType? result = Stringification.LevelTypeFromString(text);
                 if (result == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Not a valid JSON representation of LevelType ");
                 }
                 return result;
@@ -8857,14 +9243,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.ValueReferencePair? ValueReferencePairFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -8872,7 +9258,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeValue = obj["value"];
                 if (nodeValue == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"value\" is missing ");
                     return null;
                 }
@@ -8882,7 +9268,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("value"));
+                        new Reporting.NameSegment(
+                            "value"));
                     return null;
                 }
                 if (theValue == null)
@@ -8894,7 +9281,7 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeValueId = obj["valueId"];
                 if (nodeValueId == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"valueId\" is missing ");
                     return null;
                 }
@@ -8904,7 +9291,8 @@ namespace AasCore.Aas3
                 if (error != null)
                 {
                     error.PathSegments.AddFirst(
-                        new NameSegment("valueId"));
+                        new Reporting.NameSegment(
+                            "valueId"));
                     return null;
                 }
                 if (theValueId == null)
@@ -8929,14 +9317,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.ValueList? ValueListFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -8944,17 +9332,18 @@ namespace AasCore.Aas3
                 Nodes.JsonNode? nodeValueReferencePairs = obj["valueReferencePairs"];
                 if (nodeValueReferencePairs == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         "Required property \"valueReferencePairs\" is missing ");
                     return null;
                 }
                 Nodes.JsonArray? arrayValueReferencePairs = nodeValueReferencePairs as Nodes.JsonArray;
                 if (arrayValueReferencePairs == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeValueReferencePairs.GetType()}");
                     error.PathSegments.AddFirst(
-                        new NameSegment("valueReferencePairs"));
+                        new Reporting.NameSegment(
+                            "valueReferencePairs"));
                     return null;
                 }
                 var theValueReferencePairs = new List<ValueReferencePair>(
@@ -8964,12 +9353,14 @@ namespace AasCore.Aas3
                 {
                     if (item == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexValueReferencePairs));
+                            new Reporting.IndexSegment(
+                                indexValueReferencePairs));
                         error.PathSegments.AddFirst(
-                            new NameSegment("valueReferencePairs"));
+                            new Reporting.NameSegment(
+                                "valueReferencePairs"));
                     }
                     ValueReferencePair? parsedItem = DeserializeImplementation.ValueReferencePairFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -8977,9 +9368,11 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new IndexSegment(indexValueReferencePairs));
+                            new Reporting.IndexSegment(
+                                indexValueReferencePairs));
                         error.PathSegments.AddFirst(
-                            new NameSegment("valueReferencePairs"));
+                            new Reporting.NameSegment(
+                                "valueReferencePairs"));
                         return null;
                     }
                     theValueReferencePairs.Add(
@@ -9002,14 +9395,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.DataSpecificationIec61360? DataSpecificationIec61360From(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -9024,7 +9417,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("preferredName"));
+                            new Reporting.NameSegment(
+                                "preferredName"));
                         return null;
                     }
                     if (thePreferredName == null)
@@ -9044,7 +9438,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("shortName"));
+                            new Reporting.NameSegment(
+                                "shortName"));
                         return null;
                     }
                     if (theShortName == null)
@@ -9064,7 +9459,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("unit"));
+                            new Reporting.NameSegment(
+                                "unit"));
                         return null;
                     }
                     if (theUnit == null)
@@ -9084,7 +9480,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("unitId"));
+                            new Reporting.NameSegment(
+                                "unitId"));
                         return null;
                     }
                     if (theUnitId == null)
@@ -9104,7 +9501,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("sourceOfDefinition"));
+                            new Reporting.NameSegment(
+                                "sourceOfDefinition"));
                         return null;
                     }
                     if (theSourceOfDefinition == null)
@@ -9124,7 +9522,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("symbol"));
+                            new Reporting.NameSegment(
+                                "symbol"));
                         return null;
                     }
                     if (theSymbol == null)
@@ -9144,7 +9543,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("dataType"));
+                            new Reporting.NameSegment(
+                                "dataType"));
                         return null;
                     }
                     if (theDataType == null)
@@ -9164,7 +9564,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("definition"));
+                            new Reporting.NameSegment(
+                                "definition"));
                         return null;
                     }
                     if (theDefinition == null)
@@ -9184,7 +9585,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("valueFormat"));
+                            new Reporting.NameSegment(
+                                "valueFormat"));
                         return null;
                     }
                     if (theValueFormat == null)
@@ -9204,7 +9606,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("valueList"));
+                            new Reporting.NameSegment(
+                                "valueList"));
                         return null;
                     }
                     if (theValueList == null)
@@ -9224,7 +9627,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("value"));
+                            new Reporting.NameSegment(
+                                "value"));
                         return null;
                     }
                     if (theValue == null)
@@ -9244,7 +9648,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("valueId"));
+                            new Reporting.NameSegment(
+                                "valueId"));
                         return null;
                     }
                     if (theValueId == null)
@@ -9264,7 +9669,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("levelType"));
+                            new Reporting.NameSegment(
+                                "levelType"));
                         return null;
                     }
                     if (theLevelType == null)
@@ -9297,14 +9703,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.DataSpecificationPhysicalUnit? DataSpecificationPhysicalUnitFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -9319,7 +9725,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("unitName"));
+                            new Reporting.NameSegment(
+                                "unitName"));
                         return null;
                     }
                     if (theUnitName == null)
@@ -9339,7 +9746,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("unitSymbol"));
+                            new Reporting.NameSegment(
+                                "unitSymbol"));
                         return null;
                     }
                     if (theUnitSymbol == null)
@@ -9359,7 +9767,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("definition"));
+                            new Reporting.NameSegment(
+                                "definition"));
                         return null;
                     }
                     if (theDefinition == null)
@@ -9379,7 +9788,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("siNotation"));
+                            new Reporting.NameSegment(
+                                "siNotation"));
                         return null;
                     }
                     if (theSiNotation == null)
@@ -9399,7 +9809,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("dinNotation"));
+                            new Reporting.NameSegment(
+                                "dinNotation"));
                         return null;
                     }
                     if (theDinNotation == null)
@@ -9419,7 +9830,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("eceName"));
+                            new Reporting.NameSegment(
+                                "eceName"));
                         return null;
                     }
                     if (theEceName == null)
@@ -9439,7 +9851,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("eceCode"));
+                            new Reporting.NameSegment(
+                                "eceCode"));
                         return null;
                     }
                     if (theEceCode == null)
@@ -9459,7 +9872,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("nistName"));
+                            new Reporting.NameSegment(
+                                "nistName"));
                         return null;
                     }
                     if (theNistName == null)
@@ -9479,7 +9893,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("sourceOfDefinition"));
+                            new Reporting.NameSegment(
+                                "sourceOfDefinition"));
                         return null;
                     }
                     if (theSourceOfDefinition == null)
@@ -9499,7 +9914,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("conversionFactor"));
+                            new Reporting.NameSegment(
+                                "conversionFactor"));
                         return null;
                     }
                     if (theConversionFactor == null)
@@ -9519,7 +9935,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("registrationAuthorityId"));
+                            new Reporting.NameSegment(
+                                "registrationAuthorityId"));
                         return null;
                     }
                     if (theRegistrationAuthorityId == null)
@@ -9539,7 +9956,8 @@ namespace AasCore.Aas3
                     if (error != null)
                     {
                         error.PathSegments.AddFirst(
-                            new NameSegment("supplier"));
+                            new Reporting.NameSegment(
+                                "supplier"));
                         return null;
                     }
                     if (theSupplier == null)
@@ -9571,14 +9989,14 @@ namespace AasCore.Aas3
             /// <param name="error">Error, if any, during the deserialization</param>
             internal static Aas.Environment? EnvironmentFrom(
                 Nodes.JsonNode node,
-                out Jsonization.Error? error)
+                out Reporting.Error? error)
             {
                 error = null;
 
                 Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
-                    error = new Jsonization.Error(
+                    error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
@@ -9590,10 +10008,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayAssetAdministrationShells = nodeAssetAdministrationShells as Nodes.JsonArray;
                     if (arrayAssetAdministrationShells == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeAssetAdministrationShells.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("assetAdministrationShells"));
+                            new Reporting.NameSegment(
+                                "assetAdministrationShells"));
                         return null;
                     }
                     theAssetAdministrationShells = new List<AssetAdministrationShell>(
@@ -9603,12 +10022,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexAssetAdministrationShells));
+                                new Reporting.IndexSegment(
+                                    indexAssetAdministrationShells));
                             error.PathSegments.AddFirst(
-                                new NameSegment("assetAdministrationShells"));
+                                new Reporting.NameSegment(
+                                    "assetAdministrationShells"));
                         }
                         AssetAdministrationShell? parsedItem = DeserializeImplementation.AssetAdministrationShellFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9616,9 +10037,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexAssetAdministrationShells));
+                                new Reporting.IndexSegment(
+                                    indexAssetAdministrationShells));
                             error.PathSegments.AddFirst(
-                                new NameSegment("assetAdministrationShells"));
+                                new Reporting.NameSegment(
+                                    "assetAdministrationShells"));
                             return null;
                         }
                         theAssetAdministrationShells.Add(
@@ -9636,10 +10059,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arraySubmodels = nodeSubmodels as Nodes.JsonArray;
                     if (arraySubmodels == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeSubmodels.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("submodels"));
+                            new Reporting.NameSegment(
+                                "submodels"));
                         return null;
                     }
                     theSubmodels = new List<Submodel>(
@@ -9649,12 +10073,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexSubmodels));
+                                new Reporting.IndexSegment(
+                                    indexSubmodels));
                             error.PathSegments.AddFirst(
-                                new NameSegment("submodels"));
+                                new Reporting.NameSegment(
+                                    "submodels"));
                         }
                         Submodel? parsedItem = DeserializeImplementation.SubmodelFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9662,9 +10088,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexSubmodels));
+                                new Reporting.IndexSegment(
+                                    indexSubmodels));
                             error.PathSegments.AddFirst(
-                                new NameSegment("submodels"));
+                                new Reporting.NameSegment(
+                                    "submodels"));
                             return null;
                         }
                         theSubmodels.Add(
@@ -9682,10 +10110,11 @@ namespace AasCore.Aas3
                     Nodes.JsonArray? arrayConceptDescriptions = nodeConceptDescriptions as Nodes.JsonArray;
                     if (arrayConceptDescriptions == null)
                     {
-                        error = new Jsonization.Error(
+                        error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeConceptDescriptions.GetType()}");
                         error.PathSegments.AddFirst(
-                            new NameSegment("conceptDescriptions"));
+                            new Reporting.NameSegment(
+                                "conceptDescriptions"));
                         return null;
                     }
                     theConceptDescriptions = new List<ConceptDescription>(
@@ -9695,12 +10124,14 @@ namespace AasCore.Aas3
                     {
                         if (item == null)
                         {
-                            error = new Jsonization.Error(
+                            error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexConceptDescriptions));
+                                new Reporting.IndexSegment(
+                                    indexConceptDescriptions));
                             error.PathSegments.AddFirst(
-                                new NameSegment("conceptDescriptions"));
+                                new Reporting.NameSegment(
+                                    "conceptDescriptions"));
                         }
                         ConceptDescription? parsedItem = DeserializeImplementation.ConceptDescriptionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9708,9 +10139,11 @@ namespace AasCore.Aas3
                         if (error != null)
                         {
                             error.PathSegments.AddFirst(
-                                new IndexSegment(indexConceptDescriptions));
+                                new Reporting.IndexSegment(
+                                    indexConceptDescriptions));
                             error.PathSegments.AddFirst(
-                                new NameSegment("conceptDescriptions"));
+                                new Reporting.NameSegment(
+                                    "conceptDescriptions"));
                             return null;
                         }
                         theConceptDescriptions.Add(
@@ -9770,11 +10203,11 @@ namespace AasCore.Aas3
             {
                 Aas.IHasSemantics? result = DeserializeImplementation.IHasSemanticsFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9795,11 +10228,11 @@ namespace AasCore.Aas3
             {
                 Aas.Extension? result = DeserializeImplementation.ExtensionFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9820,11 +10253,11 @@ namespace AasCore.Aas3
             {
                 Aas.IHasExtensions? result = DeserializeImplementation.IHasExtensionsFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9845,11 +10278,11 @@ namespace AasCore.Aas3
             {
                 Aas.IReferable? result = DeserializeImplementation.IReferableFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9870,11 +10303,11 @@ namespace AasCore.Aas3
             {
                 Aas.IIdentifiable? result = DeserializeImplementation.IIdentifiableFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9895,11 +10328,11 @@ namespace AasCore.Aas3
             {
                 Aas.ModelingKind? result = DeserializeImplementation.ModelingKindFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9920,11 +10353,11 @@ namespace AasCore.Aas3
             {
                 Aas.IHasKind? result = DeserializeImplementation.IHasKindFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9945,11 +10378,11 @@ namespace AasCore.Aas3
             {
                 Aas.IHasDataSpecification? result = DeserializeImplementation.IHasDataSpecificationFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9970,11 +10403,11 @@ namespace AasCore.Aas3
             {
                 Aas.AdministrativeInformation? result = DeserializeImplementation.AdministrativeInformationFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -9995,11 +10428,11 @@ namespace AasCore.Aas3
             {
                 Aas.IConstraint? result = DeserializeImplementation.IConstraintFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10020,11 +10453,11 @@ namespace AasCore.Aas3
             {
                 Aas.IQualifiable? result = DeserializeImplementation.IQualifiableFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10045,11 +10478,11 @@ namespace AasCore.Aas3
             {
                 Aas.Qualifier? result = DeserializeImplementation.QualifierFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10070,11 +10503,11 @@ namespace AasCore.Aas3
             {
                 Aas.Formula? result = DeserializeImplementation.FormulaFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10095,11 +10528,11 @@ namespace AasCore.Aas3
             {
                 Aas.AssetAdministrationShell? result = DeserializeImplementation.AssetAdministrationShellFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10120,11 +10553,11 @@ namespace AasCore.Aas3
             {
                 Aas.AssetInformation? result = DeserializeImplementation.AssetInformationFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10145,11 +10578,11 @@ namespace AasCore.Aas3
             {
                 Aas.AssetKind? result = DeserializeImplementation.AssetKindFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10170,11 +10603,11 @@ namespace AasCore.Aas3
             {
                 Aas.IdentifierKeyValuePair? result = DeserializeImplementation.IdentifierKeyValuePairFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10195,11 +10628,11 @@ namespace AasCore.Aas3
             {
                 Aas.Submodel? result = DeserializeImplementation.SubmodelFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10220,11 +10653,11 @@ namespace AasCore.Aas3
             {
                 Aas.ISubmodelElement? result = DeserializeImplementation.ISubmodelElementFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10245,11 +10678,11 @@ namespace AasCore.Aas3
             {
                 Aas.IRelationshipElement? result = DeserializeImplementation.IRelationshipElementFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10270,11 +10703,11 @@ namespace AasCore.Aas3
             {
                 Aas.SubmodelElementList? result = DeserializeImplementation.SubmodelElementListFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10295,11 +10728,11 @@ namespace AasCore.Aas3
             {
                 Aas.SubmodelElementStruct? result = DeserializeImplementation.SubmodelElementStructFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10320,11 +10753,11 @@ namespace AasCore.Aas3
             {
                 Aas.IDataElement? result = DeserializeImplementation.IDataElementFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10345,11 +10778,11 @@ namespace AasCore.Aas3
             {
                 Aas.Property? result = DeserializeImplementation.PropertyFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10370,11 +10803,11 @@ namespace AasCore.Aas3
             {
                 Aas.MultiLanguageProperty? result = DeserializeImplementation.MultiLanguagePropertyFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10395,11 +10828,11 @@ namespace AasCore.Aas3
             {
                 Aas.Range? result = DeserializeImplementation.RangeFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10420,11 +10853,11 @@ namespace AasCore.Aas3
             {
                 Aas.ReferenceElement? result = DeserializeImplementation.ReferenceElementFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10445,11 +10878,11 @@ namespace AasCore.Aas3
             {
                 Aas.Blob? result = DeserializeImplementation.BlobFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10470,11 +10903,11 @@ namespace AasCore.Aas3
             {
                 Aas.File? result = DeserializeImplementation.FileFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10495,11 +10928,11 @@ namespace AasCore.Aas3
             {
                 Aas.AnnotatedRelationshipElement? result = DeserializeImplementation.AnnotatedRelationshipElementFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10520,11 +10953,11 @@ namespace AasCore.Aas3
             {
                 Aas.EntityType? result = DeserializeImplementation.EntityTypeFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10545,11 +10978,11 @@ namespace AasCore.Aas3
             {
                 Aas.Entity? result = DeserializeImplementation.EntityFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10570,11 +11003,11 @@ namespace AasCore.Aas3
             {
                 Aas.IEvent? result = DeserializeImplementation.IEventFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10595,11 +11028,11 @@ namespace AasCore.Aas3
             {
                 Aas.BasicEvent? result = DeserializeImplementation.BasicEventFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10620,11 +11053,11 @@ namespace AasCore.Aas3
             {
                 Aas.Operation? result = DeserializeImplementation.OperationFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10645,11 +11078,11 @@ namespace AasCore.Aas3
             {
                 Aas.OperationVariable? result = DeserializeImplementation.OperationVariableFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10670,11 +11103,11 @@ namespace AasCore.Aas3
             {
                 Aas.Capability? result = DeserializeImplementation.CapabilityFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10695,11 +11128,11 @@ namespace AasCore.Aas3
             {
                 Aas.ConceptDescription? result = DeserializeImplementation.ConceptDescriptionFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10720,11 +11153,11 @@ namespace AasCore.Aas3
             {
                 Aas.View? result = DeserializeImplementation.ViewFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10745,11 +11178,11 @@ namespace AasCore.Aas3
             {
                 Aas.IReference? result = DeserializeImplementation.IReferenceFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10770,11 +11203,11 @@ namespace AasCore.Aas3
             {
                 Aas.GlobalReference? result = DeserializeImplementation.GlobalReferenceFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10795,11 +11228,11 @@ namespace AasCore.Aas3
             {
                 Aas.ModelReference? result = DeserializeImplementation.ModelReferenceFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10820,11 +11253,11 @@ namespace AasCore.Aas3
             {
                 Aas.Key? result = DeserializeImplementation.KeyFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10845,11 +11278,11 @@ namespace AasCore.Aas3
             {
                 Aas.IdentifiableElements? result = DeserializeImplementation.IdentifiableElementsFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10870,11 +11303,11 @@ namespace AasCore.Aas3
             {
                 Aas.ReferableElements? result = DeserializeImplementation.ReferableElementsFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10895,11 +11328,11 @@ namespace AasCore.Aas3
             {
                 Aas.KeyElements? result = DeserializeImplementation.KeyElementsFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10920,11 +11353,11 @@ namespace AasCore.Aas3
             {
                 Aas.SubmodelElements? result = DeserializeImplementation.SubmodelElementsFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10945,11 +11378,11 @@ namespace AasCore.Aas3
             {
                 Aas.BuildInListTypes? result = DeserializeImplementation.BuildInListTypesFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10970,11 +11403,11 @@ namespace AasCore.Aas3
             {
                 Aas.DecimalBuildInTypes? result = DeserializeImplementation.DecimalBuildInTypesFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -10995,11 +11428,11 @@ namespace AasCore.Aas3
             {
                 Aas.DurationBuildInTypes? result = DeserializeImplementation.DurationBuildInTypesFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11020,11 +11453,11 @@ namespace AasCore.Aas3
             {
                 Aas.PrimitiveTypes? result = DeserializeImplementation.PrimitiveTypesFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11045,11 +11478,11 @@ namespace AasCore.Aas3
             {
                 Aas.StringBuildInTypes? result = DeserializeImplementation.StringBuildInTypesFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11070,11 +11503,11 @@ namespace AasCore.Aas3
             {
                 Aas.DataTypeDef? result = DeserializeImplementation.DataTypeDefFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11095,11 +11528,11 @@ namespace AasCore.Aas3
             {
                 Aas.LangStringSet? result = DeserializeImplementation.LangStringSetFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11120,11 +11553,11 @@ namespace AasCore.Aas3
             {
                 Aas.IDataSpecificationContent? result = DeserializeImplementation.IDataSpecificationContentFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11145,11 +11578,11 @@ namespace AasCore.Aas3
             {
                 Aas.DataTypeIec61360? result = DeserializeImplementation.DataTypeIec61360From(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11170,11 +11603,11 @@ namespace AasCore.Aas3
             {
                 Aas.LevelType? result = DeserializeImplementation.LevelTypeFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11195,11 +11628,11 @@ namespace AasCore.Aas3
             {
                 Aas.ValueReferencePair? result = DeserializeImplementation.ValueReferencePairFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11220,11 +11653,11 @@ namespace AasCore.Aas3
             {
                 Aas.ValueList? result = DeserializeImplementation.ValueListFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11245,11 +11678,11 @@ namespace AasCore.Aas3
             {
                 Aas.DataSpecificationIec61360? result = DeserializeImplementation.DataSpecificationIec61360From(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11270,11 +11703,11 @@ namespace AasCore.Aas3
             {
                 Aas.DataSpecificationPhysicalUnit? result = DeserializeImplementation.DataSpecificationPhysicalUnitFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
@@ -11295,11 +11728,11 @@ namespace AasCore.Aas3
             {
                 Aas.Environment? result = DeserializeImplementation.EnvironmentFrom(
                     node,
-                    out Jsonization.Error? error);
+                    out Reporting.Error? error);
                 if (error != null)
                 {
                     throw new Jsonization.Exception(
-                        Jsonization.GeneratePath(error.PathSegments),
+                        Reporting.GenerateJsonPath(error.PathSegments),
                         error.Cause);
                 }
                 return result
