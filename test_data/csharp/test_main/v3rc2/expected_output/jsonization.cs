@@ -1680,10 +1680,10 @@ namespace AasCore.Aas3
                 }
 
                 Nodes.JsonNode? nodeDerivedFrom = obj["derivedFrom"];
-                Aas.IReference? theDerivedFrom = null;
+                Aas.ModelReference? theDerivedFrom = null;
                 if (nodeDerivedFrom != null)
                 {
-                    theDerivedFrom = DeserializeImplementation.IReferenceFrom(
+                    theDerivedFrom = DeserializeImplementation.ModelReferenceFrom(
                         nodeDerivedFrom,
                         out error);
                     if (error != null)
@@ -1724,56 +1724,54 @@ namespace AasCore.Aas3
                 }
 
                 Nodes.JsonNode? nodeSubmodels = obj["submodels"];
-                if (nodeSubmodels == null)
+                List<ModelReference>? theSubmodels = null;
+                if (nodeSubmodels != null)
                 {
-                    error = new Reporting.Error(
-                        "Required property \"submodels\" is missing ");
-                    return null;
-                }
-                Nodes.JsonArray? arraySubmodels = nodeSubmodels as Nodes.JsonArray;
-                if (arraySubmodels == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonArray, but got {nodeSubmodels.GetType()}");
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "submodels"));
-                    return null;
-                }
-                var theSubmodels = new List<IReference>(
-                    arraySubmodels.Count);
-                int indexSubmodels = 0;
-                foreach (Nodes.JsonNode? item in arraySubmodels)
-                {
-                    if (item == null)
+                    Nodes.JsonArray? arraySubmodels = nodeSubmodels as Nodes.JsonArray;
+                    if (arraySubmodels == null)
                     {
                         error = new Reporting.Error(
-                            "Expected a non-null item, but got a null");
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexSubmodels));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "submodels"));
-                    }
-                    IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                        item ?? throw new System.InvalidOperationException(),
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexSubmodels));
+                            $"Expected a JsonArray, but got {nodeSubmodels.GetType()}");
                         error._pathSegments.AddFirst(
                             new Reporting.NameSegment(
                                 "submodels"));
                         return null;
                     }
-                    theSubmodels.Add(
-                        parsedItem
-                            ?? throw new System.InvalidOperationException(
-                                "Unexpected result null when error is null"));
-                    indexSubmodels++;
+                    theSubmodels = new List<ModelReference>(
+                        arraySubmodels.Count);
+                    int indexSubmodels = 0;
+                    foreach (Nodes.JsonNode? item in arraySubmodels)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexSubmodels));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "submodels"));
+                        }
+                        ModelReference? parsedItem = DeserializeImplementation.ModelReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexSubmodels));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "submodels"));
+                            return null;
+                        }
+                        theSubmodels.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexSubmodels++;
+                    }
                 }
 
                 return new Aas.AssetAdministrationShell(
@@ -1793,9 +1791,7 @@ namespace AasCore.Aas3
                     theAdministration,
                     theDataSpecifications,
                     theDerivedFrom,
-                    theSubmodels
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"));
+                    theSubmodels);
             }  // internal static AssetAdministrationShellFrom
 
             /// <summary>
@@ -11948,14 +11944,17 @@ namespace AasCore.Aas3
                 result["assetInformation"] = Transform(
                     that.AssetInformation);
 
-                var arraySubmodels = new Nodes.JsonArray();
-                foreach (IReference item in that.Submodels)
+                if (that.Submodels != null)
                 {
-                    arraySubmodels.Add(
-                        Transform(
-                            item));
+                    var arraySubmodels = new Nodes.JsonArray();
+                    foreach (ModelReference item in that.Submodels)
+                    {
+                        arraySubmodels.Add(
+                            Transform(
+                                item));
+                    }
+                    result["submodels"] = arraySubmodels;
                 }
-                result["submodels"] = arraySubmodels;
 
                 return result;
             }

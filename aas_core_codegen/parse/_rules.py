@@ -75,6 +75,93 @@ class _ParseComparison(_Parse):
         return tree.Comparison(left=left, op=op, right=right, original_node=node), None
 
 
+class _ParseAll(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "all"
+        )
+
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        assert (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "all"
+        )
+
+        if len(node.keywords) > 0:
+            return None, Error(
+                node,
+                "Expected no keyword arguments in ``all``, "
+                f"but got {len(node.keywords)}",
+            )
+
+        if len(node.args) != 1:
+            return None, Error(
+                node,
+                "Expected exactly one argument in ``all``, "
+                f"but got {len(node.args)}",
+            )
+
+        if not isinstance(node.args[0], ast.GeneratorExp):
+            return None, Error(
+                node,
+                "Expected a generator expression in ``all``, "
+                f"but got: {ast.dump(node)}",
+            )
+
+        generator_exp = node.args[0]
+
+        condition, error = ast_node_to_our_node(generator_exp.elt)
+        if error is not None:
+            return None, error
+
+        assert isinstance(condition, tree.Expression), f"{condition=}"
+
+        if len(generator_exp.generators) != 1:
+            return None, Error(
+                node,
+                "Expected exactly one generator in ``all``, "
+                f"but got {len(generator_exp.generators)}",
+            )
+
+        generator = generator_exp.generators[0]
+        if not isinstance(generator, ast.comprehension):
+            return None, Error(
+                generator, f"Expected a comprehension, but got: {ast.dump(generator)}"
+            )
+
+        if not isinstance(generator.target, ast.Name):
+            return None, Error(
+                generator,
+                f"Expected the target of the generator to be a name, "
+                f"but got: {ast.dump(generator.target)}",
+            )
+
+        variable, error = ast_node_to_our_node(generator.target)
+        if error is not None:
+            return None, error
+        assert isinstance(variable, tree.Name), f"{variable=}"
+
+        an_iter, error = ast_node_to_our_node(generator.iter)
+        if error is not None:
+            return None, error
+
+        assert isinstance(an_iter, tree.Expression), f"{an_iter=}"
+
+        return (
+            tree.All(
+                for_each=tree.ForEach(
+                    variable=variable, iteration=an_iter, original_node=generator
+                ),
+                condition=condition,
+                original_node=node,
+            ),
+            None,
+        )
+
+
 class _ParseCall(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.Call)
@@ -398,6 +485,7 @@ class _ParseReturn(_Parse):
 
 _CHAIN_OF_RULES = [
     _ParseComparison(),
+    _ParseAll(),
     _ParseCall(),
     _ParseConstant(),
     _ParseImplication(),

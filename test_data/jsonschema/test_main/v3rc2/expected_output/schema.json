@@ -245,7 +245,7 @@
         {
           "properties": {
             "derivedFrom": {
-              "$ref": "#/definitions/Reference"
+              "$ref": "#/definitions/ModelReference"
             },
             "assetInformation": {
               "$ref": "#/definitions/AssetInformation"
@@ -253,13 +253,12 @@
             "submodels": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Reference"
+                "$ref": "#/definitions/ModelReference"
               }
             }
           },
           "required": [
-            "assetInformation",
-            "submodels"
+            "assetInformation"
           ]
         }
       ]

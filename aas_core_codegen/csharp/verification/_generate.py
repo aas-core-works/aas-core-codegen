@@ -674,7 +674,43 @@ class _InvariantTranspiler(
             # The ``that`` refers to the argument of the verification function.
             return Stripped("that"), None
 
-        return Stripped(csharp_naming.variable_name(node.identifier)), None
+        name = None  # type: Optional[Identifier]
+
+        type_in_env = self.environment.find(node.identifier)
+        if type_in_env is None:
+            name = csharp_naming.variable_name(node.identifier)
+        else:
+            while isinstance(
+                type_in_env, intermediate_type_inference.OptionalTypeAnnotation
+            ):
+                type_in_env = type_in_env.value
+
+            assert not isinstance(
+                type_in_env, intermediate_type_inference.OptionalTypeAnnotation
+            )
+
+            if isinstance(
+                type_in_env,
+                (
+                    intermediate_type_inference.PrimitiveTypeAnnotation,
+                    intermediate_type_inference.OurTypeAnnotation,
+                    intermediate_type_inference.VerificationTypeAnnotation,
+                    intermediate_type_inference.BuiltinFunctionTypeAnnotation,
+                    intermediate_type_inference.MethodTypeAnnotation,
+                    intermediate_type_inference.ListTypeAnnotation,
+                ),
+            ):
+                name = csharp_naming.variable_name(node.identifier)
+            elif isinstance(
+                type_in_env, intermediate_type_inference.EnumerationAsTypeTypeAnnotation
+            ):
+                name = csharp_naming.enum_name(node.identifier)
+            else:
+                assert_never(type_in_env)
+
+        assert name is not None
+
+        return Stripped(name), None
 
     def transform_and(
         self, node: parse_tree.And
@@ -789,6 +825,55 @@ class _InvariantTranspiler(
         writer.write('"')
 
         return Stripped(writer.getvalue()), None
+
+    def transform_all(
+        self, node: parse_tree.All
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        variable, error = self.transform(node.for_each.variable)
+        if error is not None:
+            errors.append(error)
+
+        iteration, error = self.transform(node.for_each.iteration)
+        if error is not None:
+            errors.append(error)
+
+        condition, error = self.transform(node.condition)
+        if error is not None:
+            errors.append(error)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the ``all``", errors
+            )
+
+        assert variable is not None
+        assert iteration is not None
+        assert condition is not None
+
+        no_parentheses_types_in_this_context = (
+            parse_tree.Member,
+            parse_tree.MethodCall,
+            parse_tree.FunctionCall,
+            parse_tree.Name,
+        )
+
+        if not isinstance(
+            node.for_each.iteration, no_parentheses_types_in_this_context
+        ):
+            iteration = Stripped(f"({iteration})")
+
+        return (
+            Stripped(
+                textwrap.dedent(
+                    f"""\
+                {iteration}.All(
+                {I}{variable} => {condition})"""
+                )
+            ),
+            None,
+        )
 
 
 # noinspection PyProtectedMember,PyProtectedMember
@@ -1455,6 +1540,7 @@ def generate(
             f"""\
 using Regex = System.Text.RegularExpressions.Regex;
 using System.Collections.Generic;  // can't alias
+using System.Linq;  // can't alias
 
 using Aas = {namespace};
 using Reporting = {namespace}.Reporting;
@@ -1464,17 +1550,6 @@ using Visitation = {namespace}.Visitation;"""
 
     verification_blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]
-
-    for implementation_key in [
-        specific_implementations.ImplementationKey(f"Verification/{func.name}.cs")
-        for func in symbol_table.verification_functions
-        if isinstance(func, intermediate.ImplementationSpecificVerification)
-    ]:
-        implementation = spec_impls.get(implementation_key, None)
-        if implementation is None:
-            errors.append(Error(None, f"The snippet is missing: {implementation_key}"))
-        else:
-            verification_blocks.append(implementation)
 
     for verification in symbol_table.verification_functions:
         if isinstance(verification, intermediate.ImplementationSpecificVerification):

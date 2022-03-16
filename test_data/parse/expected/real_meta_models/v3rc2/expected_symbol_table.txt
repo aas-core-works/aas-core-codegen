@@ -1219,7 +1219,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Reference',
+                identifier='Model_reference',
                 node=...)],
             node=...),
           description=Description(
@@ -1238,10 +1238,14 @@ UnverifiedSymbolTable(
         Property(
           name='submodels',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Reference',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Model_reference',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -1370,7 +1374,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Reference',
+                    identifier='Model_reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -1385,7 +1389,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Reference',
+                        identifier='Model_reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -1401,7 +1405,15 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='derived_from points to an Asset Administration Shell',
+          body="Implication(\n  antecedent=IsNotNone(\n    value=Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='derived_from',\n      original_node=...),\n    original_node=...),\n  consequent=FunctionCall(\n    name='is_model_reference_to',\n    args=[\n      Member(\n        instance=Name(\n          identifier='self',\n          original_node=...),\n        name='derived_from',\n        original_node=...),\n      Member(\n        instance=Name(\n          identifier='Key_elements',\n          original_node=...),\n        name='Submodel',\n        original_node=...)],\n    original_node=...),\n  original_node=...)",
+          node=...),
+        Invariant(
+          description='Submodel references point to a submodel',
+          body="Implication(\n  antecedent=IsNotNone(\n    value=Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='submodels',\n      original_node=...),\n    original_node=...),\n  consequent=All(\n    for_each=ForEach(\n      variable=Name(\n        identifier='submodel',\n        original_node=...),\n      iteration=Member(\n        instance=Name(\n          identifier='self',\n          original_node=...),\n        name='submodels',\n        original_node=...),\n      original_node=...),\n    condition=FunctionCall(\n      name='is_model_reference_to',\n      args=[\n        Name(\n          identifier='submodel',\n          original_node=...),\n        Member(\n          instance=Name(\n            identifier='Key_elements',\n            original_node=...),\n          name='Submodel',\n          original_node=...)],\n      original_node=...),\n    original_node=...),\n  original_node=...)",
+          node=...)],
       serialization=Serialization(
         with_model_type=True),
       reference_in_the_book=ReferenceInTheBook(
@@ -8251,6 +8263,36 @@ UnverifiedSymbolTable(
         "Assignment(\n  target=Name(\n    identifier='parameter',\n    original_node=...),\n  value=JoinedStr(\n    values=[\n      FormattedValue(\n        value=Name(\n          identifier='token',\n          original_node=...),\n        original_node=...),\n      '=(',\n      FormattedValue(\n        value=Name(\n          identifier='token',\n          original_node=...),\n        original_node=...),\n      '|',\n      FormattedValue(\n        value=Name(\n          identifier='quoted_string',\n          original_node=...),\n        original_node=...),\n      ')'],\n    original_node=...),\n  original_node=...)",
         "Assignment(\n  target=Name(\n    identifier='media_type',\n    original_node=...),\n  value=JoinedStr(\n    values=[\n      FormattedValue(\n        value=Name(\n          identifier='type',\n          original_node=...),\n        original_node=...),\n      '/',\n      FormattedValue(\n        value=Name(\n          identifier='subtype',\n          original_node=...),\n        original_node=...),\n      '(',\n      FormattedValue(\n        value=Name(\n          identifier='ows',\n          original_node=...),\n        original_node=...),\n      ';',\n      FormattedValue(\n        value=Name(\n          identifier='ows',\n          original_node=...),\n        original_node=...),\n      FormattedValue(\n        value=Name(\n          identifier='parameter',\n          original_node=...),\n        original_node=...),\n      ')*'],\n    original_node=...),\n  original_node=...)",
         "Return(\n  value=IsNotNone(\n    value=FunctionCall(\n      name='match',\n      args=[\n        Name(\n          identifier='media_type',\n          original_node=...),\n        Name(\n          identifier='text',\n          original_node=...)],\n      original_node=...),\n    original_node=...),\n  original_node=...)"],
+      node=...,
+      arguments_by_name=...),
+    ImplementationSpecificMethod(
+      name='is_model_reference_to',
+      verification=True,
+      arguments=[
+        Argument(
+          name='reference',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Model_reference',
+            node=...),
+          default=None,
+          node=...),
+        Argument(
+          name='expected_type',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Key_elements',
+            node=...),
+          default=None,
+          node=...)],
+      returns=AtomicTypeAnnotation(
+        identifier='bool',
+        node=...),
+      description=Description(
+        document=...,
+        node=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
       node=...,
       arguments_by_name=...)],
   meta_model=MetaModel(

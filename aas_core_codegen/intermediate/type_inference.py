@@ -870,6 +870,57 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         self.type_map[node] = result
         return result
 
+    def transform_for_each(
+        self, node: parse_tree.ForEach
+    ) -> Optional["TypeAnnotationUnion"]:
+        variable_type_in_env = self._environment.find(node.variable.identifier)
+        if variable_type_in_env is not None:
+            self.errors.append(
+                Error(
+                    node.variable.original_node,
+                    f"The variable {node.variable.identifier} "
+                    f"has been already defined before",
+                )
+            )
+            return None
+
+        iter_type = self.transform(node.iteration)
+        if iter_type is None:
+            return None
+
+        while isinstance(iter_type, OptionalTypeAnnotation):
+            iter_type = iter_type.value
+
+        if not isinstance(iter_type, ListTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.iteration.original_node,
+                    f"Expected an iteration over a list, but got: {iter_type}",
+                )
+            )
+            return None
+
+        self._environment.set(
+            identifier=node.variable.identifier, type_annotation=iter_type.items
+        )
+
+        result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
+        self.type_map[node] = result
+        return result
+
+    def transform_all(self, node: parse_tree.All) -> Optional["TypeAnnotationUnion"]:
+        a_type = self.transform(node.for_each)
+        if a_type is None:
+            return None
+
+        a_type = self.transform(node.condition)
+        if a_type is None:
+            return None
+
+        result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
+        self.type_map[node] = result
+        return result
+
     def transform_assignment(
         self, node: parse_tree.Assignment
     ) -> Optional["TypeAnnotationUnion"]:
