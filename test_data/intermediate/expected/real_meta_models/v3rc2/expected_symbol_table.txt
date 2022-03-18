@@ -1850,20 +1850,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -1944,6 +1930,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Identifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='derived_from',
@@ -2456,56 +2456,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
-          name='kind',
-          type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              symbol='Reference to symbol Modeling_kind',
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_kind',
-          parsed=...),
-        Property(
-          name='semantic_ID',
-          type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              symbol='Reference to symbol Reference',
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_semantics',
-          parsed=...),
-        Property(
-          name='qualifiers',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              symbol='Reference to symbol Constraint',
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -2586,6 +2536,56 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Identifiable',
+          parsed=...),
+        Property(
+          name='kind',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              symbol='Reference to symbol Modeling_kind',
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_kind',
+          parsed=...),
+        Property(
+          name='semantic_ID',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              symbol='Reference to symbol Reference',
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Property(
+          name='qualifiers',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              symbol='Reference to symbol Constraint',
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='submodel_elements',
@@ -2814,20 +2814,6 @@ SymbolTable(
           'Reference to ConcreteClass Submodel_element_struct'],
         properties=[
           Property(
-            name='data_specifications',
-            type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Reference',
-                  parsed=...),
-                parsed=...),
-              parsed=...),
-            description=Description(
-              document=...,
-              node=...),
-            specified_for='Reference to AbstractClass Has_data_specification',
-            parsed=...),
-          Property(
             name='extensions',
             type_annotation=ListTypeAnnotation(
               items=OurTypeAnnotation(
@@ -2922,6 +2908,20 @@ SymbolTable(
               document=...,
               node=...),
             specified_for='Reference to AbstractClass Qualifiable',
+            parsed=...),
+          Property(
+            name='data_specifications',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Reference',
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            description=Description(
+              document=...,
+              node=...),
+            specified_for='Reference to AbstractClass Has_data_specification',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -2946,20 +2946,6 @@ SymbolTable(
         'Reference to ConcreteClass Submodel_element_list',
         'Reference to ConcreteClass Submodel_element_struct'],
       properties=[
-        Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
         Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
@@ -3055,6 +3041,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -3217,20 +3217,6 @@ SymbolTable(
           'Reference to ConcreteClass Annotated_relationship_element'],
         properties=[
           Property(
-            name='data_specifications',
-            type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Reference',
-                  parsed=...),
-                parsed=...),
-              parsed=...),
-            description=Description(
-              document=...,
-              node=...),
-            specified_for='Reference to AbstractClass Has_data_specification',
-            parsed=...),
-          Property(
             name='extensions',
             type_annotation=ListTypeAnnotation(
               items=OurTypeAnnotation(
@@ -3327,6 +3313,20 @@ SymbolTable(
             specified_for='Reference to AbstractClass Qualifiable',
             parsed=...),
           Property(
+            name='data_specifications',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Reference',
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            description=Description(
+              document=...,
+              node=...),
+            specified_for='Reference to AbstractClass Has_data_specification',
+            parsed=...),
+          Property(
             name='first',
             type_annotation=OurTypeAnnotation(
               symbol='Reference to symbol Reference',
@@ -3357,20 +3357,6 @@ SymbolTable(
       concrete_descendants=[
         'Reference to ConcreteClass Annotated_relationship_element'],
       properties=[
-        Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
         Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
@@ -3466,6 +3452,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='first',
@@ -3661,20 +3661,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -3769,6 +3755,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='submodel_element_type_values',
@@ -4020,20 +4020,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -4128,6 +4114,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='values',
@@ -4322,20 +4322,6 @@ SymbolTable(
           'Reference to ConcreteClass Reference_element'],
         properties=[
           Property(
-            name='data_specifications',
-            type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Reference',
-                  parsed=...),
-                parsed=...),
-              parsed=...),
-            description=Description(
-              document=...,
-              node=...),
-            specified_for='Reference to AbstractClass Has_data_specification',
-            parsed=...),
-          Property(
             name='extensions',
             type_annotation=ListTypeAnnotation(
               items=OurTypeAnnotation(
@@ -4430,6 +4416,20 @@ SymbolTable(
               document=...,
               node=...),
             specified_for='Reference to AbstractClass Qualifiable',
+            parsed=...),
+          Property(
+            name='data_specifications',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Reference',
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            description=Description(
+              document=...,
+              node=...),
+            specified_for='Reference to AbstractClass Has_data_specification',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -4447,20 +4447,6 @@ SymbolTable(
         'Reference to ConcreteClass Range',
         'Reference to ConcreteClass Reference_element'],
       properties=[
-        Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
         Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
@@ -4556,6 +4542,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -4715,20 +4715,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -4823,6 +4809,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='value_type',
@@ -5048,20 +5048,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -5156,6 +5142,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='value',
@@ -5363,20 +5363,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -5471,6 +5457,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='value_type',
@@ -5696,20 +5696,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -5804,6 +5790,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='value',
@@ -5987,20 +5987,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -6095,6 +6081,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='MIME_type',
@@ -6301,20 +6301,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -6409,6 +6395,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='MIME_type',
@@ -6615,20 +6615,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -6723,6 +6709,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='first',
@@ -6976,20 +6976,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -7084,6 +7070,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='entity_type',
@@ -7339,20 +7339,6 @@ SymbolTable(
           'Reference to ConcreteClass Basic_Event'],
         properties=[
           Property(
-            name='data_specifications',
-            type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Reference',
-                  parsed=...),
-                parsed=...),
-              parsed=...),
-            description=Description(
-              document=...,
-              node=...),
-            specified_for='Reference to AbstractClass Has_data_specification',
-            parsed=...),
-          Property(
             name='extensions',
             type_annotation=ListTypeAnnotation(
               items=OurTypeAnnotation(
@@ -7447,6 +7433,20 @@ SymbolTable(
               document=...,
               node=...),
             specified_for='Reference to AbstractClass Qualifiable',
+            parsed=...),
+          Property(
+            name='data_specifications',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Reference',
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            description=Description(
+              document=...,
+              node=...),
+            specified_for='Reference to AbstractClass Has_data_specification',
             parsed=...)],
         signatures=[],
         description=Description(
@@ -7459,20 +7459,6 @@ SymbolTable(
       concrete_descendants=[
         'Reference to ConcreteClass Basic_Event'],
       properties=[
-        Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
         Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
@@ -7568,6 +7554,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -7727,20 +7727,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -7835,6 +7821,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='observed',
@@ -8012,20 +8012,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -8120,6 +8106,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='input_variables',
@@ -8417,20 +8417,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -8525,6 +8511,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -8685,20 +8685,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -8779,6 +8765,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Identifiable',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='is_case_of',
@@ -8947,20 +8947,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
-          type_annotation=OptionalTypeAnnotation(
-            value=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            parsed=...),
-          description=Description(
-            document=...,
-            node=...),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
-        Property(
           name='extensions',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
@@ -9031,6 +9017,20 @@ SymbolTable(
             document=...,
             node=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Property(
+          name='data_specifications',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=Description(
+            document=...,
+            node=...),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Property(
           name='contained_elements',

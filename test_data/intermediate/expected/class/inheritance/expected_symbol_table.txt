@@ -235,12 +235,6 @@ SymbolTable(
           preconditions=[
             Contract(
               args=[
-                'some_property'],
-              description=None,
-              body="Comparison(\n  left=Name(\n    identifier='some_property',\n    original_node=...),\n  op='GT',\n  right=Constant(\n    value=0,\n    original_node=...),\n  original_node=...)",
-              parsed=...),
-            Contract(
-              args=[
                 'another_property'],
               description=None,
               body="Comparison(\n  left=Name(\n    identifier='another_property',\n    original_node=...),\n  op='GT',\n  right=Constant(\n    value=0,\n    original_node=...),\n  original_node=...)",
@@ -368,18 +362,6 @@ SymbolTable(
         description=None,
         contracts=Contracts(
           preconditions=[
-            Contract(
-              args=[
-                'some_property'],
-              description=None,
-              body="Comparison(\n  left=Name(\n    identifier='some_property',\n    original_node=...),\n  op='GT',\n  right=Constant(\n    value=0,\n    original_node=...),\n  original_node=...)",
-              parsed=...),
-            Contract(
-              args=[
-                'another_property'],
-              description=None,
-              body="Comparison(\n  left=Name(\n    identifier='another_property',\n    original_node=...),\n  op='GT',\n  right=Constant(\n    value=0,\n    original_node=...),\n  original_node=...)",
-              parsed=...),
             Contract(
               args=[
                 'yet_another_property'],

@@ -548,25 +548,6 @@ namespace AasCore.Aas3
                         "    submodel => Verification.IsModelReferenceTo(submodel, KeyElements.Submodel)))");
                 }
 
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -643,6 +624,25 @@ namespace AasCore.Aas3
                             new Reporting.NameSegment(
                                 "administration"));
                         yield return error;
+                    }
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
                     }
                 }
 
@@ -775,66 +775,6 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Submodel that)
             {
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
-                if (that.Kind != null)
-                {
-                    // We need to help the static analyzer with a null coalescing.
-                    Aas.ModelingKind value = that.Kind
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyModelingKind(value))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "kind"));
-                        yield return error;
-                    }
-                }
-
-                if (that.SemanticId != null)
-                {
-                    foreach (var error in Verification.Verify(that.SemanticId))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "semanticId"));
-                        yield return error;
-                    }
-                }
-
-                int indexQualifiers = 0;
-                foreach (var item in that.Qualifiers)
-                {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexQualifiers));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "qualifiers"));
-                        yield return error;
-                    }
-                    indexQualifiers++;
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -914,6 +854,66 @@ namespace AasCore.Aas3
                     }
                 }
 
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
+                }
+
+                if (that.SemanticId != null)
+                {
+                    foreach (var error in Verification.Verify(that.SemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
+                    }
+                }
+
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
                 int indexSubmodelElements = 0;
                 foreach (var item in that.SubmodelElements)
                 {
@@ -934,25 +934,6 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.SubmodelElementList that)
             {
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -1052,6 +1033,25 @@ namespace AasCore.Aas3
                         yield return error;
                     }
                     indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
                 }
 
                 foreach (
@@ -1109,25 +1109,6 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.SubmodelElementStruct that)
             {
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -1227,6 +1208,25 @@ namespace AasCore.Aas3
                         yield return error;
                     }
                     indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
                 }
 
                 int indexValues = 0;
@@ -1249,25 +1249,6 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Property that)
             {
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -1367,6 +1348,25 @@ namespace AasCore.Aas3
                         yield return error;
                     }
                     indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
                 }
 
                 foreach (var error in Verification.VerifyDataTypeDef(that.ValueType))
@@ -1403,25 +1403,6 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.MultiLanguageProperty that)
             {
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -1521,6 +1502,25 @@ namespace AasCore.Aas3
                         yield return error;
                     }
                     indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
                 }
 
                 if (that.Value != null)
@@ -1549,25 +1549,6 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Range that)
             {
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -1667,6 +1648,25 @@ namespace AasCore.Aas3
                         yield return error;
                     }
                     indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
                 }
 
                 foreach (var error in Verification.VerifyDataTypeDef(that.ValueType))
@@ -1703,25 +1703,6 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.ReferenceElement that)
             {
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -1821,6 +1802,25 @@ namespace AasCore.Aas3
                         yield return error;
                     }
                     indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
                 }
 
                 if (that.Value != null)
@@ -1845,25 +1845,6 @@ namespace AasCore.Aas3
                         "Verification.IsMimeType(that.MimeType)");
                 }
 
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -1963,6 +1944,25 @@ namespace AasCore.Aas3
                         yield return error;
                     }
                     indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
                 }
 
                 foreach (var error in Verification.VerifyMimeTyped(that.MimeType))
@@ -1984,25 +1984,6 @@ namespace AasCore.Aas3
                         "Verification.IsMimeType(that.MimeType)");
                 }
 
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -2102,6 +2083,25 @@ namespace AasCore.Aas3
                         yield return error;
                     }
                     indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
                 }
 
                 foreach (var error in Verification.VerifyMimeTyped(that.MimeType))
@@ -2127,25 +2127,6 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.AnnotatedRelationshipElement that)
             {
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -2245,6 +2226,25 @@ namespace AasCore.Aas3
                         yield return error;
                     }
                     indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
                 }
 
                 foreach (var error in Verification.Verify(that.First))
@@ -2283,25 +2283,6 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Entity that)
             {
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -2401,6 +2382,25 @@ namespace AasCore.Aas3
                         yield return error;
                     }
                     indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
                 }
 
                 foreach (var error in Verification.VerifyEntityType(that.EntityType))
@@ -2453,25 +2453,6 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.BasicEvent that)
             {
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -2571,6 +2552,25 @@ namespace AasCore.Aas3
                         yield return error;
                     }
                     indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
                 }
 
                 foreach (var error in Verification.Verify(that.Observed))
@@ -2585,25 +2585,6 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Operation that)
             {
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -2703,6 +2684,25 @@ namespace AasCore.Aas3
                         yield return error;
                     }
                     indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
                 }
 
                 int indexInputVariables = 0;
@@ -2769,25 +2769,6 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Capability that)
             {
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -2888,11 +2869,7 @@ namespace AasCore.Aas3
                     }
                     indexQualifiers++;
                 }
-            }
 
-            public override IEnumerable<Reporting.Error> Transform(
-                Aas.ConceptDescription that)
-            {
                 if (that.DataSpecifications != null)
                 {
                     int indexDataSpecifications = 0;
@@ -2911,7 +2888,11 @@ namespace AasCore.Aas3
                         indexDataSpecifications++;
                     }
                 }
+            }
 
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.ConceptDescription that)
+            {
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -2991,6 +2972,25 @@ namespace AasCore.Aas3
                     }
                 }
 
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
                 int indexIsCaseOf = 0;
                 foreach (var item in that.IsCaseOf)
                 {
@@ -3011,25 +3011,6 @@ namespace AasCore.Aas3
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.View that)
             {
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
                 int indexExtensions = 0;
                 foreach (var item in that.Extensions)
                 {
@@ -3098,6 +3079,25 @@ namespace AasCore.Aas3
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
+                    }
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
                     }
                 }
 
