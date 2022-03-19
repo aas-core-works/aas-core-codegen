@@ -1447,57 +1447,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -1676,6 +1625,57 @@ namespace AasCore.Aas3
                     {
                         throw new System.InvalidOperationException(
                             "Unexpected theAdministration null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
                     }
                 }
 
@@ -2075,152 +2075,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
-                Nodes.JsonNode? nodeKind = obj["kind"];
-                Aas.ModelingKind? theKind = null;
-                if (nodeKind != null)
-                {
-                    theKind = DeserializeImplementation.ModelingKindFrom(
-                        nodeKind,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "kind"));
-                        return null;
-                    }
-                    if (theKind == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theKind null when error is also null");
-                    }
-                }
-
-                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
-                Aas.IReference? theSemanticId = null;
-                if (nodeSemanticId != null)
-                {
-                    theSemanticId = DeserializeImplementation.IReferenceFrom(
-                        nodeSemanticId,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "semanticId"));
-                        return null;
-                    }
-                    if (theSemanticId == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theSemanticId null when error is also null");
-                    }
-                }
-
-                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
-                if (nodeQualifiers == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"qualifiers\" is missing ");
-                    return null;
-                }
-                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
-                if (arrayQualifiers == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "qualifiers"));
-                    return null;
-                }
-                var theQualifiers = new List<IConstraint>(
-                    arrayQualifiers.Count);
-                int indexQualifiers = 0;
-                foreach (Nodes.JsonNode? item in arrayQualifiers)
-                {
-                    if (item == null)
-                    {
-                        error = new Reporting.Error(
-                            "Expected a non-null item, but got a null");
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexQualifiers));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "qualifiers"));
-                    }
-                    IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
-                        item ?? throw new System.InvalidOperationException(),
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexQualifiers));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "qualifiers"));
-                        return null;
-                    }
-                    theQualifiers.Add(
-                        parsedItem
-                            ?? throw new System.InvalidOperationException(
-                                "Unexpected result null when error is null"));
-                    indexQualifiers++;
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -2399,6 +2253,152 @@ namespace AasCore.Aas3
                     {
                         throw new System.InvalidOperationException(
                             "Unexpected theAdministration null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = DeserializeImplementation.ModelingKindFrom(
+                        nodeKind,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        return null;
+                    }
+                    if (theKind == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theKind null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = DeserializeImplementation.IReferenceFrom(
+                        nodeSemanticId,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        return null;
+                    }
+                    if (theSemanticId == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theSemanticId null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"qualifiers\" is missing ");
+                    return null;
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "qualifiers"));
+                    return null;
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        error = new Reporting.Error(
+                            "Expected a non-null item, but got a null");
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                    }
+                    IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
+                        item ?? throw new System.InvalidOperationException(),
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        return null;
+                    }
+                    theQualifiers.Add(
+                        parsedItem
+                            ?? throw new System.InvalidOperationException(
+                                "Unexpected result null when error is null"));
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
                     }
                 }
 
@@ -2645,57 +2645,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -2926,6 +2875,57 @@ namespace AasCore.Aas3
                             ?? throw new System.InvalidOperationException(
                                 "Unexpected result null when error is null"));
                     indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
                 }
 
                 Nodes.JsonNode? nodeSubmodelElementTypeValues = obj["submodelElementTypeValues"];
@@ -3089,57 +3089,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -3370,6 +3319,57 @@ namespace AasCore.Aas3
                             ?? throw new System.InvalidOperationException(
                                 "Unexpected result null when error is null"));
                     indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
                 }
 
                 Nodes.JsonNode? nodeValues = obj["values"];
@@ -3534,57 +3534,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -3815,6 +3764,57 @@ namespace AasCore.Aas3
                             ?? throw new System.InvalidOperationException(
                                 "Unexpected result null when error is null"));
                     indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
                 }
 
                 Nodes.JsonNode? nodeValueType = obj["valueType"];
@@ -3922,57 +3922,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -4203,6 +4152,57 @@ namespace AasCore.Aas3
                             ?? throw new System.InvalidOperationException(
                                 "Unexpected result null when error is null"));
                     indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
                 }
 
                 Nodes.JsonNode? nodeValue = obj["value"];
@@ -4284,57 +4284,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -4565,6 +4514,57 @@ namespace AasCore.Aas3
                             ?? throw new System.InvalidOperationException(
                                 "Unexpected result null when error is null"));
                     indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
                 }
 
                 Nodes.JsonNode? nodeValueType = obj["valueType"];
@@ -4672,57 +4672,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -4953,6 +4902,57 @@ namespace AasCore.Aas3
                             ?? throw new System.InvalidOperationException(
                                 "Unexpected result null when error is null"));
                     indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
                 }
 
                 Nodes.JsonNode? nodeValue = obj["value"];
@@ -5012,57 +5012,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -5293,6 +5242,57 @@ namespace AasCore.Aas3
                             ?? throw new System.InvalidOperationException(
                                 "Unexpected result null when error is null"));
                     indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
                 }
 
                 Nodes.JsonNode? nodeMimeType = obj["mimeType"];
@@ -5378,57 +5378,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -5659,6 +5608,57 @@ namespace AasCore.Aas3
                             ?? throw new System.InvalidOperationException(
                                 "Unexpected result null when error is null"));
                     indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
                 }
 
                 Nodes.JsonNode? nodeMimeType = obj["mimeType"];
@@ -5744,57 +5744,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -6025,6 +5974,57 @@ namespace AasCore.Aas3
                             ?? throw new System.InvalidOperationException(
                                 "Unexpected result null when error is null"));
                     indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
                 }
 
                 Nodes.JsonNode? nodeFirst = obj["first"];
@@ -6200,57 +6200,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -6481,6 +6430,57 @@ namespace AasCore.Aas3
                             ?? throw new System.InvalidOperationException(
                                 "Unexpected result null when error is null"));
                     indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
                 }
 
                 Nodes.JsonNode? nodeEntityType = obj["entityType"];
@@ -6700,57 +6700,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -6981,6 +6930,57 @@ namespace AasCore.Aas3
                             ?? throw new System.InvalidOperationException(
                                 "Unexpected result null when error is null"));
                     indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
                 }
 
                 Nodes.JsonNode? nodeObserved = obj["observed"];
@@ -7044,57 +7044,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -7325,6 +7274,57 @@ namespace AasCore.Aas3
                             ?? throw new System.InvalidOperationException(
                                 "Unexpected result null when error is null"));
                     indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
                 }
 
                 Nodes.JsonNode? nodeInputVariables = obj["inputVariables"];
@@ -7578,57 +7578,6 @@ namespace AasCore.Aas3
                     return null;
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
                 if (nodeExtensions == null)
                 {
@@ -7861,41 +7810,6 @@ namespace AasCore.Aas3
                     indexQualifiers++;
                 }
 
-                return new Aas.Capability(
-                    theExtensions
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
-                    theIdShort,
-                    theDisplayName,
-                    theCategory,
-                    theDescription,
-                    theKind,
-                    theSemanticId,
-                    theQualifiers
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
-                    theDataSpecifications);
-            }  // internal static CapabilityFrom
-
-            /// <summary>
-            /// Deserialize an instance of ConceptDescription from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.ConceptDescription? ConceptDescriptionFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-
-                Nodes.JsonObject? obj = node as Nodes.JsonObject;
-                if (obj == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonObject, but got {node.GetType()}");
-                    return null;
-                }
-
                 Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
                 List<IReference>? theDataSpecifications = null;
                 if (nodeDataSpecifications != null)
@@ -7945,6 +7859,41 @@ namespace AasCore.Aas3
                                     "Unexpected result null when error is null"));
                         indexDataSpecifications++;
                     }
+                }
+
+                return new Aas.Capability(
+                    theExtensions
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theIdShort,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theDataSpecifications);
+            }  // internal static CapabilityFrom
+
+            /// <summary>
+            /// Deserialize an instance of ConceptDescription from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.ConceptDescription? ConceptDescriptionFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject, but got {node.GetType()}");
+                    return null;
                 }
 
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
@@ -8128,6 +8077,57 @@ namespace AasCore.Aas3
                     }
                 }
 
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
+                }
+
                 Nodes.JsonNode? nodeIsCaseOf = obj["isCaseOf"];
                 if (nodeIsCaseOf == null)
                 {
@@ -8216,57 +8216,6 @@ namespace AasCore.Aas3
                     error = new Reporting.Error(
                         $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
-                }
-
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
                 }
 
                 Nodes.JsonNode? nodeExtensions = obj["extensions"];
@@ -8424,6 +8373,57 @@ namespace AasCore.Aas3
                     {
                         throw new System.InvalidOperationException(
                             "Unexpected theSemanticId null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
                     }
                 }
 
@@ -11881,18 +11881,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -11933,6 +11921,18 @@ namespace AasCore.Aas3
                 {
                     result["administration"] = Transform(
                         that.Administration);
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
                 }
 
                 if (that.DerivedFrom != null)
@@ -12016,42 +12016,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
-                if (that.Kind != null)
-                {
-                    // We need to help the static analyzer with a null coalescing.
-                    Aas.ModelingKind value = that.Kind
-                        ?? throw new System.InvalidOperationException();
-                    result["kind"] = Serialize.ModelingKindToJsonValue(
-                        value);
-                }
-
-                if (that.SemanticId != null)
-                {
-                    result["semanticId"] = Transform(
-                        that.SemanticId);
-                }
-
-                var arrayQualifiers = new Nodes.JsonArray();
-                foreach (IConstraint item in that.Qualifiers)
-                {
-                    arrayQualifiers.Add(
-                        Transform(
-                            item));
-                }
-                result["qualifiers"] = arrayQualifiers;
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -12094,6 +12058,42 @@ namespace AasCore.Aas3
                         that.Administration);
                 }
 
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
+                }
+
+                if (that.SemanticId != null)
+                {
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
+                }
+
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
+
                 var arraySubmodelElements = new Nodes.JsonArray();
                 foreach (ISubmodelElement item in that.SubmodelElements)
                 {
@@ -12109,18 +12109,6 @@ namespace AasCore.Aas3
             public override Nodes.JsonObject Transform(Aas.SubmodelElementList that)
             {
                 var result = new Nodes.JsonObject();
-
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
 
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
@@ -12178,6 +12166,18 @@ namespace AasCore.Aas3
                             item));
                 }
                 result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
                 result["submodelElementTypeValues"] = Serialize.SubmodelElementsToJsonValue(
                     that.SubmodelElementTypeValues);
@@ -12213,18 +12213,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -12281,6 +12269,18 @@ namespace AasCore.Aas3
                             item));
                 }
                 result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
                 var arrayValues = new Nodes.JsonArray();
                 foreach (ISubmodelElement item in that.Values)
@@ -12298,18 +12298,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -12366,6 +12354,18 @@ namespace AasCore.Aas3
                             item));
                 }
                 result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
                 result["valueType"] = Serialize.DataTypeDefToJsonValue(
                     that.ValueType);
@@ -12389,18 +12389,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -12457,6 +12445,18 @@ namespace AasCore.Aas3
                             item));
                 }
                 result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
                 if (that.Value != null)
                 {
@@ -12477,18 +12477,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -12545,6 +12533,18 @@ namespace AasCore.Aas3
                             item));
                 }
                 result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
                 result["valueType"] = Serialize.DataTypeDefToJsonValue(
                     that.ValueType);
@@ -12568,18 +12568,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -12636,6 +12624,18 @@ namespace AasCore.Aas3
                             item));
                 }
                 result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
                 if (that.Value != null)
                 {
@@ -12650,18 +12650,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -12718,6 +12706,18 @@ namespace AasCore.Aas3
                             item));
                 }
                 result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
                 result["mimeType"] = Nodes.JsonValue.Create(
                     that.MimeType);
@@ -12736,18 +12736,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -12804,6 +12792,18 @@ namespace AasCore.Aas3
                             item));
                 }
                 result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
                 result["mimeType"] = Nodes.JsonValue.Create(
                     that.MimeType);
@@ -12821,18 +12821,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -12889,6 +12877,18 @@ namespace AasCore.Aas3
                             item));
                 }
                 result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
                 result["first"] = Transform(
                     that.First);
@@ -12912,18 +12912,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -12980,6 +12968,18 @@ namespace AasCore.Aas3
                             item));
                 }
                 result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
                 result["entityType"] = Serialize.EntityTypeToJsonValue(
                     that.EntityType);
@@ -13012,18 +13012,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -13080,6 +13068,18 @@ namespace AasCore.Aas3
                             item));
                 }
                 result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
                 result["observed"] = Transform(
                     that.Observed);
@@ -13091,18 +13091,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -13159,6 +13147,18 @@ namespace AasCore.Aas3
                             item));
                 }
                 result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
 
                 var arrayInputVariables = new Nodes.JsonArray();
                 foreach (OperationVariable item in that.InputVariables)
@@ -13204,18 +13204,6 @@ namespace AasCore.Aas3
             {
                 var result = new Nodes.JsonObject();
 
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
                 {
@@ -13273,13 +13261,6 @@ namespace AasCore.Aas3
                 }
                 result["qualifiers"] = arrayQualifiers;
 
-                return result;
-            }
-
-            public override Nodes.JsonObject Transform(Aas.ConceptDescription that)
-            {
-                var result = new Nodes.JsonObject();
-
                 if (that.DataSpecifications != null)
                 {
                     var arrayDataSpecifications = new Nodes.JsonArray();
@@ -13291,6 +13272,13 @@ namespace AasCore.Aas3
                     }
                     result["dataSpecifications"] = arrayDataSpecifications;
                 }
+
+                return result;
+            }
+
+            public override Nodes.JsonObject Transform(Aas.ConceptDescription that)
+            {
+                var result = new Nodes.JsonObject();
 
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
@@ -13334,6 +13322,18 @@ namespace AasCore.Aas3
                         that.Administration);
                 }
 
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
+
                 var arrayIsCaseOf = new Nodes.JsonArray();
                 foreach (IReference item in that.IsCaseOf)
                 {
@@ -13349,18 +13349,6 @@ namespace AasCore.Aas3
             public override Nodes.JsonObject Transform(Aas.View that)
             {
                 var result = new Nodes.JsonObject();
-
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
 
                 var arrayExtensions = new Nodes.JsonArray();
                 foreach (Extension item in that.Extensions)
@@ -13399,6 +13387,18 @@ namespace AasCore.Aas3
                 {
                     result["semanticId"] = Transform(
                         that.SemanticId);
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
                 }
 
                 var arrayContainedElements = new Nodes.JsonArray();

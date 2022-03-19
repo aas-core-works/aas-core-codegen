@@ -887,8 +887,27 @@ class ConstrainedPrimitive:
     #: for each implementation target
     is_implementation_specific: Final[bool]
 
-    #: List of class invariants
-    invariants: Final[Sequence[Invariant]]
+    # region Invariants
+
+    # NOTE (mristin, 2022-03-19):
+    # We have to decorate invariants with ``@property`` so that the translation code
+    # is forced to use ``_set_invariants``.
+
+    _invariants: Sequence[Invariant]
+
+    @property
+    def invariants(self) -> Sequence[Invariant]:
+        """List invariants of the class."""
+        return self._invariants
+
+    _invariant_id_set: FrozenSet[int]
+
+    @property
+    def invariant_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the invariant objects in a set."""
+        return self._invariant_id_set
+
+    # endregion
 
     #: Reference to the original specs
     reference_in_the_book: Final[Optional[ReferenceInTheBook]]
@@ -942,12 +961,10 @@ class ConstrainedPrimitive:
         self._set_descendants(descendants)
         self.constrainee = constrainee
         self.is_implementation_specific = is_implementation_specific
-        self.invariants = invariants
+        self._set_invariants(invariants)
         self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.parsed = parsed
-
-        self.invariant_id_set = frozenset(id(inv) for inv in self.invariants)
 
     def _set_descendants(self, descendants: Sequence["ConstrainedPrimitive"]) -> None:
         """
@@ -958,6 +975,15 @@ class ConstrainedPrimitive:
         self._descendant_id_set = frozenset(
             id(descendant) for descendant in descendants
         )
+
+    def _set_invariants(self, invariants: Sequence[Invariant]) -> None:
+        """
+        Set the invariants in the class.
+
+        This method is expected to be called only during the translation phase.
+        """
+        self._invariants = invariants
+        self._invariant_id_set = frozenset(id(invariant) for invariant in invariants)
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -1044,18 +1070,86 @@ class Class(DBC):
 
     # endregion
 
-    #: List of properties of the class
-    properties: Final[Sequence[Property]]
+    # region Properties
 
-    #: List of methods of the class. The methods are strictly non-static and non-class
-    #: (in the Python sense of the terms).
-    methods: Final[Sequence[Method]]
+    # NOTE (mristin, 2022-03-19):
+    # We have to decorate properties with ``@property`` so that the translation code
+    # is forced to use ``_set_properties``.
+
+    _properties: Sequence[Property]
+
+    @property
+    def properties(self) -> Sequence[Property]:
+        """Return list of properties of the class."""
+        return self._properties
+
+    _properties_by_name: Mapping[Identifier, Property]
+
+    @property
+    def properties_by_name(self) -> Mapping[Identifier, Property]:
+        """Map all properties by their names."""
+        return self._properties_by_name
+
+    _property_id_set: FrozenSet[int]
+
+    @property
+    def property_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the property objects in a set."""
+        return self._property_id_set
+
+    # endregion
+
+    # region Methods
+
+    # NOTE (mristin, 2022-03-19):
+    # We have to decorate methods with ``@property`` so that the translation code
+    # is forced to use ``_set_methods``.
+
+    _methods: Sequence[Method]
+
+    @property
+    def methods(self) -> Sequence[Method]:
+        """
+        List methods of the class.
+
+        The methods are strictly non-static and non-class (in the Python sense of
+        the terms).
+        """
+        return self._methods
+
+    _methods_by_name: Mapping[Identifier, Method]
+
+    @property
+    def methods_by_name(self) -> Mapping[Identifier, Method]:
+        """Map all methods by their names."""
+        return self._methods_by_name
+
+    # endregion
 
     #: Constructor specification of the class
     constructor: Final[Constructor]
 
-    #: List of class invariants
-    invariants: Final[Sequence[Invariant]]
+    # region Invariants
+
+    # NOTE (mristin, 2022-03-19):
+    # We have to decorate invariants with ``@property`` so that the translation code
+    # is forced to use ``_set_invariants``.
+
+    _invariants: Sequence[Invariant]
+
+    @property
+    def invariants(self) -> Sequence[Invariant]:
+        """List invariants of the class."""
+        return self._invariants
+
+    _invariant_id_set: FrozenSet[int]
+
+    @property
+    def invariant_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the invariant objects in a set."""
+        return self._invariant_id_set
+
+    # endregion
 
     #: Particular serialization settings for this class
     serialization: Final[Serialization]
@@ -1069,30 +1163,6 @@ class Class(DBC):
     #: Relation to the class from the parse stage
     parsed: Final[parse.Class]
 
-    #: Map all properties by their identifiers to the corresponding objects
-    properties_by_name: Final[Mapping[Identifier, Property]]
-
-    #: Collect IDs (with :py:func:`id`) of the property objects in a set
-    property_id_set: Final[FrozenSet[int]]
-
-    #: Map all methods by their identifiers to the corresponding objects
-    methods_by_name: Final[Mapping[Identifier, Method]]
-
-    #: Collect IDs (with :py:func:`id`) of the invariant objects in a set
-    invariant_id_set: Final[FrozenSet[int]]
-
-    # fmt: off
-    @require(
-        lambda properties:
-        len(properties) == len(set(prop.name for prop in properties)),
-        "No duplicate properties"
-    )
-    @require(
-        lambda methods:
-        len(methods) == len(set(method.name for method in methods)),
-        "No duplicate methods"
-    )
-    # fmt: on
     def __init__(
         self,
         name: Identifier,
@@ -1112,26 +1182,17 @@ class Class(DBC):
         """Initialize with the given values."""
         self.name = name
         self._set_inheritances(inheritances)
-        self._set_descendants(descendants)
-
         self.interface = interface
+        self._set_descendants(descendants)
         self.is_implementation_specific = is_implementation_specific
-        self.properties = properties
-        self.methods = methods
+        self._set_properties(properties)
+        self._set_methods(methods)
         self.constructor = constructor
-        self.invariants = invariants
+        self._set_invariants(invariants)
         self.serialization = serialization
         self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.parsed = parsed
-
-        self.properties_by_name = {prop.name: prop for prop in self.properties}
-
-        self.property_id_set = frozenset(id(prop) for prop in self.properties)
-
-        self.methods_by_name = {method.name: method for method in self.methods}
-
-        self.invariant_id_set = frozenset(id(inv) for inv in self.invariants)
 
     # fmt: off
     @require(
@@ -1167,6 +1228,48 @@ class Class(DBC):
             for descendant in descendants
             if isinstance(descendant, ConcreteClass)
         ]
+
+    # fmt: off
+    @require(
+        lambda properties:
+        len(properties) == len(set(prop.name for prop in properties)),
+        "No duplicate properties"
+    )
+    # fmt: on
+    def _set_properties(self, properties: Sequence[Property]) -> None:
+        """
+        Set the properties in the class.
+
+        This method is expected to be called only during the translation phase.
+        """
+        self._properties = properties
+        self._properties_by_name = {prop.name: prop for prop in properties}
+        self._property_id_set = frozenset(id(prop) for prop in properties)
+
+    # fmt: off
+    @require(
+        lambda methods:
+        len(methods) == len(set(method.name for method in methods)),
+        "No duplicate methods"
+    )
+    # fmt: on
+    def _set_methods(self, methods: Sequence[Method]) -> None:
+        """
+        Set the methods in the class.
+
+        This method is expected to be called only during the translation phase.
+        """
+        self._methods = methods
+        self._methods_by_name = {method.name: method for method in methods}
+
+    def _set_invariants(self, invariants: Sequence[Invariant]) -> None:
+        """
+        Set the invariants in the class.
+
+        This method is expected to be called only during the translation phase.
+        """
+        self._invariants = invariants
+        self._invariant_id_set = frozenset(id(invariant) for invariant in invariants)
 
     @abc.abstractmethod
     def __repr__(self) -> str:

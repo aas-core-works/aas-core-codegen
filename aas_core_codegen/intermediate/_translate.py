@@ -6,7 +6,6 @@ import re
 from typing import (
     Sequence,
     List,
-    Mapping,
     Optional,
     MutableMapping,
     Tuple,
@@ -18,6 +17,8 @@ from typing import (
     Final,
     Type,
     Any,
+    Set,
+    Dict,
 )
 
 import asttokens
@@ -521,199 +522,6 @@ def _parsed_method_to_method(
     raise AssertionError("Should have never gotten here")
 
 
-def _in_line_constructors(
-    parsed_symbol_table: parse.SymbolTable,
-    ontology: _hierarchy.Ontology,
-    constructor_table: construction.ConstructorTable,
-) -> Mapping[parse.Class, Sequence[construction.AssignArgument]]:
-    """In-line recursively all the constructor bodies."""
-    result = (
-        dict()
-    )  # type: MutableMapping[parse.Class, List[construction.AssignArgument]]
-
-    for cls in ontology.classes:
-        # We explicitly check at the stage of
-        # :py:mod:`aas_core_codegen.intermediate.constructor` that all the calls
-        # are calls to constructors of a super class or property assignments.
-
-        constructor_body = constructor_table.must_find(cls)
-        in_lined = []  # type: List[construction.AssignArgument]
-        for statement in constructor_body:
-            if isinstance(statement, construction.CallSuperConstructor):
-                ancestor = parsed_symbol_table.must_find_class(statement.super_name)
-
-                in_lined_of_ancestor = result.get(ancestor, None)
-
-                assert in_lined_of_ancestor is not None, (
-                    f"Expected all the constructors of the ancestors "
-                    f"of the class {cls.name} to have been in-lined before "
-                    f"due to the topological order of classes in the ontology, "
-                    f"but the ancestor {ancestor.name} has not had its "
-                    f"constructor in-lined yet"
-                )
-
-                in_lined.extend(in_lined_of_ancestor)
-            else:
-                in_lined.append(statement)
-
-        assert cls not in result, (
-            f"Expected the class {cls} not to be inserted into the registry of "
-            f"in-lined constructors since its in-lined constructor "
-            f"has just been computed."
-        )
-
-        result[cls] = in_lined
-
-    return result
-
-
-def _stack_contracts(contracts: Contracts, other: Contracts) -> Contracts:
-    """Join the two contracts together."""
-    return Contracts(
-        preconditions=list(
-            itertools.chain(contracts.preconditions, other.preconditions)
-        ),
-        snapshots=list(itertools.chain(contracts.snapshots, other.snapshots)),
-        postconditions=list(
-            itertools.chain(contracts.postconditions, other.postconditions)
-        ),
-    )
-
-
-T = TypeVar("T")
-
-
-class _SettingWithSource(Generic[T]):
-    """
-    Represent a setting from an inheritance chain.
-
-    For example, a setting for JSON serialization.
-    """
-
-    def __init__(self, value: T, source: parse.Class):
-        """Initialize with the given values."""
-        self.value = value
-        self.source = source
-
-    def __repr__(self) -> str:
-        return f"_SettingWithSource(value={self.value!r}, source={self.source.name!r})"
-
-
-# fmt: off
-@ensure(
-    lambda parsed_symbol_table, result:
-    not (result[0] is not None)
-    or all(
-        symbol in result[0]
-        for symbol in parsed_symbol_table.symbols
-        if not isinstance(symbol, parse.Enumeration)
-    ),
-    "Resolution of serialization settings performed for all non-enumeration symbols"
-)
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-# fmt: on
-def _resolve_serializations(
-    ontology: _hierarchy.Ontology, parsed_symbol_table: parse.SymbolTable
-) -> Tuple[Optional[MutableMapping[parse.Class, Serialization]], Optional[Error]]:
-    """Resolve how general serialization settings stack through the ontology."""
-    # NOTE (mristin, 2021-11-03):
-    # We do not abstract away different serialization settings at this point
-    # as there is only a single one, ``with_model_type``. In the future, if there are
-    # more settings, this function needs to be split into multiple ones (one function
-    # for a setting each), or maybe we can even think of a more general approach to
-    # inheritance of serialization settings.
-
-    # region ``with_model_type``
-
-    with_model_type_map = (
-        dict()
-    )  # type: MutableMapping[Identifier, Optional[_SettingWithSource[bool]]]
-
-    for parsed_cls in ontology.classes:
-        if any(
-            parent_name in parse.PRIMITIVE_TYPES
-            for parent_name in parsed_cls.inheritances
-        ):
-            assert len(parsed_cls.inheritances) == 1, (
-                f"A constrained primitive type in the initial set should only "
-                f"inherit from the primitive type. {parsed_cls.name=}"
-            )
-
-            # We can not steer how constrained primitives are serialized as they will be
-            # serialized according to their underlying primitive type.
-
-            with_model_type_map[parsed_cls.name] = None
-            continue
-
-        assert parsed_cls.name not in with_model_type_map, (
-            f"Expected the ontology to be a correctly linearized DAG, "
-            f"but the class {parsed_cls.name!r} has been already visited before"
-        )
-
-        settings = []  # type: List[_SettingWithSource[bool]]
-
-        if (
-            parsed_cls.serialization is not None
-            and parsed_cls.serialization.with_model_type
-        ):
-            settings.append(
-                _SettingWithSource(
-                    value=parsed_cls.serialization.with_model_type, source=parsed_cls
-                )
-            )
-
-        for inheritance in parsed_cls.inheritances:
-            assert inheritance in with_model_type_map, (
-                f"Expected the ontology to be a correctly linearized DAG, "
-                f"but the inheritance {inheritance!r} of the class {parsed_cls.name!r} "
-                f"has not been visited before."
-            )
-
-            setting = with_model_type_map[inheritance]
-            if setting is None:
-                continue
-
-            settings.append(setting)
-
-        if len(settings) > 1:
-            # Verify that the setting for the class as well as all the inherited
-            # settings are consistent.
-            for setting in settings[1:]:
-                if setting.value != settings[0].value:
-                    # NOTE (mristin, 2021-11-03):
-                    # We have to return immediately at the first error and can not
-                    # continue to interpret the remainder of the hierarchy since
-                    # a single inconsistency impedes us to make synchronization
-                    # points for a viable error recovery.
-
-                    return None, Error(
-                        parsed_cls.node,
-                        f"The serialization setting ``with_model_type`` "
-                        f"between the class {setting.source} "
-                        f"and {settings[0].source} is "
-                        f"inconsistent",
-                    )
-
-        with_model_type_map[parsed_cls.name] = (
-            None if len(settings) == 0 else settings[0]
-        )
-
-    # endregion
-
-    mapping = dict()  # type: MutableMapping[parse.Class, Serialization]
-
-    for identifier, setting in with_model_type_map.items():
-        cls = parsed_symbol_table.must_find_class(name=identifier)
-        if setting is None:
-            # Neither the current class nor its ancestors specified the setting
-            # so we assume the default value.
-            mapping[cls] = Serialization(with_model_type=False)
-        else:
-            mapping[cls] = Serialization(with_model_type=setting.value)
-
-    return mapping, None
-
-
 # fmt: off
 @ensure(
     lambda parsed_symbol_table, result:
@@ -741,6 +549,11 @@ def _determine_constrained_primitives_by_name(
     For example, if a class that inherits from a primitive type also specifies
     properties or methods.
     """
+    # NOTE (mristin, 2022-03-18):
+    # While we perform different stackings in second passes, we can not stack the
+    # constrainees in the second pass since we need to determine whether a class is a
+    # constrained primitive *or* an abstract or a concrete class.
+
     # NOTE (mristin, 2021-12-22):
     # We consider two sets of constrained primitives. The first set is
     # the initial set that constraints the primitive. The second set, the extended
@@ -958,54 +771,10 @@ def _determine_constrained_primitives_by_name(
     return result, None
 
 
-def _stack_invariants(
-    ontology: _hierarchy.Ontology,
-) -> MutableMapping[Identifier, List[Invariant]]:
-    """Determine invariants for all the classes by stacking them from the ancestors."""
-    invariants_map = (
-        collections.OrderedDict()
-    )  # type: MutableMapping[Identifier, List[Invariant]]
-
-    for parsed_cls in ontology.classes:
-        # NOTE (mristin, 2021-12-14):
-        # We assume here that classes in the ontology are sorted
-        # in the topological order.
-
-        invariants = invariants_map.get(parsed_cls.name, None)
-        if invariants is None:
-            invariants = []
-            invariants_map[parsed_cls.name] = invariants
-
-        # noinspection PyTypeChecker
-        invariants.extend(
-            Invariant(
-                description=parsed_invariant.description,
-                body=parsed_invariant.body,
-                specified_for=_PlaceholderSymbol(parsed_cls.name),  # type: ignore
-                parsed=parsed_invariant,
-            )
-            for parsed_invariant in parsed_cls.invariants
-        )
-
-        # Propagate all the invariants to the descendants
-
-        for descendant in ontology.list_descendants(parsed_cls):
-            descendant_invariants = invariants_map.get(descendant.name, None)
-
-            if descendant_invariants is None:
-                descendant_invariants = []
-                invariants_map[descendant.name] = descendant_invariants
-
-            descendant_invariants.extend(invariants)
-
-    return invariants_map
-
-
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parsed_class_to_constrained_primitive(
-    parsed: parse.ConcreteClass,
-    constrainee: PrimitiveType,
-    invariants: Sequence[Invariant],
-) -> ConstrainedPrimitive:
+    parsed: parse.ConcreteClass, constrainee: PrimitiveType
+) -> Tuple[Optional[ConstrainedPrimitive], Optional[List[Error]]]:
     """
     Translate a concrete class to a constrained primitive.
 
@@ -1014,32 +783,43 @@ def _parsed_class_to_constrained_primitive(
 
     The ``constrainee`` is determined by propagation in
     :py:function:`_determine_constrained_primitives_by_name`.
-
-    The ``invariants`` are determined by stacking in
-    :py:function:`_stack_invariants`.
     """
     # noinspection PyTypeChecker
-    return ConstrainedPrimitive(
-        name=parsed.name,
-        # Use placeholders for inheritances and descendants as we are still in
-        # the first pass and building up the symbol table. They will be resolved in
-        # a second pass.
-        inheritances=[],
-        descendants=[],
-        constrainee=constrainee,
-        is_implementation_specific=parsed.is_implementation_specific,
-        invariants=invariants,
-        reference_in_the_book=_propagate_parsed_reference_in_the_book(
-            parsed.reference_in_the_book
+    invariants = [
+        Invariant(
+            description=parsed_invariant.description,
+            body=parsed_invariant.body,
+            specified_for=_PlaceholderSymbol(parsed.name),  # type: ignore
+            parsed=parsed_invariant,
         )
-        if parsed.reference_in_the_book is not None
-        else None,
-        description=(
-            _parsed_description_to_description(parsed.description)
-            if parsed.description is not None
-            else None
+        for parsed_invariant in parsed.invariants
+    ]
+
+    # noinspection PyTypeChecker
+    return (
+        ConstrainedPrimitive(
+            name=parsed.name,
+            # Use placeholders for inheritances and descendants as we are still in
+            # the first pass and building up the symbol table. They will be resolved in
+            # a second pass.
+            inheritances=[],
+            descendants=[],
+            constrainee=constrainee,
+            is_implementation_specific=parsed.is_implementation_specific,
+            invariants=invariants,
+            reference_in_the_book=_propagate_parsed_reference_in_the_book(
+                parsed.reference_in_the_book
+            )
+            if parsed.reference_in_the_book is not None
+            else None,
+            description=(
+                _parsed_description_to_description(parsed.description)
+                if parsed.description is not None
+                else None
+            ),
+            parsed=parsed,
         ),
-        parsed=parsed,
+        None,
     )
 
 
@@ -1053,60 +833,41 @@ class _MaybeInterfacePlaceholder:
 
 
 def _parsed_class_to_class(
-    parsed: parse.ClassUnion,
-    ontology: _hierarchy.Ontology,
-    serializations: Mapping[parse.Class, Serialization],
-    invariants: Sequence[Invariant],
-    in_lined_constructors: Mapping[parse.Class, Sequence[construction.AssignArgument]],
+    parsed: parse.ClassUnion, constructor_statements: Sequence[construction.Statement]
 ) -> ClassUnion:
     """
     Translate a concrete parsed class to an intermediate class.
 
-    The ``invariants`` are determined by stacking in
-    :py:function:`_stack_invariants`.
+    The ``constructor_statements`` is determined by the constructor table and is not
+    expected to be stacked yet.
     """
-    ancestors = ontology.list_ancestors(cls=parsed)
-
-    # region Stack properties from the ancestors
-
-    # BEFORE-RELEASE (mristin, 2021-12-14):
-    #  We need to refactor this function since it is now running in quadratic time
-    #  for properties, methods and constructors. We just have to follow the same trick
-    #  as with ``_stack_invariants``, but we have to be careful not to miss one or the
-    #  other important detail.
-
-    properties = []  # type: List[Property]
-
-    # We explicitly check that there are no property overloads at the parse stage so
-    # we do not perform the same check here for the second time.
-
-    for ancestor in ancestors:
-        properties.extend(
-            _parsed_property_to_property(parsed=parsed_prop, cls=ancestor)
-            for parsed_prop in ancestor.properties
+    serialization = None  # type: Optional[Serialization]
+    if parsed.serialization is not None:
+        # NOTE (mristin, 2022-03-19):
+        # The ``parsed.serialization.with_model_type`` might be None, but we have to
+        # allow it here as we will apply a second pass and properly inherit the
+        # with_model_type.
+        serialization = Serialization(
+            with_model_type=parsed.serialization.with_model_type  # type: ignore
         )
 
+    # noinspection PyTypeChecker
+    invariants = [
+        Invariant(
+            description=parsed_invariant.description,
+            body=parsed_invariant.body,
+            specified_for=_PlaceholderSymbol(parsed.name),  # type: ignore
+            parsed=parsed_invariant,
+        )
+        for parsed_invariant in parsed.invariants
+    ]
+
+    properties = []  # type: List[Property]
     for parsed_prop in parsed.properties:
         properties.append(_parsed_property_to_property(parsed=parsed_prop, cls=parsed))
 
-    # endregion
-
-    # region Stack constructors from the ancestors
-
     contracts = Contracts(preconditions=[], snapshots=[], postconditions=[])
-
-    for ancestor in ancestors:
-        parsed_ancestor_init = ancestor.methods_by_name.get(
-            Identifier("__init__"), None
-        )
-
-        if parsed_ancestor_init is not None:
-            contracts = _stack_contracts(
-                contracts,
-                _parsed_contracts_to_contracts(parsed_ancestor_init.contracts),
-            )
-
-    arguments = []
+    arguments = []  # type: List[Argument]
     init_is_implementation_specific = False
 
     parsed_class_init = parsed.methods_by_name.get(Identifier("__init__"), None)
@@ -1117,11 +878,9 @@ def _parsed_class_to_class(
             parsed_class_init, parse.ImplementationSpecificMethod
         )
 
-        contracts = _stack_contracts(
-            contracts, _parsed_contracts_to_contracts(parsed_class_init.contracts)
-        )
+        contracts = _parsed_contracts_to_contracts(parsed_class_init.contracts)
 
-    ctor = Constructor(
+    constructor = Constructor(
         is_implementation_specific=init_is_implementation_specific,
         arguments=arguments,
         contracts=contracts,
@@ -1134,39 +893,24 @@ def _parsed_class_to_class(
             if parsed_class_init is not None
             else None
         ),
-        statements=in_lined_constructors[parsed],
+        # NOTE (mristin, 2022-03-19):
+        # We ignore the typing system for the moment and allow calls to
+        # super constructors in the statements. In the
+        # :py:func:`_second_pass_to_stack_constructors`, we will in-line them.
+        statements=constructor_statements,  # type: ignore
         parsed=(parsed_class_init if parsed_class_init is not None else None),
     )
 
-    # endregion
-
-    # region Stack methods from the ancestors
-
     methods = []  # type: List[Method]
-
-    # We explicitly check that there are no method overloads at the parse stage
-    # so we do not perform this check for the second time here.
-
-    for ancestor in ancestors:
-        methods.extend(
-            _parsed_method_to_method(parsed=parsed_method)
-            for parsed_method in ancestor.methods
-            if isinstance(
-                parsed_method, (parse.UnderstoodMethod, ImplementationSpecificMethod)
-            )
-        )
-
     for parsed_method in parsed.methods:
         if not isinstance(
             parsed_method, (parse.UnderstoodMethod, ImplementationSpecificMethod)
         ):
-            # Constructors are in-lined and handled in a different way through
+            # Constructors are handled in a different way through
             # :py:class:`Constructors`.
             continue
 
         methods.append(_parsed_method_to_method(parsed=parsed_method))
-
-    # endregion
 
     factory_to_use = None  # type: Optional[Type[Class]]
 
@@ -1190,9 +934,12 @@ def _parsed_class_to_class(
         is_implementation_specific=parsed.is_implementation_specific,
         properties=properties,
         methods=methods,
-        constructor=ctor,
+        constructor=constructor,
         invariants=invariants,
-        serialization=serializations[parsed],
+        # We allow temporarily the ``serialization`` to be possibly None since we
+        # have to resolve it in the second pass in
+        # :py:func:`_second_pass_to_stack_serializations`.
+        serialization=serialization,  # type: ignore
         reference_in_the_book=_propagate_parsed_reference_in_the_book(
             parsed=parsed.reference_in_the_book
         )
@@ -1497,146 +1244,6 @@ def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
                 continue
 
             symbol_ref_in_doc.symbol = referenced_symbol
-
-    return errors
-
-
-def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
-    symbol_table: SymbolTable,
-) -> List[Error]:
-    """Resolve the attribute references in the descriptions in-place."""
-    errors = []  # type: List[Error]
-
-    # The ``symbol`` is None if the description is in the context outside of a symbol.
-    for symbol, description in _over_descriptions(symbol_table):
-        # BEFORE-RELEASE (mristin, 2021-12-13):
-        #  test this, especially the failure cases
-        for attr_ref_in_doc in description.document.findall(
-            condition=doc.AttributeReference
-        ):
-            if isinstance(attr_ref_in_doc.reference, _PlaceholderAttributeReference):
-                pth = attr_ref_in_doc.reference.path
-                parts = pth.split(".")
-
-                if any(not IDENTIFIER_RE.match(part) for part in parts):
-                    errors.append(
-                        Error(
-                            description.node,
-                            f"Invalid reference to a property or a literal; "
-                            f"each part of the path needs to be an identifier, "
-                            f"but it is not: {pth}",
-                        )
-                    )
-                    continue
-
-                part_identifiers = [Identifier(part) for part in parts]
-
-                if len(part_identifiers) == 0:
-                    errors.append(
-                        Error(
-                            description.node,
-                            "Unexpected empty reference " "to a property or a literal",
-                        )
-                    )
-                    continue
-
-                # noinspection PyUnusedLocal
-                target_symbol = None  # type: Optional[Symbol]
-
-                # noinspection PyUnusedLocal
-                attr_identifier = None  # type: Optional[Identifier]
-
-                if len(part_identifiers) == 1:
-                    if symbol is None:
-                        errors.append(
-                            Error(
-                                description.node,
-                                f"The attribute reference can not be resolved as there "
-                                f"is no encompassing symbol in the given "
-                                f"context: {pth}",
-                            )
-                        )
-                        continue
-
-                    target_symbol = symbol
-                    attr_identifier = part_identifiers[0]
-                elif len(part_identifiers) == 2:
-                    target_symbol = symbol_table.find(part_identifiers[0])
-                    if target_symbol is None:
-                        errors.append(
-                            Error(
-                                description.node,
-                                f"Dangling reference to a non-existing "
-                                f"symbol: {pth}",
-                            )
-                        )
-                        continue
-
-                    attr_identifier = part_identifiers[1]
-                else:
-                    errors.append(
-                        Error(
-                            description.node,
-                            f"We did not implement the resolution of such "
-                            f"a reference to a property or a literal: {pth}",
-                        )
-                    )
-                    continue
-
-                assert target_symbol is not None
-                assert attr_identifier is not None
-
-                reference: Optional[
-                    Union[doc.PropertyReference, doc.EnumerationLiteralReference]
-                ] = None
-
-                if isinstance(target_symbol, Enumeration):
-                    literal = target_symbol.literals_by_name.get(attr_identifier, None)
-
-                    if literal is None:
-                        errors.append(
-                            Error(
-                                description.node,
-                                f"Dangling reference to a non-existing literal "
-                                f"in the enumeration {target_symbol.name!r}: {pth}",
-                            )
-                        )
-                        continue
-
-                    reference = doc.EnumerationLiteralReference(
-                        symbol=target_symbol, literal=literal
-                    )
-
-                elif isinstance(target_symbol, ConstrainedPrimitive):
-                    errors.append(
-                        Error(
-                            description.node,
-                            f"Unexpected references to a property of "
-                            f"a constrained primitive {target_symbol.name!r}: {pth}",
-                        )
-                    )
-                    continue
-
-                elif isinstance(target_symbol, Class):
-                    prop = target_symbol.properties_by_name.get(attr_identifier, None)
-
-                    if prop is None:
-                        errors.append(
-                            Error(
-                                description.node,
-                                f"Dangling reference to a non-existing property "
-                                f"of a class {target_symbol.name!r}: {pth}",
-                            )
-                        )
-                        continue
-
-                    reference = doc.PropertyReference(cls=target_symbol, prop=prop)
-
-                else:
-                    assert_never(target_symbol)
-
-                assert reference is not None
-                attr_ref_in_doc.reference = reference
 
     return errors
 
@@ -1997,6 +1604,554 @@ def _second_pass_to_resolve_descendants_in_place(
 
         else:
             assert_never(symbol)
+
+
+T = TypeVar("T")
+
+
+class _SettingWithSource(Generic[T]):
+    """
+    Represent a setting from an inheritance chain.
+
+    For example, a setting for JSON serialization.
+    """
+
+    def __init__(self, value: T, source: ClassUnion):
+        """Initialize with the given values."""
+        self.value = value
+        self.source = source
+
+    def __repr__(self) -> str:
+        return (
+            f"{_SettingWithSource.__name__}("
+            f"value={self.value!r}, "
+            f"source={self.source.name!r}"
+            f")"
+        )
+
+
+def _second_pass_to_stack_serializations_in_place(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    """Pass on the serializations among the classes along the ontology."""
+    errors = []  # type: List[Error]
+
+    for symbol in symbol_table.symbols_topologically_sorted:
+        # NOTE (mristin, 2022-03-18):
+        # Assume that the parents have all the serializations resolved already due to
+        # the topological order of the iteration.
+
+        if isinstance(symbol, (Enumeration, ConstrainedPrimitive)):
+            continue
+        elif isinstance(symbol, (AbstractClass, ConcreteClass)):
+            # NOTE (mristin, 2021-11-03):
+            # We do not abstract away different serialization settings at this point
+            # as there is only a single one, ``with_model_type``. In the future,
+            # if there are more settings, this function needs to be split into multiple
+            # ones (one function for a setting each), or maybe we can even think of a
+            # more general approach to inheritance of serialization settings.
+
+            with_model_types = []  # type: List[_SettingWithSource[bool]]
+
+            for inheritance in symbol.inheritances:
+                if (
+                    inheritance.serialization is not None
+                    and inheritance.serialization.with_model_type is not None
+                ):
+                    with_model_types.append(
+                        _SettingWithSource(
+                            value=inheritance.serialization.with_model_type,
+                            source=inheritance,
+                        )
+                    )
+
+            if (
+                symbol.serialization is not None
+                and symbol.serialization.with_model_type is not None
+            ):
+                with_model_types.append(
+                    _SettingWithSource(
+                        value=symbol.serialization.with_model_type, source=symbol
+                    )
+                )
+
+            if len(with_model_types) > 0:
+                # region Verify that the with_model_type is consistent
+
+                cursor = iter(with_model_types)
+                first = next(cursor)
+
+                success = True
+                lookahead = next(cursor, None)
+                while lookahead is not None:
+                    if lookahead.value != first.value:
+                        errors.append(
+                            Error(
+                                symbol.parsed.node,
+                                f"The serialization setting ``with_model_type`` "
+                                f"between the class {lookahead.source.name!r} "
+                                f"and {first.source.name!r} is "
+                                f"inconsistent: {lookahead.value!r} != {first.value!r}",
+                            )
+                        )
+                        success = False
+                        break
+
+                    lookahead = next(cursor, None)
+
+                if not success:
+                    continue
+
+                # endregion
+
+                # Propagate the inferred value to the symbol
+                if symbol.serialization is None:
+                    symbol.serialization = Serialization(with_model_type=first.value)
+                else:
+                    symbol.serialization.with_model_type = first.value
+
+        else:
+            assert_never(symbol)
+
+    if len(errors) > 0:
+        return errors
+
+    # region Set to default values wherever there was no serialization set
+
+    for symbol in symbol_table.symbols_topologically_sorted:
+        # NOTE (mristin, 2022-03-18):
+        # Assume that the parents have all the serializations resolved already due to
+        # the topological order of the iteration.
+
+        if isinstance(symbol, (Enumeration, ConstrainedPrimitive)):
+            continue
+        elif isinstance(symbol, (AbstractClass, ConcreteClass)):
+            if symbol.serialization is None:
+                symbol.serialization = Serialization(with_model_type=False)
+            else:
+                if symbol.serialization.with_model_type is None:
+                    symbol.serialization.with_model_type = False
+        else:
+            assert_never(symbol)
+
+    # endregion
+
+    return errors
+
+
+def _second_pass_to_stack_invariants_in_place(symbol_table: SymbolTable) -> None:
+    """Pass on the invariants among the classes along the ontology."""
+    for symbol in symbol_table.symbols_topologically_sorted:
+        # NOTE (mristin, 2022-03-18):
+        # Assume that the parents have all the invariants stacked already due to
+        # the topological order of the iteration..
+
+        # Propagate the invariants from the parents to this symbol.
+        if isinstance(symbol, Enumeration):
+            continue
+        elif isinstance(symbol, (ConstrainedPrimitive, AbstractClass, ConcreteClass)):
+            inherited_invariants = []  # type: List[Invariant]
+
+            # NOTE (mristin, 2022-03-18):
+            # Skip duplicates which might arise from the diamond inheritance
+            observed_invariants = set()  # type: Set[int]
+
+            for inheritance in symbol.inheritances:
+                for invariant in inheritance.invariants:
+                    invariant_id = id(invariant)
+                    if invariant_id not in observed_invariants:
+                        inherited_invariants.append(invariant)
+                        observed_invariants.add(invariant_id)
+
+            symbol._set_invariants(
+                list(itertools.chain(inherited_invariants, symbol.invariants))
+            )
+        else:
+            assert_never(symbol)
+
+
+def _second_pass_to_stack_properties_in_place(symbol_table: SymbolTable) -> List[Error]:
+    """Pass on the properties among the classes along the ontology."""
+    for symbol in symbol_table.symbols_topologically_sorted:
+        # NOTE (mristin, 2022-03-18):
+        # Assume that the parents have all the invariants stacked already due to
+        # the topological order of the iteration..
+
+        # Propagate the properties from the parents to this symbol.
+        if isinstance(symbol, (Enumeration, ConstrainedPrimitive)):
+            continue
+        elif isinstance(symbol, (AbstractClass, ConcreteClass)):
+            inherited_properties = []  # type: List[Property]
+
+            # NOTE (mristin, 2022-03-18):
+            # Skip duplicates which might arise from the diamond inheritance
+            observed_properties = set()  # type: Set[int]
+
+            for inheritance in symbol.inheritances:
+                for prop in inheritance.properties:
+                    property_id = id(prop)
+                    if property_id not in observed_properties:
+                        inherited_properties.append(prop)
+                        observed_properties.add(property_id)
+
+            symbol._set_properties(
+                list(itertools.chain(inherited_properties, symbol.properties))
+            )
+        else:
+            assert_never(symbol)
+
+    return []
+
+
+def _second_pass_to_stack_methods_in_place(symbol_table: SymbolTable) -> List[Error]:
+    """Pass on the methods among the classes along the ontology."""
+    errors = []  # type: List[Error]
+    for symbol in symbol_table.symbols_topologically_sorted:
+        # NOTE (mristin, 2022-03-18):
+        # Assume that the parents have all the invariants stacked already due to
+        # the topological order of the iteration..
+
+        # Propagate the methods from the parents to this symbol.
+        if isinstance(symbol, (Enumeration, ConstrainedPrimitive)):
+            continue
+        elif isinstance(symbol, (AbstractClass, ConcreteClass)):
+            inherited_methods = []  # type: List[Method]
+
+            # NOTE (mristin, 2022-03-19):
+            # We have to disallow diamond inheritance of the methods so we keep track
+            # of the inherited methods and report an error in case of conflicts.
+
+            method_specified_for = dict()  # type: Dict[Identifier, Identifier]
+            for inheritance in symbol.inheritances:
+                for method in inheritance.methods:
+                    conflicting_parent = method_specified_for.get(method.name, None)
+                    if conflicting_parent is not None:
+                        errors.append(
+                            Error(
+                                symbol.parsed.node,
+                                f"The method {method.name!r} can not be inherited "
+                                f"in the class {symbol.name!r} due to "
+                                f"the diamond inheritance both "
+                                f"from the parent {inheritance.name} and "
+                                f"from the parent {conflicting_parent}",
+                            )
+                        )
+                        continue
+
+                    inherited_methods.append(method)
+                    method_specified_for[method.name] = inheritance.name
+
+            # NOTE (mristin, 2022-03-19):
+            # We still haven't updated the ``methods`` in the symbol so it only
+            # contains methods specified for that particular class and does not
+            # include any inherited methods.
+
+            has_override = False
+            for method in symbol.methods:
+                conflicting_parent = method_specified_for.get(method.name, None)
+                if conflicting_parent is not None:
+                    errors.append(
+                        Error(
+                            method.parsed.node,
+                            f"We do not support the overriding of the methods, "
+                            f"but the method {method.name!r} is specified both in "
+                            f"the class {symbol.name!r} and in {conflicting_parent!r}; "
+                            f"if you need this functionality please contact "
+                            f"the developers.",
+                        )
+                    )
+                    has_override = True
+
+            if has_override:
+                continue
+
+            symbol._set_methods(
+                list(itertools.chain(inherited_methods, symbol.methods))
+            )
+        else:
+            assert_never(symbol)
+
+    return errors
+
+
+def _second_pass_to_stack_constructors_in_place(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    """In-line the super constructors and inherit the constructor contracts."""
+    errors = []  # type: List[Error]
+
+    for symbol in symbol_table.symbols:
+        # NOTE (mristin, 2022-03-18):
+        # Assume that the parents have all been processed already due to
+        # the topological order of the iteration..
+
+        if isinstance(symbol, (Enumeration, ConstrainedPrimitive)):
+            continue
+        elif isinstance(symbol, (AbstractClass, ConcreteClass)):
+
+            # region In-line super constructors
+
+            in_lined = []  # type: List[construction.AssignArgument]
+
+            for statement in symbol.constructor.statements:
+                if isinstance(statement, construction.CallSuperConstructor):
+                    ancestor = symbol_table.find(statement.super_name)
+
+                    assert isinstance(ancestor, (AbstractClass, ConcreteClass)), (
+                        f"Expected the ancestor of a class {symbol.name!r} "
+                        f"to be a class, but got: {ancestor}"
+                    )
+
+                    if ancestor is None:
+                        errors.append(
+                            Error(
+                                symbol.constructor.parsed.node
+                                if symbol.constructor.parsed is not None
+                                else symbol.parsed.node,
+                                f"In the constructor of the class {symbol.name!r} "
+                                f"the super-constructor for "
+                                f"the class {statement.super_name!r} is invoked, "
+                                f"but the class {statement.super_name!r} could not "
+                                f"be found",
+                            )
+                        )
+                        continue
+
+                    if id(ancestor) not in symbol.inheritance_id_set:
+                        errors.append(
+                            Error(
+                                symbol.constructor.parsed.node
+                                if symbol.constructor.parsed is not None
+                                else symbol.parsed.node,
+                                f"In the constructor of the class {symbol.name!r} "
+                                f"the super-constructor for "
+                                f"the class {statement.super_name!r} is invoked, "
+                                f"but the class {statement.super_name!r} is not "
+                                f"a direct parent of the class {symbol.name!r}",
+                            )
+                        )
+                        continue
+
+                    assert all(
+                        not isinstance(a_statement, construction.CallSuperConstructor)
+                        for a_statement in ancestor.constructor.statements
+                    ), (
+                        f"Expected all the calls to super-constructors to be in-lined "
+                        f"in the ancestor {ancestor.name} of the class {symbol.name}"
+                    )
+
+                    in_lined.extend(ancestor.constructor.statements)
+                else:
+                    in_lined.append(statement)
+
+            # NOTE (mristin, 2022-03-19):
+            # Restore the type safety at run-time
+            assert all(
+                isinstance(stmt, construction.AssignArgument) for stmt in in_lined
+            )
+
+            # NOTE (mristin, 2022-03-18):
+            # The ``Final`` qualifier is meant for the external clients, not for the
+            # internal clients in the submodules.
+            # noinspection PyFinal
+            symbol.constructor.statements = in_lined  # type: ignore
+
+            # endregion
+
+            # region Stack contracts
+
+            # NOTE (mristin, 2022-03-19):
+            # The pre-conditions are not inherited in the constructors.
+            # See a tutorial on design-by-contract. However, we do in-line
+            # the calls to the super constructors. We leave it to the user to maintain
+            # the list of pre-conditions and copy/paste them from the ancestors
+            # manually.
+
+            inherited_snapshots = []  # type: List[Snapshot]
+            inherited_postconditions = []  # type: List[Contract]
+
+            # NOTE (mristin, 2022-03-19):
+            # We skip the duplicates since we have to deal with the diamond inheritance.
+            observed_snapshots = set()  # type: Set[int]
+            observed_postconditions = set()  # type: Set[int]
+
+            for inheritance in symbol.inheritances:
+                for snapshot in inheritance.constructor.contracts.snapshots:
+                    snapshot_id = id(snapshot)
+                    if snapshot_id not in observed_snapshots:
+                        inherited_snapshots.append(snapshot)
+                        observed_snapshots.add(snapshot_id)
+
+                for postcondition in inheritance.constructor.contracts.postconditions:
+                    postcondition_id = id(postcondition)
+                    if postcondition_id not in observed_postconditions:
+                        inherited_postconditions.append(postcondition)
+                        observed_postconditions.add(postcondition_id)
+
+            # NOTE (mristin, 2022-03-18):
+            # The ``Final`` qualifier is meant for the external clients, not for the
+            # internal clients in the submodules.
+
+            # noinspection PyFinal
+            symbol.constructor.contracts.snapshots = list(
+                itertools.chain(
+                    inherited_snapshots, symbol.constructor.contracts.snapshots
+                )
+            )
+
+            # noinspection PyFinal
+            symbol.constructor.contracts.postconditions = list(
+                itertools.chain(
+                    inherited_postconditions,
+                    symbol.constructor.contracts.postconditions,
+                )
+            )
+
+            # endregion
+        else:
+            assert_never(symbol)
+
+    return errors
+
+
+def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    """Resolve the attribute references in the descriptions in-place."""
+    errors = []  # type: List[Error]
+
+    # The ``symbol`` is None if the description is in the context outside of a symbol.
+    for symbol, description in _over_descriptions(symbol_table):
+        # BEFORE-RELEASE (mristin, 2021-12-13):
+        #  test this, especially the failure cases
+        for attr_ref_in_doc in description.document.findall(
+            condition=doc.AttributeReference
+        ):
+            if isinstance(attr_ref_in_doc.reference, _PlaceholderAttributeReference):
+                pth = attr_ref_in_doc.reference.path
+                parts = pth.split(".")
+
+                if any(not IDENTIFIER_RE.match(part) for part in parts):
+                    errors.append(
+                        Error(
+                            description.node,
+                            f"Invalid reference to a property or a literal; "
+                            f"each part of the path needs to be an identifier, "
+                            f"but it is not: {pth}",
+                        )
+                    )
+                    continue
+
+                part_identifiers = [Identifier(part) for part in parts]
+
+                if len(part_identifiers) == 0:
+                    errors.append(
+                        Error(
+                            description.node,
+                            "Unexpected empty reference " "to a property or a literal",
+                        )
+                    )
+                    continue
+
+                # noinspection PyUnusedLocal
+                target_symbol = None  # type: Optional[Symbol]
+
+                # noinspection PyUnusedLocal
+                attr_identifier = None  # type: Optional[Identifier]
+
+                if len(part_identifiers) == 1:
+                    if symbol is None:
+                        errors.append(
+                            Error(
+                                description.node,
+                                f"The attribute reference can not be resolved as there "
+                                f"is no encompassing symbol in the given "
+                                f"context: {pth}",
+                            )
+                        )
+                        continue
+
+                    target_symbol = symbol
+                    attr_identifier = part_identifiers[0]
+                elif len(part_identifiers) == 2:
+                    target_symbol = symbol_table.find(part_identifiers[0])
+                    if target_symbol is None:
+                        errors.append(
+                            Error(
+                                description.node,
+                                f"Dangling reference to a non-existing "
+                                f"symbol: {pth}",
+                            )
+                        )
+                        continue
+
+                    attr_identifier = part_identifiers[1]
+                else:
+                    errors.append(
+                        Error(
+                            description.node,
+                            f"We did not implement the resolution of such "
+                            f"a reference to a property or a literal: {pth}",
+                        )
+                    )
+                    continue
+
+                assert target_symbol is not None
+                assert attr_identifier is not None
+
+                reference: Optional[
+                    Union[doc.PropertyReference, doc.EnumerationLiteralReference]
+                ] = None
+
+                if isinstance(target_symbol, Enumeration):
+                    literal = target_symbol.literals_by_name.get(attr_identifier, None)
+
+                    if literal is None:
+                        errors.append(
+                            Error(
+                                description.node,
+                                f"Dangling reference to a non-existing literal "
+                                f"in the enumeration {target_symbol.name!r}: {pth}",
+                            )
+                        )
+                        continue
+
+                    reference = doc.EnumerationLiteralReference(
+                        symbol=target_symbol, literal=literal
+                    )
+
+                elif isinstance(target_symbol, ConstrainedPrimitive):
+                    errors.append(
+                        Error(
+                            description.node,
+                            f"Unexpected references to a property of "
+                            f"a constrained primitive {target_symbol.name!r}: {pth}",
+                        )
+                    )
+                    continue
+
+                elif isinstance(target_symbol, Class):
+                    prop = target_symbol.properties_by_name.get(attr_identifier, None)
+
+                    if prop is None:
+                        errors.append(
+                            Error(
+                                description.node,
+                                f"Dangling reference to a non-existing property "
+                                f"of a class {target_symbol.name!r}: {pth}",
+                            )
+                        )
+                        continue
+
+                    reference = doc.PropertyReference(cls=target_symbol, prop=prop)
+
+                else:
+                    assert_never(target_symbol)
+
+                assert reference is not None
+                attr_ref_in_doc.reference = reference
+
+    return errors
 
 
 # fmt: off
@@ -2439,7 +2594,7 @@ def translate(
 
     # endregion
 
-    # region Understand constructor stacks
+    # region Understand constructors
 
     constructor_table, constructor_error = construction.understand_all(
         parsed_symbol_table=parsed_symbol_table, atok=atok
@@ -2450,33 +2605,10 @@ def translate(
 
     # endregion
 
-    # region Resolve settings for the JSON serialization
-
-    serializations, serializations_error = _resolve_serializations(
-        ontology=ontology, parsed_symbol_table=parsed_symbol_table
-    )
-
-    if serializations_error is not None:
-        underlying_errors.append(serializations_error)
-
-    # endregion
-
     if len(underlying_errors) > 0:
         # We can not proceed and recover from these errors as they concern critical
         # dependencies of the further analysis.
         return None, bundle_underlying_errors()
-
-    # region In-line constructors
-
-    assert constructor_table is not None
-
-    in_lined_constructors = _in_line_constructors(
-        parsed_symbol_table=parsed_symbol_table,
-        ontology=ontology,
-        constructor_table=constructor_table,
-    )
-
-    # endregion
 
     # region Figure out the sub-hierarchy of the constrained primitive types
 
@@ -2495,15 +2627,12 @@ def translate(
         # dependencies of the further analysis.
         return None, bundle_underlying_errors()
 
-    assert constrained_primitives_by_name is not None
-
     # endregion
-
-    invariants_map = _stack_invariants(ontology=ontology)
 
     # region First pass of translation
 
-    assert serializations is not None
+    assert constructor_table is not None
+    assert constrained_primitives_by_name is not None
 
     # Type annotations reference symbol placeholders at this point.
 
@@ -2518,22 +2647,22 @@ def translate(
                 parsed_symbol, parse.ConcreteClass
             ), "All constrained primitive types must be concrete."
 
-            symbol = _parsed_class_to_constrained_primitive(
-                parsed=parsed_symbol,
-                constrainee=constrainee,
-                invariants=invariants_map[parsed_symbol.name],
+            symbol, parsing_errors = _parsed_class_to_constrained_primitive(
+                parsed=parsed_symbol, constrainee=constrainee
             )
+            if parsing_errors is not None:
+                underlying_errors.extend(parsing_errors)
+                continue
+
+            assert symbol is not None
 
         elif isinstance(parsed_symbol, parse.Enumeration):
             symbol = _parsed_enumeration_to_enumeration(parsed=parsed_symbol)
 
-        elif isinstance(parsed_symbol, parse.Class):
+        elif isinstance(parsed_symbol, (parse.AbstractClass, parse.ConcreteClass)):
             symbol = _parsed_class_to_class(
                 parsed=parsed_symbol,
-                ontology=ontology,
-                serializations=serializations,
-                invariants=invariants_map[parsed_symbol.name],
-                in_lined_constructors=in_lined_constructors,
+                constructor_statements=constructor_table.must_find(parsed_symbol),
             )
 
         else:
@@ -2599,6 +2728,8 @@ def translate(
     # order of the functions with their call order here, and do not call them elsewhere
     # in code.
 
+    # region Second passes which do not require the heritage to be inherited
+
     underlying_errors.extend(
         _second_pass_to_resolve_symbols_in_atomic_types_in_place(
             symbol_table=symbol_table
@@ -2607,12 +2738,6 @@ def translate(
 
     underlying_errors.extend(
         _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
-            symbol_table=symbol_table
-        )
-    )
-
-    underlying_errors.extend(
-        _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
             symbol_table=symbol_table
         )
     )
@@ -2632,10 +2757,6 @@ def translate(
     if len(underlying_errors) > 0:
         return None, bundle_underlying_errors()
 
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, (ConstrainedPrimitive, Class)):
-            continue
-
     _second_pass_to_resolve_inheritances_in_place(symbol_table=symbol_table)
 
     _second_pass_to_resolve_resulting_class_of_specified_for(
@@ -2650,9 +2771,55 @@ def translate(
         symbol_table=symbol_table, ontology=ontology
     )
 
+    # endregion
+
+    if len(underlying_errors) > 0:
+        return None, bundle_underlying_errors()
+
+    # region Second passes to inherit the heritage
+
+    underlying_errors.extend(
+        _second_pass_to_stack_serializations_in_place(symbol_table=symbol_table)
+    )
+
+    _second_pass_to_stack_invariants_in_place(symbol_table=symbol_table)
+
+    underlying_errors.extend(
+        _second_pass_to_stack_properties_in_place(symbol_table=symbol_table)
+    )
+
+    underlying_errors.extend(
+        _second_pass_to_stack_methods_in_place(symbol_table=symbol_table)
+    )
+
+    underlying_errors.extend(
+        _second_pass_to_stack_constructors_in_place(symbol_table=symbol_table)
+    )
+
+    # endregion
+
+    if len(underlying_errors) > 0:
+        return None, bundle_underlying_errors()
+
+    # region Second passes which presupose the inheritance of the heritage
+
+    # NOTE (mristin, 2022-03-18):
+    # We might reference inherited properties of a symbol so we need to apply
+    # this second pass only after the properties have been stacked.
+    underlying_errors.extend(
+        _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
+            symbol_table=symbol_table
+        )
+    )
+
+    # NOTE (mristin, 2022-03-18):
+    # We need to include all the properties and methods in the interface so they need
+    # to be inherited first.
     _second_pass_to_resolve_interfaces_in_place(
         symbol_table=symbol_table, ontology=ontology
     )
+
+    # endregion
 
     underlying_errors.extend(_verify(symbol_table=symbol_table, ontology=ontology))
 
