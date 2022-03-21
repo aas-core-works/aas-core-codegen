@@ -1161,7 +1161,7 @@ def _over_descriptions_in_symbol(symbol: Symbol) -> Iterator[Description]:
                 yield method.description
 
     elif isinstance(symbol, Description):
-        for node in symbol.document.traverse(condition=doc.SymbolReference):
+        for node in symbol.document.findall(condition=doc.SymbolReference):
             yield node
     else:
         assert_never(symbol)
@@ -1450,6 +1450,13 @@ def _second_pass_to_resolve_resulting_class_of_specified_for(
                     f"the property {prop} of {symbol}, but got: {prop.specified_for}"
                 )
 
+                # NOTE (mristin, 2022-01-02):
+                # We have to override the ``specified_for`` as we could not set it
+                # during the first pass of the translation phase. The ``Final`` in
+                # this context is meant for the users of the translation phase, not
+                # the translation phase itself.
+
+                # noinspection PyFinal
                 prop.specified_for = symbol_table.must_find(
                     Identifier(prop.specified_for.name)
                 )
@@ -1538,7 +1545,7 @@ def _second_pass_to_resolve_inheritances_in_place(symbol_table: SymbolTable) -> 
 
             symbol._set_inheritances(resolved_constrained_primitive_inheritances)
 
-        elif isinstance(symbol, Class):
+        elif isinstance(symbol, (AbstractClass, ConcreteClass)):
             resolved_class_inheritances = []  # type: List[ClassUnion]
 
             for inheritance_name in symbol.parsed.inheritances:
@@ -1546,7 +1553,7 @@ def _second_pass_to_resolve_inheritances_in_place(symbol_table: SymbolTable) -> 
                     Identifier(inheritance_name)
                 )
 
-                assert isinstance(inheritance_symbol, Class)
+                assert isinstance(inheritance_symbol, (AbstractClass, ConcreteClass))
                 resolved_class_inheritances.append(inheritance_symbol)
 
             symbol._set_inheritances(resolved_class_inheritances)
@@ -1953,7 +1960,7 @@ def _second_pass_to_stack_constructors_in_place(
             # NOTE (mristin, 2022-03-18):
             # The ``Final`` qualifier is meant for the external clients, not for the
             # internal clients in the submodules.
-            # noinspection PyFinal
+            # noinspection PyFinal,PyTypeHints
             symbol.constructor.statements = in_lined  # type: ignore
 
             # endregion
@@ -2130,7 +2137,7 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
                     )
                     continue
 
-                elif isinstance(target_symbol, Class):
+                elif isinstance(target_symbol, (AbstractClass, ConcreteClass)):
                     prop = target_symbol.properties_by_name.get(attr_identifier, None)
 
                     if prop is None:
@@ -2801,7 +2808,7 @@ def translate(
     if len(underlying_errors) > 0:
         return None, bundle_underlying_errors()
 
-    # region Second passes which presupose the inheritance of the heritage
+    # region Second passes which assume the inheritance of the heritage
 
     # NOTE (mristin, 2022-03-18):
     # We might reference inherited properties of a symbol so we need to apply
