@@ -230,7 +230,7 @@ docutils.parsers.rst.roles.register_local_role(
 )
 
 
-def _parsed_description_to_description(parsed: parse.Description) -> Description:
+def _to_description(parsed: parse.Description) -> Description:
     """Translate the parsed description to an intermediate form."""
     # NOTE (mristin, 2021-09-16):
     # This function makes a simple copy at the moment, which might seem pointless.
@@ -265,7 +265,7 @@ def _propagate_parsed_reference_in_the_book(
     )
 
 
-def _parsed_enumeration_to_enumeration(parsed: parse.Enumeration) -> Enumeration:
+def _to_enumeration(parsed: parse.Enumeration) -> Enumeration:
     """Translate an enumeration from the meta-model to an intermediate enumeration."""
     return Enumeration(
         name=parsed.name,
@@ -274,7 +274,7 @@ def _parsed_enumeration_to_enumeration(parsed: parse.Enumeration) -> Enumeration
                 name=parsed_literal.name,
                 value=parsed_literal.value,
                 description=(
-                    _parsed_description_to_description(parsed_literal.description)
+                    _to_description(parsed_literal.description)
                     if parsed_literal.description is not None
                     else None
                 ),
@@ -297,7 +297,7 @@ def _parsed_enumeration_to_enumeration(parsed: parse.Enumeration) -> Enumeration
         if parsed.reference_in_the_book is not None
         else None,
         description=(
-            _parsed_description_to_description(parsed.description)
+            _to_description(parsed.description)
             if parsed.description is not None
             else None
         ),
@@ -305,7 +305,7 @@ def _parsed_enumeration_to_enumeration(parsed: parse.Enumeration) -> Enumeration
     )
 
 
-def _parsed_type_annotation_to_type_annotation(
+def _to_type_annotation(
     parsed: parse.TypeAnnotation,
 ) -> TypeAnnotationUnion:
     """
@@ -338,7 +338,7 @@ def _parsed_type_annotation_to_type_annotation(
             )
 
             return ListTypeAnnotation(
-                items=_parsed_type_annotation_to_type_annotation(parsed.subscripts[0]),
+                items=_to_type_annotation(parsed.subscripts[0]),
                 parsed=parsed,
             )
 
@@ -349,7 +349,7 @@ def _parsed_type_annotation_to_type_annotation(
             )
 
             return OptionalTypeAnnotation(
-                value=_parsed_type_annotation_to_type_annotation(parsed.subscripts[0]),
+                value=_to_type_annotation(parsed.subscripts[0]),
                 parsed=parsed,
             )
 
@@ -387,14 +387,12 @@ class _DefaultPlaceholder:
         self.parsed = parsed
 
 
-def _parsed_arguments_to_arguments(parsed: Sequence[parse.Argument]) -> List[Argument]:
+def _to_arguments(parsed: Sequence[parse.Argument]) -> List[Argument]:
     """Translate the arguments of a method in meta-model to the intermediate ones."""
     return [
         Argument(
             name=parsed_arg.name,
-            type_annotation=_parsed_type_annotation_to_type_annotation(
-                parsed_arg.type_annotation
-            ),
+            type_annotation=_to_type_annotation(parsed_arg.type_annotation),
             default=_DefaultPlaceholder(parsed=parsed_arg.default)  # type: ignore
             if parsed_arg.default is not None
             else None,
@@ -405,16 +403,14 @@ def _parsed_arguments_to_arguments(parsed: Sequence[parse.Argument]) -> List[Arg
     ]
 
 
-def _parsed_property_to_property(parsed: parse.Property, cls: parse.Class) -> Property:
+def _to_property(parsed: parse.Property, cls: parse.Class) -> Property:
     """Translate a parsed property of a class to an intermediate one."""
     # noinspection PyTypeChecker
     return Property(
         name=parsed.name,
-        type_annotation=_parsed_type_annotation_to_type_annotation(
-            parsed.type_annotation
-        ),
+        type_annotation=_to_type_annotation(parsed.type_annotation),
         description=(
-            _parsed_description_to_description(parsed.description)
+            _to_description(parsed.description)
             if parsed.description is not None
             else None
         ),
@@ -427,7 +423,7 @@ def _parsed_property_to_property(parsed: parse.Property, cls: parse.Class) -> Pr
     )
 
 
-def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
+def _to_contracts(parsed: parse.Contracts) -> Contracts:
     """Translate the parsed contracts into intermediate ones."""
     return Contracts(
         preconditions=[
@@ -477,42 +473,38 @@ def _parsed_contracts_to_contracts(parsed: parse.Contracts) -> Contracts:
     "Expected only non-verification methods"
 )
 # fmt: on
-def _parsed_method_to_method(
+def _to_method(
     parsed: Union[parse.UnderstoodMethod, parse.ImplementationSpecificMethod]
 ) -> Union[UnderstoodMethod, ImplementationSpecificMethod]:
     """Translate the parsed method into an intermediate representation."""
     if isinstance(parsed, parse.ImplementationSpecificMethod):
         return ImplementationSpecificMethod(
             name=parsed.name,
-            arguments=_parsed_arguments_to_arguments(parsed=parsed.arguments),
+            arguments=_to_arguments(parsed=parsed.arguments),
             returns=(
-                None
-                if parsed.returns is None
-                else _parsed_type_annotation_to_type_annotation(parsed.returns)
+                None if parsed.returns is None else _to_type_annotation(parsed.returns)
             ),
             description=(
-                _parsed_description_to_description(parsed.description)
+                _to_description(parsed.description)
                 if parsed.description is not None
                 else None
             ),
-            contracts=_parsed_contracts_to_contracts(parsed.contracts),
+            contracts=_to_contracts(parsed.contracts),
             parsed=parsed,
         )
     elif isinstance(parsed, parse.UnderstoodMethod):
         return UnderstoodMethod(
             name=parsed.name,
-            arguments=_parsed_arguments_to_arguments(parsed=parsed.arguments),
+            arguments=_to_arguments(parsed=parsed.arguments),
             returns=(
-                None
-                if parsed.returns is None
-                else _parsed_type_annotation_to_type_annotation(parsed.returns)
+                None if parsed.returns is None else _to_type_annotation(parsed.returns)
             ),
             description=(
-                _parsed_description_to_description(parsed.description)
+                _to_description(parsed.description)
                 if parsed.description is not None
                 else None
             ),
-            contracts=_parsed_contracts_to_contracts(parsed.contracts),
+            contracts=_to_contracts(parsed.contracts),
             body=parsed.body,
             parsed=parsed,
         )
@@ -772,7 +764,7 @@ def _determine_constrained_primitives_by_name(
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _parsed_class_to_constrained_primitive(
+def _to_constrained_primitive(
     parsed: parse.ConcreteClass, constrainee: PrimitiveType
 ) -> Tuple[Optional[ConstrainedPrimitive], Optional[List[Error]]]:
     """
@@ -813,7 +805,7 @@ def _parsed_class_to_constrained_primitive(
             if parsed.reference_in_the_book is not None
             else None,
             description=(
-                _parsed_description_to_description(parsed.description)
+                _to_description(parsed.description)
                 if parsed.description is not None
                 else None
             ),
@@ -832,7 +824,7 @@ class _MaybeInterfacePlaceholder:
     """
 
 
-def _parsed_class_to_class(
+def _to_class(
     parsed: parse.ClassUnion, constructor_statements: Sequence[construction.Statement]
 ) -> ClassUnion:
     """
@@ -864,7 +856,7 @@ def _parsed_class_to_class(
 
     properties = []  # type: List[Property]
     for parsed_prop in parsed.properties:
-        properties.append(_parsed_property_to_property(parsed=parsed_prop, cls=parsed))
+        properties.append(_to_property(parsed=parsed_prop, cls=parsed))
 
     contracts = Contracts(preconditions=[], snapshots=[], postconditions=[])
     arguments = []  # type: List[Argument]
@@ -872,13 +864,13 @@ def _parsed_class_to_class(
 
     parsed_class_init = parsed.methods_by_name.get(Identifier("__init__"), None)
     if parsed_class_init is not None:
-        arguments = _parsed_arguments_to_arguments(parsed=parsed_class_init.arguments)
+        arguments = _to_arguments(parsed=parsed_class_init.arguments)
 
         init_is_implementation_specific = isinstance(
             parsed_class_init, parse.ImplementationSpecificMethod
         )
 
-        contracts = _parsed_contracts_to_contracts(parsed_class_init.contracts)
+        contracts = _to_contracts(parsed_class_init.contracts)
 
     constructor = Constructor(
         is_implementation_specific=init_is_implementation_specific,
@@ -886,7 +878,7 @@ def _parsed_class_to_class(
         contracts=contracts,
         description=(
             (
-                _parsed_description_to_description(parsed_class_init.description)
+                _to_description(parsed_class_init.description)
                 if parsed_class_init.description is not None
                 else None
             )
@@ -910,7 +902,7 @@ def _parsed_class_to_class(
             # :py:class:`Constructors`.
             continue
 
-        methods.append(_parsed_method_to_method(parsed=parsed_method))
+        methods.append(_to_method(parsed=parsed_method))
 
     factory_to_use = None  # type: Optional[Type[Class]]
 
@@ -946,7 +938,7 @@ def _parsed_class_to_class(
         if parsed.reference_in_the_book is not None
         else None,
         description=(
-            _parsed_description_to_description(parsed.description)
+            _to_description(parsed.description)
             if parsed.description is not None
             else None
         ),
@@ -967,23 +959,17 @@ def _parsed_class_to_class(
 )
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
-def _parsed_verification_function_to_verification_function(
+def _to_verification_function(
     parsed: parse.FunctionUnion,
 ) -> Tuple[Optional[VerificationUnion], Optional[Error]]:
     """Translate the verification function and try to understand it, if necessary."""
     name = parsed.name
-    arguments = _parsed_arguments_to_arguments(parsed=parsed.arguments)
-    returns = (
-        None
-        if parsed.returns is None
-        else _parsed_type_annotation_to_type_annotation(parsed.returns)
-    )
+    arguments = _to_arguments(parsed=parsed.arguments)
+    returns = None if parsed.returns is None else _to_type_annotation(parsed.returns)
     description = (
-        _parsed_description_to_description(parsed.description)
-        if parsed.description is not None
-        else None
+        _to_description(parsed.description) if parsed.description is not None else None
     )
-    contracts = _parsed_contracts_to_contracts(parsed.contracts)
+    contracts = _to_contracts(parsed.contracts)
 
     if isinstance(parsed, parse.ImplementationSpecificMethod):
         return (
@@ -2654,7 +2640,7 @@ def translate(
                 parsed_symbol, parse.ConcreteClass
             ), "All constrained primitive types must be concrete."
 
-            symbol, parsing_errors = _parsed_class_to_constrained_primitive(
+            symbol, parsing_errors = _to_constrained_primitive(
                 parsed=parsed_symbol, constrainee=constrainee
             )
             if parsing_errors is not None:
@@ -2664,10 +2650,10 @@ def translate(
             assert symbol is not None
 
         elif isinstance(parsed_symbol, parse.Enumeration):
-            symbol = _parsed_enumeration_to_enumeration(parsed=parsed_symbol)
+            symbol = _to_enumeration(parsed=parsed_symbol)
 
         elif isinstance(parsed_symbol, (parse.AbstractClass, parse.ConcreteClass)):
-            symbol = _parsed_class_to_class(
+            symbol = _to_class(
                 parsed=parsed_symbol,
                 constructor_statements=constructor_table.must_find(parsed_symbol),
             )
@@ -2685,9 +2671,7 @@ def translate(
         book_url=parsed_symbol_table.meta_model.book_url,
         book_version=parsed_symbol_table.meta_model.book_version,
         description=(
-            _parsed_description_to_description(
-                parsed_symbol_table.meta_model.description
-            )
+            _to_description(parsed_symbol_table.meta_model.description)
             if parsed_symbol_table.meta_model.description is not None
             else None
         ),
@@ -2695,9 +2679,7 @@ def translate(
 
     verification_functions = []  # type: List[VerificationUnion]
     for func in parsed_symbol_table.verification_functions:
-        verification, error = _parsed_verification_function_to_verification_function(
-            func
-        )
+        verification, error = _to_verification_function(func)
 
         if error is not None:
             underlying_errors.append(error)
