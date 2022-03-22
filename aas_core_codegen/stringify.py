@@ -18,7 +18,11 @@ PrimitiveStringifiable = Union[
     bool, int, float, str, "Entity", "Property", "PropertyEllipsis", None
 ]
 
-Stringifiable = Union[PrimitiveStringifiable, Sequence[PrimitiveStringifiable]]
+Stringifiable = Union[
+    PrimitiveStringifiable,
+    Sequence[PrimitiveStringifiable],
+    Sequence[Sequence[PrimitiveStringifiable]],
+]
 
 
 class Property:

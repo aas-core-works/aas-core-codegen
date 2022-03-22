@@ -238,9 +238,15 @@ def _transpile_pattern_verification(
 
     writer = io.StringIO()
     if verification.description is not None:
-        comment, error = csharp_description.generate_comment(verification.description)
-        if error is not None:
-            return None, error
+        comment, comment_errors = csharp_description.generate_signature_comment(
+            verification.description
+        )
+        if comment_errors is not None:
+            return None, Error(
+                verification.description.parsed.node,
+                "Failed to generate the documentation comment",
+                comment_errors,
+            )
 
         assert comment is not None
 

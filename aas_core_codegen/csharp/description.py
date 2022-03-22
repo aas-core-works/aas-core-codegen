@@ -1,23 +1,24 @@
 """Render descriptions to C# documentation comments."""
+import io
 import textwrap
-from typing import Tuple, Optional, List
 import xml.sax.saxutils
+from typing import Tuple, Optional, List
 
-from icontract import ensure
 import docutils.nodes
 import docutils.parsers.rst.roles
 import docutils.utils
+from icontract import require
 
-from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
 from aas_core_codegen import intermediate
-from aas_core_codegen.intermediate import (
-    doc as intermediate_doc,
-    rendering as intermediate_rendering,
-)
+from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
 from aas_core_codegen.csharp import (
     naming as csharp_naming,
 )
 from aas_core_codegen.csharp.common import INDENT as I
+from aas_core_codegen.intermediate import (
+    doc as intermediate_doc,
+    rendering as intermediate_rendering,
+)
 
 
 class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
@@ -25,12 +26,12 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
 
     def transform_text(
         self, element: docutils.nodes.Text
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
         return xml.sax.saxutils.escape(element.astext()), None
 
     def transform_symbol_reference_in_doc(
         self, element: intermediate_doc.SymbolReference
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
         name = None  # type: Optional[str]
 
         if isinstance(element.symbol, intermediate.Enumeration):
@@ -68,7 +69,7 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
 
     def transform_attribute_reference_in_doc(
         self, element: intermediate_doc.AttributeReference
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
         cref = None  # type: Optional[str]
 
         if isinstance(element.reference, intermediate_doc.PropertyReference):
@@ -110,23 +111,23 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
 
     def transform_argument_reference_in_doc(
         self, element: intermediate_doc.ArgumentReference
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
         arg_name = csharp_naming.argument_name(Identifier(element.reference))
         return f"<paramref name={xml.sax.saxutils.quoteattr(arg_name)} />", None
 
     def transform_constraint_reference_in_doc(
         self, element: intermediate_doc.ConstraintReference
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
         return f"Constraint {element.reference}", None
 
     def transform_literal(
         self, element: docutils.nodes.literal
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
         return f"<c>{xml.sax.saxutils.escape(element.astext())}</c>", None
 
     def transform_paragraph(
         self, element: docutils.nodes.paragraph
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
         parts = []  # type: List[str]
         for child in element.children:
             text, error = self.transform(child)
@@ -140,7 +141,7 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
 
     def transform_emphasis(
         self, element: docutils.nodes.emphasis
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
         parts = []  # type: List[str]
         for child in element.children:
             text, error = self.transform(child)
@@ -154,262 +155,398 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
 
     def transform_list_item(
         self, element: docutils.nodes.list_item
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
         parts = []  # type: List[str]
-        for child in element.children:
-            text, error = self.transform(child)
-            if error is not None:
-                return None, error
+        errors = []  # type: List[str]
 
-            assert text is not None
-            parts.append(text)
+        for child in element.children:
+            text, child_errors = self.transform(child)
+            if child_errors is not None:
+                errors.extend(child_errors)
+            else:
+                assert text is not None
+                parts.append(text)
+
+        if len(errors) > 0:
+            return None, errors
 
         return "<li>{}</li>".format("".join(parts)), None
 
     def transform_bullet_list(
         self, element: docutils.nodes.bullet_list
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
         parts = ["<ul>\n"]
-        for child in element.children:
-            text, error = self.transform(child)
-            if error is not None:
-                return None, error
+        errors = []  # type: List[str]
 
-            assert text is not None
-            parts.append(f"{text}\n")
+        for child in element.children:
+            text, child_errors = self.transform(child)
+            if child_errors is not None:
+                errors.extend(child_errors)
+            else:
+                assert text is not None
+                parts.append(f"{text}\n")
+
+        if len(errors) > 0:
+            return None, errors
+
         parts.append("</ul>")
 
         return "".join(parts), None
 
     def transform_note(
         self, element: docutils.nodes.note
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
         parts = []  # type: List[str]
-        for child in element.children:
-            text, error = self.transform(child)
-            if error is not None:
-                return None, error
+        errors = []  # type: List[str]
 
-            assert text is not None
-            parts.append(text)
+        for child in element.children:
+            text, child_errors = self.transform(child)
+            if child_errors is not None:
+                errors.extend(child_errors)
+            else:
+                assert text is not None
+                parts.append(text)
+
+        if len(errors) > 0:
+            return None, errors
 
         return "".join(parts), None
 
     def transform_reference(
         self, element: docutils.nodes.reference
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
         parts = []  # type: List[str]
-        for child in element.children:
-            text, error = self.transform(child)
-            if error is not None:
-                return None, error
+        errors = []  # type: List[str]
 
-            assert text is not None
-            parts.append(text)
+        for child in element.children:
+            text, child_errors = self.transform(child)
+            if child_errors is not None:
+                errors.extend(child_errors)
+            else:
+                assert text is not None
+                parts.append(text)
+
+        if len(errors) > 0:
+            return None, errors
 
         return "".join(parts), None
 
-    def transform_document(
-        self, element: docutils.nodes.document
-    ) -> Tuple[Optional[str], Optional[str]]:
+    def _transform_children_joined_with_double_new_line(
+        self, element: docutils.nodes.Element
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
+        """Transform the ``element``'s children and join them with a double new-line."""
         if len(element.children) == 0:
             return "", None
 
-        summary = None  # type: Optional[docutils.nodes.paragraph]
-        remarks = []  # type: List[docutils.nodes.Element]
-        tail = []  # type: List[docutils.nodes.Element]
+        if len(element.children) == 1:
+            return self.transform(element.children[0])
 
-        # Try to match the summary and the remarks
-        if len(element.children) >= 1:
-            if not isinstance(element.children[0], docutils.nodes.paragraph):
-                return None, (
-                    f"Expected the first document element to be a summary and "
-                    f"thus a paragraph, but got: {element.children[0]}"
-                )
+        parts = []  # type: List[str]
+        errors = []  # type: List[str]
 
-            summary = element.children[0]
-
-        remainder = element.children[1:]
-        for i, child in enumerate(remainder):
-            if isinstance(
-                child,
-                (
-                    docutils.nodes.paragraph,
-                    docutils.nodes.bullet_list,
-                    docutils.nodes.note,
-                ),
-            ):
-                remarks.append(child)
+        for child in element.children:
+            part, child_errors = self.transform(child)
+            if child_errors is not None:
+                errors.extend(child_errors)
             else:
-                tail = remainder[i:]
-                break
+                assert part is not None
+                parts.append(part)
 
-        # NOTE (2021-09-16, mristin):
-        # We restrict ourselves here quite a lot. This function will need to evolve as
-        # we add a larger variety of docstrings to the meta-model.
-        #
-        # For example, we need to translate ``:paramref:``'s to ``<paramref ...>`` in
-        # C#. Additionally, we need to change the name of the argument accordingly
-        # (``snake_case`` to ``camelCase``).
+        if len(errors) > 0:
+            return None, errors
 
-        # Blocks to be joined by a new-line
-        blocks = []  # type: List[Stripped]
+        return "\n\n".join(parts), None
 
-        renderer = _ElementRenderer()
+    def transform_field_body(
+        self, element: docutils.nodes.field_body
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
+        return self._transform_children_joined_with_double_new_line(element=element)
 
-        if summary:
-            summary_text, error = renderer.transform(element=summary)
-            if error:
-                return None, error
+    def transform_document(
+        self, element: docutils.nodes.field_body
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
+        return self._transform_children_joined_with_double_new_line(element=element)
 
-            assert summary_text is not None
-            blocks.append(Stripped(f"<summary>\n" f"{summary_text}\n" f"</summary>"))
 
-        if remarks:
-            remark_blocks = []  # type: List[str]
-            for remark in remarks:
-                remark_text, error = renderer.transform(element=remark)
-                if error:
-                    return None, error
+@require(lambda line: "\n" not in line)
+def _slash_slash_slash_line(line: str) -> str:
+    """Prepend ``///`` to the ``line``."""
+    if len(line) == 0:
+        return "///"
 
-                assert remark_text is not None
-                remark_blocks.append(remark_text)
+    return f"/// {line}"
 
-            assert len(remark_blocks) >= 1, (
-                f"Expected at least one remark block "
-                f"since ``remarks`` defined: {remarks}"
+
+def _generate_summary_remarks(
+    description: intermediate.SummaryRemarksDescription,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the documentation comment for a summary-remarks-constraints."""
+    errors = []  # type: List[Error]
+    renderer = _ElementRenderer()
+
+    summary, summary_errors = renderer.transform(description.summary)
+    if summary_errors is not None:
+        errors.extend(
+            Error(description.parsed.node, message) for message in summary_errors
+        )
+
+    remarks = []  # type: List[str]
+    for remark in description.remarks:
+        remark, remark_errors = renderer.transform(remark)
+        if remark_errors is not None:
+            errors.extend(
+                Error(description.parsed.node, message) for message in remark_errors
+            )
+        else:
+            assert remark is not None
+            remarks.append(remark)
+
+    if len(errors) > 0:
+        return None, errors
+
+    assert summary is not None
+
+    # Don't use textwrap.dedent to preserve the formatting
+
+    blocks = [
+        Stripped(
+            f"""\
+<summary>
+{summary}
+</summary>"""
+        )
+    ]
+
+    if len(remarks) > 0:
+        remarks_joined = "\n\n".join(remarks)
+        blocks.append(
+            Stripped(
+                f"""\
+<remarks>
+{remarks_joined}
+</remarks>"""
+            )
+        )
+
+    commented_lines = [
+        _slash_slash_slash_line(line) for block in blocks for line in block.splitlines()
+    ]
+
+    return Stripped("\n".join(commented_lines)), None
+
+
+def _generate_summary_remarks_constraints(
+    description: intermediate.SummaryRemarksConstraintsDescription,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the documentation comment for a summary-remarks-constraints."""
+    errors = []  # type: List[Error]
+    renderer = _ElementRenderer()
+
+    summary, summary_errors = renderer.transform(description.summary)
+    if summary_errors is not None:
+        errors.extend(
+            Error(description.parsed.node, message) for message in summary_errors
+        )
+
+    remarks = []  # type: List[str]
+    for remark in description.remarks:
+        remark, remark_errors = renderer.transform(remark)
+        if remark_errors is not None:
+            errors.extend(
+                Error(description.parsed.node, message) for message in remark_errors
+            )
+        else:
+            assert remark is not None
+            remarks.append(remark)
+
+    constraints = []  # type: List[str]
+    for identifier, body_element in description.constraints_by_identifier.items():
+        body, body_errors = renderer.transform(body_element)
+        if body_errors is not None:
+            errors.extend(
+                Error(description.parsed.node, message) for message in body_errors
+            )
+        else:
+            assert body is not None
+
+            constraints.append(
+                f"Constraint {xml.sax.saxutils.escape(identifier)}:\n{body}"
             )
 
-            if len(remark_blocks) == 1:
-                blocks.append(
-                    Stripped(f"<remarks>\n" f"{remark_blocks[0]}\n" f"</remarks>")
-                )
-            else:
-                remarks_paras = "\n".join(
-                    f"<para>{remark_block}</para>" for remark_block in remark_blocks
-                )
+    if len(errors) > 0:
+        return None, errors
 
-                blocks.append(
-                    Stripped(f"<remarks>\n" f"{remarks_paras}\n" f"</remarks>")
-                )
+    assert summary is not None
 
-        for tail_element in tail:
-            # BEFORE-RELEASE (mristin, 2021-12-13): test
-            if not isinstance(tail_element, docutils.nodes.field_list):
-                return None, (
-                    f"Expected only a field list to follow the summary and remarks, "
-                    f"but got: {tail_element}"
-                )
+    # Don't use textwrap.dedent to preserve the formatting
 
-            for field in tail_element.children:
-                assert len(field.children) == 2
-                field_name, field_body = field.children
-                assert isinstance(field_name, docutils.nodes.field_name)
-                assert isinstance(field_body, docutils.nodes.field_body)
-
-                # region Generate field body
-
-                body_blocks = []  # type: List[str]
-                for body_child in field_body.children:
-                    body_block, error = renderer.transform(body_child)
-                    if error:
-                        return None, error
-
-                    assert body_block is not None
-
-                    body_blocks.append(body_block)
-
-                if len(body_blocks) == 0:
-                    body = ""
-                elif len(body_blocks) == 1:
-                    body = body_blocks[0]
-                else:
-                    body = "\n".join(
-                        f"<para>{body_block}</para>" for body_block in body_blocks
-                    )
-
-                # endregion
-
-                # region Generate tags in the description
-
-                assert len(field_name.children) == 1 and isinstance(
-                    field_name.children[0], docutils.nodes.Text
-                )
-
-                name = field_name.children[0].astext()
-                name_parts = name.split()
-                if len(name_parts) > 2:
-                    # BEFORE-RELEASE (mristin, 2021-12-13): test
-                    return (
-                        None,
-                        f"Expected one or two parts in a field name, "
-                        f"but got: {field_name}",
-                    )
-
-                if len(name_parts) == 1:
-                    directive = name_parts[0]
-                    if directive in ("return", "returns"):
-                        body_indented = textwrap.indent(body, I)
-                        blocks.append(
-                            Stripped(f"<returns>\n{body_indented}\n</returns>")
-                        )
-                    else:
-                        return None, f"Unhandled directive: {directive}"
-
-                elif len(name_parts) == 2:
-                    directive, directive_arg = name_parts
-
-                    if directive == "param":
-                        arg_name = csharp_naming.argument_name(directive_arg)
-
-                        if body != "":
-                            indented_body = textwrap.indent(body, I)
-                            blocks.append(
-                                Stripped(
-                                    f"<param name={xml.sax.saxutils.quoteattr(arg_name)}>\n"
-                                    f"{indented_body}\n"
-                                    f"</param>"
-                                )
-                            )
-                        else:
-                            blocks.append(
-                                Stripped(
-                                    f"<param name={xml.sax.saxutils.quoteattr(arg_name)}>"
-                                    f"</param>"
-                                )
-                            )
-                    else:
-                        return None, f"Unhandled directive: {directive}"
-                else:
-                    return (
-                        None,
-                        f"Expected one or two parts in a field name, "
-                        f"but got: {field_name}",
-                    )
-
-                # endregion
-
-        # fmt: off
-        text = '\n'.join(
-            f'/// {line}'
-            for line in '\n'.join(blocks).splitlines()
+    blocks = [
+        Stripped(
+            f"""\
+<summary>
+{summary}
+</summary>"""
         )
-        # fmt: on
-        return text, None
+    ]
+
+    if len(constraints) > 0:
+        constraints_writer = io.StringIO()
+        constraints_writer.write("Constraints:\n<ul>\n")
+        for constraint in constraints:
+            constraints_writer.write(textwrap.indent(f"<li>\n{constraint}\n</li>\n", I))
+        constraints_writer.write("</ul>")
+        remarks.append(constraints_writer.getvalue())
+
+    if len(remarks) > 0:
+        remarks_joined = "\n\n".join(remarks)
+        blocks.append(
+            Stripped(
+                f"""\
+<remarks>
+{remarks_joined}
+</remarks>"""
+            )
+        )
+
+    commented_lines = [
+        _slash_slash_slash_line(line) for block in blocks for line in block.splitlines()
+    ]
+
+    return Stripped("\n".join(commented_lines)), None
 
 
-@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
-def generate_comment(
-    description: intermediate.Description,
-) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate a documentation comment based on the docstring."""
-    if len(description.document.children) == 0:
-        return Stripped(""), None
+def generate_meta_model_comment(
+    description: intermediate.MetaModelDescription,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the documentation comment for the given meta-model."""
+    return _generate_summary_remarks_constraints(description)
 
+
+def generate_symbol_comment(
+    description: intermediate.SymbolDescription,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the documentation comment for the given symbol."""
+    return _generate_summary_remarks_constraints(description)
+
+
+def generate_property_comment(
+    description: intermediate.PropertyDescription,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the documentation comment for the given property."""
+    return _generate_summary_remarks_constraints(description)
+
+
+def generate_enumeration_literal_comment(
+    description: intermediate.EnumerationLiteralDescription,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the documentation comment for the given enumeration literal."""
+    return _generate_summary_remarks(description)
+
+
+def generate_signature_comment(
+    description: intermediate.SignatureDescription,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """
+    Generate the documentation comment for the given signature.
+
+    A signature, in this context, means a function or a method signature.
+    """
+    errors = []  # type: List[Error]
     renderer = _ElementRenderer()
-    text, error = renderer.transform(description.document)
-    if error:
-        return None, Error(description.node, error)
 
-    assert text is not None
-    return Stripped(text), None
+    summary, summary_errors = renderer.transform(description.summary)
+    if summary_errors is not None:
+        errors.extend(
+            Error(description.parsed.node, message) for message in summary_errors
+        )
+
+    remarks = []  # type: List[str]
+    for remark in description.remarks:
+        remark, remark_errors = renderer.transform(remark)
+        if remark_errors is not None:
+            errors.extend(
+                Error(description.parsed.node, message) for message in remark_errors
+            )
+        else:
+            assert remark is not None
+            remarks.append(remark)
+
+    params = []  # type: List[Stripped]
+    for name, body_element in description.arguments_by_name.items():
+        body, body_errors = renderer.transform(body_element)
+        if body_errors is not None:
+            errors.extend(
+                Error(description.parsed.node, message) for message in body_errors
+            )
+        else:
+            assert body is not None
+
+            # Don't use textwrap.dedent to preserve the formatting
+            params.append(
+                Stripped(
+                    f"""\
+<param name={xml.sax.saxutils.quoteattr(name)}>
+{body}
+</param>"""
+                )
+            )
+
+    returns = None  # type: Optional[str]
+    if description.returns is not None:
+        # We need to help the type checker in PyCharm a bit.
+        assert isinstance(description.returns, docutils.nodes.field_body)
+
+        returns, returns_errors = renderer.transform(description.returns)
+        if returns_errors is not None:
+            errors.extend(
+                Error(description.parsed.node, message) for message in returns_errors
+            )
+        else:
+            assert returns is not None
+
+    if len(errors) > 0:
+        return None, errors
+
+    assert summary is not None
+
+    # Don't use textwrap.dedent to preserve the formatting
+
+    blocks = [
+        Stripped(
+            f"""\
+<summary>
+{summary}
+</summary>"""
+        )
+    ]
+
+    if len(remarks) > 0:
+        remarks_joined = "\n\n".join(remarks)
+        blocks.append(
+            Stripped(
+                f"""\
+<remarks>
+{remarks_joined}
+</remarks>"""
+            )
+        )
+
+    if len(params) > 0:
+        params_joined = "\n".join(params)
+        blocks.append(Stripped(params_joined))
+
+    if returns is not None:
+        blocks.append(
+            Stripped(
+                f"""\
+<returns>
+{returns}
+</returns>"""
+            )
+        )
+
+    commented_lines = [
+        _slash_slash_slash_line(line) for block in blocks for line in block.splitlines()
+    ]
+
+    return Stripped("\n".join(commented_lines)), None

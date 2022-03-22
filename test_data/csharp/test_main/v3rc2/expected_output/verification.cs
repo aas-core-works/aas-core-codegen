@@ -55,10 +55,10 @@ namespace AasCore.Aas3
         /// Check that <paramref name="text" /> conforms to the pattern of MIME type.
         /// </summary>
         /// <param name="text">
-        ///     Text to be checked
+        /// Text to be checked
         /// </param>
         /// <returns>
-        ///     True if the <paramref name="text" /> conforms to the pattern
+        /// True if the <paramref name="text" /> conforms to the pattern
         /// </returns>
         public static bool IsMimeType(string text)
         {

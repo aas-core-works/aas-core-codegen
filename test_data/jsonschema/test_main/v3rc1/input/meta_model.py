@@ -210,8 +210,9 @@ class Extension(Has_semantics):
     """
     Name of the extension.
 
-    Constraint AASd-077: The name of an extension within HasExtensions needs to be
-    unique.
+    :constraint AASd-077:
+        The name of an extension within HasExtensions needs to be
+        unique.
     """
 
     value_type: Optional["Data_type_def"]
@@ -531,7 +532,8 @@ class Has_data_specification(DBC):
 
     # TODO (all, 2021-09-24): need to implement the constraint:
     #  page 60 in V3RC1
-    #  Constraint AASd-050:  If the DataSpecificationContent
+    #  :constraint AASd-050:
+    #  If the DataSpecificationContent
     #  DataSpecificationIEC61360 is used for an element then the value of
     #  hasDataSpecification/dataSpecification shall contain the global reference to the
     #  IRI of the corresponding data specification template https://admin-
@@ -1010,7 +1012,8 @@ class Submodel_element(
 
 
 # TODO (mristin, 2021-10-27, page 77):
-#  Constraint AASd-055: If the semanticId of a RelationshipElement or an
+#  :constraint AASd-055:
+#  If the semanticId of a RelationshipElement or an
 #  AnnotatedRelationshipElement submodel element references a  ConceptDescription then
 #  the ConceptDescription/category shall be one of following values: RELATIONSHIP.
 #
@@ -1022,9 +1025,11 @@ class Relationship_element(Submodel_element):
     A relationship element is used to define a relationship between two referable
     elements.
 
-    Constraint AASd-055: If the semanticId of a RelationshipElement or an
-    AnnotatedRelationshipElement submodel element references a ConceptDescription then
-    the ConceptDescription/category shall be one of following values: RELATIONSHIP.
+    :constraint AASd-055:
+        If the semanticId of a RelationshipElement or an
+        AnnotatedRelationshipElement submodel element references a ConceptDescription
+        then the ConceptDescription/category shall be one of following values:
+        RELATIONSHIP.
     """
 
     first: "Reference"
@@ -1073,17 +1078,20 @@ class Submodel_element_collection(Submodel_element):
     """
     A submodel element collection is a set or list of submodel elements.
 
-    Constraint AASd-059: If the semanticId of a SubmodelElementCollection references a
-    ConceptDescription then the category of the ConceptDescription shall be COLLECTION
-    or ENTITY.
+    :constraint AASd-059:
+        If the semanticId of a SubmodelElementCollection references a
+        ConceptDescription then the category of the ConceptDescription shall be
+        COLLECTION or ENTITY.
 
-    Constraint AASd-092: If the semanticId of a SubmodelElementCollection with
-    SubmodelElementCollection/allowDuplicates == false references a ConceptDescription
-    then the ConceptDescription/category shall be ENTITY.
+    :constraint AASd-092:
+        If the semanticId of a SubmodelElementCollection with
+        SubmodelElementCollection/allowDuplicates == false references
+        a ConceptDescription then the ConceptDescription/category shall be ENTITY.
 
-    Constraint AASd-093: If the semanticId of a SubmodelElementCollection with
-    SubmodelElementCollection/allowDuplicates == true references a ConceptDescription
-    then the ConceptDescription/category shall be COLLECTION.
+    :constraint AASd-093:
+        If the semanticId of a SubmodelElementCollection with
+        SubmodelElementCollection/allowDuplicates == true references
+        a ConceptDescription then the ConceptDescription/category shall be COLLECTION.
 
     Example: A set of documents is referencing a concept description of category
     COLLECTION. A document within this collection is described as
@@ -1115,10 +1123,13 @@ class Submodel_element_collection(Submodel_element):
     """
     If allowDuplicates==true, then it is allowed that the collection contains several
     elements with the same semantics (i.e. the same semanticId).
-    Constraint AASd-026: If allowDuplicates==false then it is not allowed that
-    the collection contains several elements with the same semantics (i.e. the same
-    semanticId).
+    
     Default = false
+    
+    :constraint AASd-026:
+        If allowDuplicates==false then it is not allowed that
+        the collection contains several elements with the same semantics (i.e. the same
+        semanticId).
     """
 
     def __init__(
@@ -1169,9 +1180,10 @@ class Data_element(Submodel_element):
         A controlled value is a value whose meaning is given in an external source
         (see “ISO/TS 29002-10)
 
-    Constraint AASd-090: For data elements DataElement/category shall be one of the
-    following values: CONSTANT, PARAMETER or VARIABLE.
-    Exception: File and Blob data elements.
+    :constraint AASd-090:
+        For data elements DataElement/category shall be one of the
+        following values: CONSTANT, PARAMETER or VARIABLE.
+        Exception: File and Blob data elements.
     """
 
     def __init__(
@@ -1205,25 +1217,29 @@ class Property(Data_element):
     """
     A property is a data element that has a single value.
 
-    Constraint AASd-007: If both, the Property/value and the Property/valueId are
-    present then the value of Property/value needs to be identical to the value of
-    the referenced coded value in Property/valueId.
+    :constraint AASd-007:
+        If both, the Property/value and the Property/valueId are
+        present then the value of Property/value needs to be identical to the value of
+        the referenced coded value in Property/valueId.
 
-    Constraint AASd-052a: If the semanticId of a Property references a
-    ConceptDescription then the ConceptDescription/category shall be one of
-    following values: VALUE, PROPERTY.
+    :constraint AASd-052a:
+        If the semanticId of a Property references a
+        ConceptDescription then the ConceptDescription/category shall be one of
+        following values: VALUE, PROPERTY.
 
-    Constraint AASd-065: If the semanticId of a Property or MultiLanguageProperty
-    references a ConceptDescription with the category VALUE then the value of the
-    property is identical to DataSpecificationIEC61360/value and the valueId of the
-    property is identical to DataSpecificationIEC61360/valueId.
+    :constraint AASd-065:
+        If the semanticId of a Property or MultiLanguageProperty
+        references a ConceptDescription with the category VALUE then the value of the
+        property is identical to DataSpecificationIEC61360/value and the valueId of the
+        property is identical to DataSpecificationIEC61360/valueId.
 
-    Constraint AASd-066: If the semanticId of a Property or MultiLanguageProperty
-    references a ConceptDescription with the category PROPERTY and
-    DataSpecificationIEC61360/valueList is defined the value and valueId of the
-    property is identical to one of the value reference pair types references in the
-    value list, i.e. ValueReferencePairType/value or ValueReferencePairType/valueId,
-    resp.
+    :constraint AASd-066:
+        If the semanticId of a Property or MultiLanguageProperty
+        references a ConceptDescription with the category PROPERTY and
+        DataSpecificationIEC61360/valueList is defined the value and valueId of the
+        property is identical to one of the value reference pair types references in the
+        value list, i.e. ValueReferencePairType/value or ValueReferencePairType/valueId,
+        resp.
     """
 
     value_type: "Data_type_def"
@@ -1285,20 +1301,23 @@ class Multi_language_property(Data_element):
     """
     A property is a data element that has a multi-language value.
 
-    Constraint AASd-052b: If the semanticId of a MultiLanguageProperty references
-    a ConceptDescription then the ConceptDescription/category shall be one of
-    following values: PROPERTY.
-
-    Constraint AASd-012: If both, the MultiLanguageProperty/value and the
-    MultiLanguageProperty/valueId are present then for each string in a specific
-    language the meaning must be the same as specified in
-    MultiLanguageProperty/valueId.
-
-    Constraint AASd-067: If the semanticId of a MultiLanguageProperty references a
-    ConceptDescription then DataSpecificationIEC61360/dataType shall be
-    STRING_TRANSLATABLE.
-
     See :constraintref:`AASd-065`
+
+    :constraint AASd-052b:
+        If the semanticId of a MultiLanguageProperty references
+        a ConceptDescription then the ConceptDescription/category shall be one of
+        following values: PROPERTY.
+
+    :constraint AASd-012:
+        If both, the MultiLanguageProperty/value and the
+        MultiLanguageProperty/valueId are present then for each string in a specific
+        language the meaning must be the same as specified in
+        MultiLanguageProperty/valueId.
+
+    :constraint AASd-067:
+        If the semanticId of a MultiLanguageProperty references a
+        ConceptDescription then DataSpecificationIEC61360/dataType shall be
+        STRING_TRANSLATABLE.
     """
 
     value: Optional["Lang_string_set"]
@@ -1351,16 +1370,20 @@ class Range(Data_element):
     """
     A range data element is a data element that defines a range with min and max.
 
-    Constraint AASd-053: If the semanticId of a Range submodel element references a
-    ConceptDescription then the ConceptDescription/category shall be one of following
-    values: PROPERTY.
+    :constraint AASd-053:
+        If the semanticId of a Range submodel element references a
+        ConceptDescription then the ConceptDescription/category shall be one of following
+        values: PROPERTY.
 
-    Constraint AASd-068: If the semanticId of a Range submodel element references a
-    ConceptDescription then DataSpecificationIEC61360/dataType shall be a numerical
-    one, i.e. REAL_* or RATIONAL_*.
+    :constraint AASd-068:
+        If the semanticId of a Range submodel element references a
+        ConceptDescription then DataSpecificationIEC61360/dataType shall be a numerical
+        one, i.e. REAL_* or RATIONAL_*.
 
-    Constraint AASd-069: If the semanticId of a Range references a ConceptDescription
-    then DataSpecificationIEC61360/levelType shall be identical to the set {Min, Max}.
+    :constraint AASd-069:
+        If the semanticId of a Range references a ConceptDescription
+        then DataSpecificationIEC61360/levelType shall be identical to the set
+        {Min, Max}.
     """
 
     value_type: "Data_type_def"
@@ -1426,9 +1449,10 @@ class Reference_element(Data_element):
     Reference to any other referable element of the same of any other AAS or a
     reference to an external object or entity.
 
-    Constraint AASd-054: If the semanticId of a ReferenceElement submodel element
-    references a ConceptDescription then the ConceptDescription/category shall be one of
-    following values: REFERENCE.
+    :constraint AASd-054:
+        If the semanticId of a ReferenceElement submodel element
+        references a ConceptDescription then the ConceptDescription/category shall be
+        one of following values: REFERENCE.
     """
 
     def __init__(
@@ -1484,8 +1508,9 @@ class Blob(Data_element):
       In contrast to the file property the file content is stored directly as value
       in the Blob data element.
 
-    Constraint AASd-057: The semanticId of a File or Blob submodel element shall only
-    reference a ConceptDescription with the category DOCUMENT.
+    :constraint AASd-057:
+        The semanticId of a File or Blob submodel element shall only
+        reference a ConceptDescription with the category DOCUMENT.
     """
 
     def __init__(
@@ -1627,7 +1652,7 @@ class Annotated_relationship_element(Relationship_element):
 
 # TODO (mristin, 2021-10-29): We can not implement this constraint, correct?
 #  🠒 Double-check with Nico!
-#  Constraint AASd-061:
+#  :constraint AASd-061:
 #  If the semanticId of a Event submodel element references
 #  a ConceptDescription then the category of the ConceptDescription shall be one of
 #  the following: EVENT.
@@ -1659,10 +1684,11 @@ class Entity(Submodel_element):
     """
     An entity is a submodel element that is used to model entities.
 
-    Constraint AASd-056: If the semanticId of a Entity submodel element
-    references a ConceptDescription then the ConceptDescription/category shall
-    be one of following values: ENTITY. The ConceptDescription describes the elements
-    assigned to the entity via Entity/statement.
+    :constraint AASd-056:
+        If the semanticId of a Entity submodel element
+        references a ConceptDescription then the ConceptDescription/category shall
+        be one of following values: ENTITY. The ConceptDescription describes
+        the elements assigned to the entity via Entity/statement.
     """
 
     entity_type: "Entity_type"
@@ -1679,9 +1705,11 @@ class Entity(Submodel_element):
     global_asset_ID: Optional["Reference"]
     """
     Reference to the asset the entity is representing.
-    Constraint AASd-014: Either the attribute globalAssetId or specificAssetId of an
-    Entity must be set if Entity/entityType is set to “SelfManagedEntity”. They are
-    not existing otherwise.
+    
+    :constraint AASd-014:
+        Either the attribute globalAssetId or specificAssetId of an
+        Entity must be set if Entity/entityType is set to “SelfManagedEntity”. They are
+        not existing otherwise.
     """
 
     specific_asset_ID: Optional["Identifier_key_value_pair"]
@@ -1805,9 +1833,10 @@ class Operation(Submodel_element):
     """
     An operation is a submodel element with input and output variables.
 
-    Constraint AASd-060: If the semanticId of a Operation submodel element
-    references a ConceptDescription then the category of the ConceptDescription
-    shall be one of the following values: FUNCTION.
+    :constraint AASd-060:
+        If the semanticId of a Operation submodel element
+        references a ConceptDescription then the category of the ConceptDescription
+        shall be one of the following values: FUNCTION.
     """
 
     input_variables: Optional[List["Operation_variable"]]
@@ -1917,10 +1946,11 @@ class Concept_description(Identifiable, Has_data_specification):
     is defined by a concept description. The description of the concept should follow a
     standardized schema (realized as data specification template).
 
-    Constraint AASd-051: A ConceptDescription shall have one of the following
-    categories:
-    VALUE, PROPERTY, REFERENCE, DOCUMENT, CAPABILITY, RELATIONSHIP, COLLECTION,
-    FUNCTION, EVENT, ENTITY, APPLICATION_CLASS, QUALIFIER, VIEW. Default: PROPERTY.
+    :constraint AASd-051:
+        A ConceptDescription shall have one of the following
+        categories:
+        VALUE, PROPERTY, REFERENCE, DOCUMENT, CAPABILITY, RELATIONSHIP, COLLECTION,
+        FUNCTION, EVENT, ENTITY, APPLICATION_CLASS, QUALIFIER, VIEW. Default: PROPERTY.
     """
 
     is_case_of: Optional[List["Reference"]]
@@ -1966,12 +1996,13 @@ class View(Referable, Has_semantics, Has_data_specification):
     A view is a collection of referable elements w.r.t. to a specific viewpoint of one
     or more stakeholders.
 
-    Constraint AASd-064: If the semanticId of a View references a ConceptDescription
-    then the category of the ConceptDescription shall be VIEW.
-
     .. note::
        Views are a projection of submodel elements for a given perspective.
        They are not equivalent to submodels.
+
+    :constraint AASd-064:
+        If the semanticId of a View references a ConceptDescription
+        then the category of the ConceptDescription shall be VIEW.
     """
 
     contained_elements: Optional[List["Reference"]]
@@ -2081,11 +2112,13 @@ class Key(DBC):
     """
     Type of the key value.
 
-    Constraint AASd-080: In case Key/type == GlobalReference idType shall not be any
-    LocalKeyType (IdShort, FragmentId).
+    :constraint AASd-080:
+        In case Key/type == GlobalReference idType shall not be any
+        LocalKeyType (IdShort, FragmentId).
 
-    Constraint AASd-081: In case Key/type==AssetAdministrationShell Key/idType shall
-    not be any LocalKeyType (IdShort, FragmentId).
+    :constraint AASd-081:
+        In case Key/type==AssetAdministrationShell Key/idType shall
+        not be any LocalKeyType (IdShort, FragmentId).
     """
 
     def __init__(
@@ -2453,21 +2486,24 @@ class Data_specification_IEC_61360(Data_specification_content):
     and values and value lists only it is also possible to use the template for other
     definition This is shown in the tables Table 7, Table 8, Table 9 and Table 10.
 
-    Constraint AASd-075: For all ConceptDescriptions using data specification template
-    IEC61360
-    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0)
-    values for the attributes not being marked as mandatory or optional in tables
-    Table 7, Table 8, Table 9 and Table 10.depending on its category are ignored and
-    handled as undefined.
+    :constraint AASd-075:
+        For all ConceptDescriptions using data specification template
+        IEC61360
+        (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0)
+        values for the attributes not being marked as mandatory or optional in tables
+        Table 7, Table 8, Table 9 and Table 10.depending on its category are ignored and
+        handled as undefined.
     """
 
     preferred_name: "Lang_string_set"
     """
     Preferred name
-    Constraint AASd-076: For all ConceptDescriptions using data specification template
-    IEC61360
-    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0)
-    at least a preferred name in English shall be defined.
+
+    :constraint AASd-076:
+        For all ConceptDescriptions using data specification template
+        IEC61360
+        (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0)
+        at least a preferred name in English shall be defined.
     """
 
     short_name: Optional["Lang_string_set"]
@@ -2499,37 +2535,42 @@ class Data_specification_IEC_61360(Data_specification_content):
     """
     Data Type
 
-    Constraint AASd-070: For a ConceptDescription with category PROPERTY or VALUE using
-    data specification template IEC61360
-    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-    DataSpecificationIEC61360/dataType is mandatory and shall be defined.
+    :constraint AASd-070:
+        For a ConceptDescription with category PROPERTY or VALUE using
+        data specification template IEC61360
+        (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
+        DataSpecificationIEC61360/dataType is mandatory and shall be defined.
 
-    Constraint AASd-071: For a ConceptDescription with category REFERENCE using data
-    specification template IEC61360
-    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-    DataSpecificationIEC61360/dataType is STRING by default.
+    :constraint AASd-071:
+        For a ConceptDescription with category REFERENCE using data
+        specification template IEC61360
+        (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
+        DataSpecificationIEC61360/dataType is STRING by default.
 
-    Constraint AASd-072: For a ConceptDescription with category DOCUMENT using data
-    specification template IEC61360
-    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-    DataSpecificationIEC61360/dataType shall be one of the following values: STRING or
-    URL.
+    :constraint AASd-072:
+        For a ConceptDescription with category DOCUMENT using data
+        specification template IEC61360
+        (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
+        DataSpecificationIEC61360/dataType shall be one of the following values:
+        STRING or URL.
 
-    Constraint AASd-073: For a ConceptDescription with category QUALIFIER using data
-    specification template IEC61360
-    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-    DataSpecificationIEC61360/dataType is mandatory and shall be defined.
+    :constraint AASd-073:
+        For a ConceptDescription with category QUALIFIER using data
+        specification template IEC61360
+        (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
+        DataSpecificationIEC61360/dataType is mandatory and shall be defined.
     """
 
     definition: Optional["Lang_string_set"]
     """
     Definition in different languages
 
-    Constraint AASd-074: For all ConceptDescriptions except for ConceptDescriptions of
-    category VALUE using data specification template IEC61360
-    (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-    DataSpecificationIEC61360/definition is mandatory and shall be defined at least in
-    English.
+    :constraint AASd-074:
+        For all ConceptDescriptions except for ConceptDescriptions of
+        category VALUE using data specification template IEC61360
+        (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
+        DataSpecificationIEC61360/definition is mandatory and shall be defined at least
+        in English.
     """
 
     value_format: Optional[Non_empty_string]
@@ -2822,9 +2863,10 @@ class Subject_attributes:
     """
     A data element that further classifies a specific subject.
 
-    Constraint AASs-015: The data element SubjectAttributes/subjectAttribute shall be
-    part of the submodel that is referenced within the “selectableSubjectAttributes”
-    attribute of “AccessControl”."
+    :constraint AASs-015:
+        The data element SubjectAttributes/subjectAttribute shall be
+        part of the submodel that is referenced within the “selectableSubjectAttributes”
+        attribute of “AccessControl”."
     """
 
     def __init__(self, subject_attributes: List["Reference"]) -> None:

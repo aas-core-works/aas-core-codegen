@@ -1122,7 +1122,9 @@ def _string_constant_to_description(
     if warnings_text:
         return None, Error(
             constant,
-            f"Failed to parse the description with docutils:\n{warnings_text.strip()}",
+            f"Failed to parse the description with docutils:\n"
+            f"{warnings_text.strip()}\n\n"
+            f"The original text was: {dedented!r}",
         )
 
     assert document is not None

@@ -77,8 +77,8 @@ class Test_parsing_docstrings(unittest.TestCase):
                 """
                 This is some documentation.
 
-                 * Nested reference :class:`.Some_class`
-                 """
+                Nested reference :class:`.Some_class`
+                """
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
@@ -96,9 +96,10 @@ class Test_parsing_docstrings(unittest.TestCase):
         assert isinstance(some_class, intermediate.Class)
 
         assert some_class.description is not None
+        assert len(some_class.description.remarks) == 1
 
         symbol_references = list(
-            some_class.description.document.findall(
+            some_class.description.remarks[0].findall(
                 condition=intermediate_doc.SymbolReference
             )
         )
@@ -106,16 +107,17 @@ class Test_parsing_docstrings(unittest.TestCase):
         self.assertEqual(1, len(symbol_references))
         self.assertIsInstance(symbol_references[0].symbol, intermediate.Class)
 
-    def test_constraint_reference(self) -> None:
+    def test_constraint_and_constraintref(self) -> None:
         source = textwrap.dedent(
             '''\
             class Some_class:
                 """
                 This is some documentation.
 
-                Constraint AAS-001: some constraint
-
                 See :constraintref:`AAS-001`.
+
+                :constraint AAS-001:
+                    some constraint
                 """
 
             __book_url__ = "dummy"
@@ -134,15 +136,19 @@ class Test_parsing_docstrings(unittest.TestCase):
         assert isinstance(some_class, intermediate.Class)
 
         assert some_class.description is not None
+        assert len(some_class.description.remarks) == 1
 
         constraint_references = list(
-            some_class.description.document.findall(
+            some_class.description.remarks[0].findall(
                 condition=intermediate_doc.ConstraintReference
             )
         )
-
         self.assertEqual(1, len(constraint_references))
         self.assertEqual("AAS-001", constraint_references[0].reference)
+
+        self.assertListEqual(
+            ["AAS-001"], list(some_class.description.constraints_by_identifier.keys())
+        )
 
 
 class Test_against_recorded(unittest.TestCase):

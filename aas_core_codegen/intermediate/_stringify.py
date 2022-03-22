@@ -16,7 +16,6 @@ from aas_core_codegen.intermediate._types import (
     Default,
     DefaultConstant,
     DefaultEnumerationLiteral,
-    Description,
     Enumeration,
     EnumerationLiteral,
     ImplementationSpecificMethod,
@@ -38,6 +37,11 @@ from aas_core_codegen.intermediate._types import (
     SymbolTable,
     UnderstoodMethod,
     ReferenceInTheBook,
+    MetaModelDescription,
+    SymbolDescription,
+    SignatureDescription,
+    PropertyDescription,
+    EnumerationLiteralDescription,
     SignatureLike,
 )
 from aas_core_codegen.parse import tree as parse_tree
@@ -99,14 +103,103 @@ def _stringify_optional_type_annotation(
     return result
 
 
-def _stringify_description(
-    that: Description,
+def _stringify_meta_model_description(
+    that: MetaModelDescription,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.PropertyEllipsis("document", that.document),
-            stringify.PropertyEllipsis("node", that.node),
+            stringify.Property("summary", str(that.summary)),
+            stringify.Property("remarks", list(map(str, that.remarks))),
+            stringify.Property(
+                "constraints_by_identifier",
+                [
+                    [identifier, str(body)]
+                    for identifier, body in that.constraints_by_identifier.items()
+                ],
+            ),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_symbol_description(
+    that: SymbolDescription,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("summary", str(that.summary)),
+            stringify.Property("remarks", list(map(str, that.remarks))),
+            stringify.Property(
+                "constraints_by_identifier",
+                [
+                    [identifier, str(body)]
+                    for identifier, body in that.constraints_by_identifier.items()
+                ],
+            ),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_property_description(
+    that: PropertyDescription,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("summary", str(that.summary)),
+            stringify.Property("remarks", list(map(str, that.remarks))),
+            stringify.Property(
+                "constraints_by_identifier",
+                [
+                    [identifier, str(body)]
+                    for identifier, body in that.constraints_by_identifier.items()
+                ],
+            ),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_enumeration_literal_description(
+    that: EnumerationLiteralDescription,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("summary", str(that.summary)),
+            stringify.Property("remarks", list(map(str, that.remarks))),
+            stringify.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_signature_description(
+    that: SignatureDescription,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("summary", str(that.summary)),
+            stringify.Property("remarks", list(map(str, that.remarks))),
+            stringify.Property(
+                "arguments_by_name",
+                [[name, str(body)] for name, body in that.arguments_by_name.items()],
+            ),
+            stringify.Property(
+                "returns", None if that.returns is None else str(that.returns)
+            ),
+            stringify.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -618,7 +711,11 @@ Dumpable = Union[
     Contract,
     Contracts,
     Default,
-    Description,
+    MetaModelDescription,
+    SymbolDescription,
+    PropertyDescription,
+    EnumerationLiteralDescription,
+    SignatureDescription,
     Enumeration,
     EnumerationLiteral,
     ImplementationSpecificMethod,
@@ -655,7 +752,11 @@ _DISPATCH = {
     Contracts: _stringify_contracts,
     DefaultConstant: _stringify_default_constant,
     DefaultEnumerationLiteral: _stringify_default_enumeration_literal,
-    Description: _stringify_description,
+    MetaModelDescription: _stringify_meta_model_description,
+    SymbolDescription: _stringify_symbol_description,
+    PropertyDescription: _stringify_property_description,
+    EnumerationLiteralDescription: _stringify_enumeration_literal_description,
+    SignatureDescription: _stringify_signature_description,
     Enumeration: _stringify_enumeration,
     EnumerationLiteral: _stringify_enumeration_literal,
     ImplementationSpecificMethod: _stringify_implementation_specific_method,
