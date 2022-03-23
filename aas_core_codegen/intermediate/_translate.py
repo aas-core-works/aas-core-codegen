@@ -833,14 +833,62 @@ class _MaybeInterfacePlaceholder:
     """
 
 
+def _extract_constructor(
+    parsed_class: parse.ClassUnion,
+    constructor_statements: Sequence[construction.Statement],
+) -> Constructor:
+    """
+    Extract the constructor from the given ``parsed_class``.
+
+    The ``constructor_statements`` are determined by the constructor table. The calls
+    to super-constructors are not expected to be in-lined yet.
+    """
+    contracts = Contracts(preconditions=[], snapshots=[], postconditions=[])
+    arguments = []  # type: List[Argument]
+    init_is_implementation_specific = False
+    description = None  # type: Optional[Description]
+
+    parsed_class_init = parsed_class.methods_by_name.get(Identifier("__init__"), None)
+    if parsed_class_init is not None:
+        arguments = _to_arguments(parsed=parsed_class_init.arguments)
+
+        init_is_implementation_specific = isinstance(
+            parsed_class_init, parse.ImplementationSpecificMethod
+        )
+
+        contracts = _to_contracts(parsed_class_init.contracts)
+
+        if parsed_class_init.description is not None:
+            description = (
+                _to_description(parsed_class_init.description)
+                if parsed_class_init.description is not None
+                else None
+            )
+
+    constructor = Constructor(
+        is_implementation_specific=init_is_implementation_specific,
+        arguments=arguments,
+        contracts=contracts,
+        description=description,
+        # NOTE (mristin, 2022-03-19):
+        # We ignore the typing system for the moment and allow calls to
+        # super constructors in the statements. In the
+        # :py:func:`_second_pass_to_stack_constructors`, we will in-line them.
+        statements=constructor_statements,  # type: ignore
+        parsed=(parsed_class_init if parsed_class_init is not None else None),
+    )
+
+    return constructor
+
+
 def _to_class(
     parsed: parse.ClassUnion, constructor_statements: Sequence[construction.Statement]
 ) -> ClassUnion:
     """
     Translate a concrete parsed class to an intermediate class.
 
-    The ``constructor_statements`` is determined by the constructor table and is not
-    expected to be stacked yet.
+    The ``constructor_statements`` are determined by the constructor table. The calls
+    to super-constructors are not expected to be in-lined yet.
     """
     serialization = None  # type: Optional[Serialization]
     if parsed.serialization is not None:
@@ -867,39 +915,8 @@ def _to_class(
     for parsed_prop in parsed.properties:
         properties.append(_to_property(parsed=parsed_prop, cls=parsed))
 
-    contracts = Contracts(preconditions=[], snapshots=[], postconditions=[])
-    arguments = []  # type: List[Argument]
-    init_is_implementation_specific = False
-
-    parsed_class_init = parsed.methods_by_name.get(Identifier("__init__"), None)
-    if parsed_class_init is not None:
-        arguments = _to_arguments(parsed=parsed_class_init.arguments)
-
-        init_is_implementation_specific = isinstance(
-            parsed_class_init, parse.ImplementationSpecificMethod
-        )
-
-        contracts = _to_contracts(parsed_class_init.contracts)
-
-    constructor = Constructor(
-        is_implementation_specific=init_is_implementation_specific,
-        arguments=arguments,
-        contracts=contracts,
-        description=(
-            (
-                _to_description(parsed_class_init.description)
-                if parsed_class_init.description is not None
-                else None
-            )
-            if parsed_class_init is not None
-            else None
-        ),
-        # NOTE (mristin, 2022-03-19):
-        # We ignore the typing system for the moment and allow calls to
-        # super constructors in the statements. In the
-        # :py:func:`_second_pass_to_stack_constructors`, we will in-line them.
-        statements=constructor_statements,  # type: ignore
-        parsed=(parsed_class_init if parsed_class_init is not None else None),
+    constructor = _extract_constructor(
+        parsed_class=parsed, constructor_statements=constructor_statements
     )
 
     methods = []  # type: List[MethodUnion]
