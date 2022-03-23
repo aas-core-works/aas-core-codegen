@@ -1,6 +1,5 @@
 """Provide types of the intermediate representation."""
 import abc
-import ast
 import enum
 import pathlib
 from typing import (
@@ -14,6 +13,7 @@ from typing import (
     FrozenSet,
     Set,
     Tuple,
+    OrderedDict,
 )
 
 import docutils.nodes
@@ -204,14 +204,173 @@ def beneath_optional(
     return type_anno
 
 
-class Description:
-    """Represent a docstring describing something in the meta-model."""
+# region Descriptions
 
-    @require(lambda node: isinstance(node.value, str))
-    def __init__(self, document: docutils.nodes.document, node: ast.Constant) -> None:
+# NOTE (mristin, 2022-03-18):
+# We take C# documentation comments as an orientation for the structure of the
+# descriptions.
+
+
+def find_first_field_list(
+    element: docutils.nodes.Element,
+) -> Optional[docutils.nodes.field_list]:
+    """Find the first field list beneath the element or return None."""
+    return next(element.findall(condition=docutils.nodes.field_list), None)
+
+
+class SummaryRemarksDescription(DBC):
+    """Represent a description with a summary and remarks."""
+
+    #: Summary as the first line of the docstring
+    summary: Final[docutils.nodes.paragraph]
+
+    #: List of remarks following the summary in the docstring
+    remarks: Final[Sequence[docutils.nodes.Element]]
+
+    #: Original parsed description
+    parsed: Final[parse.Description]
+
+    # fmt: off
+    @require(
+        lambda summary:
+        find_first_field_list(summary) is None,
+        "Summary expected without field lists"
+    )
+    @require(
+        lambda remarks:
+        all(
+            find_first_field_list(remark) is None
+            for remark in remarks
+        ),
+        "Remarks expected without field lists"
+    )
+    # fmt: on
+    def __init__(
+        self,
+        summary: docutils.nodes.paragraph,
+        remarks: Sequence[docutils.nodes.Element],
+        parsed: parse.Description,
+    ) -> None:
         """Initialize with the given values."""
-        self.document = document
-        self.node = node
+        self.summary = summary
+        self.remarks = remarks
+        self.parsed = parsed
+
+    @abc.abstractmethod
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        raise NotImplementedError()
+
+
+# noinspection PyAbstractClass
+class SummaryRemarksConstraintsDescription(SummaryRemarksDescription):
+    """Represent a description with summary, remarks and constraints blocks."""
+
+    #: Map constraint documentation elements by their identifiers
+    constraints_by_identifier: Final[OrderedDict[str, docutils.nodes.field_body]]
+
+    # fmt: off
+    @require(
+        lambda constraints_by_identifier:
+        all(
+            find_first_field_list(body) is None
+            for body in constraints_by_identifier.values()
+        ),
+        "Constraint bodies expected without field lists"
+    )
+    # fmt: on
+    def __init__(
+        self,
+        summary: docutils.nodes.paragraph,
+        remarks: Sequence[docutils.nodes.Element],
+        constraints_by_identifier: OrderedDict[str, docutils.nodes.field_body],
+        parsed: parse.Description,
+    ) -> None:
+        """Initialize with the given values."""
+        SummaryRemarksDescription.__init__(
+            self, summary=summary, remarks=remarks, parsed=parsed
+        )
+        self.constraints_by_identifier = constraints_by_identifier
+
+
+class MetaModelDescription(SummaryRemarksConstraintsDescription):
+    """Represent a description of a meta-model."""
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
+
+
+class SymbolDescription(SummaryRemarksConstraintsDescription):
+    """Represent a description of a symbol."""
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
+
+
+class PropertyDescription(SummaryRemarksConstraintsDescription):
+    """Represent a documentation of a property."""
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
+
+
+class EnumerationLiteralDescription(SummaryRemarksDescription):
+    """Represent a documentation of an enumeration literal."""
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
+
+
+class SignatureDescription(SummaryRemarksDescription):
+    """Represent a documentation of a method or a function signature."""
+
+    #: Map argument documentation by the argument names
+    arguments_by_name: Final[OrderedDict[Identifier, docutils.nodes.field_body]]
+
+    #: Documentation of the return value, if written
+    returns: Final[Optional[docutils.nodes.field_body]]
+
+    # fmt: off
+    @require(
+        lambda arguments_by_name:
+        all(
+            find_first_field_list(body) is None
+            for body in arguments_by_name.values()
+        ),
+        "Argument descriptions expected without field lists"
+    )
+    @require(
+        lambda returns:
+        not (returns is not None)
+        or find_first_field_list(returns) is None,
+        "Return value description expected without field lists"
+    )
+    # fmt: on
+    def __init__(
+        self,
+        summary: docutils.nodes.paragraph,
+        remarks: Sequence[docutils.nodes.Element],
+        arguments_by_name: OrderedDict[Identifier, docutils.nodes.field_body],
+        returns: Optional[docutils.nodes.field_body],
+        parsed: parse.Description,
+    ) -> None:
+        """Initialize with the given values."""
+        SummaryRemarksDescription.__init__(
+            self, summary=summary, remarks=remarks, parsed=parsed
+        )
+        self.arguments_by_name = arguments_by_name
+        self.returns = returns
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
+
+
+# endregion
 
 
 class Property:
@@ -224,7 +383,7 @@ class Property:
     type_annotation: Final[TypeAnnotationUnion]
 
     #: Description of the property, if any
-    description: Final[Optional[Description]]
+    description: Final[Optional[PropertyDescription]]
 
     #: The original class where this property is specified.
     #: We stack all the properties over the ancestors, so using ``specified_for``
@@ -239,7 +398,7 @@ class Property:
         self,
         name: Identifier,
         type_annotation: TypeAnnotationUnion,
-        description: Optional[Description],
+        description: Optional[PropertyDescription],
         specified_for: "Class",
         parsed: parse.Property,
     ) -> None:
@@ -494,7 +653,7 @@ class SignatureLike(DBC):
     returns: Final[Optional[TypeAnnotationUnion]]
 
     #: Description of the signature-like, if any
-    description: Final[Optional[Description]]
+    description: Final[Optional[SignatureDescription]]
 
     #: List of contracts of the signature-like. The contracts are stacked from the
     #: ancestors.
@@ -544,7 +703,7 @@ class SignatureLike(DBC):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[Description],
+        description: Optional[SignatureDescription],
         contracts: Contracts,
         parsed: Optional[parse.Method],
     ) -> None:
@@ -615,7 +774,7 @@ class Method(SignatureLike):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[Description],
+        description: Optional[SignatureDescription],
         contracts: Contracts,
         parsed: parse.Method,
     ) -> None:
@@ -683,7 +842,7 @@ class UnderstoodMethod(Method):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[Description],
+        description: Optional[SignatureDescription],
         contracts: Contracts,
         body: Sequence[parse_tree.Node],
         parsed: parse.Method,
@@ -727,7 +886,7 @@ class Constructor(SignatureLike):
         is_implementation_specific: bool,
         arguments: Sequence[Argument],
         contracts: Contracts,
-        description: Optional[Description],
+        description: Optional[SignatureDescription],
         statements: Sequence[construction.AssignArgument],
         parsed: Optional[parse.Method],
     ) -> None:
@@ -758,7 +917,7 @@ class EnumerationLiteral:
         self,
         name: Identifier,
         value: str,
-        description: Optional[Description],
+        description: Optional[EnumerationLiteralDescription],
         parsed: parse.EnumerationLiteral,
     ) -> None:
         self.name = name
@@ -799,7 +958,7 @@ class Enumeration:
     reference_in_the_book: Final[Optional[ReferenceInTheBook]]
 
     #: Description of the enumeration, if any
-    description: Final[Optional[Description]]
+    description: Final[Optional[SymbolDescription]]
 
     #: Map literals by their identifiers
     literals_by_name: Final[Mapping[str, EnumerationLiteral]]
@@ -813,7 +972,7 @@ class Enumeration:
         literals: Sequence[EnumerationLiteral],
         is_superset_of: Sequence["Enumeration"],
         reference_in_the_book: Optional[ReferenceInTheBook],
-        description: Optional[Description],
+        description: Optional[SymbolDescription],
         parsed: parse.Enumeration,
     ) -> None:
         self.name = name
@@ -913,7 +1072,7 @@ class ConstrainedPrimitive:
     reference_in_the_book: Final[Optional[ReferenceInTheBook]]
 
     #: Description of the class
-    description: Final[Optional[Description]]
+    description: Final[Optional[SymbolDescription]]
 
     #: Relation to the class from the parse stage
     parsed: parse.Class
@@ -953,7 +1112,7 @@ class ConstrainedPrimitive:
         is_implementation_specific: bool,
         invariants: Sequence[Invariant],
         reference_in_the_book: Optional[ReferenceInTheBook],
-        description: Optional[Description],
+        description: Optional[SymbolDescription],
         parsed: parse.Class,
     ) -> None:
         self.name = name
@@ -1158,7 +1317,7 @@ class Class(DBC):
     reference_in_the_book: Final[Optional[ReferenceInTheBook]]
 
     #: Description of the class
-    description: Final[Optional[Description]]
+    description: Final[Optional[SymbolDescription]]
 
     #: Relation to the class from the parse stage
     parsed: Final[parse.Class]
@@ -1176,7 +1335,7 @@ class Class(DBC):
         invariants: Sequence[Invariant],
         serialization: Serialization,
         reference_in_the_book: Optional[ReferenceInTheBook],
-        description: Optional[Description],
+        description: Optional[SymbolDescription],
         parsed: parse.Class,
     ) -> None:
         """Initialize with the given values."""
@@ -1308,7 +1467,7 @@ class AbstractClass(Class):
         invariants: Sequence[Invariant],
         serialization: Serialization,
         reference_in_the_book: Optional[ReferenceInTheBook],
-        description: Optional[Description],
+        description: Optional[SymbolDescription],
         parsed: parse.Class,
     ) -> None:
         """Initialize with the given values."""
@@ -1371,7 +1530,7 @@ class Verification(SignatureLike):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[Description],
+        description: Optional[SignatureDescription],
         contracts: Contracts,
         parsed: parse.Method,
     ) -> None:
@@ -1400,7 +1559,7 @@ class ImplementationSpecificVerification(Verification):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[Description],
+        description: Optional[SignatureDescription],
         contracts: Contracts,
         parsed: parse.Method,
     ) -> None:
@@ -1456,7 +1615,7 @@ class PatternVerification(Verification):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[Description],
+        description: Optional[SignatureDescription],
         contracts: Contracts,
         pattern: str,
         parsed: parse.UnderstoodMethod,
@@ -1489,7 +1648,7 @@ class Signature(SignatureLike):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[Description],
+        description: Optional[SignatureDescription],
         contracts: Contracts,
         parsed: parse.Method,
     ) -> None:
@@ -1544,7 +1703,7 @@ class Interface:
     signatures: Final[Sequence[Signature]]
 
     #: Description of the interface, taken from class
-    description: Final[Optional[Description]]
+    description: Final[Optional[SymbolDescription]]
 
     #: Relation to the class from the parse stage
     parsed: Final[parse.Class]
@@ -1610,7 +1769,7 @@ class MetaModel:
     """Collect information about the underlying meta-model."""
 
     #: Description of the meta-model extracted from the docstring
-    description: Final[Optional[Description]]
+    description: Final[Optional[MetaModelDescription]]
 
     #: Specify the URL of the book that the meta-model is based on
     book_url: Final[str]
@@ -1619,7 +1778,10 @@ class MetaModel:
     book_version: Final[str]
 
     def __init__(
-        self, book_url: str, book_version: str, description: Optional[Description]
+        self,
+        book_url: str,
+        book_version: str,
+        description: Optional[MetaModelDescription],
     ) -> None:
         self.book_url = book_url
         self.book_version = book_version
@@ -1833,6 +1995,17 @@ def collect_ids_of_symbols_in_properties(symbol_table: SymbolTable) -> Set[int]:
 
     return result
 
+
+DescriptionUnion = Union[
+    MetaModelDescription,
+    SymbolDescription,
+    PropertyDescription,
+    EnumerationLiteralDescription,
+    SignatureDescription,
+]
+assert_union_of_descendants_exhaustive(
+    union=DescriptionUnion, base_class=SummaryRemarksDescription
+)
 
 ClassUnion = Union[AbstractClass, ConcreteClass]
 assert_union_of_descendants_exhaustive(union=ClassUnion, base_class=Class)

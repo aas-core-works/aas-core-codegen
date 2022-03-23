@@ -31,9 +31,12 @@ SymbolTable(
           returns=PrimitiveTypeAnnotation(
             a_type='INT',
             parsed=...),
-          description=Description(
-            document=...,
-            node=...),
+          description=SignatureDescription(
+            summary='<paragraph>Do something.</paragraph>',
+            remarks=[],
+            arguments_by_name=[],
+            returns=None,
+            parsed=...),
           contracts=Contracts(
             preconditions=[
               Contract(

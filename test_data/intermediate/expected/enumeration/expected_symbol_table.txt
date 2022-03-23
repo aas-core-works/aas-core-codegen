@@ -6,15 +6,18 @@ SymbolTable(
         EnumerationLiteral(
           name='some_literal',
           value='Some-Literal',
-          description=Description(
-            document=...,
-            node=...),
+          description=EnumerationLiteralDescription(
+            summary='<paragraph>Represent something.</paragraph>',
+            remarks=[],
+            parsed=...),
           parsed=...)],
       is_superset_of=[],
       reference_in_the_book=None,
-      description=Description(
-        document=...,
-        node=...),
+      description=SymbolDescription(
+        summary='<paragraph>Enumerate something.</paragraph>',
+        remarks=[],
+        constraints_by_identifier=[],
+        parsed=...),
       literals_by_name=...,
       literal_id_set=...,
       parsed=...)],

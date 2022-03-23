@@ -19,6 +19,7 @@ from typing import (
     Any,
     Set,
     Dict,
+    OrderedDict,
 )
 
 import asttokens
@@ -62,7 +63,6 @@ from aas_core_codegen.intermediate._types import (
     OurTypeAnnotation,
     STR_TO_PRIMITIVE_TYPE,
     PrimitiveTypeAnnotation,
-    Description,
     DefaultEnumerationLiteral,
     MetaModel,
     ImplementationSpecificMethod,
@@ -80,6 +80,14 @@ from aas_core_codegen.intermediate._types import (
     collect_ids_of_symbols_in_properties,
     SymbolExceptEnumeration,
     ReferenceInTheBook,
+    SignatureDescription,
+    MetaModelDescription,
+    SymbolDescription,
+    PropertyDescription,
+    EnumerationLiteralDescription,
+    DescriptionUnion,
+    find_first_field_list,
+    SummaryRemarksConstraintsDescription,
     MethodUnion,
 )
 from aas_core_codegen.parse import tree as parse_tree
@@ -230,20 +238,486 @@ docutils.parsers.rst.roles.register_local_role(
 )
 
 
-def _to_description(parsed: parse.Description) -> Description:
-    """Translate the parsed description to an intermediate form."""
-    # NOTE (mristin, 2021-09-16):
-    # This function makes a simple copy at the moment, which might seem pointless.
-    #
-    # However, we want to explicitly delineate layers (the parse and the intermediate
-    # layer, respectively). This simple copying thus helps the understanding
-    # of the general system and allows the reader to ignore, to a certain degree, the
-    # parse layer when examining the output of the intermediate layer.
+# region Descriptions
 
-    # This run-time check is necessary, we already burned our fingers.
-    assert parsed is not None
 
-    return Description(document=parsed.document, node=parsed.node)
+class _StructuredDescription:
+    """Represent a structured description extracted from a docstring."""
+
+    # fmt: off
+    @require(
+        lambda summary:
+        find_first_field_list(summary) is None,
+        "Summary expected without field lists"
+    )
+    @require(
+        lambda remarks:
+        all(
+            find_first_field_list(remark) is None
+            for remark in remarks
+        ),
+        "Remarks expected without field lists"
+    )
+    @require(
+        lambda fields_by_name:
+        all(
+            find_first_field_list(body) is None
+            for body in fields_by_name.values()
+        ),
+        "Field bodies expected without sub-field lists"
+    )
+    # fmt: on
+    def __init__(
+        self,
+        summary: docutils.nodes.paragraph,
+        remarks: List[docutils.nodes.Element],
+        fields_by_name: OrderedDict[str, docutils.nodes.field_body],
+    ) -> None:
+        """Initialize with the given values."""
+        self.summary = summary
+        self.remarks = remarks
+        self.fields_by_name = fields_by_name
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _extract_structured_description(
+    parsed: parse.Description,
+) -> Tuple[Optional[_StructuredDescription], Optional[List[Error]]]:
+    """Extract structured information from a description."""
+    if len(parsed.document.children) == 0:
+        return None, [Error(parsed.node, "Unexpected empty description")]
+
+    cursor = iter(parsed.document.children)
+    lookahead = next(cursor, None)
+
+    errors = []  # type: List[Error]
+
+    if not isinstance(lookahead, docutils.nodes.paragraph):
+        errors.append(
+            Error(
+                parsed.node,
+                f"Expected the first document element to be a summary and "
+                f"thus a paragraph, but got: {lookahead}",
+            )
+        )
+
+    # region Match
+
+    summary = lookahead
+    remarks = []  # type: List[docutils.nodes.Element]
+    field_list = None  # type: Optional[docutils.nodes.field_list]
+
+    lookahead = next(cursor, None)
+    while lookahead is not None:
+        if isinstance(lookahead, docutils.nodes.field_list):
+            field_list = lookahead
+        else:
+            assert lookahead is not None
+            remarks.append(lookahead)
+
+        lookahead = next(cursor, None)
+
+    if field_list is not None and lookahead is not None:
+        errors.append(
+            Error(
+                parsed.node,
+                f"Expected no document elements after the field list, "
+                f"but got: {lookahead}",
+            )
+        )
+
+    # endregion
+
+    # region Check summary and remarks
+
+    assert summary is not None
+
+    field_list_in_summary = next(summary.findall(docutils.nodes.field_list), None)
+    if field_list_in_summary is not None:
+        errors.append(
+            Error(
+                parsed.node,
+                f"Expected no field lists in the summary, "
+                f"but the summary contains one: {field_list_in_summary}",
+            )
+        )
+
+    for i, remark in enumerate(remarks):
+        field_list_in_remark = next(remark.findall(docutils.nodes.field_list), None)
+        if field_list_in_remark is not None:
+            errors.append(
+                Error(
+                    parsed.node,
+                    f"Expected no field lists in remarks, "
+                    f"but the remark {i + 1} contains one: {field_list_in_remark}",
+                )
+            )
+
+    # endregion
+
+    # region Transform the field list to an ordered dictionary
+
+    fields_by_name = (
+        collections.OrderedDict()
+    )  # type: OrderedDict[str, docutils.nodes.field_body]
+
+    if field_list is not None:
+        for field in field_list.children:
+            if len(field.children) != 2:
+                errors.append(
+                    Error(
+                        parsed.node,
+                        f"Expected exactly two document elements in a field, "
+                        f"but got {len(field.children)}: {field}",
+                    )
+                )
+                continue
+
+            field_name, field_body = field.children
+            if not isinstance(field_name, docutils.nodes.field_name):
+                errors.append(
+                    Error(
+                        parsed.node,
+                        f"Expected the field name to be a ``field_name``, "
+                        f"but got {type(field_name)} : {field_name}",
+                    )
+                )
+                continue
+            if not isinstance(field_body, docutils.nodes.field_body):
+                errors.append(
+                    Error(
+                        parsed.node,
+                        f"Expected the field body to be a ``field_body``, "
+                        f"but got {type(field_body)} : {field_body}",
+                    )
+                )
+                continue
+
+            assert isinstance(field_name, docutils.nodes.field_name)
+            assert isinstance(field_body, docutils.nodes.field_body)
+
+            if len(field_name.children) != 1:
+                errors.append(
+                    Error(
+                        parsed.node,
+                        f"Expected exactly one sub-element in the field name, "
+                        f"but got {len(field_name.children)} : {field_name}",
+                    )
+                )
+                continue
+
+            if not isinstance(field_name.children[0], docutils.nodes.Text):
+                errors.append(
+                    Error(
+                        parsed.node,
+                        f"Expected the field name to be text, "
+                        f"but got {type(field_name.children[0])} : {field_name}",
+                    )
+                )
+                continue
+
+            name = field_name.children[0].astext()
+
+            field_list_in_body = next(
+                field_body.findall(condition=docutils.nodes.field_list), None
+            )
+
+            if field_list_in_body is not None:
+                errors.append(
+                    Error(
+                        parsed.node,
+                        f"Expected no nested field lists, "
+                        f"but got a field list nested "
+                        f"under the field {name} : {field_list_in_body}",
+                    )
+                )
+                continue
+
+            fields_by_name[name] = field_body
+
+    # endregion
+
+    if len(errors) > 0:
+        return None, errors
+
+    return (
+        _StructuredDescription(
+            summary=summary, remarks=remarks, fields_by_name=fields_by_name
+        ),
+        None,
+    )
+
+
+_SummaryRemarksConstraintsDescriptionT = TypeVar(
+    "_SummaryRemarksConstraintsDescriptionT", bound=SummaryRemarksConstraintsDescription
+)
+
+
+def _to_summary_remarks_constraints_description(
+    parsed: parse.Description, factory: Type[_SummaryRemarksConstraintsDescriptionT]
+) -> Tuple[Optional[_SummaryRemarksConstraintsDescriptionT], Optional[List[Error]]]:
+    """Translate the description and produce the instance using the ``factory``."""
+    structured_desc, structured_desc_errors = _extract_structured_description(
+        parsed=parsed
+    )
+    if structured_desc_errors is not None:
+        return None, structured_desc_errors
+
+    assert structured_desc is not None
+
+    errors = []  # type: List[Error]
+
+    constraints_by_identifier = (
+        collections.OrderedDict()
+    )  # type: OrderedDict[str, docutils.nodes.field_body]
+
+    for name, body in structured_desc.fields_by_name.items():
+        parts = name.split()
+        if len(parts) != 2:
+            errors.append(
+                Error(
+                    parsed.node,
+                    f"Expected only directives such as "
+                    f"``constraint some-identifier`` "
+                    f"in this context, but got a directive with {len(parts)} part(s): "
+                    f"{name}",
+                )
+            )
+            continue
+
+        if parts[0].lower() != "constraint":
+            errors.append(
+                Error(
+                    parsed.node,
+                    f"Expected only directives such as "
+                    f"``constraint some-identifier`` "
+                    f"in this context, but got a directive with "
+                    f"the first part {parts[0]!r}: {name}",
+                )
+            )
+            continue
+
+        constraint_id = parts[1]
+
+        if constraint_id in constraints_by_identifier:
+            errors.append(
+                Error(
+                    parsed.node,
+                    f"Expected all constraints to have unique identifiers, "
+                    f"but two or more constraints share the identifier: {constraint_id}",
+                )
+            )
+
+        constraints_by_identifier[constraint_id] = body
+
+    if len(errors) > 0:
+        return None, errors
+
+    return (
+        factory(
+            summary=structured_desc.summary,
+            remarks=structured_desc.remarks,
+            constraints_by_identifier=constraints_by_identifier,
+            parsed=parsed,
+        ),
+        None,
+    )
+
+
+def _to_meta_model_description(
+    parsed: parse.Description,
+) -> Tuple[Optional[MetaModelDescription], Optional[List[Error]]]:
+    """Structure the information from the docstring of the meta-model."""
+    return _to_summary_remarks_constraints_description(
+        parsed=parsed, factory=MetaModelDescription
+    )
+
+
+def _to_symbol_description(
+    parsed: parse.Description,
+) -> Tuple[Optional[SymbolDescription], Optional[List[Error]]]:
+    """Structure the information from the docstring of a symbol."""
+    return _to_summary_remarks_constraints_description(
+        parsed=parsed, factory=SymbolDescription
+    )
+
+
+def _to_property_description(
+    parsed: parse.Description,
+) -> Tuple[Optional[PropertyDescription], Optional[List[Error]]]:
+    """Translate the description into a structured property description."""
+    return _to_summary_remarks_constraints_description(
+        parsed=parsed, factory=PropertyDescription
+    )
+
+
+def _to_enumeration_literal_description(
+    parsed: parse.Description,
+) -> Tuple[Optional[EnumerationLiteralDescription], Optional[List[Error]]]:
+    """Translate ``parsed`` into a structured description of an enumeration literal."""
+    structured_desc, structured_desc_errors = _extract_structured_description(
+        parsed=parsed
+    )
+    if structured_desc_errors is not None:
+        return None, structured_desc_errors
+    assert structured_desc is not None
+
+    field_list = next(parsed.document.findall(docutils.nodes.field_list), None)
+    if field_list is not None:
+        return None, [
+            Error(
+                parsed.node,
+                f"Expected no field list in a description of an enumeration literal, "
+                f"but got at least one: {field_list}",
+            )
+        ]
+
+    assert (
+        len(structured_desc.fields_by_name) == 0
+    ), "Expected to match the previous findall"
+
+    return (
+        EnumerationLiteralDescription(
+            summary=structured_desc.summary,
+            remarks=structured_desc.remarks,
+            parsed=parsed,
+        ),
+        None,
+    )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _to_signature_description(
+    parsed: parse.Description,
+    arguments: Sequence["Argument"],
+    returns: Optional[TypeAnnotationUnion],
+) -> Tuple[Optional[SignatureDescription], Optional[List[Error]]]:
+    """Translate ``parsed`` into a structured description of a signature."""
+    structured_desc, structured_desc_errors = _extract_structured_description(
+        parsed=parsed
+    )
+    if structured_desc_errors is not None:
+        return None, structured_desc_errors
+    assert structured_desc is not None
+
+    errors = []  # type: List[Error]
+
+    argument_descriptions_by_name = (
+        collections.OrderedDict()
+    )  # type: OrderedDict[Identifier, docutils.nodes.field_body]
+
+    returns_description = None  # type: Optional[docutils.nodes.field_body]
+
+    for name, body in structured_desc.fields_by_name.items():
+        parts = name.split()
+        if len(parts) > 2:
+            errors.append(
+                Error(
+                    parsed.node, f"Unexpected field name with more than 2 parts: {name}"
+                )
+            )
+            continue
+
+        directive = parts[0]
+        if directive.lower() == "param":
+            arg_name = parts[1]
+            if not IDENTIFIER_RE.fullmatch(arg_name):
+                errors.append(
+                    Error(
+                        parsed.node,
+                        f"Expected the argument name to be a valid identifier, "
+                        f"but got: {arg_name}",
+                    )
+                )
+                continue
+
+            if arg_name in argument_descriptions_by_name:
+                errors.append(
+                    Error(
+                        parsed.node,
+                        f"Expected non-duplicate argument descriptions, "
+                        f"but got two or more for the argument {arg_name!r}",
+                    )
+                )
+                continue
+
+            argument_descriptions_by_name[Identifier(arg_name)] = body
+
+        elif directive.lower() in ("return", "returns"):
+            if len(parts) > 1:
+                errors.append(
+                    Error(
+                        parsed.node,
+                        f"Expected return field without additional parts, "
+                        f"but got: {parts[1:]}",
+                    )
+                )
+                continue
+
+            if returns_description is not None:
+                errors.append(
+                    Error(
+                        parsed.node,
+                        "Expected a single ``return`` field, but got two or more",
+                    )
+                )
+                continue
+
+            returns_description = body
+        else:
+            errors.append(Error(parsed.node, f"Unexpected field: {name}"))
+            continue
+
+    if returns is None and returns_description is not None:
+        errors.append(
+            Error(
+                parsed.node,
+                f"No return value is specified, "
+                f"but the return value is in the description: {returns_description}",
+            )
+        )
+
+    arg_name_set = {arg.name for arg in arguments}
+    for arg_name, arg_description in argument_descriptions_by_name.items():
+        if arg_name not in arg_name_set:
+            errors.append(
+                Error(
+                    parsed.node,
+                    f"The argument {arg_name} has not been specified, "
+                    f"but is listed in the description: {arg_description}",
+                )
+            )
+
+    description = SignatureDescription(
+        summary=structured_desc.summary,
+        remarks=structured_desc.remarks,
+        arguments_by_name=argument_descriptions_by_name,
+        returns=returns_description,
+        parsed=parsed,
+    )
+
+    for arg_ref_in_doc, _ in _find_all_in_signature_description(
+        element_type=doc.ArgumentReference, signature_description=description
+    ):
+        assert isinstance(arg_ref_in_doc.reference, str)
+
+        arg_name = arg_ref_in_doc.reference
+        if arg_name not in arg_name_set:
+            errors.append(
+                Error(
+                    parsed.node,
+                    f"The argument referenced in the description "
+                    f"is not listed as an argument: {arg_name!r}",
+                )
+            )
+
+    if len(errors) > 0:
+        return None, errors
+
+    return description, None
+
+
+# endregion
 
 
 class _PlaceholderSymbol:
@@ -265,52 +739,86 @@ def _propagate_parsed_reference_in_the_book(
     )
 
 
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _to_enumeration_literal(
     parsed: parse.EnumerationLiteral,
-) -> EnumerationLiteral:
+) -> Tuple[Optional[EnumerationLiteral], Optional[List[Error]]]:
     """Translate the enumeration literal from the meta-model."""
-    return EnumerationLiteral(
-        name=parsed.name,
-        value=parsed.value,
-        description=(
-            _to_description(parsed.description)
-            if parsed.description is not None
-            else None
-        ),
-        parsed=parsed,
-    )
+    description = None  # type: Optional[EnumerationLiteralDescription]
 
-
-def _to_enumeration(parsed: parse.Enumeration) -> Enumeration:
-    """Translate an enumeration from the meta-model to an intermediate enumeration."""
-    description = (
-        _to_description(parsed.description) if parsed.description is not None else None
-    )
-
-    literals = [
-        _to_enumeration_literal(parsed_literal) for parsed_literal in parsed.literals
-    ]
-
-    return Enumeration(
-        name=parsed.name,
-        literals=literals,
-        # NOTE (mristin, 2021-12-27):
-        # Postpone the resolution to the second pass once the symbol table has been
-        # completely built
-        is_superset_of=cast(
-            List[Enumeration],
-            [
-                _PlaceholderSymbol(name=identifier)
-                for identifier in parsed.is_superset_of
-            ],
-        ),
-        reference_in_the_book=_propagate_parsed_reference_in_the_book(
-            parsed.reference_in_the_book
+    if parsed.description is not None:
+        description, description_errors = _to_enumeration_literal_description(
+            parsed.description
         )
-        if parsed.reference_in_the_book is not None
-        else None,
-        description=description,
-        parsed=parsed,
+        if description_errors is not None:
+            return None, description_errors
+
+    return (
+        EnumerationLiteral(
+            name=parsed.name,
+            value=parsed.value,
+            description=description,
+            parsed=parsed,
+        ),
+        None,
+    )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _to_enumeration(
+    parsed: parse.Enumeration,
+) -> Tuple[Optional[Enumeration], Optional[List[Error]]]:
+    """Translate an enumeration from the meta-model to an intermediate enumeration."""
+    errors = []  # type: List[Error]
+
+    description = None  # type: Optional[SymbolDescription]
+    if parsed.description is not None:
+        description, description_errors = _to_symbol_description(parsed.description)
+        if description_errors is not None:
+            errors.extend(description_errors)
+
+    literals = []  # type: List[EnumerationLiteral]
+    for parsed_literal in parsed.literals:
+        literal, literal_errors = _to_enumeration_literal(parsed_literal)
+        if literal_errors is not None:
+            errors.append(
+                Error(
+                    parsed_literal.node,
+                    f"Failed to parse the enumeration literal {parsed_literal.name!r}",
+                    literal_errors,
+                )
+            )
+            continue
+
+        assert literal is not None
+        literals.append(literal)
+
+    if len(errors) > 0:
+        return None, errors
+
+    return (
+        Enumeration(
+            name=parsed.name,
+            literals=literals,
+            # NOTE (mristin, 2021-12-27):
+            # Postpone the resolution to the second pass once the symbol table has been
+            # completely built
+            is_superset_of=cast(
+                List[Enumeration],
+                [
+                    _PlaceholderSymbol(name=identifier)
+                    for identifier in parsed.is_superset_of
+                ],
+            ),
+            reference_in_the_book=_propagate_parsed_reference_in_the_book(
+                parsed.reference_in_the_book
+            )
+            if parsed.reference_in_the_book is not None
+            else None,
+            description=description,
+            parsed=parsed,
+        ),
+        None,
     )
 
 
@@ -412,23 +920,32 @@ def _to_arguments(parsed: Sequence[parse.Argument]) -> List[Argument]:
     ]
 
 
-def _to_property(parsed: parse.Property, cls: parse.Class) -> Property:
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _to_property(
+    parsed: parse.Property, cls: parse.Class
+) -> Tuple[Optional[Property], Optional[List[Error]]]:
     """Translate a parsed property of a class to an intermediate one."""
+    description = None  # type: Optional[PropertyDescription]
+
+    if parsed.description is not None:
+        description, description_errors = _to_property_description(parsed.description)
+        if description_errors is not None:
+            return None, description_errors
+
     # noinspection PyTypeChecker
-    return Property(
-        name=parsed.name,
-        type_annotation=_to_type_annotation(parsed.type_annotation),
-        description=(
-            _to_description(parsed.description)
-            if parsed.description is not None
-            else None
+    return (
+        Property(
+            name=parsed.name,
+            type_annotation=_to_type_annotation(parsed.type_annotation),
+            description=description,
+            # NOTE (mristin, 2021-12-26):
+            # We can only resolve the ``specified_for`` when the class is actually
+            # created. Therefore, we assign here a placeholder and fix it later in a second
+            # pass.
+            specified_for=_PlaceholderSymbol(cls.name),  # type: ignore
+            parsed=parsed,
         ),
-        # NOTE (mristin, 2021-12-26):
-        # We can only resolve the ``specified_for`` when the class is actually
-        # created. Therefore, we assign here a placeholder and fix it later in a second
-        # pass.
-        specified_for=_PlaceholderSymbol(cls.name),  # type: ignore
-        parsed=parsed,
+        None,
     )
 
 
@@ -481,42 +998,54 @@ def _to_contracts(parsed: parse.Contracts) -> Contracts:
     not parsed.verification,
     "Expected only non-verification methods"
 )
-# fmt: on
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _to_method(
-    parsed: Union[parse.UnderstoodMethod, parse.ImplementationSpecificMethod]
-) -> Union[UnderstoodMethod, ImplementationSpecificMethod]:
+        parsed: Union[parse.UnderstoodMethod, parse.ImplementationSpecificMethod]
+) -> Tuple[
+    Optional[Union[UnderstoodMethod, ImplementationSpecificMethod]],
+    Optional[List[Error]]
+]:
     """Translate the parsed method into an intermediate representation."""
+    arguments = _to_arguments(parsed=parsed.arguments)
+
+    returns = (
+        None
+        if parsed.returns is None
+        else _to_type_annotation(parsed.returns)
+    )
+
+    # fmt: on
+    description = None  # type: Optional[SignatureDescription]
+    if parsed.description:
+        description, description_errors = _to_signature_description(
+            parsed=parsed.description,
+            arguments=arguments,
+            returns=returns
+        )
+        if description_errors is not None:
+            return None, description_errors
+
+    contracts = _to_contracts(parsed.contracts)
+
     if isinstance(parsed, parse.ImplementationSpecificMethod):
         return ImplementationSpecificMethod(
             name=parsed.name,
-            arguments=_to_arguments(parsed=parsed.arguments),
-            returns=(
-                None if parsed.returns is None else _to_type_annotation(parsed.returns)
-            ),
-            description=(
-                _to_description(parsed.description)
-                if parsed.description is not None
-                else None
-            ),
-            contracts=_to_contracts(parsed.contracts),
+            arguments=arguments,
+            returns=returns,
+            description=description,
+            contracts=contracts,
             parsed=parsed,
-        )
+        ), None
     elif isinstance(parsed, parse.UnderstoodMethod):
         return UnderstoodMethod(
             name=parsed.name,
-            arguments=_to_arguments(parsed=parsed.arguments),
-            returns=(
-                None if parsed.returns is None else _to_type_annotation(parsed.returns)
-            ),
-            description=(
-                _to_description(parsed.description)
-                if parsed.description is not None
-                else None
-            ),
-            contracts=_to_contracts(parsed.contracts),
+            arguments=arguments,
+            returns=returns,
+            description=description,
+            contracts=contracts,
             body=parsed.body,
             parsed=parsed,
-        )
+        ), None
     else:
         assert_never(parsed)
 
@@ -796,6 +1325,13 @@ def _to_constrained_primitive(
         for parsed_invariant in parsed.invariants
     ]
 
+    description = None  # type: Optional[SymbolDescription]
+
+    if parsed.description is not None:
+        description, description_errors = _to_symbol_description(parsed.description)
+        if description_errors is not None:
+            return None, description_errors
+
     # noinspection PyTypeChecker
     return (
         ConstrainedPrimitive(
@@ -813,11 +1349,7 @@ def _to_constrained_primitive(
             )
             if parsed.reference_in_the_book is not None
             else None,
-            description=(
-                _to_description(parsed.description)
-                if parsed.description is not None
-                else None
-            ),
+            description=description,
             parsed=parsed,
         ),
         None,
@@ -833,10 +1365,11 @@ class _MaybeInterfacePlaceholder:
     """
 
 
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _extract_constructor(
     parsed_class: parse.ClassUnion,
     constructor_statements: Sequence[construction.Statement],
-) -> Constructor:
+) -> Tuple[Optional[Constructor], Optional[List[Error]]]:
     """
     Extract the constructor from the given ``parsed_class``.
 
@@ -846,7 +1379,9 @@ def _extract_constructor(
     contracts = Contracts(preconditions=[], snapshots=[], postconditions=[])
     arguments = []  # type: List[Argument]
     init_is_implementation_specific = False
-    description = None  # type: Optional[Description]
+    description = None  # type: Optional[SignatureDescription]
+
+    errors = []  # type: List[Error]
 
     parsed_class_init = parsed_class.methods_by_name.get(Identifier("__init__"), None)
     if parsed_class_init is not None:
@@ -859,11 +1394,14 @@ def _extract_constructor(
         contracts = _to_contracts(parsed_class_init.contracts)
 
         if parsed_class_init.description is not None:
-            description = (
-                _to_description(parsed_class_init.description)
-                if parsed_class_init.description is not None
-                else None
+            (description, description_errors,) = _to_signature_description(
+                parsed=parsed_class_init.description, arguments=arguments, returns=None
             )
+            if description_errors is not None:
+                errors.extend(description_errors)
+
+    if len(errors) > 0:
+        return None, errors
 
     constructor = Constructor(
         is_implementation_specific=init_is_implementation_specific,
@@ -878,12 +1416,13 @@ def _extract_constructor(
         parsed=(parsed_class_init if parsed_class_init is not None else None),
     )
 
-    return constructor
+    return constructor, None
 
 
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _to_class(
     parsed: parse.ClassUnion, constructor_statements: Sequence[construction.Statement]
-) -> ClassUnion:
+) -> Tuple[Optional[ClassUnion], Optional[List[Error]]]:
     """
     Translate a concrete parsed class to an intermediate class.
 
@@ -911,13 +1450,35 @@ def _to_class(
         for parsed_invariant in parsed.invariants
     ]
 
+    errors = []  # type: List[Error]
+
     properties = []  # type: List[Property]
     for parsed_prop in parsed.properties:
-        properties.append(_to_property(parsed=parsed_prop, cls=parsed))
+        prop, prop_errors = _to_property(parsed=parsed_prop, cls=parsed)
+        if prop_errors is not None:
+            errors.append(
+                Error(
+                    parsed_prop.node,
+                    f"Failed to parse the property {parsed_prop.name!r}",
+                    prop_errors,
+                )
+            )
+            continue
 
-    constructor = _extract_constructor(
+        assert prop is not None
+        properties.append(prop)
+
+    constructor, constructor_errors = _extract_constructor(
         parsed_class=parsed, constructor_statements=constructor_statements
     )
+    if constructor_errors is not None:
+        errors.append(
+            Error(
+                parsed.node,
+                f"Failed to parsed the constructor of the class {parsed.name!r}",
+                constructor_errors,
+            )
+        )
 
     methods = []  # type: List[MethodUnion]
     for parsed_method in parsed.methods:
@@ -928,7 +1489,32 @@ def _to_class(
             # :py:class:`Constructors`.
             continue
 
-        methods.append(_to_method(parsed=parsed_method))
+        method, method_errors = _to_method(parsed=parsed_method)
+        if method_errors is not None:
+            errors.append(
+                Error(
+                    parsed_method.node,
+                    f"Failed to parse the method {parsed_method.name!r}",
+                    method_errors,
+                )
+            )
+            continue
+
+        assert method is not None
+        methods.append(method)
+
+    description = None  # type: Optional[SymbolDescription]
+    if parsed.description is not None:
+        description, description_errors = _to_symbol_description(
+            parsed=parsed.description
+        )
+        if description_errors is not None:
+            errors.extend(description_errors)
+
+    if len(errors) > 0:
+        return None, errors
+
+    assert constructor is not None
 
     factory_to_use = None  # type: Optional[Type[Class]]
 
@@ -942,33 +1528,32 @@ def _to_class(
     assert factory_to_use is not None
 
     # noinspection PyTypeChecker
-    return factory_to_use(
-        name=parsed.name,
-        # Use a placeholder for inheritances, descendants and the interface as we can
-        # not resolve inheritances at this point
-        inheritances=[],
-        interface=_MaybeInterfacePlaceholder(),  # type: ignore
-        descendants=[],
-        is_implementation_specific=parsed.is_implementation_specific,
-        properties=properties,
-        methods=methods,
-        constructor=constructor,
-        invariants=invariants,
-        # We allow temporarily the ``serialization`` to be possibly None since we
-        # have to resolve it in the second pass in
-        # :py:func:`_second_pass_to_stack_serializations`.
-        serialization=serialization,  # type: ignore
-        reference_in_the_book=_propagate_parsed_reference_in_the_book(
-            parsed=parsed.reference_in_the_book
-        )
-        if parsed.reference_in_the_book is not None
-        else None,
-        description=(
-            _to_description(parsed.description)
-            if parsed.description is not None
-            else None
+    return (
+        factory_to_use(
+            name=parsed.name,
+            # Use a placeholder for inheritances, descendants and the interface as we can
+            # not resolve inheritances at this point
+            inheritances=[],
+            interface=_MaybeInterfacePlaceholder(),  # type: ignore
+            descendants=[],
+            is_implementation_specific=parsed.is_implementation_specific,
+            properties=properties,
+            methods=methods,
+            constructor=constructor,
+            invariants=invariants,
+            # We allow temporarily the ``serialization`` to be possibly None since we
+            # have to resolve it in the second pass in
+            # :py:func:`_second_pass_to_stack_serializations`.
+            serialization=serialization,  # type: ignore
+            reference_in_the_book=_propagate_parsed_reference_in_the_book(
+                parsed=parsed.reference_in_the_book
+            )
+            if parsed.reference_in_the_book is not None
+            else None,
+            description=description,
+            parsed=parsed,
         ),
-        parsed=parsed,
+        None,
     )
 
 
@@ -987,17 +1572,28 @@ def _to_class(
 # fmt: on
 def _to_verification_function(
     parsed: parse.FunctionUnion,
-) -> Tuple[Optional[VerificationUnion], Optional[Error]]:
+) -> Tuple[Optional[VerificationUnion], Optional[List[Error]]]:
     """Translate the verification function and try to understand it, if necessary."""
     name = parsed.name
     arguments = _to_arguments(parsed=parsed.arguments)
     returns = None if parsed.returns is None else _to_type_annotation(parsed.returns)
-    description = (
-        _to_description(parsed.description) if parsed.description is not None else None
-    )
+
+    errors = []  # type: List[Error]
+
+    description = None  # type: Optional[SignatureDescription]
+    if parsed.description is not None:
+        description, description_errors = _to_signature_description(
+            parsed=parsed.description, arguments=arguments, returns=returns
+        )
+        if description_errors is not None:
+            errors.extend(description_errors)
+
     contracts = _to_contracts(parsed.contracts)
 
     if isinstance(parsed, parse.ImplementationSpecificMethod):
+        if len(errors) > 0:
+            return None, errors
+
         return (
             ImplementationSpecificVerification(
                 name=name,
@@ -1016,7 +1612,8 @@ def _to_verification_function(
         )
 
         if fatal_error is not None:
-            return None, fatal_error
+            errors.append(fatal_error)
+            return None, errors
 
         # NOTE (mristin, 2021-01-02):
         # Since we only have a single rule, we also return an ``ok_error`` as critical
@@ -1026,8 +1623,7 @@ def _to_verification_function(
         # functions.
 
         if ok_error is not None:
-            return (
-                None,
+            errors.append(
                 Error(
                     parsed.node,
                     f"We do not know how to interpret the verification function {name!r} "
@@ -1037,6 +1633,9 @@ def _to_verification_function(
                     [ok_error],
                 ),
             )
+
+        if len(errors) > 0:
+            return None, errors
 
         assert pattern is not None
 
@@ -1054,28 +1653,34 @@ def _to_verification_function(
         )
 
     elif isinstance(parsed, parse.ConstructorToBeUnderstood):
-        return (
-            None,
-            Error(parsed.node, "Unexpected constructor as a verification function"),
+        errors.append(
+            Error(parsed.node, "Unexpected constructor as a verification function")
         )
+        return None, errors
     else:
         assert_never(parsed)
 
     raise AssertionError("Should not have gotten here")
 
 
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _to_meta_model(
     parsed: parse.MetaModel,
-) -> MetaModel:
+) -> Tuple[Optional[MetaModel], Optional[List[Error]]]:
     """Translate the meta-model meta-data."""
-    return MetaModel(
-        book_url=parsed.book_url,
-        book_version=parsed.book_version,
-        description=(
-            _to_description(parsed.description)
-            if parsed.description is not None
-            else None
+    description = None  # type: Optional[MetaModelDescription]
+    if parsed.description is not None:
+        description, description_errors = _to_meta_model_description(parsed.description)
+        if description_errors is not None:
+            return None, description_errors
+
+    return (
+        MetaModel(
+            book_url=parsed.book_url,
+            book_version=parsed.book_version,
+            description=description,
         ),
+        None,
     )
 
 
@@ -1164,9 +1769,97 @@ def _second_pass_to_resolve_symbols_in_atomic_types_in_place(
 _DocElementT = TypeVar("_DocElementT", bound=docutils.nodes.Element)
 
 
+def _find_all_in_symbol_description(
+    element_type: Type[_DocElementT], symbol_description: SymbolDescription
+) -> Iterator[Tuple[_DocElementT, DescriptionUnion]]:
+    """Iterate over all the fields of the description and yield the desired elements."""
+    for element in symbol_description.summary.findall(element_type):
+        yield element, symbol_description
+
+    for remark in symbol_description.remarks:
+        for element in remark.findall(element_type):
+            yield element, symbol_description
+
+    for constraint in symbol_description.constraints_by_identifier.values():
+        for element in constraint.findall(element_type):
+            yield element, symbol_description
+
+
+def _find_all_in_enumeration_literal_description(
+    element_type: Type[_DocElementT],
+    enumeration_literal_description: EnumerationLiteralDescription,
+) -> Iterator[Tuple[_DocElementT, DescriptionUnion]]:
+    """Iterate over all the fields of the description and yield the desired elements."""
+    for element in enumeration_literal_description.summary.findall(element_type):
+        yield element, enumeration_literal_description
+
+    for remark in enumeration_literal_description.remarks:
+        for element in remark.findall(element_type):
+            yield element, enumeration_literal_description
+
+
+def _find_all_in_property_description(
+    element_type: Type[_DocElementT], property_description: PropertyDescription
+) -> Iterator[Tuple[_DocElementT, DescriptionUnion]]:
+    """Iterate over all the fields of the description and yield the desired elements."""
+    for element in property_description.summary.findall(element_type):
+        yield element, property_description
+
+    for remark in property_description.remarks:
+        for element in remark.findall(element_type):
+            yield element, property_description
+
+
+def _find_all_in_signature_description(
+    element_type: Type[_DocElementT], signature_description: SignatureDescription
+) -> Iterator[Tuple[_DocElementT, DescriptionUnion]]:
+    """
+    Iterate over all the fields of the description and yield the desired elements.
+
+    We also return the description for the client to report errors etc.
+    """
+    for element in signature_description.summary.findall(element_type):
+        yield element, signature_description
+
+    for element in signature_description.summary.findall(element_type):
+        yield element, signature_description
+
+    for remark in signature_description.remarks:
+        for element in remark.findall(element_type):
+            yield element, signature_description
+
+    for arg_description in signature_description.arguments_by_name.values():
+        for element in arg_description.findall(element_type):
+            yield element, signature_description
+
+    if signature_description.returns is not None:
+        for element in signature_description.returns.findall(element_type):
+            yield element, signature_description
+
+
+def _find_all_in_meta_model_description(
+    element_type: Type[_DocElementT], meta_model_description: MetaModelDescription
+) -> Iterator[Tuple[_DocElementT, DescriptionUnion]]:
+    """
+    Iterate over all the fields of the description and yield the desired elements.
+
+    We also return the description for the client to report errors etc.
+    """
+    for element in meta_model_description.summary.findall(element_type):
+        yield element, meta_model_description
+
+    for remark in meta_model_description.remarks:
+        for element in remark.findall(element_type):
+            yield element, meta_model_description
+
+    for constraint in meta_model_description.constraints_by_identifier.values():
+        for element in constraint.findall(element_type):
+            yield element, meta_model_description
+
+
 def _find_all_in_descriptions(
     element_type: Type[_DocElementT], symbol_table: SymbolTable
-) -> Iterator[Tuple[_DocElementT, Description, Optional[Symbol]]]:
+) -> Iterator[Tuple[_DocElementT, DescriptionUnion, Optional[Symbol]]]:
     """
     Iterate over the descriptions and yield the desired documentation elements.
 
@@ -1177,48 +1870,62 @@ def _find_all_in_descriptions(
     verification functions, no symbol is yielded.
     """
     for symbol in symbol_table.symbols:
-        if isinstance(symbol, Enumeration):
-            if symbol.description is not None:
-                for element in symbol.description.document.findall(element_type):
-                    yield element, symbol.description, symbol
+        if symbol.description is not None:
+            for element, description in _find_all_in_symbol_description(
+                element_type=element_type, symbol_description=symbol.description
+            ):
+                yield element, description, symbol
 
+        if isinstance(symbol, Enumeration):
             for literal in symbol.literals:
                 if literal.description is not None:
-                    for element in literal.description.document.findall(element_type):
-                        yield element, literal.description, symbol
+                    for (
+                        element,
+                        description,
+                    ) in _find_all_in_enumeration_literal_description(
+                        element_type=element_type,
+                        enumeration_literal_description=literal.description,
+                    ):
+                        yield element, description, symbol
 
         elif isinstance(symbol, ConstrainedPrimitive):
-            if symbol.description is not None:
-                for element in symbol.description.document.findall(element_type):
-                    yield element, symbol.description, symbol
+            # No special sub-descriptions in the constrained primitive
+            pass
 
-        elif isinstance(symbol, Class):
-            if symbol.description is not None:
-                for element in symbol.description.document.findall(element_type):
-                    yield element, symbol.description, symbol
-
+        elif isinstance(symbol, (AbstractClass, ConcreteClass)):
             for prop in symbol.properties:
                 if prop.description is not None:
-                    for element in prop.description.document.findall(element_type):
-                        yield element, prop.description, symbol
+                    for element, description in _find_all_in_property_description(
+                        element_type=element_type, property_description=prop.description
+                    ):
+                        yield element, description, symbol
 
             for method in symbol.methods:
                 if method.description is not None:
-                    for element in method.description.document.findall(element_type):
-                        yield element, method.description, symbol
+                    for element, description in _find_all_in_signature_description(
+                        element_type=element_type,
+                        signature_description=method.description,
+                    ):
+                        yield element, description, symbol
         else:
             assert_never(symbol)
 
     for verification in symbol_table.verification_functions:
         if verification.description is not None:
-            for element in verification.description.document.findall(element_type):
-                yield element, verification.description, None
+            for element, description in _find_all_in_signature_description(
+                element_type=element_type,
+                signature_description=verification.description,
+            ):
+                # There is no symbol in the context of a global function.
+                yield element, description, None
 
     if symbol_table.meta_model.description is not None:
-        for element in symbol_table.meta_model.description.document.findall(
-            element_type
+        for element, description in _find_all_in_meta_model_description(
+            element_type=element_type,
+            meta_model_description=symbol_table.meta_model.description,
         ):
-            yield element, symbol_table.meta_model.description, None
+            # There is no symbol in the context of the whole meta-model.
+            yield element, description, None
 
 
 def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
@@ -1239,7 +1946,7 @@ def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
         if not raw_identifier.startswith("."):
             errors.append(
                 Error(
-                    description.node,
+                    description.parsed.node,
                     f"The identifier of the symbol reference "
                     f"is invalid: {raw_identifier}; "
                     f"expected an identifier starting with a dot",
@@ -1252,7 +1959,7 @@ def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
         if not IDENTIFIER_RE.match(raw_identifier_no_dot):
             errors.append(
                 Error(
-                    description.node,
+                    description.parsed.node,
                     f"The identifier of the symbol reference "
                     f"is invalid: {raw_identifier_no_dot}",
                 )
@@ -1266,7 +1973,7 @@ def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
         if referenced_symbol is None:
             errors.append(
                 Error(
-                    description.node,
+                    description.parsed.node,
                     f"The identifier of the symbol reference "
                     f"could not be found in the symbol table: {identifier}",
                 )
@@ -2070,7 +2777,7 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
             if any(not IDENTIFIER_RE.match(part) for part in parts):
                 errors.append(
                     Error(
-                        description.node,
+                        description.parsed.node,
                         f"Invalid reference to a property or a literal; "
                         f"each part of the path needs to be an identifier, "
                         f"but it is not: {pth}",
@@ -2083,7 +2790,7 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
             if len(part_identifiers) == 0:
                 errors.append(
                     Error(
-                        description.node,
+                        description.parsed.node,
                         "Unexpected empty reference " "to a property or a literal",
                     )
                 )
@@ -2099,7 +2806,7 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
                 if symbol is None:
                     errors.append(
                         Error(
-                            description.node,
+                            description.parsed.node,
                             f"The attribute reference can not be resolved as there "
                             f"is no encompassing symbol in the given "
                             f"context: {pth}",
@@ -2114,7 +2821,7 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
                 if target_symbol is None:
                     errors.append(
                         Error(
-                            description.node,
+                            description.parsed.node,
                             f"Dangling reference to a non-existing " f"symbol: {pth}",
                         )
                     )
@@ -2124,7 +2831,7 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
             else:
                 errors.append(
                     Error(
-                        description.node,
+                        description.parsed.node,
                         f"We did not implement the resolution of such "
                         f"a reference to a property or a literal: {pth}",
                     )
@@ -2144,7 +2851,7 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
                 if literal is None:
                     errors.append(
                         Error(
-                            description.node,
+                            description.parsed.node,
                             f"Dangling reference to a non-existing literal "
                             f"in the enumeration {target_symbol.name!r}: {pth}",
                         )
@@ -2158,7 +2865,7 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
             elif isinstance(target_symbol, ConstrainedPrimitive):
                 errors.append(
                     Error(
-                        description.node,
+                        description.parsed.node,
                         f"Unexpected references to a property of "
                         f"a constrained primitive {target_symbol.name!r}: {pth}",
                     )
@@ -2171,7 +2878,7 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
                 if prop is None:
                     errors.append(
                         Error(
-                            description.node,
+                            description.parsed.node,
                             f"Dangling reference to a non-existing property "
                             f"of a class {target_symbol.name!r}: {pth}",
                         )
@@ -2542,26 +3249,89 @@ def _verify_all_non_optional_properties_are_initialized_in_the_constructor(
     return errors
 
 
-def _verify_all_argument_references_are_valid(symbol_table: SymbolTable) -> List[Error]:
+def _verify_all_argument_references_occur_in_valid_context(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    """Verify that all the argument references occur where they should."""
     errors = []  # type: List[Error]
+    for arg_ref_in_doc, description, _ in _find_all_in_descriptions(
+        element_type=doc.ArgumentReference, symbol_table=symbol_table
+    ):
+        if not isinstance(description, SignatureDescription):
+            errors.append(
+                Error(
+                    description.parsed.node,
+                    f"Unexpected argument reference in the description of "
+                    f"a non-signature (*i.e.*, a non-function and a non-method): "
+                    f"{arg_ref_in_doc}",
+                )
+            )
 
-    for signature_like in _over_signature_likes(symbol_table):
-        if signature_like.description is not None:
-            for arg_ref_in_doc in signature_like.description.document.findall(
-                condition=doc.ArgumentReference
-            ):
-                assert isinstance(arg_ref_in_doc.reference, str)
-                arg_name = arg_ref_in_doc.reference
+    return errors
 
-                if arg_name not in signature_like.arguments_by_name:
-                    errors.append(
-                        Error(
-                            signature_like.description.node,
-                            f"The argument referenced in the docstring "
-                            f"is not an argument "
-                            f"of {signature_like.name!r}: {arg_name!r}",
+
+def _verify_constraints_and_constraintrefs(symbol_table: SymbolTable) -> List[Error]:
+    """Check that each constraint has a unique identifier."""
+    errors = []  # type: List[Error]
+    observed_constraint_id_set = set()  # type: Set[str]
+
+    def check_and_report_duplicate(
+        an_identifier: str, a_description: DescriptionUnion
+    ) -> None:
+        """If the identifier has been already observed, report a duplicate."""
+        if an_identifier in observed_constraint_id_set:
+            errors.append(
+                Error(
+                    a_description.parsed.node,
+                    f"The constraint with the same identifier has been already "
+                    f"defined: {an_identifier!r}",
+                )
+            )
+
+    if symbol_table.meta_model.description is not None:
+        for identifier in symbol_table.meta_model.description.constraints_by_identifier:
+            check_and_report_duplicate(
+                an_identifier=identifier,
+                a_description=symbol_table.meta_model.description,
+            )
+            observed_constraint_id_set.add(identifier)
+
+    for symbol in symbol_table.symbols:
+        if symbol.description is not None:
+            for identifier in symbol.description.constraints_by_identifier:
+                check_and_report_duplicate(
+                    an_identifier=identifier, a_description=symbol.description
+                )
+                observed_constraint_id_set.add(identifier)
+
+        if isinstance(symbol, (Enumeration, ConstrainedPrimitive)):
+            pass
+        elif isinstance(symbol, (AbstractClass, ConcreteClass)):
+            for prop in symbol.properties:
+                if prop.specified_for is not symbol:
+                    continue
+
+                if prop.description is not None:
+                    for identifier in prop.description.constraints_by_identifier:
+                        check_and_report_duplicate(
+                            an_identifier=identifier, a_description=prop.description
                         )
-                    )
+                        observed_constraint_id_set.add(identifier)
+        else:
+            assert_never(symbol)
+
+    for constraintref, description, _ in _find_all_in_descriptions(
+        element_type=doc.ConstraintReference, symbol_table=symbol_table
+    ):
+        assert isinstance(constraintref.reference, str)
+
+        if constraintref.reference not in observed_constraint_id_set:
+            errors.append(
+                Error(
+                    description.parsed.node,
+                    f"The constraint reference is dangling: {constraintref.reference}",
+                )
+            )
 
     return errors
 
@@ -2626,7 +3396,13 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
         )
     )
 
-    errors.extend(_verify_all_argument_references_are_valid(symbol_table=symbol_table))
+    errors.extend(
+        _verify_all_argument_references_occur_in_valid_context(
+            symbol_table=symbol_table
+        )
+    )
+
+    errors.extend(_verify_constraints_and_constraintrefs(symbol_table=symbol_table))
 
     if len(errors) > 0:
         return errors
@@ -2729,19 +3505,43 @@ def translate(
                 parsed=parsed_symbol, constrainee=constrainee
             )
             if parsing_errors is not None:
-                underlying_errors.extend(parsing_errors)
+                underlying_errors.append(
+                    Error(
+                        parsed_symbol.node,
+                        f"Failed to translate "
+                        f"the constrained primitive {parsed_symbol.name}",
+                        parsing_errors,
+                    )
+                )
                 continue
 
-            assert symbol is not None
-
         elif isinstance(parsed_symbol, parse.Enumeration):
-            symbol = _to_enumeration(parsed=parsed_symbol)
+            symbol, symbol_errors = _to_enumeration(parsed=parsed_symbol)
+            if symbol_errors is not None:
+                underlying_errors.append(
+                    Error(
+                        parsed_symbol.node,
+                        f"Failed to translate the enumeration {parsed_symbol.name!r}",
+                        symbol_errors,
+                    )
+                )
+                continue
 
         elif isinstance(parsed_symbol, (parse.AbstractClass, parse.ConcreteClass)):
-            symbol = _to_class(
+            symbol, symbol_errors = _to_class(
                 parsed=parsed_symbol,
                 constructor_statements=constructor_table.must_find(parsed_symbol),
             )
+
+            if symbol_errors is not None:
+                underlying_errors.append(
+                    Error(
+                        parsed_symbol.node,
+                        f"Failed to translate the class {parsed_symbol.name!r}",
+                        symbol_errors,
+                    )
+                )
+                continue
 
         else:
             assert_never(parsed_symbol)
@@ -2749,14 +3549,30 @@ def translate(
         assert symbol is not None
         symbols.append(symbol)
 
-    meta_model = _to_meta_model(parsed_symbol_table.meta_model)
+    meta_model, meta_model_errors = _to_meta_model(
+        parsed=parsed_symbol_table.meta_model
+    )
+    if meta_model_errors is not None:
+        underlying_errors.append(
+            Error(
+                None,
+                "Failed to translate the meta-data of the meta-model",
+                meta_model_errors,
+            )
+        )
 
     verification_functions = []  # type: List[VerificationUnion]
     for func in parsed_symbol_table.verification_functions:
-        verification, error = _to_verification_function(func)
+        verification, verification_errors = _to_verification_function(func)
 
-        if error is not None:
-            underlying_errors.append(error)
+        if verification_errors is not None:
+            underlying_errors.append(
+                Error(
+                    func.node,
+                    f"Failed to translate the verification function {func.name!r}",
+                    verification_errors,
+                )
+            )
             continue
 
         assert verification is not None
@@ -2764,6 +3580,8 @@ def translate(
 
     if len(underlying_errors) > 0:
         return None, bundle_underlying_errors()
+
+    assert meta_model is not None
 
     symbols_by_name = {symbol.name: symbol for symbol in symbols}
 

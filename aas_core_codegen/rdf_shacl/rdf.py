@@ -6,7 +6,7 @@ from typing import Tuple, Optional, List
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate, specific_implementations
-from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
+from aas_core_codegen.common import Stripped, Error, assert_never
 from aas_core_codegen.rdf_shacl import (
     naming as rdf_shacl_naming,
     common as rdf_shacl_common,
@@ -16,20 +16,19 @@ from aas_core_codegen.rdf_shacl.common import INDENT as I, INDENT2 as II
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_comment(
-    description: intermediate.Description,
+def _generate_summary(
+    description: intermediate.DescriptionUnion,
 ) -> Tuple[Optional[str], Optional[Error]]:
-    """
-    Generate the comment text based on the description.
-
-    The description might come either from an interface or a class, or from
-    a property.
-    """
+    """Generate the comment text based on the summary in the description."""
     renderer = rdf_shacl_description.Renderer()
-    tokens, error = renderer.transform(description.document)
+    tokens, errors = renderer.transform(description.summary)
 
-    if error:
-        return None, Error(description.node, error)
+    if errors is not None:
+        return None, Error(
+            description.parsed.node,
+            "Failed to generate the description comment",
+            [Error(description.parsed.node, message) for message in errors],
+        )
 
     assert tokens is not None
 
@@ -75,13 +74,13 @@ def _define_for_enumeration(
     errors = []  # type: List[Error]
 
     if enumeration.description is not None:
-        comment, error = _generate_comment(enumeration.description)
+        summary, error = _generate_summary(enumeration.description)
         if error is not None:
             errors.append(error)
         else:
-            assert comment is not None
+            assert summary is not None
             writer.write(
-                f"\n{I}rdfs:comment {rdf_shacl_common.string_literal(comment)}@en ;"
+                f"\n{I}rdfs:comment {rdf_shacl_common.string_literal(summary)}@en ;"
             )
 
     if len(enumeration.literals) > 0:
@@ -110,14 +109,14 @@ def _define_for_enumeration(
             )
 
             if literal.description is not None:
-                comment, error = _generate_comment(literal.description)
+                summary, error = _generate_summary(literal.description)
                 if error is not None:
                     errors.append(error)
                 else:
-                    assert comment is not None
+                    assert summary is not None
                     writer.write(
                         f"\n{I}rdfs:comment "
-                        f"{rdf_shacl_common.string_literal(comment)}@en ;"
+                        f"{rdf_shacl_common.string_literal(summary)}@en ;"
                     )
 
             writer.write("\n.")
@@ -155,13 +154,13 @@ def _define_owl_class_for_class(
     )
 
     if cls.description is not None:
-        comment, error = _generate_comment(cls.description)
+        summary, error = _generate_summary(cls.description)
         if error is not None:
             return None, error
 
-        assert comment is not None
+        assert summary is not None
         writer.write(
-            f"{I}rdfs:comment {rdf_shacl_common.string_literal(comment)}@en ;\n"
+            f"{I}rdfs:comment {rdf_shacl_common.string_literal(summary)}@en ;\n"
         )
 
     writer.write(".")
@@ -250,14 +249,14 @@ def _define_property(
     )
 
     if prop.description:
-        comment, error = _generate_comment(prop.description)
+        summary, error = _generate_summary(prop.description)
         if error is not None:
             return None, error
 
-        assert comment is not None
+        assert summary is not None
 
         writer.write(
-            f"\n{I}rdfs:comment {rdf_shacl_common.string_literal(comment)}@en ;"
+            f"\n{I}rdfs:comment {rdf_shacl_common.string_literal(summary)}@en ;"
         )
 
     writer.write("\n.")

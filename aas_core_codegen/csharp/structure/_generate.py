@@ -217,9 +217,15 @@ def _generate_enum(
     writer = io.StringIO()
 
     if enum.description is not None:
-        comment, error = csharp_description.generate_comment(enum.description)
-        if error:
-            return None, error
+        comment, comment_errors = csharp_description.generate_symbol_comment(
+            enum.description
+        )
+        if comment_errors:
+            return None, Error(
+                enum.description.parsed.node,
+                "Failed to generate the documentation comment",
+                comment_errors,
+            )
 
         assert comment is not None
 
@@ -237,12 +243,20 @@ def _generate_enum(
             writer.write(",\n\n")
 
         if literal.description:
-            literal_comment, error = csharp_description.generate_comment(
+            (
+                literal_comment,
+                literal_comment_errors,
+            ) = csharp_description.generate_enumeration_literal_comment(
                 literal.description
             )
 
-            if error:
-                return None, error
+            if literal_comment_errors:
+                return None, Error(
+                    literal.description.parsed.node,
+                    f"Failed to generate the comment "
+                    f"for the enumeration literal {literal.name!r}",
+                    literal_comment_errors,
+                )
 
             assert literal_comment is not None
 
@@ -270,9 +284,16 @@ def _generate_interface(
     writer = io.StringIO()
 
     if interface.description is not None:
-        comment, error = csharp_description.generate_comment(interface.description)
-        if error:
-            return None, error
+        comment, comment_errors = csharp_description.generate_symbol_comment(
+            interface.description
+        )
+
+        if comment_errors is not None:
+            return None, Error(
+                interface.description.parsed.node,
+                "Failed to generate the documentation comment",
+                comment_errors,
+            )
 
         assert comment is not None
 
@@ -313,12 +334,18 @@ def _generate_interface(
             prop_name = csharp_naming.property_name(prop.name)
 
             if prop.description is not None:
-                prop_comment, error = csharp_description.generate_comment(
-                    prop.description
-                )
+                (
+                    prop_comment,
+                    prop_comment_errors,
+                ) = csharp_description.generate_property_comment(prop.description)
 
-                if error:
-                    return None, error
+                if prop_comment_errors is not None:
+                    return None, Error(
+                        prop.description.parsed.node,
+                        f"Failed to generate the documentation comment "
+                        f"for the property {prop.name!r}",
+                        prop_comment_errors,
+                    )
 
                 blocks.append(
                     Stripped(
@@ -339,12 +366,18 @@ def _generate_interface(
         signature_blocks = []  # type: List[Stripped]
 
         if signature.description is not None:
-            signature_comment, error = csharp_description.generate_comment(
-                signature.description
-            )
+            (
+                signature_comment,
+                signature_comment_errors,
+            ) = csharp_description.generate_signature_comment(signature.description)
 
-            if error:
-                return None, error
+            if signature_comment_errors is not None:
+                return None, Error(
+                    signature.description.parsed.node,
+                    f"Failed to generate the documentation comment "
+                    f"for signature {signature.name!r}",
+                    signature_comment_errors,
+                )
 
             assert signature_comment is not None
 
@@ -756,9 +789,15 @@ def _generate_class(
     writer = io.StringIO()
 
     if cls.description is not None:
-        comment, error = csharp_description.generate_comment(cls.description)
-        if error:
-            return None, error
+        comment, comment_errors = csharp_description.generate_symbol_comment(
+            cls.description
+        )
+        if comment_errors is not None:
+            return None, Error(
+                cls.description.parsed.node,
+                "Failed to generate the comment description",
+                comment_errors,
+            )
 
         assert comment is not None
 
@@ -816,9 +855,17 @@ def _generate_class(
         prop_blocks = []  # type: List[Stripped]
 
         if prop.description is not None:
-            prop_comment, error = csharp_description.generate_comment(prop.description)
-            if error:
-                return None, error
+            (
+                prop_comment,
+                prop_comment_errors,
+            ) = csharp_description.generate_property_comment(prop.description)
+            if prop_comment_errors:
+                return None, Error(
+                    prop.description.parsed.node,
+                    f"Failed to generate the documentation comment "
+                    f"for the property {prop.name!r}",
+                    prop_comment_errors,
+                )
 
             assert prop_comment is not None
 
@@ -1107,7 +1154,13 @@ def generate(
 
         assert (code is None) ^ (error is None)
         if error is not None:
-            errors.append(error)
+            errors.append(
+                Error(
+                    something.parsed.node,
+                    f"Failed to generate the code for {something.name!r}",
+                    [error],
+                )
+            )
         else:
             assert code is not None
             blocks.append(Rstripped(textwrap.indent(code, "    ")))

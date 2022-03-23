@@ -10,8 +10,11 @@
       <w>clses</w>
       <w>codegen</w>
       <w>columner</w>
+      <w>comanagedentity</w>
       <w>constrainee</w>
       <w>constrainees</w>
+      <w>constraintref</w>
+      <w>constraintrefs</w>
       <w>csharp</w>
       <w>csproj</w>
       <w>datatype</w>
@@ -72,8 +75,10 @@
       <w>referables</w>
       <w>reformattable</w>
       <w>rstripped</w>
+      <w>selfmanagedentity</w>
       <w>shacl</w>
       <w>sparql</w>
+      <w>stackings</w>
       <w>stmts</w>
       <w>stringifiable</w>
       <w>stringification</w>

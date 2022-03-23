@@ -80,8 +80,13 @@ namespace AasCore.Aas3
         /// Name of the extension.
         /// </summary>
         /// <remarks>
-        /// Constraint AASd-077: The name of an extension within HasExtensions needs to be
-        /// unique.
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-077:
+        ///     The name of an extension within HasExtensions needs to be unique.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string Name { get; set; }
 
@@ -231,21 +236,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -253,9 +274,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -264,7 +286,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -337,11 +359,13 @@ namespace AasCore.Aas3
         /// Concrete, clearly identifiable component of a certain template.
         /// </summary>
         /// <remarks>
-        /// <para>It becomes an individual entity of a  template,  for example a
-        /// device model, by defining specific property values.</para>
-        /// <para>In an object oriented view,  an instance denotes an object of a
-        /// template (class).</para>
-        /// <para>[SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV]  modified</para>
+        /// It becomes an individual entity of a  template,  for example a
+        /// device model, by defining specific property values.
+        ///
+        /// In an object oriented view,  an instance denotes an object of a
+        /// template (class).
+        ///
+        /// [SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV]  modified
         /// </remarks>
         [EnumMember(Value = "INSTANCE")]
         Instance
@@ -754,21 +778,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -776,9 +816,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -787,7 +828,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -1245,11 +1286,13 @@ namespace AasCore.Aas3
         /// concrete, clearly identifiable component of a certain type
         /// </summary>
         /// <remarks>
-        /// <para>It becomes an individual entity of a type, for example a device, by defining
-        /// specific property values.</para>
-        /// <para>In an object oriented view, an instance denotes an object of a class
-        /// (of a type).</para>
-        /// <para>[SOURCE: IEC 62890:2016, 3.1.16] 65/617/CDV</para>
+        /// It becomes an individual entity of a type, for example a device, by defining
+        /// specific property values.
+        ///
+        /// In an object oriented view, an instance denotes an object of a class
+        /// (of a type).
+        ///
+        /// [SOURCE: IEC 62890:2016, 3.1.16] 65/617/CDV
         /// </remarks>
         [EnumMember(Value = "Instance")]
         Instance
@@ -1272,9 +1315,15 @@ namespace AasCore.Aas3
         /// Key of the identifier
         /// </summary>
         /// <remarks>
-        /// Constraint AASd-116: “globalAssetId” (case-insensitive) is a reserved key. If used
-        /// as value for IdentifierKeyValuePair/key IdentifierKeyValuePair/value shall be
-        /// identical to AssetInformation/globalAssetId.
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-116:
+        ///     “globalAssetId” (case-insensitive) is a reserved key. If used
+        ///     as value for IdentifierKeyValuePair/key IdentifierKeyValuePair/value shall be
+        ///     identical to AssetInformation/globalAssetId.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string Key { get; set; }
 
@@ -1411,21 +1460,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -1433,9 +1498,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -1444,7 +1510,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -1760,9 +1826,16 @@ namespace AasCore.Aas3
     /// elements.
     /// </summary>
     /// <remarks>
-    /// Constraint AASd-055: If the semanticId of a RelationshipElement or an
-    /// AnnotatedRelationshipElement submodel element references a ConceptDescription then
-    /// the ConceptDescription/category shall be one of following values: RELATIONSHIP.
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-055:
+    ///     If the semanticId of a RelationshipElement or an
+    ///     AnnotatedRelationshipElement submodel element references a ConceptDescription
+    ///     then the ConceptDescription/category shall be one of following values:
+    ///     RELATIONSHIP.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public interface IRelationshipElement :
             ISubmodelElement,
@@ -1783,8 +1856,14 @@ namespace AasCore.Aas3
     /// A submodel element list is an ordered collection of submodel elements.
     /// </summary>
     /// <remarks>
-    /// Constraint AASd-093: If the semanticId of a SubmodelElementList references
-    /// a ConceptDescription then the ConceptDescription/category shall be COLLECTION.
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-093:
+    ///     If the semanticId of a SubmodelElementList references
+    ///     a ConceptDescription then the ConceptDescription/category shall be COLLECTION.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class SubmodelElementList :
             ISubmodelElement,
@@ -1801,21 +1880,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -1823,9 +1918,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -1834,7 +1930,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -1893,9 +1989,15 @@ namespace AasCore.Aas3
         /// The submodel element type of the submodel elements contained in the list.
         /// </summary>
         /// <remarks>
-        /// Constraint AASd-108: All first level child elements in a SubmodelElementList shall
-        /// have the same submodel element type as specified in
-        /// SubmodelElementList/submodelElementTypeValues.
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-108:
+        ///     All first level child elements in a SubmodelElementList shall
+        ///     have the same submodel element type as specified in
+        ///     SubmodelElementList/submodelElementTypeValues.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public SubmodelElements SubmodelElementTypeValues { get; set; }
 
@@ -1909,13 +2011,25 @@ namespace AasCore.Aas3
         /// Semantic Id the submodel elements contained in the list match to.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-107: If a first level child element in a SubmodelElementList has
-        /// a semanticId it shall be identical to SubmodelElementList/semanticIdValues.</para>
-        /// <para>Constraint AASd-114: If two first level child elements in a SubmodelElementList have
-        /// a semanticId then they shall be identical.</para>
-        /// <para>Constraint AASd-115: If a first level child element in a SubmodelElementList does
-        /// not specify a semanticId then the value is assumed to be identical to
-        /// SubmodelElementList/semanticIdValues.</para>
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-107:
+        ///     If a first level child element in a SubmodelElementList has
+        ///     a semanticId it shall be identical to SubmodelElementList/semanticIdValues.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-114:
+        ///     If two first level child elements in a SubmodelElementList have
+        ///     a semanticId then they shall be identical.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-115:
+        ///     If a first level child element in a SubmodelElementList does
+        ///     not specify a semanticId then the value is assumed to be identical to
+        ///     SubmodelElementList/semanticIdValues.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public IReference? SemanticIdValues { get; set; }
 
@@ -1923,10 +2037,16 @@ namespace AasCore.Aas3
         /// The value type of the submodel element contained in the list.
         /// </summary>
         /// <remarks>
-        /// Constraint AASd-109: If SubmodelElementList/submodelElementTypeValues equal to
-        /// Property or Range SubmodelElementList/valueTypeValues shall be set and all first
-        /// level child elements in the SubmodelElementList shall have the the value type
-        /// as specified
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-109:
+        ///     If SubmodelElementList/submodelElementTypeValues equal to
+        ///     Property or Range SubmodelElementList/valueTypeValues shall be set and all first
+        ///     level child elements in the SubmodelElementList shall have the the value type
+        ///     as specified
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public DataTypeDef? ValueTypeValues { get; set; }
 
@@ -2156,8 +2276,14 @@ namespace AasCore.Aas3
     /// a number of of submodel elements.
     /// </summary>
     /// <remarks>
-    /// Constraint AASd-092: If the semanticId of a SubmodelElementStruct references
-    /// a ConceptDescription then the ConceptDescription/category shall be ENTITY.
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-092:
+    ///     If the semanticId of a SubmodelElementStruct references
+    ///     a ConceptDescription then the ConceptDescription/category shall be ENTITY.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class SubmodelElementStruct :
             ISubmodelElement,
@@ -2174,21 +2300,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -2196,9 +2338,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -2207,7 +2350,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -2471,11 +2614,18 @@ namespace AasCore.Aas3
     /// other submodel elements.
     /// </summary>
     /// <remarks>
-    /// <para>A data element is a submodel element that has a value. The type of value differs
-    /// for different subtypes of data elements.</para>
-    /// <para>Constraint AASd-090: For data elements DataElement/category shall be one of the
-    /// following values: CONSTANT, PARAMETER or VARIABLE.
-    /// Exception: File and Blob data elements.</para>
+    /// A data element is a submodel element that has a value. The type of value differs
+    /// for different subtypes of data elements.
+    ///
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-090:
+    ///     For data elements DataElement/category shall be one of the
+    ///     following values: CONSTANT, PARAMETER or VARIABLE.
+    ///     Exception: File and Blob data elements.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public interface IDataElement :
             ISubmodelElement,
@@ -2488,22 +2638,37 @@ namespace AasCore.Aas3
     /// A property is a data element that has a single value.
     /// </summary>
     /// <remarks>
-    /// <para>Constraint AASd-007: If both, the Property/value and the Property/valueId are
-    /// present then the value of Property/value needs to be identical to the value of
-    /// the referenced coded value in Property/valueId.</para>
-    /// <para>Constraint AASd-052a: If the semanticId of a Property references a
-    /// ConceptDescription then the ConceptDescription/category shall be one of
-    /// following values: VALUE, PROPERTY.</para>
-    /// <para>Constraint AASd-065: If the semanticId of a Property or MultiLanguageProperty
-    /// references a ConceptDescription with the category VALUE then the value of the
-    /// property is identical to DataSpecificationIEC61360/value and the valueId of the
-    /// property is identical to DataSpecificationIEC61360/valueId.</para>
-    /// <para>Constraint AASd-066: If the semanticId of a Property or MultiLanguageProperty
-    /// references a ConceptDescription with the category PROPERTY and
-    /// DataSpecificationIEC61360/valueList is defined the value and valueId of the
-    /// property is identical to one of the value reference pair types references in the
-    /// value list, i.e. ValueReferencePairType/value or ValueReferencePairType/valueId,
-    /// resp.</para>
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-007:
+    ///     If both, the Property/value and the Property/valueId are
+    ///     present then the value of Property/value needs to be identical to the value of
+    ///     the referenced coded value in Property/valueId.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-052a:
+    ///     If the semanticId of a Property references a
+    ///     ConceptDescription then the ConceptDescription/category shall be one of
+    ///     following values: VALUE, PROPERTY.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-065:
+    ///     If the semanticId of a Property or MultiLanguageProperty
+    ///     references a ConceptDescription with the category VALUE then the value of the
+    ///     property is identical to DataSpecificationIEC61360/value and the valueId of the
+    ///     property is identical to DataSpecificationIEC61360/valueId.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-066:
+    ///     If the semanticId of a Property or MultiLanguageProperty
+    ///     references a ConceptDescription with the category PROPERTY and
+    ///     DataSpecificationIEC61360/valueList is defined the value and valueId of the
+    ///     property is identical to one of the value reference pair types references in the
+    ///     value list, i.e. ValueReferencePairType/value or ValueReferencePairType/valueId,
+    ///     resp.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class Property :
             IDataElement,
@@ -2520,21 +2685,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -2542,9 +2723,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -2553,7 +2735,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -2836,18 +3018,32 @@ namespace AasCore.Aas3
     /// A property is a data element that has a multi-language value.
     /// </summary>
     /// <remarks>
-    /// <para>Constraint AASd-052b: If the semanticId of a MultiLanguageProperty references
-    /// a ConceptDescription then the ConceptDescription/category shall be one of
-    /// following values: PROPERTY.</para>
-    /// <para>Constraint AASd-012: If both, the MultiLanguageProperty/value and the
-    /// MultiLanguageProperty/valueId are present then for each string in a specific
-    /// language the meaning must be the same as specified in
-    /// MultiLanguageProperty/valueId.</para>
-    /// <para>Constraint AASd-067: If the semanticId of a MultiLanguageProperty references a
-    /// ConceptDescription then DataSpecificationIEC61360/dataType shall be
-    /// STRING_TRANSLATABLE.</para>
-    /// <para>See Constraint AASd-065</para>
-    /// <para>See Constraint AASd-066</para>
+    /// See Constraint AASd-065
+    ///
+    /// See Constraint AASd-066
+    ///
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-052b:
+    ///     If the semanticId of a MultiLanguageProperty references
+    ///     a ConceptDescription then the ConceptDescription/category shall be one of
+    ///     following values: PROPERTY.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-012:
+    ///     If both, the MultiLanguageProperty/value and the
+    ///     MultiLanguageProperty/valueId are present then for each string in a specific
+    ///     language the meaning must be the same as specified in
+    ///     MultiLanguageProperty/valueId.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-067:
+    ///     If the semanticId of a MultiLanguageProperty references a
+    ///     ConceptDescription then DataSpecificationIEC61360/dataType shall be
+    ///     STRING_TRANSLATABLE.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class MultiLanguageProperty :
             IDataElement,
@@ -2864,21 +3060,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -2886,9 +3098,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -2897,7 +3110,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -3185,14 +3398,27 @@ namespace AasCore.Aas3
     /// A range data element is a data element that defines a range with min and max.
     /// </summary>
     /// <remarks>
-    /// <para>Constraint AASd-053: If the semanticId of a Range submodel element references a
-    /// ConceptDescription then the ConceptDescription/category shall be one of following
-    /// values: PROPERTY.</para>
-    /// <para>Constraint AASd-068: If the semanticId of a Range submodel element references a
-    /// ConceptDescription then DataSpecificationIEC61360/dataType shall be a numerical
-    /// one, i.e. REAL_* or RATIONAL_*.</para>
-    /// <para>Constraint AASd-069: If the semanticId of a Range references a ConceptDescription
-    /// then DataSpecificationIEC61360/levelType shall be identical to the set {Min, Max}.</para>
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-053:
+    ///     If the semanticId of a Range submodel element references a
+    ///     ConceptDescription then the ConceptDescription/category shall be one of
+    ///     following values: PROPERTY.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-068:
+    ///     If the semanticId of a Range submodel element references a
+    ///     ConceptDescription then DataSpecificationIEC61360/dataType shall be a numerical
+    ///     one, i.e. REAL_* or RATIONAL_*.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-069:
+    ///     If the semanticId of a Range references a ConceptDescription
+    ///     then DataSpecificationIEC61360/levelType shall be identical to the set
+    ///     {Min, Max}.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class Range :
             IDataElement,
@@ -3209,21 +3435,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -3231,9 +3473,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -3242,7 +3485,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -3505,12 +3748,21 @@ namespace AasCore.Aas3
     /// entity.
     /// </summary>
     /// <remarks>
-    /// <para>Constraint AASd-054: If the semanticId of a ReferenceElement submodel element
-    /// references a ConceptDescription then the ConceptDescription/category shall be one
-    /// of following values: REFERENCE.</para>
-    /// <para>Constraint AASd-082: If the semanticId of a ReferenceElement references a
-    /// ConceptDescription then DataSpecificationIEC61360/dataType shall be one of: STRING,
-    /// IRI, IRDI.</para>
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-054:
+    ///     If the semanticId of a ReferenceElement submodel element
+    ///     references a ConceptDescription then the ConceptDescription/category shall be
+    ///     one of following values: REFERENCE.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-082:
+    ///     If the semanticId of a ReferenceElement references a
+    ///     ConceptDescription then DataSpecificationIEC61360/dataType shall be one of:
+    ///     STRING, IRI, IRDI.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class ReferenceElement :
             IDataElement,
@@ -3527,21 +3779,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -3549,9 +3817,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -3560,7 +3829,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -3823,10 +4092,19 @@ namespace AasCore.Aas3
     /// code in the value attribute.
     /// </summary>
     /// <remarks>
-    /// <para>Constraint AASd-057: The semanticId of a File or Blob submodel element shall only
-    /// reference a ConceptDescription with the category DOCUMENT.</para>
-    /// <para>Constraint AASd-083: If the semanticId of a Blob references a ConceptDescription
-    /// then DataSpecificationIEC61360/dataType shall be one of: BLOB, HTML.</para>
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-057:
+    ///     The semanticId of a File or Blob submodel element shall only
+    ///     reference a ConceptDescription with the category DOCUMENT.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-083:
+    ///     If the semanticId of a Blob references a ConceptDescription
+    ///     then DataSpecificationIEC61360/dataType shall be one of: BLOB, HTML.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class Blob :
             IDataElement,
@@ -3843,21 +4121,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -3865,9 +4159,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -3876,7 +4171,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -4136,9 +4431,17 @@ namespace AasCore.Aas3
     /// The value is an URI that can represent an absolute or relative path.
     /// </summary>
     /// <remarks>
-    /// <para>See Constraint AASd-057</para>
-    /// <para>Constraint AASd-079: If the semanticId of a File references a
-    /// ConceptDescription then DataSpecificationIEC61360/dataType shall be one of: FILE.</para>
+    /// See Constraint AASd-057
+    ///
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-079:
+    ///     If the semanticId of a File references a
+    ///     ConceptDescription then DataSpecificationIEC61360/dataType shall be one of:
+    ///     FILE.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class File :
             IDataElement,
@@ -4155,21 +4458,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -4177,9 +4496,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -4188,7 +4508,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -4460,21 +4780,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -4482,9 +4818,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -4493,7 +4830,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -4813,10 +5150,16 @@ namespace AasCore.Aas3
     /// An entity is a submodel element that is used to model entities.
     /// </summary>
     /// <remarks>
-    /// Constraint AASd-056: If the semanticId of a Entity submodel element
-    /// references a ConceptDescription then the ConceptDescription/category shall
-    /// be one of following values: ENTITY. The ConceptDescription describes the elements
-    /// assigned to the entity via Entity/statement.
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-056:
+    ///     If the semanticId of a Entity submodel element
+    ///     references a ConceptDescription then the ConceptDescription/category shall
+    ///     be one of following values: ENTITY. The ConceptDescription describes
+    ///     the elements assigned to the entity via Entity/statement.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class Entity :
             ISubmodelElement,
@@ -4833,21 +5176,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -4855,9 +5214,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -4866,7 +5226,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -4936,9 +5296,15 @@ namespace AasCore.Aas3
         /// Reference to the asset the entity is representing.
         /// </summary>
         /// <remarks>
-        /// Constraint AASd-014: Either the attribute globalAssetId or specificAssetId of an
-        /// Entity must be set if Entity/entityType is set to “SelfManagedEntity”. They are
-        /// not existing otherwise.
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-014:
+        ///     Either the attribute globalAssetId or specificAssetId of an
+        ///     Entity must be set if Entity/entityType is set to “SelfManagedEntity”. They are
+        ///     not existing otherwise.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public IReference? GlobalAssetId { get; set; }
 
@@ -5192,9 +5558,15 @@ namespace AasCore.Aas3
     /// An event.
     /// </summary>
     /// <remarks>
-    /// Constraint AASd-061: If the semanticId of a Event submodel element references a
-    /// ConceptDescription then the category of the ConceptDescription shall be one of
-    /// the following: EVENT.
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-061:
+    ///     If the semanticId of a Event submodel element references a
+    ///     ConceptDescription then the category of the ConceptDescription shall be one of
+    ///     the following: EVENT.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public interface IEvent :
             ISubmodelElement,
@@ -5221,21 +5593,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -5243,9 +5631,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -5254,7 +5643,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -5510,9 +5899,15 @@ namespace AasCore.Aas3
     /// An operation is a submodel element with input and output variables.
     /// </summary>
     /// <remarks>
-    /// Constraint AASd-060: If the semanticId of a Operation submodel element
-    /// references a ConceptDescription then the category of the ConceptDescription
-    /// shall be one of the following values: FUNCTION.
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-060:
+    ///     If the semanticId of a Operation submodel element
+    ///     references a ConceptDescription then the category of the ConceptDescription
+    ///     shall be one of the following values: FUNCTION.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class Operation :
             ISubmodelElement,
@@ -5529,21 +5924,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -5551,9 +5962,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -5562,7 +5974,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -5953,10 +6365,17 @@ namespace AasCore.Aas3
     /// asset to achieve a certain effect in the physical or virtual world.
     /// </summary>
     /// <remarks>
-    /// <para>Constraint AASd-058: If the semanticId of a Capability submodel element references
-    /// a ConceptDescription then the ConceptDescription/category shall be CAPABILITY.</para>
-    /// <para>The semanticId of a capability is typically an ontology. Thus, reasoning on
-    /// capabilities is enabled.</para>
+    /// The semanticId of a capability is typically an ontology. Thus, reasoning on
+    /// capabilities is enabled.
+    ///
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-058:
+    ///     If the semanticId of a Capability submodel element references
+    ///     a ConceptDescription then the ConceptDescription/category shall be CAPABILITY.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class Capability :
             ISubmodelElement,
@@ -5973,21 +6392,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -5995,9 +6430,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -6006,7 +6442,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -6246,9 +6682,15 @@ namespace AasCore.Aas3
     /// standardized schema (realized as data specification template).
     /// </summary>
     /// <remarks>
-    /// Constraint AASd-051: A ConceptDescription shall have one of the following categories
-    /// VALUE, PROPERTY, REFERENCE, DOCUMENT, CAPABILITY, RELATIONSHIP, COLLECTION, FUNCTION
-    /// , EVENT, ENTITY, APPLICATION_CLASS, QUALIFIER, VIEW. Default: PROPERTY.
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-051:
+    ///     A ConceptDescription shall have one of the following categories
+    ///     VALUE, PROPERTY, REFERENCE, DOCUMENT, CAPABILITY, RELATIONSHIP, COLLECTION,
+    ///     FUNCTION, EVENT, ENTITY, APPLICATION_CLASS, QUALIFIER, VIEW. Default: PROPERTY.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class ConceptDescription :
             IIdentifiable,
@@ -6266,21 +6708,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -6288,9 +6746,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -6299,7 +6758,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -6541,10 +7000,17 @@ namespace AasCore.Aas3
     /// or more stakeholders.
     /// </summary>
     /// <remarks>
-    /// <para>Constraint AASd-064: If the semanticId of a View references a ConceptDescription
-    /// then the category of the ConceptDescription shall be VIEW.</para>
-    /// <para>Views are a projection of submodel elements for a given perspective.
-    /// They are not equivalent to submodels.</para>
+    /// Views are a projection of submodel elements for a given perspective.
+    /// They are not equivalent to submodels.
+    ///
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-064:
+    ///     If the semanticId of a View references a ConceptDescription
+    ///     then the category of the ConceptDescription shall be VIEW.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class View :
             IReferable,
@@ -6563,21 +7029,37 @@ namespace AasCore.Aas3
         /// the element within its name space.
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-002: idShort of Referables shall only feature letters, digits,
-        /// underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        /// Exception: In case of direct submodel elements within a SubmodelElementList the
-        /// idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c> or
-        /// <c>[1-9][0-9]+</c>.</para>
-        /// <para>Constraint AASd-117: For all Referables which are not Identifiables the idShort is
-        /// mandatory.</para>
-        /// <para>Constraint AASd-003: idShort shall be matched case-sensitive.</para>
-        /// <para>Constraint AASd-022: idShort of non-identifiable referables shall be unique in its
-        /// namespace.</para>
-        /// <para>Constraint AASd-027: idShort of Referables shall have a maximum length of 128
-        /// characters.</para>
-        /// <para>In case the element is a property and the property has a semantic definition
+        /// In case the element is a property and the property has a semantic definition
         /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.</para>
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -6585,9 +7067,10 @@ namespace AasCore.Aas3
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
-        /// <para>If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:</para>
-        /// <para><ul>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
         /// <li>the preferred name in the requested language of the concept description defining
         /// the semantics of the element</li>
         /// <li>If there is a default language list defined in the application,
@@ -6596,7 +7079,7 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul></para>
+        /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
 
@@ -7964,9 +8447,15 @@ namespace AasCore.Aas3
         /// Global unique id of the value.
         /// </summary>
         /// <remarks>
-        /// Constraint AASd-078: If the valueId of a ValueReferencePair references a
-        /// ConceptDescription then the ConceptDescription/category shall be one of following
-        /// values: VALUE.
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-078:
+        ///     If the valueId of a ValueReferencePair references a
+        ///     ConceptDescription then the ConceptDescription/category shall be one of
+        ///     following values: VALUE.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public IReference ValueId { get; set; }
 
@@ -8133,11 +8622,19 @@ namespace AasCore.Aas3
     {
         /// <summary>
         /// Preferred name
-        /// Constraint AASd-076: For all ConceptDescriptions using data specification template
-        /// IEC61360
-        /// (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0)
-        /// at least a preferred name in English shall be defined.
         /// </summary>
+        /// <remarks>
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-076:
+        ///     For all ConceptDescriptions using data specification template
+        ///     IEC61360
+        ///     (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0)
+        ///     at least a preferred name in English shall be defined.
+        ///     </li>
+        /// </ul>
+        /// </remarks>
         public LangStringSet? PreferredName { get; set; }
 
         /// <summary>
@@ -8169,26 +8666,45 @@ namespace AasCore.Aas3
         /// Data Type
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-070: For a ConceptDescription with category PROPERTY or VALUE using
-        /// data specification template IEC61360
-        /// (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-        /// DataSpecificationIEC61360/dataType is mandatory and shall be defined.</para>
-        /// <para>Constraint AASd-071: For a ConceptDescription with category REFERENCE using data
-        /// specification template IEC61360
-        /// (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-        /// DataSpecificationIEC61360/dataType is STRING by default.</para>
-        /// <para>Constraint AASd-072: For a ConceptDescription with category DOCUMENT using data
-        /// specification template IEC61360
-        /// (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-        /// DataSpecificationIEC61360/dataType shall be one of the following values: STRING or
-        /// URL.</para>
-        /// <para>Constraint AASd-073: For a ConceptDescription with category QUALIFIER using data
-        /// specification template IEC61360
-        /// (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-        /// DataSpecificationIEC61360/dataType is mandatory and shall be defined.</para>
-        /// <para>Constraint AASd-103: If DataSpecificationIEC61360/-dataType one of: INTEGER_MEASURE,
-        /// REAL_MEASURE, RATIONAL_MEASURE, INTEGER_CURRENCY, REAL_CURRENCY, then
-        /// DataSpecificationIEC61360/unit or DataSpecificationIEC61360/unitId shall be defined.</para>
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-070:
+        ///     For a ConceptDescription with category PROPERTY or VALUE using
+        ///     data specification template IEC61360
+        ///     (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
+        ///     DataSpecificationIEC61360/dataType is mandatory and shall be defined.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-071:
+        ///     For a ConceptDescription with category REFERENCE using data
+        ///     specification template IEC61360
+        ///     (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
+        ///     DataSpecificationIEC61360/dataType is STRING by default.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-072:
+        ///     For a ConceptDescription with category DOCUMENT using data
+        ///     specification template IEC61360
+        ///     (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
+        ///     DataSpecificationIEC61360/dataType shall be one of the following values: STRING or
+        ///     URL.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-073:
+        ///     For a ConceptDescription with category QUALIFIER using data
+        ///     specification template IEC61360
+        ///     (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
+        ///     DataSpecificationIEC61360/dataType is mandatory and shall be defined.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-103:
+        ///     If DataSpecificationIEC61360/-dataType one of: INTEGER_MEASURE,
+        ///     REAL_MEASURE, RATIONAL_MEASURE, INTEGER_CURRENCY, REAL_CURRENCY, then
+        ///     DataSpecificationIEC61360/unit or DataSpecificationIEC61360/unitId shall be
+        ///     defined.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public DataTypeIec61360? DataType { get; set; }
 
@@ -8196,11 +8712,17 @@ namespace AasCore.Aas3
         /// Definition in different languages
         /// </summary>
         /// <remarks>
-        /// Constraint AASd-074: For all ConceptDescriptions except for ConceptDescriptions of
-        /// category VALUE using data specification template IEC61360
-        /// (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-        /// DataSpecificationIEC61360/definition is mandatory and shall be defined at least in
-        /// English.
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-074:
+        ///     For all ConceptDescriptions except for ConceptDescriptions of
+        ///     category VALUE using data specification template IEC61360
+        ///     (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
+        ///     DataSpecificationIEC61360/definition is mandatory and shall be defined at least
+        ///     in English.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public LangStringSet? Definition { get; set; }
 
@@ -8221,11 +8743,20 @@ namespace AasCore.Aas3
         /// Value
         /// </summary>
         /// <remarks>
-        /// <para>Constraint AASd-101: If DataSpecificationIEC61360/category equal to VALUE then
-        /// DataSpecificationIEC61360/value shall be set.</para>
-        /// <para>Constraint AASd-102: If DataSpecificationIEC61360/value or
-        /// DataSpecificationIEC61360/valueId is not empty then
-        /// DataSpecificationIEC61360/valueList shall be empty and vice versa.</para>
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-101:
+        ///     If DataSpecificationIEC61360/category equal to VALUE then
+        ///     DataSpecificationIEC61360/value shall be set.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-102:
+        ///     If DataSpecificationIEC61360/value or
+        ///     DataSpecificationIEC61360/valueId is not empty then
+        ///     DataSpecificationIEC61360/valueList shall be empty and vice versa.
+        ///     </li>
+        /// </ul>
         /// </remarks>
         public string? Value { get; set; }
 

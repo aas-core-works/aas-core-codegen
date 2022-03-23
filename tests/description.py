@@ -19,7 +19,9 @@ def parse_restructured_text(text: str) -> docutils.nodes.document:
     warnings_text = warnings.getvalue()
     if warnings_text:
         raise RuntimeError(
-            f"Failed to parse the description with docutils:\n{warnings_text.strip()}"
+            f"Failed to parse the description with docutils:\n"
+            f"{warnings_text.strip()}\n\n"
+            f"The original text was: {text!r}"
         )
 
     assert document is not None
