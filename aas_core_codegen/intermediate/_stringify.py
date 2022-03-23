@@ -33,14 +33,12 @@ from aas_core_codegen.intermediate._types import (
     Property,
     Serialization,
     Signature,
-    SignatureLike,
     Snapshot,
     Symbol,
     SymbolTable,
-    TypeAnnotation,
-    Verification,
     UnderstoodMethod,
     ReferenceInTheBook,
+    SignatureLike,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -615,7 +613,6 @@ def _stringify_symbol_table(
 Dumpable = Union[
     AbstractClass,
     Argument,
-    Class,
     ConcreteClass,
     Constructor,
     Contract,
@@ -630,7 +627,6 @@ Dumpable = Union[
     Invariant,
     ListTypeAnnotation,
     MetaModel,
-    Method,
     OptionalTypeAnnotation,
     OurTypeAnnotation,
     PatternVerification,
@@ -639,12 +635,9 @@ Dumpable = Union[
     ReferenceInTheBook,
     Serialization,
     Signature,
-    SignatureLike,
     Snapshot,
     Symbol,
     SymbolTable,
-    TypeAnnotation,
-    Verification,
     UnderstoodMethod,
 ]
 

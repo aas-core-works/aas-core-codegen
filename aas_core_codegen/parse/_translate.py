@@ -49,7 +49,6 @@ from aas_core_codegen.parse._types import (
     EnumerationLiteral,
     is_string_expr,
     Serialization,
-    Method,
     Property,
     SelfTypeAnnotation,
     Snapshot,
@@ -67,6 +66,7 @@ from aas_core_codegen.parse._types import (
     ConstructorToBeUnderstood,
     FunctionUnion,
     ReferenceInTheBook,
+    MethodUnion,
 )
 
 
@@ -712,7 +712,7 @@ def _parse_snapshot(
 # fmt: on
 def _function_def_to_method(
     node: ast.FunctionDef, expect_self: bool, atok: asttokens.ASTTokens
-) -> Tuple[Optional[Method], Optional[Error]]:
+) -> Tuple[Optional[MethodUnion], Optional[Error]]:
     """
     Parse the function definition into a method.
 
@@ -1877,7 +1877,7 @@ def _classdef_to_symbol(
     description = None  # type: Optional[Description]
 
     properties = []  # type: List[Property]
-    methods = []  # type: List[Method]
+    methods = []  # type: List[MethodUnion]
 
     cursor = 0
     while cursor < len(node.body):

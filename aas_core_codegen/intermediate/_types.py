@@ -1105,10 +1105,10 @@ class Class(DBC):
     # We have to decorate methods with ``@property`` so that the translation code
     # is forced to use ``_set_methods``.
 
-    _methods: Sequence[Method]
+    _methods: Sequence["MethodUnion"]
 
     @property
-    def methods(self) -> Sequence[Method]:
+    def methods(self) -> Sequence["MethodUnion"]:
         """
         List methods of the class.
 
@@ -1117,10 +1117,10 @@ class Class(DBC):
         """
         return self._methods
 
-    _methods_by_name: Mapping[Identifier, Method]
+    _methods_by_name: Mapping[Identifier, "MethodUnion"]
 
     @property
-    def methods_by_name(self) -> Mapping[Identifier, Method]:
+    def methods_by_name(self) -> Mapping[Identifier, "MethodUnion"]:
         """Map all methods by their names."""
         return self._methods_by_name
 
@@ -1171,7 +1171,7 @@ class Class(DBC):
         descendants: Sequence["ClassUnion"],
         is_implementation_specific: bool,
         properties: Sequence[Property],
-        methods: Sequence[Method],
+        methods: Sequence["MethodUnion"],
         constructor: Constructor,
         invariants: Sequence[Invariant],
         serialization: Serialization,
@@ -1253,7 +1253,7 @@ class Class(DBC):
         "No duplicate methods"
     )
     # fmt: on
-    def _set_methods(self, methods: Sequence[Method]) -> None:
+    def _set_methods(self, methods: Sequence["MethodUnion"]) -> None:
         """
         Set the methods in the class.
 
@@ -1303,7 +1303,7 @@ class AbstractClass(Class):
         descendants: Sequence["ClassUnion"],
         is_implementation_specific: bool,
         properties: Sequence[Property],
-        methods: Sequence[Method],
+        methods: Sequence["MethodUnion"],
         constructor: Constructor,
         invariants: Sequence[Invariant],
         serialization: Serialization,
@@ -1836,6 +1836,9 @@ def collect_ids_of_symbols_in_properties(symbol_table: SymbolTable) -> Set[int]:
 
 ClassUnion = Union[AbstractClass, ConcreteClass]
 assert_union_of_descendants_exhaustive(union=ClassUnion, base_class=Class)
+
+MethodUnion = Union[UnderstoodMethod, ImplementationSpecificMethod]
+assert_union_of_descendants_exhaustive(union=MethodUnion, base_class=Method)
 
 Symbol = Union[Enumeration, ConstrainedPrimitive, ClassUnion]
 

@@ -483,7 +483,7 @@ class Class(DBC):
     properties: Final[Sequence[Property]]
 
     #: Methods of the class
-    methods: Final[Sequence[Method]]
+    methods: Final[Sequence["MethodUnion"]]
 
     #: Invariants of the class
     invariants: Final[Sequence[Invariant]]
@@ -540,7 +540,7 @@ class Class(DBC):
         is_implementation_specific: bool,
         inheritances: Sequence[Identifier],
         properties: Sequence[Property],
-        methods: Sequence[Method],
+        methods: Sequence["MethodUnion"],
         invariants: Sequence[Invariant],
         serialization: Optional[Serialization],
         reference_in_the_book: Optional[ReferenceInTheBook],
