@@ -210,11 +210,15 @@ def assert_all_public_types_listed_as_dumpables(
         dumpable_set.add(dumpable_cls.__name__)
 
     module_set = set()  # type: Set[str]
+
     for identifier, cls in inspect.getmembers(types_module, inspect.isclass):
         if identifier.startswith("_"):
             continue
 
         if issubclass(cls, enum.Enum):
+            continue
+
+        if inspect.isabstract(cls):
             continue
 
         if cls.__module__ == types_module.__name__:
@@ -226,7 +230,8 @@ def assert_all_public_types_listed_as_dumpables(
 
         raise AssertionError(
             f"The following classes were defined as dumpable, "
-            f"but not found in the module ``_types``: {sorted(dumpable_diff)}\n\n"
+            f"but not found as concrete classes "
+            f"in the module ``_types``: {sorted(dumpable_diff)}\n\n"
             f"The following classes were defined in the module ``_types``, "
             f"but not found in dumpables: {sorted(module_diff)}"
         )

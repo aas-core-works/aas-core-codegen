@@ -54,7 +54,6 @@ from aas_core_codegen.intermediate._types import (
     Contract,
     Snapshot,
     Serialization,
-    Method,
     Class,
     Constructor,
     Symbol,
@@ -81,6 +80,7 @@ from aas_core_codegen.intermediate._types import (
     collect_ids_of_symbols_in_properties,
     SymbolExceptEnumeration,
     ReferenceInTheBook,
+    MethodUnion,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -893,7 +893,7 @@ def _to_class(
         parsed=(parsed_class_init if parsed_class_init is not None else None),
     )
 
-    methods = []  # type: List[Method]
+    methods = []  # type: List[MethodUnion]
     for parsed_method in parsed.methods:
         if not isinstance(
             parsed_method, (parse.UnderstoodMethod, ImplementationSpecificMethod)
@@ -1808,7 +1808,7 @@ def _second_pass_to_stack_methods_in_place(symbol_table: SymbolTable) -> List[Er
         if isinstance(symbol, (Enumeration, ConstrainedPrimitive)):
             continue
         elif isinstance(symbol, (AbstractClass, ConcreteClass)):
-            inherited_methods = []  # type: List[Method]
+            inherited_methods = []  # type: List[MethodUnion]
 
             # NOTE (mristin, 2022-03-19):
             # We have to disallow diamond inheritance of the methods so we keep track
