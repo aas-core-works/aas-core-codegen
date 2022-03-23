@@ -2344,7 +2344,123 @@ class _ContractChecker(parse_tree.Visitor):
             self.visit(arg)
 
 
-def _check_all_non_optional_properties_initialized(cls: Class) -> List[Error]:
+def _over_signature_likes(symbol_table: SymbolTable) -> Iterator[SignatureLike]:
+    """
+    Iterate over all signature-like instances in the symbol table.
+
+    Since interfaces are constructed on top of abstract classes and concrete classes
+    with descendants, we do not iterate here over the signatures in the interfaces.
+    """
+    yield from symbol_table.verification_functions
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, Enumeration):
+            pass
+        elif isinstance(symbol, ConstrainedPrimitive):
+            pass
+        elif isinstance(symbol, Class):
+            yield from symbol.methods
+
+            yield symbol.constructor
+
+            # We do not recurse here into signatures of interfaces since they are based
+            # on the methods of the corresponding class.
+        else:
+            assert_never(symbol)
+
+
+def _verify_there_are_no_duplicate_symbol_names(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    errors = []  # type: List[Error]
+
+    observed_names = dict()  # type: MutableMapping[Identifier, Symbol]
+    for symbol in symbol_table.symbols:
+        other_symbol = observed_names.get(symbol.name, None)
+        if other_symbol is None:
+            observed_names[symbol.name] = symbol
+        else:
+            errors.append(
+                Error(
+                    symbol.parsed.node,
+                    f"The symbol with the name {symbol.name!r} conflicts with "
+                    f"other symbol with the same name.",
+                )
+            )
+
+    return errors
+
+
+def _verify_with_model_type_for_classes_with_at_least_one_concrete_descendant(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    errors = []  # type: List[Error]
+
+    symbols_in_properties = collect_ids_of_symbols_in_properties(
+        symbol_table=symbol_table
+    )
+
+    for symbol in symbol_table.symbols:
+        if not isinstance(symbol, Class):
+            continue
+
+        if id(symbol) in symbols_in_properties:
+            if len(symbol.concrete_descendants) >= 1:
+                if not symbol.serialization.with_model_type:
+                    descendants_str = ", ".join(
+                        repr(descendant.name)
+                        for descendant in symbol.concrete_descendants
+                    )
+
+                    errors.append(
+                        Error(
+                            symbol.parsed.node,
+                            f"The class {symbol.name!r} has one or more concrete "
+                            f"descendants ({descendants_str}), but its serialization "
+                            f"setting ``with_model_type`` has not been set. We need "
+                            f"to discriminate on model type at the de-serialization.",
+                        )
+                    )
+
+                for descendant in symbol.concrete_descendants:
+                    if not descendant.serialization.with_model_type:
+                        errors.append(
+                            Error(
+                                descendant.parsed.node,
+                                f"The class {descendant.name!r} needs to have "
+                                f"serialization setting ``with_model_type`` set since "
+                                f"it is among the concrete descendant classes of "
+                                f"the class {symbol.name!r}. We need to discriminate "
+                                f"on model type at the de-serialization",
+                            )
+                        )
+
+    return errors
+
+
+def _verify_all_the_function_calls_in_the_contracts_are_valid(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    contract_checker = _ContractChecker(symbol_table=symbol_table)
+
+    for signature_like in _over_signature_likes(symbol_table):
+        for contract_or_snapshot in itertools.chain(
+            signature_like.contracts.preconditions,
+            signature_like.contracts.postconditions,
+            signature_like.contracts.snapshots,
+        ):
+            assert isinstance(contract_or_snapshot, (Contract, Snapshot))
+            contract_checker.visit(contract_or_snapshot.body)
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, Class):
+            for invariant in symbol.invariants:
+                contract_checker.visit(invariant.body)
+
+    return contract_checker.errors
+
+
+def _verify_all_non_optional_properties_initialized(cls: Class) -> List[Error]:
     """
     Check that all properties of the class are properly initialized in the constructor.
 
@@ -2412,130 +2528,22 @@ def _check_all_non_optional_properties_initialized(cls: Class) -> List[Error]:
     return errors
 
 
-def _over_signature_likes(symbol_table: SymbolTable) -> Iterator[SignatureLike]:
-    """
-    Iterate over all signature-like instances in the symbol table.
-
-    Since interfaces are constructed on top of abstract classes and concrete classes
-    with descendants, we do not iterate here over the signatures in the interfaces.
-    """
-    yield from symbol_table.verification_functions
-
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, Enumeration):
-            pass
-        elif isinstance(symbol, ConstrainedPrimitive):
-            pass
-        elif isinstance(symbol, Class):
-            yield from symbol.methods
-
-            yield symbol.constructor
-
-            # We do not recurse here into signatures of interfaces since they are based
-            # on the methods of the corresponding class.
-        else:
-            assert_never(symbol)
-
-
-def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Error]:
-    """Perform a battery of checks on the consistency of ``symbol_table``."""
+def _verify_all_non_optional_properties_are_initialized_in_the_constructor(
+    symbol_table: SymbolTable,
+) -> List[Error]:
     errors = []  # type: List[Error]
 
-    # region Check that there are no duplicate symbol names
-
-    observed_names = dict()  # type: MutableMapping[Identifier, Symbol]
-    for symbol in symbol_table.symbols:
-        other_symbol = observed_names.get(symbol.name, None)
-        if other_symbol is None:
-            observed_names[symbol.name] = symbol
-        else:
-            errors.append(
-                Error(
-                    symbol.parsed.node,
-                    f"The symbol with the name {symbol.name!r} conflicts with "
-                    f"other symbol with the same name.",
-                )
-            )
-
-    if len(errors) > 0:
-        return errors
-
-    # endregion
-
-    # region Check ``with_model_type`` for classes with at least one concrete descendant
-
-    symbols_in_properties = collect_ids_of_symbols_in_properties(
-        symbol_table=symbol_table
-    )
-
     for symbol in symbol_table.symbols:
         if not isinstance(symbol, Class):
             continue
 
-        if id(symbol) in symbols_in_properties:
-            if len(symbol.concrete_descendants) >= 1:
-                if not symbol.serialization.with_model_type:
-                    descendants_str = ", ".join(
-                        repr(descendant.name)
-                        for descendant in symbol.concrete_descendants
-                    )
+        errors.extend(_verify_all_non_optional_properties_initialized(cls=symbol))
 
-                    errors.append(
-                        Error(
-                            symbol.parsed.node,
-                            f"The class {symbol.name!r} has one or more concrete "
-                            f"descendants ({descendants_str}), but its serialization "
-                            f"setting ``with_model_type`` has not been set. We need "
-                            f"to discriminate on model type at the de-serialization.",
-                        )
-                    )
+    return errors
 
-                for descendant in symbol.concrete_descendants:
-                    if not descendant.serialization.with_model_type:
-                        errors.append(
-                            Error(
-                                descendant.parsed.node,
-                                f"The class {descendant.name!r} needs to have "
-                                f"serialization setting ``with_model_type`` set since "
-                                f"it is among the concrete descendant classes of "
-                                f"the class {symbol.name!r}. We need to discriminate "
-                                f"on model type at the de-serialization",
-                            )
-                        )
 
-    # endregion
-
-    # region Check that all the function calls in the contracts are valid
-
-    contract_checker = _ContractChecker(symbol_table=symbol_table)
-
-    for signature_like in _over_signature_likes(symbol_table):
-        for contract_or_snapshot in itertools.chain(
-            signature_like.contracts.preconditions,
-            signature_like.contracts.postconditions,
-            signature_like.contracts.snapshots,
-        ):
-            assert isinstance(contract_or_snapshot, (Contract, Snapshot))
-            contract_checker.visit(contract_or_snapshot.body)
-
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, Class):
-            for invariant in symbol.invariants:
-                contract_checker.visit(invariant.body)
-
-    # endregion
-
-    # region Check that all non-optional properties are initialized in the constructor
-
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, Class):
-            continue
-
-        errors.extend(_check_all_non_optional_properties_initialized(cls=symbol))
-
-    # endregion
-
-    # region Check that all argument references are valid
+def _verify_all_argument_references_are_valid(symbol_table: SymbolTable) -> List[Error]:
+    errors = []  # type: List[Error]
 
     for signature_like in _over_signature_likes(symbol_table):
         if signature_like.description is not None:
@@ -2555,10 +2563,12 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
                         )
                     )
 
-    # endregion
+    return errors
 
-    # region Assert that interfaces defined correctly
 
+def _assert_interfaces_defined_correctly(
+    symbol_table: SymbolTable, ontology: _hierarchy.Ontology
+) -> None:
     # NOTE (mristin, 2021-12-15):
     # We expect the interfaces of the classes to be defined only for abstract classes
     # and for the concrete classes with at least one descendant.
@@ -2575,10 +2585,10 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
         else:
             assert symbol.interface is None
 
-    # endregion
 
-    # region Assert that all class inheritances defined an interface
-
+def _assert_all_class_inheritances_defined_an_interface(
+    symbol_table: SymbolTable,
+) -> None:
     for symbol in symbol_table.symbols:
         if not isinstance(symbol, Class):
             continue
@@ -2590,7 +2600,40 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
                 f"defined for it, but it does not."
             )
 
-    # endregion
+
+def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Error]:
+    """Perform a battery of checks on the consistency of ``symbol_table``."""
+    errors = _verify_there_are_no_duplicate_symbol_names(symbol_table=symbol_table)
+
+    if len(errors) > 0:
+        return errors
+
+    errors.extend(
+        _verify_with_model_type_for_classes_with_at_least_one_concrete_descendant(
+            symbol_table=symbol_table
+        )
+    )
+
+    errors.extend(
+        _verify_all_the_function_calls_in_the_contracts_are_valid(
+            symbol_table=symbol_table
+        )
+    )
+
+    errors.extend(
+        _verify_all_non_optional_properties_are_initialized_in_the_constructor(
+            symbol_table=symbol_table
+        )
+    )
+
+    errors.extend(_verify_all_argument_references_are_valid(symbol_table=symbol_table))
+
+    if len(errors) > 0:
+        return errors
+
+    _assert_interfaces_defined_correctly(symbol_table=symbol_table, ontology=ontology)
+
+    _assert_all_class_inheritances_defined_an_interface(symbol_table=symbol_table)
 
     return errors
 
