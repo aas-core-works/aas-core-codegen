@@ -265,23 +265,36 @@ def _propagate_parsed_reference_in_the_book(
     )
 
 
+def _to_enumeration_literal(
+    parsed: parse.EnumerationLiteral,
+) -> EnumerationLiteral:
+    """Translate the enumeration literal from the meta-model."""
+    return EnumerationLiteral(
+        name=parsed.name,
+        value=parsed.value,
+        description=(
+            _to_description(parsed.description)
+            if parsed.description is not None
+            else None
+        ),
+        parsed=parsed,
+    )
+
+
 def _to_enumeration(parsed: parse.Enumeration) -> Enumeration:
     """Translate an enumeration from the meta-model to an intermediate enumeration."""
+    description = (
+        _to_description(parsed.description) if parsed.description is not None else None
+    )
+
+    literals = [
+        _to_enumeration_literal(parsed_literal) for parsed_literal in parsed.literals
+    ]
+
     return Enumeration(
         name=parsed.name,
-        literals=[
-            EnumerationLiteral(
-                name=parsed_literal.name,
-                value=parsed_literal.value,
-                description=(
-                    _to_description(parsed_literal.description)
-                    if parsed_literal.description is not None
-                    else None
-                ),
-                parsed=parsed_literal,
-            )
-            for parsed_literal in parsed.literals
-        ],
+        literals=literals,
+        # NOTE (mristin, 2021-12-27):
         # Postpone the resolution to the second pass once the symbol table has been
         # completely built
         is_superset_of=cast(
@@ -296,11 +309,7 @@ def _to_enumeration(parsed: parse.Enumeration) -> Enumeration:
         )
         if parsed.reference_in_the_book is not None
         else None,
-        description=(
-            _to_description(parsed.description)
-            if parsed.description is not None
-            else None
-        ),
+        description=description,
         parsed=parsed,
     )
 
