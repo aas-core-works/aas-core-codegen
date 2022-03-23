@@ -1161,59 +1161,64 @@ def _second_pass_to_resolve_symbols_in_atomic_types_in_place(
     return errors
 
 
-def _over_descriptions_in_symbol(symbol: Symbol) -> Iterator[Description]:
-    """Iterate over all the descriptions from the ``something``."""
-    if isinstance(symbol, Enumeration):
-        if symbol.description is not None:
-            yield symbol.description
-
-        for literal in symbol.literals:
-            if literal.description is not None:
-                yield literal.description
-
-    elif isinstance(symbol, ConstrainedPrimitive):
-        if symbol.description is not None:
-            yield symbol.description
-
-    elif isinstance(symbol, Class):
-        if symbol.description is not None:
-            yield symbol.description
-
-        for prop in symbol.properties:
-            if prop.description is not None:
-                yield prop.description
-
-        for method in symbol.methods:
-            if method.description is not None:
-                yield method.description
-
-    elif isinstance(symbol, Description):
-        for node in symbol.document.findall(condition=doc.SymbolReference):
-            yield node
-    else:
-        assert_never(symbol)
+_DocElementT = TypeVar("_DocElementT", bound=docutils.nodes.Element)
 
 
-def _over_descriptions(
-    symbol_table: SymbolTable,
-) -> Iterator[Tuple[Optional[Symbol], Description]]:
+def _find_all_in_descriptions(
+    element_type: Type[_DocElementT], symbol_table: SymbolTable
+) -> Iterator[Tuple[_DocElementT, Description, Optional[Symbol]]]:
     """
-    Iterate over all the descriptions in the meta-model.
+    Iterate over the descriptions and yield the desired documentation elements.
 
-    The symbol indicates the symbol that encompasses the description (*e.g.*
-    a class if the description is related to a member or a property). This gives,
-    for example, the context when we have to resolve references in the downstream code.
+    We return the corresponding description containing the element as well as
+    the outer symbol in which context the description is given.
+
+    If there is no symbol available as a context, which is the case for example in
+    verification functions, no symbol is yielded.
     """
     for symbol in symbol_table.symbols:
-        for description in _over_descriptions_in_symbol(symbol):
-            yield symbol, description
+        if isinstance(symbol, Enumeration):
+            if symbol.description is not None:
+                for element in symbol.description.document.findall(element_type):
+                    yield element, symbol.description, symbol
+
+            for literal in symbol.literals:
+                if literal.description is not None:
+                    for element in literal.description.document.findall(element_type):
+                        yield element, literal.description, symbol
+
+        elif isinstance(symbol, ConstrainedPrimitive):
+            if symbol.description is not None:
+                for element in symbol.description.document.findall(element_type):
+                    yield element, symbol.description, symbol
+
+        elif isinstance(symbol, Class):
+            if symbol.description is not None:
+                for element in symbol.description.document.findall(element_type):
+                    yield element, symbol.description, symbol
+
+            for prop in symbol.properties:
+                if prop.description is not None:
+                    for element in prop.description.document.findall(element_type):
+                        yield element, prop.description, symbol
+
+            for method in symbol.methods:
+                if method.description is not None:
+                    for element in method.description.document.findall(element_type):
+                        yield element, method.description, symbol
+        else:
+            assert_never(symbol)
 
     for verification in symbol_table.verification_functions:
         if verification.description is not None:
-            yield None, verification.description
+            for element in verification.description.document.findall(element_type):
+                yield element, verification.description, None
 
     if symbol_table.meta_model.description is not None:
-        yield None, symbol_table.meta_model.description
+        for element in symbol_table.meta_model.description.document.findall(
+            element_type
+        ):
+            yield element, symbol_table.meta_model.description, None
 
 
 def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
@@ -1222,55 +1227,53 @@ def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
     """Resolve the symbol references in the descriptions in-place."""
     errors = []  # type: List[Error]
 
-    for _, description in _over_descriptions(symbol_table):
-        for symbol_ref_in_doc in description.document.findall(
-            condition=doc.SymbolReference
-        ):
+    for symbol_ref_in_doc, description, _ in _find_all_in_descriptions(
+        element_type=doc.SymbolReference, symbol_table=symbol_table
+    ):
+        # Symbol references can be repeated as docutils will cache them
+        # so we need to skip them.
+        if not isinstance(symbol_ref_in_doc.symbol, _PlaceholderSymbol):
+            continue
 
-            # Symbol references can be repeated as docutils will cache them
-            # so we need to skip them.
-            if not isinstance(symbol_ref_in_doc.symbol, _PlaceholderSymbol):
-                continue
-
-            raw_identifier = symbol_ref_in_doc.symbol.name
-            if not raw_identifier.startswith("."):
-                errors.append(
-                    Error(
-                        description.node,
-                        f"The identifier of the symbol reference "
-                        f"is invalid: {raw_identifier}; "
-                        f"expected an identifier starting with a dot",
-                    )
+        raw_identifier = symbol_ref_in_doc.symbol.name
+        if not raw_identifier.startswith("."):
+            errors.append(
+                Error(
+                    description.node,
+                    f"The identifier of the symbol reference "
+                    f"is invalid: {raw_identifier}; "
+                    f"expected an identifier starting with a dot",
                 )
-                continue
+            )
+            continue
 
-            raw_identifier_no_dot = raw_identifier[1:]
+        raw_identifier_no_dot = raw_identifier[1:]
 
-            if not IDENTIFIER_RE.match(raw_identifier_no_dot):
-                errors.append(
-                    Error(
-                        description.node,
-                        f"The identifier of the symbol reference "
-                        f"is invalid: {raw_identifier_no_dot}",
-                    )
+        if not IDENTIFIER_RE.match(raw_identifier_no_dot):
+            errors.append(
+                Error(
+                    description.node,
+                    f"The identifier of the symbol reference "
+                    f"is invalid: {raw_identifier_no_dot}",
                 )
-                continue
+            )
+            continue
 
-            # Strip the dot
-            identifier = Identifier(raw_identifier_no_dot)
+        # Strip the dot
+        identifier = Identifier(raw_identifier_no_dot)
 
-            referenced_symbol = symbol_table.find(name=identifier)
-            if referenced_symbol is None:
-                errors.append(
-                    Error(
-                        description.node,
-                        f"The identifier of the symbol reference "
-                        f"could not be found in the symbol table: {identifier}",
-                    )
+        referenced_symbol = symbol_table.find(name=identifier)
+        if referenced_symbol is None:
+            errors.append(
+                Error(
+                    description.node,
+                    f"The identifier of the symbol reference "
+                    f"could not be found in the symbol table: {identifier}",
                 )
-                continue
+            )
+            continue
 
-            symbol_ref_in_doc.symbol = referenced_symbol
+        symbol_ref_in_doc.symbol = referenced_symbol
 
     return errors
 
@@ -2055,135 +2058,133 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
     errors = []  # type: List[Error]
 
     # The ``symbol`` is None if the description is in the context outside of a symbol.
-    for symbol, description in _over_descriptions(symbol_table):
+    for attr_ref_in_doc, description, symbol in _find_all_in_descriptions(
+        element_type=doc.AttributeReference, symbol_table=symbol_table
+    ):
         # BEFORE-RELEASE (mristin, 2021-12-13):
         #  test this, especially the failure cases
-        for attr_ref_in_doc in description.document.findall(
-            condition=doc.AttributeReference
-        ):
-            if isinstance(attr_ref_in_doc.reference, _PlaceholderAttributeReference):
-                pth = attr_ref_in_doc.reference.path
-                parts = pth.split(".")
+        if isinstance(attr_ref_in_doc.reference, _PlaceholderAttributeReference):
+            pth = attr_ref_in_doc.reference.path
+            parts = pth.split(".")
 
-                if any(not IDENTIFIER_RE.match(part) for part in parts):
+            if any(not IDENTIFIER_RE.match(part) for part in parts):
+                errors.append(
+                    Error(
+                        description.node,
+                        f"Invalid reference to a property or a literal; "
+                        f"each part of the path needs to be an identifier, "
+                        f"but it is not: {pth}",
+                    )
+                )
+                continue
+
+            part_identifiers = [Identifier(part) for part in parts]
+
+            if len(part_identifiers) == 0:
+                errors.append(
+                    Error(
+                        description.node,
+                        "Unexpected empty reference " "to a property or a literal",
+                    )
+                )
+                continue
+
+            # noinspection PyUnusedLocal
+            target_symbol = None  # type: Optional[Symbol]
+
+            # noinspection PyUnusedLocal
+            attr_identifier = None  # type: Optional[Identifier]
+
+            if len(part_identifiers) == 1:
+                if symbol is None:
                     errors.append(
                         Error(
                             description.node,
-                            f"Invalid reference to a property or a literal; "
-                            f"each part of the path needs to be an identifier, "
-                            f"but it is not: {pth}",
+                            f"The attribute reference can not be resolved as there "
+                            f"is no encompassing symbol in the given "
+                            f"context: {pth}",
                         )
                     )
                     continue
 
-                part_identifiers = [Identifier(part) for part in parts]
-
-                if len(part_identifiers) == 0:
+                target_symbol = symbol
+                attr_identifier = part_identifiers[0]
+            elif len(part_identifiers) == 2:
+                target_symbol = symbol_table.find(part_identifiers[0])
+                if target_symbol is None:
                     errors.append(
                         Error(
                             description.node,
-                            "Unexpected empty reference " "to a property or a literal",
+                            f"Dangling reference to a non-existing " f"symbol: {pth}",
                         )
                     )
                     continue
 
-                # noinspection PyUnusedLocal
-                target_symbol = None  # type: Optional[Symbol]
+                attr_identifier = part_identifiers[1]
+            else:
+                errors.append(
+                    Error(
+                        description.node,
+                        f"We did not implement the resolution of such "
+                        f"a reference to a property or a literal: {pth}",
+                    )
+                )
+                continue
 
-                # noinspection PyUnusedLocal
-                attr_identifier = None  # type: Optional[Identifier]
+            assert target_symbol is not None
+            assert attr_identifier is not None
 
-                if len(part_identifiers) == 1:
-                    if symbol is None:
-                        errors.append(
-                            Error(
-                                description.node,
-                                f"The attribute reference can not be resolved as there "
-                                f"is no encompassing symbol in the given "
-                                f"context: {pth}",
-                            )
-                        )
-                        continue
+            reference: Optional[
+                Union[doc.PropertyReference, doc.EnumerationLiteralReference]
+            ] = None
 
-                    target_symbol = symbol
-                    attr_identifier = part_identifiers[0]
-                elif len(part_identifiers) == 2:
-                    target_symbol = symbol_table.find(part_identifiers[0])
-                    if target_symbol is None:
-                        errors.append(
-                            Error(
-                                description.node,
-                                f"Dangling reference to a non-existing "
-                                f"symbol: {pth}",
-                            )
-                        )
-                        continue
+            if isinstance(target_symbol, Enumeration):
+                literal = target_symbol.literals_by_name.get(attr_identifier, None)
 
-                    attr_identifier = part_identifiers[1]
-                else:
+                if literal is None:
                     errors.append(
                         Error(
                             description.node,
-                            f"We did not implement the resolution of such "
-                            f"a reference to a property or a literal: {pth}",
+                            f"Dangling reference to a non-existing literal "
+                            f"in the enumeration {target_symbol.name!r}: {pth}",
                         )
                     )
                     continue
 
-                assert target_symbol is not None
-                assert attr_identifier is not None
+                reference = doc.EnumerationLiteralReference(
+                    symbol=target_symbol, literal=literal
+                )
 
-                reference: Optional[
-                    Union[doc.PropertyReference, doc.EnumerationLiteralReference]
-                ] = None
-
-                if isinstance(target_symbol, Enumeration):
-                    literal = target_symbol.literals_by_name.get(attr_identifier, None)
-
-                    if literal is None:
-                        errors.append(
-                            Error(
-                                description.node,
-                                f"Dangling reference to a non-existing literal "
-                                f"in the enumeration {target_symbol.name!r}: {pth}",
-                            )
-                        )
-                        continue
-
-                    reference = doc.EnumerationLiteralReference(
-                        symbol=target_symbol, literal=literal
+            elif isinstance(target_symbol, ConstrainedPrimitive):
+                errors.append(
+                    Error(
+                        description.node,
+                        f"Unexpected references to a property of "
+                        f"a constrained primitive {target_symbol.name!r}: {pth}",
                     )
+                )
+                continue
 
-                elif isinstance(target_symbol, ConstrainedPrimitive):
+            elif isinstance(target_symbol, (AbstractClass, ConcreteClass)):
+                prop = target_symbol.properties_by_name.get(attr_identifier, None)
+
+                if prop is None:
                     errors.append(
                         Error(
                             description.node,
-                            f"Unexpected references to a property of "
-                            f"a constrained primitive {target_symbol.name!r}: {pth}",
+                            f"Dangling reference to a non-existing property "
+                            f"of a class {target_symbol.name!r}: {pth}",
                         )
                     )
                     continue
 
-                elif isinstance(target_symbol, (AbstractClass, ConcreteClass)):
-                    prop = target_symbol.properties_by_name.get(attr_identifier, None)
+                reference = doc.PropertyReference(cls=target_symbol, prop=prop)
 
-                    if prop is None:
-                        errors.append(
-                            Error(
-                                description.node,
-                                f"Dangling reference to a non-existing property "
-                                f"of a class {target_symbol.name!r}: {pth}",
-                            )
-                        )
-                        continue
+            else:
+                assert_never(target_symbol)
 
-                    reference = doc.PropertyReference(cls=target_symbol, prop=prop)
-
-                else:
-                    assert_never(target_symbol)
-
-                assert reference is not None
-                attr_ref_in_doc.reference = reference
+            assert reference is not None
+            attr_ref_in_doc.reference = reference
 
     return errors
 
