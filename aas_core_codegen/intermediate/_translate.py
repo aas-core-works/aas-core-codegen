@@ -1064,6 +1064,21 @@ def _to_verification_function(
     raise AssertionError("Should not have gotten here")
 
 
+def _to_meta_model(
+    parsed: parse.MetaModel,
+) -> MetaModel:
+    """Translate the meta-model meta-data."""
+    return MetaModel(
+        book_url=parsed.book_url,
+        book_version=parsed.book_version,
+        description=(
+            _to_description(parsed.description)
+            if parsed.description is not None
+            else None
+        ),
+    )
+
+
 def _over_our_type_annotations(
     something: Union[Symbol, TypeAnnotationUnion]
 ) -> Iterator[OurTypeAnnotation]:
@@ -2690,18 +2705,7 @@ def translate(
         assert symbol is not None
         symbols.append(symbol)
 
-    if len(underlying_errors) > 0:
-        return None, bundle_underlying_errors()
-
-    meta_model = MetaModel(
-        book_url=parsed_symbol_table.meta_model.book_url,
-        book_version=parsed_symbol_table.meta_model.book_version,
-        description=(
-            _to_description(parsed_symbol_table.meta_model.description)
-            if parsed_symbol_table.meta_model.description is not None
-            else None
-        ),
-    )
+    meta_model = _to_meta_model(parsed_symbol_table.meta_model)
 
     verification_functions = []  # type: List[VerificationUnion]
     for func in parsed_symbol_table.verification_functions:
