@@ -10,8 +10,29 @@ import shlex
 
 def main() -> int:
     """Execute the main routine."""
+    available_tests = [
+        "tests.csharp.test_main.Test_against_recorded",
+        "tests.intermediate.test_translate.Test_against_recorded",
+        "tests.jsonschema.test_main.Test_against_recorded",
+        "tests.rdf_shacl.test_main.Test_against_recorded",
+        "tests.test_parse.Test_against_recorded",
+    ]
+
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.parse_args()
+    parser.add_argument(
+        "--select",
+        help=(
+            "If set, only the selected tests are executed. "
+            "This is practical if some of the tests failed and you want to "
+            "fix them in isolation. "
+            "The tests are given as a space-separated list of: "
+            + " ".join(available_tests)
+        ),
+        metavar="",
+        nargs="+",
+        choices=available_tests,
+    )
+    args = parser.parse_args()
 
     this_path = pathlib.Path(os.path.realpath(__file__))
     repo_root = this_path.parent.parent
@@ -19,13 +40,10 @@ def main() -> int:
     env = os.environ.copy()
     env["AAS_CORE_CODEGEN_RERECORD"] = "1"
 
-    tests_to_run = [
-        "tests.csharp.test_main.Test_against_recorded",
-        "tests.intermediate.test_translate.Test_against_recorded",
-        "tests.jsonschema.test_main.Test_against_recorded",
-        "tests.rdf_shacl.test_main.Test_against_recorded",
-        "tests.test_parse.Test_against_recorded",
-    ]
+    if args.select is not None:
+        tests_to_run = list(args.select)
+    else:
+        tests_to_run = available_tests
 
     for qualified_test_name in tests_to_run:
         cmd = [sys.executable, "-m", "unittest", "-v", qualified_test_name]
