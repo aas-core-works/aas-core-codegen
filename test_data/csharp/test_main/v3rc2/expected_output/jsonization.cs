@@ -198,12 +198,192 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of IHasSemantics by dispatching
+            /// Deserialize the enumeration BuildInListTypes from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.BuildInListTypes? BuildInListTypesFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+                string? text = DeserializeImplementation.StringFrom(
+                    node, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected text null if error null");
+                }
+                Aas.BuildInListTypes? result = Stringification.BuildInListTypesFromString(text);
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "Not a valid JSON representation of BuildInListTypes ");
+                }
+                return result;
+            }  // internal static BuildInListTypesFrom
+
+            /// <summary>
+            /// Deserialize the enumeration DecimalBuildInTypes from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.DecimalBuildInTypes? DecimalBuildInTypesFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+                string? text = DeserializeImplementation.StringFrom(
+                    node, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected text null if error null");
+                }
+                Aas.DecimalBuildInTypes? result = Stringification.DecimalBuildInTypesFromString(text);
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "Not a valid JSON representation of DecimalBuildInTypes ");
+                }
+                return result;
+            }  // internal static DecimalBuildInTypesFrom
+
+            /// <summary>
+            /// Deserialize the enumeration DurationBuildInTypes from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.DurationBuildInTypes? DurationBuildInTypesFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+                string? text = DeserializeImplementation.StringFrom(
+                    node, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected text null if error null");
+                }
+                Aas.DurationBuildInTypes? result = Stringification.DurationBuildInTypesFromString(text);
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "Not a valid JSON representation of DurationBuildInTypes ");
+                }
+                return result;
+            }  // internal static DurationBuildInTypesFrom
+
+            /// <summary>
+            /// Deserialize the enumeration PrimitiveTypes from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.PrimitiveTypes? PrimitiveTypesFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+                string? text = DeserializeImplementation.StringFrom(
+                    node, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected text null if error null");
+                }
+                Aas.PrimitiveTypes? result = Stringification.PrimitiveTypesFromString(text);
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "Not a valid JSON representation of PrimitiveTypes ");
+                }
+                return result;
+            }  // internal static PrimitiveTypesFrom
+
+            /// <summary>
+            /// Deserialize the enumeration StringBuildInTypes from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.StringBuildInTypes? StringBuildInTypesFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+                string? text = DeserializeImplementation.StringFrom(
+                    node, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected text null if error null");
+                }
+                Aas.StringBuildInTypes? result = Stringification.StringBuildInTypesFromString(text);
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "Not a valid JSON representation of StringBuildInTypes ");
+                }
+                return result;
+            }  // internal static StringBuildInTypesFrom
+
+            /// <summary>
+            /// Deserialize the enumeration DataTypeDef from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.DataTypeDef? DataTypeDefFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+                string? text = DeserializeImplementation.StringFrom(
+                    node, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected text null if error null");
+                }
+                Aas.DataTypeDef? result = Stringification.DataTypeDefFromString(text);
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "Not a valid JSON representation of DataTypeDef ");
+                }
+                return result;
+            }  // internal static DataTypeDefFrom
+
+            /// <summary>
+            /// Deserialize an instance of IReference by dispatching
             /// based on <c>modelType</c> property of the <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            public static Aas.IHasSemantics? IHasSemanticsFrom(
+            public static Aas.IReference? IReferenceFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
             {
@@ -243,202 +423,18 @@ namespace AasCore.Aas3
 
                 switch (modelType)
                 {
-                case "AnnotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFrom(
+                case "GlobalReference":
+                    return GlobalReferenceFrom(
                         node, out error);
-                case "BasicEvent":
-                    return BasicEventFrom(
-                        node, out error);
-                case "Blob":
-                    return BlobFrom(
-                        node, out error);
-                case "Capability":
-                    return CapabilityFrom(
-                        node, out error);
-                case "Entity":
-                    return EntityFrom(
-                        node, out error);
-                case "Extension":
-                    return ExtensionFrom(
-                        node, out error);
-                case "File":
-                    return FileFrom(
-                        node, out error);
-                case "IdentifierKeyValuePair":
-                    return IdentifierKeyValuePairFrom(
-                        node, out error);
-                case "MultiLanguageProperty":
-                    return MultiLanguagePropertyFrom(
-                        node, out error);
-                case "Operation":
-                    return OperationFrom(
-                        node, out error);
-                case "Property":
-                    return PropertyFrom(
-                        node, out error);
-                case "Qualifier":
-                    return QualifierFrom(
-                        node, out error);
-                case "Range":
-                    return RangeFrom(
-                        node, out error);
-                case "ReferenceElement":
-                    return ReferenceElementFrom(
-                        node, out error);
-                case "Submodel":
-                    return SubmodelFrom(
-                        node, out error);
-                case "SubmodelElementList":
-                    return SubmodelElementListFrom(
-                        node, out error);
-                case "SubmodelElementStruct":
-                    return SubmodelElementStructFrom(
-                        node, out error);
-                case "View":
-                    return ViewFrom(
+                case "ModelReference":
+                    return ModelReferenceFrom(
                         node, out error);
                     default:
                         error = new Reporting.Error(
-                            $"Unexpected model type for IHasSemantics: {modelType}");
+                            $"Unexpected model type for IReference: {modelType}");
                         return null;
                 }
-            }  // public static Aas.IHasSemantics IHasSemanticsFrom
-
-            /// <summary>
-            /// Deserialize an instance of Extension from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Extension? ExtensionFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-
-                Nodes.JsonObject? obj = node as Nodes.JsonObject;
-                if (obj == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonObject, but got {node.GetType()}");
-                    return null;
-                }
-
-                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
-                Aas.IReference? theSemanticId = null;
-                if (nodeSemanticId != null)
-                {
-                    theSemanticId = DeserializeImplementation.IReferenceFrom(
-                        nodeSemanticId,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "semanticId"));
-                        return null;
-                    }
-                    if (theSemanticId == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theSemanticId null when error is also null");
-                    }
-                }
-
-                Nodes.JsonNode? nodeName = obj["name"];
-                if (nodeName == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"name\" is missing ");
-                    return null;
-                }
-                string? theName = DeserializeImplementation.StringFrom(
-                    nodeName,
-                    out error);
-                if (error != null)
-                {
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "name"));
-                    return null;
-                }
-                if (theName == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected theName null when error is also null");
-                }
-
-                Nodes.JsonNode? nodeValueType = obj["valueType"];
-                Aas.DataTypeDef? theValueType = null;
-                if (nodeValueType != null)
-                {
-                    theValueType = DeserializeImplementation.DataTypeDefFrom(
-                        nodeValueType,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "valueType"));
-                        return null;
-                    }
-                    if (theValueType == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theValueType null when error is also null");
-                    }
-                }
-
-                Nodes.JsonNode? nodeValue = obj["value"];
-                string? theValue = null;
-                if (nodeValue != null)
-                {
-                    theValue = DeserializeImplementation.StringFrom(
-                        nodeValue,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "value"));
-                        return null;
-                    }
-                    if (theValue == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theValue null when error is also null");
-                    }
-                }
-
-                Nodes.JsonNode? nodeRefersTo = obj["refersTo"];
-                Aas.IReference? theRefersTo = null;
-                if (nodeRefersTo != null)
-                {
-                    theRefersTo = DeserializeImplementation.IReferenceFrom(
-                        nodeRefersTo,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "refersTo"));
-                        return null;
-                    }
-                    if (theRefersTo == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theRefersTo null when error is also null");
-                    }
-                }
-
-                return new Aas.Extension(
-                    theName
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
-                    theSemanticId,
-                    theValueType,
-                    theValue,
-                    theRefersTo);
-            }  // internal static ExtensionFrom
+            }  // public static Aas.IReference IReferenceFrom
 
             /// <summary>
             /// Deserialize an instance of IHasExtensions by dispatching
@@ -649,98 +645,6 @@ namespace AasCore.Aas3
             }  // public static Aas.IReferable IReferableFrom
 
             /// <summary>
-            /// Deserialize an instance of IIdentifiable by dispatching
-            /// based on <c>modelType</c> property of the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            public static Aas.IIdentifiable? IIdentifiableFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-
-                var obj = node as Nodes.JsonObject;
-                if (obj == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
-                    return null;
-                }
-
-                Nodes.JsonNode? modelTypeNode = obj["modelType"];
-                if (modelTypeNode == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected a model type, but none is present");
-                    return null;
-                }
-                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
-                if (modelTypeValue == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected JsonValue, " +
-                        $"but got {modelTypeNode.GetType()}");
-                    return null;
-                }
-                modelTypeValue.TryGetValue<string>(out string? modelType);
-                if (modelType == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected a string, " +
-                        $"but the conversion failed from {modelTypeValue}");
-                    return null;
-                }
-
-                switch (modelType)
-                {
-                case "AssetAdministrationShell":
-                    return AssetAdministrationShellFrom(
-                        node, out error);
-                case "ConceptDescription":
-                    return ConceptDescriptionFrom(
-                        node, out error);
-                case "Submodel":
-                    return SubmodelFrom(
-                        node, out error);
-                    default:
-                        error = new Reporting.Error(
-                            $"Unexpected model type for IIdentifiable: {modelType}");
-                        return null;
-                }
-            }  // public static Aas.IIdentifiable IIdentifiableFrom
-
-            /// <summary>
-            /// Deserialize the enumeration ModelingKind from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.ModelingKind? ModelingKindFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.ModelingKind? result = Stringification.ModelingKindFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of ModelingKind ");
-                }
-                return result;
-            }  // internal static ModelingKindFrom
-
-            /// <summary>
             /// Deserialize an instance of IHasKind by dispatching
             /// based on <c>modelType</c> property of the <paramref name="node" />.
             /// </summary>
@@ -834,6 +738,208 @@ namespace AasCore.Aas3
                         return null;
                 }
             }  // public static Aas.IHasKind IHasKindFrom
+
+            /// <summary>
+            /// Deserialize an instance of IHasSemantics by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            public static Aas.IHasSemantics? IHasSemanticsFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                    return null;
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected a model type, but none is present");
+                    return null;
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()}");
+                    return null;
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue}");
+                    return null;
+                }
+
+                switch (modelType)
+                {
+                case "AnnotatedRelationshipElement":
+                    return AnnotatedRelationshipElementFrom(
+                        node, out error);
+                case "BasicEvent":
+                    return BasicEventFrom(
+                        node, out error);
+                case "Blob":
+                    return BlobFrom(
+                        node, out error);
+                case "Capability":
+                    return CapabilityFrom(
+                        node, out error);
+                case "Entity":
+                    return EntityFrom(
+                        node, out error);
+                case "Extension":
+                    return ExtensionFrom(
+                        node, out error);
+                case "File":
+                    return FileFrom(
+                        node, out error);
+                case "IdentifierKeyValuePair":
+                    return IdentifierKeyValuePairFrom(
+                        node, out error);
+                case "MultiLanguageProperty":
+                    return MultiLanguagePropertyFrom(
+                        node, out error);
+                case "Operation":
+                    return OperationFrom(
+                        node, out error);
+                case "Property":
+                    return PropertyFrom(
+                        node, out error);
+                case "Qualifier":
+                    return QualifierFrom(
+                        node, out error);
+                case "Range":
+                    return RangeFrom(
+                        node, out error);
+                case "ReferenceElement":
+                    return ReferenceElementFrom(
+                        node, out error);
+                case "Submodel":
+                    return SubmodelFrom(
+                        node, out error);
+                case "SubmodelElementList":
+                    return SubmodelElementListFrom(
+                        node, out error);
+                case "SubmodelElementStruct":
+                    return SubmodelElementStructFrom(
+                        node, out error);
+                case "View":
+                    return ViewFrom(
+                        node, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected model type for IHasSemantics: {modelType}");
+                        return null;
+                }
+            }  // public static Aas.IHasSemantics IHasSemanticsFrom
+
+            /// <summary>
+            /// Deserialize an instance of IQualifiable by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            public static Aas.IQualifiable? IQualifiableFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                    return null;
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected a model type, but none is present");
+                    return null;
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()}");
+                    return null;
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue}");
+                    return null;
+                }
+
+                switch (modelType)
+                {
+                case "AnnotatedRelationshipElement":
+                    return AnnotatedRelationshipElementFrom(
+                        node, out error);
+                case "BasicEvent":
+                    return BasicEventFrom(
+                        node, out error);
+                case "Blob":
+                    return BlobFrom(
+                        node, out error);
+                case "Capability":
+                    return CapabilityFrom(
+                        node, out error);
+                case "Entity":
+                    return EntityFrom(
+                        node, out error);
+                case "File":
+                    return FileFrom(
+                        node, out error);
+                case "MultiLanguageProperty":
+                    return MultiLanguagePropertyFrom(
+                        node, out error);
+                case "Operation":
+                    return OperationFrom(
+                        node, out error);
+                case "Property":
+                    return PropertyFrom(
+                        node, out error);
+                case "Range":
+                    return RangeFrom(
+                        node, out error);
+                case "ReferenceElement":
+                    return ReferenceElementFrom(
+                        node, out error);
+                case "Submodel":
+                    return SubmodelFrom(
+                        node, out error);
+                case "SubmodelElementList":
+                    return SubmodelElementListFrom(
+                        node, out error);
+                case "SubmodelElementStruct":
+                    return SubmodelElementStructFrom(
+                        node, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected model type for IQualifiable: {modelType}");
+                        return null;
+                }
+            }  // public static Aas.IQualifiable IQualifiableFrom
 
             /// <summary>
             /// Deserialize an instance of IHasDataSpecification by dispatching
@@ -941,6 +1047,1129 @@ namespace AasCore.Aas3
                         return null;
                 }
             }  // public static Aas.IHasDataSpecification IHasDataSpecificationFrom
+
+            /// <summary>
+            /// Deserialize an instance of ISubmodelElement by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            public static Aas.ISubmodelElement? ISubmodelElementFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                    return null;
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected a model type, but none is present");
+                    return null;
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()}");
+                    return null;
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue}");
+                    return null;
+                }
+
+                switch (modelType)
+                {
+                case "AnnotatedRelationshipElement":
+                    return AnnotatedRelationshipElementFrom(
+                        node, out error);
+                case "BasicEvent":
+                    return BasicEventFrom(
+                        node, out error);
+                case "Blob":
+                    return BlobFrom(
+                        node, out error);
+                case "Capability":
+                    return CapabilityFrom(
+                        node, out error);
+                case "Entity":
+                    return EntityFrom(
+                        node, out error);
+                case "File":
+                    return FileFrom(
+                        node, out error);
+                case "MultiLanguageProperty":
+                    return MultiLanguagePropertyFrom(
+                        node, out error);
+                case "Operation":
+                    return OperationFrom(
+                        node, out error);
+                case "Property":
+                    return PropertyFrom(
+                        node, out error);
+                case "Range":
+                    return RangeFrom(
+                        node, out error);
+                case "ReferenceElement":
+                    return ReferenceElementFrom(
+                        node, out error);
+                case "SubmodelElementList":
+                    return SubmodelElementListFrom(
+                        node, out error);
+                case "SubmodelElementStruct":
+                    return SubmodelElementStructFrom(
+                        node, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected model type for ISubmodelElement: {modelType}");
+                        return null;
+                }
+            }  // public static Aas.ISubmodelElement ISubmodelElementFrom
+
+            /// <summary>
+            /// Deserialize an instance of Qualifier from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.Qualifier? QualifierFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject, but got {node.GetType()}");
+                    return null;
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = DeserializeImplementation.IReferenceFrom(
+                        nodeSemanticId,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        return null;
+                    }
+                    if (theSemanticId == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theSemanticId null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeType = obj["type"];
+                if (nodeType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"type\" is missing ");
+                    return null;
+                }
+                string? theType = DeserializeImplementation.StringFrom(
+                    nodeType,
+                    out error);
+                if (error != null)
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "type"));
+                    return null;
+                }
+                if (theType == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected theType null when error is also null");
+                }
+
+                Nodes.JsonNode? nodeValueType = obj["valueType"];
+                if (nodeValueType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"valueType\" is missing ");
+                    return null;
+                }
+                Aas.DataTypeDef? theValueType = DeserializeImplementation.DataTypeDefFrom(
+                    nodeValueType,
+                    out error);
+                if (error != null)
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "valueType"));
+                    return null;
+                }
+                if (theValueType == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected theValueType null when error is also null");
+                }
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                string? theValue = null;
+                if (nodeValue != null)
+                {
+                    theValue = DeserializeImplementation.StringFrom(
+                        nodeValue,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "value"));
+                        return null;
+                    }
+                    if (theValue == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theValue null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeValueId = obj["valueId"];
+                Aas.IReference? theValueId = null;
+                if (nodeValueId != null)
+                {
+                    theValueId = DeserializeImplementation.IReferenceFrom(
+                        nodeValueId,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "valueId"));
+                        return null;
+                    }
+                    if (theValueId == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theValueId null when error is also null");
+                    }
+                }
+
+                return new Aas.Qualifier(
+                    theType
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theValueType
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theSemanticId,
+                    theValue,
+                    theValueId);
+            }  // internal static QualifierFrom
+
+            /// <summary>
+            /// Deserialize an instance of IDataElement by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            public static Aas.IDataElement? IDataElementFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                    return null;
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected a model type, but none is present");
+                    return null;
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()}");
+                    return null;
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue}");
+                    return null;
+                }
+
+                switch (modelType)
+                {
+                case "Blob":
+                    return BlobFrom(
+                        node, out error);
+                case "File":
+                    return FileFrom(
+                        node, out error);
+                case "MultiLanguageProperty":
+                    return MultiLanguagePropertyFrom(
+                        node, out error);
+                case "Property":
+                    return PropertyFrom(
+                        node, out error);
+                case "Range":
+                    return RangeFrom(
+                        node, out error);
+                case "ReferenceElement":
+                    return ReferenceElementFrom(
+                        node, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected model type for IDataElement: {modelType}");
+                        return null;
+                }
+            }  // public static Aas.IDataElement IDataElementFrom
+
+            /// <summary>
+            /// Deserialize an instance of ReferenceElement from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.ReferenceElement? ReferenceElementFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject, but got {node.GetType()}");
+                    return null;
+                }
+
+                Nodes.JsonNode? nodeExtensions = obj["extensions"];
+                if (nodeExtensions == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"extensions\" is missing ");
+                    return null;
+                }
+                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
+                if (arrayExtensions == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "extensions"));
+                    return null;
+                }
+                var theExtensions = new List<Extension>(
+                    arrayExtensions.Count);
+                int indexExtensions = 0;
+                foreach (Nodes.JsonNode? item in arrayExtensions)
+                {
+                    if (item == null)
+                    {
+                        error = new Reporting.Error(
+                            "Expected a non-null item, but got a null");
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                    }
+                    Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                        item ?? throw new System.InvalidOperationException(),
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        return null;
+                    }
+                    theExtensions.Add(
+                        parsedItem
+                            ?? throw new System.InvalidOperationException(
+                                "Unexpected result null when error is null"));
+                    indexExtensions++;
+                }
+
+                Nodes.JsonNode? nodeIdShort = obj["idShort"];
+                string? theIdShort = null;
+                if (nodeIdShort != null)
+                {
+                    theIdShort = DeserializeImplementation.StringFrom(
+                        nodeIdShort,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        return null;
+                    }
+                    if (theIdShort == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theIdShort null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
+                Aas.LangStringSet? theDisplayName = null;
+                if (nodeDisplayName != null)
+                {
+                    theDisplayName = DeserializeImplementation.LangStringSetFrom(
+                        nodeDisplayName,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        return null;
+                    }
+                    if (theDisplayName == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theDisplayName null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeCategory = obj["category"];
+                string? theCategory = null;
+                if (nodeCategory != null)
+                {
+                    theCategory = DeserializeImplementation.StringFrom(
+                        nodeCategory,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        return null;
+                    }
+                    if (theCategory == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theCategory null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = DeserializeImplementation.LangStringSetFrom(
+                        nodeDescription,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        return null;
+                    }
+                    if (theDescription == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theDescription null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeKind = obj["kind"];
+                Aas.ModelingKind? theKind = null;
+                if (nodeKind != null)
+                {
+                    theKind = DeserializeImplementation.ModelingKindFrom(
+                        nodeKind,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        return null;
+                    }
+                    if (theKind == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theKind null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = DeserializeImplementation.IReferenceFrom(
+                        nodeSemanticId,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        return null;
+                    }
+                    if (theSemanticId == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theSemanticId null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
+                if (nodeQualifiers == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"qualifiers\" is missing ");
+                    return null;
+                }
+                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
+                if (arrayQualifiers == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "qualifiers"));
+                    return null;
+                }
+                var theQualifiers = new List<IConstraint>(
+                    arrayQualifiers.Count);
+                int indexQualifiers = 0;
+                foreach (Nodes.JsonNode? item in arrayQualifiers)
+                {
+                    if (item == null)
+                    {
+                        error = new Reporting.Error(
+                            "Expected a non-null item, but got a null");
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                    }
+                    IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
+                        item ?? throw new System.InvalidOperationException(),
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        return null;
+                    }
+                    theQualifiers.Add(
+                        parsedItem
+                            ?? throw new System.InvalidOperationException(
+                                "Unexpected result null when error is null"));
+                    indexQualifiers++;
+                }
+
+                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
+                List<IReference>? theDataSpecifications = null;
+                if (nodeDataSpecifications != null)
+                {
+                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
+                    if (arrayDataSpecifications == null)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "dataSpecifications"));
+                        return null;
+                    }
+                    theDataSpecifications = new List<IReference>(
+                        arrayDataSpecifications.Count);
+                    int indexDataSpecifications = 0;
+                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
+                    {
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                        }
+                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            return null;
+                        }
+                        theDataSpecifications.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexDataSpecifications++;
+                    }
+                }
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                Aas.IReference? theValue = null;
+                if (nodeValue != null)
+                {
+                    theValue = DeserializeImplementation.IReferenceFrom(
+                        nodeValue,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "value"));
+                        return null;
+                    }
+                    if (theValue == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theValue null when error is also null");
+                    }
+                }
+
+                return new Aas.ReferenceElement(
+                    theExtensions
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theIdShort,
+                    theDisplayName,
+                    theCategory,
+                    theDescription,
+                    theKind,
+                    theSemanticId,
+                    theQualifiers
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theDataSpecifications,
+                    theValue);
+            }  // internal static ReferenceElementFrom
+
+            /// <summary>
+            /// Deserialize an instance of GlobalReference from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.GlobalReference? GlobalReferenceFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject, but got {node.GetType()}");
+                    return null;
+                }
+
+                Nodes.JsonNode? nodeValues = obj["values"];
+                if (nodeValues == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"values\" is missing ");
+                    return null;
+                }
+                Nodes.JsonArray? arrayValues = nodeValues as Nodes.JsonArray;
+                if (arrayValues == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonArray, but got {nodeValues.GetType()}");
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "values"));
+                    return null;
+                }
+                var theValues = new List<string>(
+                    arrayValues.Count);
+                int indexValues = 0;
+                foreach (Nodes.JsonNode? item in arrayValues)
+                {
+                    if (item == null)
+                    {
+                        error = new Reporting.Error(
+                            "Expected a non-null item, but got a null");
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexValues));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "values"));
+                    }
+                    string? parsedItem = DeserializeImplementation.StringFrom(
+                        item ?? throw new System.InvalidOperationException(),
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexValues));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "values"));
+                        return null;
+                    }
+                    theValues.Add(
+                        parsedItem
+                            ?? throw new System.InvalidOperationException(
+                                "Unexpected result null when error is null"));
+                    indexValues++;
+                }
+
+                return new Aas.GlobalReference(
+                    theValues
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"));
+            }  // internal static GlobalReferenceFrom
+
+            /// <summary>
+            /// Deserialize an instance of ModelReference from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.ModelReference? ModelReferenceFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject, but got {node.GetType()}");
+                    return null;
+                }
+
+                Nodes.JsonNode? nodeKeys = obj["keys"];
+                if (nodeKeys == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"keys\" is missing ");
+                    return null;
+                }
+                Nodes.JsonArray? arrayKeys = nodeKeys as Nodes.JsonArray;
+                if (arrayKeys == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonArray, but got {nodeKeys.GetType()}");
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "keys"));
+                    return null;
+                }
+                var theKeys = new List<Key>(
+                    arrayKeys.Count);
+                int indexKeys = 0;
+                foreach (Nodes.JsonNode? item in arrayKeys)
+                {
+                    if (item == null)
+                    {
+                        error = new Reporting.Error(
+                            "Expected a non-null item, but got a null");
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexKeys));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "keys"));
+                    }
+                    Key? parsedItem = DeserializeImplementation.KeyFrom(
+                        item ?? throw new System.InvalidOperationException(),
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexKeys));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "keys"));
+                        return null;
+                    }
+                    theKeys.Add(
+                        parsedItem
+                            ?? throw new System.InvalidOperationException(
+                                "Unexpected result null when error is null"));
+                    indexKeys++;
+                }
+
+                Nodes.JsonNode? nodeReferredSemanticId = obj["referredSemanticId"];
+                Aas.IReference? theReferredSemanticId = null;
+                if (nodeReferredSemanticId != null)
+                {
+                    theReferredSemanticId = DeserializeImplementation.IReferenceFrom(
+                        nodeReferredSemanticId,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "referredSemanticId"));
+                        return null;
+                    }
+                    if (theReferredSemanticId == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theReferredSemanticId null when error is also null");
+                    }
+                }
+
+                return new Aas.ModelReference(
+                    theKeys
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theReferredSemanticId);
+            }  // internal static ModelReferenceFrom
+
+            /// <summary>
+            /// Deserialize an instance of Key from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.Key? KeyFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject, but got {node.GetType()}");
+                    return null;
+                }
+
+                Nodes.JsonNode? nodeType = obj["type"];
+                if (nodeType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"type\" is missing ");
+                    return null;
+                }
+                Aas.KeyElements? theType = DeserializeImplementation.KeyElementsFrom(
+                    nodeType,
+                    out error);
+                if (error != null)
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "type"));
+                    return null;
+                }
+                if (theType == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected theType null when error is also null");
+                }
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                if (nodeValue == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"value\" is missing ");
+                    return null;
+                }
+                string? theValue = DeserializeImplementation.StringFrom(
+                    nodeValue,
+                    out error);
+                if (error != null)
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "value"));
+                    return null;
+                }
+                if (theValue == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected theValue null when error is also null");
+                }
+
+                return new Aas.Key(
+                    theType
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theValue
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"));
+            }  // internal static KeyFrom
+
+            /// <summary>
+            /// Deserialize an instance of Extension from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.Extension? ExtensionFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject, but got {node.GetType()}");
+                    return null;
+                }
+
+                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
+                Aas.IReference? theSemanticId = null;
+                if (nodeSemanticId != null)
+                {
+                    theSemanticId = DeserializeImplementation.IReferenceFrom(
+                        nodeSemanticId,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        return null;
+                    }
+                    if (theSemanticId == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theSemanticId null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeName = obj["name"];
+                if (nodeName == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"name\" is missing ");
+                    return null;
+                }
+                string? theName = DeserializeImplementation.StringFrom(
+                    nodeName,
+                    out error);
+                if (error != null)
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "name"));
+                    return null;
+                }
+                if (theName == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected theName null when error is also null");
+                }
+
+                Nodes.JsonNode? nodeValueType = obj["valueType"];
+                Aas.DataTypeDef? theValueType = null;
+                if (nodeValueType != null)
+                {
+                    theValueType = DeserializeImplementation.DataTypeDefFrom(
+                        nodeValueType,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "valueType"));
+                        return null;
+                    }
+                    if (theValueType == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theValueType null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeValue = obj["value"];
+                string? theValue = null;
+                if (nodeValue != null)
+                {
+                    theValue = DeserializeImplementation.StringFrom(
+                        nodeValue,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "value"));
+                        return null;
+                    }
+                    if (theValue == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theValue null when error is also null");
+                    }
+                }
+
+                Nodes.JsonNode? nodeRefersTo = obj["refersTo"];
+                Aas.IReference? theRefersTo = null;
+                if (nodeRefersTo != null)
+                {
+                    theRefersTo = DeserializeImplementation.IReferenceFrom(
+                        nodeRefersTo,
+                        out error);
+                    if (error != null)
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "refersTo"));
+                        return null;
+                    }
+                    if (theRefersTo == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theRefersTo null when error is also null");
+                    }
+                }
+
+                return new Aas.Extension(
+                    theName
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theSemanticId,
+                    theValueType,
+                    theValue,
+                    theRefersTo);
+            }  // internal static ExtensionFrom
+
+            /// <summary>
+            /// Deserialize an instance of IIdentifiable by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            public static Aas.IIdentifiable? IIdentifiableFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                var obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                    return null;
+                }
+
+                Nodes.JsonNode? modelTypeNode = obj["modelType"];
+                if (modelTypeNode == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected a model type, but none is present");
+                    return null;
+                }
+                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
+                if (modelTypeValue == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected JsonValue, " +
+                        $"but got {modelTypeNode.GetType()}");
+                    return null;
+                }
+                modelTypeValue.TryGetValue<string>(out string? modelType);
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Expected a string, " +
+                        $"but the conversion failed from {modelTypeValue}");
+                    return null;
+                }
+
+                switch (modelType)
+                {
+                case "AssetAdministrationShell":
+                    return AssetAdministrationShellFrom(
+                        node, out error);
+                case "ConceptDescription":
+                    return ConceptDescriptionFrom(
+                        node, out error);
+                case "Submodel":
+                    return SubmodelFrom(
+                        node, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected model type for IIdentifiable: {modelType}");
+                        return null;
+                }
+            }  // public static Aas.IIdentifiable IIdentifiableFrom
+
+            /// <summary>
+            /// Deserialize the enumeration ModelingKind from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.ModelingKind? ModelingKindFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+                string? text = DeserializeImplementation.StringFrom(
+                    node, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected text null if error null");
+                }
+                Aas.ModelingKind? result = Stringification.ModelingKindFromString(text);
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "Not a valid JSON representation of ModelingKind ");
+                }
+                return result;
+            }  // internal static ModelingKindFrom
 
             /// <summary>
             /// Deserialize an instance of AdministrativeInformation from <paramref name="node" />.
@@ -1118,241 +2347,6 @@ namespace AasCore.Aas3
                         return null;
                 }
             }  // public static Aas.IConstraint IConstraintFrom
-
-            /// <summary>
-            /// Deserialize an instance of IQualifiable by dispatching
-            /// based on <c>modelType</c> property of the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            public static Aas.IQualifiable? IQualifiableFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-
-                var obj = node as Nodes.JsonObject;
-                if (obj == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
-                    return null;
-                }
-
-                Nodes.JsonNode? modelTypeNode = obj["modelType"];
-                if (modelTypeNode == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected a model type, but none is present");
-                    return null;
-                }
-                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
-                if (modelTypeValue == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected JsonValue, " +
-                        $"but got {modelTypeNode.GetType()}");
-                    return null;
-                }
-                modelTypeValue.TryGetValue<string>(out string? modelType);
-                if (modelType == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected a string, " +
-                        $"but the conversion failed from {modelTypeValue}");
-                    return null;
-                }
-
-                switch (modelType)
-                {
-                case "AnnotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFrom(
-                        node, out error);
-                case "BasicEvent":
-                    return BasicEventFrom(
-                        node, out error);
-                case "Blob":
-                    return BlobFrom(
-                        node, out error);
-                case "Capability":
-                    return CapabilityFrom(
-                        node, out error);
-                case "Entity":
-                    return EntityFrom(
-                        node, out error);
-                case "File":
-                    return FileFrom(
-                        node, out error);
-                case "MultiLanguageProperty":
-                    return MultiLanguagePropertyFrom(
-                        node, out error);
-                case "Operation":
-                    return OperationFrom(
-                        node, out error);
-                case "Property":
-                    return PropertyFrom(
-                        node, out error);
-                case "Range":
-                    return RangeFrom(
-                        node, out error);
-                case "ReferenceElement":
-                    return ReferenceElementFrom(
-                        node, out error);
-                case "Submodel":
-                    return SubmodelFrom(
-                        node, out error);
-                case "SubmodelElementList":
-                    return SubmodelElementListFrom(
-                        node, out error);
-                case "SubmodelElementStruct":
-                    return SubmodelElementStructFrom(
-                        node, out error);
-                    default:
-                        error = new Reporting.Error(
-                            $"Unexpected model type for IQualifiable: {modelType}");
-                        return null;
-                }
-            }  // public static Aas.IQualifiable IQualifiableFrom
-
-            /// <summary>
-            /// Deserialize an instance of Qualifier from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Qualifier? QualifierFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-
-                Nodes.JsonObject? obj = node as Nodes.JsonObject;
-                if (obj == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonObject, but got {node.GetType()}");
-                    return null;
-                }
-
-                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
-                Aas.IReference? theSemanticId = null;
-                if (nodeSemanticId != null)
-                {
-                    theSemanticId = DeserializeImplementation.IReferenceFrom(
-                        nodeSemanticId,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "semanticId"));
-                        return null;
-                    }
-                    if (theSemanticId == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theSemanticId null when error is also null");
-                    }
-                }
-
-                Nodes.JsonNode? nodeType = obj["type"];
-                if (nodeType == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"type\" is missing ");
-                    return null;
-                }
-                string? theType = DeserializeImplementation.StringFrom(
-                    nodeType,
-                    out error);
-                if (error != null)
-                {
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "type"));
-                    return null;
-                }
-                if (theType == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected theType null when error is also null");
-                }
-
-                Nodes.JsonNode? nodeValueType = obj["valueType"];
-                if (nodeValueType == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"valueType\" is missing ");
-                    return null;
-                }
-                Aas.DataTypeDef? theValueType = DeserializeImplementation.DataTypeDefFrom(
-                    nodeValueType,
-                    out error);
-                if (error != null)
-                {
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "valueType"));
-                    return null;
-                }
-                if (theValueType == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected theValueType null when error is also null");
-                }
-
-                Nodes.JsonNode? nodeValue = obj["value"];
-                string? theValue = null;
-                if (nodeValue != null)
-                {
-                    theValue = DeserializeImplementation.StringFrom(
-                        nodeValue,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "value"));
-                        return null;
-                    }
-                    if (theValue == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theValue null when error is also null");
-                    }
-                }
-
-                Nodes.JsonNode? nodeValueId = obj["valueId"];
-                Aas.IReference? theValueId = null;
-                if (nodeValueId != null)
-                {
-                    theValueId = DeserializeImplementation.IReferenceFrom(
-                        nodeValueId,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "valueId"));
-                        return null;
-                    }
-                    if (theValueId == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theValueId null when error is also null");
-                    }
-                }
-
-                return new Aas.Qualifier(
-                    theType
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
-                    theValueType
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
-                    theSemanticId,
-                    theValue,
-                    theValueId);
-            }  // internal static QualifierFrom
 
             /// <summary>
             /// Deserialize an instance of Formula from <paramref name="node" />.
@@ -2479,98 +3473,6 @@ namespace AasCore.Aas3
             }  // internal static SubmodelFrom
 
             /// <summary>
-            /// Deserialize an instance of ISubmodelElement by dispatching
-            /// based on <c>modelType</c> property of the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            public static Aas.ISubmodelElement? ISubmodelElementFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-
-                var obj = node as Nodes.JsonObject;
-                if (obj == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
-                    return null;
-                }
-
-                Nodes.JsonNode? modelTypeNode = obj["modelType"];
-                if (modelTypeNode == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected a model type, but none is present");
-                    return null;
-                }
-                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
-                if (modelTypeValue == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected JsonValue, " +
-                        $"but got {modelTypeNode.GetType()}");
-                    return null;
-                }
-                modelTypeValue.TryGetValue<string>(out string? modelType);
-                if (modelType == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected a string, " +
-                        $"but the conversion failed from {modelTypeValue}");
-                    return null;
-                }
-
-                switch (modelType)
-                {
-                case "AnnotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFrom(
-                        node, out error);
-                case "BasicEvent":
-                    return BasicEventFrom(
-                        node, out error);
-                case "Blob":
-                    return BlobFrom(
-                        node, out error);
-                case "Capability":
-                    return CapabilityFrom(
-                        node, out error);
-                case "Entity":
-                    return EntityFrom(
-                        node, out error);
-                case "File":
-                    return FileFrom(
-                        node, out error);
-                case "MultiLanguageProperty":
-                    return MultiLanguagePropertyFrom(
-                        node, out error);
-                case "Operation":
-                    return OperationFrom(
-                        node, out error);
-                case "Property":
-                    return PropertyFrom(
-                        node, out error);
-                case "Range":
-                    return RangeFrom(
-                        node, out error);
-                case "ReferenceElement":
-                    return ReferenceElementFrom(
-                        node, out error);
-                case "SubmodelElementList":
-                    return SubmodelElementListFrom(
-                        node, out error);
-                case "SubmodelElementStruct":
-                    return SubmodelElementStructFrom(
-                        node, out error);
-                    default:
-                        error = new Reporting.Error(
-                            $"Unexpected model type for ISubmodelElement: {modelType}");
-                        return null;
-                }
-            }  // public static Aas.ISubmodelElement ISubmodelElementFrom
-
-            /// <summary>
             /// Deserialize an instance of IRelationshipElement by dispatching
             /// based on <c>modelType</c> property of the <paramref name="node" />.
             /// </summary>
@@ -3443,77 +4345,6 @@ namespace AasCore.Aas3
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
             }  // internal static SubmodelElementStructFrom
-
-            /// <summary>
-            /// Deserialize an instance of IDataElement by dispatching
-            /// based on <c>modelType</c> property of the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            public static Aas.IDataElement? IDataElementFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-
-                var obj = node as Nodes.JsonObject;
-                if (obj == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
-                    return null;
-                }
-
-                Nodes.JsonNode? modelTypeNode = obj["modelType"];
-                if (modelTypeNode == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected a model type, but none is present");
-                    return null;
-                }
-                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
-                if (modelTypeValue == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected JsonValue, " +
-                        $"but got {modelTypeNode.GetType()}");
-                    return null;
-                }
-                modelTypeValue.TryGetValue<string>(out string? modelType);
-                if (modelType == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected a string, " +
-                        $"but the conversion failed from {modelTypeValue}");
-                    return null;
-                }
-
-                switch (modelType)
-                {
-                case "Blob":
-                    return BlobFrom(
-                        node, out error);
-                case "File":
-                    return FileFrom(
-                        node, out error);
-                case "MultiLanguageProperty":
-                    return MultiLanguagePropertyFrom(
-                        node, out error);
-                case "Property":
-                    return PropertyFrom(
-                        node, out error);
-                case "Range":
-                    return RangeFrom(
-                        node, out error);
-                case "ReferenceElement":
-                    return ReferenceElementFrom(
-                        node, out error);
-                    default:
-                        error = new Reporting.Error(
-                            $"Unexpected model type for IDataElement: {modelType}");
-                        return null;
-                }
-            }  // public static Aas.IDataElement IDataElementFrom
 
             /// <summary>
             /// Deserialize an instance of Property from <paramref name="node" />.
@@ -4652,346 +5483,6 @@ namespace AasCore.Aas3
                     theMin,
                     theMax);
             }  // internal static RangeFrom
-
-            /// <summary>
-            /// Deserialize an instance of ReferenceElement from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.ReferenceElement? ReferenceElementFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-
-                Nodes.JsonObject? obj = node as Nodes.JsonObject;
-                if (obj == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonObject, but got {node.GetType()}");
-                    return null;
-                }
-
-                Nodes.JsonNode? nodeExtensions = obj["extensions"];
-                if (nodeExtensions == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"extensions\" is missing ");
-                    return null;
-                }
-                Nodes.JsonArray? arrayExtensions = nodeExtensions as Nodes.JsonArray;
-                if (arrayExtensions == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "extensions"));
-                    return null;
-                }
-                var theExtensions = new List<Extension>(
-                    arrayExtensions.Count);
-                int indexExtensions = 0;
-                foreach (Nodes.JsonNode? item in arrayExtensions)
-                {
-                    if (item == null)
-                    {
-                        error = new Reporting.Error(
-                            "Expected a non-null item, but got a null");
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexExtensions));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "extensions"));
-                    }
-                    Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
-                        item ?? throw new System.InvalidOperationException(),
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexExtensions));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "extensions"));
-                        return null;
-                    }
-                    theExtensions.Add(
-                        parsedItem
-                            ?? throw new System.InvalidOperationException(
-                                "Unexpected result null when error is null"));
-                    indexExtensions++;
-                }
-
-                Nodes.JsonNode? nodeIdShort = obj["idShort"];
-                string? theIdShort = null;
-                if (nodeIdShort != null)
-                {
-                    theIdShort = DeserializeImplementation.StringFrom(
-                        nodeIdShort,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "idShort"));
-                        return null;
-                    }
-                    if (theIdShort == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theIdShort null when error is also null");
-                    }
-                }
-
-                Nodes.JsonNode? nodeDisplayName = obj["displayName"];
-                Aas.LangStringSet? theDisplayName = null;
-                if (nodeDisplayName != null)
-                {
-                    theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                        nodeDisplayName,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "displayName"));
-                        return null;
-                    }
-                    if (theDisplayName == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theDisplayName null when error is also null");
-                    }
-                }
-
-                Nodes.JsonNode? nodeCategory = obj["category"];
-                string? theCategory = null;
-                if (nodeCategory != null)
-                {
-                    theCategory = DeserializeImplementation.StringFrom(
-                        nodeCategory,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "category"));
-                        return null;
-                    }
-                    if (theCategory == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theCategory null when error is also null");
-                    }
-                }
-
-                Nodes.JsonNode? nodeDescription = obj["description"];
-                Aas.LangStringSet? theDescription = null;
-                if (nodeDescription != null)
-                {
-                    theDescription = DeserializeImplementation.LangStringSetFrom(
-                        nodeDescription,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "description"));
-                        return null;
-                    }
-                    if (theDescription == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theDescription null when error is also null");
-                    }
-                }
-
-                Nodes.JsonNode? nodeKind = obj["kind"];
-                Aas.ModelingKind? theKind = null;
-                if (nodeKind != null)
-                {
-                    theKind = DeserializeImplementation.ModelingKindFrom(
-                        nodeKind,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "kind"));
-                        return null;
-                    }
-                    if (theKind == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theKind null when error is also null");
-                    }
-                }
-
-                Nodes.JsonNode? nodeSemanticId = obj["semanticId"];
-                Aas.IReference? theSemanticId = null;
-                if (nodeSemanticId != null)
-                {
-                    theSemanticId = DeserializeImplementation.IReferenceFrom(
-                        nodeSemanticId,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "semanticId"));
-                        return null;
-                    }
-                    if (theSemanticId == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theSemanticId null when error is also null");
-                    }
-                }
-
-                Nodes.JsonNode? nodeQualifiers = obj["qualifiers"];
-                if (nodeQualifiers == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"qualifiers\" is missing ");
-                    return null;
-                }
-                Nodes.JsonArray? arrayQualifiers = nodeQualifiers as Nodes.JsonArray;
-                if (arrayQualifiers == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "qualifiers"));
-                    return null;
-                }
-                var theQualifiers = new List<IConstraint>(
-                    arrayQualifiers.Count);
-                int indexQualifiers = 0;
-                foreach (Nodes.JsonNode? item in arrayQualifiers)
-                {
-                    if (item == null)
-                    {
-                        error = new Reporting.Error(
-                            "Expected a non-null item, but got a null");
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexQualifiers));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "qualifiers"));
-                    }
-                    IConstraint? parsedItem = DeserializeImplementation.IConstraintFrom(
-                        item ?? throw new System.InvalidOperationException(),
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexQualifiers));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "qualifiers"));
-                        return null;
-                    }
-                    theQualifiers.Add(
-                        parsedItem
-                            ?? throw new System.InvalidOperationException(
-                                "Unexpected result null when error is null"));
-                    indexQualifiers++;
-                }
-
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IReference>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<IReference>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                        }
-                        IReference? parsedItem = DeserializeImplementation.IReferenceFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
-                Nodes.JsonNode? nodeValue = obj["value"];
-                Aas.IReference? theValue = null;
-                if (nodeValue != null)
-                {
-                    theValue = DeserializeImplementation.IReferenceFrom(
-                        nodeValue,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "value"));
-                        return null;
-                    }
-                    if (theValue == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theValue null when error is also null");
-                    }
-                }
-
-                return new Aas.ReferenceElement(
-                    theExtensions
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
-                    theIdShort,
-                    theDisplayName,
-                    theCategory,
-                    theDescription,
-                    theKind,
-                    theSemanticId,
-                    theQualifiers
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
-                    theDataSpecifications,
-                    theValue);
-            }  // internal static ReferenceElementFrom
 
             /// <summary>
             /// Deserialize an instance of Blob from <paramref name="node" />.
@@ -8496,317 +8987,6 @@ namespace AasCore.Aas3
             }  // internal static ViewFrom
 
             /// <summary>
-            /// Deserialize an instance of IReference by dispatching
-            /// based on <c>modelType</c> property of the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            public static Aas.IReference? IReferenceFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-
-                var obj = node as Nodes.JsonObject;
-                if (obj == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
-                    return null;
-                }
-
-                Nodes.JsonNode? modelTypeNode = obj["modelType"];
-                if (modelTypeNode == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected a model type, but none is present");
-                    return null;
-                }
-                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
-                if (modelTypeValue == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected JsonValue, " +
-                        $"but got {modelTypeNode.GetType()}");
-                    return null;
-                }
-                modelTypeValue.TryGetValue<string>(out string? modelType);
-                if (modelType == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected a string, " +
-                        $"but the conversion failed from {modelTypeValue}");
-                    return null;
-                }
-
-                switch (modelType)
-                {
-                case "GlobalReference":
-                    return GlobalReferenceFrom(
-                        node, out error);
-                case "ModelReference":
-                    return ModelReferenceFrom(
-                        node, out error);
-                    default:
-                        error = new Reporting.Error(
-                            $"Unexpected model type for IReference: {modelType}");
-                        return null;
-                }
-            }  // public static Aas.IReference IReferenceFrom
-
-            /// <summary>
-            /// Deserialize an instance of GlobalReference from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.GlobalReference? GlobalReferenceFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-
-                Nodes.JsonObject? obj = node as Nodes.JsonObject;
-                if (obj == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonObject, but got {node.GetType()}");
-                    return null;
-                }
-
-                Nodes.JsonNode? nodeValues = obj["values"];
-                if (nodeValues == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"values\" is missing ");
-                    return null;
-                }
-                Nodes.JsonArray? arrayValues = nodeValues as Nodes.JsonArray;
-                if (arrayValues == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonArray, but got {nodeValues.GetType()}");
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "values"));
-                    return null;
-                }
-                var theValues = new List<string>(
-                    arrayValues.Count);
-                int indexValues = 0;
-                foreach (Nodes.JsonNode? item in arrayValues)
-                {
-                    if (item == null)
-                    {
-                        error = new Reporting.Error(
-                            "Expected a non-null item, but got a null");
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexValues));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "values"));
-                    }
-                    string? parsedItem = DeserializeImplementation.StringFrom(
-                        item ?? throw new System.InvalidOperationException(),
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexValues));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "values"));
-                        return null;
-                    }
-                    theValues.Add(
-                        parsedItem
-                            ?? throw new System.InvalidOperationException(
-                                "Unexpected result null when error is null"));
-                    indexValues++;
-                }
-
-                return new Aas.GlobalReference(
-                    theValues
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"));
-            }  // internal static GlobalReferenceFrom
-
-            /// <summary>
-            /// Deserialize an instance of ModelReference from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.ModelReference? ModelReferenceFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-
-                Nodes.JsonObject? obj = node as Nodes.JsonObject;
-                if (obj == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonObject, but got {node.GetType()}");
-                    return null;
-                }
-
-                Nodes.JsonNode? nodeKeys = obj["keys"];
-                if (nodeKeys == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"keys\" is missing ");
-                    return null;
-                }
-                Nodes.JsonArray? arrayKeys = nodeKeys as Nodes.JsonArray;
-                if (arrayKeys == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonArray, but got {nodeKeys.GetType()}");
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "keys"));
-                    return null;
-                }
-                var theKeys = new List<Key>(
-                    arrayKeys.Count);
-                int indexKeys = 0;
-                foreach (Nodes.JsonNode? item in arrayKeys)
-                {
-                    if (item == null)
-                    {
-                        error = new Reporting.Error(
-                            "Expected a non-null item, but got a null");
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexKeys));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "keys"));
-                    }
-                    Key? parsedItem = DeserializeImplementation.KeyFrom(
-                        item ?? throw new System.InvalidOperationException(),
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexKeys));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "keys"));
-                        return null;
-                    }
-                    theKeys.Add(
-                        parsedItem
-                            ?? throw new System.InvalidOperationException(
-                                "Unexpected result null when error is null"));
-                    indexKeys++;
-                }
-
-                Nodes.JsonNode? nodeReferredSemanticId = obj["referredSemanticId"];
-                Aas.IReference? theReferredSemanticId = null;
-                if (nodeReferredSemanticId != null)
-                {
-                    theReferredSemanticId = DeserializeImplementation.IReferenceFrom(
-                        nodeReferredSemanticId,
-                        out error);
-                    if (error != null)
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "referredSemanticId"));
-                        return null;
-                    }
-                    if (theReferredSemanticId == null)
-                    {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theReferredSemanticId null when error is also null");
-                    }
-                }
-
-                return new Aas.ModelReference(
-                    theKeys
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
-                    theReferredSemanticId);
-            }  // internal static ModelReferenceFrom
-
-            /// <summary>
-            /// Deserialize an instance of Key from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.Key? KeyFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-
-                Nodes.JsonObject? obj = node as Nodes.JsonObject;
-                if (obj == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonObject, but got {node.GetType()}");
-                    return null;
-                }
-
-                Nodes.JsonNode? nodeType = obj["type"];
-                if (nodeType == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"type\" is missing ");
-                    return null;
-                }
-                Aas.KeyElements? theType = DeserializeImplementation.KeyElementsFrom(
-                    nodeType,
-                    out error);
-                if (error != null)
-                {
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "type"));
-                    return null;
-                }
-                if (theType == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected theType null when error is also null");
-                }
-
-                Nodes.JsonNode? nodeValue = obj["value"];
-                if (nodeValue == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"value\" is missing ");
-                    return null;
-                }
-                string? theValue = DeserializeImplementation.StringFrom(
-                    nodeValue,
-                    out error);
-                if (error != null)
-                {
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "value"));
-                    return null;
-                }
-                if (theValue == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected theValue null when error is also null");
-                }
-
-                return new Aas.Key(
-                    theType
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
-                    theValue
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"));
-            }  // internal static KeyFrom
-
-            /// <summary>
             /// Deserialize the enumeration IdentifiableElements from the <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -8925,186 +9105,6 @@ namespace AasCore.Aas3
                 }
                 return result;
             }  // internal static SubmodelElementsFrom
-
-            /// <summary>
-            /// Deserialize the enumeration BuildInListTypes from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.BuildInListTypes? BuildInListTypesFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.BuildInListTypes? result = Stringification.BuildInListTypesFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of BuildInListTypes ");
-                }
-                return result;
-            }  // internal static BuildInListTypesFrom
-
-            /// <summary>
-            /// Deserialize the enumeration DecimalBuildInTypes from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.DecimalBuildInTypes? DecimalBuildInTypesFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.DecimalBuildInTypes? result = Stringification.DecimalBuildInTypesFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of DecimalBuildInTypes ");
-                }
-                return result;
-            }  // internal static DecimalBuildInTypesFrom
-
-            /// <summary>
-            /// Deserialize the enumeration DurationBuildInTypes from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.DurationBuildInTypes? DurationBuildInTypesFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.DurationBuildInTypes? result = Stringification.DurationBuildInTypesFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of DurationBuildInTypes ");
-                }
-                return result;
-            }  // internal static DurationBuildInTypesFrom
-
-            /// <summary>
-            /// Deserialize the enumeration PrimitiveTypes from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.PrimitiveTypes? PrimitiveTypesFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.PrimitiveTypes? result = Stringification.PrimitiveTypesFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of PrimitiveTypes ");
-                }
-                return result;
-            }  // internal static PrimitiveTypesFrom
-
-            /// <summary>
-            /// Deserialize the enumeration StringBuildInTypes from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.StringBuildInTypes? StringBuildInTypesFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.StringBuildInTypes? result = Stringification.StringBuildInTypesFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of StringBuildInTypes ");
-                }
-                return result;
-            }  // internal static StringBuildInTypesFrom
-
-            /// <summary>
-            /// Deserialize the enumeration DataTypeDef from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.DataTypeDef? DataTypeDefFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.DataTypeDef? result = Stringification.DataTypeDefFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of DataTypeDef ");
-                }
-                return result;
-            }  // internal static DataTypeDefFrom
 
             public static Aas.LangStringSet LangStringSetFrom(
                 Nodes.JsonNode node,
@@ -10176,28 +10176,28 @@ namespace AasCore.Aas3
         /// Deserialize instances of meta-model classes from JSON nodes.
         /// </summary>
         /// <example>
-        /// Here is an example how to parse an instance of IHasSemantics:
+        /// Here is an example how to parse an instance of IReference:
         /// <code>
         /// string someString = "... some JSON ...";
         /// var node = System.Text.Json.Nodes.JsonNode.Parse(someString);
-        /// Aas.IHasSemantics anInstance = Deserialize.IHasSemanticsFrom(
+        /// Aas.IReference anInstance = Deserialize.IReferenceFrom(
         ///     node);
         /// </code>
         /// </example>
         public static class Deserialize
         {
             /// <summary>
-            /// Deserialize an instance of IHasSemantics from <paramref name="node" />.
+            /// Deserialize an instance of BuildInListTypes from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <exception cref="Jsonization.Exception">
             /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of IHasSemantics.
+            /// representation of BuildInListTypes.
             /// </exception>
-            public static Aas.IHasSemantics IHasSemanticsFrom(
+            public static Aas.BuildInListTypes BuildInListTypesFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IHasSemantics? result = DeserializeImplementation.IHasSemanticsFrom(
+                Aas.BuildInListTypes? result = DeserializeImplementation.BuildInListTypesFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -10212,17 +10212,142 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of Extension from <paramref name="node" />.
+            /// Deserialize an instance of DecimalBuildInTypes from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <exception cref="Jsonization.Exception">
             /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of Extension.
+            /// representation of DecimalBuildInTypes.
             /// </exception>
-            public static Aas.Extension ExtensionFrom(
+            public static Aas.DecimalBuildInTypes DecimalBuildInTypesFrom(
                 Nodes.JsonNode node)
             {
-                Aas.Extension? result = DeserializeImplementation.ExtensionFrom(
+                Aas.DecimalBuildInTypes? result = DeserializeImplementation.DecimalBuildInTypesFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of DurationBuildInTypes from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of DurationBuildInTypes.
+            /// </exception>
+            public static Aas.DurationBuildInTypes DurationBuildInTypesFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.DurationBuildInTypes? result = DeserializeImplementation.DurationBuildInTypesFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of PrimitiveTypes from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of PrimitiveTypes.
+            /// </exception>
+            public static Aas.PrimitiveTypes PrimitiveTypesFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.PrimitiveTypes? result = DeserializeImplementation.PrimitiveTypesFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of StringBuildInTypes from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of StringBuildInTypes.
+            /// </exception>
+            public static Aas.StringBuildInTypes StringBuildInTypesFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.StringBuildInTypes? result = DeserializeImplementation.StringBuildInTypesFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of DataTypeDef from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of DataTypeDef.
+            /// </exception>
+            public static Aas.DataTypeDef DataTypeDefFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.DataTypeDef? result = DeserializeImplementation.DataTypeDefFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of IReference from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of IReference.
+            /// </exception>
+            public static Aas.IReference IReferenceFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.IReference? result = DeserializeImplementation.IReferenceFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -10287,6 +10412,306 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
+            /// Deserialize an instance of IHasKind from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of IHasKind.
+            /// </exception>
+            public static Aas.IHasKind IHasKindFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.IHasKind? result = DeserializeImplementation.IHasKindFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of IHasSemantics from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of IHasSemantics.
+            /// </exception>
+            public static Aas.IHasSemantics IHasSemanticsFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.IHasSemantics? result = DeserializeImplementation.IHasSemanticsFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of IQualifiable from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of IQualifiable.
+            /// </exception>
+            public static Aas.IQualifiable IQualifiableFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.IQualifiable? result = DeserializeImplementation.IQualifiableFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of IHasDataSpecification from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of IHasDataSpecification.
+            /// </exception>
+            public static Aas.IHasDataSpecification IHasDataSpecificationFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.IHasDataSpecification? result = DeserializeImplementation.IHasDataSpecificationFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of ISubmodelElement from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of ISubmodelElement.
+            /// </exception>
+            public static Aas.ISubmodelElement ISubmodelElementFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.ISubmodelElement? result = DeserializeImplementation.ISubmodelElementFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of Qualifier from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of Qualifier.
+            /// </exception>
+            public static Aas.Qualifier QualifierFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.Qualifier? result = DeserializeImplementation.QualifierFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of IDataElement from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of IDataElement.
+            /// </exception>
+            public static Aas.IDataElement IDataElementFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.IDataElement? result = DeserializeImplementation.IDataElementFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of ReferenceElement from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of ReferenceElement.
+            /// </exception>
+            public static Aas.ReferenceElement ReferenceElementFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.ReferenceElement? result = DeserializeImplementation.ReferenceElementFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of GlobalReference from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of GlobalReference.
+            /// </exception>
+            public static Aas.GlobalReference GlobalReferenceFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.GlobalReference? result = DeserializeImplementation.GlobalReferenceFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of ModelReference from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of ModelReference.
+            /// </exception>
+            public static Aas.ModelReference ModelReferenceFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.ModelReference? result = DeserializeImplementation.ModelReferenceFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of Key from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of Key.
+            /// </exception>
+            public static Aas.Key KeyFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.Key? result = DeserializeImplementation.KeyFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of Extension from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of Extension.
+            /// </exception>
+            public static Aas.Extension ExtensionFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.Extension? result = DeserializeImplementation.ExtensionFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
             /// Deserialize an instance of IIdentifiable from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -10337,56 +10762,6 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of IHasKind from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of IHasKind.
-            /// </exception>
-            public static Aas.IHasKind IHasKindFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.IHasKind? result = DeserializeImplementation.IHasKindFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of IHasDataSpecification from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of IHasDataSpecification.
-            /// </exception>
-            public static Aas.IHasDataSpecification IHasDataSpecificationFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.IHasDataSpecification? result = DeserializeImplementation.IHasDataSpecificationFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
             /// Deserialize an instance of AdministrativeInformation from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -10423,56 +10798,6 @@ namespace AasCore.Aas3
                 Nodes.JsonNode node)
             {
                 Aas.IConstraint? result = DeserializeImplementation.IConstraintFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of IQualifiable from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of IQualifiable.
-            /// </exception>
-            public static Aas.IQualifiable IQualifiableFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.IQualifiable? result = DeserializeImplementation.IQualifiableFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of Qualifier from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of Qualifier.
-            /// </exception>
-            public static Aas.Qualifier QualifierFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.Qualifier? result = DeserializeImplementation.QualifierFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -10637,31 +10962,6 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of ISubmodelElement from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of ISubmodelElement.
-            /// </exception>
-            public static Aas.ISubmodelElement ISubmodelElementFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.ISubmodelElement? result = DeserializeImplementation.ISubmodelElementFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
             /// Deserialize an instance of IRelationshipElement from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -10737,31 +11037,6 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of IDataElement from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of IDataElement.
-            /// </exception>
-            public static Aas.IDataElement IDataElementFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.IDataElement? result = DeserializeImplementation.IDataElementFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
             /// Deserialize an instance of Property from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -10823,31 +11098,6 @@ namespace AasCore.Aas3
                 Nodes.JsonNode node)
             {
                 Aas.Range? result = DeserializeImplementation.RangeFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of ReferenceElement from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of ReferenceElement.
-            /// </exception>
-            public static Aas.ReferenceElement ReferenceElementFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.ReferenceElement? result = DeserializeImplementation.ReferenceElementFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -11162,106 +11412,6 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of IReference from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of IReference.
-            /// </exception>
-            public static Aas.IReference IReferenceFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.IReference? result = DeserializeImplementation.IReferenceFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of GlobalReference from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of GlobalReference.
-            /// </exception>
-            public static Aas.GlobalReference GlobalReferenceFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.GlobalReference? result = DeserializeImplementation.GlobalReferenceFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of ModelReference from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of ModelReference.
-            /// </exception>
-            public static Aas.ModelReference ModelReferenceFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.ModelReference? result = DeserializeImplementation.ModelReferenceFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of Key from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of Key.
-            /// </exception>
-            public static Aas.Key KeyFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.Key? result = DeserializeImplementation.KeyFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
             /// Deserialize an instance of IdentifiableElements from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -11348,156 +11498,6 @@ namespace AasCore.Aas3
                 Nodes.JsonNode node)
             {
                 Aas.SubmodelElements? result = DeserializeImplementation.SubmodelElementsFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of BuildInListTypes from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of BuildInListTypes.
-            /// </exception>
-            public static Aas.BuildInListTypes BuildInListTypesFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.BuildInListTypes? result = DeserializeImplementation.BuildInListTypesFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of DecimalBuildInTypes from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of DecimalBuildInTypes.
-            /// </exception>
-            public static Aas.DecimalBuildInTypes DecimalBuildInTypesFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.DecimalBuildInTypes? result = DeserializeImplementation.DecimalBuildInTypesFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of DurationBuildInTypes from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of DurationBuildInTypes.
-            /// </exception>
-            public static Aas.DurationBuildInTypes DurationBuildInTypesFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.DurationBuildInTypes? result = DeserializeImplementation.DurationBuildInTypesFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of PrimitiveTypes from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of PrimitiveTypes.
-            /// </exception>
-            public static Aas.PrimitiveTypes PrimitiveTypesFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.PrimitiveTypes? result = DeserializeImplementation.PrimitiveTypesFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of StringBuildInTypes from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of StringBuildInTypes.
-            /// </exception>
-            public static Aas.StringBuildInTypes StringBuildInTypesFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.StringBuildInTypes? result = DeserializeImplementation.StringBuildInTypesFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of DataTypeDef from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of DataTypeDef.
-            /// </exception>
-            public static Aas.DataTypeDef DataTypeDefFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.DataTypeDef? result = DeserializeImplementation.DataTypeDefFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -11759,6 +11759,170 @@ namespace AasCore.Aas3
                 return Nodes.JsonValue.Create(that);
             }
 
+            public override Nodes.JsonObject Transform(Aas.Qualifier that)
+            {
+                var result = new Nodes.JsonObject();
+
+                if (that.SemanticId != null)
+                {
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
+                }
+
+                result["type"] = Nodes.JsonValue.Create(
+                    that.Type);
+
+                result["valueType"] = Serialize.DataTypeDefToJsonValue(
+                    that.ValueType);
+
+                if (that.Value != null)
+                {
+                    result["value"] = Nodes.JsonValue.Create(
+                        that.Value);
+                }
+
+                if (that.ValueId != null)
+                {
+                    result["valueId"] = Transform(
+                        that.ValueId);
+                }
+
+                return result;
+            }
+
+            public override Nodes.JsonObject Transform(Aas.ReferenceElement that)
+            {
+                var result = new Nodes.JsonObject();
+
+                var arrayExtensions = new Nodes.JsonArray();
+                foreach (Extension item in that.Extensions)
+                {
+                    arrayExtensions.Add(
+                        Transform(
+                            item));
+                }
+                result["extensions"] = arrayExtensions;
+
+                if (that.IdShort != null)
+                {
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
+                }
+
+                if (that.DisplayName != null)
+                {
+                    result["displayName"] = Transform(
+                        that.DisplayName);
+                }
+
+                if (that.Category != null)
+                {
+                    result["category"] = Nodes.JsonValue.Create(
+                        that.Category);
+                }
+
+                if (that.Description != null)
+                {
+                    result["description"] = Transform(
+                        that.Description);
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    result["kind"] = Serialize.ModelingKindToJsonValue(
+                        value);
+                }
+
+                if (that.SemanticId != null)
+                {
+                    result["semanticId"] = Transform(
+                        that.SemanticId);
+                }
+
+                var arrayQualifiers = new Nodes.JsonArray();
+                foreach (IConstraint item in that.Qualifiers)
+                {
+                    arrayQualifiers.Add(
+                        Transform(
+                            item));
+                }
+                result["qualifiers"] = arrayQualifiers;
+
+                if (that.DataSpecifications != null)
+                {
+                    var arrayDataSpecifications = new Nodes.JsonArray();
+                    foreach (IReference item in that.DataSpecifications)
+                    {
+                        arrayDataSpecifications.Add(
+                            Transform(
+                                item));
+                    }
+                    result["dataSpecifications"] = arrayDataSpecifications;
+                }
+
+                if (that.Value != null)
+                {
+                    result["value"] = Transform(
+                        that.Value);
+                }
+
+                return result;
+            }
+
+            public override Nodes.JsonObject Transform(Aas.GlobalReference that)
+            {
+                var result = new Nodes.JsonObject();
+
+                var arrayValues = new Nodes.JsonArray();
+                foreach (string item in that.Values)
+                {
+                    arrayValues.Add(
+                        Nodes.JsonValue.Create(
+                            item));
+                }
+                result["values"] = arrayValues;
+
+                return result;
+            }
+
+            public override Nodes.JsonObject Transform(Aas.ModelReference that)
+            {
+                var result = new Nodes.JsonObject();
+
+                var arrayKeys = new Nodes.JsonArray();
+                foreach (Key item in that.Keys)
+                {
+                    arrayKeys.Add(
+                        Transform(
+                            item));
+                }
+                result["keys"] = arrayKeys;
+
+                if (that.ReferredSemanticId != null)
+                {
+                    result["referredSemanticId"] = Transform(
+                        that.ReferredSemanticId);
+                }
+
+                return result;
+            }
+
+            public override Nodes.JsonObject Transform(Aas.Key that)
+            {
+                var result = new Nodes.JsonObject();
+
+                result["type"] = Serialize.KeyElementsToJsonValue(
+                    that.Type);
+
+                result["value"] = Nodes.JsonValue.Create(
+                    that.Value);
+
+                return result;
+            }
+
             public override Nodes.JsonObject Transform(Aas.Extension that)
             {
                 var result = new Nodes.JsonObject();
@@ -11822,37 +11986,6 @@ namespace AasCore.Aas3
                 {
                     result["revision"] = Nodes.JsonValue.Create(
                         that.Revision);
-                }
-
-                return result;
-            }
-
-            public override Nodes.JsonObject Transform(Aas.Qualifier that)
-            {
-                var result = new Nodes.JsonObject();
-
-                if (that.SemanticId != null)
-                {
-                    result["semanticId"] = Transform(
-                        that.SemanticId);
-                }
-
-                result["type"] = Nodes.JsonValue.Create(
-                    that.Type);
-
-                result["valueType"] = Serialize.DataTypeDefToJsonValue(
-                    that.ValueType);
-
-                if (that.Value != null)
-                {
-                    result["value"] = Nodes.JsonValue.Create(
-                        that.Value);
-                }
-
-                if (that.ValueId != null)
-                {
-                    result["valueId"] = Transform(
-                        that.ValueId);
                 }
 
                 return result;
@@ -12559,88 +12692,6 @@ namespace AasCore.Aas3
                 {
                     result["max"] = Nodes.JsonValue.Create(
                         that.Max);
-                }
-
-                return result;
-            }
-
-            public override Nodes.JsonObject Transform(Aas.ReferenceElement that)
-            {
-                var result = new Nodes.JsonObject();
-
-                var arrayExtensions = new Nodes.JsonArray();
-                foreach (Extension item in that.Extensions)
-                {
-                    arrayExtensions.Add(
-                        Transform(
-                            item));
-                }
-                result["extensions"] = arrayExtensions;
-
-                if (that.IdShort != null)
-                {
-                    result["idShort"] = Nodes.JsonValue.Create(
-                        that.IdShort);
-                }
-
-                if (that.DisplayName != null)
-                {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
-                }
-
-                if (that.Category != null)
-                {
-                    result["category"] = Nodes.JsonValue.Create(
-                        that.Category);
-                }
-
-                if (that.Description != null)
-                {
-                    result["description"] = Transform(
-                        that.Description);
-                }
-
-                if (that.Kind != null)
-                {
-                    // We need to help the static analyzer with a null coalescing.
-                    Aas.ModelingKind value = that.Kind
-                        ?? throw new System.InvalidOperationException();
-                    result["kind"] = Serialize.ModelingKindToJsonValue(
-                        value);
-                }
-
-                if (that.SemanticId != null)
-                {
-                    result["semanticId"] = Transform(
-                        that.SemanticId);
-                }
-
-                var arrayQualifiers = new Nodes.JsonArray();
-                foreach (IConstraint item in that.Qualifiers)
-                {
-                    arrayQualifiers.Add(
-                        Transform(
-                            item));
-                }
-                result["qualifiers"] = arrayQualifiers;
-
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IReference item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
-                }
-
-                if (that.Value != null)
-                {
-                    result["value"] = Transform(
-                        that.Value);
                 }
 
                 return result;
@@ -13413,57 +13464,6 @@ namespace AasCore.Aas3
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.GlobalReference that)
-            {
-                var result = new Nodes.JsonObject();
-
-                var arrayValues = new Nodes.JsonArray();
-                foreach (string item in that.Values)
-                {
-                    arrayValues.Add(
-                        Nodes.JsonValue.Create(
-                            item));
-                }
-                result["values"] = arrayValues;
-
-                return result;
-            }
-
-            public override Nodes.JsonObject Transform(Aas.ModelReference that)
-            {
-                var result = new Nodes.JsonObject();
-
-                var arrayKeys = new Nodes.JsonArray();
-                foreach (Key item in that.Keys)
-                {
-                    arrayKeys.Add(
-                        Transform(
-                            item));
-                }
-                result["keys"] = arrayKeys;
-
-                if (that.ReferredSemanticId != null)
-                {
-                    result["referredSemanticId"] = Transform(
-                        that.ReferredSemanticId);
-                }
-
-                return result;
-            }
-
-            public override Nodes.JsonObject Transform(Aas.Key that)
-            {
-                var result = new Nodes.JsonObject();
-
-                result["type"] = Serialize.KeyElementsToJsonValue(
-                    that.Type);
-
-                result["value"] = Nodes.JsonValue.Create(
-                    that.Value);
-
-                return result;
-            }
-
             public override Nodes.JsonObject Transform(Aas.LangStringSet that)
             {
                 throw new System.NotImplementedException("TODO");
@@ -13716,9 +13716,9 @@ namespace AasCore.Aas3
         /// Serialize instances of meta-model classes to JSON elements.
         /// </summary>
         /// <example>
-        /// Here is an example how to serialize an instance of IHasSemantics:
+        /// Here is an example how to serialize an instance of IReference:
         /// <code>
-        /// var anInstance = new Aas.IHasSemantics(
+        /// var anInstance = new Aas.IReference(
         ///     // ... some constructor arguments ...
         /// );
         /// System.Text.Json.Nodes.JsonObject element = (
@@ -13736,6 +13736,72 @@ namespace AasCore.Aas3
             public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
             {
                 return Serialize._transformer.Transform(that);
+            }
+
+            /// <summary>
+            /// Serialize a literal of BuildInListTypes into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue BuildInListTypesToJsonValue(Aas.BuildInListTypes that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid BuildInListTypes: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of DecimalBuildInTypes into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue DecimalBuildInTypesToJsonValue(Aas.DecimalBuildInTypes that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid DecimalBuildInTypes: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of DurationBuildInTypes into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue DurationBuildInTypesToJsonValue(Aas.DurationBuildInTypes that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid DurationBuildInTypes: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of PrimitiveTypes into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue PrimitiveTypesToJsonValue(Aas.PrimitiveTypes that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid PrimitiveTypes: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of StringBuildInTypes into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue StringBuildInTypesToJsonValue(Aas.StringBuildInTypes that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid StringBuildInTypes: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of DataTypeDef into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue DataTypeDefToJsonValue(Aas.DataTypeDef that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid DataTypeDef: {that}");
             }
 
             /// <summary>
@@ -13813,72 +13879,6 @@ namespace AasCore.Aas3
                 return Nodes.JsonValue.Create(text)
                     ?? throw new System.ArgumentException(
                         $"Invalid SubmodelElements: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of BuildInListTypes into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue BuildInListTypesToJsonValue(Aas.BuildInListTypes that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid BuildInListTypes: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of DecimalBuildInTypes into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue DecimalBuildInTypesToJsonValue(Aas.DecimalBuildInTypes that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid DecimalBuildInTypes: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of DurationBuildInTypes into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue DurationBuildInTypesToJsonValue(Aas.DurationBuildInTypes that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid DurationBuildInTypes: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of PrimitiveTypes into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue PrimitiveTypesToJsonValue(Aas.PrimitiveTypes that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid PrimitiveTypes: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of StringBuildInTypes into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue StringBuildInTypesToJsonValue(Aas.StringBuildInTypes that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid StringBuildInTypes: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of DataTypeDef into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue DataTypeDefToJsonValue(Aas.DataTypeDef that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid DataTypeDef: {that}");
             }
 
             /// <summary>

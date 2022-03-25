@@ -9,40 +9,63 @@
     }
   ],
   "definitions": {
-    "HasSemantics": {
+    "DataTypeDef": {
+      "type": "string",
+      "enum": [
+        "ENTITIES",
+        "IDREFS",
+        "NMTOKENS",
+        "integer",
+        "long",
+        "int",
+        "short",
+        "byte",
+        "NonNegativeInteger",
+        "positiveInteger",
+        "unsignedInteger",
+        "unsignedLong",
+        "unsignedInt",
+        "unsignedShort",
+        "unsignedByte",
+        "nonPositiveInteger",
+        "negativeInteger",
+        "dayTimeDuration",
+        "yearMonthDuration",
+        "anyURI",
+        "base64Binary",
+        "boolean",
+        "date",
+        "dateTime",
+        "decimal",
+        "double",
+        "duration",
+        "float",
+        "gDay",
+        "gMonth",
+        "gMonthDay",
+        "heyBinary",
+        "NOTATION",
+        "QName",
+        "string",
+        "time",
+        "normalizedString",
+        "token",
+        "Language",
+        "NCName",
+        "ENTITY",
+        "ID",
+        "IDREF"
+      ]
+    },
+    "Reference": {
       "type": "object",
       "properties": {
-        "semanticId": {
-          "$ref": "#/definitions/Reference"
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
         }
-      }
-    },
-    "Extension": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/HasSemantics"
-        },
-        {
-          "properties": {
-            "name": {
-              "type": "string",
-              "minLength": 1
-            },
-            "valueType": {
-              "$ref": "#/definitions/DataTypeDef"
-            },
-            "value": {
-              "type": "string",
-              "minLength": 1
-            },
-            "refersTo": {
-              "$ref": "#/definitions/Reference"
-            }
-          },
-          "required": [
-            "name"
-          ]
-        }
+      },
+      "required": [
+        "modelType"
       ]
     },
     "HasExtensions": {
@@ -90,34 +113,6 @@
         }
       ]
     },
-    "Identifiable": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/Referable"
-        },
-        {
-          "properties": {
-            "id": {
-              "type": "string",
-              "minLength": 1
-            },
-            "administration": {
-              "$ref": "#/definitions/AdministrativeInformation"
-            }
-          },
-          "required": [
-            "id"
-          ]
-        }
-      ]
-    },
-    "ModelingKind": {
-      "type": "string",
-      "enum": [
-        "TEMPLATE",
-        "INSTANCE"
-      ]
-    },
     "HasKind": {
       "type": "object",
       "properties": {
@@ -126,46 +121,13 @@
         }
       }
     },
-    "HasDataSpecification": {
+    "HasSemantics": {
       "type": "object",
       "properties": {
-        "dataSpecifications": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Reference"
-          }
+        "semanticId": {
+          "$ref": "#/definitions/Reference"
         }
       }
-    },
-    "AdministrativeInformation": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/HasDataSpecification"
-        },
-        {
-          "properties": {
-            "version": {
-              "type": "string",
-              "minLength": 1
-            },
-            "revision": {
-              "type": "string",
-              "minLength": 1
-            }
-          }
-        }
-      ]
-    },
-    "Constraint": {
-      "type": "object",
-      "properties": {
-        "modelType": {
-          "$ref": "#/definitions/ModelType"
-        }
-      },
-      "required": [
-        "modelType"
-      ]
     },
     "Qualifiable": {
       "type": "object",
@@ -183,6 +145,36 @@
       "required": [
         "qualifiers",
         "modelType"
+      ]
+    },
+    "HasDataSpecification": {
+      "type": "object",
+      "properties": {
+        "dataSpecifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Reference"
+          }
+        }
+      }
+    },
+    "SubmodelElement": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Referable"
+        },
+        {
+          "$ref": "#/definitions/HasKind"
+        },
+        {
+          "$ref": "#/definitions/HasSemantics"
+        },
+        {
+          "$ref": "#/definitions/Qualifiable"
+        },
+        {
+          "$ref": "#/definitions/HasDataSpecification"
+        }
       ]
     },
     "Qualifier": {
@@ -215,6 +207,170 @@
             "valueType"
           ]
         }
+      ]
+    },
+    "DataElement": {
+      "$ref": "#/definitions/SubmodelElement"
+    },
+    "ReferenceElement": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/DataElement"
+        },
+        {
+          "properties": {
+            "value": {
+              "$ref": "#/definitions/Reference"
+            }
+          }
+        }
+      ]
+    },
+    "GlobalReference": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Reference"
+        },
+        {
+          "properties": {
+            "values": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "values"
+          ]
+        }
+      ]
+    },
+    "ModelReference": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Reference"
+        },
+        {
+          "properties": {
+            "keys": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Key"
+              },
+              "minItems": 1
+            },
+            "referredSemanticId": {
+              "$ref": "#/definitions/Reference"
+            }
+          },
+          "required": [
+            "keys"
+          ]
+        }
+      ]
+    },
+    "Key": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/KeyElements"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ]
+    },
+    "Extension": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/HasSemantics"
+        },
+        {
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "valueType": {
+              "$ref": "#/definitions/DataTypeDef"
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1
+            },
+            "refersTo": {
+              "$ref": "#/definitions/Reference"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    },
+    "Identifiable": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Referable"
+        },
+        {
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "administration": {
+              "$ref": "#/definitions/AdministrativeInformation"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ]
+    },
+    "ModelingKind": {
+      "type": "string",
+      "enum": [
+        "TEMPLATE",
+        "INSTANCE"
+      ]
+    },
+    "AdministrativeInformation": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/HasDataSpecification"
+        },
+        {
+          "properties": {
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "revision": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "Constraint": {
+      "type": "object",
+      "properties": {
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
+        }
+      },
+      "required": [
+        "modelType"
       ]
     },
     "Formula": {
@@ -348,25 +504,6 @@
         }
       ]
     },
-    "SubmodelElement": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/Referable"
-        },
-        {
-          "$ref": "#/definitions/HasKind"
-        },
-        {
-          "$ref": "#/definitions/HasSemantics"
-        },
-        {
-          "$ref": "#/definitions/Qualifiable"
-        },
-        {
-          "$ref": "#/definitions/HasDataSpecification"
-        }
-      ]
-    },
     "RelationshipElement": {
       "allOf": [
         {
@@ -438,9 +575,6 @@
         }
       ]
     },
-    "DataElement": {
-      "$ref": "#/definitions/SubmodelElement"
-    },
     "Property": {
       "allOf": [
         {
@@ -504,20 +638,6 @@
           "required": [
             "valueType"
           ]
-        }
-      ]
-    },
-    "ReferenceElement": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/DataElement"
-        },
-        {
-          "properties": {
-            "value": {
-              "$ref": "#/definitions/Reference"
-            }
-          }
         }
       ]
     },
@@ -759,78 +879,6 @@
         }
       ]
     },
-    "Reference": {
-      "type": "object",
-      "properties": {
-        "modelType": {
-          "$ref": "#/definitions/ModelType"
-        }
-      },
-      "required": [
-        "modelType"
-      ]
-    },
-    "GlobalReference": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/Reference"
-        },
-        {
-          "properties": {
-            "values": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "minItems": 1
-            }
-          },
-          "required": [
-            "values"
-          ]
-        }
-      ]
-    },
-    "ModelReference": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/Reference"
-        },
-        {
-          "properties": {
-            "keys": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Key"
-              },
-              "minItems": 1
-            },
-            "referredSemanticId": {
-              "$ref": "#/definitions/Reference"
-            }
-          },
-          "required": [
-            "keys"
-          ]
-        }
-      ]
-    },
-    "Key": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/KeyElements"
-        },
-        "value": {
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "required": [
-        "type",
-        "value"
-      ]
-    },
     "KeyElements": {
       "type": "string",
       "enum": [
@@ -884,54 +932,6 @@
         "SubmodelElement",
         "SubmodelElementList",
         "SubmodelElementStruct"
-      ]
-    },
-    "DataTypeDef": {
-      "type": "string",
-      "enum": [
-        "ENTITIES",
-        "IDREFS",
-        "NMTOKENS",
-        "integer",
-        "long",
-        "int",
-        "short",
-        "byte",
-        "NonNegativeInteger",
-        "positiveInteger",
-        "unsignedInteger",
-        "unsignedLong",
-        "unsignedInt",
-        "unsignedShort",
-        "unsignedByte",
-        "nonPositiveInteger",
-        "negativeInteger",
-        "dayTimeDuration",
-        "yearMonthDuration",
-        "anyURI",
-        "base64Binary",
-        "boolean",
-        "date",
-        "dateTime",
-        "decimal",
-        "double",
-        "duration",
-        "float",
-        "gDay",
-        "gMonth",
-        "gMonthDay",
-        "heyBinary",
-        "NOTATION",
-        "QName",
-        "string",
-        "time",
-        "normalizedString",
-        "token",
-        "Language",
-        "NCName",
-        "ENTITY",
-        "ID",
-        "IDREF"
       ]
     },
     "LangString": {
@@ -1170,6 +1170,9 @@
       "type": "string",
       "enum": [
         "Qualifier",
+        "ReferenceElement",
+        "GlobalReference",
+        "ModelReference",
         "Formula",
         "AssetAdministrationShell",
         "Submodel",
@@ -1178,7 +1181,6 @@
         "Property",
         "MultiLanguageProperty",
         "Range",
-        "ReferenceElement",
         "Blob",
         "File",
         "AnnotatedRelationshipElement",
@@ -1187,9 +1189,7 @@
         "Operation",
         "Capability",
         "ConceptDescription",
-        "View",
-        "GlobalReference",
-        "ModelReference"
+        "View"
       ]
     },
     "ModelType": {

@@ -17,9 +17,9 @@ namespace AasCore.Aas3
     /// Verify that the instances of the meta-model satisfy the invariants.
     /// </summary>
     /// <example>
-    /// Here is an example how to verify an instance of IHasSemantics:
+    /// Here is an example how to verify an instance of IReference:
     /// <code>
-    /// var anInstance = new Aas.IHasSemantics(
+    /// var anInstance = new Aas.IReference(
     ///     // ... some constructor arguments ...
     /// );
     /// foreach (var error in Verification.Verify(anInstance))
@@ -78,110 +78,6 @@ namespace AasCore.Aas3
         /// </summary>
         internal static class EnumValueSet
         {
-            internal static HashSet<int> ForModelingKind = new HashSet<int>
-            {
-                (int)Aas.ModelingKind.Template,
-                (int)Aas.ModelingKind.Instance
-            };
-
-            internal static HashSet<int> ForAssetKind = new HashSet<int>
-            {
-                (int)Aas.AssetKind.Type,
-                (int)Aas.AssetKind.Instance
-            };
-
-            internal static HashSet<int> ForEntityType = new HashSet<int>
-            {
-                (int)Aas.EntityType.CoManagedEntity,
-                (int)Aas.EntityType.SelfManagedEntity
-            };
-
-            internal static HashSet<int> ForIdentifiableElements = new HashSet<int>
-            {
-                (int)Aas.IdentifiableElements.AssetAdministrationShell,
-                (int)Aas.IdentifiableElements.ConceptDescription,
-                (int)Aas.IdentifiableElements.Submodel
-            };
-
-            internal static HashSet<int> ForReferableElements = new HashSet<int>
-            {
-                (int)Aas.ReferableElements.AccessPermissionRule,
-                (int)Aas.ReferableElements.AnnotatedRelationshipElement,
-                (int)Aas.ReferableElements.Asset,
-                (int)Aas.ReferableElements.AssetAdministrationShell,
-                (int)Aas.ReferableElements.BasicEvent,
-                (int)Aas.ReferableElements.Blob,
-                (int)Aas.ReferableElements.Capability,
-                (int)Aas.ReferableElements.ConceptDescription,
-                (int)Aas.ReferableElements.DataElement,
-                (int)Aas.ReferableElements.Entity,
-                (int)Aas.ReferableElements.Event,
-                (int)Aas.ReferableElements.File,
-                (int)Aas.ReferableElements.MultiLanguageProperty,
-                (int)Aas.ReferableElements.Operation,
-                (int)Aas.ReferableElements.Property,
-                (int)Aas.ReferableElements.Range,
-                (int)Aas.ReferableElements.ReferenceElement,
-                (int)Aas.ReferableElements.RelationshipElement,
-                (int)Aas.ReferableElements.Submodel,
-                (int)Aas.ReferableElements.SubmodelElement,
-                (int)Aas.ReferableElements.SubmodelElementList,
-                (int)Aas.ReferableElements.SubmodelElementStruct
-            };
-
-            internal static HashSet<int> ForKeyElements = new HashSet<int>
-            {
-                (int)Aas.KeyElements.FragmentReference,
-                (int)Aas.KeyElements.AccessPermissionRule,
-                (int)Aas.KeyElements.AnnotatedRelationshipElement,
-                (int)Aas.KeyElements.Asset,
-                (int)Aas.KeyElements.AssetAdministrationShell,
-                (int)Aas.KeyElements.BasicEvent,
-                (int)Aas.KeyElements.Blob,
-                (int)Aas.KeyElements.Capability,
-                (int)Aas.KeyElements.ConceptDescription,
-                (int)Aas.KeyElements.DataElement,
-                (int)Aas.KeyElements.Entity,
-                (int)Aas.KeyElements.Event,
-                (int)Aas.KeyElements.File,
-                (int)Aas.KeyElements.MultiLanguageProperty,
-                (int)Aas.KeyElements.Operation,
-                (int)Aas.KeyElements.Property,
-                (int)Aas.KeyElements.Range,
-                (int)Aas.KeyElements.GlobalReference,
-                (int)Aas.KeyElements.ReferenceElement,
-                (int)Aas.KeyElements.RelationshipElement,
-                (int)Aas.KeyElements.Submodel,
-                (int)Aas.KeyElements.SubmodelElement,
-                (int)Aas.KeyElements.SubmodelElementList,
-                (int)Aas.KeyElements.SubmodelElementStruct
-            };
-
-            internal static HashSet<int> ForSubmodelElements = new HashSet<int>
-            {
-                (int)Aas.SubmodelElements.AnnotatedRelationshipElement,
-                (int)Aas.SubmodelElements.Asset,
-                (int)Aas.SubmodelElements.AssetAdministrationShell,
-                (int)Aas.SubmodelElements.BasicEvent,
-                (int)Aas.SubmodelElements.Blob,
-                (int)Aas.SubmodelElements.Capability,
-                (int)Aas.SubmodelElements.ConceptDescription,
-                (int)Aas.SubmodelElements.DataElement,
-                (int)Aas.SubmodelElements.Entity,
-                (int)Aas.SubmodelElements.Event,
-                (int)Aas.SubmodelElements.File,
-                (int)Aas.SubmodelElements.MultiLanguageProperty,
-                (int)Aas.SubmodelElements.Operation,
-                (int)Aas.SubmodelElements.Property,
-                (int)Aas.SubmodelElements.Range,
-                (int)Aas.SubmodelElements.ReferenceElement,
-                (int)Aas.SubmodelElements.RelationshipElement,
-                (int)Aas.SubmodelElements.Submodel,
-                (int)Aas.SubmodelElements.SubmodelElement,
-                (int)Aas.SubmodelElements.SubmodelElementList,
-                (int)Aas.SubmodelElements.SubmodelElementStruct
-            };
-
             internal static HashSet<int> ForBuildInListTypes = new HashSet<int>
             {
                 (int)Aas.BuildInListTypes.Entities,
@@ -292,6 +188,110 @@ namespace AasCore.Aas3
                 (int)Aas.DataTypeDef.Idref
             };
 
+            internal static HashSet<int> ForModelingKind = new HashSet<int>
+            {
+                (int)Aas.ModelingKind.Template,
+                (int)Aas.ModelingKind.Instance
+            };
+
+            internal static HashSet<int> ForAssetKind = new HashSet<int>
+            {
+                (int)Aas.AssetKind.Type,
+                (int)Aas.AssetKind.Instance
+            };
+
+            internal static HashSet<int> ForEntityType = new HashSet<int>
+            {
+                (int)Aas.EntityType.CoManagedEntity,
+                (int)Aas.EntityType.SelfManagedEntity
+            };
+
+            internal static HashSet<int> ForIdentifiableElements = new HashSet<int>
+            {
+                (int)Aas.IdentifiableElements.AssetAdministrationShell,
+                (int)Aas.IdentifiableElements.ConceptDescription,
+                (int)Aas.IdentifiableElements.Submodel
+            };
+
+            internal static HashSet<int> ForReferableElements = new HashSet<int>
+            {
+                (int)Aas.ReferableElements.AccessPermissionRule,
+                (int)Aas.ReferableElements.AnnotatedRelationshipElement,
+                (int)Aas.ReferableElements.Asset,
+                (int)Aas.ReferableElements.AssetAdministrationShell,
+                (int)Aas.ReferableElements.BasicEvent,
+                (int)Aas.ReferableElements.Blob,
+                (int)Aas.ReferableElements.Capability,
+                (int)Aas.ReferableElements.ConceptDescription,
+                (int)Aas.ReferableElements.DataElement,
+                (int)Aas.ReferableElements.Entity,
+                (int)Aas.ReferableElements.Event,
+                (int)Aas.ReferableElements.File,
+                (int)Aas.ReferableElements.MultiLanguageProperty,
+                (int)Aas.ReferableElements.Operation,
+                (int)Aas.ReferableElements.Property,
+                (int)Aas.ReferableElements.Range,
+                (int)Aas.ReferableElements.ReferenceElement,
+                (int)Aas.ReferableElements.RelationshipElement,
+                (int)Aas.ReferableElements.Submodel,
+                (int)Aas.ReferableElements.SubmodelElement,
+                (int)Aas.ReferableElements.SubmodelElementList,
+                (int)Aas.ReferableElements.SubmodelElementStruct
+            };
+
+            internal static HashSet<int> ForKeyElements = new HashSet<int>
+            {
+                (int)Aas.KeyElements.FragmentReference,
+                (int)Aas.KeyElements.AccessPermissionRule,
+                (int)Aas.KeyElements.AnnotatedRelationshipElement,
+                (int)Aas.KeyElements.Asset,
+                (int)Aas.KeyElements.AssetAdministrationShell,
+                (int)Aas.KeyElements.BasicEvent,
+                (int)Aas.KeyElements.Blob,
+                (int)Aas.KeyElements.Capability,
+                (int)Aas.KeyElements.ConceptDescription,
+                (int)Aas.KeyElements.DataElement,
+                (int)Aas.KeyElements.Entity,
+                (int)Aas.KeyElements.Event,
+                (int)Aas.KeyElements.File,
+                (int)Aas.KeyElements.MultiLanguageProperty,
+                (int)Aas.KeyElements.Operation,
+                (int)Aas.KeyElements.Property,
+                (int)Aas.KeyElements.Range,
+                (int)Aas.KeyElements.GlobalReference,
+                (int)Aas.KeyElements.ReferenceElement,
+                (int)Aas.KeyElements.RelationshipElement,
+                (int)Aas.KeyElements.Submodel,
+                (int)Aas.KeyElements.SubmodelElement,
+                (int)Aas.KeyElements.SubmodelElementList,
+                (int)Aas.KeyElements.SubmodelElementStruct
+            };
+
+            internal static HashSet<int> ForSubmodelElements = new HashSet<int>
+            {
+                (int)Aas.SubmodelElements.AnnotatedRelationshipElement,
+                (int)Aas.SubmodelElements.Asset,
+                (int)Aas.SubmodelElements.AssetAdministrationShell,
+                (int)Aas.SubmodelElements.BasicEvent,
+                (int)Aas.SubmodelElements.Blob,
+                (int)Aas.SubmodelElements.Capability,
+                (int)Aas.SubmodelElements.ConceptDescription,
+                (int)Aas.SubmodelElements.DataElement,
+                (int)Aas.SubmodelElements.Entity,
+                (int)Aas.SubmodelElements.Event,
+                (int)Aas.SubmodelElements.File,
+                (int)Aas.SubmodelElements.MultiLanguageProperty,
+                (int)Aas.SubmodelElements.Operation,
+                (int)Aas.SubmodelElements.Property,
+                (int)Aas.SubmodelElements.Range,
+                (int)Aas.SubmodelElements.ReferenceElement,
+                (int)Aas.SubmodelElements.RelationshipElement,
+                (int)Aas.SubmodelElements.Submodel,
+                (int)Aas.SubmodelElements.SubmodelElement,
+                (int)Aas.SubmodelElements.SubmodelElementList,
+                (int)Aas.SubmodelElements.SubmodelElementStruct
+            };
+
             internal static HashSet<int> ForDataTypeIec61360 = new HashSet<int>
             {
                 (int)Aas.DataTypeIec61360.Date,
@@ -330,6 +330,279 @@ namespace AasCore.Aas3
         private class Transformer
             : Visitation.AbstractTransformer<IEnumerable<Reporting.Error>>
         {
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Qualifier that)
+            {
+                if (that.SemanticId != null)
+                {
+                    foreach (var error in Verification.Verify(that.SemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
+                    }
+                }
+
+                foreach (var error in Verification.VerifyNonEmptyString(that.Type))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "type"));
+                    yield return error;
+                }
+
+                foreach (var error in Verification.VerifyDataTypeDef(that.ValueType))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "valueType"));
+                    yield return error;
+                }
+
+                if (that.Value != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "value"));
+                        yield return error;
+                    }
+                }
+
+                if (that.ValueId != null)
+                {
+                    foreach (var error in Verification.Verify(that.ValueId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "valueId"));
+                        yield return error;
+                    }
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.ReferenceElement that)
+            {
+                int indexExtensions = 0;
+                foreach (var item in that.Extensions)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexExtensions));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "extensions"));
+                        yield return error;
+                    }
+                    indexExtensions++;
+                }
+
+                if (that.IdShort != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "idShort"));
+                        yield return error;
+                    }
+                }
+
+                if (that.DisplayName != null)
+                {
+                    foreach (var error in Verification.Verify(that.DisplayName))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "displayName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Category != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "category"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Description != null)
+                {
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Kind != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.ModelingKind value = that.Kind
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyModelingKind(value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "kind"));
+                        yield return error;
+                    }
+                }
+
+                if (that.SemanticId != null)
+                {
+                    foreach (var error in Verification.Verify(that.SemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "semanticId"));
+                        yield return error;
+                    }
+                }
+
+                int indexQualifiers = 0;
+                foreach (var item in that.Qualifiers)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexQualifiers));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "qualifiers"));
+                        yield return error;
+                    }
+                    indexQualifiers++;
+                }
+
+                if (that.DataSpecifications != null)
+                {
+                    int indexDataSpecifications = 0;
+                    foreach (var item in that.DataSpecifications)
+                    {
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error._pathSegments.AddFirst(
+                                new Reporting.IndexSegment(
+                                    indexDataSpecifications));
+                            error._pathSegments.AddFirst(
+                                new Reporting.NameSegment(
+                                    "dataSpecifications"));
+                            yield return error;
+                        }
+                        indexDataSpecifications++;
+                    }
+                }
+
+                if (that.Value != null)
+                {
+                    foreach (var error in Verification.Verify(that.Value))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "value"));
+                        yield return error;
+                    }
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.GlobalReference that)
+            {
+                if (!(that.Values.Count >= 1))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "that.Values.Count >= 1");
+                }
+
+                int indexValues = 0;
+                foreach (var item in that.Values)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexValues));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "values"));
+                        yield return error;
+                    }
+                    indexValues++;
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.ModelReference that)
+            {
+                if (!(that.Keys.Count >= 1))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "that.Keys.Count >= 1");
+                }
+
+                int indexKeys = 0;
+                foreach (var item in that.Keys)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.IndexSegment(
+                                indexKeys));
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "keys"));
+                        yield return error;
+                    }
+                    indexKeys++;
+                }
+
+                if (that.ReferredSemanticId != null)
+                {
+                    foreach (var error in Verification.Verify(that.ReferredSemanticId))
+                    {
+                        error._pathSegments.AddFirst(
+                            new Reporting.NameSegment(
+                                "referredSemanticId"));
+                        yield return error;
+                    }
+                }
+            }
+
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.Key that)
+            {
+                foreach (var error in Verification.VerifyKeyElements(that.Type))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "type"));
+                    yield return error;
+                }
+
+                foreach (var error in Verification.VerifyNonEmptyString(that.Value))
+                {
+                    error._pathSegments.AddFirst(
+                        new Reporting.NameSegment(
+                            "value"));
+                    yield return error;
+                }
+            }
+
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Extension that)
             {
@@ -440,59 +713,6 @@ namespace AasCore.Aas3
                         error._pathSegments.AddFirst(
                             new Reporting.NameSegment(
                                 "revision"));
-                        yield return error;
-                    }
-                }
-            }
-
-            public override IEnumerable<Reporting.Error> Transform(
-                Aas.Qualifier that)
-            {
-                if (that.SemanticId != null)
-                {
-                    foreach (var error in Verification.Verify(that.SemanticId))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "semanticId"));
-                        yield return error;
-                    }
-                }
-
-                foreach (var error in Verification.VerifyNonEmptyString(that.Type))
-                {
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "type"));
-                    yield return error;
-                }
-
-                foreach (var error in Verification.VerifyDataTypeDef(that.ValueType))
-                {
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "valueType"));
-                    yield return error;
-                }
-
-                if (that.Value != null)
-                {
-                    foreach (var error in Verification.VerifyNonEmptyString(that.Value))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "value"));
-                        yield return error;
-                    }
-                }
-
-                if (that.ValueId != null)
-                {
-                    foreach (var error in Verification.Verify(that.ValueId))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "valueId"));
                         yield return error;
                     }
                 }
@@ -1695,141 +1915,6 @@ namespace AasCore.Aas3
                         error._pathSegments.AddFirst(
                             new Reporting.NameSegment(
                                 "max"));
-                        yield return error;
-                    }
-                }
-            }
-
-            public override IEnumerable<Reporting.Error> Transform(
-                Aas.ReferenceElement that)
-            {
-                int indexExtensions = 0;
-                foreach (var item in that.Extensions)
-                {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexExtensions));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "extensions"));
-                        yield return error;
-                    }
-                    indexExtensions++;
-                }
-
-                if (that.IdShort != null)
-                {
-                    foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "idShort"));
-                        yield return error;
-                    }
-                }
-
-                if (that.DisplayName != null)
-                {
-                    foreach (var error in Verification.Verify(that.DisplayName))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "displayName"));
-                        yield return error;
-                    }
-                }
-
-                if (that.Category != null)
-                {
-                    foreach (var error in Verification.VerifyNonEmptyString(that.Category))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "category"));
-                        yield return error;
-                    }
-                }
-
-                if (that.Description != null)
-                {
-                    foreach (var error in Verification.Verify(that.Description))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "description"));
-                        yield return error;
-                    }
-                }
-
-                if (that.Kind != null)
-                {
-                    // We need to help the static analyzer with a null coalescing.
-                    Aas.ModelingKind value = that.Kind
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyModelingKind(value))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "kind"));
-                        yield return error;
-                    }
-                }
-
-                if (that.SemanticId != null)
-                {
-                    foreach (var error in Verification.Verify(that.SemanticId))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "semanticId"));
-                        yield return error;
-                    }
-                }
-
-                int indexQualifiers = 0;
-                foreach (var item in that.Qualifiers)
-                {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexQualifiers));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "qualifiers"));
-                        yield return error;
-                    }
-                    indexQualifiers++;
-                }
-
-                if (that.DataSpecifications != null)
-                {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
-                    {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error._pathSegments.AddFirst(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error._pathSegments.AddFirst(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            yield return error;
-                        }
-                        indexDataSpecifications++;
-                    }
-                }
-
-                if (that.Value != null)
-                {
-                    foreach (var error in Verification.Verify(that.Value))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "value"));
                         yield return error;
                     }
                 }
@@ -3119,91 +3204,6 @@ namespace AasCore.Aas3
             }
 
             public override IEnumerable<Reporting.Error> Transform(
-                Aas.GlobalReference that)
-            {
-                if (!(that.Values.Count >= 1))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "that.Values.Count >= 1");
-                }
-
-                int indexValues = 0;
-                foreach (var item in that.Values)
-                {
-                    foreach (var error in Verification.VerifyNonEmptyString(item))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexValues));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "values"));
-                        yield return error;
-                    }
-                    indexValues++;
-                }
-            }
-
-            public override IEnumerable<Reporting.Error> Transform(
-                Aas.ModelReference that)
-            {
-                if (!(that.Keys.Count >= 1))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "that.Keys.Count >= 1");
-                }
-
-                int indexKeys = 0;
-                foreach (var item in that.Keys)
-                {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.IndexSegment(
-                                indexKeys));
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "keys"));
-                        yield return error;
-                    }
-                    indexKeys++;
-                }
-
-                if (that.ReferredSemanticId != null)
-                {
-                    foreach (var error in Verification.Verify(that.ReferredSemanticId))
-                    {
-                        error._pathSegments.AddFirst(
-                            new Reporting.NameSegment(
-                                "referredSemanticId"));
-                        yield return error;
-                    }
-                }
-            }
-
-            public override IEnumerable<Reporting.Error> Transform(
-                Aas.Key that)
-            {
-                foreach (var error in Verification.VerifyKeyElements(that.Type))
-                {
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "type"));
-                    yield return error;
-                }
-
-                foreach (var error in Verification.VerifyNonEmptyString(that.Value))
-                {
-                    error._pathSegments.AddFirst(
-                        new Reporting.NameSegment(
-                            "value"));
-                    yield return error;
-                }
-            }
-
-            public override IEnumerable<Reporting.Error> Transform(
                 Aas.LangStringSet that)
             {
                 throw new System.NotImplementedException("TODO");
@@ -3635,6 +3635,90 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyBuildInListTypes(
+            Aas.BuildInListTypes that)
+        {
+            if (!EnumValueSet.ForBuildInListTypes.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid BuildInListTypes: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyDecimalBuildInTypes(
+            Aas.DecimalBuildInTypes that)
+        {
+            if (!EnumValueSet.ForDecimalBuildInTypes.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid DecimalBuildInTypes: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyDurationBuildInTypes(
+            Aas.DurationBuildInTypes that)
+        {
+            if (!EnumValueSet.ForDurationBuildInTypes.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid DurationBuildInTypes: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyPrimitiveTypes(
+            Aas.PrimitiveTypes that)
+        {
+            if (!EnumValueSet.ForPrimitiveTypes.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid PrimitiveTypes: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyStringBuildInTypes(
+            Aas.StringBuildInTypes that)
+        {
+            if (!EnumValueSet.ForStringBuildInTypes.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid StringBuildInTypes: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyDataTypeDef(
+            Aas.DataTypeDef that)
+        {
+            if (!EnumValueSet.ForDataTypeDef.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid DataTypeDef: {that}");
+            }
+        }
+
+        /// <summary>
         /// Verify the constraints of <paramref name="that" />.
         /// </summary>
         public static IEnumerable<Reporting.Error> VerifyMimeTyped (
@@ -3750,90 +3834,6 @@ namespace AasCore.Aas3
             {
                 yield return new Reporting.Error(
                     $"Invalid SubmodelElements: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyBuildInListTypes(
-            Aas.BuildInListTypes that)
-        {
-            if (!EnumValueSet.ForBuildInListTypes.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid BuildInListTypes: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyDecimalBuildInTypes(
-            Aas.DecimalBuildInTypes that)
-        {
-            if (!EnumValueSet.ForDecimalBuildInTypes.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid DecimalBuildInTypes: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyDurationBuildInTypes(
-            Aas.DurationBuildInTypes that)
-        {
-            if (!EnumValueSet.ForDurationBuildInTypes.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid DurationBuildInTypes: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyPrimitiveTypes(
-            Aas.PrimitiveTypes that)
-        {
-            if (!EnumValueSet.ForPrimitiveTypes.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid PrimitiveTypes: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyStringBuildInTypes(
-            Aas.StringBuildInTypes that)
-        {
-            if (!EnumValueSet.ForStringBuildInTypes.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid StringBuildInTypes: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyDataTypeDef(
-            Aas.DataTypeDef that)
-        {
-            if (!EnumValueSet.ForDataTypeDef.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid DataTypeDef: {that}");
             }
         }
 

@@ -13,9 +13,13 @@ namespace AasCore.Aas3
         public interface IVisitor
         {
             public void Visit(IClass that);
+            public void Visit(Qualifier that);
+            public void Visit(ReferenceElement that);
+            public void Visit(GlobalReference that);
+            public void Visit(ModelReference that);
+            public void Visit(Key that);
             public void Visit(Extension that);
             public void Visit(AdministrativeInformation that);
-            public void Visit(Qualifier that);
             public void Visit(Formula that);
             public void Visit(AssetAdministrationShell that);
             public void Visit(AssetInformation that);
@@ -26,7 +30,6 @@ namespace AasCore.Aas3
             public void Visit(Property that);
             public void Visit(MultiLanguageProperty that);
             public void Visit(Range that);
-            public void Visit(ReferenceElement that);
             public void Visit(Blob that);
             public void Visit(File that);
             public void Visit(AnnotatedRelationshipElement that);
@@ -37,9 +40,6 @@ namespace AasCore.Aas3
             public void Visit(Capability that);
             public void Visit(ConceptDescription that);
             public void Visit(View that);
-            public void Visit(GlobalReference that);
-            public void Visit(ModelReference that);
-            public void Visit(Key that);
             public void Visit(LangStringSet that);
             public void Visit(ValueReferencePair that);
             public void Visit(ValueList that);
@@ -55,9 +55,13 @@ namespace AasCore.Aas3
         public interface IVisitorWithContext<C>
         {
             public void Visit(IClass that, C context);
+            public void Visit(Qualifier that, C context);
+            public void Visit(ReferenceElement that, C context);
+            public void Visit(GlobalReference that, C context);
+            public void Visit(ModelReference that, C context);
+            public void Visit(Key that, C context);
             public void Visit(Extension that, C context);
             public void Visit(AdministrativeInformation that, C context);
-            public void Visit(Qualifier that, C context);
             public void Visit(Formula that, C context);
             public void Visit(AssetAdministrationShell that, C context);
             public void Visit(AssetInformation that, C context);
@@ -68,7 +72,6 @@ namespace AasCore.Aas3
             public void Visit(Property that, C context);
             public void Visit(MultiLanguageProperty that, C context);
             public void Visit(Range that, C context);
-            public void Visit(ReferenceElement that, C context);
             public void Visit(Blob that, C context);
             public void Visit(File that, C context);
             public void Visit(AnnotatedRelationshipElement that, C context);
@@ -79,9 +82,6 @@ namespace AasCore.Aas3
             public void Visit(Capability that, C context);
             public void Visit(ConceptDescription that, C context);
             public void Visit(View that, C context);
-            public void Visit(GlobalReference that, C context);
-            public void Visit(ModelReference that, C context);
-            public void Visit(Key that, C context);
             public void Visit(LangStringSet that, C context);
             public void Visit(ValueReferencePair that, C context);
             public void Visit(ValueList that, C context);
@@ -98,9 +98,13 @@ namespace AasCore.Aas3
         public interface ITransformer<T>
         {
             public T Transform(IClass that);
+            public T Transform(Qualifier that);
+            public T Transform(ReferenceElement that);
+            public T Transform(GlobalReference that);
+            public T Transform(ModelReference that);
+            public T Transform(Key that);
             public T Transform(Extension that);
             public T Transform(AdministrativeInformation that);
-            public T Transform(Qualifier that);
             public T Transform(Formula that);
             public T Transform(AssetAdministrationShell that);
             public T Transform(AssetInformation that);
@@ -111,7 +115,6 @@ namespace AasCore.Aas3
             public T Transform(Property that);
             public T Transform(MultiLanguageProperty that);
             public T Transform(Range that);
-            public T Transform(ReferenceElement that);
             public T Transform(Blob that);
             public T Transform(File that);
             public T Transform(AnnotatedRelationshipElement that);
@@ -122,9 +125,6 @@ namespace AasCore.Aas3
             public T Transform(Capability that);
             public T Transform(ConceptDescription that);
             public T Transform(View that);
-            public T Transform(GlobalReference that);
-            public T Transform(ModelReference that);
-            public T Transform(Key that);
             public T Transform(LangStringSet that);
             public T Transform(ValueReferencePair that);
             public T Transform(ValueList that);
@@ -145,11 +145,19 @@ namespace AasCore.Aas3
                 return that.Transform(this);
             }
 
+            public abstract T Transform(Qualifier that);
+
+            public abstract T Transform(ReferenceElement that);
+
+            public abstract T Transform(GlobalReference that);
+
+            public abstract T Transform(ModelReference that);
+
+            public abstract T Transform(Key that);
+
             public abstract T Transform(Extension that);
 
             public abstract T Transform(AdministrativeInformation that);
-
-            public abstract T Transform(Qualifier that);
 
             public abstract T Transform(Formula that);
 
@@ -171,8 +179,6 @@ namespace AasCore.Aas3
 
             public abstract T Transform(Range that);
 
-            public abstract T Transform(ReferenceElement that);
-
             public abstract T Transform(Blob that);
 
             public abstract T Transform(File that);
@@ -192,12 +198,6 @@ namespace AasCore.Aas3
             public abstract T Transform(ConceptDescription that);
 
             public abstract T Transform(View that);
-
-            public abstract T Transform(GlobalReference that);
-
-            public abstract T Transform(ModelReference that);
-
-            public abstract T Transform(Key that);
 
             public abstract T Transform(LangStringSet that);
 
@@ -221,9 +221,13 @@ namespace AasCore.Aas3
         public interface ITransformerWithContext<C, T>
         {
             public T Transform(IClass that, C context);
+            public T Transform(Qualifier that, C context);
+            public T Transform(ReferenceElement that, C context);
+            public T Transform(GlobalReference that, C context);
+            public T Transform(ModelReference that, C context);
+            public T Transform(Key that, C context);
             public T Transform(Extension that, C context);
             public T Transform(AdministrativeInformation that, C context);
-            public T Transform(Qualifier that, C context);
             public T Transform(Formula that, C context);
             public T Transform(AssetAdministrationShell that, C context);
             public T Transform(AssetInformation that, C context);
@@ -234,7 +238,6 @@ namespace AasCore.Aas3
             public T Transform(Property that, C context);
             public T Transform(MultiLanguageProperty that, C context);
             public T Transform(Range that, C context);
-            public T Transform(ReferenceElement that, C context);
             public T Transform(Blob that, C context);
             public T Transform(File that, C context);
             public T Transform(AnnotatedRelationshipElement that, C context);
@@ -245,9 +248,6 @@ namespace AasCore.Aas3
             public T Transform(Capability that, C context);
             public T Transform(ConceptDescription that, C context);
             public T Transform(View that, C context);
-            public T Transform(GlobalReference that, C context);
-            public T Transform(ModelReference that, C context);
-            public T Transform(Key that, C context);
             public T Transform(LangStringSet that, C context);
             public T Transform(ValueReferencePair that, C context);
             public T Transform(ValueList that, C context);
@@ -270,11 +270,19 @@ namespace AasCore.Aas3
                 return that.Transform(this, context);
             }
 
+            public abstract T Transform(Qualifier that, C context);
+
+            public abstract T Transform(ReferenceElement that, C context);
+
+            public abstract T Transform(GlobalReference that, C context);
+
+            public abstract T Transform(ModelReference that, C context);
+
+            public abstract T Transform(Key that, C context);
+
             public abstract T Transform(Extension that, C context);
 
             public abstract T Transform(AdministrativeInformation that, C context);
-
-            public abstract T Transform(Qualifier that, C context);
 
             public abstract T Transform(Formula that, C context);
 
@@ -296,8 +304,6 @@ namespace AasCore.Aas3
 
             public abstract T Transform(Range that, C context);
 
-            public abstract T Transform(ReferenceElement that, C context);
-
             public abstract T Transform(Blob that, C context);
 
             public abstract T Transform(File that, C context);
@@ -317,12 +323,6 @@ namespace AasCore.Aas3
             public abstract T Transform(ConceptDescription that, C context);
 
             public abstract T Transform(View that, C context);
-
-            public abstract T Transform(GlobalReference that, C context);
-
-            public abstract T Transform(ModelReference that, C context);
-
-            public abstract T Transform(Key that, C context);
 
             public abstract T Transform(LangStringSet that, C context);
 

@@ -72,6 +72,129 @@ class Non_empty_string(str, DBC):
     pass
 
 
+@reference_in_the_book(section=(6, 7, 12, 1), index=1)
+class Build_in_list_types(Enum):
+    Entities = "ENTITIES"
+    ID_refs = "IDREFS"
+    N_M_tokens = "NMTOKENS"
+
+
+@reference_in_the_book(section=(6, 7, 12, 1), index=2)
+class Decimal_build_in_types(Enum):
+    Integer = "integer"
+    Long = "long"
+    Int = "int"
+    Short = "short"
+    Byte = "byte"
+    Non_negative_integer = "NonNegativeInteger"
+    Positive_integer = "positiveInteger"
+    Unsigned_integer = "unsignedInteger"
+    Unsigned_long = "unsignedLong"
+    Unsigned_int = "unsignedInt"
+    Unsigned_short = "unsignedShort"
+    Unsigned_byte = "unsignedByte"
+    Non_positive_integer = "nonPositiveInteger"
+    Negative_integer = "negativeInteger"
+
+
+@reference_in_the_book(section=(6, 7, 12, 1), index=3)
+class Duration_build_in_types(Enum):
+    Day_time_duration = "dayTimeDuration"
+    Year_month_duration = "yearMonthDuration"
+
+
+@reference_in_the_book(section=(6, 7, 12, 1), index=4)
+class Primitive_types(Enum):
+    Any_URI = "anyURI"
+    Base_64_binary = "base64Binary"
+    Boolean = "boolean"
+    Date = "date"
+    Date_time = "dateTime"
+    Decimal = "decimal"
+    Double = "double"
+    Duration = "duration"
+    Float = "float"
+    G_day = "gDay"
+    G_month = "gMonth"
+    G_month_day = "gMonthDay"
+    Hey_binary = "heyBinary"
+    Notation = "NOTATION"
+    Q_name = "QName"
+    String = "string"
+    Time = "time"
+
+
+@reference_in_the_book(section=(6, 7, 12, 1), index=5)
+class String_build_in_types(Enum):
+    Normalized_string = "normalizedString"
+    Token = "token"
+    Language = "Language"
+    N_C_name = "NCName"
+    Entity = "ENTITY"
+    ID = "ID"
+    IDREF = "IDREF"
+
+
+@reference_in_the_book(section=(6, 7, 12, 2))
+@is_superset_of(
+    enums=[
+        Build_in_list_types,
+        Decimal_build_in_types,
+        Duration_build_in_types,
+        Primitive_types,
+        String_build_in_types,
+    ]
+)
+class Data_type_def(Enum):
+    """
+    Enumeration listing all xsd anySimpleTypes
+    """
+
+    Entities = "ENTITIES"
+    ID_refs = "IDREFS"
+    N_M_tokens = "NMTOKENS"
+    Integer = "integer"
+    Long = "long"
+    Int = "int"
+    Short = "short"
+    Byte = "byte"
+    Non_negative_integer = "NonNegativeInteger"
+    Positive_integer = "positiveInteger"
+    Unsigned_integer = "unsignedInteger"
+    Unsigned_long = "unsignedLong"
+    Unsigned_int = "unsignedInt"
+    Unsigned_short = "unsignedShort"
+    Unsigned_byte = "unsignedByte"
+    Non_positive_integer = "nonPositiveInteger"
+    Negative_integer = "negativeInteger"
+    Day_time_duration = "dayTimeDuration"
+    Year_month_duration = "yearMonthDuration"
+    Any_URI = "anyURI"
+    Base_64_binary = "base64Binary"
+    Boolean = "boolean"
+    Date = "date"
+    Date_time = "dateTime"
+    Decimal = "decimal"
+    Double = "double"
+    Duration = "duration"
+    Float = "float"
+    G_day = "gDay"
+    G_month = "gMonth"
+    G_month_day = "gMonthDay"
+    Hey_binary = "heyBinary"
+    Notation = "NOTATION"
+    Q_name = "QName"
+    String = "string"
+    Time = "time"
+    Normalized_string = "normalizedString"
+    Token = "token"
+    Language = "Language"
+    N_C_name = "NCName"
+    Entity = "ENTITY"
+    ID = "ID"
+    IDREF = "IDREF"
+
+
 @invariant(lambda self: is_MIME_type(self))
 class MIME_typed(Non_empty_string, DBC):
     """Represent a string that follows the pattern of a MIME type."""
@@ -81,67 +204,13 @@ class MIME_typed(Non_empty_string, DBC):
 
 
 @abstract
-@reference_in_the_book(section=(6, 7, 2, 6))
-class Has_semantics(DBC):
+@reference_in_the_book(section=(6, 7, 10))
+@serialization(with_model_type=True)
+class Reference(DBC):
     """
-    Element that can have a semantic definition.
+    Reference to either a model element of the same or another AAs or to an external
+    entity.
     """
-
-    semantic_ID: Optional["Reference"]
-    """
-    Identifier of the semantic definition of the element. It is called semantic ID
-    of the element.
-    """
-
-    def __init__(self, semantic_ID: Optional["Reference"] = None) -> None:
-        self.semantic_ID = semantic_ID
-
-
-@reference_in_the_book(section=(6, 7, 2, 1), index=2)
-class Extension(Has_semantics):
-    """
-    Single extension of an element.
-    """
-
-    name: Non_empty_string
-    """
-    Name of the extension.
-
-    :constraint AASd-077:
-        The name of an extension within HasExtensions needs to be unique.
-    """
-
-    value_type: Optional["Data_type_def"]
-    """
-    Type of the value of the extension.
-
-    Default: xsd:string
-    """
-    # TODO (Nico: Add ValueDataType)
-    value: Optional[Non_empty_string]
-    """
-    Value of the extension
-    """
-
-    refers_to: Optional["Reference"]
-    """
-    Reference to an element the extension refers to.
-    """
-
-    def __init__(
-            self,
-            name: Non_empty_string,
-            semantic_ID: Optional["Reference"] = None,
-            value_type: Optional["Data_type_def"] = None,
-            value: Optional[Non_empty_string] = None,
-            refers_to: Optional["Reference"] = None,
-    ) -> None:
-        Has_semantics.__init__(self, semantic_ID=semantic_ID)
-
-        self.name = name
-        self.value_type = value_type
-        self.value = value
-        self.refers_to = refers_to
 
 
 @abstract
@@ -266,6 +335,419 @@ class Referable(Has_extensions):
 
 
 @abstract
+@reference_in_the_book(section=(6, 7, 2, 4))
+class Has_kind(DBC):
+    """
+    An element with a kind is an element that can either represent a template or an
+    instance.
+
+    Default for an element is that it is representing an instance.
+    """
+
+    kind: Optional["Modeling_kind"]
+    """
+    Kind of the element: either type or instance.
+
+    Default Value = Instance
+    """
+
+    # TODO (all, 2021-05-28): how can ``kind`` be optional
+    #  and have a default value?
+    #  (See page 54 in the book V3RC1, kind has the cardinality ``0..1``.)
+    def __init__(self, kind: Optional["Modeling_kind"] = None) -> None:
+        self.kind = kind if kind is not None else Modeling_kind.Instance
+
+
+@abstract
+@reference_in_the_book(section=(6, 7, 2, 6))
+class Has_semantics(DBC):
+    """
+    Element that can have a semantic definition.
+    """
+
+    semantic_ID: Optional["Reference"]
+    """
+    Identifier of the semantic definition of the element. It is called semantic ID
+    of the element.
+    """
+
+    def __init__(self, semantic_ID: Optional["Reference"] = None) -> None:
+        self.semantic_ID = semantic_ID
+
+
+# fmt: off
+# TODO (mristin, 2021-11-17): review this constraint once the ``Constraint`` has been
+#  implemented.
+# @invariant(
+#     lambda self:
+#     are_unique(
+#         constraint.qualifier_type
+#         for constraint in self.qualifiers
+#         if isinstance(constraint, Qualifier)
+#     ),
+#     ":constraint AASd-021"
+# )
+@abstract
+@reference_in_the_book(section=(6, 7, 2, 7))
+@serialization(with_model_type=True)
+# fmt: on
+class Qualifiable(DBC):
+    """
+    The value of a qualifiable element may be further qualified by one or more
+    qualifiers or complex formulas.
+    """
+
+    qualifiers: List["Constraint"]
+    """Additional qualification of a qualifiable element."""
+
+    def __init__(self, qualifiers: Optional[List["Constraint"]] = None) -> None:
+        self.qualifiers = qualifiers if qualifiers is not None else []
+
+
+@abstract
+@reference_in_the_book(section=(6, 7, 2, 12))
+class Has_data_specification(DBC):
+    """
+    Element that can be extended by using data specification templates.
+
+    A data specification template defines a named set of additional attributes an
+    element may or shall have. The data specifications used are explicitly specified
+    with their global ID.
+    """
+
+    data_specifications: Optional[List["Reference"]]
+    """
+    Global reference to the data specification template used by the element.
+    """
+
+    # TODO (all, 2021-09-24): need to implement the constraint:
+    #  page 60 in V3RC1
+    #  :constraint AASd-050: If the DataSpecificationContent
+    #  DataSpecificationIEC61360 is used for an element then the value of
+    #  hasDataSpecification/dataSpecification shall contain the global reference to the
+    #  IRI of the corresponding data specification template https://admin-
+    #  shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0.
+
+    def __init__(self, data_specifications: Optional[List["Reference"]] = None) -> None:
+        self.data_specifications = data_specifications
+
+
+@abstract
+@reference_in_the_book(section=(6, 7, 6))
+class Submodel_element(
+    Referable, Has_kind, Has_semantics, Qualifiable, Has_data_specification
+):
+    """
+    A submodel element is an element suitable for the description and differentiation of
+    assets.
+
+    It is recommended to add a semantic ID to a submodel element.
+    """
+
+    def __init__(
+            self,
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List["Constraint"]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+    ) -> None:
+        Referable.__init__(
+            self,
+            extensions=extensions,
+            ID_short=ID_short,
+            display_name=display_name,
+            category=category,
+            description=description,
+        )
+
+        Has_kind.__init__(self, kind=kind)
+
+        Has_semantics.__init__(self, semantic_ID=semantic_ID)
+
+        Qualifiable.__init__(self, qualifiers=qualifiers)
+
+        Has_data_specification.__init__(self, data_specifications=data_specifications)
+
+
+# fmt: off
+# TODO (mristin, 2021-11-17): rewrite using XSD constraints on strings
+# @invariant(
+#     lambda self:
+#     not (self.value is not None) or is_of_type(self.value, self.value_type),
+#     ":constraint AASd-020"
+# )
+@reference_in_the_book(section=(6, 7, 2, 10))
+@serialization(with_model_type=True)
+# fmt: on
+class Qualifier(Constraint, Has_semantics):
+    """
+    A qualifier is a type-value-pair that makes additional statements w.r.t.  the value
+    of the element.
+    """
+
+    type: Non_empty_string
+    """
+    The qualifier type describes the type of the qualifier that is applied to
+    the element.
+    """
+
+    value_type: "Data_type_def"
+    """
+    Data type of the qualifier value.
+    """
+
+    value: Optional[Non_empty_string]
+    """
+    The qualifier value is the value of the qualifier.
+    """
+
+    value_ID: Optional["Reference"]
+    """
+    Reference to the global unique ID of a coded value.
+    """
+
+    def __init__(
+            self,
+            type: Non_empty_string,
+            value_type: "Data_type_def",
+            semantic_ID: Optional["Reference"] = None,
+            value: Optional[Non_empty_string] = None,
+            value_ID: Optional["Reference"] = None,
+    ) -> None:
+        Has_semantics.__init__(self, semantic_ID=semantic_ID)
+
+        self.type = type
+        self.value_type = value_type
+        self.value = value
+        self.value_ID = value_ID
+
+
+@abstract
+@reference_in_the_book(section=(6, 7, 7, 5))
+class Data_element(Submodel_element):
+    """
+    A data element is a submodel element that is not further composed out of
+    other submodel elements.
+
+    A data element is a submodel element that has a value. The type of value differs
+    for different subtypes of data elements.
+
+    :constraint AASd-090:
+        For data elements DataElement/category shall be one of the
+        following values: CONSTANT, PARAMETER or VARIABLE.
+        Exception: File and Blob data elements.
+    """
+
+    def __init__(
+            self,
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List[Constraint]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+    ) -> None:
+        Submodel_element.__init__(
+            self,
+            extensions=extensions,
+            ID_short=ID_short,
+            display_name=display_name,
+            category=category,
+            description=description,
+            kind=kind,
+            semantic_ID=semantic_ID,
+            qualifiers=qualifiers,
+            data_specifications=data_specifications,
+        )
+
+
+@reference_in_the_book(section=(6, 7, 7, 13))
+class Reference_element(Data_element):
+    """
+    A reference element is a data element that defines a logical reference to another
+    element within the same or another AAS or a reference to an external object or
+    entity.
+
+    :constraint AASd-054:
+        If the semanticId of a ReferenceElement submodel element
+        references a ConceptDescription then the ConceptDescription/category shall be
+        one of following values: REFERENCE.
+
+    :constraint AASd-082:
+        If the semanticId of a ReferenceElement references a
+        ConceptDescription then DataSpecificationIEC61360/dataType shall be one of:
+        STRING, IRI, IRDI.
+    """
+
+    value: Optional["Reference"]
+    """
+    Reference to any other referable element of the same of any other AAS or a
+    reference to an external object or entity.
+    """
+
+    def __init__(
+            self,
+            extensions: Optional[List["Extension"]] = None,
+            ID_short: Optional[Non_empty_string] = None,
+            display_name: Optional["Lang_string_set"] = None,
+            category: Optional[Non_empty_string] = None,
+            description: Optional["Lang_string_set"] = None,
+            kind: Optional["Modeling_kind"] = None,
+            semantic_ID: Optional["Reference"] = None,
+            qualifiers: Optional[List[Constraint]] = None,
+            data_specifications: Optional[List["Reference"]] = None,
+            value: Optional["Reference"] = None,
+    ) -> None:
+        Data_element.__init__(
+            self,
+            extensions=extensions,
+            ID_short=ID_short,
+            display_name=display_name,
+            category=category,
+            description=description,
+            kind=kind,
+            semantic_ID=semantic_ID,
+            qualifiers=qualifiers,
+            data_specifications=data_specifications,
+        )
+
+        self.value = value
+
+
+@invariant(lambda self: len(self.values) >= 1)
+@reference_in_the_book(section=(6, 7, 10), index=1)
+@serialization(with_model_type=True)
+class Global_reference(Reference):
+    """
+    Reference to an external entity.
+    """
+
+    values: List[Non_empty_string]
+    """
+    Unique reference. The reference can be a concatenation of different identifiers,
+    for example to an IRDI path etc.
+    """
+
+    def __init__(self, values: List[Non_empty_string]) -> None:
+        self.values = values
+
+
+@invariant(lambda self: len(self.keys) >= 1)
+@reference_in_the_book(section=(6, 7, 10), index=2)
+@serialization(with_model_type=True)
+class Model_reference(Reference):
+    """
+    Reference to a model element of the same or another AAS.
+    A model reference is an ordered list of keys, each key referencing an element.
+    The complete list of keys may for example be concatenated to a path that then gives
+    unique access to an element.
+    """
+
+    keys: List["Key"]
+    """Unique references in their name space."""
+
+    referred_semantic_ID: Optional["Reference"]
+    """
+    SemanticId of the referenced model element.
+    """
+
+    def __init__(
+            self, keys: List["Key"], referred_semantic_ID: Optional["Reference"] = None
+    ) -> None:
+        self.keys = keys
+        self.referred_semantic_ID = referred_semantic_ID
+
+
+@reference_in_the_book(section=(6, 7, 10), index=1)
+class Key(DBC):
+    """A key is a reference to an element by its id."""
+
+    type: "Key_elements"
+    # TODO (mristin, 2021-12-13):
+    #  The docstring seems to reference non-existing literals.
+    #  Needs to be double-checked.
+    # """
+    # Denote which kind of entity is referenced.
+    #
+    # In case type = :attr:`~Key_elements.Global_reference` then the key represents
+    # a global unique id.
+    #
+    # In case type = :attr:`~Fragment_ID` the key represents a bookmark or
+    # a similar local identifier within its parent element as specified by the key that
+    # precedes this key.
+    #
+    # In all other cases the key references a model element of the same or of another AAS.
+    # The name of the model element is explicitly listed.
+    # """
+
+    value: Non_empty_string
+
+    # TODO (mristin, 2021-12-13):
+    #  The docstring seems to reference non-existing literals.
+    #  Needs to be double-checked.
+    # """The key value, for example an IRDI if the :attr:`~ID_type` is IRDI."""
+
+    def __init__(self, type: "Key_elements", value: Non_empty_string) -> None:
+        self.type = type
+        self.value = value
+
+
+@reference_in_the_book(section=(6, 7, 2, 1), index=2)
+class Extension(Has_semantics):
+    """
+    Single extension of an element.
+    """
+
+    name: Non_empty_string
+    """
+    Name of the extension.
+
+    :constraint AASd-077:
+        The name of an extension within HasExtensions needs to be unique.
+    """
+
+    value_type: Optional["Data_type_def"]
+    """
+    Type of the value of the extension.
+
+    Default: xsd:string
+    """
+    # TODO (Nico: Add ValueDataType)
+    value: Optional[Non_empty_string]
+    """
+    Value of the extension
+    """
+
+    refers_to: Optional["Reference"]
+    """
+    Reference to an element the extension refers to.
+    """
+
+    def __init__(
+            self,
+            name: Non_empty_string,
+            semantic_ID: Optional["Reference"] = None,
+            value_type: Optional["Data_type_def"] = None,
+            value: Optional[Non_empty_string] = None,
+            refers_to: Optional["Reference"] = None,
+    ) -> None:
+        Has_semantics.__init__(self, semantic_ID=semantic_ID)
+
+        self.name = name
+        self.value_type = value_type
+        self.value = value
+        self.refers_to = refers_to
+
+
+@abstract
 @reference_in_the_book(section=(6, 7, 2, 3))
 class Identifiable(Referable):
     """An element that has a globally unique identifier."""
@@ -336,58 +818,6 @@ class Modeling_kind(Enum):
     """
 
 
-@abstract
-@reference_in_the_book(section=(6, 7, 2, 4))
-class Has_kind(DBC):
-    """
-    An element with a kind is an element that can either represent a template or an
-    instance.
-
-    Default for an element is that it is representing an instance.
-    """
-
-    kind: Optional["Modeling_kind"]
-    """
-    Kind of the element: either type or instance.
-
-    Default Value = Instance
-    """
-
-    # TODO (all, 2021-05-28): how can ``kind`` be optional
-    #  and have a default value?
-    #  (See page 54 in the book V3RC1, kind has the cardinality ``0..1``.)
-    def __init__(self, kind: Optional["Modeling_kind"] = None) -> None:
-        self.kind = kind if kind is not None else Modeling_kind.Instance
-
-
-@abstract
-@reference_in_the_book(section=(6, 7, 2, 12))
-class Has_data_specification(DBC):
-    """
-    Element that can be extended by using data specification templates.
-
-    A data specification template defines a named set of additional attributes an
-    element may or shall have. The data specifications used are explicitly specified
-    with their global ID.
-    """
-
-    data_specifications: Optional[List["Reference"]]
-    """
-    Global reference to the data specification template used by the element.
-    """
-
-    # TODO (all, 2021-09-24): need to implement the constraint:
-    #  page 60 in V3RC1
-    #  :constraint AASd-050: If the DataSpecificationContent
-    #  DataSpecificationIEC61360 is used for an element then the value of
-    #  hasDataSpecification/dataSpecification shall contain the global reference to the
-    #  IRI of the corresponding data specification template https://admin-
-    #  shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0.
-
-    def __init__(self, data_specifications: Optional[List["Reference"]] = None) -> None:
-        self.data_specifications = data_specifications
-
-
 # fmt: off
 @invariant(
     lambda self:
@@ -424,88 +854,6 @@ class Administrative_information(Has_data_specification):
 @serialization(with_model_type=True)
 class Constraint(DBC):
     """A constraint is used to further qualify or restrict an element."""
-
-
-# fmt: off
-# TODO (mristin, 2021-11-17): review this constraint once the ``Constraint`` has been
-#  implemented.
-# @invariant(
-#     lambda self:
-#     are_unique(
-#         constraint.qualifier_type
-#         for constraint in self.qualifiers
-#         if isinstance(constraint, Qualifier)
-#     ),
-#     ":constraint AASd-021"
-# )
-@abstract
-@reference_in_the_book(section=(6, 7, 2, 7))
-@serialization(with_model_type=True)
-# fmt: on
-class Qualifiable(DBC):
-    """
-    The value of a qualifiable element may be further qualified by one or more
-    qualifiers or complex formulas.
-    """
-
-    qualifiers: List["Constraint"]
-    """Additional qualification of a qualifiable element."""
-
-    def __init__(self, qualifiers: Optional[List["Constraint"]] = None) -> None:
-        self.qualifiers = qualifiers if qualifiers is not None else []
-
-
-# fmt: off
-# TODO (mristin, 2021-11-17): rewrite using XSD constraints on strings
-# @invariant(
-#     lambda self:
-#     not (self.value is not None) or is_of_type(self.value, self.value_type),
-#     ":constraint AASd-020"
-# )
-@reference_in_the_book(section=(6, 7, 2, 10))
-@serialization(with_model_type=True)
-# fmt: on
-class Qualifier(Constraint, Has_semantics):
-    """
-    A qualifier is a type-value-pair that makes additional statements w.r.t.  the value
-    of the element.
-    """
-
-    type: Non_empty_string
-    """
-    The qualifier type describes the type of the qualifier that is applied to
-    the element.
-    """
-
-    value_type: "Data_type_def"
-    """
-    Data type of the qualifier value.
-    """
-
-    value: Optional[Non_empty_string]
-    """
-    The qualifier value is the value of the qualifier.
-    """
-
-    value_ID: Optional["Reference"]
-    """
-    Reference to the global unique ID of a coded value.
-    """
-
-    def __init__(
-            self,
-            type: Non_empty_string,
-            value_type: "Data_type_def",
-            semantic_ID: Optional["Reference"] = None,
-            value: Optional[Non_empty_string] = None,
-            value_ID: Optional["Reference"] = None,
-    ) -> None:
-        Has_semantics.__init__(self, semantic_ID=semantic_ID)
-
-        self.type = type
-        self.value_type = value_type
-        self.value = value
-        self.value_ID = value_ID
 
 
 @reference_in_the_book(section=(6, 7, 2, 11))
@@ -789,48 +1137,6 @@ class Submodel(
         )
 
 
-@abstract
-@reference_in_the_book(section=(6, 7, 6))
-class Submodel_element(
-    Referable, Has_kind, Has_semantics, Qualifiable, Has_data_specification
-):
-    """
-    A submodel element is an element suitable for the description and differentiation of
-    assets.
-
-    It is recommended to add a semantic ID to a submodel element.
-    """
-
-    def __init__(
-            self,
-            extensions: Optional[List["Extension"]] = None,
-            ID_short: Optional[Non_empty_string] = None,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[Non_empty_string] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List["Constraint"]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-    ) -> None:
-        Referable.__init__(
-            self,
-            extensions=extensions,
-            ID_short=ID_short,
-            display_name=display_name,
-            category=category,
-            description=description,
-        )
-
-        Has_kind.__init__(self, kind=kind)
-
-        Has_semantics.__init__(self, semantic_ID=semantic_ID)
-
-        Qualifiable.__init__(self, qualifiers=qualifiers)
-
-        Has_data_specification.__init__(self, data_specifications=data_specifications)
-
-
 # TODO (mristin, 2021-10-27, page 77):
 #  :constraint AASd-055: If the semanticId of a RelationshipElement or an
 #  AnnotatedRelationshipElement submodel element references a  ConceptDescription then
@@ -1026,48 +1332,6 @@ class Submodel_element_struct(Submodel_element):
         )
 
         self.values = values if values is not None else []
-
-
-@abstract
-@reference_in_the_book(section=(6, 7, 7, 5))
-class Data_element(Submodel_element):
-    """
-    A data element is a submodel element that is not further composed out of
-    other submodel elements.
-
-    A data element is a submodel element that has a value. The type of value differs
-    for different subtypes of data elements.
-
-    :constraint AASd-090:
-        For data elements DataElement/category shall be one of the
-        following values: CONSTANT, PARAMETER or VARIABLE.
-        Exception: File and Blob data elements.
-    """
-
-    def __init__(
-            self,
-            extensions: Optional[List["Extension"]] = None,
-            ID_short: Optional[Non_empty_string] = None,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[Non_empty_string] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List[Constraint]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-    ) -> None:
-        Submodel_element.__init__(
-            self,
-            extensions=extensions,
-            ID_short=ID_short,
-            display_name=display_name,
-            category=category,
-            description=description,
-            kind=kind,
-            semantic_ID=semantic_ID,
-            qualifiers=qualifiers,
-            data_specifications=data_specifications,
-        )
 
 
 @reference_in_the_book(section=(6, 7, 7, 11))
@@ -1294,59 +1558,6 @@ class Range(Data_element):
         self.value_type = value_type
         self.min = min
         self.max = max
-
-
-@reference_in_the_book(section=(6, 7, 7, 13))
-class Reference_element(Data_element):
-    """
-    A reference element is a data element that defines a logical reference to another
-    element within the same or another AAS or a reference to an external object or
-    entity.
-
-    :constraint AASd-054:
-        If the semanticId of a ReferenceElement submodel element
-        references a ConceptDescription then the ConceptDescription/category shall be
-        one of following values: REFERENCE.
-
-    :constraint AASd-082:
-        If the semanticId of a ReferenceElement references a
-        ConceptDescription then DataSpecificationIEC61360/dataType shall be one of:
-        STRING, IRI, IRDI.
-    """
-
-    value: Optional["Reference"]
-    """
-    Reference to any other referable element of the same of any other AAS or a
-    reference to an external object or entity.
-    """
-
-    def __init__(
-            self,
-            extensions: Optional[List["Extension"]] = None,
-            ID_short: Optional[Non_empty_string] = None,
-            display_name: Optional["Lang_string_set"] = None,
-            category: Optional[Non_empty_string] = None,
-            description: Optional["Lang_string_set"] = None,
-            kind: Optional["Modeling_kind"] = None,
-            semantic_ID: Optional["Reference"] = None,
-            qualifiers: Optional[List[Constraint]] = None,
-            data_specifications: Optional[List["Reference"]] = None,
-            value: Optional["Reference"] = None,
-    ) -> None:
-        Data_element.__init__(
-            self,
-            extensions=extensions,
-            ID_short=ID_short,
-            display_name=display_name,
-            category=category,
-            description=description,
-            kind=kind,
-            semantic_ID=semantic_ID,
-            qualifiers=qualifiers,
-            data_specifications=data_specifications,
-        )
-
-        self.value = value
 
 
 @reference_in_the_book(section=(5, 7, 7, 4))
@@ -1929,94 +2140,6 @@ class View(Referable, Has_semantics, Has_data_specification):
         )
 
 
-@abstract
-@reference_in_the_book(section=(6, 7, 10))
-@serialization(with_model_type=True)
-class Reference(DBC):
-    """
-    Reference to either a model element of the same or another AAs or to an external
-    entity.
-    """
-
-
-@invariant(lambda self: len(self.values) >= 1)
-@reference_in_the_book(section=(6, 7, 10), index=1)
-@serialization(with_model_type=True)
-class Global_reference(Reference):
-    """
-    Reference to an external entity.
-    """
-
-    values: List[Non_empty_string]
-    """
-    Unique reference. The reference can be a concatenation of different identifiers,
-    for example to an IRDI path etc.
-    """
-
-    def __init__(self, values: List[Non_empty_string]) -> None:
-        self.values = values
-
-
-@invariant(lambda self: len(self.keys) >= 1)
-@reference_in_the_book(section=(6, 7, 10), index=2)
-@serialization(with_model_type=True)
-class Model_reference(Reference):
-    """
-    Reference to a model element of the same or another AAS.
-    A model reference is an ordered list of keys, each key referencing an element.
-    The complete list of keys may for example be concatenated to a path that then gives
-    unique access to an element.
-    """
-
-    keys: List["Key"]
-    """Unique references in their name space."""
-
-    referred_semantic_ID: Optional["Reference"]
-    """
-    SemanticId of the referenced model element.
-    """
-
-    def __init__(
-            self, keys: List["Key"], referred_semantic_ID: Optional["Reference"] = None
-    ) -> None:
-        self.keys = keys
-        self.referred_semantic_ID = referred_semantic_ID
-
-
-@reference_in_the_book(section=(6, 7, 10), index=1)
-class Key(DBC):
-    """A key is a reference to an element by its id."""
-
-    type: "Key_elements"
-    # TODO (mristin, 2021-12-13):
-    #  The docstring seems to reference non-existing literals.
-    #  Needs to be double-checked.
-    # """
-    # Denote which kind of entity is referenced.
-    #
-    # In case type = :attr:`~Key_elements.Global_reference` then the key represents
-    # a global unique id.
-    #
-    # In case type = :attr:`~Fragment_ID` the key represents a bookmark or
-    # a similar local identifier within its parent element as specified by the key that
-    # precedes this key.
-    #
-    # In all other cases the key references a model element of the same or of another AAS.
-    # The name of the model element is explicitly listed.
-    # """
-
-    value: Non_empty_string
-
-    # TODO (mristin, 2021-12-13):
-    #  The docstring seems to reference non-existing literals.
-    #  Needs to be double-checked.
-    # """The key value, for example an IRDI if the :attr:`~ID_type` is IRDI."""
-
-    def __init__(self, type: "Key_elements", value: Non_empty_string) -> None:
-        self.type = type
-        self.value = value
-
-
 @reference_in_the_book(section=(6, 7, 11), index=8)
 class Identifiable_elements(Enum):
     """Enumeration of all identifiable elements within an asset administration shell."""
@@ -2264,129 +2387,6 @@ class Submodel_elements(Enum):
     """
     Struct of Submodel Elements
     """
-
-
-@reference_in_the_book(section=(6, 7, 12, 1), index=1)
-class Build_in_list_types(Enum):
-    Entities = "ENTITIES"
-    ID_refs = "IDREFS"
-    N_M_tokens = "NMTOKENS"
-
-
-@reference_in_the_book(section=(6, 7, 12, 1), index=2)
-class Decimal_build_in_types(Enum):
-    Integer = "integer"
-    Long = "long"
-    Int = "int"
-    Short = "short"
-    Byte = "byte"
-    Non_negative_integer = "NonNegativeInteger"
-    Positive_integer = "positiveInteger"
-    Unsigned_integer = "unsignedInteger"
-    Unsigned_long = "unsignedLong"
-    Unsigned_int = "unsignedInt"
-    Unsigned_short = "unsignedShort"
-    Unsigned_byte = "unsignedByte"
-    Non_positive_integer = "nonPositiveInteger"
-    Negative_integer = "negativeInteger"
-
-
-@reference_in_the_book(section=(6, 7, 12, 1), index=3)
-class Duration_build_in_types(Enum):
-    Day_time_duration = "dayTimeDuration"
-    Year_month_duration = "yearMonthDuration"
-
-
-@reference_in_the_book(section=(6, 7, 12, 1), index=4)
-class Primitive_types(Enum):
-    Any_URI = "anyURI"
-    Base_64_binary = "base64Binary"
-    Boolean = "boolean"
-    Date = "date"
-    Date_time = "dateTime"
-    Decimal = "decimal"
-    Double = "double"
-    Duration = "duration"
-    Float = "float"
-    G_day = "gDay"
-    G_month = "gMonth"
-    G_month_day = "gMonthDay"
-    Hey_binary = "heyBinary"
-    Notation = "NOTATION"
-    Q_name = "QName"
-    String = "string"
-    Time = "time"
-
-
-@reference_in_the_book(section=(6, 7, 12, 1), index=5)
-class String_build_in_types(Enum):
-    Normalized_string = "normalizedString"
-    Token = "token"
-    Language = "Language"
-    N_C_name = "NCName"
-    Entity = "ENTITY"
-    ID = "ID"
-    IDREF = "IDREF"
-
-
-@reference_in_the_book(section=(6, 7, 12, 2))
-@is_superset_of(
-    enums=[
-        Build_in_list_types,
-        Decimal_build_in_types,
-        Duration_build_in_types,
-        Primitive_types,
-        String_build_in_types,
-    ]
-)
-class Data_type_def(Enum):
-    """
-    Enumeration listing all xsd anySimpleTypes
-    """
-
-    Entities = "ENTITIES"
-    ID_refs = "IDREFS"
-    N_M_tokens = "NMTOKENS"
-    Integer = "integer"
-    Long = "long"
-    Int = "int"
-    Short = "short"
-    Byte = "byte"
-    Non_negative_integer = "NonNegativeInteger"
-    Positive_integer = "positiveInteger"
-    Unsigned_integer = "unsignedInteger"
-    Unsigned_long = "unsignedLong"
-    Unsigned_int = "unsignedInt"
-    Unsigned_short = "unsignedShort"
-    Unsigned_byte = "unsignedByte"
-    Non_positive_integer = "nonPositiveInteger"
-    Negative_integer = "negativeInteger"
-    Day_time_duration = "dayTimeDuration"
-    Year_month_duration = "yearMonthDuration"
-    Any_URI = "anyURI"
-    Base_64_binary = "base64Binary"
-    Boolean = "boolean"
-    Date = "date"
-    Date_time = "dateTime"
-    Decimal = "decimal"
-    Double = "double"
-    Duration = "duration"
-    Float = "float"
-    G_day = "gDay"
-    G_month = "gMonth"
-    G_month_day = "gMonthDay"
-    Hey_binary = "heyBinary"
-    Notation = "NOTATION"
-    Q_name = "QName"
-    String = "string"
-    Time = "time"
-    Normalized_string = "normalizedString"
-    Token = "token"
-    Language = "Language"
-    N_C_name = "NCName"
-    Entity = "ENTITY"
-    ID = "ID"
-    IDREF = "IDREF"
 
 
 @implementation_specific
