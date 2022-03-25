@@ -500,9 +500,9 @@ namespace AasCore.Aas3
         }
 
         public AdministrativeInformation(
+            List<IReference>? dataSpecifications = null,
             string? version = null,
-            string? revision = null,
-            List<IReference>? dataSpecifications = null)
+            string? revision = null)
         {
             DataSpecifications = dataSpecifications;
             Version = version;
@@ -651,9 +651,9 @@ namespace AasCore.Aas3
         public Qualifier(
             string type,
             DataTypeDef valueType,
+            IReference? semanticId = null,
             string? value = null,
-            IReference? valueId = null,
-            IReference? semanticId = null)
+            IReference? valueId = null)
         {
             SemanticId = semanticId;
             Type = type;
@@ -1085,8 +1085,8 @@ namespace AasCore.Aas3
         public AssetAdministrationShell(
             string id,
             AssetInformation assetInformation,
-            string? idShort = null,
             List<Extension>? extensions = null,
+            string? idShort = null,
             LangStringSet? displayName = null,
             string? category = null,
             LangStringSet? description = null,
@@ -1422,8 +1422,8 @@ namespace AasCore.Aas3
         public IdentifierKeyValuePair(
             string key,
             string value,
-            IReference? externalSubjectId = null,
-            IReference? semanticId = null)
+            IReference? semanticId = null,
+            IReference? externalSubjectId = null)
         {
             SemanticId = semanticId;
             Key = key;
@@ -1770,9 +1770,8 @@ namespace AasCore.Aas3
 
         public Submodel(
             string id,
-            string? idShort = null,
-            List<ISubmodelElement>? submodelElements = null,
             List<Extension>? extensions = null,
+            string? idShort = null,
             LangStringSet? displayName = null,
             string? category = null,
             LangStringSet? description = null,
@@ -1780,7 +1779,8 @@ namespace AasCore.Aas3
             ModelingKind? kind = null,
             IReference? semanticId = null,
             List<IConstraint>? qualifiers = null,
-            List<IReference>? dataSpecifications = null)
+            List<IReference>? dataSpecifications = null,
+            List<ISubmodelElement>? submodelElements = null)
         {
             Extensions = (extensions != null)
                 ? extensions
@@ -2983,8 +2983,8 @@ namespace AasCore.Aas3
 
         public Property(
             DataTypeDef valueType,
-            string? idShort = null,
             List<Extension>? extensions = null,
+            string? idShort = null,
             LangStringSet? displayName = null,
             string? category = null,
             LangStringSet? description = null,
@@ -3364,8 +3364,8 @@ namespace AasCore.Aas3
         }
 
         public MultiLanguageProperty(
-            string? idShort = null,
             List<Extension>? extensions = null,
+            string? idShort = null,
             LangStringSet? displayName = null,
             string? category = null,
             LangStringSet? description = null,
@@ -3711,8 +3711,8 @@ namespace AasCore.Aas3
 
         public Range(
             DataTypeDef valueType,
-            string? idShort = null,
             List<Extension>? extensions = null,
+            string? idShort = null,
             LangStringSet? displayName = null,
             string? category = null,
             LangStringSet? description = null,
@@ -4059,8 +4059,8 @@ namespace AasCore.Aas3
         }
 
         public ReferenceElement(
-            string? idShort = null,
             List<Extension>? extensions = null,
+            string? idShort = null,
             LangStringSet? displayName = null,
             string? category = null,
             LangStringSet? description = null,
@@ -4397,8 +4397,8 @@ namespace AasCore.Aas3
 
         public Blob(
             string mimeType,
-            string? idShort = null,
             List<Extension>? extensions = null,
+            string? idShort = null,
             LangStringSet? displayName = null,
             string? category = null,
             LangStringSet? description = null,
@@ -4729,8 +4729,8 @@ namespace AasCore.Aas3
 
         public File(
             string mimeType,
-            string? idShort = null,
             List<Extension>? extensions = null,
+            string? idShort = null,
             LangStringSet? displayName = null,
             string? category = null,
             LangStringSet? description = null,
@@ -5868,8 +5868,8 @@ namespace AasCore.Aas3
 
         public BasicEvent(
             IReference observed,
-            string? idShort = null,
             List<Extension>? extensions = null,
+            string? idShort = null,
             LangStringSet? displayName = null,
             string? category = null,
             LangStringSet? description = null,
@@ -6970,14 +6970,14 @@ namespace AasCore.Aas3
 
         public ConceptDescription(
             string id,
-            string? idShort = null,
             List<Extension>? extensions = null,
+            string? idShort = null,
             LangStringSet? displayName = null,
             string? category = null,
             LangStringSet? description = null,
             AdministrativeInformation? administration = null,
-            List<IReference>? isCaseOf = null,
-            List<IReference>? dataSpecifications = null)
+            List<IReference>? dataSpecifications = null,
+            List<IReference>? isCaseOf = null)
         {
             Extensions = (extensions != null)
                 ? extensions

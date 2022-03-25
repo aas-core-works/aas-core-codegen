@@ -3249,6 +3249,72 @@ def _verify_all_non_optional_properties_are_initialized_in_the_constructor(
     return errors
 
 
+def _verify_orders_of_constructors_arguments_and_properties_match(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    """Verify the order between the constructor arguments and the properties."""
+    errors = []  # type: List[Error]
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, (Enumeration, ConstrainedPrimitive)):
+            continue
+        elif isinstance(symbol, (AbstractClass, ConcreteClass)):
+            args_without_default = []  # type: List[Identifier]
+            args_without_default_set = set()  # type: Set[Identifier]
+
+            args_with_default = []  # type: List[Identifier]
+            args_with_default_set = set()  # type: Set[Identifier]
+
+            # NOTE (mristin, 2022-03-25):
+            # This verification is only a heuristic since we do not really analyze
+            # the code and only look into the names of the properties and arguments.
+
+            for arg in symbol.constructor.arguments:
+                if arg.name not in symbol.properties_by_name:
+                    continue
+
+                if arg.default is None:
+                    args_without_default.append(arg.name)
+                    args_without_default_set.add(arg.name)
+                else:
+                    args_with_default.append(arg.name)
+                    args_with_default_set.add(arg.name)
+
+            # The order of the properties corresponding to the constructor
+            # arguments without the default value
+            props_without_default = [
+                prop.name
+                for prop in symbol.properties
+                if prop.name in args_without_default_set
+            ]
+
+            # The order of the properties corresponding to the constructor arguments
+            # with the specified default value
+            props_with_default = [
+                prop.name
+                for prop in symbol.properties
+                if prop.name in args_with_default_set
+            ]
+
+            ordered_args = args_without_default + args_with_default
+            ordered_props = props_without_default + props_with_default
+
+            if ordered_args != ordered_props:
+                errors.append(
+                    Error(
+                        symbol.parsed.node,
+                        f"The order of constructor arguments and properties "
+                        f"for the class {symbol.name!r} is not maintained "
+                        f"where they match by name. "
+                        f"The partial order of constructor arguments "
+                        f"should be: {ordered_props!r}",
+                    )
+                )
+        else:
+            assert_never(symbol)
+
+    return errors
+
+
 def _verify_all_argument_references_occur_in_valid_context(
     symbol_table: SymbolTable,
 ) -> List[Error]:
@@ -3392,6 +3458,12 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
 
     errors.extend(
         _verify_all_non_optional_properties_are_initialized_in_the_constructor(
+            symbol_table=symbol_table
+        )
+    )
+
+    errors.extend(
+        _verify_orders_of_constructors_arguments_and_properties_match(
             symbol_table=symbol_table
         )
     )

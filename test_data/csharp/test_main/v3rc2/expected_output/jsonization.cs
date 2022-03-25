@@ -1055,9 +1055,9 @@ namespace AasCore.Aas3
                 }
 
                 return new Aas.AdministrativeInformation(
+                    theDataSpecifications,
                     theVersion,
-                    theRevision,
-                    theDataSpecifications);
+                    theRevision);
             }  // internal static AdministrativeInformationFrom
 
             /// <summary>
@@ -1349,9 +1349,9 @@ namespace AasCore.Aas3
                     theValueType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
+                    theSemanticId,
                     theValue,
-                    theValueId,
-                    theSemanticId);
+                    theValueId);
             }  // internal static QualifierFrom
 
             /// <summary>
@@ -1781,10 +1781,10 @@ namespace AasCore.Aas3
                     theAssetInformation
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theIdShort,
                     theExtensions
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
+                    theIdShort,
                     theDisplayName,
                     theCategory,
                     theDescription,
@@ -2052,8 +2052,8 @@ namespace AasCore.Aas3
                     theValue
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theExternalSubjectId,
-                    theSemanticId);
+                    theSemanticId,
+                    theExternalSubjectId);
             }  // internal static IdentifierKeyValuePairFrom
 
             /// <summary>
@@ -2459,13 +2459,10 @@ namespace AasCore.Aas3
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theIdShort,
-                    theSubmodelElements
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
                     theExtensions
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
+                    theIdShort,
                     theDisplayName,
                     theCategory,
                     theDescription,
@@ -2475,7 +2472,10 @@ namespace AasCore.Aas3
                     theQualifiers
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theDataSpecifications);
+                    theDataSpecifications,
+                    theSubmodelElements
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"));
             }  // internal static SubmodelFrom
 
             /// <summary>
@@ -3886,10 +3886,10 @@ namespace AasCore.Aas3
                     theValueType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theIdShort,
                     theExtensions
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
+                    theIdShort,
                     theDisplayName,
                     theCategory,
                     theDescription,
@@ -4248,10 +4248,10 @@ namespace AasCore.Aas3
                 }
 
                 return new Aas.MultiLanguageProperty(
-                    theIdShort,
                     theExtensions
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
+                    theIdShort,
                     theDisplayName,
                     theCategory,
                     theDescription,
@@ -4636,10 +4636,10 @@ namespace AasCore.Aas3
                     theValueType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theIdShort,
                     theExtensions
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
+                    theIdShort,
                     theDisplayName,
                     theCategory,
                     theDescription,
@@ -4977,10 +4977,10 @@ namespace AasCore.Aas3
                 }
 
                 return new Aas.ReferenceElement(
-                    theIdShort,
                     theExtensions
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
+                    theIdShort,
                     theDisplayName,
                     theCategory,
                     theDescription,
@@ -5343,10 +5343,10 @@ namespace AasCore.Aas3
                     theMimeType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theIdShort,
                     theExtensions
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
+                    theIdShort,
                     theDisplayName,
                     theCategory,
                     theDescription,
@@ -5709,10 +5709,10 @@ namespace AasCore.Aas3
                     theMimeType
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theIdShort,
                     theExtensions
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
+                    theIdShort,
                     theDisplayName,
                     theCategory,
                     theDescription,
@@ -7010,10 +7010,10 @@ namespace AasCore.Aas3
                     theObserved
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theIdShort,
                     theExtensions
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
+                    theIdShort,
                     theDisplayName,
                     theCategory,
                     theDescription,
@@ -8185,18 +8185,18 @@ namespace AasCore.Aas3
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theIdShort,
                     theExtensions
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
+                    theIdShort,
                     theDisplayName,
                     theCategory,
                     theDescription,
                     theAdministration,
+                    theDataSpecifications,
                     theIsCaseOf
                          ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
-                    theDataSpecifications);
+                            "Unexpected null, had to be handled before"));
             }  // internal static ConceptDescriptionFrom
 
             /// <summary>
