@@ -51,6 +51,425 @@ namespace AasCore.Aas3
             Visitation.ITransformerWithContext<C, T> transformer, C context);
     }
 
+    public enum BuildInListTypes
+    {
+        [EnumMember(Value = "ENTITIES")]
+        Entities,
+
+        [EnumMember(Value = "IDREFS")]
+        IdRefs,
+
+        [EnumMember(Value = "NMTOKENS")]
+        NMTokens
+    }
+
+    public enum DecimalBuildInTypes
+    {
+        [EnumMember(Value = "integer")]
+        Integer,
+
+        [EnumMember(Value = "long")]
+        Long,
+
+        [EnumMember(Value = "int")]
+        Int,
+
+        [EnumMember(Value = "short")]
+        Short,
+
+        [EnumMember(Value = "byte")]
+        Byte,
+
+        [EnumMember(Value = "NonNegativeInteger")]
+        NonNegativeInteger,
+
+        [EnumMember(Value = "positiveInteger")]
+        PositiveInteger,
+
+        [EnumMember(Value = "unsignedInteger")]
+        UnsignedInteger,
+
+        [EnumMember(Value = "unsignedLong")]
+        UnsignedLong,
+
+        [EnumMember(Value = "unsignedInt")]
+        UnsignedInt,
+
+        [EnumMember(Value = "unsignedShort")]
+        UnsignedShort,
+
+        [EnumMember(Value = "unsignedByte")]
+        UnsignedByte,
+
+        [EnumMember(Value = "nonPositiveInteger")]
+        NonPositiveInteger,
+
+        [EnumMember(Value = "negativeInteger")]
+        NegativeInteger
+    }
+
+    public enum DurationBuildInTypes
+    {
+        [EnumMember(Value = "dayTimeDuration")]
+        DayTimeDuration,
+
+        [EnumMember(Value = "yearMonthDuration")]
+        YearMonthDuration
+    }
+
+    public enum PrimitiveTypes
+    {
+        [EnumMember(Value = "anyURI")]
+        AnyUri,
+
+        [EnumMember(Value = "base64Binary")]
+        Base64Binary,
+
+        [EnumMember(Value = "boolean")]
+        Boolean,
+
+        [EnumMember(Value = "date")]
+        Date,
+
+        [EnumMember(Value = "dateTime")]
+        DateTime,
+
+        [EnumMember(Value = "decimal")]
+        Decimal,
+
+        [EnumMember(Value = "double")]
+        Double,
+
+        [EnumMember(Value = "duration")]
+        Duration,
+
+        [EnumMember(Value = "float")]
+        Float,
+
+        [EnumMember(Value = "gDay")]
+        GDay,
+
+        [EnumMember(Value = "gMonth")]
+        GMonth,
+
+        [EnumMember(Value = "gMonthDay")]
+        GMonthDay,
+
+        [EnumMember(Value = "heyBinary")]
+        HeyBinary,
+
+        [EnumMember(Value = "NOTATION")]
+        Notation,
+
+        [EnumMember(Value = "QName")]
+        QName,
+
+        [EnumMember(Value = "string")]
+        String,
+
+        [EnumMember(Value = "time")]
+        Time
+    }
+
+    public enum StringBuildInTypes
+    {
+        [EnumMember(Value = "normalizedString")]
+        NormalizedString,
+
+        [EnumMember(Value = "token")]
+        Token,
+
+        [EnumMember(Value = "Language")]
+        Language,
+
+        [EnumMember(Value = "NCName")]
+        NCName,
+
+        [EnumMember(Value = "ENTITY")]
+        Entity,
+
+        [EnumMember(Value = "ID")]
+        Id,
+
+        [EnumMember(Value = "IDREF")]
+        Idref
+    }
+
+    /// <summary>
+    /// Enumeration listing all xsd anySimpleTypes
+    /// </summary>
+    public enum DataTypeDef
+    {
+        [EnumMember(Value = "ENTITIES")]
+        Entities,
+
+        [EnumMember(Value = "IDREFS")]
+        IdRefs,
+
+        [EnumMember(Value = "NMTOKENS")]
+        NMTokens,
+
+        [EnumMember(Value = "integer")]
+        Integer,
+
+        [EnumMember(Value = "long")]
+        Long,
+
+        [EnumMember(Value = "int")]
+        Int,
+
+        [EnumMember(Value = "short")]
+        Short,
+
+        [EnumMember(Value = "byte")]
+        Byte,
+
+        [EnumMember(Value = "NonNegativeInteger")]
+        NonNegativeInteger,
+
+        [EnumMember(Value = "positiveInteger")]
+        PositiveInteger,
+
+        [EnumMember(Value = "unsignedInteger")]
+        UnsignedInteger,
+
+        [EnumMember(Value = "unsignedLong")]
+        UnsignedLong,
+
+        [EnumMember(Value = "unsignedInt")]
+        UnsignedInt,
+
+        [EnumMember(Value = "unsignedShort")]
+        UnsignedShort,
+
+        [EnumMember(Value = "unsignedByte")]
+        UnsignedByte,
+
+        [EnumMember(Value = "nonPositiveInteger")]
+        NonPositiveInteger,
+
+        [EnumMember(Value = "negativeInteger")]
+        NegativeInteger,
+
+        [EnumMember(Value = "dayTimeDuration")]
+        DayTimeDuration,
+
+        [EnumMember(Value = "yearMonthDuration")]
+        YearMonthDuration,
+
+        [EnumMember(Value = "anyURI")]
+        AnyUri,
+
+        [EnumMember(Value = "base64Binary")]
+        Base64Binary,
+
+        [EnumMember(Value = "boolean")]
+        Boolean,
+
+        [EnumMember(Value = "date")]
+        Date,
+
+        [EnumMember(Value = "dateTime")]
+        DateTime,
+
+        [EnumMember(Value = "decimal")]
+        Decimal,
+
+        [EnumMember(Value = "double")]
+        Double,
+
+        [EnumMember(Value = "duration")]
+        Duration,
+
+        [EnumMember(Value = "float")]
+        Float,
+
+        [EnumMember(Value = "gDay")]
+        GDay,
+
+        [EnumMember(Value = "gMonth")]
+        GMonth,
+
+        [EnumMember(Value = "gMonthDay")]
+        GMonthDay,
+
+        [EnumMember(Value = "heyBinary")]
+        HeyBinary,
+
+        [EnumMember(Value = "NOTATION")]
+        Notation,
+
+        [EnumMember(Value = "QName")]
+        QName,
+
+        [EnumMember(Value = "string")]
+        String,
+
+        [EnumMember(Value = "time")]
+        Time,
+
+        [EnumMember(Value = "normalizedString")]
+        NormalizedString,
+
+        [EnumMember(Value = "token")]
+        Token,
+
+        [EnumMember(Value = "Language")]
+        Language,
+
+        [EnumMember(Value = "NCName")]
+        NCName,
+
+        [EnumMember(Value = "ENTITY")]
+        Entity,
+
+        [EnumMember(Value = "ID")]
+        Id,
+
+        [EnumMember(Value = "IDREF")]
+        Idref
+    }
+
+    /// <summary>
+    /// Reference to either a model element of the same or another AAs or to an external
+    /// entity.
+    /// </summary>
+    public interface IReference : IClass
+    {
+
+    }
+
+    /// <summary>
+    /// Element that can be extended by proprietary extensions.
+    /// </summary>
+    /// <remarks>
+    /// Note: Extensions are proprietary, i.e. they do not support global interoperability.
+    /// </remarks>
+    public interface IHasExtensions : IClass
+    {
+        /// <summary>
+        /// An extension of the element.
+        /// </summary>
+        public List<Extension> Extensions { get; set; }
+    }
+
+    /// <summary>
+    /// An element that is referable by its <see cref="IReferable.IdShort" />.
+    /// </summary>
+    /// <remarks>
+    /// This identifier is not globally unique.
+    /// This identifier is unique within the name space of the element.
+    /// </remarks>
+    public interface IReferable :
+            IHasExtensions,
+            IClass
+    {
+        /// <summary>
+        /// In case of identifiables this attribute is a short name of the element.
+        /// In case of referable this ID is an identifying string of
+        /// the element within its name space.
+        /// </summary>
+        /// <remarks>
+        /// In case the element is a property and the property has a semantic definition
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
+        /// </remarks>
+        public string? IdShort { get; set; }
+
+        /// <summary>
+        /// Display name. Can be provided in several languages.
+        /// </summary>
+        /// <remarks>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
+        /// <li>the preferred name in the requested language of the concept description defining
+        /// the semantics of the element</li>
+        /// <li>If there is a default language list defined in the application,
+        /// then the corresponding preferred name in the language is chosen
+        /// according to this order.</li>
+        /// <li>the English preferred name of the concept description defining
+        /// the semantics of the element</li>
+        /// <li>the short name of the concept description-the idShort of the element</li>
+        /// </ul>
+        /// </remarks>
+        public LangStringSet? DisplayName { get; set; }
+
+        /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category
+        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
+        /// semantic definition of the element would
+        /// denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
+        /// Description or comments on the element.
+        /// </summary>
+        /// <remarks>
+        /// The description can be provided in several languages. If no description is defined,
+        /// then the definition of the concept description that defines the semantics
+        /// of the element is used. Additional information can be provided,
+        /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
+        /// in which context or which additional data specification templates are provided.
+        /// </remarks>
+        public LangStringSet? Description { get; set; }
+    }
+
+    /// <summary>
+    /// An element with a kind is an element that can either represent a template or an
+    /// instance.
+    /// </summary>
+    /// <remarks>
+    /// Default for an element is that it is representing an instance.
+    /// </remarks>
+    public interface IHasKind : IClass
+    {
+        /// <summary>
+        /// Kind of the element: either type or instance.
+        /// </summary>
+        /// <remarks>
+        /// Default Value = Instance
+        /// </remarks>
+        public ModelingKind? Kind { get; set; }
+    }
+
     /// <summary>
     /// Element that can have a semantic definition.
     /// </summary>
@@ -61,6 +480,815 @@ namespace AasCore.Aas3
         /// of the element.
         /// </summary>
         public IReference? SemanticId { get; set; }
+    }
+
+    /// <summary>
+    /// The value of a qualifiable element may be further qualified by one or more
+    /// qualifiers or complex formulas.
+    /// </summary>
+    public interface IQualifiable : IClass
+    {
+        /// <summary>
+        /// Additional qualification of a qualifiable element.
+        /// </summary>
+        public List<IConstraint> Qualifiers { get; set; }
+    }
+
+    /// <summary>
+    /// Element that can be extended by using data specification templates.
+    /// </summary>
+    /// <remarks>
+    /// A data specification template defines a named set of additional attributes an
+    /// element may or shall have. The data specifications used are explicitly specified
+    /// with their global ID.
+    /// </remarks>
+    public interface IHasDataSpecification : IClass
+    {
+        /// <summary>
+        /// Global reference to the data specification template used by the element.
+        /// </summary>
+        public List<IReference>? DataSpecifications { get; set; }
+    }
+
+    /// <summary>
+    /// A submodel element is an element suitable for the description and differentiation of
+    /// assets.
+    /// </summary>
+    /// <remarks>
+    /// It is recommended to add a semantic ID to a submodel element.
+    /// </remarks>
+    public interface ISubmodelElement :
+            IReferable,
+            IHasKind,
+            IHasSemantics,
+            IQualifiable,
+            IHasDataSpecification,
+            IClass
+    {
+
+    }
+
+    /// <summary>
+    /// A qualifier is a type-value-pair that makes additional statements w.r.t.  the value
+    /// of the element.
+    /// </summary>
+    public class Qualifier :
+            IConstraint,
+            IHasSemantics,
+            IClass
+    {
+        /// <summary>
+        /// Identifier of the semantic definition of the element. It is called semantic ID
+        /// of the element.
+        /// </summary>
+        public IReference? SemanticId { get; set; }
+
+        /// <summary>
+        /// The qualifier type describes the type of the qualifier that is applied to
+        /// the element.
+        /// </summary>
+        public string Type { get; set; }
+
+        /// <summary>
+        /// Data type of the qualifier value.
+        /// </summary>
+        public DataTypeDef ValueType { get; set; }
+
+        /// <summary>
+        /// The qualifier value is the value of the qualifier.
+        /// </summary>
+        public string? Value { get; set; }
+
+        /// <summary>
+        /// Reference to the global unique ID of a coded value.
+        /// </summary>
+        public IReference? ValueId { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            if (SemanticId != null)
+            {
+                yield return SemanticId;
+            }
+
+            if (ValueId != null)
+            {
+                yield return ValueId;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            if (SemanticId != null)
+            {
+                yield return SemanticId;
+
+                // Recurse
+                foreach (var anItem in SemanticId.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (ValueId != null)
+            {
+                yield return ValueId;
+
+                // Recurse
+                foreach (var anItem in ValueId.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public Qualifier(
+            string type,
+            DataTypeDef valueType,
+            IReference? semanticId = null,
+            string? value = null,
+            IReference? valueId = null)
+        {
+            SemanticId = semanticId;
+            Type = type;
+            ValueType = valueType;
+            Value = value;
+            ValueId = valueId;
+        }
+    }
+
+    /// <summary>
+    /// A data element is a submodel element that is not further composed out of
+    /// other submodel elements.
+    /// </summary>
+    /// <remarks>
+    /// A data element is a submodel element that has a value. The type of value differs
+    /// for different subtypes of data elements.
+    ///
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-090:
+    ///     For data elements DataElement/category shall be one of the
+    ///     following values: CONSTANT, PARAMETER or VARIABLE.
+    ///     Exception: File and Blob data elements.
+    ///     </li>
+    /// </ul>
+    /// </remarks>
+    public interface IDataElement :
+            ISubmodelElement,
+            IClass
+    {
+
+    }
+
+    /// <summary>
+    /// A reference element is a data element that defines a logical reference to another
+    /// element within the same or another AAS or a reference to an external object or
+    /// entity.
+    /// </summary>
+    /// <remarks>
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-054:
+    ///     If the semanticId of a ReferenceElement submodel element
+    ///     references a ConceptDescription then the ConceptDescription/category shall be
+    ///     one of following values: REFERENCE.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-082:
+    ///     If the semanticId of a ReferenceElement references a
+    ///     ConceptDescription then DataSpecificationIEC61360/dataType shall be one of:
+    ///     STRING, IRI, IRDI.
+    ///     </li>
+    /// </ul>
+    /// </remarks>
+    public class ReferenceElement :
+            IDataElement,
+            IClass
+    {
+        /// <summary>
+        /// An extension of the element.
+        /// </summary>
+        public List<Extension> Extensions { get; set; }
+
+        /// <summary>
+        /// In case of identifiables this attribute is a short name of the element.
+        /// In case of referable this ID is an identifying string of
+        /// the element within its name space.
+        /// </summary>
+        /// <remarks>
+        /// In case the element is a property and the property has a semantic definition
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
+        /// identical to the short name in English.
+        ///
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-002:
+        ///     idShort of Referables shall only feature letters, digits,
+        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
+        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
+        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
+        ///     or <c>[1-9][0-9]+</c>.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-117:
+        ///     For all Referables which are not Identifiables the idShort is mandatory.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-003:
+        ///     idShort shall be matched case-sensitive.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-022:
+        ///     idShort of non-identifiable referables shall be unique in its namespace.
+        ///     </li>
+        ///     <li>
+        ///     Constraint AASd-027:
+        ///     idShort of Referables shall have a maximum length of 128 characters.
+        ///     </li>
+        /// </ul>
+        /// </remarks>
+        public string? IdShort { get; set; }
+
+        /// <summary>
+        /// Display name. Can be provided in several languages.
+        /// </summary>
+        /// <remarks>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
+        /// <li>the preferred name in the requested language of the concept description defining
+        /// the semantics of the element</li>
+        /// <li>If there is a default language list defined in the application,
+        /// then the corresponding preferred name in the language is chosen
+        /// according to this order.</li>
+        /// <li>the English preferred name of the concept description defining
+        /// the semantics of the element</li>
+        /// <li>the short name of the concept description-the idShort of the element</li>
+        /// </ul>
+        /// </remarks>
+        public LangStringSet? DisplayName { get; set; }
+
+        /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category
+        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
+        /// semantic definition of the element would
+        /// denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
+        /// Description or comments on the element.
+        /// </summary>
+        /// <remarks>
+        /// The description can be provided in several languages. If no description is defined,
+        /// then the definition of the concept description that defines the semantics
+        /// of the element is used. Additional information can be provided,
+        /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
+        /// in which context or which additional data specification templates are provided.
+        /// </remarks>
+        public LangStringSet? Description { get; set; }
+
+        /// <summary>
+        /// Kind of the element: either type or instance.
+        /// </summary>
+        /// <remarks>
+        /// Default Value = Instance
+        /// </remarks>
+        public ModelingKind? Kind { get; set; }
+
+        /// <summary>
+        /// Identifier of the semantic definition of the element. It is called semantic ID
+        /// of the element.
+        /// </summary>
+        public IReference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Additional qualification of a qualifiable element.
+        /// </summary>
+        public List<IConstraint> Qualifiers { get; set; }
+
+        /// <summary>
+        /// Global reference to the data specification template used by the element.
+        /// </summary>
+        public List<IReference>? DataSpecifications { get; set; }
+
+        /// <summary>
+        /// Reference to any other referable element of the same of any other AAS or a
+        /// reference to an external object or entity.
+        /// </summary>
+        public IReference? Value { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            foreach (var anItem in Extensions)
+            {
+                yield return anItem;
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+            }
+
+            if (SemanticId != null)
+            {
+                yield return SemanticId;
+            }
+
+            foreach (var anItem in Qualifiers)
+            {
+                yield return anItem;
+            }
+
+            if (DataSpecifications != null)
+            {
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (Value != null)
+            {
+                yield return Value;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            foreach (var anItem in Extensions)
+            {
+                yield return anItem;
+
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+
+                // Recurse
+                foreach (var anItem in DisplayName.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (SemanticId != null)
+            {
+                yield return SemanticId;
+
+                // Recurse
+                foreach (var anItem in SemanticId.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            foreach (var anItem in Qualifiers)
+            {
+                yield return anItem;
+
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
+                }
+            }
+
+            if (DataSpecifications != null)
+            {
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (Value != null)
+            {
+                yield return Value;
+
+                // Recurse
+                foreach (var anItem in Value.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public ReferenceElement(
+            List<Extension>? extensions = null,
+            string? idShort = null,
+            LangStringSet? displayName = null,
+            string? category = null,
+            LangStringSet? description = null,
+            ModelingKind? kind = null,
+            IReference? semanticId = null,
+            List<IConstraint>? qualifiers = null,
+            List<IReference>? dataSpecifications = null,
+            IReference? value = null)
+        {
+            Extensions = (extensions != null)
+                ? extensions
+                : new List<Extension>();
+            IdShort = idShort;
+            DisplayName = displayName;
+            Category = category;
+            Description = description;
+            Kind = ModelingKind.Instance;
+            SemanticId = semanticId;
+            Qualifiers = (qualifiers != null)
+                ? qualifiers
+                : new List<IConstraint>();
+            DataSpecifications = dataSpecifications;
+            Value = value;
+        }
+    }
+
+    /// <summary>
+    /// Reference to an external entity.
+    /// </summary>
+    public class GlobalReference :
+            IReference,
+            IClass
+    {
+        /// <summary>
+        /// Unique reference. The reference can be a concatenation of different identifiers,
+        /// for example to an IRDI path etc.
+        /// </summary>
+        public List<string> Values { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public GlobalReference(List<string> values)
+        {
+            Values = values;
+        }
+    }
+
+    /// <summary>
+    /// Reference to a model element of the same or another AAS.
+    /// A model reference is an ordered list of keys, each key referencing an element.
+    /// The complete list of keys may for example be concatenated to a path that then gives
+    /// unique access to an element.
+    /// </summary>
+    public class ModelReference :
+            IReference,
+            IClass
+    {
+        /// <summary>
+        /// Unique references in their name space.
+        /// </summary>
+        public List<Key> Keys { get; set; }
+
+        /// <summary>
+        /// SemanticId of the referenced model element.
+        /// </summary>
+        public IReference? ReferredSemanticId { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            foreach (var anItem in Keys)
+            {
+                yield return anItem;
+            }
+
+            if (ReferredSemanticId != null)
+            {
+                yield return ReferredSemanticId;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            foreach (var anItem in Keys)
+            {
+                yield return anItem;
+
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
+                }
+            }
+
+            if (ReferredSemanticId != null)
+            {
+                yield return ReferredSemanticId;
+
+                // Recurse
+                foreach (var anItem in ReferredSemanticId.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public ModelReference(
+            List<Key> keys,
+            IReference? referredSemanticId = null)
+        {
+            Keys = keys;
+            ReferredSemanticId = referredSemanticId;
+        }
+    }
+
+    /// <summary>
+    /// A key is a reference to an element by its id.
+    /// </summary>
+    public class Key : IClass
+    {
+        public KeyElements Type { get; set; }
+
+        public string Value { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<C, T>(
+            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public Key(
+            KeyElements type,
+            string value)
+        {
+            Type = type;
+            Value = value;
+        }
     }
 
     /// <summary>
@@ -206,119 +1434,6 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// Element that can be extended by proprietary extensions.
-    /// </summary>
-    /// <remarks>
-    /// Note: Extensions are proprietary, i.e. they do not support global interoperability.
-    /// </remarks>
-    public interface IHasExtensions : IClass
-    {
-        /// <summary>
-        /// An extension of the element.
-        /// </summary>
-        public List<Extension> Extensions { get; set; }
-    }
-
-    /// <summary>
-    /// An element that is referable by its <see cref="IReferable.IdShort" />.
-    /// </summary>
-    /// <remarks>
-    /// This identifier is not globally unique.
-    /// This identifier is unique within the name space of the element.
-    /// </remarks>
-    public interface IReferable :
-            IHasExtensions,
-            IClass
-    {
-        /// <summary>
-        /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
-        /// </summary>
-        /// <remarks>
-        /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-002:
-        ///     idShort of Referables shall only feature letters, digits,
-        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
-        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
-        ///     or <c>[1-9][0-9]+</c>.
-        ///     </li>
-        ///     <li>
-        ///     Constraint AASd-117:
-        ///     For all Referables which are not Identifiables the idShort is mandatory.
-        ///     </li>
-        ///     <li>
-        ///     Constraint AASd-003:
-        ///     idShort shall be matched case-sensitive.
-        ///     </li>
-        ///     <li>
-        ///     Constraint AASd-022:
-        ///     idShort of non-identifiable referables shall be unique in its namespace.
-        ///     </li>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128 characters.
-        ///     </li>
-        /// </ul>
-        /// </remarks>
-        public string? IdShort { get; set; }
-
-        /// <summary>
-        /// Display name. Can be provided in several languages.
-        /// </summary>
-        /// <remarks>
-        /// If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:
-        ///
-        /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul>
-        /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
-
-        /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
-        /// Description or comments on the element.
-        /// </summary>
-        /// <remarks>
-        /// The description can be provided in several languages. If no description is defined,
-        /// then the definition of the concept description that defines the semantics
-        /// of the element is used. Additional information can be provided,
-        /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
-        /// in which context or which additional data specification templates are provided.
-        /// </remarks>
-        public LangStringSet? Description { get; set; }
-    }
-
-    /// <summary>
     /// An element that has a globally unique identifier.
     /// </summary>
     public interface IIdentifiable :
@@ -369,40 +1484,6 @@ namespace AasCore.Aas3
         /// </remarks>
         [EnumMember(Value = "INSTANCE")]
         Instance
-    }
-
-    /// <summary>
-    /// An element with a kind is an element that can either represent a template or an
-    /// instance.
-    /// </summary>
-    /// <remarks>
-    /// Default for an element is that it is representing an instance.
-    /// </remarks>
-    public interface IHasKind : IClass
-    {
-        /// <summary>
-        /// Kind of the element: either type or instance.
-        /// </summary>
-        /// <remarks>
-        /// Default Value = Instance
-        /// </remarks>
-        public ModelingKind? Kind { get; set; }
-    }
-
-    /// <summary>
-    /// Element that can be extended by using data specification templates.
-    /// </summary>
-    /// <remarks>
-    /// A data specification template defines a named set of additional attributes an
-    /// element may or shall have. The data specifications used are explicitly specified
-    /// with their global ID.
-    /// </remarks>
-    public interface IHasDataSpecification : IClass
-    {
-        /// <summary>
-        /// Global reference to the data specification template used by the element.
-        /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
     }
 
     /// <summary>
@@ -516,151 +1597,6 @@ namespace AasCore.Aas3
     public interface IConstraint : IClass
     {
 
-    }
-
-    /// <summary>
-    /// The value of a qualifiable element may be further qualified by one or more
-    /// qualifiers or complex formulas.
-    /// </summary>
-    public interface IQualifiable : IClass
-    {
-        /// <summary>
-        /// Additional qualification of a qualifiable element.
-        /// </summary>
-        public List<IConstraint> Qualifiers { get; set; }
-    }
-
-    /// <summary>
-    /// A qualifier is a type-value-pair that makes additional statements w.r.t.  the value
-    /// of the element.
-    /// </summary>
-    public class Qualifier :
-            IConstraint,
-            IHasSemantics,
-            IClass
-    {
-        /// <summary>
-        /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
-        /// </summary>
-        public IReference? SemanticId { get; set; }
-
-        /// <summary>
-        /// The qualifier type describes the type of the qualifier that is applied to
-        /// the element.
-        /// </summary>
-        public string Type { get; set; }
-
-        /// <summary>
-        /// Data type of the qualifier value.
-        /// </summary>
-        public DataTypeDef ValueType { get; set; }
-
-        /// <summary>
-        /// The qualifier value is the value of the qualifier.
-        /// </summary>
-        public string? Value { get; set; }
-
-        /// <summary>
-        /// Reference to the global unique ID of a coded value.
-        /// </summary>
-        public IReference? ValueId { get; set; }
-
-        /// <summary>
-        /// Iterate over all the class instances referenced from this instance
-        /// without further recursion.
-        /// </summary>
-        public IEnumerable<IClass> DescendOnce()
-        {
-            if (SemanticId != null)
-            {
-                yield return SemanticId;
-            }
-
-            if (ValueId != null)
-            {
-                yield return ValueId;
-            }
-        }
-
-        /// <summary>
-        /// Iterate recursively over all the class instances referenced from this instance.
-        /// </summary>
-        public IEnumerable<IClass> Descend()
-        {
-            if (SemanticId != null)
-            {
-                yield return SemanticId;
-
-                // Recurse
-                foreach (var anItem in SemanticId.Descend())
-                {
-                    yield return anItem;
-                }
-            }
-
-            if (ValueId != null)
-            {
-                yield return ValueId;
-
-                // Recurse
-                foreach (var anItem in ValueId.Descend())
-                {
-                    yield return anItem;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance
-        /// for double dispatch.
-        /// </summary>
-        public void Accept(Visitation.IVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch
-        /// with the <paramref name="context" />.
-        /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
-        {
-            visitor.Visit(this, context);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance
-        /// for double dispatch.
-        /// </summary>
-        public T Transform<T>(Visitation.ITransformer<T> transformer)
-        {
-            return transformer.Transform(this);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance
-        /// for double dispatch with the <paramref name="context" />.
-        /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
-        {
-            return transformer.Transform(this, context);
-        }
-
-        public Qualifier(
-            string type,
-            DataTypeDef valueType,
-            IReference? semanticId = null,
-            string? value = null,
-            IReference? valueId = null)
-        {
-            SemanticId = semanticId;
-            Type = type;
-            ValueType = valueType;
-            Value = value;
-            ValueId = valueId;
-        }
     }
 
     /// <summary>
@@ -1804,24 +2740,6 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// A submodel element is an element suitable for the description and differentiation of
-    /// assets.
-    /// </summary>
-    /// <remarks>
-    /// It is recommended to add a semantic ID to a submodel element.
-    /// </remarks>
-    public interface ISubmodelElement :
-            IReferable,
-            IHasKind,
-            IHasSemantics,
-            IQualifiable,
-            IHasDataSpecification,
-            IClass
-    {
-
-    }
-
-    /// <summary>
     /// A relationship element is used to define a relationship between two referable
     /// elements.
     /// </summary>
@@ -2607,31 +3525,6 @@ namespace AasCore.Aas3
                 ? values
                 : new List<ISubmodelElement>();
         }
-    }
-
-    /// <summary>
-    /// A data element is a submodel element that is not further composed out of
-    /// other submodel elements.
-    /// </summary>
-    /// <remarks>
-    /// A data element is a submodel element that has a value. The type of value differs
-    /// for different subtypes of data elements.
-    ///
-    /// Constraints:
-    /// <ul>
-    ///     <li>
-    ///     Constraint AASd-090:
-    ///     For data elements DataElement/category shall be one of the
-    ///     following values: CONSTANT, PARAMETER or VARIABLE.
-    ///     Exception: File and Blob data elements.
-    ///     </li>
-    /// </ul>
-    /// </remarks>
-    public interface IDataElement :
-            ISubmodelElement,
-            IClass
-    {
-
     }
 
     /// <summary>
@@ -3739,351 +4632,6 @@ namespace AasCore.Aas3
             ValueType = valueType;
             Min = min;
             Max = max;
-        }
-    }
-
-    /// <summary>
-    /// A reference element is a data element that defines a logical reference to another
-    /// element within the same or another AAS or a reference to an external object or
-    /// entity.
-    /// </summary>
-    /// <remarks>
-    /// Constraints:
-    /// <ul>
-    ///     <li>
-    ///     Constraint AASd-054:
-    ///     If the semanticId of a ReferenceElement submodel element
-    ///     references a ConceptDescription then the ConceptDescription/category shall be
-    ///     one of following values: REFERENCE.
-    ///     </li>
-    ///     <li>
-    ///     Constraint AASd-082:
-    ///     If the semanticId of a ReferenceElement references a
-    ///     ConceptDescription then DataSpecificationIEC61360/dataType shall be one of:
-    ///     STRING, IRI, IRDI.
-    ///     </li>
-    /// </ul>
-    /// </remarks>
-    public class ReferenceElement :
-            IDataElement,
-            IClass
-    {
-        /// <summary>
-        /// An extension of the element.
-        /// </summary>
-        public List<Extension> Extensions { get; set; }
-
-        /// <summary>
-        /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
-        /// </summary>
-        /// <remarks>
-        /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-002:
-        ///     idShort of Referables shall only feature letters, digits,
-        ///     underscore ("_"); starting mandatory with a letter. I.e. <c>[a-zA-Z][a-zA-Z0-9_]+</c>
-        ///     Exception: In case of direct submodel elements within a SubmodelElementList the
-        ///     idShort shall feature a sequence of digits representing an integer. I.e. <c>[0]</c>
-        ///     or <c>[1-9][0-9]+</c>.
-        ///     </li>
-        ///     <li>
-        ///     Constraint AASd-117:
-        ///     For all Referables which are not Identifiables the idShort is mandatory.
-        ///     </li>
-        ///     <li>
-        ///     Constraint AASd-003:
-        ///     idShort shall be matched case-sensitive.
-        ///     </li>
-        ///     <li>
-        ///     Constraint AASd-022:
-        ///     idShort of non-identifiable referables shall be unique in its namespace.
-        ///     </li>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128 characters.
-        ///     </li>
-        /// </ul>
-        /// </remarks>
-        public string? IdShort { get; set; }
-
-        /// <summary>
-        /// Display name. Can be provided in several languages.
-        /// </summary>
-        /// <remarks>
-        /// If no display name is defined in the language requested by the application,
-        /// then the display name is selected in the following order if available:
-        ///
-        /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description-the idShort of the element</li>
-        /// </ul>
-        /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
-
-        /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
-        /// Description or comments on the element.
-        /// </summary>
-        /// <remarks>
-        /// The description can be provided in several languages. If no description is defined,
-        /// then the definition of the concept description that defines the semantics
-        /// of the element is used. Additional information can be provided,
-        /// <em>e.g.</em>, if the element is qualified and which qualifier types can be expected
-        /// in which context or which additional data specification templates are provided.
-        /// </remarks>
-        public LangStringSet? Description { get; set; }
-
-        /// <summary>
-        /// Kind of the element: either type or instance.
-        /// </summary>
-        /// <remarks>
-        /// Default Value = Instance
-        /// </remarks>
-        public ModelingKind? Kind { get; set; }
-
-        /// <summary>
-        /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
-        /// </summary>
-        public IReference? SemanticId { get; set; }
-
-        /// <summary>
-        /// Additional qualification of a qualifiable element.
-        /// </summary>
-        public List<IConstraint> Qualifiers { get; set; }
-
-        /// <summary>
-        /// Global reference to the data specification template used by the element.
-        /// </summary>
-        public List<IReference>? DataSpecifications { get; set; }
-
-        /// <summary>
-        /// Reference to any other referable element of the same of any other AAS or a
-        /// reference to an external object or entity.
-        /// </summary>
-        public IReference? Value { get; set; }
-
-        /// <summary>
-        /// Iterate over all the class instances referenced from this instance
-        /// without further recursion.
-        /// </summary>
-        public IEnumerable<IClass> DescendOnce()
-        {
-            foreach (var anItem in Extensions)
-            {
-                yield return anItem;
-            }
-
-            if (DisplayName != null)
-            {
-                yield return DisplayName;
-            }
-
-            if (Description != null)
-            {
-                yield return Description;
-            }
-
-            if (SemanticId != null)
-            {
-                yield return SemanticId;
-            }
-
-            foreach (var anItem in Qualifiers)
-            {
-                yield return anItem;
-            }
-
-            if (DataSpecifications != null)
-            {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-                }
-            }
-
-            if (Value != null)
-            {
-                yield return Value;
-            }
-        }
-
-        /// <summary>
-        /// Iterate recursively over all the class instances referenced from this instance.
-        /// </summary>
-        public IEnumerable<IClass> Descend()
-        {
-            foreach (var anItem in Extensions)
-            {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
-                {
-                    yield return anotherItem;
-                }
-            }
-
-            if (DisplayName != null)
-            {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
-                {
-                    yield return anItem;
-                }
-            }
-
-            if (Description != null)
-            {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
-                {
-                    yield return anItem;
-                }
-            }
-
-            if (SemanticId != null)
-            {
-                yield return SemanticId;
-
-                // Recurse
-                foreach (var anItem in SemanticId.Descend())
-                {
-                    yield return anItem;
-                }
-            }
-
-            foreach (var anItem in Qualifiers)
-            {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
-                {
-                    yield return anotherItem;
-                }
-            }
-
-            if (DataSpecifications != null)
-            {
-                foreach (var anItem in DataSpecifications)
-                {
-                    yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
-                }
-            }
-
-            if (Value != null)
-            {
-                yield return Value;
-
-                // Recurse
-                foreach (var anItem in Value.Descend())
-                {
-                    yield return anItem;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance
-        /// for double dispatch.
-        /// </summary>
-        public void Accept(Visitation.IVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch
-        /// with the <paramref name="context" />.
-        /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
-        {
-            visitor.Visit(this, context);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance
-        /// for double dispatch.
-        /// </summary>
-        public T Transform<T>(Visitation.ITransformer<T> transformer)
-        {
-            return transformer.Transform(this);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance
-        /// for double dispatch with the <paramref name="context" />.
-        /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
-        {
-            return transformer.Transform(this, context);
-        }
-
-        public ReferenceElement(
-            List<Extension>? extensions = null,
-            string? idShort = null,
-            LangStringSet? displayName = null,
-            string? category = null,
-            LangStringSet? description = null,
-            ModelingKind? kind = null,
-            IReference? semanticId = null,
-            List<IConstraint>? qualifiers = null,
-            List<IReference>? dataSpecifications = null,
-            IReference? value = null)
-        {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
-            IdShort = idShort;
-            DisplayName = displayName;
-            Category = category;
-            Description = description;
-            Kind = ModelingKind.Instance;
-            SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<IConstraint>();
-            DataSpecifications = dataSpecifications;
-            Value = value;
         }
     }
 
@@ -7304,275 +7852,6 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// Reference to either a model element of the same or another AAs or to an external
-    /// entity.
-    /// </summary>
-    public interface IReference : IClass
-    {
-
-    }
-
-    /// <summary>
-    /// Reference to an external entity.
-    /// </summary>
-    public class GlobalReference :
-            IReference,
-            IClass
-    {
-        /// <summary>
-        /// Unique reference. The reference can be a concatenation of different identifiers,
-        /// for example to an IRDI path etc.
-        /// </summary>
-        public List<string> Values { get; set; }
-
-        /// <summary>
-        /// Iterate over all the class instances referenced from this instance
-        /// without further recursion.
-        /// </summary>
-        public IEnumerable<IClass> DescendOnce()
-        {
-            // No descendable properties
-            yield break;
-        }
-
-        /// <summary>
-        /// Iterate recursively over all the class instances referenced from this instance.
-        /// </summary>
-        public IEnumerable<IClass> Descend()
-        {
-            // No descendable properties
-            yield break;
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance
-        /// for double dispatch.
-        /// </summary>
-        public void Accept(Visitation.IVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch
-        /// with the <paramref name="context" />.
-        /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
-        {
-            visitor.Visit(this, context);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance
-        /// for double dispatch.
-        /// </summary>
-        public T Transform<T>(Visitation.ITransformer<T> transformer)
-        {
-            return transformer.Transform(this);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance
-        /// for double dispatch with the <paramref name="context" />.
-        /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
-        {
-            return transformer.Transform(this, context);
-        }
-
-        public GlobalReference(List<string> values)
-        {
-            Values = values;
-        }
-    }
-
-    /// <summary>
-    /// Reference to a model element of the same or another AAS.
-    /// A model reference is an ordered list of keys, each key referencing an element.
-    /// The complete list of keys may for example be concatenated to a path that then gives
-    /// unique access to an element.
-    /// </summary>
-    public class ModelReference :
-            IReference,
-            IClass
-    {
-        /// <summary>
-        /// Unique references in their name space.
-        /// </summary>
-        public List<Key> Keys { get; set; }
-
-        /// <summary>
-        /// SemanticId of the referenced model element.
-        /// </summary>
-        public IReference? ReferredSemanticId { get; set; }
-
-        /// <summary>
-        /// Iterate over all the class instances referenced from this instance
-        /// without further recursion.
-        /// </summary>
-        public IEnumerable<IClass> DescendOnce()
-        {
-            foreach (var anItem in Keys)
-            {
-                yield return anItem;
-            }
-
-            if (ReferredSemanticId != null)
-            {
-                yield return ReferredSemanticId;
-            }
-        }
-
-        /// <summary>
-        /// Iterate recursively over all the class instances referenced from this instance.
-        /// </summary>
-        public IEnumerable<IClass> Descend()
-        {
-            foreach (var anItem in Keys)
-            {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
-                {
-                    yield return anotherItem;
-                }
-            }
-
-            if (ReferredSemanticId != null)
-            {
-                yield return ReferredSemanticId;
-
-                // Recurse
-                foreach (var anItem in ReferredSemanticId.Descend())
-                {
-                    yield return anItem;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance
-        /// for double dispatch.
-        /// </summary>
-        public void Accept(Visitation.IVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch
-        /// with the <paramref name="context" />.
-        /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
-        {
-            visitor.Visit(this, context);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance
-        /// for double dispatch.
-        /// </summary>
-        public T Transform<T>(Visitation.ITransformer<T> transformer)
-        {
-            return transformer.Transform(this);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance
-        /// for double dispatch with the <paramref name="context" />.
-        /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
-        {
-            return transformer.Transform(this, context);
-        }
-
-        public ModelReference(
-            List<Key> keys,
-            IReference? referredSemanticId = null)
-        {
-            Keys = keys;
-            ReferredSemanticId = referredSemanticId;
-        }
-    }
-
-    /// <summary>
-    /// A key is a reference to an element by its id.
-    /// </summary>
-    public class Key : IClass
-    {
-        public KeyElements Type { get; set; }
-
-        public string Value { get; set; }
-
-        /// <summary>
-        /// Iterate over all the class instances referenced from this instance
-        /// without further recursion.
-        /// </summary>
-        public IEnumerable<IClass> DescendOnce()
-        {
-            // No descendable properties
-            yield break;
-        }
-
-        /// <summary>
-        /// Iterate recursively over all the class instances referenced from this instance.
-        /// </summary>
-        public IEnumerable<IClass> Descend()
-        {
-            // No descendable properties
-            yield break;
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance
-        /// for double dispatch.
-        /// </summary>
-        public void Accept(Visitation.IVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch
-        /// with the <paramref name="context" />.
-        /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
-        {
-            visitor.Visit(this, context);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance
-        /// for double dispatch.
-        /// </summary>
-        public T Transform<T>(Visitation.ITransformer<T> transformer)
-        {
-            return transformer.Transform(this);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance
-        /// for double dispatch with the <paramref name="context" />.
-        /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
-        {
-            return transformer.Transform(this, context);
-        }
-
-        public Key(
-            KeyElements type,
-            string value)
-        {
-            Type = type;
-            Value = value;
-        }
-    }
-
-    /// <summary>
     /// Enumeration of all identifiable elements within an asset administration shell.
     /// </summary>
     public enum IdentifiableElements
@@ -7945,285 +8224,6 @@ namespace AasCore.Aas3
         /// </summary>
         [EnumMember(Value = "SubmodelElementStruct")]
         SubmodelElementStruct
-    }
-
-    public enum BuildInListTypes
-    {
-        [EnumMember(Value = "ENTITIES")]
-        Entities,
-
-        [EnumMember(Value = "IDREFS")]
-        IdRefs,
-
-        [EnumMember(Value = "NMTOKENS")]
-        NMTokens
-    }
-
-    public enum DecimalBuildInTypes
-    {
-        [EnumMember(Value = "integer")]
-        Integer,
-
-        [EnumMember(Value = "long")]
-        Long,
-
-        [EnumMember(Value = "int")]
-        Int,
-
-        [EnumMember(Value = "short")]
-        Short,
-
-        [EnumMember(Value = "byte")]
-        Byte,
-
-        [EnumMember(Value = "NonNegativeInteger")]
-        NonNegativeInteger,
-
-        [EnumMember(Value = "positiveInteger")]
-        PositiveInteger,
-
-        [EnumMember(Value = "unsignedInteger")]
-        UnsignedInteger,
-
-        [EnumMember(Value = "unsignedLong")]
-        UnsignedLong,
-
-        [EnumMember(Value = "unsignedInt")]
-        UnsignedInt,
-
-        [EnumMember(Value = "unsignedShort")]
-        UnsignedShort,
-
-        [EnumMember(Value = "unsignedByte")]
-        UnsignedByte,
-
-        [EnumMember(Value = "nonPositiveInteger")]
-        NonPositiveInteger,
-
-        [EnumMember(Value = "negativeInteger")]
-        NegativeInteger
-    }
-
-    public enum DurationBuildInTypes
-    {
-        [EnumMember(Value = "dayTimeDuration")]
-        DayTimeDuration,
-
-        [EnumMember(Value = "yearMonthDuration")]
-        YearMonthDuration
-    }
-
-    public enum PrimitiveTypes
-    {
-        [EnumMember(Value = "anyURI")]
-        AnyUri,
-
-        [EnumMember(Value = "base64Binary")]
-        Base64Binary,
-
-        [EnumMember(Value = "boolean")]
-        Boolean,
-
-        [EnumMember(Value = "date")]
-        Date,
-
-        [EnumMember(Value = "dateTime")]
-        DateTime,
-
-        [EnumMember(Value = "decimal")]
-        Decimal,
-
-        [EnumMember(Value = "double")]
-        Double,
-
-        [EnumMember(Value = "duration")]
-        Duration,
-
-        [EnumMember(Value = "float")]
-        Float,
-
-        [EnumMember(Value = "gDay")]
-        GDay,
-
-        [EnumMember(Value = "gMonth")]
-        GMonth,
-
-        [EnumMember(Value = "gMonthDay")]
-        GMonthDay,
-
-        [EnumMember(Value = "heyBinary")]
-        HeyBinary,
-
-        [EnumMember(Value = "NOTATION")]
-        Notation,
-
-        [EnumMember(Value = "QName")]
-        QName,
-
-        [EnumMember(Value = "string")]
-        String,
-
-        [EnumMember(Value = "time")]
-        Time
-    }
-
-    public enum StringBuildInTypes
-    {
-        [EnumMember(Value = "normalizedString")]
-        NormalizedString,
-
-        [EnumMember(Value = "token")]
-        Token,
-
-        [EnumMember(Value = "Language")]
-        Language,
-
-        [EnumMember(Value = "NCName")]
-        NCName,
-
-        [EnumMember(Value = "ENTITY")]
-        Entity,
-
-        [EnumMember(Value = "ID")]
-        Id,
-
-        [EnumMember(Value = "IDREF")]
-        Idref
-    }
-
-    /// <summary>
-    /// Enumeration listing all xsd anySimpleTypes
-    /// </summary>
-    public enum DataTypeDef
-    {
-        [EnumMember(Value = "ENTITIES")]
-        Entities,
-
-        [EnumMember(Value = "IDREFS")]
-        IdRefs,
-
-        [EnumMember(Value = "NMTOKENS")]
-        NMTokens,
-
-        [EnumMember(Value = "integer")]
-        Integer,
-
-        [EnumMember(Value = "long")]
-        Long,
-
-        [EnumMember(Value = "int")]
-        Int,
-
-        [EnumMember(Value = "short")]
-        Short,
-
-        [EnumMember(Value = "byte")]
-        Byte,
-
-        [EnumMember(Value = "NonNegativeInteger")]
-        NonNegativeInteger,
-
-        [EnumMember(Value = "positiveInteger")]
-        PositiveInteger,
-
-        [EnumMember(Value = "unsignedInteger")]
-        UnsignedInteger,
-
-        [EnumMember(Value = "unsignedLong")]
-        UnsignedLong,
-
-        [EnumMember(Value = "unsignedInt")]
-        UnsignedInt,
-
-        [EnumMember(Value = "unsignedShort")]
-        UnsignedShort,
-
-        [EnumMember(Value = "unsignedByte")]
-        UnsignedByte,
-
-        [EnumMember(Value = "nonPositiveInteger")]
-        NonPositiveInteger,
-
-        [EnumMember(Value = "negativeInteger")]
-        NegativeInteger,
-
-        [EnumMember(Value = "dayTimeDuration")]
-        DayTimeDuration,
-
-        [EnumMember(Value = "yearMonthDuration")]
-        YearMonthDuration,
-
-        [EnumMember(Value = "anyURI")]
-        AnyUri,
-
-        [EnumMember(Value = "base64Binary")]
-        Base64Binary,
-
-        [EnumMember(Value = "boolean")]
-        Boolean,
-
-        [EnumMember(Value = "date")]
-        Date,
-
-        [EnumMember(Value = "dateTime")]
-        DateTime,
-
-        [EnumMember(Value = "decimal")]
-        Decimal,
-
-        [EnumMember(Value = "double")]
-        Double,
-
-        [EnumMember(Value = "duration")]
-        Duration,
-
-        [EnumMember(Value = "float")]
-        Float,
-
-        [EnumMember(Value = "gDay")]
-        GDay,
-
-        [EnumMember(Value = "gMonth")]
-        GMonth,
-
-        [EnumMember(Value = "gMonthDay")]
-        GMonthDay,
-
-        [EnumMember(Value = "heyBinary")]
-        HeyBinary,
-
-        [EnumMember(Value = "NOTATION")]
-        Notation,
-
-        [EnumMember(Value = "QName")]
-        QName,
-
-        [EnumMember(Value = "string")]
-        String,
-
-        [EnumMember(Value = "time")]
-        Time,
-
-        [EnumMember(Value = "normalizedString")]
-        NormalizedString,
-
-        [EnumMember(Value = "token")]
-        Token,
-
-        [EnumMember(Value = "Language")]
-        Language,
-
-        [EnumMember(Value = "NCName")]
-        NCName,
-
-        [EnumMember(Value = "ENTITY")]
-        Entity,
-
-        [EnumMember(Value = "ID")]
-        Id,
-
-        [EnumMember(Value = "IDREF")]
-        Idref
     }
 
     public class LangStringSet : IClass {

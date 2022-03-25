@@ -47,8 +47,8 @@ setup(
             "coverage>=4.5.1,<5",
             "pygments>=2,<3",
             "pyinstaller>=4,<5",
-            "twine"
-        ],
+            "twine",
+        ]
     },
     # fmt: on
     py_modules=["aas_core_codegen"],

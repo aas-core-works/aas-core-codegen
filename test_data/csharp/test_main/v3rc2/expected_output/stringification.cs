@@ -11,6 +11,466 @@ namespace AasCore.Aas3
 {
     public static class Stringification
     {
+        private static readonly Dictionary<Aas.BuildInListTypes, string> _buildInListTypesToString = (
+            new Dictionary<Aas.BuildInListTypes, string>()
+            {
+                { Aas.BuildInListTypes.Entities, "ENTITIES" },
+                { Aas.BuildInListTypes.IdRefs, "IDREFS" },
+                { Aas.BuildInListTypes.NMTokens, "NMTOKENS" }
+            });
+
+        /// <summary>
+        /// Retrieve the string representation of <paramref name="that" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
+        /// </remarks>
+        public static string? ToString(Aas.BuildInListTypes that)
+        {
+            if (_buildInListTypesToString.TryGetValue(that, out string? value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<string, Aas.BuildInListTypes> _buildInListTypesFromString = (
+            new Dictionary<string, Aas.BuildInListTypes>()
+            {
+                { "ENTITIES", Aas.BuildInListTypes.Entities },
+                { "IDREFS", Aas.BuildInListTypes.IdRefs },
+                { "NMTOKENS", Aas.BuildInListTypes.NMTokens }
+            });
+
+        /// <summary>
+        /// Parse the string representation of <see cref="BuildInListTypes" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="BuildInListTypes" />,
+        /// return <c>null</c>.
+        /// </remarks>
+        public static Aas.BuildInListTypes? BuildInListTypesFromString(string text)
+        {
+            if (_buildInListTypesFromString.TryGetValue(text, out BuildInListTypes value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<Aas.DecimalBuildInTypes, string> _decimalBuildInTypesToString = (
+            new Dictionary<Aas.DecimalBuildInTypes, string>()
+            {
+                { Aas.DecimalBuildInTypes.Integer, "integer" },
+                { Aas.DecimalBuildInTypes.Long, "long" },
+                { Aas.DecimalBuildInTypes.Int, "int" },
+                { Aas.DecimalBuildInTypes.Short, "short" },
+                { Aas.DecimalBuildInTypes.Byte, "byte" },
+                { Aas.DecimalBuildInTypes.NonNegativeInteger, "NonNegativeInteger" },
+                { Aas.DecimalBuildInTypes.PositiveInteger, "positiveInteger" },
+                { Aas.DecimalBuildInTypes.UnsignedInteger, "unsignedInteger" },
+                { Aas.DecimalBuildInTypes.UnsignedLong, "unsignedLong" },
+                { Aas.DecimalBuildInTypes.UnsignedInt, "unsignedInt" },
+                { Aas.DecimalBuildInTypes.UnsignedShort, "unsignedShort" },
+                { Aas.DecimalBuildInTypes.UnsignedByte, "unsignedByte" },
+                { Aas.DecimalBuildInTypes.NonPositiveInteger, "nonPositiveInteger" },
+                { Aas.DecimalBuildInTypes.NegativeInteger, "negativeInteger" }
+            });
+
+        /// <summary>
+        /// Retrieve the string representation of <paramref name="that" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
+        /// </remarks>
+        public static string? ToString(Aas.DecimalBuildInTypes that)
+        {
+            if (_decimalBuildInTypesToString.TryGetValue(that, out string? value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<string, Aas.DecimalBuildInTypes> _decimalBuildInTypesFromString = (
+            new Dictionary<string, Aas.DecimalBuildInTypes>()
+            {
+                { "integer", Aas.DecimalBuildInTypes.Integer },
+                { "long", Aas.DecimalBuildInTypes.Long },
+                { "int", Aas.DecimalBuildInTypes.Int },
+                { "short", Aas.DecimalBuildInTypes.Short },
+                { "byte", Aas.DecimalBuildInTypes.Byte },
+                { "NonNegativeInteger", Aas.DecimalBuildInTypes.NonNegativeInteger },
+                { "positiveInteger", Aas.DecimalBuildInTypes.PositiveInteger },
+                { "unsignedInteger", Aas.DecimalBuildInTypes.UnsignedInteger },
+                { "unsignedLong", Aas.DecimalBuildInTypes.UnsignedLong },
+                { "unsignedInt", Aas.DecimalBuildInTypes.UnsignedInt },
+                { "unsignedShort", Aas.DecimalBuildInTypes.UnsignedShort },
+                { "unsignedByte", Aas.DecimalBuildInTypes.UnsignedByte },
+                { "nonPositiveInteger", Aas.DecimalBuildInTypes.NonPositiveInteger },
+                { "negativeInteger", Aas.DecimalBuildInTypes.NegativeInteger }
+            });
+
+        /// <summary>
+        /// Parse the string representation of <see cref="DecimalBuildInTypes" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="DecimalBuildInTypes" />,
+        /// return <c>null</c>.
+        /// </remarks>
+        public static Aas.DecimalBuildInTypes? DecimalBuildInTypesFromString(string text)
+        {
+            if (_decimalBuildInTypesFromString.TryGetValue(text, out DecimalBuildInTypes value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<Aas.DurationBuildInTypes, string> _durationBuildInTypesToString = (
+            new Dictionary<Aas.DurationBuildInTypes, string>()
+            {
+                { Aas.DurationBuildInTypes.DayTimeDuration, "dayTimeDuration" },
+                { Aas.DurationBuildInTypes.YearMonthDuration, "yearMonthDuration" }
+            });
+
+        /// <summary>
+        /// Retrieve the string representation of <paramref name="that" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
+        /// </remarks>
+        public static string? ToString(Aas.DurationBuildInTypes that)
+        {
+            if (_durationBuildInTypesToString.TryGetValue(that, out string? value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<string, Aas.DurationBuildInTypes> _durationBuildInTypesFromString = (
+            new Dictionary<string, Aas.DurationBuildInTypes>()
+            {
+                { "dayTimeDuration", Aas.DurationBuildInTypes.DayTimeDuration },
+                { "yearMonthDuration", Aas.DurationBuildInTypes.YearMonthDuration }
+            });
+
+        /// <summary>
+        /// Parse the string representation of <see cref="DurationBuildInTypes" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="DurationBuildInTypes" />,
+        /// return <c>null</c>.
+        /// </remarks>
+        public static Aas.DurationBuildInTypes? DurationBuildInTypesFromString(string text)
+        {
+            if (_durationBuildInTypesFromString.TryGetValue(text, out DurationBuildInTypes value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<Aas.PrimitiveTypes, string> _primitiveTypesToString = (
+            new Dictionary<Aas.PrimitiveTypes, string>()
+            {
+                { Aas.PrimitiveTypes.AnyUri, "anyURI" },
+                { Aas.PrimitiveTypes.Base64Binary, "base64Binary" },
+                { Aas.PrimitiveTypes.Boolean, "boolean" },
+                { Aas.PrimitiveTypes.Date, "date" },
+                { Aas.PrimitiveTypes.DateTime, "dateTime" },
+                { Aas.PrimitiveTypes.Decimal, "decimal" },
+                { Aas.PrimitiveTypes.Double, "double" },
+                { Aas.PrimitiveTypes.Duration, "duration" },
+                { Aas.PrimitiveTypes.Float, "float" },
+                { Aas.PrimitiveTypes.GDay, "gDay" },
+                { Aas.PrimitiveTypes.GMonth, "gMonth" },
+                { Aas.PrimitiveTypes.GMonthDay, "gMonthDay" },
+                { Aas.PrimitiveTypes.HeyBinary, "heyBinary" },
+                { Aas.PrimitiveTypes.Notation, "NOTATION" },
+                { Aas.PrimitiveTypes.QName, "QName" },
+                { Aas.PrimitiveTypes.String, "string" },
+                { Aas.PrimitiveTypes.Time, "time" }
+            });
+
+        /// <summary>
+        /// Retrieve the string representation of <paramref name="that" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
+        /// </remarks>
+        public static string? ToString(Aas.PrimitiveTypes that)
+        {
+            if (_primitiveTypesToString.TryGetValue(that, out string? value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<string, Aas.PrimitiveTypes> _primitiveTypesFromString = (
+            new Dictionary<string, Aas.PrimitiveTypes>()
+            {
+                { "anyURI", Aas.PrimitiveTypes.AnyUri },
+                { "base64Binary", Aas.PrimitiveTypes.Base64Binary },
+                { "boolean", Aas.PrimitiveTypes.Boolean },
+                { "date", Aas.PrimitiveTypes.Date },
+                { "dateTime", Aas.PrimitiveTypes.DateTime },
+                { "decimal", Aas.PrimitiveTypes.Decimal },
+                { "double", Aas.PrimitiveTypes.Double },
+                { "duration", Aas.PrimitiveTypes.Duration },
+                { "float", Aas.PrimitiveTypes.Float },
+                { "gDay", Aas.PrimitiveTypes.GDay },
+                { "gMonth", Aas.PrimitiveTypes.GMonth },
+                { "gMonthDay", Aas.PrimitiveTypes.GMonthDay },
+                { "heyBinary", Aas.PrimitiveTypes.HeyBinary },
+                { "NOTATION", Aas.PrimitiveTypes.Notation },
+                { "QName", Aas.PrimitiveTypes.QName },
+                { "string", Aas.PrimitiveTypes.String },
+                { "time", Aas.PrimitiveTypes.Time }
+            });
+
+        /// <summary>
+        /// Parse the string representation of <see cref="PrimitiveTypes" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="PrimitiveTypes" />,
+        /// return <c>null</c>.
+        /// </remarks>
+        public static Aas.PrimitiveTypes? PrimitiveTypesFromString(string text)
+        {
+            if (_primitiveTypesFromString.TryGetValue(text, out PrimitiveTypes value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<Aas.StringBuildInTypes, string> _stringBuildInTypesToString = (
+            new Dictionary<Aas.StringBuildInTypes, string>()
+            {
+                { Aas.StringBuildInTypes.NormalizedString, "normalizedString" },
+                { Aas.StringBuildInTypes.Token, "token" },
+                { Aas.StringBuildInTypes.Language, "Language" },
+                { Aas.StringBuildInTypes.NCName, "NCName" },
+                { Aas.StringBuildInTypes.Entity, "ENTITY" },
+                { Aas.StringBuildInTypes.Id, "ID" },
+                { Aas.StringBuildInTypes.Idref, "IDREF" }
+            });
+
+        /// <summary>
+        /// Retrieve the string representation of <paramref name="that" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
+        /// </remarks>
+        public static string? ToString(Aas.StringBuildInTypes that)
+        {
+            if (_stringBuildInTypesToString.TryGetValue(that, out string? value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<string, Aas.StringBuildInTypes> _stringBuildInTypesFromString = (
+            new Dictionary<string, Aas.StringBuildInTypes>()
+            {
+                { "normalizedString", Aas.StringBuildInTypes.NormalizedString },
+                { "token", Aas.StringBuildInTypes.Token },
+                { "Language", Aas.StringBuildInTypes.Language },
+                { "NCName", Aas.StringBuildInTypes.NCName },
+                { "ENTITY", Aas.StringBuildInTypes.Entity },
+                { "ID", Aas.StringBuildInTypes.Id },
+                { "IDREF", Aas.StringBuildInTypes.Idref }
+            });
+
+        /// <summary>
+        /// Parse the string representation of <see cref="StringBuildInTypes" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="StringBuildInTypes" />,
+        /// return <c>null</c>.
+        /// </remarks>
+        public static Aas.StringBuildInTypes? StringBuildInTypesFromString(string text)
+        {
+            if (_stringBuildInTypesFromString.TryGetValue(text, out StringBuildInTypes value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<Aas.DataTypeDef, string> _dataTypeDefToString = (
+            new Dictionary<Aas.DataTypeDef, string>()
+            {
+                { Aas.DataTypeDef.Entities, "ENTITIES" },
+                { Aas.DataTypeDef.IdRefs, "IDREFS" },
+                { Aas.DataTypeDef.NMTokens, "NMTOKENS" },
+                { Aas.DataTypeDef.Integer, "integer" },
+                { Aas.DataTypeDef.Long, "long" },
+                { Aas.DataTypeDef.Int, "int" },
+                { Aas.DataTypeDef.Short, "short" },
+                { Aas.DataTypeDef.Byte, "byte" },
+                { Aas.DataTypeDef.NonNegativeInteger, "NonNegativeInteger" },
+                { Aas.DataTypeDef.PositiveInteger, "positiveInteger" },
+                { Aas.DataTypeDef.UnsignedInteger, "unsignedInteger" },
+                { Aas.DataTypeDef.UnsignedLong, "unsignedLong" },
+                { Aas.DataTypeDef.UnsignedInt, "unsignedInt" },
+                { Aas.DataTypeDef.UnsignedShort, "unsignedShort" },
+                { Aas.DataTypeDef.UnsignedByte, "unsignedByte" },
+                { Aas.DataTypeDef.NonPositiveInteger, "nonPositiveInteger" },
+                { Aas.DataTypeDef.NegativeInteger, "negativeInteger" },
+                { Aas.DataTypeDef.DayTimeDuration, "dayTimeDuration" },
+                { Aas.DataTypeDef.YearMonthDuration, "yearMonthDuration" },
+                { Aas.DataTypeDef.AnyUri, "anyURI" },
+                { Aas.DataTypeDef.Base64Binary, "base64Binary" },
+                { Aas.DataTypeDef.Boolean, "boolean" },
+                { Aas.DataTypeDef.Date, "date" },
+                { Aas.DataTypeDef.DateTime, "dateTime" },
+                { Aas.DataTypeDef.Decimal, "decimal" },
+                { Aas.DataTypeDef.Double, "double" },
+                { Aas.DataTypeDef.Duration, "duration" },
+                { Aas.DataTypeDef.Float, "float" },
+                { Aas.DataTypeDef.GDay, "gDay" },
+                { Aas.DataTypeDef.GMonth, "gMonth" },
+                { Aas.DataTypeDef.GMonthDay, "gMonthDay" },
+                { Aas.DataTypeDef.HeyBinary, "heyBinary" },
+                { Aas.DataTypeDef.Notation, "NOTATION" },
+                { Aas.DataTypeDef.QName, "QName" },
+                { Aas.DataTypeDef.String, "string" },
+                { Aas.DataTypeDef.Time, "time" },
+                { Aas.DataTypeDef.NormalizedString, "normalizedString" },
+                { Aas.DataTypeDef.Token, "token" },
+                { Aas.DataTypeDef.Language, "Language" },
+                { Aas.DataTypeDef.NCName, "NCName" },
+                { Aas.DataTypeDef.Entity, "ENTITY" },
+                { Aas.DataTypeDef.Id, "ID" },
+                { Aas.DataTypeDef.Idref, "IDREF" }
+            });
+
+        /// <summary>
+        /// Retrieve the string representation of <paramref name="that" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
+        /// </remarks>
+        public static string? ToString(Aas.DataTypeDef that)
+        {
+            if (_dataTypeDefToString.TryGetValue(that, out string? value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<string, Aas.DataTypeDef> _dataTypeDefFromString = (
+            new Dictionary<string, Aas.DataTypeDef>()
+            {
+                { "ENTITIES", Aas.DataTypeDef.Entities },
+                { "IDREFS", Aas.DataTypeDef.IdRefs },
+                { "NMTOKENS", Aas.DataTypeDef.NMTokens },
+                { "integer", Aas.DataTypeDef.Integer },
+                { "long", Aas.DataTypeDef.Long },
+                { "int", Aas.DataTypeDef.Int },
+                { "short", Aas.DataTypeDef.Short },
+                { "byte", Aas.DataTypeDef.Byte },
+                { "NonNegativeInteger", Aas.DataTypeDef.NonNegativeInteger },
+                { "positiveInteger", Aas.DataTypeDef.PositiveInteger },
+                { "unsignedInteger", Aas.DataTypeDef.UnsignedInteger },
+                { "unsignedLong", Aas.DataTypeDef.UnsignedLong },
+                { "unsignedInt", Aas.DataTypeDef.UnsignedInt },
+                { "unsignedShort", Aas.DataTypeDef.UnsignedShort },
+                { "unsignedByte", Aas.DataTypeDef.UnsignedByte },
+                { "nonPositiveInteger", Aas.DataTypeDef.NonPositiveInteger },
+                { "negativeInteger", Aas.DataTypeDef.NegativeInteger },
+                { "dayTimeDuration", Aas.DataTypeDef.DayTimeDuration },
+                { "yearMonthDuration", Aas.DataTypeDef.YearMonthDuration },
+                { "anyURI", Aas.DataTypeDef.AnyUri },
+                { "base64Binary", Aas.DataTypeDef.Base64Binary },
+                { "boolean", Aas.DataTypeDef.Boolean },
+                { "date", Aas.DataTypeDef.Date },
+                { "dateTime", Aas.DataTypeDef.DateTime },
+                { "decimal", Aas.DataTypeDef.Decimal },
+                { "double", Aas.DataTypeDef.Double },
+                { "duration", Aas.DataTypeDef.Duration },
+                { "float", Aas.DataTypeDef.Float },
+                { "gDay", Aas.DataTypeDef.GDay },
+                { "gMonth", Aas.DataTypeDef.GMonth },
+                { "gMonthDay", Aas.DataTypeDef.GMonthDay },
+                { "heyBinary", Aas.DataTypeDef.HeyBinary },
+                { "NOTATION", Aas.DataTypeDef.Notation },
+                { "QName", Aas.DataTypeDef.QName },
+                { "string", Aas.DataTypeDef.String },
+                { "time", Aas.DataTypeDef.Time },
+                { "normalizedString", Aas.DataTypeDef.NormalizedString },
+                { "token", Aas.DataTypeDef.Token },
+                { "Language", Aas.DataTypeDef.Language },
+                { "NCName", Aas.DataTypeDef.NCName },
+                { "ENTITY", Aas.DataTypeDef.Entity },
+                { "ID", Aas.DataTypeDef.Id },
+                { "IDREF", Aas.DataTypeDef.Idref }
+            });
+
+        /// <summary>
+        /// Parse the string representation of <see cref="DataTypeDef" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="DataTypeDef" />,
+        /// return <c>null</c>.
+        /// </remarks>
+        public static Aas.DataTypeDef? DataTypeDefFromString(string text)
+        {
+            if (_dataTypeDefFromString.TryGetValue(text, out DataTypeDef value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         private static readonly Dictionary<Aas.ModelingKind, string> _modelingKindToString = (
             new Dictionary<Aas.ModelingKind, string>()
             {
@@ -490,466 +950,6 @@ namespace AasCore.Aas3
         public static Aas.SubmodelElements? SubmodelElementsFromString(string text)
         {
             if (_submodelElementsFromString.TryGetValue(text, out SubmodelElements value))
-            {
-                return value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static readonly Dictionary<Aas.BuildInListTypes, string> _buildInListTypesToString = (
-            new Dictionary<Aas.BuildInListTypes, string>()
-            {
-                { Aas.BuildInListTypes.Entities, "ENTITIES" },
-                { Aas.BuildInListTypes.IdRefs, "IDREFS" },
-                { Aas.BuildInListTypes.NMTokens, "NMTOKENS" }
-            });
-
-        /// <summary>
-        /// Retrieve the string representation of <paramref name="that" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
-        /// </remarks>
-        public static string? ToString(Aas.BuildInListTypes that)
-        {
-            if (_buildInListTypesToString.TryGetValue(that, out string? value))
-            {
-                return value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static readonly Dictionary<string, Aas.BuildInListTypes> _buildInListTypesFromString = (
-            new Dictionary<string, Aas.BuildInListTypes>()
-            {
-                { "ENTITIES", Aas.BuildInListTypes.Entities },
-                { "IDREFS", Aas.BuildInListTypes.IdRefs },
-                { "NMTOKENS", Aas.BuildInListTypes.NMTokens }
-            });
-
-        /// <summary>
-        /// Parse the string representation of <see cref="BuildInListTypes" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation
-        /// of a literal of <see cref="BuildInListTypes" />,
-        /// return <c>null</c>.
-        /// </remarks>
-        public static Aas.BuildInListTypes? BuildInListTypesFromString(string text)
-        {
-            if (_buildInListTypesFromString.TryGetValue(text, out BuildInListTypes value))
-            {
-                return value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static readonly Dictionary<Aas.DecimalBuildInTypes, string> _decimalBuildInTypesToString = (
-            new Dictionary<Aas.DecimalBuildInTypes, string>()
-            {
-                { Aas.DecimalBuildInTypes.Integer, "integer" },
-                { Aas.DecimalBuildInTypes.Long, "long" },
-                { Aas.DecimalBuildInTypes.Int, "int" },
-                { Aas.DecimalBuildInTypes.Short, "short" },
-                { Aas.DecimalBuildInTypes.Byte, "byte" },
-                { Aas.DecimalBuildInTypes.NonNegativeInteger, "NonNegativeInteger" },
-                { Aas.DecimalBuildInTypes.PositiveInteger, "positiveInteger" },
-                { Aas.DecimalBuildInTypes.UnsignedInteger, "unsignedInteger" },
-                { Aas.DecimalBuildInTypes.UnsignedLong, "unsignedLong" },
-                { Aas.DecimalBuildInTypes.UnsignedInt, "unsignedInt" },
-                { Aas.DecimalBuildInTypes.UnsignedShort, "unsignedShort" },
-                { Aas.DecimalBuildInTypes.UnsignedByte, "unsignedByte" },
-                { Aas.DecimalBuildInTypes.NonPositiveInteger, "nonPositiveInteger" },
-                { Aas.DecimalBuildInTypes.NegativeInteger, "negativeInteger" }
-            });
-
-        /// <summary>
-        /// Retrieve the string representation of <paramref name="that" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
-        /// </remarks>
-        public static string? ToString(Aas.DecimalBuildInTypes that)
-        {
-            if (_decimalBuildInTypesToString.TryGetValue(that, out string? value))
-            {
-                return value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static readonly Dictionary<string, Aas.DecimalBuildInTypes> _decimalBuildInTypesFromString = (
-            new Dictionary<string, Aas.DecimalBuildInTypes>()
-            {
-                { "integer", Aas.DecimalBuildInTypes.Integer },
-                { "long", Aas.DecimalBuildInTypes.Long },
-                { "int", Aas.DecimalBuildInTypes.Int },
-                { "short", Aas.DecimalBuildInTypes.Short },
-                { "byte", Aas.DecimalBuildInTypes.Byte },
-                { "NonNegativeInteger", Aas.DecimalBuildInTypes.NonNegativeInteger },
-                { "positiveInteger", Aas.DecimalBuildInTypes.PositiveInteger },
-                { "unsignedInteger", Aas.DecimalBuildInTypes.UnsignedInteger },
-                { "unsignedLong", Aas.DecimalBuildInTypes.UnsignedLong },
-                { "unsignedInt", Aas.DecimalBuildInTypes.UnsignedInt },
-                { "unsignedShort", Aas.DecimalBuildInTypes.UnsignedShort },
-                { "unsignedByte", Aas.DecimalBuildInTypes.UnsignedByte },
-                { "nonPositiveInteger", Aas.DecimalBuildInTypes.NonPositiveInteger },
-                { "negativeInteger", Aas.DecimalBuildInTypes.NegativeInteger }
-            });
-
-        /// <summary>
-        /// Parse the string representation of <see cref="DecimalBuildInTypes" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation
-        /// of a literal of <see cref="DecimalBuildInTypes" />,
-        /// return <c>null</c>.
-        /// </remarks>
-        public static Aas.DecimalBuildInTypes? DecimalBuildInTypesFromString(string text)
-        {
-            if (_decimalBuildInTypesFromString.TryGetValue(text, out DecimalBuildInTypes value))
-            {
-                return value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static readonly Dictionary<Aas.DurationBuildInTypes, string> _durationBuildInTypesToString = (
-            new Dictionary<Aas.DurationBuildInTypes, string>()
-            {
-                { Aas.DurationBuildInTypes.DayTimeDuration, "dayTimeDuration" },
-                { Aas.DurationBuildInTypes.YearMonthDuration, "yearMonthDuration" }
-            });
-
-        /// <summary>
-        /// Retrieve the string representation of <paramref name="that" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
-        /// </remarks>
-        public static string? ToString(Aas.DurationBuildInTypes that)
-        {
-            if (_durationBuildInTypesToString.TryGetValue(that, out string? value))
-            {
-                return value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static readonly Dictionary<string, Aas.DurationBuildInTypes> _durationBuildInTypesFromString = (
-            new Dictionary<string, Aas.DurationBuildInTypes>()
-            {
-                { "dayTimeDuration", Aas.DurationBuildInTypes.DayTimeDuration },
-                { "yearMonthDuration", Aas.DurationBuildInTypes.YearMonthDuration }
-            });
-
-        /// <summary>
-        /// Parse the string representation of <see cref="DurationBuildInTypes" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation
-        /// of a literal of <see cref="DurationBuildInTypes" />,
-        /// return <c>null</c>.
-        /// </remarks>
-        public static Aas.DurationBuildInTypes? DurationBuildInTypesFromString(string text)
-        {
-            if (_durationBuildInTypesFromString.TryGetValue(text, out DurationBuildInTypes value))
-            {
-                return value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static readonly Dictionary<Aas.PrimitiveTypes, string> _primitiveTypesToString = (
-            new Dictionary<Aas.PrimitiveTypes, string>()
-            {
-                { Aas.PrimitiveTypes.AnyUri, "anyURI" },
-                { Aas.PrimitiveTypes.Base64Binary, "base64Binary" },
-                { Aas.PrimitiveTypes.Boolean, "boolean" },
-                { Aas.PrimitiveTypes.Date, "date" },
-                { Aas.PrimitiveTypes.DateTime, "dateTime" },
-                { Aas.PrimitiveTypes.Decimal, "decimal" },
-                { Aas.PrimitiveTypes.Double, "double" },
-                { Aas.PrimitiveTypes.Duration, "duration" },
-                { Aas.PrimitiveTypes.Float, "float" },
-                { Aas.PrimitiveTypes.GDay, "gDay" },
-                { Aas.PrimitiveTypes.GMonth, "gMonth" },
-                { Aas.PrimitiveTypes.GMonthDay, "gMonthDay" },
-                { Aas.PrimitiveTypes.HeyBinary, "heyBinary" },
-                { Aas.PrimitiveTypes.Notation, "NOTATION" },
-                { Aas.PrimitiveTypes.QName, "QName" },
-                { Aas.PrimitiveTypes.String, "string" },
-                { Aas.PrimitiveTypes.Time, "time" }
-            });
-
-        /// <summary>
-        /// Retrieve the string representation of <paramref name="that" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
-        /// </remarks>
-        public static string? ToString(Aas.PrimitiveTypes that)
-        {
-            if (_primitiveTypesToString.TryGetValue(that, out string? value))
-            {
-                return value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static readonly Dictionary<string, Aas.PrimitiveTypes> _primitiveTypesFromString = (
-            new Dictionary<string, Aas.PrimitiveTypes>()
-            {
-                { "anyURI", Aas.PrimitiveTypes.AnyUri },
-                { "base64Binary", Aas.PrimitiveTypes.Base64Binary },
-                { "boolean", Aas.PrimitiveTypes.Boolean },
-                { "date", Aas.PrimitiveTypes.Date },
-                { "dateTime", Aas.PrimitiveTypes.DateTime },
-                { "decimal", Aas.PrimitiveTypes.Decimal },
-                { "double", Aas.PrimitiveTypes.Double },
-                { "duration", Aas.PrimitiveTypes.Duration },
-                { "float", Aas.PrimitiveTypes.Float },
-                { "gDay", Aas.PrimitiveTypes.GDay },
-                { "gMonth", Aas.PrimitiveTypes.GMonth },
-                { "gMonthDay", Aas.PrimitiveTypes.GMonthDay },
-                { "heyBinary", Aas.PrimitiveTypes.HeyBinary },
-                { "NOTATION", Aas.PrimitiveTypes.Notation },
-                { "QName", Aas.PrimitiveTypes.QName },
-                { "string", Aas.PrimitiveTypes.String },
-                { "time", Aas.PrimitiveTypes.Time }
-            });
-
-        /// <summary>
-        /// Parse the string representation of <see cref="PrimitiveTypes" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation
-        /// of a literal of <see cref="PrimitiveTypes" />,
-        /// return <c>null</c>.
-        /// </remarks>
-        public static Aas.PrimitiveTypes? PrimitiveTypesFromString(string text)
-        {
-            if (_primitiveTypesFromString.TryGetValue(text, out PrimitiveTypes value))
-            {
-                return value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static readonly Dictionary<Aas.StringBuildInTypes, string> _stringBuildInTypesToString = (
-            new Dictionary<Aas.StringBuildInTypes, string>()
-            {
-                { Aas.StringBuildInTypes.NormalizedString, "normalizedString" },
-                { Aas.StringBuildInTypes.Token, "token" },
-                { Aas.StringBuildInTypes.Language, "Language" },
-                { Aas.StringBuildInTypes.NCName, "NCName" },
-                { Aas.StringBuildInTypes.Entity, "ENTITY" },
-                { Aas.StringBuildInTypes.Id, "ID" },
-                { Aas.StringBuildInTypes.Idref, "IDREF" }
-            });
-
-        /// <summary>
-        /// Retrieve the string representation of <paramref name="that" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
-        /// </remarks>
-        public static string? ToString(Aas.StringBuildInTypes that)
-        {
-            if (_stringBuildInTypesToString.TryGetValue(that, out string? value))
-            {
-                return value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static readonly Dictionary<string, Aas.StringBuildInTypes> _stringBuildInTypesFromString = (
-            new Dictionary<string, Aas.StringBuildInTypes>()
-            {
-                { "normalizedString", Aas.StringBuildInTypes.NormalizedString },
-                { "token", Aas.StringBuildInTypes.Token },
-                { "Language", Aas.StringBuildInTypes.Language },
-                { "NCName", Aas.StringBuildInTypes.NCName },
-                { "ENTITY", Aas.StringBuildInTypes.Entity },
-                { "ID", Aas.StringBuildInTypes.Id },
-                { "IDREF", Aas.StringBuildInTypes.Idref }
-            });
-
-        /// <summary>
-        /// Parse the string representation of <see cref="StringBuildInTypes" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation
-        /// of a literal of <see cref="StringBuildInTypes" />,
-        /// return <c>null</c>.
-        /// </remarks>
-        public static Aas.StringBuildInTypes? StringBuildInTypesFromString(string text)
-        {
-            if (_stringBuildInTypesFromString.TryGetValue(text, out StringBuildInTypes value))
-            {
-                return value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static readonly Dictionary<Aas.DataTypeDef, string> _dataTypeDefToString = (
-            new Dictionary<Aas.DataTypeDef, string>()
-            {
-                { Aas.DataTypeDef.Entities, "ENTITIES" },
-                { Aas.DataTypeDef.IdRefs, "IDREFS" },
-                { Aas.DataTypeDef.NMTokens, "NMTOKENS" },
-                { Aas.DataTypeDef.Integer, "integer" },
-                { Aas.DataTypeDef.Long, "long" },
-                { Aas.DataTypeDef.Int, "int" },
-                { Aas.DataTypeDef.Short, "short" },
-                { Aas.DataTypeDef.Byte, "byte" },
-                { Aas.DataTypeDef.NonNegativeInteger, "NonNegativeInteger" },
-                { Aas.DataTypeDef.PositiveInteger, "positiveInteger" },
-                { Aas.DataTypeDef.UnsignedInteger, "unsignedInteger" },
-                { Aas.DataTypeDef.UnsignedLong, "unsignedLong" },
-                { Aas.DataTypeDef.UnsignedInt, "unsignedInt" },
-                { Aas.DataTypeDef.UnsignedShort, "unsignedShort" },
-                { Aas.DataTypeDef.UnsignedByte, "unsignedByte" },
-                { Aas.DataTypeDef.NonPositiveInteger, "nonPositiveInteger" },
-                { Aas.DataTypeDef.NegativeInteger, "negativeInteger" },
-                { Aas.DataTypeDef.DayTimeDuration, "dayTimeDuration" },
-                { Aas.DataTypeDef.YearMonthDuration, "yearMonthDuration" },
-                { Aas.DataTypeDef.AnyUri, "anyURI" },
-                { Aas.DataTypeDef.Base64Binary, "base64Binary" },
-                { Aas.DataTypeDef.Boolean, "boolean" },
-                { Aas.DataTypeDef.Date, "date" },
-                { Aas.DataTypeDef.DateTime, "dateTime" },
-                { Aas.DataTypeDef.Decimal, "decimal" },
-                { Aas.DataTypeDef.Double, "double" },
-                { Aas.DataTypeDef.Duration, "duration" },
-                { Aas.DataTypeDef.Float, "float" },
-                { Aas.DataTypeDef.GDay, "gDay" },
-                { Aas.DataTypeDef.GMonth, "gMonth" },
-                { Aas.DataTypeDef.GMonthDay, "gMonthDay" },
-                { Aas.DataTypeDef.HeyBinary, "heyBinary" },
-                { Aas.DataTypeDef.Notation, "NOTATION" },
-                { Aas.DataTypeDef.QName, "QName" },
-                { Aas.DataTypeDef.String, "string" },
-                { Aas.DataTypeDef.Time, "time" },
-                { Aas.DataTypeDef.NormalizedString, "normalizedString" },
-                { Aas.DataTypeDef.Token, "token" },
-                { Aas.DataTypeDef.Language, "Language" },
-                { Aas.DataTypeDef.NCName, "NCName" },
-                { Aas.DataTypeDef.Entity, "ENTITY" },
-                { Aas.DataTypeDef.Id, "ID" },
-                { Aas.DataTypeDef.Idref, "IDREF" }
-            });
-
-        /// <summary>
-        /// Retrieve the string representation of <paramref name="that" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
-        /// </remarks>
-        public static string? ToString(Aas.DataTypeDef that)
-        {
-            if (_dataTypeDefToString.TryGetValue(that, out string? value))
-            {
-                return value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static readonly Dictionary<string, Aas.DataTypeDef> _dataTypeDefFromString = (
-            new Dictionary<string, Aas.DataTypeDef>()
-            {
-                { "ENTITIES", Aas.DataTypeDef.Entities },
-                { "IDREFS", Aas.DataTypeDef.IdRefs },
-                { "NMTOKENS", Aas.DataTypeDef.NMTokens },
-                { "integer", Aas.DataTypeDef.Integer },
-                { "long", Aas.DataTypeDef.Long },
-                { "int", Aas.DataTypeDef.Int },
-                { "short", Aas.DataTypeDef.Short },
-                { "byte", Aas.DataTypeDef.Byte },
-                { "NonNegativeInteger", Aas.DataTypeDef.NonNegativeInteger },
-                { "positiveInteger", Aas.DataTypeDef.PositiveInteger },
-                { "unsignedInteger", Aas.DataTypeDef.UnsignedInteger },
-                { "unsignedLong", Aas.DataTypeDef.UnsignedLong },
-                { "unsignedInt", Aas.DataTypeDef.UnsignedInt },
-                { "unsignedShort", Aas.DataTypeDef.UnsignedShort },
-                { "unsignedByte", Aas.DataTypeDef.UnsignedByte },
-                { "nonPositiveInteger", Aas.DataTypeDef.NonPositiveInteger },
-                { "negativeInteger", Aas.DataTypeDef.NegativeInteger },
-                { "dayTimeDuration", Aas.DataTypeDef.DayTimeDuration },
-                { "yearMonthDuration", Aas.DataTypeDef.YearMonthDuration },
-                { "anyURI", Aas.DataTypeDef.AnyUri },
-                { "base64Binary", Aas.DataTypeDef.Base64Binary },
-                { "boolean", Aas.DataTypeDef.Boolean },
-                { "date", Aas.DataTypeDef.Date },
-                { "dateTime", Aas.DataTypeDef.DateTime },
-                { "decimal", Aas.DataTypeDef.Decimal },
-                { "double", Aas.DataTypeDef.Double },
-                { "duration", Aas.DataTypeDef.Duration },
-                { "float", Aas.DataTypeDef.Float },
-                { "gDay", Aas.DataTypeDef.GDay },
-                { "gMonth", Aas.DataTypeDef.GMonth },
-                { "gMonthDay", Aas.DataTypeDef.GMonthDay },
-                { "heyBinary", Aas.DataTypeDef.HeyBinary },
-                { "NOTATION", Aas.DataTypeDef.Notation },
-                { "QName", Aas.DataTypeDef.QName },
-                { "string", Aas.DataTypeDef.String },
-                { "time", Aas.DataTypeDef.Time },
-                { "normalizedString", Aas.DataTypeDef.NormalizedString },
-                { "token", Aas.DataTypeDef.Token },
-                { "Language", Aas.DataTypeDef.Language },
-                { "NCName", Aas.DataTypeDef.NCName },
-                { "ENTITY", Aas.DataTypeDef.Entity },
-                { "ID", Aas.DataTypeDef.Id },
-                { "IDREF", Aas.DataTypeDef.Idref }
-            });
-
-        /// <summary>
-        /// Parse the string representation of <see cref="DataTypeDef" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation
-        /// of a literal of <see cref="DataTypeDef" />,
-        /// return <c>null</c>.
-        /// </remarks>
-        public static Aas.DataTypeDef? DataTypeDefFromString(string text)
-        {
-            if (_dataTypeDefFromString.TryGetValue(text, out DataTypeDef value))
             {
                 return value;
             }
