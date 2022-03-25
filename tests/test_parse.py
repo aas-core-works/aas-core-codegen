@@ -428,9 +428,9 @@ class Test_against_recorded(unittest.TestCase):
                 error_str = tests.common.most_underlying_messages(error)
 
                 if Test_against_recorded.RERECORD:
-                    expected_error_pth.write_text(error_str)
+                    expected_error_pth.write_text(error_str, encoding="utf-8")
                 else:
-                    expected_error_str = expected_error_pth.read_text()
+                    expected_error_str = expected_error_pth.read_text(encoding="utf-8")
                     self.assertEqual(expected_error_str, error_str, f"{case_dir=}")
 
             else:
@@ -445,9 +445,13 @@ class Test_against_recorded(unittest.TestCase):
                 symbol_table_str = parse.dump(symbol_table)
 
                 if Test_against_recorded.RERECORD:
-                    expected_symbol_table_pth.write_text(symbol_table_str)
+                    expected_symbol_table_pth.write_text(
+                        symbol_table_str, encoding="utf-8"
+                    )
                 else:
-                    expected_symbol_table_str = expected_symbol_table_pth.read_text()
+                    expected_symbol_table_str = expected_symbol_table_pth.read_text(
+                        encoding="utf-8"
+                    )
                     self.assertEqual(
                         expected_symbol_table_str,
                         symbol_table_str,

@@ -79,10 +79,12 @@ class Test_against_recorded(unittest.TestCase):
                 )
 
                 if Test_against_recorded.RERECORD:
-                    stdout_pth.write_text(normalized_stdout)
+                    stdout_pth.write_text(normalized_stdout, encoding="utf-8")
                 else:
                     self.assertEqual(
-                        normalized_stdout, stdout_pth.read_text(), stdout_pth
+                        normalized_stdout,
+                        stdout_pth.read_text(encoding="utf-8"),
+                        stdout_pth,
                     )
 
                 # BEFORE-RELEASE (mristin, 2021-12-13):

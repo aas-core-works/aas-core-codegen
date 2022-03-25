@@ -89,7 +89,8 @@ def main() -> int:
                     </PropertyGroup>
                 </Project>
                 """
-                )
+                ),
+                encoding="utf-8",
             )
 
             print("Calling dotnet build...")
