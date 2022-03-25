@@ -1708,9 +1708,11 @@ def _enum_to_symbol(
                 None,
                 Error(
                     node.body[cursor],
-                    f"Expected either a docstring or an assignment "
+                    f"Expected either a docstring at the beginning or an assignment "
                     f"in an enumeration, "
-                    f"but got: {atok.get_text(node.body[cursor])}",
+                    f"but got the body element {type(node.body[cursor])} "
+                    f"at index {cursor} of the class definition {node.name!r}: "
+                    f"{atok.get_text(node.body[cursor])}",
                 ),
             )
 
