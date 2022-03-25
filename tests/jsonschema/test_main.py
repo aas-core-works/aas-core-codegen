@@ -79,10 +79,12 @@ class Test_against_recorded(unittest.TestCase):
                 )
 
                 if Test_against_recorded.RERECORD:
-                    stdout_pth.write_text(normalized_stdout)
+                    stdout_pth.write_text(normalized_stdout, encoding="utf-8")
                 else:
                     self.assertEqual(
-                        normalized_stdout, stdout_pth.read_text(), stdout_pth
+                        normalized_stdout,
+                        stdout_pth.read_text(encoding="utf-8"),
+                        stdout_pth,
                     )
 
                 # BEFORE-RELEASE (mristin, 2021-12-13):
@@ -99,11 +101,13 @@ class Test_against_recorded(unittest.TestCase):
                         )
 
                     if Test_against_recorded.RERECORD:
-                        expected_pth.write_text(output_pth.read_text())
+                        expected_pth.write_text(
+                            output_pth.read_text(encoding="utf-8"), encoding="utf-8"
+                        )
                     else:
                         self.assertEqual(
-                            expected_pth.read_text(),
-                            output_pth.read_text(),
+                            expected_pth.read_text(encoding="utf-8"),
+                            output_pth.read_text(encoding="utf-8"),
                             f"The files {expected_pth} and {output_pth} do not match.",
                         )
 

@@ -47,7 +47,7 @@ def read_from_directory(
             continue
 
         key = ImplementationKey(maybe_key)
-        value = Stripped(pth.read_text().strip())
+        value = Stripped(pth.read_text(encoding="utf-8").strip())
         mapping[key] = value
 
     if errors:

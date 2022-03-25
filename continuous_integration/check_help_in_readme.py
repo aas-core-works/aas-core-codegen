@@ -183,7 +183,7 @@ def main() -> int:
         result.extend(lines[previous_block.end_line_idx :])
         result.append("")  # new line at the end of file
 
-        pth.write_text("\n".join(result))
+        pth.write_text("\n".join(result), encoding="utf-8")
 
     else:
         for block in blocks:

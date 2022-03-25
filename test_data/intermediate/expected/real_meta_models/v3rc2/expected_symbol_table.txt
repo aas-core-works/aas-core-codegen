@@ -2581,7 +2581,7 @@ SymbolTable(
       description=SymbolDescription(
         summary='<paragraph>Identifying meta data of the asset that is represented by an AAS.</paragraph>',
         remarks=[
-          '<paragraph>The asset may either represent an asset type or an asset instance. The asset has\na globally unique identifier plus ñ if needed ñ additional domain-specific\n(proprietary) identifiers. However, to support the corner case of very first\nphase of lifecycle where a stabilised/constant global asset identifier does not\nalready exist, the corresponding attribute <AttributeReference refuri="~global_asset_ID">~global_asset_ID</AttributeReference> is optional.</paragraph>'],
+          '<paragraph>The asset may either represent an asset type or an asset instance. The asset has\na globally unique identifier plus ‚Äì if needed ‚Äì additional domain-specific\n(proprietary) identifiers. However, to support the corner case of very first\nphase of lifecycle where a stabilised/constant global asset identifier does not\nalready exist, the corresponding attribute <AttributeReference refuri="~global_asset_ID">~global_asset_ID</AttributeReference> is optional.</paragraph>'],
         constraints_by_identifier=[],
         parsed=...),
       parsed=...,
@@ -2663,7 +2663,7 @@ SymbolTable(
             constraints_by_identifier=[
               [
                 'AASd-116',
-                '<field_body><paragraph>ìglobalAssetIdî (case-insensitive) is a reserved key. If used\nas value for IdentifierKeyValuePair/key IdentifierKeyValuePair/value shall be\nidentical to AssetInformation/globalAssetId.</paragraph></field_body>']],
+                '<field_body><paragraph>‚ÄúglobalAssetId‚Äù (case-insensitive) is a reserved key. If used\nas value for IdentifierKeyValuePair/key IdentifierKeyValuePair/value shall be\nidentical to AssetInformation/globalAssetId.</paragraph></field_body>']],
             parsed=...),
           specified_for='Reference to ConcreteClass Identifier_key_value_pair',
           parsed=...),
@@ -7121,7 +7121,7 @@ SymbolTable(
             symbol='Reference to symbol MIME_typed',
             parsed=...),
           description=PropertyDescription(
-            summary='<paragraph>Mime type of the content of the BLOB.\nThe mime type states which file extensions the file can have.\nValid values are e.g. ìapplication/jsonî, ìapplication/xlsî, îimage/jpgî\nThe allowed values are defined as in RFC2046.</paragraph>',
+            summary='<paragraph>Mime type of the content of the BLOB.\nThe mime type states which file extensions the file can have.\nValid values are e.g. ‚Äúapplication/json‚Äù, ‚Äúapplication/xls‚Äù, ‚Äùimage/jpg‚Äù\nThe allowed values are defined as in RFC2046.</paragraph>',
             remarks=[],
             constraints_by_identifier=[],
             parsed=...),
@@ -8296,7 +8296,7 @@ SymbolTable(
             constraints_by_identifier=[
               [
                 'AASd-014',
-                '<field_body><paragraph>Either the attribute globalAssetId or specificAssetId of an\nEntity must be set if Entity/entityType is set to ìSelfManagedEntityî. They are\nnot existing otherwise.</paragraph></field_body>']],
+                '<field_body><paragraph>Either the attribute globalAssetId or specificAssetId of an\nEntity must be set if Entity/entityType is set to ‚ÄúSelfManagedEntity‚Äù. They are\nnot existing otherwise.</paragraph></field_body>']],
             parsed=...),
           specified_for='Reference to ConcreteClass Entity',
           parsed=...),
@@ -11407,7 +11407,7 @@ SymbolTable(
           description=EnumerationLiteralDescription(
             summary='<paragraph>Data Element.</paragraph>',
             remarks=[
-              '<note><paragraph>Data Element is abstract, <emphasis>i.e.</emphasis> if a key uses ìDataElementî the reference may\nbe a Property, a File etc.</paragraph></note>'],
+              '<note><paragraph>Data Element is abstract, <emphasis>i.e.</emphasis> if a key uses ‚ÄúDataElement‚Äù the reference may\nbe a Property, a File etc.</paragraph></note>'],
             parsed=...),
           parsed=...),
         EnumerationLiteral(
@@ -11497,7 +11497,7 @@ SymbolTable(
           description=EnumerationLiteralDescription(
             summary='<paragraph>Submodel Element</paragraph>',
             remarks=[
-              '<note><paragraph>Submodel Element is abstract, i.e. if a key uses ìSubmodelElementî\nthe reference may be a Property, a SubmodelElementList,\nan Operation etc.</paragraph></note>'],
+              '<note><paragraph>Submodel Element is abstract, i.e. if a key uses ‚ÄúSubmodelElement‚Äù\nthe reference may be a Property, a SubmodelElementList,\nan Operation etc.</paragraph></note>'],
             parsed=...),
           parsed=...),
         EnumerationLiteral(
@@ -12271,7 +12271,7 @@ SymbolTable(
           name='IRDI',
           value='IRDI',
           description=EnumerationLiteralDescription(
-            summary='<paragraph>values conforming to ISO/IEC 11179 series global identifier sequences IRDI can be\nused instead of the more specific data types ICID or ISO29002_IRDI. ICID values are\nvalue conformant to an IRDI, where the delimiter between RAI and ID is ì#î while the\ndelimiter between DI and VI is confined to ì##î ISO29002_IRDI values are values\ncontaining a global identifier that identifies an administrated item in a registry.\nThe structure of this identifier complies with identifier syntax defined in ISO/TS\n29002-5. The identifier shall fulfill the requirements specified in ISO/TS 29002-5\nfor an "international registration data identifier" (IRDI).</paragraph>',
+            summary='<paragraph>values conforming to ISO/IEC 11179 series global identifier sequences IRDI can be\nused instead of the more specific data types ICID or ISO29002_IRDI. ICID values are\nvalue conformant to an IRDI, where the delimiter between RAI and ID is ‚Äú#‚Äù while the\ndelimiter between DI and VI is confined to ‚Äú##‚Äù ISO29002_IRDI values are values\ncontaining a global identifier that identifies an administrated item in a registry.\nThe structure of this identifier complies with identifier syntax defined in ISO/TS\n29002-5. The identifier shall fulfill the requirements specified in ISO/TS 29002-5\nfor an "international registration data identifier" (IRDI).</paragraph>',
             remarks=[],
             parsed=...),
           parsed=...),
@@ -12327,7 +12327,7 @@ SymbolTable(
           name='Blob',
           value='BLOB',
           description=EnumerationLiteralDescription(
-            summary='<paragraph>values containing the content of a file. Values may be binaries.\nHTML conformant to HTML5 is a special blob. In IEC61360 binary is for a sequence of\nbits, each bit being represented by ì0î and ì1î only. A binary is a blob but a blob\nmay also contain other source code.</paragraph>',
+            summary='<paragraph>values containing the content of a file. Values may be binaries.\nHTML conformant to HTML5 is a special blob. In IEC61360 binary is for a sequence of\nbits, each bit being represented by ‚Äú0‚Äù and ‚Äú1‚Äù only. A binary is a blob but a blob\nmay also contain other source code.</paragraph>',
             remarks=[],
             parsed=...),
           parsed=...)],
