@@ -1,1 +1,1 @@
-Expected either a docstring or an assignment in an enumeration, but got: some_func()
+Expected either a docstring at the beginning or an assignment in an enumeration, but got the body element <class '_ast.Expr'> at index 1 of the class definition 'Some_enum': some_func()
