@@ -1582,6 +1582,19 @@ SymbolTable(
         name='__init__',
         arguments=[
           Argument(
+            name='data_specifications',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Reference',
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            default=DefaultConstant(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
             name='version',
             type_annotation=OptionalTypeAnnotation(
               value=OurTypeAnnotation(
@@ -1597,19 +1610,6 @@ SymbolTable(
             type_annotation=OptionalTypeAnnotation(
               value=OurTypeAnnotation(
                 symbol='Reference to symbol Non_empty_string',
-                parsed=...),
-              parsed=...),
-            default=DefaultConstant(
-              value=None,
-              parsed=...),
-            parsed=...),
-          Argument(
-            name='data_specifications',
-            type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Reference',
-                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -1941,6 +1941,17 @@ SymbolTable(
             default=None,
             parsed=...),
           Argument(
+            name='semantic_ID',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Reference',
+                parsed=...),
+              parsed=...),
+            default=DefaultConstant(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
             name='value',
             type_annotation=OptionalTypeAnnotation(
               value=OurTypeAnnotation(
@@ -1953,17 +1964,6 @@ SymbolTable(
             parsed=...),
           Argument(
             name='value_ID',
-            type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Reference',
-                parsed=...),
-              parsed=...),
-            default=DefaultConstant(
-              value=None,
-              parsed=...),
-            parsed=...),
-          Argument(
-            name='semantic_ID',
             type_annotation=OptionalTypeAnnotation(
               value=OurTypeAnnotation(
                 symbol='Reference to symbol Reference',
@@ -2289,10 +2289,12 @@ SymbolTable(
             default=None,
             parsed=...),
           Argument(
-            name='ID_short',
+            name='extensions',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Non_empty_string',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Extension',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -2300,12 +2302,10 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='extensions',
+            name='ID_short',
             type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Extension',
-                  parsed=...),
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -2712,7 +2712,7 @@ SymbolTable(
             default=None,
             parsed=...),
           Argument(
-            name='external_subject_ID',
+            name='semantic_ID',
             type_annotation=OptionalTypeAnnotation(
               value=OurTypeAnnotation(
                 symbol='Reference to symbol Reference',
@@ -2723,7 +2723,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='semantic_ID',
+            name='external_subject_ID',
             type_annotation=OptionalTypeAnnotation(
               value=OurTypeAnnotation(
                 symbol='Reference to symbol Reference',
@@ -2983,36 +2983,23 @@ SymbolTable(
             default=None,
             parsed=...),
           Argument(
-            name='ID_short',
-            type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Non_empty_string',
-                parsed=...),
-              parsed=...),
-            default=DefaultConstant(
-              value=None,
-              parsed=...),
-            parsed=...),
-          Argument(
-            name='submodel_elements',
-            type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Submodel_element',
-                  parsed=...),
-                parsed=...),
-              parsed=...),
-            default=DefaultConstant(
-              value=None,
-              parsed=...),
-            parsed=...),
-          Argument(
             name='extensions',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
                   symbol='Reference to symbol Extension',
                   parsed=...),
+                parsed=...),
+              parsed=...),
+            default=DefaultConstant(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='ID_short',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -3104,6 +3091,19 @@ SymbolTable(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
                   symbol='Reference to symbol Reference',
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            default=DefaultConstant(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='submodel_elements',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Submodel_element',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -5675,10 +5675,12 @@ SymbolTable(
             default=None,
             parsed=...),
           Argument(
-            name='ID_short',
+            name='extensions',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Non_empty_string',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Extension',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -5686,12 +5688,10 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='extensions',
+            name='ID_short',
             type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Extension',
-                  parsed=...),
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -6048,10 +6048,12 @@ SymbolTable(
         name='__init__',
         arguments=[
           Argument(
-            name='ID_short',
+            name='extensions',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Non_empty_string',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Extension',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -6059,12 +6061,10 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='extensions',
+            name='ID_short',
             type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Extension',
-                  parsed=...),
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -6438,10 +6438,12 @@ SymbolTable(
             default=None,
             parsed=...),
           Argument(
-            name='ID_short',
+            name='extensions',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Non_empty_string',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Extension',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -6449,12 +6451,10 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='extensions',
+            name='ID_short',
             type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Extension',
-                  parsed=...),
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -6794,10 +6794,12 @@ SymbolTable(
         name='__init__',
         arguments=[
           Argument(
-            name='ID_short',
+            name='extensions',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Non_empty_string',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Extension',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -6805,12 +6807,10 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='extensions',
+            name='ID_short',
             type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Extension',
-                  parsed=...),
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -7154,10 +7154,12 @@ SymbolTable(
             default=None,
             parsed=...),
           Argument(
-            name='ID_short',
+            name='extensions',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Non_empty_string',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Extension',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -7165,12 +7167,10 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='extensions',
+            name='ID_short',
             type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Extension',
-                  parsed=...),
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -7519,10 +7519,12 @@ SymbolTable(
             default=None,
             parsed=...),
           Argument(
-            name='ID_short',
+            name='extensions',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Non_empty_string',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Extension',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -7530,12 +7532,10 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='extensions',
+            name='ID_short',
             type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Extension',
-                  parsed=...),
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -9176,10 +9176,12 @@ SymbolTable(
             default=None,
             parsed=...),
           Argument(
-            name='ID_short',
+            name='extensions',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Non_empty_string',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Extension',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -9187,12 +9189,10 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='extensions',
+            name='ID_short',
             type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Extension',
-                  parsed=...),
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -10263,10 +10263,12 @@ SymbolTable(
             default=None,
             parsed=...),
           Argument(
-            name='ID_short',
+            name='extensions',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Non_empty_string',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Extension',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -10274,12 +10276,10 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='extensions',
+            name='ID_short',
             type_annotation=OptionalTypeAnnotation(
-              value=ListTypeAnnotation(
-                items=OurTypeAnnotation(
-                  symbol='Reference to symbol Extension',
-                  parsed=...),
+              value=OurTypeAnnotation(
+                symbol='Reference to symbol Non_empty_string',
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -10331,7 +10331,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='is_case_of',
+            name='data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
@@ -10344,7 +10344,7 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='is_case_of',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
