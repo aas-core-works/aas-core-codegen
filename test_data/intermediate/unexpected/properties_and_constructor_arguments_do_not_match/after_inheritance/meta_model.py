@@ -6,11 +6,11 @@ class SomethingAbstract:
     property_d: Optional[str]
 
     def __init__(
-            self,
-            property_a: str,
-            property_b: str,
-            property_c: Optional[str] = None,
-            property_d: Optional[str] = None
+        self,
+        property_a: str,
+        property_b: str,
+        property_c: Optional[str] = None,
+        property_d: Optional[str] = None,
     ) -> None:
         self.property_a = property_a
         self.property_b = property_b
@@ -30,22 +30,22 @@ class Something(SomethingAbstract):
     # the constructor arguments.
 
     def __init__(
-            self,
-            property_e: str,
-            property_f: str,
-            property_a: str,
-            property_b: str,
-            property_g: Optional[str] = None,
-            property_h: Optional[str] = None,
-            property_c: Optional[str] = None,
-            property_d: Optional[str] = None
+        self,
+        property_e: str,
+        property_f: str,
+        property_a: str,
+        property_b: str,
+        property_g: Optional[str] = None,
+        property_h: Optional[str] = None,
+        property_c: Optional[str] = None,
+        property_d: Optional[str] = None,
     ) -> None:
         SomethingAbstract.__init__(
             self,
             property_a=property_a,
             property_b=property_b,
             property_c=property_c,
-            property_d=property_d
+            property_d=property_d,
         )
 
         self.property_e = property_e

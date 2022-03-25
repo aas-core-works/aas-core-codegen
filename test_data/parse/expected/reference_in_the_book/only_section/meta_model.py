@@ -1,4 +1,4 @@
-@reference_in_the_book(section=(1,2,3))
+@reference_in_the_book(section=(1, 2, 3))
 class Something:
     @implementation_specific
     def __init__(self) -> None:
