@@ -105,6 +105,7 @@ def main() -> int:
             "continuous_integration",
             "dev_scripts",
             "tests",
+            "test_data",
             "setup.py",
         ]
 
