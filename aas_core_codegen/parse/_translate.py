@@ -1704,14 +1704,15 @@ def _enum_to_symbol(
             cursor += 1
 
         else:
+
             return (
                 None,
                 Error(
                     node.body[cursor],
                     f"Expected either a docstring at the beginning or an assignment "
                     f"in an enumeration, "
-                    f"but got the body element {type(node.body[cursor])} "
-                    f"at index {cursor} of the class definition {node.name!r}: "
+                    f"but got an unexpected body element at index {cursor} "
+                    f"of the class definition {node.name!r}: "
                     f"{atok.get_text(node.body[cursor])}",
                 ),
             )
