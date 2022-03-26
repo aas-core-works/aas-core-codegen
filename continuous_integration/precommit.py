@@ -2,7 +2,6 @@
 
 """Run pre-commit checks on the repository."""
 import argparse
-import difflib
 import enum
 import os
 import pathlib
@@ -168,41 +167,19 @@ def main() -> int:
         Step.CHECK_TEST_META_MODELS_COINCIDE
         and Step.CHECK_TEST_META_MODELS_COINCIDE not in skips
     ):
-        groups = [
-            [
-                repo_root / "test_data/jsonschema/test_main/v3rc1/input/meta_model.py",
-                repo_root / "test_data/rdf_shacl/test_main/v3rc1/input/meta_model.py",
+        print("Checking that the test meta-models coincide...")
+        exit_code = call_and_report(
+            verb="check that the test meta-models coincide",
+            cmd=[
+                sys.executable,
+                "continuous_integration/check_test_meta_models_coincide.py",
             ],
-            [
-                repo_root / "test_data/csharp/test_main/v3rc2/input/meta_model.py",
-                (
-                    repo_root / "test_data/intermediate/"
-                    "expected/real_meta_models/v3rc2/meta_model.py"
-                ),
-                repo_root / "test_data/jsonschema/test_main/v3rc2/input/meta_model.py",
-                (
-                    repo_root / "test_data/parse/"
-                    "expected/real_meta_models/v3rc2/meta_model.py"
-                ),
-            ],
-        ]
-
-        for group in groups:
-            assert len(group) >= 1, "At least one path expected in a group."
-            expected = group[0].read_text(encoding="utf-8").splitlines()
-            for pth in group[1:]:
-                got = pth.read_text(encoding="utf-8").splitlines()
-                if expected != got:
-                    print(
-                        f"The files {group[0]} and {pth} do not match:", file=sys.stderr
-                    )
-                    diff = difflib.context_diff(
-                        expected, got, fromfile=str(group[0]), tofile=str(pth)
-                    )
-
-                    for line in diff:
-                        print(line, file=sys.stderr)
-                    return 1
+            cwd=repo_root,
+        )
+        if exit_code != 0:
+            return 1
+    else:
+        print("Skipped checking that the test meta-models coincide.")
 
     if Step.TEST in selects and Step.TEST not in skips:
         print("Testing...")
