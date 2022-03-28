@@ -359,12 +359,12 @@ def infer_constraints_by_class(
 
         # endregion
 
-        if len(errors) > 0:
-            return None, errors
-
         result[symbol] = ConstraintsByProperty(
             len_constraints_by_property=len_constraints_by_property,
             patterns_by_property=patterns_by_property,
         )
+
+    if len(errors) > 0:
+        return None, errors
 
     return result, None
