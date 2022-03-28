@@ -1,5 +1,5 @@
 """Merge constrained primitives as property constraints."""
-
+import collections
 from typing import Tuple, Optional, List, Mapping, MutableMapping, Sequence
 
 from icontract import ensure
@@ -112,10 +112,13 @@ def _infer_pattern_constraints_by_constrained_primitive(
     first_pass: MutableMapping[
         intermediate.ConstrainedPrimitive,
         List[infer_for_schema_pattern.PatternConstraint],
-    ] = dict()
+    ] = collections.OrderedDict()
 
     for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.ConstrainedPrimitive):
+        if (
+            isinstance(symbol, intermediate.ConstrainedPrimitive)
+            and symbol.constrainee is intermediate.PrimitiveType.STR
+        ):
             pattern_constraints = infer_for_schema_pattern.infer_patterns_on_self(
                 constrained_primitive=symbol,
                 pattern_verifications_by_name=pattern_verifications_by_name,
@@ -128,24 +131,28 @@ def _infer_pattern_constraints_by_constrained_primitive(
         List[infer_for_schema_pattern.PatternConstraint],
     ] = dict()
 
-    for symbol in symbol_table.symbols_topologically_sorted:
-        if isinstance(symbol, intermediate.ConstrainedPrimitive):
-            # NOTE (mristin, 2022-02-11):
-            # We make the copy in order to avoid bugs when we start processing
-            # the inheritances.
-            pattern_constraints = first_pass[symbol][:]
+    for symbol in first_pass:
+        # NOTE (mristin, 2022-02-11):
+        # We make the copy in order to avoid bugs when we start processing
+        # the inheritances.
+        pattern_constraints = first_pass[symbol][:]
 
-            for inheritance in symbol.inheritances:
-                inherited_pattern_constraints = second_pass.get(inheritance, None)
-                assert (
-                    inherited_pattern_constraints is not None
-                ), "Expected topological order"
+        for inheritance in symbol.inheritances:
+            assert inheritance in first_pass, (
+                f"We are processing the constrained primitive {symbol.name!r}. "
+                f"However, its parent, {inheritance.name!r}, has not been processed in "
+                f"the first pass. Something probably went wrong in the first pass."
+            )
 
-                pattern_constraints = (
-                    inherited_pattern_constraints + pattern_constraints
-                )
+            inherited_pattern_constraints = second_pass.get(inheritance, None)
+            assert inherited_pattern_constraints is not None, (
+                f"Expected topological order. However, the symbol {symbol.name!r} "
+                f"is being processed before one of its parents, {inheritance.name!r}."
+            )
 
-            second_pass[symbol] = pattern_constraints
+            pattern_constraints = inherited_pattern_constraints + pattern_constraints
+
+        second_pass[symbol] = pattern_constraints
 
     return second_pass
 
