@@ -285,7 +285,6 @@ def _match_len_constraint_on_property(
 ) -> Optional[_LenConstraintOnProperty]:
     """Match a len constraint on a property such as ``len(self.something) < 42``."""
     len_constraint_on_member_or_name = _match_len_constraint_on_member_or_name(node)
-
     if len_constraint_on_member_or_name:
         prop_name = infer_for_schema_common.match_property(
             len_constraint_on_member_or_name.member_or_name
@@ -489,7 +488,7 @@ LENGTHABLE_PRIMITIVES = frozenset(
 # fmt: on
 def infer_len_constraint_of_self(
     constrained_primitive: intermediate.ConstrainedPrimitive,
-) -> Tuple[Optional[LenConstraint], Optional[List[Error]],]:
+) -> Tuple[Optional[LenConstraint], Optional[List[Error]]]:
     """
     Infer the constraint on ``len(self)``.
 
