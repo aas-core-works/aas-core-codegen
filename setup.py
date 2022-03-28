@@ -55,6 +55,9 @@ setup(
     package_data={"aas_core_codegen": ["py.typed"]},
     data_files=[(".", ["LICENSE", "README.rst", "requirements.txt"])],
     entry_points={
-        "console_scripts": ["aas-core-codegen=aas_core_codegen.main:entry_point"]
+        "console_scripts": [
+            "aas-core-codegen=aas_core_codegen.main:entry_point",
+            "aas-core-codegen-smoke=aas_core_codegen.smoke.main:entry_point",
+        ]
     },
 )

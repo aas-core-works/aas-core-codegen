@@ -225,7 +225,7 @@ def main(prog: str) -> int:
     # as ``--version`` so we manually hard-wire.
     if "--version" in sys.argv and "--help" not in sys.argv:
         print(aas_core_codegen.__version__)
-        return 1
+        return 0
 
     args = parser.parse_args()
 
