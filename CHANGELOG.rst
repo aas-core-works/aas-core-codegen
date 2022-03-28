@@ -3,6 +3,11 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.6 (2022-03-28)
+==================
+* Script smoke-testing a meta-model (#119)
+* Fix swallowed errors in ``infer_for_schema`` (#118)
+
 0.0.5 (2022-03-28)
 ==================
 
