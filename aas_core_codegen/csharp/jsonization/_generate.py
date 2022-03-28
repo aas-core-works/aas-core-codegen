@@ -533,25 +533,29 @@ def _generate_from_method_for_class(
             # constructor. However, we can not have an optional property and a required
             # constructor argument as we then would not know how to create the instance.
 
-            # fmt: off
-            assert (
-                    intermediate.type_annotations_equal(
-                        arg.type_annotation,
-                        prop.type_annotation
-                    ) or intermediate.type_annotations_equal(
-                intermediate.beneath_optional(arg.type_annotation),
-                prop.type_annotation
-            )
-            ), (
-                f"Expected type annotation for property {prop.name!r} "
-                f"and constructor argument {arg.name!r} "
-                f"of the class {cls.name!r} to have matching types, "
-                f"but they do not: "
-                f"property type is {prop.type_annotation} "
-                f"and argument type is {arg.type_annotation}. "
-                f"Hence we do not know how to generate the call to the constructor."
-            )
-            # fmt: on
+            if not (
+                intermediate.type_annotations_equal(
+                    arg.type_annotation, prop.type_annotation
+                )
+                or intermediate.type_annotations_equal(
+                    intermediate.beneath_optional(arg.type_annotation),
+                    prop.type_annotation,
+                )
+            ):
+                errors.append(
+                    Error(
+                        arg.parsed.node,
+                        f"Expected type annotation for property {prop.name!r} "
+                        f"and constructor argument {arg.name!r} "
+                        f"of the class {cls.name!r} to have matching types, "
+                        f"but they do not: "
+                        f"property type is {prop.type_annotation} "
+                        f"and argument type is {arg.type_annotation}. "
+                        f"Hence we do not know how to generate the call "
+                        f"to the constructor in the JSON de-serialization.",
+                    )
+                )
+                continue
 
             arg_var = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
 
@@ -573,6 +577,9 @@ def _generate_from_method_for_class(
                 init_writer.write(",\n")
             else:
                 init_writer.write(");")
+
+        if len(errors) > 0:
+            return None, errors
 
         # endregion
 
