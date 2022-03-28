@@ -1,0 +1,2 @@
+Failed to infer the constraints by class for the schemas based on <meta_model.py>:
+* At line 2 and column 2: The property some_prop has conflicting invariants on the length: The exact length, 11, contradicts another exactly expected length 10.

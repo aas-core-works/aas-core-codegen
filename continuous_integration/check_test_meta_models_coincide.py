@@ -21,6 +21,7 @@ META_MODEL_GROUPS = collections.OrderedDict(
             [
                 _REPO_DIR / "test_data/jsonschema/test_main/v3rc1/input/meta_model.py",
                 _REPO_DIR / "test_data/rdf_shacl/test_main/v3rc1/input/meta_model.py",
+                _REPO_DIR / "test_data/smoke/test_main/expected/v3rc1.py",
             ],
         ),
         (
@@ -36,6 +37,7 @@ META_MODEL_GROUPS = collections.OrderedDict(
                     _REPO_DIR / "test_data/parse/"
                     "expected/real_meta_models/v3rc2/meta_model.py"
                 ),
+                _REPO_DIR / "test_data/smoke/test_main/expected/v3rc2.py",
             ],
         ),
     ]

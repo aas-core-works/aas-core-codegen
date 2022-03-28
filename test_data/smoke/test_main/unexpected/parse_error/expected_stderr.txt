@@ -1,0 +1,4 @@
+Failed to construct the symbol table from <meta_model.py>:
+* Failed to parse the meta-model
+    The book URL (given as assignment to ``__book_url__``) is missing
+    The book version (given as assignment to ``__book_version__``) is missing

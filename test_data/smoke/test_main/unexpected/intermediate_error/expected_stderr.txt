@@ -1,0 +1,4 @@
+Failed to translate the parsed symbol table to intermediate symbol table based on <meta_model.py>:
+* At line 1 and column 1: Failed to translate the parsed symbol table to an intermediate symbol table
+    At line 2 and column 2: The class 'Something' has one or more concrete descendants ('Concrete'), but its serialization setting ``with_model_type`` has not been set. We need to discriminate on model type at the de-serialization.
+    At line 6 and column 2: The class 'Concrete' needs to have serialization setting ``with_model_type`` set since it is among the concrete descendant classes of the class 'Something'. We need to discriminate on model type at the de-serialization
