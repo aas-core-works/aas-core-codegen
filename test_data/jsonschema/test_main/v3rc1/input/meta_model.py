@@ -1123,9 +1123,9 @@ class Submodel_element_collection(Submodel_element):
     """
     If allowDuplicates==true, then it is allowed that the collection contains several
     elements with the same semantics (i.e. the same semanticId).
-    
+
     Default = false
-    
+
     :constraint AASd-026:
         If allowDuplicates==false then it is not allowed that
         the collection contains several elements with the same semantics (i.e. the same
@@ -1705,7 +1705,7 @@ class Entity(Submodel_element):
     global_asset_ID: Optional["Reference"]
     """
     Reference to the asset the entity is representing.
-    
+
     :constraint AASd-014:
         Either the attribute globalAssetId or specificAssetId of an
         Entity must be set if Entity/entityType is set to “SelfManagedEntity”. They are
