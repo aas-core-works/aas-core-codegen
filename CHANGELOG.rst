@@ -3,6 +3,45 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.5 (2022-03-28)
+==================
+
+* Infer schema constraints only for strings (#115)
+* Return errors instead of raising in C# jsonization (#114)
+* Exclude ``ast`` class names from errors (#112)
+* Produce better errors on unexpected enum elements (#111)
+* Check the order of properties and constructor args (#107)
+* Extract structure information from docstrings (#106)
+* Handle ``all`` in intermediate representation (#95)
+* Introduce ``constraintref`` role in the docs (#71)
+* Parse ``reference_in_the_book`` (#69)
+* Remove ``ID`` from abbreviations in ``naming`` (#60)
+* Fix naming for set of symbols used in properties (#57)
+
+C#
+--
+* Refactor verification in ``IEnumerable`` in C# (#93)
+* Refactor errors to ``Reporting`` in C# (#92)
+* Generate JSON paths for C# jsonization errors (#91)
+* Optimize path handling in C# JSON deserialization (#90)
+* Re-write two-pass serialization based on NET6 (#89)
+
+JSON Schema
+-----------
+* Enforce base64 encoding for bytearrays in JSON (#87)
+* Fix ``ModelTypes`` enumeration in JSON (#82)
+* Remove ``*_abstract`` definitions from JSON (#78)
+* In-line constrained primitives in JSON Schema (#77)
+* Nest constrained primitives in JSON (#67)
+* Skip unused symbols in JSON schema (#58)
+* Use ``oneOf`` instead of ``anyOf`` in JSON schema (#56)
+* Add ``modelType`` in JSON schema (#55)
+* Remove redundant ``type`` property in JSON schema (#54)
+
+RDF+SHACL
+---------
+* Update RDF gen after review of V3RC01 (#62)
+
 0.0.4 (2022-02-17)
 ==================
 
