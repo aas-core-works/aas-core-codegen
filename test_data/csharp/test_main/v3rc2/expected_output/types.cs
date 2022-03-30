@@ -367,7 +367,8 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// string with values of enumerations DataTypeDefXsd, Data_type_def_Rdf
+    /// string with values of enumerations <see cref="DataTypeDefXsd" />,
+    /// <see cref="DataTypeDefRdf" />
     /// </summary>
     public enum DataTypeDef
     {
@@ -474,109 +475,36 @@ namespace AasCore.Aas3
         LangString
     }
 
-    /// <summary>
-    /// any xsd atomic type as specified via DataTypeDefXsd
-    /// </summary>
-    public enum ValueDataType
-    {
-        [EnumMember(Value = "xs:anyURI")]
-        AnyUri,
+    public class LangStringSet : IClass {
+        public IEnumerable<IClass> DescendOnce()
+        {
+            throw new System.NotImplementedException("TODO");
+        }
 
-        [EnumMember(Value = "xs:base64Binary")]
-        Base64Binary,
+        public IEnumerable<IClass> Descend()
+        {
+            throw new System.NotImplementedException("TODO");
+        }
 
-        [EnumMember(Value = "xs:boolean")]
-        Boolean,
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            throw new System.NotImplementedException("TODO");
+        }
 
-        [EnumMember(Value = "xs:date")]
-        Date,
+        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        {
+            throw new System.NotImplementedException("TODO");
+        }
 
-        [EnumMember(Value = "xs:dateTime")]
-        DateTime,
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            throw new System.NotImplementedException("TODO");
+        }
 
-        [EnumMember(Value = "xs:dateTimeStamp")]
-        DateTimeStamp,
-
-        [EnumMember(Value = "xs:decimal")]
-        Decimal,
-
-        [EnumMember(Value = "xs:double")]
-        Double,
-
-        [EnumMember(Value = "xs:duration")]
-        Duration,
-
-        [EnumMember(Value = "xs:float")]
-        Float,
-
-        [EnumMember(Value = "xs:gDay")]
-        GDay,
-
-        [EnumMember(Value = "xs:gMonth")]
-        GMonth,
-
-        [EnumMember(Value = "xs:gMonthDay")]
-        GMonthDay,
-
-        [EnumMember(Value = "xs:gYear")]
-        GYear,
-
-        [EnumMember(Value = "xs:gYearMonth")]
-        GYearMonth,
-
-        [EnumMember(Value = "xs:hexBinary")]
-        HexBinary,
-
-        [EnumMember(Value = "xs:string")]
-        String,
-
-        [EnumMember(Value = "xs:time")]
-        Time,
-
-        [EnumMember(Value = "xs:dayTimeDuration")]
-        DayTimeDuration,
-
-        [EnumMember(Value = "xs:yearMonthDuration")]
-        YearMonthDuration,
-
-        [EnumMember(Value = "xs:integer")]
-        Integer,
-
-        [EnumMember(Value = "xs:long")]
-        Long,
-
-        [EnumMember(Value = "xs:int")]
-        Int,
-
-        [EnumMember(Value = "xs:short")]
-        Short,
-
-        [EnumMember(Value = "xs:byte")]
-        Byte,
-
-        [EnumMember(Value = "xs:NonNegativeInteger")]
-        NonNegativeInteger,
-
-        [EnumMember(Value = "xs:positiveInteger")]
-        PositiveInteger,
-
-        [EnumMember(Value = "xs:unsignedLong")]
-        UnsignedLong,
-
-        [EnumMember(Value = "xs:unsignedInt")]
-        UnsignedInt,
-
-        [EnumMember(Value = "xs:unsignedShort")]
-        UnsignedShort,
-
-        [EnumMember(Value = "xs:unsignedByte")]
-        UnsignedByte,
-
-        [EnumMember(Value = "xs:nonPositiveInteger")]
-        NonPositiveInteger,
-
-        [EnumMember(Value = "xs:negativeInteger")]
-        NegativeInteger
+        public T Transform<C, T>(Visitation.ITransformerWithContext<C, T> transformer, C context)
+        {
+            throw new System.NotImplementedException("TODO");
+        }
     }
 
     /// <summary>
@@ -599,7 +527,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
     }
 
     /// <summary>
@@ -620,15 +548,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -650,10 +578,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -684,7 +612,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -743,11 +671,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
     }
 
     /// <summary>
@@ -793,14 +722,15 @@ namespace AasCore.Aas3
     /// <ul>
     ///     <li>
     ///     Constraint AASd-006:
-    ///     If both, the value and the valueId of a Qualifier are present then the value
-    ///     needs to be identical to the value of the referenced coded value in
-    ///     Qualifier/valueId.
+    ///     If both the <see cref="Qualifier.Value" /> and the <see cref="Qualifier.ValueId" /> of
+    ///     a <see cref="Qualifier" /> are present then the <see cref="Qualifier.Value" /> needs
+    ///     to be identical to the value of the referenced coded value
+    ///     in <see cref="Qualifier.ValueId" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-020:
-    ///     The value of Qualifier/value shall be consistent to the data type as defined in
-    ///     Qualifier/valueType
+    ///     The value of <see cref="Qualifier.Value" /> shall be consistent to the data type as
+    ///     defined in <see cref="Qualifier.ValueType" />.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -828,7 +758,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// The qualifier value is the value of the qualifier.
         /// </summary>
-        public ValueDataType? Value { get; set; }
+        public string? Value { get; set; }
 
         /// <summary>
         /// Reference to the global unique ID of a coded value.
@@ -921,7 +851,7 @@ namespace AasCore.Aas3
             string type,
             DataTypeDefXsd valueType,
             GlobalReference? semanticId = null,
-            ValueDataType? value = null,
+            string? value = null,
             GlobalReference? valueId = null)
         {
             SemanticId = semanticId;
@@ -947,8 +877,8 @@ namespace AasCore.Aas3
     /// <ul>
     ///     <li>
     ///     Constraint AASd-090:
-    ///     For data elements DataElement/category shall be one of the following values:
-    ///     CONSTANT, PARAMETER or VARIABLE.
+    ///     For data elements <see cref="IDataElement.Category" /> shall be one of the following
+    ///     values: <c>CONSTANT</c>, <c>PARAMETER</c> or <c>VARIABLE</c>.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -971,7 +901,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -980,15 +910,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -1010,10 +940,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -1044,7 +974,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -1080,11 +1010,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -1104,9 +1035,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -1114,9 +1058,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -1138,14 +1085,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -1160,14 +1132,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -1237,9 +1212,9 @@ namespace AasCore.Aas3
         public ReferenceElement(
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
@@ -1247,9 +1222,7 @@ namespace AasCore.Aas3
             List<GlobalReference>? dataSpecifications = null,
             IReference? value = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -1257,12 +1230,8 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
             Value = value;
         }
     }
@@ -1361,7 +1330,7 @@ namespace AasCore.Aas3
         public List<Key> Keys { get; set; }
 
         /// <summary>
-        /// SemanticId of the referenced model element.
+        /// <see cref="IHasSemantics.SemanticId" /> of the referenced model element.
         /// </summary>
         public GlobalReference? ReferredSemanticId { get; set; }
 
@@ -1565,7 +1534,7 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-077:
-        ///     The name of an extension within HasExtensions needs to be unique.
+        ///     The name of an extension within <see cref="IHasExtensions" /> needs to be unique.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -1582,7 +1551,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Value of the extension
         /// </summary>
-        public ValueDataType? Value { get; set; }
+        public string? Value { get; set; }
 
         /// <summary>
         /// Reference to an element the extension refers to.
@@ -1675,7 +1644,7 @@ namespace AasCore.Aas3
             string name,
             GlobalReference? semanticId = null,
             DataTypeDefXsd? valueType = null,
-            ValueDataType? value = null,
+            string? value = null,
             ModelReference? refersTo = null)
         {
             SemanticId = semanticId;
@@ -1748,10 +1717,9 @@ namespace AasCore.Aas3
     /// <ul>
     ///     <li>
     ///     Constraint AASd-005:
-    ///     If AdministrativeInformation/version is not specified than also
-    ///     AdministrativeInformation/revision shall be unspecified. This means, a revision
-    ///     requires a version. If there is no version there is no revision neither.
-    ///     Revision is optional.
+    ///     If <see cref="AdministrativeInformation.Version" /> is not specified than also <see cref="AdministrativeInformation.Revision" /> shall be
+    ///     unspecified. This means, a revision requires a version. If there is no version
+    ///     there is no revision neither. Revision is optional.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -1851,9 +1819,7 @@ namespace AasCore.Aas3
             string? version = null,
             string? revision = null)
         {
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
+            DataSpecifications = dataSpecifications;
             Version = version;
             Revision = revision;
         }
@@ -1870,7 +1836,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -1879,15 +1845,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -1909,10 +1875,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -1943,7 +1909,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -1989,7 +1955,7 @@ namespace AasCore.Aas3
         /// The asset of an AAS is typically described by one or more submodels.
         /// Temporarily no submodel might be assigned to the AAS.
         /// </remarks>
-        public List<ModelReference> Submodels { get; set; }
+        public List<ModelReference>? Submodels { get; set; }
 
         /// <summary>
         /// The reference to the AAS the AAS was derived from.
@@ -2002,9 +1968,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (Administration != null)
@@ -2022,9 +2001,12 @@ namespace AasCore.Aas3
 
             yield return AssetInformation;
 
-            foreach (var anItem in Submodels)
+            if (Submodels != null)
             {
-                yield return anItem;
+                foreach (var anItem in Submodels)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DerivedFrom != null)
@@ -2038,14 +2020,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -2082,14 +2089,17 @@ namespace AasCore.Aas3
                 yield return anItem;
             }
 
-            foreach (var anItem in Submodels)
+            if (Submodels != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Submodels)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -2147,18 +2157,16 @@ namespace AasCore.Aas3
             AssetInformation assetInformation,
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             AdministrativeInformation? administration = null,
             List<GlobalReference>? dataSpecifications = null,
             List<ModelReference>? submodels = null,
             ModelReference? derivedFrom = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -2166,27 +2174,24 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Id = id;
             Administration = administration;
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
+            DataSpecifications = dataSpecifications;
             DerivedFrom = derivedFrom;
             AssetInformation = assetInformation;
-            Submodels = (submodels != null)
-                ? submodels
-                : new List<ModelReference>();
+            Submodels = submodels;
         }
     }
 
     /// <summary>
-    /// In AssetInformation identifying meta data of the asset that is represented by an AAS
-    /// is defined.
+    /// In <see cref="AssetInformation" /> identifying meta data of the asset that is
+    /// represented by an AAS is defined.
     /// </summary>
     /// <remarks>
     /// The asset may either represent an asset type or an asset instance.
     /// The asset has a globally unique identifier plus – if needed – additional domain
     /// specific (proprietary) identifiers. However, to support the corner case of very
     /// first phase of lifecycle where a stabilised/constant global asset identifier does
-    /// not already exist, the corresponding attribute “globalAssetId” is optional.
+    /// not already exist, the corresponding attribute
+    /// <see cref="AssetInformation.GlobalAssetId" /> is optional.
     /// </remarks>
     public class AssetInformation : IClass
     {
@@ -2366,7 +2371,8 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// An IdentifierKeyValuePair describes a generic identifier as key-value pair.
+    /// An <see cref="IdentifierKeyValuePair" /> describes a generic identifier as
+    /// key-value pair.
     /// </summary>
     public class IdentifierKeyValuePair :
             IHasSemantics,
@@ -2508,7 +2514,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -2517,15 +2523,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -2547,10 +2553,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -2581,7 +2587,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -2631,11 +2637,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -2645,7 +2652,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// A submodel consists of zero or more submodel elements.
         /// </summary>
-        public List<ISubmodelElement> SubmodelElements { get; set; }
+        public List<ISubmodelElement>? SubmodelElements { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -2653,9 +2660,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (Administration != null)
@@ -2668,9 +2688,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -2681,9 +2704,12 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in SubmodelElements)
+            if (SubmodelElements != null)
             {
-                yield return anItem;
+                foreach (var anItem in SubmodelElements)
+                {
+                    yield return anItem;
+                }
             }
         }
 
@@ -2692,14 +2718,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -2725,14 +2776,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -2750,14 +2804,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in SubmodelElements)
+            if (SubmodelElements != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in SubmodelElements)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
         }
@@ -2803,9 +2860,9 @@ namespace AasCore.Aas3
             string id,
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             AdministrativeInformation? administration = null,
             ModelingKind? kind = null,
@@ -2814,9 +2871,7 @@ namespace AasCore.Aas3
             List<GlobalReference>? dataSpecifications = null,
             List<ISubmodelElement>? submodelElements = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -2826,15 +2881,9 @@ namespace AasCore.Aas3
             Administration = administration;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
-            SubmodelElements = (submodelElements != null)
-                ? submodelElements
-                : new List<ISubmodelElement>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
+            SubmodelElements = submodelElements;
         }
     }
 
@@ -2865,31 +2914,34 @@ namespace AasCore.Aas3
     /// <ul>
     ///     <li>
     ///     Constraint AASd-107:
-    ///     If a first level child element in a SubmodelElementList has a semanticId it
-    ///     shall be identical to SubmodelElementList/semanticIdListElement.
+    ///     If a first level child element in a <see cref="SubmodelElementList" /> has
+    ///     a <see cref="ISubmodelElement.SemanticId" /> it
+    ///     shall be identical to <see cref="SubmodelElementList.SemanticIdListElement" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-114:
-    ///     If two first level child elements in a SubmodelElementList have a semanticId
-    ///     then they shall be identical.
+    ///     If two first level child elements in a <see cref="SubmodelElementList" /> have
+    ///     a <see cref="ISubmodelElement.SemanticId" /> then they shall be identical.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-115:
-    ///     If a first level child element in a SubmodelElementList does not specify
-    ///     a semanticId then the value is assumed to be identical to
-    ///     SubmodelElementList/semanticIdListElement.
+    ///     If a first level child element in a <see cref="SubmodelElementList" /> does not
+    ///     specify a <see cref="ISubmodelElement.SemanticId" /> then the value is assumed to be
+    ///     identical to <see cref="SubmodelElementList.SemanticIdListElement" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-108:
-    ///     All first level child elements in a SubmodelElementList shall have the same
-    ///     submodel element type as specified in SubmodelElementList/typeValueListElement.
+    ///     All first level child elements in a <see cref="SubmodelElementList" /> shall have
+    ///     the same submodel element type as specified in <see cref="SubmodelElementList.TypeValueListElement" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-109:
-    ///     If SubmodelElementList/typeValueListElement equal to Property or Range
-    ///     SubmodelElementList/valueTypeListElement shall be set and all first level
-    ///     child elements in the SubmodelElementList shall have the the value type as
-    ///     specified in SubmodelElementList/valueTypeListElement.
+    ///     If <see cref="SubmodelElementList.TypeValueListElement" /> is equal to
+    ///     <see cref="SubmodelElementElements.Property" /> or
+    ///     <see cref="SubmodelElementElements.Range" />
+    ///     <see cref="SubmodelElementList.ValueTypeListElement" /> shall be set and all first
+    ///     level child elements in the <see cref="SubmodelElementList" /> shall have
+    ///     the value type as specified in <see cref="SubmodelElementList.ValueTypeListElement" />.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -2900,7 +2952,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -2909,15 +2961,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -2939,10 +2991,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -2973,7 +3025,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -3009,11 +3061,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -3026,10 +3079,12 @@ namespace AasCore.Aas3
         public SubmodelElementElements TypeValueListElement { get; set; }
 
         /// <summary>
-        /// Defines whether order in list is relevant. If orderRelevant = False then the list
-        /// is representing a set or a bag.
-        /// Default: True
+        /// Defines whether order in list is relevant. If <see cref="SubmodelElementList.OrderRelevant" /> = <c>False</c>
+        /// then the list is representing a set or a bag.
         /// </summary>
+        /// <remarks>
+        /// Default: <c>True</c>
+        /// </remarks>
         public bool? OrderRelevant { get; set; }
 
         /// <summary>
@@ -3054,9 +3109,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -3064,9 +3132,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -3096,14 +3167,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -3118,14 +3214,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -3210,9 +3309,9 @@ namespace AasCore.Aas3
             SubmodelElementElements typeValueListElement,
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
@@ -3223,9 +3322,7 @@ namespace AasCore.Aas3
             GlobalReference? semanticIdListElement = null,
             DataTypeDefXsd? valueTypeListElement = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -3233,17 +3330,11 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
             TypeValueListElement = typeValueListElement;
             OrderRelevant = orderRelevant;
-            Values = (values != null)
-                ? values
-                : new List<ISubmodelElement>();
+            Values = values;
             SemanticIdListElement = semanticIdListElement;
             ValueTypeListElement = valueTypeListElement;
         }
@@ -3260,7 +3351,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -3269,15 +3360,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -3299,10 +3390,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -3333,7 +3424,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -3369,11 +3460,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -3391,9 +3483,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -3401,9 +3506,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -3428,14 +3536,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -3450,14 +3583,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -3530,9 +3666,9 @@ namespace AasCore.Aas3
         public SubmodelElementStruct(
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
@@ -3540,9 +3676,7 @@ namespace AasCore.Aas3
             List<GlobalReference>? dataSpecifications = null,
             List<ISubmodelElement>? values = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -3550,15 +3684,9 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
-            Values = (values != null)
-                ? values
-                : new List<ISubmodelElement>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
+            Values = values;
         }
     }
 
@@ -3570,9 +3698,9 @@ namespace AasCore.Aas3
     /// <ul>
     ///     <li>
     ///     Constraint AASd-007:
-    ///     If both, the Property/value and the Property/valueId are present then the value
-    ///     of Property/value needs to be identical to the value of the referenced coded
-    ///     value in Property/valueId.
+    ///     If both, the <see cref="Property.Value" /> and the <see cref="Property.ValueId" /> are
+    ///     present then the value of <see cref="Property.Value" /> needs to be identical to
+    ///     the value of the referenced coded value in <see cref="Property.ValueId" />.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -3583,7 +3711,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -3592,15 +3720,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -3622,10 +3750,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -3656,7 +3784,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -3692,11 +3820,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -3711,7 +3840,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// The value of the property instance.
         /// </summary>
-        public ValueDataType? Value { get; set; }
+        public string? Value { get; set; }
 
         /// <summary>
         /// Reference to the global unique ID of a coded value.
@@ -3724,9 +3853,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -3734,9 +3876,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -3758,14 +3903,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -3780,14 +3950,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -3858,20 +4031,18 @@ namespace AasCore.Aas3
             DataTypeDefXsd valueType,
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
             List<Qualifier>? qualifiers = null,
             List<GlobalReference>? dataSpecifications = null,
-            ValueDataType? value = null,
+            string? value = null,
             GlobalReference? valueId = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -3879,12 +4050,8 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
             ValueType = valueType;
             Value = value;
             ValueId = valueId;
@@ -3899,9 +4066,9 @@ namespace AasCore.Aas3
     /// <ul>
     ///     <li>
     ///     Constraint AASd-012:
-    ///     If both, the MultiLanguageProperty/value and the MultiLanguageProperty/valueId
-    ///     are present then for each string in a specific language the meaning must be
-    ///     the same as specified in MultiLanguageProperty/valueId.
+    ///     If both the <see cref="MultiLanguageProperty.Value" /> and the <see cref="MultiLanguageProperty.ValueId" /> are present then for each
+    ///     string in a specific language the meaning must be the same as specified in
+    ///     <see cref="MultiLanguageProperty.ValueId" />.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -3912,7 +4079,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -3921,15 +4088,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -3951,10 +4118,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -3985,7 +4152,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -4021,11 +4188,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -4035,7 +4203,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// The value of the property instance.
         /// </summary>
-        public string? Value { get; set; }
+        public LangStringSet? Value { get; set; }
 
         /// <summary>
         /// Reference to the global unique ID of a coded value.
@@ -4048,9 +4216,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -4058,9 +4239,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -4069,6 +4253,11 @@ namespace AasCore.Aas3
                 {
                     yield return anItem;
                 }
+            }
+
+            if (Value != null)
+            {
+                yield return Value;
             }
 
             if (ValueId != null)
@@ -4082,14 +4271,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -4104,14 +4318,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -4126,6 +4343,17 @@ namespace AasCore.Aas3
                     {
                         yield return anotherItem;
                     }
+                }
+            }
+
+            if (Value != null)
+            {
+                yield return Value;
+
+                // Recurse
+                foreach (var anItem in Value.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -4181,20 +4409,18 @@ namespace AasCore.Aas3
         public MultiLanguageProperty(
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
             List<Qualifier>? qualifiers = null,
             List<GlobalReference>? dataSpecifications = null,
-            string? value = null,
+            LangStringSet? value = null,
             GlobalReference? valueId = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -4202,12 +4428,8 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
             Value = value;
             ValueId = valueId;
         }
@@ -4223,7 +4445,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -4232,15 +4454,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -4262,10 +4484,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -4296,7 +4518,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -4332,11 +4554,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -4352,13 +4575,13 @@ namespace AasCore.Aas3
         /// The minimum value of the range.
         /// If the min value is missing, then the value is assumed to be negative infinite.
         /// </summary>
-        public ValueDataType? Min { get; set; }
+        public string? Min { get; set; }
 
         /// <summary>
         /// The maximum value of the range.
         /// If the max value is missing,  then the value is assumed to be positive infinite.
         /// </summary>
-        public ValueDataType? Max { get; set; }
+        public string? Max { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -4366,9 +4589,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -4376,9 +4612,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -4395,14 +4634,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -4417,14 +4681,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -4484,20 +4751,18 @@ namespace AasCore.Aas3
             DataTypeDefXsd valueType,
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
             List<Qualifier>? qualifiers = null,
             List<GlobalReference>? dataSpecifications = null,
-            ValueDataType? min = null,
-            ValueDataType? max = null)
+            string? min = null,
+            string? max = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -4505,12 +4770,8 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
             ValueType = valueType;
             Min = min;
             Max = max;
@@ -4518,8 +4779,8 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// A BLOB is a data element that represents a file that is contained with its source
-    /// code in the value attribute.
+    /// A <see cref="Blob" /> is a data element that represents a file that is contained with its
+    /// source code in the value attribute.
     /// </summary>
     public class Blob :
             IDataElement,
@@ -4528,7 +4789,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -4537,15 +4798,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -4567,10 +4828,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -4601,7 +4862,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -4637,11 +4898,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -4649,19 +4911,21 @@ namespace AasCore.Aas3
         public List<GlobalReference>? DataSpecifications { get; set; }
 
         /// <summary>
-        /// Mime type of the content of the BLOB.
-        /// The mime type states which file extensions the file can have.
-        /// Valid values are e.g. “application/json”, “application/xls”, ”image/jpg”
-        /// The allowed values are defined as in RFC2046.
+        /// MIME type of the content of the <see cref="Blob" />.
         /// </summary>
+        /// <remarks>
+        /// The MIME type states which file extensions the file can have.
+        /// Valid values are e.g. <c>application/json</c>, <c>application/xls</c>, <c>image/jpg</c>.
+        /// The allowed values are defined as in RFC2046.
+        /// </remarks>
         public string MimeType { get; set; }
 
         /// <summary>
-        /// The value of the BLOB instance of a blob data element.
+        /// The value of the <see cref="Blob" /> instance of a blob data element.
         /// </summary>
         /// <remarks>
         /// In contrast to the file property the file content is stored directly as value
-        /// in the Blob data element.
+        /// in the <see cref="Blob" /> data element.
         /// </remarks>
         public byte[]? Value { get; set; }
 
@@ -4671,9 +4935,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -4681,9 +4958,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -4700,14 +4980,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -4722,14 +5027,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -4789,9 +5097,9 @@ namespace AasCore.Aas3
             string mimeType,
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
@@ -4799,9 +5107,7 @@ namespace AasCore.Aas3
             List<GlobalReference>? dataSpecifications = null,
             byte[]? value = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -4809,12 +5115,8 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
             MimeType = mimeType;
             Value = value;
         }
@@ -4833,7 +5135,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -4842,15 +5144,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -4872,10 +5174,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -4906,7 +5208,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -4942,11 +5244,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -4973,9 +5276,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -4983,9 +5299,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -5002,14 +5321,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -5024,14 +5368,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -5091,9 +5438,9 @@ namespace AasCore.Aas3
             string contentType,
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
@@ -5101,9 +5448,7 @@ namespace AasCore.Aas3
             List<GlobalReference>? dataSpecifications = null,
             string? value = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -5111,12 +5456,8 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
             ContentType = contentType;
             Value = value;
         }
@@ -5133,7 +5474,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -5142,15 +5483,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -5172,10 +5513,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -5206,7 +5547,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -5242,11 +5583,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -5267,7 +5609,7 @@ namespace AasCore.Aas3
         /// A data element that represents an annotation that holds for the relationship
         /// between the two elements
         /// </summary>
-        public List<IDataElement> Annotation { get; set; }
+        public List<IDataElement>? Annotation { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -5275,9 +5617,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -5285,9 +5640,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -5302,9 +5660,12 @@ namespace AasCore.Aas3
 
             yield return Second;
 
-            foreach (var anItem in Annotation)
+            if (Annotation != null)
             {
-                yield return anItem;
+                foreach (var anItem in Annotation)
+                {
+                    yield return anItem;
+                }
             }
         }
 
@@ -5313,14 +5674,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -5335,14 +5721,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -5376,14 +5765,17 @@ namespace AasCore.Aas3
                 yield return anItem;
             }
 
-            foreach (var anItem in Annotation)
+            if (Annotation != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Annotation)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
         }
@@ -5430,9 +5822,9 @@ namespace AasCore.Aas3
             IReference second,
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
@@ -5440,9 +5832,7 @@ namespace AasCore.Aas3
             List<GlobalReference>? dataSpecifications = null,
             List<IDataElement>? annotation = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -5450,17 +5840,11 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
             First = first;
             Second = second;
-            Annotation = (annotation != null)
-                ? annotation
-                : new List<IDataElement>();
+            Annotation = annotation;
         }
     }
 
@@ -5520,7 +5904,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -5529,15 +5913,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -5559,10 +5943,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -5593,7 +5977,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -5629,11 +6013,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -5641,21 +6026,22 @@ namespace AasCore.Aas3
         public List<GlobalReference>? DataSpecifications { get; set; }
 
         /// <summary>
-        /// Reference to the Referable, which defines the scope of the event. Can be AAS, Submodel
-        /// or SubmodelElement. Reference to a referable, e.g. a data element or a submodel, that
-        /// is being observed.
+        /// Reference to the <see cref="IReferable" />, which defines the scope of the event.
+        /// Can be <see cref="AssetAdministrationShell" />, <see cref="Submodel" />, or
+        /// <see cref="ISubmodelElement" />. Reference to a referable, e.g. a data element or
+        /// a submodel, that is being observed.
         /// </summary>
         public ModelReference Observed { get; set; }
 
         /// <summary>
         /// Direction of event.
-        /// Can be { Input, Output }.
+        /// Can be <c>{ Input, Output }</c>.
         /// </summary>
         public Direction Direction { get; set; }
 
         /// <summary>
         /// State of event.
-        /// Can be { On, Off }.
+        /// Can be <c>{ On, Off }</c>.
         /// </summary>
         public StateOfEvent State { get; set; }
 
@@ -5667,12 +6053,15 @@ namespace AasCore.Aas3
 
         /// <summary>
         /// Information, which outer message infrastructure shall handle messages for
-        /// the EventElement. Refers to a Submodel, SubmodelElementList, SubmodelElementStruct or
-        /// Entity, which contains DataElements describing the proprietary specification for
-        /// the message broker.
+        /// the <see cref="IEventElement" />.
         /// </summary>
         /// <remarks>
-        /// for different message infrastructure, e.g. OPC UA or MQTT or AMQP, these
+        /// Refers to a <see cref="Submodel" />, <see cref="SubmodelElementList" />,
+        /// <see cref="SubmodelElementStruct" /> or <see cref="Entity" />, which contains
+        /// <see cref="IDataElement" />'s describing the proprietary specification for
+        /// the message broker.
+        ///
+        /// For different message infrastructure, e.g. OPC UA or MQTT or AMQP, these
         /// proprietary specification could be standardized by having respective Submodels.
         /// </remarks>
         public ModelReference? MessageBroker { get; set; }
@@ -5705,9 +6094,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -5715,9 +6117,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -5741,14 +6146,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -5763,14 +6193,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -5851,9 +6284,9 @@ namespace AasCore.Aas3
             StateOfEvent state,
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
@@ -5865,9 +6298,7 @@ namespace AasCore.Aas3
             string? minInterval = null,
             string? maxInterval = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -5875,12 +6306,8 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
             Observed = observed;
             Direction = direction;
             State = state;
@@ -5902,24 +6329,29 @@ namespace AasCore.Aas3
     public class EventPayload : IClass
     {
         /// <summary>
-        /// Reference to the source event element, including identification of AAS, Submodel,
-        /// SubmodelElements.
+        /// Reference to the source event element, including identification of
+        /// <see cref="AssetAdministrationShell" />, <see cref="Submodel" />,
+        /// <see cref="ISubmodelElement" />'s.
         /// </summary>
         public ModelReference Source { get; set; }
 
         /// <summary>
-        /// semanticId of the source event element, if available
+        /// <see cref="IHasSemantics.SemanticId" /> of the source event element, if available
         /// </summary>
         public GlobalReference? SourceSemanticId { get; set; }
 
         /// <summary>
         /// Reference to the referable, which defines the scope of the event.
-        /// Can be AAS, Submodel or SubmodelElement.
         /// </summary>
+        /// <remarks>
+        /// Can be <see cref="AssetAdministrationShell" />, <see cref="Submodel" /> or
+        /// <see cref="ISubmodelElement" />.
+        /// </remarks>
         public ModelReference ObservableReference { get; set; }
 
         /// <summary>
-        /// semanticId of the referable which defines the scope of the event, if available.
+        /// <see cref="IHasSemantics.SemanticId" /> of the referable which defines the scope of
+        /// the event, if available.
         /// </summary>
         public GlobalReference? ObservableSemanticId { get; set; }
 
@@ -6113,9 +6545,9 @@ namespace AasCore.Aas3
     /// <ul>
     ///     <li>
     ///     Constraint AASd-014:
-    ///     Either the attribute globalAssetId or specificAssetId of an Entity must be set
-    ///     if Entity/entityType is set to “SelfManagedEntity”. They are not existing
-    ///     otherwise.
+    ///     Either the attribute <see cref="Entity.GlobalAssetId" /> or <see cref="Entity.SpecificAssetId" />
+    ///     of an <see cref="Entity" /> must be set if <see cref="Entity.EntityType" /> is set to
+    ///     <c>SelfManagedEntity</c>. They are not existing otherwise.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -6126,7 +6558,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -6135,15 +6567,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -6165,10 +6597,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -6199,7 +6631,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -6235,11 +6667,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -6274,9 +6707,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -6284,9 +6730,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -6321,14 +6770,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -6343,14 +6817,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -6446,9 +6923,9 @@ namespace AasCore.Aas3
             EntityType entityType,
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
@@ -6458,9 +6935,7 @@ namespace AasCore.Aas3
             IReference? globalAssetId = null,
             IdentifierKeyValuePair? specificAssetId = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -6468,15 +6943,9 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
-            Statements = (statements != null)
-                ? statements
-                : new List<ISubmodelElement>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
+            Statements = statements;
             EntityType = entityType;
             GlobalAssetId = globalAssetId;
             SpecificAssetId = specificAssetId;
@@ -6491,9 +6960,10 @@ namespace AasCore.Aas3
     /// <ul>
     ///     <li>
     ///     Constraint AASd-061:
-    ///     If the semanticId of a Event submodel element references a ConceptDescription
-    ///     then the category of the ConceptDescription shall be one of the following:
-    ///     EVENT.
+    ///     If the <see cref="IHasSemantics.SemanticId" /> of an <see cref="IEvent" /> references
+    ///     a <see cref="ConceptDescription" /> then the <see cref="ConceptDescription.Category" />
+    ///     of the <see cref="ConceptDescription" /> shall be one of the following:
+    ///     <c>EVENT</c>.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -6514,7 +6984,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -6523,15 +6993,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -6553,10 +7023,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -6587,7 +7057,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -6623,11 +7093,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -6646,9 +7117,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -6656,9 +7140,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -6677,14 +7164,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -6699,14 +7211,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -6774,18 +7289,16 @@ namespace AasCore.Aas3
             IReference observed,
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
             List<Qualifier>? qualifiers = null,
             List<GlobalReference>? dataSpecifications = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -6793,12 +7306,8 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
             Observed = observed;
         }
     }
@@ -6813,7 +7322,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -6822,15 +7331,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -6852,10 +7361,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -6886,7 +7395,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -6922,11 +7431,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -6954,9 +7464,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -6964,9 +7487,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -7007,14 +7533,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -7029,14 +7580,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -7137,9 +7691,9 @@ namespace AasCore.Aas3
         public Operation(
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
@@ -7149,9 +7703,7 @@ namespace AasCore.Aas3
             List<OperationVariable>? outputVariables = null,
             List<OperationVariable>? inoutputVariables = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -7159,21 +7711,11 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
-            InputVariables = (inputVariables != null)
-                ? inputVariables
-                : new List<OperationVariable>();
-            OutputVariables = (outputVariables != null)
-                ? outputVariables
-                : new List<OperationVariable>();
-            InoutputVariables = (inoutputVariables != null)
-                ? inoutputVariables
-                : new List<OperationVariable>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
+            InputVariables = inputVariables;
+            OutputVariables = outputVariables;
+            InoutputVariables = inoutputVariables;
         }
     }
 
@@ -7182,8 +7724,8 @@ namespace AasCore.Aas3
     /// of an operation.
     /// </summary>
     /// <remarks>
-    /// Note: OperationVariable is introduced as separate class to enable future extensions,
-    /// e.g. for adding a default value, cardinality (option/mandatory).
+    /// <see cref="OperationVariable" /> is introduced as separate class to enable future
+    /// extensions, e.g. for adding a default value, cardinality (option/mandatory).
     /// </remarks>
     public class OperationVariable : IClass
     {
@@ -7263,8 +7805,8 @@ namespace AasCore.Aas3
     /// asset to achieve a certain effect in the physical or virtual world.
     /// </summary>
     /// <remarks>
-    /// The semanticId of a capability is typically an ontology. Thus, reasoning on
-    /// capabilities is enabled.
+    /// The <see cref="Capability.SemanticId" /> of a capability is typically an ontology.
+    /// Thus, reasoning on capabilities is enabled.
     /// </remarks>
     public class Capability :
             ISubmodelElement,
@@ -7273,7 +7815,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -7282,15 +7824,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -7312,10 +7854,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -7346,7 +7888,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -7382,11 +7924,12 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-021:
-        ///     Every qualifiable can only have one qualifier with the same Qualifier/type.
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier> Qualifiers { get; set; }
+        public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -7399,9 +7942,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -7409,9 +7965,12 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DataSpecifications != null)
@@ -7428,14 +7987,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -7450,14 +8034,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in Qualifiers)
+            if (Qualifiers != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in Qualifiers)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -7516,18 +8103,16 @@ namespace AasCore.Aas3
         public Capability(
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             GlobalReference? semanticId = null,
             List<Qualifier>? qualifiers = null,
             List<GlobalReference>? dataSpecifications = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -7535,12 +8120,8 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = ModelingKind.Instance;
             SemanticId = semanticId;
-            Qualifiers = (qualifiers != null)
-                ? qualifiers
-                : new List<Qualifier>();
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
         }
     }
 
@@ -7554,11 +8135,12 @@ namespace AasCore.Aas3
     /// <ul>
     ///     <li>
     ///     Constraint AASd-051:
-    ///     A ConceptDescription shall have one of the following categories
-    ///     VALUE, PROPERTY, REFERENCE, DOCUMENT, CAPABILITY, RELATIONSHIP, COLLECTION,
-    ///     FUNCTION, EVENT, ENTITY, APPLICATION_CLASS, QUALIFIER, VIEW.
+    ///     A <see cref="ConceptDescription" /> shall have one of the following categories
+    ///     <c>VALUE</c>, <c>PROPERTY</c>, <c>REFERENCE</c>, <c>DOCUMENT</c>, <c>CAPABILITY</c>,
+    ///     <c>RELATIONSHIP</c>, <c>COLLECTION</c>, <c>FUNCTION</c>, <c>EVENT</c>, <c>ENTITY</c>,
+    ///     <c>APPLICATION_CLASS</c>, <c>QUALIFIER</c>, <c>VIEW</c>.
     ///
-    ///     Default: PROPERTY.
+    ///     Default: <c>PROPERTY</c>.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -7570,7 +8152,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -7579,15 +8161,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -7609,10 +8191,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -7643,7 +8225,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -7690,9 +8272,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (Administration != null)
@@ -7722,14 +8317,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -7814,17 +8434,15 @@ namespace AasCore.Aas3
             string id,
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             AdministrativeInformation? administration = null,
             List<GlobalReference>? dataSpecifications = null,
             List<GlobalReference>? isCaseOf = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
@@ -7832,12 +8450,8 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Id = id;
             Administration = administration;
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
-            IsCaseOf = (isCaseOf != null)
-                ? isCaseOf
-                : new List<GlobalReference>();
+            DataSpecifications = dataSpecifications;
+            IsCaseOf = isCaseOf;
         }
     }
 
@@ -7853,8 +8467,9 @@ namespace AasCore.Aas3
     /// <ul>
     ///     <li>
     ///     Constraint AASd-064:
-    ///     If the semanticId of a View references a ConceptDescription
-    ///     then the category of the ConceptDescription shall be VIEW.
+    ///     If the <see cref="View.SemanticId" /> references a <see cref="ConceptDescription" />
+    ///     then the <see cref="ConceptDescription.Category" /> of
+    ///     the <see cref="ConceptDescription" /> shall be <c>VIEW</c>.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -7867,7 +8482,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -7876,15 +8491,15 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the idShort is typically
-        /// identical to the short name in English.
+        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
+        /// is typically identical to the short name in English.
         ///
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-027:
-        ///     idShort of Referables shall have a maximum length of 128
-        ///     characters.
+        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
+        ///     of 128 characters.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -7906,10 +8521,10 @@ namespace AasCore.Aas3
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the idShort of the element</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
-        public string? DisplayName { get; set; }
+        public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -7940,7 +8555,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -7968,7 +8583,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Reference to a referable element that is contained in the view.
         /// </summary>
-        public List<IReference> ContainedElements { get; set; }
+        public List<IReference>? ContainedElements { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -7976,9 +8591,22 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (SemanticId != null)
@@ -7994,9 +8622,12 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in ContainedElements)
+            if (ContainedElements != null)
             {
-                yield return anItem;
+                foreach (var anItem in ContainedElements)
+                {
+                    yield return anItem;
+                }
             }
         }
 
@@ -8005,14 +8636,39 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Extensions)
+            if (Extensions != null)
             {
-                yield return anItem;
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
 
                 // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in DisplayName.Descend())
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
                 }
             }
 
@@ -8041,14 +8697,17 @@ namespace AasCore.Aas3
                 }
             }
 
-            foreach (var anItem in ContainedElements)
+            if (ContainedElements != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in ContainedElements)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
         }
@@ -8093,29 +8752,23 @@ namespace AasCore.Aas3
         public View(
             List<Extension>? extensions = null,
             string? idShort = null,
-            string? displayName = null,
+            LangStringSet? displayName = null,
             string? category = null,
-            string? description = null,
+            LangStringSet? description = null,
             string? checksum = null,
             GlobalReference? semanticId = null,
             List<GlobalReference>? dataSpecifications = null,
             List<IReference>? containedElements = null)
         {
-            Extensions = (extensions != null)
-                ? extensions
-                : new List<Extension>();
+            Extensions = extensions;
             IdShort = idShort;
             DisplayName = displayName;
             Category = category;
             Description = description;
             Checksum = checksum;
             SemanticId = semanticId;
-            DataSpecifications = (dataSpecifications != null)
-                ? dataSpecifications
-                : new List<GlobalReference>();
-            ContainedElements = (containedElements != null)
-                ? containedElements
-                : new List<IReference>();
+            DataSpecifications = dataSpecifications;
+            ContainedElements = containedElements;
         }
     }
 
@@ -8155,8 +8808,8 @@ namespace AasCore.Aas3
         /// Data Element.
         /// </summary>
         /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses “DataElement” the reference may
-        /// be a Property, a File etc.
+        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="SubmodelElementElements.DataElement" />
+        /// the reference may be a <see cref="Property" />, a <see cref="File" /> etc.
         /// </remarks>
         [EnumMember(Value = "DataElement")]
         DataElement,
@@ -8168,7 +8821,7 @@ namespace AasCore.Aas3
         /// Event element
         /// </summary>
         /// <remarks>
-        /// Event is abstract
+        /// <see cref="IEvent" /> is abstract.
         /// </remarks>
         [EnumMember(Value = "EventElement")]
         EventElement,
@@ -8210,9 +8863,9 @@ namespace AasCore.Aas3
         /// Submodel Element
         /// </summary>
         /// <remarks>
-        /// Submodel Element is abstract, i.e. if a key uses “SubmodelElement”
-        /// the reference may be a Property, a SubmodelElementList,
-        /// an Operation etc.
+        /// Submodel Element is abstract, i.e. if a key uses
+        /// <see cref="SubmodelElementElements.SubmodelElement" /> the reference may be a <see cref="Property" />,
+        /// a <see cref="SubmodelElementList" />, an <see cref="Operation" /> etc.
         /// </remarks>
         [EnumMember(Value = "SubmodelElement")]
         SubmodelElement,
@@ -8258,7 +8911,7 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="ReferableElements.DataElement" />
-        /// the reference may be a Property, a File <em>etc.</em>
+        /// the reference may be a <see cref="Property" />, a <see cref="File" /> <em>etc.</em>
         /// </remarks>
         [EnumMember(Value = "DataElement")]
         DataElement,
@@ -8316,8 +8969,7 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// Submodel Element is abstract, <em>i.e.</em> if a key uses <see cref="ReferableElements.SubmodelElement" />
-        /// the reference may be a Property, a SubmodelElementCollection,
-        /// an Operation <em>etc.</em>
+        /// the reference may be a <see cref="Property" />, an <see cref="Operation" /> <em>etc.</em>
         /// </remarks>
         [EnumMember(Value = "SubmodelElement")]
         SubmodelElement,
@@ -8431,8 +9083,7 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// Submodel Element is abstract, <em>i.e.</em> if a key uses <see cref="KeyElements.SubmodelElement" />
-        /// the reference may be a Property, a SubmodelElementCollection`,
-        /// an Operation <em>etc.</em>
+        /// the reference may be a <see cref="Property" />, an <see cref="Operation" /> <em>etc.</em>
         /// </remarks>
         [EnumMember(Value = "SubmodelElement")]
         SubmodelElement,
@@ -8467,9 +9118,11 @@ namespace AasCore.Aas3
     {
         /// <summary>
         /// values containing a calendar date, conformant to ISO 8601:2004 Format yyyy-mm-dd
+        /// </summary>
+        /// <remarks>
         /// Example from IEC 61360-1:2017: "1999-05-31" is the [DATE] representation of:
         /// 31 May 1999.
-        /// </summary>
+        /// </remarks>
         [EnumMember(Value = "DATE")]
         Date,
 
@@ -8631,21 +9284,21 @@ namespace AasCore.Aas3
     public class ValueReferencePair : IClass
     {
         /// <summary>
-        /// The value of the referenced concept definition of the value in valueId.
+        /// The value of the referenced concept definition of the value in <see cref="ValueReferencePair.ValueId" />.
         /// </summary>
         public string Value { get; set; }
 
         /// <summary>
-        /// Global unique id of the value.
+        /// Global unique ID of the value.
         /// </summary>
         /// <remarks>
         /// Constraints:
         /// <ul>
         ///     <li>
         ///     Constraint AASd-078:
-        ///     If the valueId of a ValueReferencePair references a
-        ///     ConceptDescription then the ConceptDescription/category shall be one of
-        ///     following values: VALUE.
+        ///     If the <see cref="ValueReferencePair.ValueId" /> of a <see cref="ValueReferencePair" /> references a
+        ///     <see cref="ConceptDescription" /> then the <see cref="ConceptDescription.Category" />
+        ///     shall be one of following values: <c>VALUE</c>.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -8728,7 +9381,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// A pair of a value together with its global unique id.
         /// </summary>
-        public List<ValueReferencePair> ValueReferencePairs { get; set; }
+        public List<ValueReferencePair>? ValueReferencePairs { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -8736,9 +9389,12 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in ValueReferencePairs)
+            if (ValueReferencePairs != null)
             {
-                yield return anItem;
+                foreach (var anItem in ValueReferencePairs)
+                {
+                    yield return anItem;
+                }
             }
         }
 
@@ -8747,14 +9403,17 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in ValueReferencePairs)
+            if (ValueReferencePairs != null)
             {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
+                foreach (var anItem in ValueReferencePairs)
                 {
-                    yield return anotherItem;
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
         }
@@ -8798,9 +9457,7 @@ namespace AasCore.Aas3
 
         public ValueList(List<ValueReferencePair>? valueReferencePairs = null)
         {
-            ValueReferencePairs = (valueReferencePairs != null)
-                ? valueReferencePairs
-                : new List<ValueReferencePair>();
+            ValueReferencePairs = valueReferencePairs;
         }
     }
 
@@ -8820,19 +9477,19 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-076:
-        ///     For all ConceptDescriptions using data specification template
+        ///     For all :class`Concept_description`'s using data specification template
         ///     IEC61360
         ///     (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0)
         ///     at least a preferred name in English shall be defined.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public string? PreferredName { get; set; }
+        public LangStringSet? PreferredName { get; set; }
 
         /// <summary>
         /// Short name
         /// </summary>
-        public string? ShortName { get; set; }
+        public LangStringSet? ShortName { get; set; }
 
         /// <summary>
         /// Unit
@@ -8862,39 +9519,38 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-070:
-        ///     For a ConceptDescription with category PROPERTY or VALUE using
-        ///     data specification template IEC61360
+        ///     For a <see cref="ConceptDescription" /> with <see cref="ConceptDescription.Category" />
+        ///     <c>PROPERTY</c> or <c>VALUE</c> using data specification template IEC61360
         ///     (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-        ///     DataSpecificationIEC61360/dataType is mandatory and shall be defined.
+        ///     <see cref="DataSpecificationIec61360.DataType" /> is mandatory and shall be defined.
         ///     </li>
         ///     <li>
         ///     Constraint AASd-071:
-        ///     For a ConceptDescription with category REFERENCE using data
-        ///     specification template IEC61360
+        ///     For a <see cref="ConceptDescription" /> with <see cref="ConceptDescription.Category" />
+        ///     <c>REFERENCE</c> using data specification template IEC61360
         ///     (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-        ///     DataSpecificationIEC61360/dataType is STRING by default.
+        ///     <see cref="DataSpecificationIec61360.DataType" /> is <c>STRING</c> by default.
         ///     </li>
         ///     <li>
         ///     Constraint AASd-072:
-        ///     For a ConceptDescription with category DOCUMENT using data
-        ///     specification template IEC61360
+        ///     For a <see cref="ConceptDescription" /> with <see cref="ConceptDescription.Category" />
+        ///     <c>DOCUMENT</c> using data specification template IEC61360
         ///     (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-        ///     DataSpecificationIEC61360/dataType shall be one of the following values: STRING or
-        ///     URL.
+        ///     <see cref="DataSpecificationIec61360.DataType" /> shall be one of the following values: <c>STRING</c> or <c>URL</c>.
         ///     </li>
         ///     <li>
         ///     Constraint AASd-073:
-        ///     For a ConceptDescription with category QUALIFIER using data
-        ///     specification template IEC61360
+        ///     For a <see cref="ConceptDescription" /> with <see cref="ConceptDescription.Category" />
+        ///     <c>QUALIFIER</c> using data specification template IEC61360
         ///     (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-        ///     DataSpecificationIEC61360/dataType is mandatory and shall be defined.
+        ///     <see cref="DataSpecificationIec61360.DataType" /> is mandatory and shall be defined.
         ///     </li>
         ///     <li>
         ///     Constraint AASd-103:
-        ///     If DataSpecificationIEC61360/-dataType one of: INTEGER_MEASURE,
-        ///     REAL_MEASURE, RATIONAL_MEASURE, INTEGER_CURRENCY, REAL_CURRENCY, then
-        ///     DataSpecificationIEC61360/unit or DataSpecificationIEC61360/unitId shall be
-        ///     defined.
+        ///     If <see cref="DataSpecificationIec61360.DataType" /> is one of:
+        ///     <c>INTEGER_MEASURE</c>, <c>REAL_MEASURE</c>, <c>RATIONAL_MEASURE</c>,
+        ///     <c>INTEGER_CURRENCY</c>, <c>REAL_CURRENCY</c>, then
+        ///     <see cref="DataSpecificationIec61360.Unit" /> or <see cref="DataSpecificationIec61360.UnitId" /> shall be defined.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -8908,15 +9564,15 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-074:
-        ///     For all ConceptDescriptions except for ConceptDescriptions of
-        ///     category VALUE using data specification template IEC61360
+        ///     For all <see cref="ConceptDescription" />'s except for
+        ///     <see cref="ConceptDescription" />'s of category <c>VALUE</c> using data specification
+        ///     template IEC61360
         ///     (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/2/0) -
-        ///     DataSpecificationIEC61360/definition is mandatory and shall be defined at least
-        ///     in English.
+        ///     <see cref="DataSpecificationIec61360.Definition" /> is mandatory and shall be defined at least in English.
         ///     </li>
         /// </ul>
         /// </remarks>
-        public string? Definition { get; set; }
+        public LangStringSet? Definition { get; set; }
 
         /// <summary>
         /// Value Format
@@ -8939,14 +9595,13 @@ namespace AasCore.Aas3
         /// <ul>
         ///     <li>
         ///     Constraint AASd-101:
-        ///     If DataSpecificationIEC61360/category equal to VALUE then
-        ///     DataSpecificationIEC61360/value shall be set.
+        ///     If <see cref="IReferable.Category" /> equal to <c>VALUE</c> then <see cref="DataSpecificationIec61360.Value" /> shall be
+        ///     set.
         ///     </li>
         ///     <li>
         ///     Constraint AASd-102:
-        ///     If DataSpecificationIEC61360/value or
-        ///     DataSpecificationIEC61360/valueId is not empty then
-        ///     DataSpecificationIEC61360/valueList shall be empty and vice versa.
+        ///     If <see cref="DataSpecificationIec61360.Value" /> or <see cref="DataSpecificationIec61360.ValueId" /> is not empty then <see cref="DataSpecificationIec61360.ValueList" />
+        ///     shall be empty and vice versa.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -8971,9 +9626,24 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
+            if (PreferredName != null)
+            {
+                yield return PreferredName;
+            }
+
+            if (ShortName != null)
+            {
+                yield return ShortName;
+            }
+
             if (UnitId != null)
             {
                 yield return UnitId;
+            }
+
+            if (Definition != null)
+            {
+                yield return Definition;
             }
 
             if (ValueList != null)
@@ -8992,12 +9662,45 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
+            if (PreferredName != null)
+            {
+                yield return PreferredName;
+
+                // Recurse
+                foreach (var anItem in PreferredName.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (ShortName != null)
+            {
+                yield return ShortName;
+
+                // Recurse
+                foreach (var anItem in ShortName.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
             if (UnitId != null)
             {
                 yield return UnitId;
 
                 // Recurse
                 foreach (var anItem in UnitId.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (Definition != null)
+            {
+                yield return Definition;
+
+                // Recurse
+                foreach (var anItem in Definition.Descend())
                 {
                     yield return anItem;
                 }
@@ -9064,14 +9767,14 @@ namespace AasCore.Aas3
         }
 
         public DataSpecificationIec61360(
-            string? preferredName = null,
-            string? shortName = null,
+            LangStringSet? preferredName = null,
+            LangStringSet? shortName = null,
             string? unit = null,
             IReference? unitId = null,
             string? sourceOfDefinition = null,
             string? symbol = null,
             DataTypeIec61360? dataType = null,
-            string? definition = null,
+            LangStringSet? definition = null,
             string? valueFormat = null,
             ValueList? valueList = null,
             string? value = null,
@@ -9114,7 +9817,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Definition
         /// </summary>
-        public string? Definition { get; set; }
+        public LangStringSet? Definition { get; set; }
 
         /// <summary>
         /// SI Notation
@@ -9167,8 +9870,10 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            // No descendable properties
-            yield break;
+            if (Definition != null)
+            {
+                yield return Definition;
+            }
         }
 
         /// <summary>
@@ -9176,8 +9881,16 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            // No descendable properties
-            yield break;
+            if (Definition != null)
+            {
+                yield return Definition;
+
+                // Recurse
+                foreach (var anItem in Definition.Descend())
+                {
+                    yield return anItem;
+                }
+            }
         }
 
         /// <summary>
@@ -9220,7 +9933,7 @@ namespace AasCore.Aas3
         public DataSpecificationPhysicalUnit(
             string? unitName = null,
             string? unitSymbol = null,
-            string? definition = null,
+            LangStringSet? definition = null,
             string? siNotation = null,
             string? dinNotation = null,
             string? eceName = null,
@@ -9399,12 +10112,12 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// A template consists of the DataSpecificationContent containing the additional attributes
-    /// to be added to the element instance that references the data specification template and
-    /// meta information about the template itself.
+    /// A template consists of the <see cref="IDataSpecificationContent" /> containing
+    /// the additional attributes to be added to the element instance that references
+    /// the data specification template and meta information about the template itself.
     /// </summary>
     /// <remarks>
-    /// The Data Specification Templates do not belong to the metamodel of the asset
+    /// The Data Specification Templates do not belong to the meta-model of the asset
     /// administration shell. In serializations that choose specific templates
     /// the corresponding data specification content may be directly incorporated.
     /// </remarks>
@@ -9438,7 +10151,7 @@ namespace AasCore.Aas3
         /// context or which additional data specification templates are
         /// provided.
         /// </remarks>
-        public string? Description { get; set; }
+        public LangStringSet? Description { get; set; }
 
         public IDataSpecificationContent? DataSpecificationContent { get; set; }
 
@@ -9451,6 +10164,11 @@ namespace AasCore.Aas3
             if (Administration != null)
             {
                 yield return Administration;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
             }
 
             if (DataSpecificationContent != null)
@@ -9470,6 +10188,17 @@ namespace AasCore.Aas3
 
                 // Recurse
                 foreach (var anItem in Administration.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
                 {
                     yield return anItem;
                 }
@@ -9527,7 +10256,7 @@ namespace AasCore.Aas3
         public DataSpecification(
             string id,
             AdministrativeInformation? administration = null,
-            string? description = null,
+            LangStringSet? description = null,
             IDataSpecificationContent? dataSpecificationContent = null)
         {
             Id = id;

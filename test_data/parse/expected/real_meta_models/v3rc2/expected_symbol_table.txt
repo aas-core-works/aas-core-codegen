@@ -75,21 +75,7 @@ UnverifiedSymbolTable(
       properties_by_name=...,
       methods_by_name=...),
     ConcreteClass(
-      name='Date_time',
-      is_implementation_specific=False,
-      inheritances=[
-        'str'],
-      properties=[],
-      methods=[],
-      invariants=[],
-      serialization=None,
-      reference_in_the_book=None,
-      description=None,
-      node=...,
-      properties_by_name=...,
-      methods_by_name=...),
-    ConcreteClass(
-      name='Date_time_stamp',
+      name='Date_time_stamp_UTC',
       is_implementation_specific=False,
       inheritances=[
         'str'],
@@ -135,7 +121,7 @@ UnverifiedSymbolTable(
         section=[
           5,
           7,
-          11,
+          12,
           2],
         index=0,
         fragment=None),
@@ -740,7 +726,14 @@ UnverifiedSymbolTable(
           value='rdf:langString',
           description=None,
           node=...)],
-      reference_in_the_book=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          12,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -755,7 +748,14 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[],
       serialization=None,
-      reference_in_the_book=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          12,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -764,14 +764,20 @@ UnverifiedSymbolTable(
       methods_by_name=...),
     ConcreteClass(
       name='Lang_string_set',
-      is_implementation_specific=False,
-      inheritances=[
-        'Non_empty_string'],
+      is_implementation_specific=True,
+      inheritances=[],
       properties=[],
       methods=[],
       invariants=[],
       serialization=None,
-      reference_in_the_book=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          12,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -791,7 +797,14 @@ UnverifiedSymbolTable(
           body="FunctionCall(\n  name='is_MIME_type',\n  args=[\n    Name(\n      identifier='self',\n      original_node=...)],\n  original_node=...)",
           node=...)],
       serialization=None,
-      reference_in_the_book=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          12,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -807,7 +820,14 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[],
       serialization=None,
-      reference_in_the_book=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          12,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
@@ -823,201 +843,28 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[],
       serialization=None,
-      reference_in_the_book=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          12,
+          2],
+        index=0,
+        fragment=None),
       description=Description(
         document=...,
         node=...),
       node=...,
       properties_by_name=...,
       methods_by_name=...),
-    Enumeration(
-      name='Value_data_type',
-      is_superset_of=[
-        'Data_type_def_XSD'],
-      literals=[
-        EnumerationLiteral(
-          name='Any_URI',
-          value='xs:anyURI',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Base_64_binary',
-          value='xs:base64Binary',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Boolean',
-          value='xs:boolean',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Date',
-          value='xs:date',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Date_time',
-          value='xs:dateTime',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Date_time_stamp',
-          value='xs:dateTimeStamp',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Decimal',
-          value='xs:decimal',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Double',
-          value='xs:double',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Duration',
-          value='xs:duration',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Float',
-          value='xs:float',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='G_day',
-          value='xs:gDay',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='G_month',
-          value='xs:gMonth',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='G_month_day',
-          value='xs:gMonthDay',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='G_year',
-          value='xs:gYear',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='G_year_month',
-          value='xs:gYearMonth',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Hex_binary',
-          value='xs:hexBinary',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='String',
-          value='xs:string',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Time',
-          value='xs:time',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Day_time_duration',
-          value='xs:dayTimeDuration',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Year_month_duration',
-          value='xs:yearMonthDuration',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Integer',
-          value='xs:integer',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Long',
-          value='xs:long',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Int',
-          value='xs:int',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Short',
-          value='xs:short',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Byte',
-          value='xs:byte',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Non_negative_integer',
-          value='xs:NonNegativeInteger',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Positive_integer',
-          value='xs:positiveInteger',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Unsigned_long',
-          value='xs:unsignedLong',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Unsigned_int',
-          value='xs:unsignedInt',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Unsigned_short',
-          value='xs:unsignedShort',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Unsigned_byte',
-          value='xs:unsignedByte',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Non_positive_integer',
-          value='xs:nonPositiveInteger',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Negative_integer',
-          value='xs:negativeInteger',
-          description=None,
-          node=...)],
-      reference_in_the_book=None,
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      literals_by_name=...),
     ConcreteClass(
-      name='MIME_typed',
+      name='Value_data_type',
       is_implementation_specific=False,
       inheritances=[
-        'Non_empty_string'],
+        'str'],
       properties=[],
       methods=[],
-      invariants=[
-        Invariant(
-          description=None,
-          body="FunctionCall(\n  name='is_MIME_type',\n  args=[\n    Name(\n      identifier='self',\n      original_node=...)],\n  original_node=...)",
-          node=...)],
+      invariants=[],
       serialization=None,
       reference_in_the_book=None,
       description=Description(
@@ -1057,10 +904,14 @@ UnverifiedSymbolTable(
         Property(
           name='extensions',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Extension',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Extension',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -1125,7 +976,7 @@ UnverifiedSymbolTable(
         'Has_extensions'],
       properties=[
         Property(
-          name='ID_short',
+          name='id_short',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -1216,7 +1067,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -1372,7 +1223,7 @@ UnverifiedSymbolTable(
       inheritances=[],
       properties=[
         Property(
-          name='semantic_ID',
+          name='semantic_id',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -1395,7 +1246,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -1439,10 +1290,14 @@ UnverifiedSymbolTable(
         Property(
           name='qualifiers',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Qualifier',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Qualifier',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -1611,7 +1466,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -1683,7 +1538,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -1788,7 +1643,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='value_ID',
+          name='value_id',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -1825,7 +1680,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -1849,7 +1704,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='value_ID',
+              name='value_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -1919,7 +1774,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -1991,7 +1846,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -2105,7 +1960,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -2177,7 +2032,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -2335,7 +2190,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='referred_semantic_ID',
+          name='referred_semantic_id',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -2369,7 +2224,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='referred_semantic_ID',
+              name='referred_semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -2552,7 +2407,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -2686,7 +2541,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -2943,10 +2798,14 @@ UnverifiedSymbolTable(
         Property(
           name='submodels',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Model_reference',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Model_reference',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -3007,7 +2866,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -3162,7 +3021,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='global_asset_ID',
+          name='global_asset_id',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -3175,7 +3034,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='specific_asset_ID',
+          name='specific_asset_id',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -3218,7 +3077,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='global_asset_ID',
+              name='global_asset_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -3230,7 +3089,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='specific_asset_ID',
+              name='specific_asset_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -3332,7 +3191,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='external_subject_ID',
+          name='external_subject_id',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -3369,7 +3228,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -3381,7 +3240,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='external_subject_ID',
+              name='external_subject_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -3429,10 +3288,14 @@ UnverifiedSymbolTable(
         Property(
           name='submodel_elements',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Submodel_element',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Submodel_element',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -3473,7 +3336,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -3557,7 +3420,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -3705,7 +3568,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -3777,7 +3640,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -3950,7 +3813,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -4022,7 +3885,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -4192,7 +4055,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -4264,7 +4127,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -4377,7 +4240,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='value_ID',
+          name='value_id',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -4423,7 +4286,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -4495,7 +4358,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -4551,7 +4414,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='value_ID',
+              name='value_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -4607,7 +4470,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='value_ID',
+          name='value_id',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -4646,7 +4509,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -4718,7 +4581,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -4774,7 +4637,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='value_ID',
+              name='value_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -4885,7 +4748,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -4957,7 +4820,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -5058,7 +4921,7 @@ UnverifiedSymbolTable(
         Property(
           name='MIME_type',
           type_annotation=AtomicTypeAnnotation(
-            identifier='MIME_typed',
+            identifier='Content_type',
             node=...),
           description=Description(
             document=...,
@@ -5090,7 +4953,7 @@ UnverifiedSymbolTable(
             Argument(
               name='MIME_type',
               type_annotation=AtomicTypeAnnotation(
-                identifier='MIME_typed',
+                identifier='Content_type',
                 node=...),
               default=None,
               node=...),
@@ -5111,7 +4974,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -5183,7 +5046,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -5247,11 +5110,7 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[
-        Invariant(
-          description=None,
-          body="FunctionCall(\n  name='is_MIME_type',\n  args=[\n    Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='MIME_type',\n      original_node=...)],\n  original_node=...)",
-          node=...)],
+      invariants=[],
       serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -5329,7 +5188,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -5401,7 +5260,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -5465,11 +5324,7 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[
-        Invariant(
-          description=None,
-          body="FunctionCall(\n  name='is_MIME_type',\n  args=[\n    Member(\n      instance=Name(\n        identifier='self',\n        original_node=...),\n      name='content_type',\n      original_node=...)],\n  original_node=...)",
-          node=...)],
+      invariants=[],
       serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -5494,10 +5349,14 @@ UnverifiedSymbolTable(
         Property(
           name='annotation',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Data_element',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Data_element',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -5545,7 +5404,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -5617,7 +5476,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -5796,7 +5655,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -5868,7 +5727,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -6001,7 +5860,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Date_time',
+                identifier='Date_time_stamp_UTC',
                 node=...)],
             node=...),
           description=Description(
@@ -6014,7 +5873,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Date_time',
+                identifier='Date_time_stamp_UTC',
                 node=...)],
             node=...),
           description=Description(
@@ -6027,7 +5886,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Date_time',
+                identifier='Date_time_stamp_UTC',
                 node=...)],
             node=...),
           description=Description(
@@ -6082,7 +5941,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -6154,7 +6013,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -6227,7 +6086,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Date_time',
+                    identifier='Date_time_stamp_UTC',
                     node=...)],
                 node=...),
               default=Default(
@@ -6239,7 +6098,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Date_time',
+                    identifier='Date_time_stamp_UTC',
                     node=...)],
                 node=...),
               default=Default(
@@ -6251,7 +6110,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Date_time',
+                    identifier='Date_time_stamp_UTC',
                     node=...)],
                 node=...),
               default=Default(
@@ -6360,7 +6219,7 @@ UnverifiedSymbolTable(
         Property(
           name='time_stamp',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Date_time_stamp',
+            identifier='Date_time_stamp_UTC',
             node=...),
           description=Description(
             document=...,
@@ -6406,7 +6265,7 @@ UnverifiedSymbolTable(
             Argument(
               name='time_stamp',
               type_annotation=AtomicTypeAnnotation(
-                identifier='Date_time_stamp',
+                identifier='Date_time_stamp_UTC',
                 node=...),
               default=None,
               node=...),
@@ -6559,7 +6418,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='global_asset_ID',
+          name='global_asset_id',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -6572,7 +6431,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='specific_asset_ID',
+          name='specific_asset_id',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -6618,7 +6477,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -6690,7 +6549,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -6750,7 +6609,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='global_asset_ID',
+              name='global_asset_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -6762,7 +6621,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='specific_asset_ID',
+              name='specific_asset_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -6831,7 +6690,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -6903,7 +6762,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -7020,7 +6879,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -7092,7 +6951,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -7244,7 +7103,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -7316,7 +7175,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -7521,7 +7380,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -7593,7 +7452,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -7719,7 +7578,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -7858,10 +7717,14 @@ UnverifiedSymbolTable(
         Property(
           name='contained_elements',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Reference',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Reference',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -7895,7 +7758,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='ID_short',
+              name='id_short',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -7955,7 +7818,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='semantic_ID',
+              name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -8679,7 +8542,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='value_ID',
+          name='value_id',
           type_annotation=AtomicTypeAnnotation(
             identifier='Reference',
             node=...),
@@ -8705,7 +8568,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='value_ID',
+              name='value_id',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Reference',
                 node=...),
@@ -8744,10 +8607,14 @@ UnverifiedSymbolTable(
         Property(
           name='value_reference_pairs',
           type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
+            identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Value_reference_pair',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Value_reference_pair',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -8851,7 +8718,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='unit_ID',
+          name='unit_id',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -8955,7 +8822,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='value_ID',
+          name='value_id',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -9027,7 +8894,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='unit_ID',
+              name='unit_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -9123,7 +8990,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='value_ID',
+              name='value_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -9308,7 +9175,7 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='registration_authority_ID',
+          name='registration_authority_id',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -9464,7 +9331,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='registration_authority_ID',
+              name='registration_authority_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -9656,7 +9523,7 @@ UnverifiedSymbolTable(
       inheritances=[],
       properties=[
         Property(
-          name='ID',
+          name='id',
           type_annotation=AtomicTypeAnnotation(
             identifier='Identifier',
             node=...),
@@ -9712,7 +9579,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='ID',
+              name='id',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Identifier',
                 node=...),
