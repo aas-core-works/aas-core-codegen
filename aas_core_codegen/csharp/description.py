@@ -18,6 +18,7 @@ from aas_core_codegen.csharp.common import INDENT as I
 from aas_core_codegen.intermediate import (
     doc as intermediate_doc,
     rendering as intermediate_rendering,
+    _translate as intermediate_translate,
 )
 
 
@@ -62,6 +63,15 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
                 assert_never(element.symbol)
 
         else:
+            # NOTE (mristin, 2022-03-30):
+            # This is a very special case where we had problems with an interface.
+            # We leave this check here, just in case the bug resurfaces.
+            if isinstance(element.symbol, intermediate_translate._PlaceholderSymbol):
+                return None, [
+                    f"Unexpected placeholder for the symbol: {element.symbol}; "
+                    f"this is a bug"
+                ]
+
             assert_never(element.symbol)
 
         assert name is not None
@@ -104,6 +114,18 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
 
             cref = f"{symbol_name}.{literal_name}"
         else:
+            # NOTE (mristin, 2022-03-30):
+            # This is a very special case where we had problems with an interface.
+            # We leave this check here, just in case the bug resurfaces.
+            if isinstance(
+                element.reference, intermediate_translate._PlaceholderAttributeReference
+            ):
+                return None, [
+                    f"Unexpected placeholder "
+                    f"for the attribute reference: {element.reference}; "
+                    f"this is a bug"
+                ]
+
             assert_never(element.reference)
 
         assert cref is not None
