@@ -2093,7 +2093,7 @@ def _verify_symbol_table(
             "descend_once",
             "accept",
             "transform",
-            "model_type",
+            "type_name",
             "property_name",
             "match",
         }

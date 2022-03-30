@@ -1,5 +1,8 @@
-<schema
+<xs:schema
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://www.admin-shell.io/aas/3/0"
         elementFormDefault="qualified"
         targetNamespace="http://www.admin-shell.io/aas/3/0"
-        xmlns="http://www.w3.org/2001/XMLSchema"
-/>
+>
+    <xs:element name="assetAdministrationShellEnvironment" type="assetAdministrationShellEnvironment_t" />
+</xs:schema>
