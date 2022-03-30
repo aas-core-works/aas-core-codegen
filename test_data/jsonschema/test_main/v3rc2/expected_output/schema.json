@@ -63,42 +63,34 @@
         "xs:negativeInteger"
       ]
     },
-    "ValueDataType": {
-      "type": "string",
-      "enum": [
-        "xs:anyURI",
-        "xs:base64Binary",
-        "xs:boolean",
-        "xs:date",
-        "xs:dateTime",
-        "xs:dateTimeStamp",
-        "xs:decimal",
-        "xs:double",
-        "xs:duration",
-        "xs:float",
-        "xs:gDay",
-        "xs:gMonth",
-        "xs:gMonthDay",
-        "xs:gYear",
-        "xs:gYearMonth",
-        "xs:hexBinary",
-        "xs:string",
-        "xs:time",
-        "xs:dayTimeDuration",
-        "xs:yearMonthDuration",
-        "xs:integer",
-        "xs:long",
-        "xs:int",
-        "xs:short",
-        "xs:byte",
-        "xs:NonNegativeInteger",
-        "xs:positiveInteger",
-        "xs:unsignedLong",
-        "xs:unsignedInt",
-        "xs:unsignedShort",
-        "xs:unsignedByte",
-        "xs:nonPositiveInteger",
-        "xs:negativeInteger"
+    "LangString": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": "string",
+          "pattern": "^(([a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){2})?|[a-zA-Z]{4}|[a-zA-Z]{5,8})(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-(([a-zA-Z0-9]){5,8}|[0-9]([a-zA-Z0-9]){3}))*(-[0-9A-WY-Za-wy-z](-([a-zA-Z0-9]){2,8})+)*(-[xX](-([a-zA-Z0-9]){1,8})+)?|[xX](-([a-zA-Z0-9]){1,8})+|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "language",
+        "text"
+      ]
+    },
+    "LangStringSet": {
+      "type": "object",
+      "properties": {
+        "langStrings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LangString"
+          }
+        }
+      },
+      "required": [
+        "langStrings"
       ]
     },
     "Reference": {
@@ -121,10 +113,7 @@
             "$ref": "#/definitions/Extension"
           }
         }
-      },
-      "required": [
-        "extensions"
-      ]
+      }
     },
     "Referable": {
       "allOf": [
@@ -138,16 +127,14 @@
               "minLength": 1
             },
             "displayName": {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/definitions/LangStringSet"
             },
             "category": {
               "type": "string",
               "minLength": 1
             },
             "description": {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/definitions/LangStringSet"
             },
             "checksum": {
               "type": "string",
@@ -193,7 +180,6 @@
         }
       },
       "required": [
-        "qualifiers",
         "modelType"
       ]
     },
@@ -242,7 +228,7 @@
               "$ref": "#/definitions/DataTypeDefXsd"
             },
             "value": {
-              "$ref": "#/definitions/ValueDataType"
+              "type": "string"
             },
             "valueId": {
               "$ref": "#/definitions/GlobalReference"
@@ -349,7 +335,7 @@
               "$ref": "#/definitions/DataTypeDefXsd"
             },
             "value": {
-              "$ref": "#/definitions/ValueDataType"
+              "type": "string"
             },
             "refersTo": {
               "$ref": "#/definitions/ModelReference"
@@ -432,8 +418,7 @@
             }
           },
           "required": [
-            "assetInformation",
-            "submodels"
+            "assetInformation"
           ]
         }
       ]
@@ -516,10 +501,7 @@
                 "$ref": "#/definitions/SubmodelElement"
               }
             }
-          },
-          "required": [
-            "submodelElements"
-          ]
+          }
         }
       ]
     },
@@ -604,7 +586,7 @@
               "$ref": "#/definitions/DataTypeDefXsd"
             },
             "value": {
-              "$ref": "#/definitions/ValueDataType"
+              "type": "string"
             },
             "valueId": {
               "$ref": "#/definitions/GlobalReference"
@@ -624,8 +606,7 @@
         {
           "properties": {
             "value": {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/definitions/LangStringSet"
             },
             "valueId": {
               "$ref": "#/definitions/GlobalReference"
@@ -645,10 +626,10 @@
               "$ref": "#/definitions/DataTypeDefXsd"
             },
             "min": {
-              "$ref": "#/definitions/ValueDataType"
+              "type": "string"
             },
             "max": {
-              "$ref": "#/definitions/ValueDataType"
+              "type": "string"
             }
           },
           "required": [
@@ -665,18 +646,9 @@
         {
           "properties": {
             "mimeType": {
-              "allOf": [
-                {
-                  "type": "string",
-                  "minLength": 1
-                },
-                {
-                  "pattern": "([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+|\"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*\"))*"
-                },
-                {
-                  "pattern": "([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+|\"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*\"))*"
-                }
-              ]
+              "type": "string",
+              "minLength": 1,
+              "pattern": "([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+|\"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*\"))*"
             },
             "value": {
               "type": "string",
@@ -697,18 +669,9 @@
         {
           "properties": {
             "contentType": {
-              "allOf": [
-                {
-                  "type": "string",
-                  "minLength": 1
-                },
-                {
-                  "pattern": "([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+|\"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*\"))*"
-                },
-                {
-                  "pattern": "([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+|\"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*\"))*"
-                }
-              ]
+              "type": "string",
+              "minLength": 1,
+              "pattern": "([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;[ \t]*([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+|\"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*\"))*"
             },
             "value": {
               "type": "string",
@@ -734,10 +697,7 @@
                 "$ref": "#/definitions/DataElement"
               }
             }
-          },
-          "required": [
-            "annotation"
-          ]
+          }
         }
       ]
     },
@@ -973,10 +933,7 @@
                 "$ref": "#/definitions/Reference"
               }
             }
-          },
-          "required": [
-            "containedElements"
-          ]
+          }
         }
       ]
     },
@@ -1098,10 +1055,7 @@
             "$ref": "#/definitions/ValueReferencePair"
           }
         }
-      },
-      "required": [
-        "valueReferencePairs"
-      ]
+      }
     },
     "DataSpecificationIec61360": {
       "allOf": [
@@ -1111,12 +1065,10 @@
         {
           "properties": {
             "preferredName": {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/definitions/LangStringSet"
             },
             "shortName": {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/definitions/LangStringSet"
             },
             "unit": {
               "type": "string",
@@ -1137,8 +1089,7 @@
               "$ref": "#/definitions/DataTypeIec61360"
             },
             "definition": {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/definitions/LangStringSet"
             },
             "valueFormat": {
               "type": "string",
@@ -1177,8 +1128,7 @@
               "minLength": 1
             },
             "definition": {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/definitions/LangStringSet"
             },
             "siNotation": {
               "type": "string",
@@ -1254,8 +1204,7 @@
           "$ref": "#/definitions/AdministrativeInformation"
         },
         "description": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/definitions/LangStringSet"
         },
         "dataSpecificationContent": {
           "$ref": "#/definitions/DataSpecificationContent"

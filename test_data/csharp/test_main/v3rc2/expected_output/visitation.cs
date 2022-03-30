@@ -14,6 +14,7 @@ namespace AasCore.Aas3
         {
             public void Visit(IClass that);
             public void Visit(Resource that);
+            public void Visit(LangStringSet that);
             public void Visit(Qualifier that);
             public void Visit(ReferenceElement that);
             public void Visit(GlobalReference that);
@@ -58,6 +59,7 @@ namespace AasCore.Aas3
         {
             public void Visit(IClass that, C context);
             public void Visit(Resource that, C context);
+            public void Visit(LangStringSet that, C context);
             public void Visit(Qualifier that, C context);
             public void Visit(ReferenceElement that, C context);
             public void Visit(GlobalReference that, C context);
@@ -103,6 +105,7 @@ namespace AasCore.Aas3
         {
             public T Transform(IClass that);
             public T Transform(Resource that);
+            public T Transform(LangStringSet that);
             public T Transform(Qualifier that);
             public T Transform(ReferenceElement that);
             public T Transform(GlobalReference that);
@@ -152,6 +155,8 @@ namespace AasCore.Aas3
             }
 
             public abstract T Transform(Resource that);
+
+            public abstract T Transform(LangStringSet that);
 
             public abstract T Transform(Qualifier that);
 
@@ -232,6 +237,7 @@ namespace AasCore.Aas3
         {
             public T Transform(IClass that, C context);
             public T Transform(Resource that, C context);
+            public T Transform(LangStringSet that, C context);
             public T Transform(Qualifier that, C context);
             public T Transform(ReferenceElement that, C context);
             public T Transform(GlobalReference that, C context);
@@ -283,6 +289,8 @@ namespace AasCore.Aas3
             }
 
             public abstract T Transform(Resource that, C context);
+
+            public abstract T Transform(LangStringSet that, C context);
 
             public abstract T Transform(Qualifier that, C context);
 
