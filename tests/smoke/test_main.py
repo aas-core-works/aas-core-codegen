@@ -12,9 +12,6 @@ class Test_against_recorded(unittest.TestCase):
         "true",
         "on",
     )
-    RERECORD = True  # TODO (mristin, 2022-03-28): debug
-
-    # TODO (mristin, 2022-03-28): add meta-models in precommit script
 
     def test_cases(self) -> None:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
