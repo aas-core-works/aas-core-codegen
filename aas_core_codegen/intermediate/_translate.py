@@ -143,6 +143,9 @@ class _PlaceholderAttributeReference:
         """Initialize with the given values."""
         self.path = path
 
+    def __repr__(self) -> str:
+        return f"{_PlaceholderAttributeReference.__name__}(path={self.path!r})"
+
 
 # noinspection PyUnusedLocal
 def _attribute_reference_role(  # type: ignore
@@ -726,6 +729,9 @@ class _PlaceholderSymbol:
     def __init__(self, name: str) -> None:
         """Initialize with the given values."""
         self.name = name
+
+    def __repr__(self) -> str:
+        return f"{_PlaceholderSymbol.__name__}(name={self.name!r})"
 
 
 def _propagate_parsed_reference_in_the_book(
@@ -1807,6 +1813,10 @@ def _find_all_in_property_description(
 
     for remark in property_description.remarks:
         for element in remark.findall(element_type):
+            yield element, property_description
+
+    for body in property_description.constraints_by_identifier.values():
+        for element in body.findall(element_type):
             yield element, property_description
 
 
