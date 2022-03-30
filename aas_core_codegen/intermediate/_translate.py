@@ -2340,19 +2340,19 @@ def _second_pass_to_resolve_descendants_in_place(
 
         elif isinstance(symbol, ConstrainedPrimitive):
             constrained_primitive_descendants = []  # type: List[ConstrainedPrimitive]
-            for descendant in ontology.list_descendants(symbol.parsed):
-                symbol = symbol_table.must_find(descendant.name)
-                assert isinstance(symbol, ConstrainedPrimitive)
-                constrained_primitive_descendants.append(symbol)
+            for parsed_descendant in ontology.list_descendants(symbol.parsed):
+                descendant = symbol_table.must_find(parsed_descendant.name)
+                assert isinstance(descendant, ConstrainedPrimitive)
+                constrained_primitive_descendants.append(descendant)
 
             symbol._set_descendants(constrained_primitive_descendants)
 
         elif isinstance(symbol, Class):
             class_descendants = []  # type: List[ClassUnion]
-            for descendant in ontology.list_descendants(symbol.parsed):
-                descendant_symbol = symbol_table.must_find(descendant.name)
-                assert isinstance(descendant_symbol, (AbstractClass, ConcreteClass))
-                class_descendants.append(descendant_symbol)
+            for parsed_descendant in ontology.list_descendants(symbol.parsed):
+                descendant = symbol_table.must_find(parsed_descendant.name)
+                assert isinstance(descendant, (AbstractClass, ConcreteClass))
+                class_descendants.append(descendant)
 
             symbol._set_descendants(class_descendants)
 
@@ -3447,6 +3447,27 @@ def _assert_all_class_inheritances_defined_an_interface(
             )
 
 
+def _assert_self_not_in_concrete_descendants(symbol_table: SymbolTable) -> None:
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, Enumeration):
+            continue
+        elif isinstance(symbol, (ConstrainedPrimitive, AbstractClass, ConcreteClass)):
+            assert id(symbol) not in symbol.descendant_id_set, (
+                f"Expected not to find the ID of the symbol {symbol!r}, {id(symbol)} "
+                f"in its descendant_id_set, "
+                f"but it was there: {symbol.descendant_id_set}"
+            )
+
+            if isinstance(symbol, ConcreteClass):
+                assert symbol not in symbol.concrete_descendants, (
+                    f"Expected not to find the symbol {symbol!r} "
+                    f"in its concrete descendants, "
+                    f"but it was there: {symbol.concrete_descendants}"
+                )
+        else:
+            assert_never(symbol)
+
+
 def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Error]:
     """Perform a battery of checks on the consistency of ``symbol_table``."""
     errors = _verify_there_are_no_duplicate_symbol_names(symbol_table=symbol_table)
@@ -3492,6 +3513,8 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     _assert_interfaces_defined_correctly(symbol_table=symbol_table, ontology=ontology)
 
     _assert_all_class_inheritances_defined_an_interface(symbol_table=symbol_table)
+
+    _assert_self_not_in_concrete_descendants(symbol_table=symbol_table)
 
     return errors
 
