@@ -23,6 +23,9 @@ from aas_core_codegen import (
     infer_for_schema,
 )
 from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
+import aas_core_codegen.jsonschema
+
+assert aas_core_codegen.jsonschema.__doc__ == __doc__
 
 
 def _define_for_enumeration(
@@ -287,7 +290,6 @@ def _define_properties_and_required(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_for_class(
     cls: intermediate.ClassUnion,
-    ids_of_classes_in_properties: Set[int],
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
@@ -476,7 +478,6 @@ def _generate(
             ):
                 extension, definition_errors = _define_for_class(
                     cls=symbol,
-                    ids_of_classes_in_properties=ids_of_symbols_in_properties,
                     constraints_by_property=constraints_by_class[symbol],
                 )
 
