@@ -1125,6 +1125,7 @@ class ConstrainedPrimitive:
         self.description = description
         self.parsed = parsed
 
+    @require(lambda self, descendants: self not in descendants)
     def _set_descendants(self, descendants: Sequence["ConstrainedPrimitive"]) -> None:
         """
         Set the descendants in the constrained primitive.
@@ -1372,6 +1373,7 @@ class Class(DBC):
             id(inheritance) for inheritance in self._inheritances
         )
 
+    @require(lambda self, descendants: self not in descendants)
     def _set_descendants(self, descendants: Sequence["ClassUnion"]) -> None:
         """
         Set the descendants and the concrete descendants in the class.

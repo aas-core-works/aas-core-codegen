@@ -8,14 +8,14 @@ these identifiers are used only for the XSD.
 from aas_core_codegen.common import Identifier
 
 
-def model_type(identifier: Identifier) -> Identifier:
+def type_name(identifier: Identifier) -> Identifier:
     """
     Generate the XML type name for the given class based on its ``identifier``.
 
-    >>> model_type(Identifier("something"))
+    >>> type_name(Identifier("something"))
     'something_t'
 
-    >>> model_type(Identifier("URL_to_something"))
+    >>> type_name(Identifier("URL_to_something"))
     'urlToSomething_t'
     """
     parts = identifier.split("_")
@@ -53,6 +53,31 @@ def group_name(identifier: Identifier) -> Identifier:
 
     return Identifier(
         "{}{}".format(
+            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
+        )
+    )
+
+
+def choice_group_name(identifier: Identifier) -> Identifier:
+    """
+    Generate the XML group name for the interface of the given class ``identifier``.
+
+    >>> choice_group_name(Identifier("something"))
+    'something_choice'
+
+    >>> choice_group_name(Identifier("URL_to_something"))
+    'urlToSomething_choice'
+    """
+    parts = identifier.split("_")
+    assert (
+        len(parts) >= 1
+    ), f"Expected at least one part for the valid identifier: {identifier}"
+
+    if len(parts) == 1:
+        return Identifier(f"{parts[0].lower()}_choice")
+
+    return Identifier(
+        "{}{}_choice".format(
             parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
         )
     )

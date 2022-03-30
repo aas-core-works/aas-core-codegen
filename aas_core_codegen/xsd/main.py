@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 import xml.dom.minidom
 from typing import TextIO, MutableMapping, Optional, Tuple, List, Sequence
 
-from icontract import ensure
+from icontract import ensure, require
 
 import aas_core_codegen.xsd
 from aas_core_codegen import (
@@ -33,7 +33,7 @@ def _define_for_enumeration(enumeration: intermediate.Enumeration) -> List[ET.El
         restriction.append(ET.Element("xs:enumeration", {"value": literal.value}))
 
     element = ET.Element(
-        "xs:simpleType", {"name": xsd_naming.model_type(enumeration.name)}
+        "xs:simpleType", {"name": xsd_naming.type_name(enumeration.name)}
     )
     element.append(restriction)
 
@@ -181,8 +181,6 @@ def _generate_xs_element_for_a_list_property(
     # in the pre-condition to help mypy a bit
     assert isinstance(type_anno, intermediate.ListTypeAnnotation)
 
-    list_element = None  # type: Optional[ET.Element]
-
     min_occurs = "0"
     max_occurs = "unbounded"
     if len_constraint is not None:
@@ -192,32 +190,84 @@ def _generate_xs_element_for_a_list_property(
         if len_constraint.max_value is not None:
             max_occurs = str(len_constraint.max_value)
 
+    xs_element = None  # type: Optional[ET.Element]
+
     if isinstance(type_anno.items, intermediate.OurTypeAnnotation):
         # NOTE (mristin, 2021-11-13):
         # We need to nest the elements in the tag element to separate them in the
         # sequence.
 
-        if isinstance(
-            type_anno.items.symbol,
-            (
-                intermediate.Enumeration,
-                intermediate.AbstractClass,
-                intermediate.ConcreteClass,
-            ),
+        symbol = type_anno.items.symbol
+
+        if isinstance(symbol, intermediate.Enumeration):
+            return None, Error(
+                prop.parsed.node,
+                f"We do not know how to specify the list of enumerations "
+                f"for the property {prop.name!r} of {prop.specified_for.name!r} "
+                f"in the XSD with the type: {type_anno}",
+            )
+
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            return None, Error(
+                prop.parsed.node,
+                f"We do not know how to specify the list of constrained primitives "
+                f"for the property {prop.name!r} of {prop.specified_for.name!r} "
+                f"in the XSD with the type: {type_anno}",
+            )
+
+        elif isinstance(
+            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            list_element = ET.Element("xs:sequence")
-            list_element.append(
-                ET.Element(
-                    "xs:element",
+            if isinstance(symbol, intermediate.AbstractClass) or (
+                isinstance(symbol, intermediate.ConcreteClass)
+                and len(symbol.concrete_descendants) > 0
+            ):
+
+                choice_group_name = xsd_naming.choice_group_name(symbol.name)
+                xs_group = ET.Element(
+                    "xs:group",
                     {
+                        "ref": choice_group_name,
                         "minOccurs": min_occurs,
                         "maxOccurs": max_occurs,
-                        "name": naming.xml_class_name(type_anno.items.symbol.name),
-                        "type": xsd_naming.model_type(type_anno.items.symbol.name),
                     },
                 )
-            )
-        elif isinstance(type_anno.items.symbol, intermediate.ConstrainedPrimitive):
+
+                xs_sequence = ET.Element("xs:sequence")
+                xs_sequence.append(xs_group)
+
+                xs_complex_type = ET.Element("xs:complexType")
+                xs_complex_type.append(xs_sequence)
+
+                xs_element = ET.Element(
+                    "xs:element", {"name": naming.xml_property(prop.name)}
+                )
+                xs_element.append(xs_complex_type)
+            else:
+                assert isinstance(symbol, intermediate.ConcreteClass)
+                assert len(symbol.concrete_descendants) == 0
+
+                xs_element_inner = ET.Element(
+                    "xs:element",
+                    {
+                        "name": naming.xml_class_name(symbol.name),
+                        "type": xsd_naming.type_name(symbol.name),
+                        "minOccurs": min_occurs,
+                        "maxOccurs": max_occurs,
+                    },
+                )
+                xs_sequence = ET.Element("xs:sequence")
+                xs_sequence.append(xs_element_inner)
+
+                xs_complex_type = ET.Element("xs:complexType")
+                xs_complex_type.append(xs_sequence)
+
+                xs_element = ET.Element(
+                    "xs:element", {"name": naming.xml_property(prop.name)}
+                )
+                xs_element.append(xs_complex_type)
+
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
             return None, Error(
                 prop.parsed.node,
                 f"We do not know how to specify the list of constrained primitives "
@@ -225,8 +275,7 @@ def _generate_xs_element_for_a_list_property(
                 f"in the XSD with the type: {type_anno}",
             )
         else:
-            assert_never(type_anno.items.symbol)
-
+            assert_never(symbol)
     else:
         return None, Error(
             prop.parsed.node,
@@ -235,14 +284,7 @@ def _generate_xs_element_for_a_list_property(
             f"in the XSD with the type: {type_anno}",
         )
 
-    assert list_element is not None
-
-    xs_complex_type = ET.Element("xs:complexType")
-    xs_complex_type.append(list_element)
-
-    xs_element = ET.Element("xs:element", {"name": naming.xml_property(prop.name)})
-    xs_element.append(xs_complex_type)
-
+    assert xs_element is not None
     return xs_element, None
 
 
@@ -265,29 +307,58 @@ def _generate_xs_element_for_a_property(
         )
 
     elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-        if isinstance(
-            type_anno.symbol,
-            (
-                intermediate.Enumeration,
-                intermediate.AbstractClass,
-                intermediate.ConcreteClass,
-            ),
-        ):
+        symbol = type_anno.symbol
+
+        if isinstance(symbol, intermediate.Enumeration):
             xs_element = ET.Element(
                 "xs:element",
                 {
                     "name": naming.xml_property(prop.name),
-                    "type": xsd_naming.model_type(type_anno.symbol.name),
+                    "type": xsd_naming.type_name(symbol.name),
                 },
             )
 
-        elif isinstance(type_anno.symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
             xs_element = _generate_xs_element_for_a_primitive_property(
                 prop=prop,
                 len_constraint=len_constraint,
                 pattern_constraints=pattern_constraints,
             )
 
+        elif isinstance(
+            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            if isinstance(symbol, intermediate.AbstractClass) or (
+                isinstance(symbol, intermediate.ConcreteClass)
+                and len(symbol.concrete_descendants) > 0
+            ):
+                xs_sequence = ET.Element("xs:sequence")
+                xs_sequence.append(
+                    ET.Element(
+                        "xs:group", {"ref": xsd_naming.choice_group_name(symbol.name)}
+                    )
+                )
+
+                xs_complex_type = ET.Element("xs:complexType")
+                xs_complex_type.append(xs_sequence)
+
+                xs_element = ET.Element(
+                    "xs:element", {"name": naming.xml_property(prop.name)}
+                )
+                xs_element.append(xs_complex_type)
+            else:
+                assert (
+                    isinstance(symbol, intermediate.ConcreteClass)
+                    and len(symbol.concrete_descendants) == 0
+                )
+
+                xs_element = ET.Element(
+                    "xs:element",
+                    {
+                        "name": naming.xml_property(prop.name),
+                        "type": xsd_naming.type_name(symbol.name),
+                    },
+                )
         else:
             assert_never(type_anno.symbol)
 
@@ -410,11 +481,43 @@ def _define_for_class(
     xs_sequence.append(xs_group_ref)
 
     complex_type = ET.Element(
-        "xs:complexType", {"name": xsd_naming.model_type(cls.name)}
+        "xs:complexType", {"name": xsd_naming.type_name(cls.name)}
     )
     complex_type.append(xs_sequence)
 
     return [xs_group, complex_type], None
+
+
+@require(lambda cls: len(cls.concrete_descendants) > 0)
+def _generate_choice_group(cls: intermediate.ClassUnion) -> ET.Element:
+    """Generate a group that defines a choice of concrete descendants."""
+    xs_choice = ET.Element("xs:choice")
+
+    if isinstance(cls, intermediate.ConcreteClass):
+        xs_choice.append(
+            ET.Element(
+                "xs:element",
+                {
+                    "name": naming.xml_class_name(cls.name),
+                    "type": xsd_naming.type_name(cls.name),
+                },
+            )
+        )
+
+    for descendant in cls.concrete_descendants:
+        xs_choice.append(
+            ET.Element(
+                "xs:element",
+                {
+                    "name": naming.xml_class_name(descendant.name),
+                    "type": xsd_naming.type_name(descendant.name),
+                },
+            )
+        )
+
+    xs_group = ET.Element("xs:group", {"name": xsd_naming.choice_group_name(cls.name)})
+    xs_group.append(xs_choice)
+    return xs_group
 
 
 _WHITESPACE_RE = re.compile(r"\s+")
@@ -522,6 +625,12 @@ def _generate(
             )
         ]
 
+    # NOTE (mristin, 2022-03-30):
+    # We need to use minidom to extract the ``xmlns`` property as ElementTree removes
+    # it.
+    minidom_doc = xml.dom.minidom.parseString(root_element_as_text)
+    xmlns = minidom_doc.documentElement.getAttribute("xmlns")
+
     assert root is not None
 
     errors = []  # type: List[Error]
@@ -583,6 +692,12 @@ def _generate(
                 if definition_error is not None:
                     errors.append(definition_error)
                     continue
+
+                assert elements is not None
+
+                if len(symbol.concrete_descendants) > 0:
+                    choice_group = _generate_choice_group(cls=symbol)
+                    elements.append(choice_group)
             else:
                 assert_never(symbol)
 
@@ -592,16 +707,25 @@ def _generate(
     if len(errors) > 0:
         return None, errors
 
-    observed_definitions = dict()  # type: MutableMapping[str, ET.Element]
+    # Tag name 🠒 (name 🠒 element)
+    observed_definitions = dict(
+        dict()
+    )  # type: MutableMapping[str, MutableMapping[str, ET.Element]]
+
     for element in root:
         name = element.attrib.get("name", None)
         if name is None:
             continue
 
-        observed = observed_definitions.get(name, None)
-        if observed is not None:
+        observed_for_tag = observed_definitions.get(element.tag, None)
+        if observed_for_tag is None:
+            observed_for_tag = dict()
+            observed_definitions[element.tag] = observed_for_tag
+
+        observed_element = observed_for_tag.get(name, None)
+        if observed_element is not None:
             ours = ET.tostring(element, encoding="unicode", method="xml")
-            theirs = ET.tostring(observed, encoding="unicode", method="xml")
+            theirs = ET.tostring(observed_element, encoding="unicode", method="xml")
 
             errors.append(
                 Error(
@@ -617,10 +741,15 @@ def _generate(
                 )
             )
         else:
-            observed_definitions[name] = element
+            observed_for_tag[name] = element
 
     if len(errors) > 0:
         return None, errors
+
+    # NOTE (mristin, 2022-03-30):
+    # For some unknown reason, ElementTree erases the xmlns property of the root
+    # element. Therefore we need to add it here manually.
+    root.attrib["xmlns"] = xmlns
 
     text = ET.tostring(root, encoding="unicode", method="xml")
 
