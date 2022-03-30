@@ -38,6 +38,7 @@ META_MODEL_GROUPS = collections.OrderedDict(
                     "expected/real_meta_models/v3rc2/meta_model.py"
                 ),
                 _REPO_DIR / "test_data/smoke/test_main/expected/v3rc2.py",
+                _REPO_DIR / "test_data/xsd/test_main/v3rc2/input/meta_model.py",
             ],
         ),
     ]
