@@ -820,7 +820,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     assert code is not None
 
-    pth = context.output_dir / "schema.xml"
+    pth = context.output_dir / "schema.xsd"
     try:
         pth.write_text(code, encoding="utf-8")
     except Exception as exception:

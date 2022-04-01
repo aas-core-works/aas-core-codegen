@@ -7,6 +7,8 @@ import pathlib
 import tempfile
 import unittest
 
+import xmlschema
+
 import aas_core_codegen.main
 from aas_core_codegen.xsd import main as xsd_main
 
@@ -71,13 +73,16 @@ class Test_against_recorded(unittest.TestCase):
         "on",
     )
 
+    _REPO_DIR = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
+    PARENT_CASE_DIR = _REPO_DIR / "test_data" / "xsd" / "test_main"
+
     def test_cases(self) -> None:
-        repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
+        assert (
+            Test_against_recorded.PARENT_CASE_DIR.exists()
+            and Test_against_recorded.PARENT_CASE_DIR.is_dir()
+        ), f"{Test_against_recorded.PARENT_CASE_DIR=}"
 
-        parent_case_dir = repo_dir / "test_data" / "xsd" / "test_main"
-        assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
-
-        for case_dir in parent_case_dir.iterdir():
+        for case_dir in Test_against_recorded.PARENT_CASE_DIR.iterdir():
             assert case_dir.is_dir(), case_dir
 
             model_pth = case_dir / "input/meta_model.py"
@@ -97,9 +102,8 @@ class Test_against_recorded(unittest.TestCase):
                         expected_output_dir.exists() and expected_output_dir.is_dir()
                     ), expected_output_dir
 
-                    tmp_dir = (
-                        tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
-                    )
+                    # pylint: disable=consider-using-with
+                    tmp_dir = tempfile.TemporaryDirectory()
                     exit_stack.push(tmp_dir)
                     output_dir = pathlib.Path(tmp_dir.name)
 
@@ -144,7 +148,7 @@ class Test_against_recorded(unittest.TestCase):
                 # BEFORE-RELEASE (mristin, 2021-12-13):
                 #  check the remainder of the generated files
                 for relevant_rel_pth in [
-                    pathlib.Path("schema.xml"),
+                    pathlib.Path("schema.xsd"),
                 ]:
                     expected_pth = expected_output_dir / relevant_rel_pth
                     output_pth = output_dir / relevant_rel_pth
@@ -164,6 +168,29 @@ class Test_against_recorded(unittest.TestCase):
                             output_pth.read_text(encoding="utf-8"),
                             f"The files {expected_pth} and {output_pth} do not match.",
                         )
+
+    def test_on_examples(self) -> None:  # pylint: disable=no-self-use
+        assert (
+            Test_against_recorded.PARENT_CASE_DIR.exists()
+            and Test_against_recorded.PARENT_CASE_DIR.is_dir()
+        ), f"{Test_against_recorded.PARENT_CASE_DIR=}"
+
+        for case_dir in Test_against_recorded.PARENT_CASE_DIR.iterdir():
+            assert case_dir.is_dir(), case_dir
+
+            schema_pth = case_dir / "expected_output" / "schema.xsd"
+
+            schema = xmlschema.XMLSchema(str(schema_pth))
+
+            for data_pth in sorted(
+                (case_dir / "examples" / "expected").glob("**/*.xml")
+            ):
+                try:
+                    schema.validate(data_pth)
+                except xmlschema.validators.exceptions.XMLSchemaValidationError as err:
+                    raise AssertionError(
+                        f"Failed to validate {data_pth} against {schema_pth}"
+                    ) from err
 
 
 if __name__ == "__main__":
