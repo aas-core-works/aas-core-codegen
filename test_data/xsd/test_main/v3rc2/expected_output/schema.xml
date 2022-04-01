@@ -11,7 +11,7 @@
       <xs:element name="contentType" minOccurs="0">
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:pattern value="([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+/([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+([ 	]*;[ 	]*([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+=(([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+|&quot;(([	 !#-\[\]-~]|[\x80-\xff])|\\([	 !-~]|[\x80-\xff]))*&quot;))*"/>
+            <xs:pattern value="([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+/([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+([ 	]*;[ 	]*([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+=(([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+|&quot;(([	 !#-\[\]-~]|[-ÿ])|\\([	 !-~]|[-ÿ]))*&quot;))*"/>
             <xs:minLength value="1"/>
           </xs:restriction>
         </xs:simpleType>
@@ -786,7 +786,7 @@
       <xs:element name="mimeType">
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:pattern value="([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+/([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+([ 	]*;[ 	]*([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+=(([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+|&quot;(([	 !#-\[\]-~]|[\x80-\xff])|\\([	 !-~]|[\x80-\xff]))*&quot;))*"/>
+            <xs:pattern value="([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+/([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+([ 	]*;[ 	]*([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+=(([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+|&quot;(([	 !#-\[\]-~]|[-ÿ])|\\([	 !-~]|[-ÿ]))*&quot;))*"/>
             <xs:minLength value="1"/>
           </xs:restriction>
         </xs:simpleType>
@@ -809,7 +809,7 @@
       <xs:element name="contentType">
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:pattern value="([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+/([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+([ 	]*;[ 	]*([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+=(([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+|&quot;(([	 !#-\[\]-~]|[\x80-\xff])|\\([	 !-~]|[\x80-\xff]))*&quot;))*"/>
+            <xs:pattern value="([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+/([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+([ 	]*;[ 	]*([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+=(([!#$%&amp;'*+\-.^_`|~0-9a-zA-Z])+|&quot;(([	 !#-\[\]-~]|[-ÿ])|\\([	 !-~]|[-ÿ]))*&quot;))*"/>
             <xs:minLength value="1"/>
           </xs:restriction>
         </xs:simpleType>

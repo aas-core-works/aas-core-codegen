@@ -8,6 +8,60 @@ import tempfile
 import unittest
 
 import aas_core_codegen.main
+from aas_core_codegen.xsd import main as xsd_main
+
+
+class Test_undo_escaping_x(unittest.TestCase):
+    def test_empty(self) -> None:
+        self.assertEqual("", xsd_main._undo_escaping_backslash_x_in_pattern(""))
+
+    def test_no_escaped(self) -> None:
+        self.assertEqual(
+            "test me", xsd_main._undo_escaping_backslash_x_in_pattern("test me")
+        )
+
+    def test_only_escaped(self) -> None:
+        self.assertEqual(
+            "\xff", xsd_main._undo_escaping_backslash_x_in_pattern("\\xff")
+        )
+
+    def test_prefix(self) -> None:
+        self.assertEqual(
+            "A\xff", xsd_main._undo_escaping_backslash_x_in_pattern("A\\xff")
+        )
+
+    def test_suffix(self) -> None:
+        self.assertEqual(
+            "\xffB", xsd_main._undo_escaping_backslash_x_in_pattern("\\xffB")
+        )
+
+    def test_prefix_suffix(self) -> None:
+        self.assertEqual(
+            "A\xffB", xsd_main._undo_escaping_backslash_x_in_pattern("A\\xffB")
+        )
+
+    def test_multiple(self) -> None:
+        self.assertEqual(
+            "A\xf1B\xf2C",
+            xsd_main._undo_escaping_backslash_x_in_pattern("A\\xf1B\\xf2C"),
+        )
+
+    def test_complex(self) -> None:
+        pattern = (
+            "([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;"
+            "[ \t]*([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+|"
+            '"(([\t !#-\\[\\]-~]|[\\x80-\\xff])|\\\\([\t !-~]|[\\x80-\\xff]))*"))*'
+        )
+
+        expected = (
+            "([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+([ \t]*;"
+            "[ \t]*([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+|"
+            '"(([\t !#-\\[\\]-~]|[\x80-\xff])|\\\\([\t !-~]|[\x80-\xff]))*"))*'
+        )
+
+        self.assertEqual(
+            expected, xsd_main._undo_escaping_backslash_x_in_pattern(pattern)
+        )
 
 
 class Test_against_recorded(unittest.TestCase):
