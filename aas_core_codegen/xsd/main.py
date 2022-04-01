@@ -49,6 +49,37 @@ _PRIMITIVE_MAP = {
 }
 assert all(literal in _PRIMITIVE_MAP for literal in intermediate.PrimitiveType)
 
+_ESCAPE_BACKSLASH_X_RE = re.compile(r"\\x([a-fA-f0-9]{2})")
+
+
+def _undo_escaping_backslash_x_in_pattern(pattern: str) -> str:
+    """
+    Undo the escaping of `\\x??` in the ``pattern``.
+
+    This is necessary since XML Schema Validators do not know how to handle such escape
+    sequences in the patterns and need the verbatim characters.
+    """
+    parts = []  # type: List[str]
+    cursor = None  # type: Optional[int]
+    for mtch in re.finditer(_ESCAPE_BACKSLASH_X_RE, pattern):
+        if cursor is None:
+            parts.append(pattern[: mtch.start()])
+        else:
+            parts.append(pattern[cursor : mtch.start()])
+
+        ascii_code = int(mtch.group(1), base=16)
+        character = chr(ascii_code)
+        parts.append(character)
+        cursor = mtch.end()
+
+    if cursor is None:
+        parts.append(pattern)
+    else:
+        if cursor < len(pattern):
+            parts.append(pattern[cursor:])
+
+    return "".join(parts)
+
 
 def _generate_xs_restriction(
     base_type: intermediate.PrimitiveType,
@@ -70,7 +101,12 @@ def _generate_xs_restriction(
     if pattern_constraints is not None and len(pattern_constraints) > 0:
         if len(pattern_constraints) == 1:
             pattern = ET.Element(
-                "xs:pattern", {"value": pattern_constraints[0].pattern}
+                "xs:pattern",
+                {
+                    "value": _undo_escaping_backslash_x_in_pattern(
+                        pattern_constraints[0].pattern
+                    )
+                },
             )
 
             restriction.append(pattern)
@@ -81,7 +117,12 @@ def _generate_xs_restriction(
             for pattern_constraint in pattern_constraints:
                 nested_restriction = ET.Element("xs:restriction")
                 pattern = ET.Element(
-                    "xs:pattern", {"value": pattern_constraint.pattern}
+                    "xs:pattern",
+                    {
+                        "value": _undo_escaping_backslash_x_in_pattern(
+                            pattern_constraint.pattern
+                        )
+                    },
                 )
 
                 nested_restriction.append(pattern)
@@ -781,7 +822,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     pth = context.output_dir / "schema.xml"
     try:
-        pth.write_text(code)
+        pth.write_text(code, encoding="utf-8")
     except Exception as exception:
         run.write_error_report(
             message=f"Failed to write the XML Schema Definition to {pth}",
