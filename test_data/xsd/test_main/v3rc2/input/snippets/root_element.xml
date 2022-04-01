@@ -4,5 +4,5 @@
         elementFormDefault="qualified"
         targetNamespace="http://www.admin-shell.io/aas/3/0"
 >
-    <xs:element name="assetAdministrationShellEnvironment" type="assetAdministrationShellEnvironment_t" />
+    <xs:element name="environment" type="environment_t" />
 </xs:schema>
