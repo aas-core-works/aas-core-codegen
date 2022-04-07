@@ -870,13 +870,14 @@ class _InvariantTranspiler(
         ):
             iteration = Stripped(f"({iteration})")
 
+        # NOTE (mristin, 2022-04-7):
+        # We can not use ``textwrap.dedent`` here since ``condition`` contains multiple
+        # lines.
         return (
             Stripped(
-                textwrap.dedent(
-                    f"""\
-                {iteration}.All(
-                {I}{variable} => {condition})"""
-                )
+                f"""\
+{iteration}.All(
+{I}{variable} => {condition})"""
             ),
             None,
         )
