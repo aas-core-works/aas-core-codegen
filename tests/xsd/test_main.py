@@ -8,6 +8,7 @@ import tempfile
 import unittest
 
 import xmlschema
+import aas_core_meta.v3rc2
 
 import aas_core_codegen.main
 from aas_core_codegen.xsd import main as xsd_main
@@ -76,16 +77,20 @@ class Test_against_recorded(unittest.TestCase):
     _REPO_DIR = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
     PARENT_CASE_DIR = _REPO_DIR / "test_data" / "xsd" / "test_main"
 
-    def test_cases(self) -> None:
+    def test_against_aas_core_meta(self) -> None:
         assert (
             Test_against_recorded.PARENT_CASE_DIR.exists()
             and Test_against_recorded.PARENT_CASE_DIR.is_dir()
         ), f"{Test_against_recorded.PARENT_CASE_DIR=}"
 
-        for case_dir in Test_against_recorded.PARENT_CASE_DIR.iterdir():
+        for module in [aas_core_meta.v3rc2]:
+            case_dir = Test_against_recorded.PARENT_CASE_DIR / module.__name__
             assert case_dir.is_dir(), case_dir
 
-            model_pth = case_dir / "input/meta_model.py"
+            assert (
+                module.__file__ is not None
+            ), f"Expected the module {module!r} to have a __file__, but it has None"
+            model_pth = pathlib.Path(module.__file__)
             assert model_pth.exists() and model_pth.is_file(), model_pth
 
             snippets_dir = case_dir / "input/snippets"

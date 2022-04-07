@@ -20,7 +20,6 @@ class Step(enum.Enum):
     REFORMAT = "reformat"
     MYPY = "mypy"
     PYLINT = "pylint"
-    CHECK_TEST_META_MODELS_COINCIDE = "check-test-meta-models-coincide"
     TEST = "test"
     DOCTEST = "doctest"
     CHECK_INIT_AND_SETUP_COINCIDE = "check-init-and-setup-coincide"
@@ -162,24 +161,6 @@ def main() -> int:
             return 1
     else:
         print("Skipped pylint'ing.")
-
-    if (
-        Step.CHECK_TEST_META_MODELS_COINCIDE
-        and Step.CHECK_TEST_META_MODELS_COINCIDE not in skips
-    ):
-        print("Checking that the test meta-models coincide...")
-        exit_code = call_and_report(
-            verb="check that the test meta-models coincide",
-            cmd=[
-                sys.executable,
-                "continuous_integration/check_test_meta_models_coincide.py",
-            ],
-            cwd=repo_root,
-        )
-        if exit_code != 0:
-            return 1
-    else:
-        print("Skipped checking that the test meta-models coincide.")
 
     if Step.TEST in selects and Step.TEST not in skips:
         print("Testing...")

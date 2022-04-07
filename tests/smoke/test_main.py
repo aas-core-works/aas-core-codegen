@@ -7,6 +7,9 @@ import os
 import pathlib
 import unittest
 
+import aas_core_meta.v3rc1
+import aas_core_meta.v3rc2
+
 from aas_core_codegen.smoke import main as smoke_main
 
 
@@ -25,7 +28,15 @@ class Test_against_recorded(unittest.TestCase):
 
         expected_dir = parent_case_dir / "expected"
 
-        for model_pth in sorted(expected_dir.glob("**/*.py")):
+        model_paths_of_the_expected = sorted(
+            list(expected_dir.glob("**/*.py"))
+            + [
+                pathlib.Path(aas_core_meta.v3rc1.__file__),
+                pathlib.Path(aas_core_meta.v3rc2.__file__),
+            ]
+        )
+
+        for model_pth in model_paths_of_the_expected:
             assert model_pth.is_file(), f"{model_pth=}"
 
             stderr = io.StringIO()

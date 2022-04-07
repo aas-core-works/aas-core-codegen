@@ -14,6 +14,8 @@ from typing import Optional, Tuple, List
 import asttokens
 import docutils.nodes
 
+import aas_core_meta.v3rc2
+
 import tests.common
 from aas_core_codegen import parse
 from aas_core_codegen.common import Error, Identifier
@@ -457,6 +459,57 @@ class Test_against_recorded(unittest.TestCase):
                         symbol_table_str,
                         f"{case_dir=}, {error=}",
                     )
+
+    def test_real_meta_models(self) -> None:
+        this_dir = pathlib.Path(os.path.realpath(__file__)).parent
+        test_cases_dir = this_dir.parent / "test_data/parse/real_meta_models"
+
+        assert test_cases_dir.exists(), f"{test_cases_dir=}"
+        assert test_cases_dir.is_dir(), f"{test_cases_dir=}"
+
+        for module in [aas_core_meta.v3rc2]:
+            case_dir = test_cases_dir / module.__name__
+
+            assert (
+                module.__file__ is not None
+            ), f"Expected the module {module!r} to have a __file__, but it has None"
+            meta_model_pth = pathlib.Path(module.__file__)
+
+            try:
+                source = meta_model_pth.read_text(encoding="utf-8")
+
+                symbol_table, error = tests.common.parse_source(source)
+
+            except Exception as exception:
+                raise AssertionError(
+                    f"Expected no exception when parsing "
+                    f"the real meta-model {meta_model_pth}"
+                ) from exception
+
+            if error is not None:
+                raise AssertionError(
+                    f"Expected no errors when parsing "
+                    f"the real meta-model {meta_model_pth}, but got:\n"
+                    f"{tests.common.most_underlying_messages(error)}"
+                )
+
+            expected_symbol_table_pth = case_dir / "expected_symbol_table.txt"
+
+            assert symbol_table is not None
+
+            symbol_table_str = parse.dump(symbol_table)
+
+            if Test_against_recorded.RERECORD:
+                expected_symbol_table_pth.write_text(symbol_table_str, encoding="utf-8")
+            else:
+                expected_symbol_table_str = expected_symbol_table_pth.read_text(
+                    encoding="utf-8"
+                )
+                self.assertEqual(
+                    expected_symbol_table_str,
+                    symbol_table_str,
+                    f"{case_dir=}, {error=}",
+                )
 
 
 if __name__ == "__main__":

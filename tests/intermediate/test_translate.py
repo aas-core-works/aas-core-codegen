@@ -6,6 +6,8 @@ import textwrap
 import unittest
 from typing import List, Tuple
 
+import aas_core_meta.v3rc2
+
 import tests.common
 from aas_core_codegen import intermediate
 from aas_core_codegen.intermediate import doc as intermediate_doc
@@ -266,6 +268,68 @@ class Test_against_recorded(unittest.TestCase):
                         symbol_table_str,
                         f"{case_dir=}, {error=}",
                     )
+
+    def test_real_meta_models(self) -> None:
+        this_dir = pathlib.Path(os.path.realpath(__file__)).parent
+        repo_root = this_dir.parent.parent
+        test_cases_dir = repo_root / "test_data/intermediate/real_meta_models"
+
+        for module in [aas_core_meta.v3rc2]:
+            case_dir = test_cases_dir / module.__name__
+
+            assert (
+                module.__file__ is not None
+            ), f"Expected the module {module!r} to have a __file__, but it has None"
+            meta_model_pth = pathlib.Path(module.__file__)
+
+            try:
+                source = meta_model_pth.read_text(encoding="utf-8")
+            except Exception as exception:
+                raise AssertionError(
+                    f"Unexpected exception when reading " f"from {meta_model_pth}"
+                ) from exception
+
+            try:
+                symbol_table, error = tests.common.translate_source_to_intermediate(
+                    source=source
+                )
+            except Exception as exception:
+                raise AssertionError(
+                    f"Unexpected exception in source-to-intermediate translation "
+                    f"for source {meta_model_pth.relative_to(repo_root)}"
+                ) from exception
+
+            if error is not None:
+                raise AssertionError(
+                    f"Expected no errors when translating "
+                    f"the real meta-model {module.__name__}, but got:\n"
+                    f"{tests.common.most_underlying_messages(error)}"
+                )
+
+            expected_symbol_table_pth = case_dir / "expected_symbol_table.txt"
+
+            assert symbol_table is not None
+
+            symbol_table_str = intermediate.dump(symbol_table)
+
+            if Test_against_recorded.RERECORD:
+                expected_symbol_table_pth.write_text(symbol_table_str, encoding="utf-8")
+            else:
+                try:
+                    expected_symbol_table_str = expected_symbol_table_pth.read_text(
+                        encoding="utf-8"
+                    )
+                except Exception as exception:
+                    raise RuntimeError(
+                        f"Failed to read the file representing "
+                        f"the expected symbol table: {expected_symbol_table_pth}"
+                    ) from exception
+
+                self.assertEqual(
+                    expected_symbol_table_str,
+                    symbol_table_str,
+                    f"{case_dir=}, {error=}",
+                )
 
 
 if __name__ == "__main__":
