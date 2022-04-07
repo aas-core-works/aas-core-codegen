@@ -1672,12 +1672,16 @@ namespace AasCore.Aas3
                 }
 
                 if (!(
-                    that.Category == "CONSTANT" || that.Category == "PARAMETER" || that.Category == "VARIABLE"))
+                    that.Category == "CONSTANT"
+                    || that.Category == "PARAMETER"
+                    || that.Category == "VARIABLE"))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
-                        "that.Category == \"CONSTANT\" || that.Category == \"PARAMETER\" || that.Category == \"VARIABLE\"");
+                        "that.Category == \"CONSTANT\"\n" +
+                        "|| that.Category == \"PARAMETER\"\n" +
+                        "|| that.Category == \"VARIABLE\"");
                 }
 
                 if (that.Extensions != null)
@@ -2055,14 +2059,18 @@ namespace AasCore.Aas3
 
                 if (!(
                     !(that.Submodels != null)
-                    || (that.Submodels.All(
-                        reference => Verification.IsModelReferenceTo(reference, KeyElements.Submodel)))))
+                    || (
+                        that.Submodels.All(
+                            reference => Verification.IsModelReferenceTo(reference, KeyElements.Submodel))
+                    )))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "!(that.Submodels != null)\n" +
-                        "|| (that.Submodels.All(\n" +
-                        "    reference => Verification.IsModelReferenceTo(reference, KeyElements.Submodel)))");
+                        "|| (\n" +
+                        "    that.Submodels.All(\n" +
+                        "        reference => Verification.IsModelReferenceTo(reference, KeyElements.Submodel))\n" +
+                        ")");
                 }
 
                 if (that.Extensions != null)
@@ -2341,15 +2349,19 @@ namespace AasCore.Aas3
 
                 if (!(
                     !(that.SubmodelElements != null)
-                    || (that.SubmodelElements.All(
-                        element => element.IdShort != null))))
+                    || (
+                        that.SubmodelElements.All(
+                            element => element.IdShort != null)
+                    )))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Short IDs need to be defined for all the submodel elements.\n" +
                         "!(that.SubmodelElements != null)\n" +
-                        "|| (that.SubmodelElements.All(\n" +
-                        "    element => element.IdShort != null))");
+                        "|| (\n" +
+                        "    that.SubmodelElements.All(\n" +
+                        "        element => element.IdShort != null)\n" +
+                        ")");
                 }
 
                 if (!(
@@ -2575,18 +2587,28 @@ namespace AasCore.Aas3
                 }
 
                 if (!(
-                    !((that.Value != null) && (that.SemanticIdListElement != null))
-                    || (that.Value.All(
-                        child => !(child.SemanticId != null)
-                    || (child.SemanticId == that.SemanticIdListElement)))))
+                    !(
+                        (that.Value != null)
+                        && (that.SemanticIdListElement != null)
+                    )
+                    || (
+                        that.Value.All(
+                            child => !(child.SemanticId != null)
+                                || (child.SemanticId == that.SemanticIdListElement))
+                    )))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-107: If a first level child element has a semantic ID it shall be identical to semantic ID list element.\n" +
-                        "!((that.Value != null) && (that.SemanticIdListElement != null))\n" +
-                        "|| (that.Value.All(\n" +
-                        "    child => !(child.SemanticId != null)\n" +
-                        "|| (child.SemanticId == that.SemanticIdListElement)))");
+                        "!(\n" +
+                        "    (that.Value != null)\n" +
+                        "    && (that.SemanticIdListElement != null)\n" +
+                        ")\n" +
+                        "|| (\n" +
+                        "    that.Value.All(\n" +
+                        "        child => !(child.SemanticId != null)\n" +
+                        "            || (child.SemanticId == that.SemanticIdListElement))\n" +
+                        ")");
                 }
 
                 if (!(
@@ -2602,39 +2624,65 @@ namespace AasCore.Aas3
 
                 if (!(
                     !(that.Value != null)
-                    || (that.Value.All(
-                        element => Verification.SubmodelElementIsOfType(element, that.TypeValueListElement)))))
+                    || (
+                        that.Value.All(
+                            element => Verification.SubmodelElementIsOfType(element, that.TypeValueListElement))
+                    )))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-108: All first level child elements shall have the same submodel element type as specified in type value list element.\n" +
                         "!(that.Value != null)\n" +
-                        "|| (that.Value.All(\n" +
-                        "    element => Verification.SubmodelElementIsOfType(element, that.TypeValueListElement)))");
+                        "|| (\n" +
+                        "    that.Value.All(\n" +
+                        "        element => Verification.SubmodelElementIsOfType(element, that.TypeValueListElement))\n" +
+                        ")");
                 }
 
                 if (!(
-                    !((that.Value != null) && (that.TypeValueListElement == SubmodelElementElements.Property || that.TypeValueListElement == SubmodelElementElements.Range))
-                    || ((that.ValueTypeListElement != null) && Verification.PropertiesOrRangesHaveValueType(that.Value, that.ValueTypeListElement))))
+                    !(
+                        (that.Value != null)
+                        && (
+                            that.TypeValueListElement == SubmodelElementElements.Property
+                            || that.TypeValueListElement == SubmodelElementElements.Range
+                        )
+                    )
+                    || (
+                        (that.ValueTypeListElement != null)
+                        && Verification.PropertiesOrRangesHaveValueType(that.Value, that.ValueTypeListElement)
+                    )))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-109: If type value list element is equal to Property or Range value type list element shall be set and all first level child elements shall have the value type as specified in value type list element.\n" +
-                        "!((that.Value != null) && (that.TypeValueListElement == SubmodelElementElements.Property || that.TypeValueListElement == SubmodelElementElements.Range))\n" +
-                        "|| ((that.ValueTypeListElement != null) && Verification.PropertiesOrRangesHaveValueType(that.Value, that.ValueTypeListElement))");
+                        "!(\n" +
+                        "    (that.Value != null)\n" +
+                        "    && (\n" +
+                        "        that.TypeValueListElement == SubmodelElementElements.Property\n" +
+                        "        || that.TypeValueListElement == SubmodelElementElements.Range\n" +
+                        "    )\n" +
+                        ")\n" +
+                        "|| (\n" +
+                        "    (that.ValueTypeListElement != null)\n" +
+                        "    && Verification.PropertiesOrRangesHaveValueType(that.Value, that.ValueTypeListElement)\n" +
+                        ")");
                 }
 
                 if (!(
                     !(that.Value != null)
-                    || (that.Value.All(
-                        element => element.IdShort != null))))
+                    || (
+                        that.Value.All(
+                            element => element.IdShort != null)
+                    )))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Short IDs need to be defined for all the elements.\n" +
                         "!(that.Value != null)\n" +
-                        "|| (that.Value.All(\n" +
-                        "    element => element.IdShort != null))");
+                        "|| (\n" +
+                        "    that.Value.All(\n" +
+                        "        element => element.IdShort != null)\n" +
+                        ")");
                 }
 
                 if (!(
@@ -2877,15 +2925,19 @@ namespace AasCore.Aas3
 
                 if (!(
                     !(that.Value != null)
-                    || (that.Value.All(
-                        element => element.IdShort != null))))
+                    || (
+                        that.Value.All(
+                            element => element.IdShort != null)
+                    )))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Short IDs need to be defined for all the elements.\n" +
                         "!(that.Value != null)\n" +
-                        "|| (that.Value.All(\n" +
-                        "    element => element.IdShort != null))");
+                        "|| (\n" +
+                        "    that.Value.All(\n" +
+                        "        element => element.IdShort != null)\n" +
+                        ")");
                 }
 
                 if (!(
@@ -3092,12 +3144,16 @@ namespace AasCore.Aas3
                 }
 
                 if (!(
-                    that.Category == "CONSTANT" || that.Category == "PARAMETER" || that.Category == "VARIABLE"))
+                    that.Category == "CONSTANT"
+                    || that.Category == "PARAMETER"
+                    || that.Category == "VARIABLE"))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
-                        "that.Category == \"CONSTANT\" || that.Category == \"PARAMETER\" || that.Category == \"VARIABLE\"");
+                        "that.Category == \"CONSTANT\"\n" +
+                        "|| that.Category == \"PARAMETER\"\n" +
+                        "|| that.Category == \"VARIABLE\"");
                 }
 
                 if (!(
@@ -3315,12 +3371,16 @@ namespace AasCore.Aas3
                 }
 
                 if (!(
-                    that.Category == "CONSTANT" || that.Category == "PARAMETER" || that.Category == "VARIABLE"))
+                    that.Category == "CONSTANT"
+                    || that.Category == "PARAMETER"
+                    || that.Category == "VARIABLE"))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
-                        "that.Category == \"CONSTANT\" || that.Category == \"PARAMETER\" || that.Category == \"VARIABLE\"");
+                        "that.Category == \"CONSTANT\"\n" +
+                        "|| that.Category == \"PARAMETER\"\n" +
+                        "|| that.Category == \"VARIABLE\"");
                 }
 
                 if (that.Extensions != null)
@@ -3520,12 +3580,16 @@ namespace AasCore.Aas3
                 }
 
                 if (!(
-                    that.Category == "CONSTANT" || that.Category == "PARAMETER" || that.Category == "VARIABLE"))
+                    that.Category == "CONSTANT"
+                    || that.Category == "PARAMETER"
+                    || that.Category == "VARIABLE"))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
-                        "that.Category == \"CONSTANT\" || that.Category == \"PARAMETER\" || that.Category == \"VARIABLE\"");
+                        "that.Category == \"CONSTANT\"\n" +
+                        "|| that.Category == \"PARAMETER\"\n" +
+                        "|| that.Category == \"VARIABLE\"");
                 }
 
                 if (!(
@@ -3753,12 +3817,16 @@ namespace AasCore.Aas3
                 }
 
                 if (!(
-                    that.Category == "CONSTANT" || that.Category == "PARAMETER" || that.Category == "VARIABLE"))
+                    that.Category == "CONSTANT"
+                    || that.Category == "PARAMETER"
+                    || that.Category == "VARIABLE"))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
-                        "that.Category == \"CONSTANT\" || that.Category == \"PARAMETER\" || that.Category == \"VARIABLE\"");
+                        "that.Category == \"CONSTANT\"\n" +
+                        "|| that.Category == \"PARAMETER\"\n" +
+                        "|| that.Category == \"VARIABLE\"");
                 }
 
                 if (that.Extensions != null)
@@ -3955,12 +4023,16 @@ namespace AasCore.Aas3
                 }
 
                 if (!(
-                    that.Category == "CONSTANT" || that.Category == "PARAMETER" || that.Category == "VARIABLE"))
+                    that.Category == "CONSTANT"
+                    || that.Category == "PARAMETER"
+                    || that.Category == "VARIABLE"))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
-                        "that.Category == \"CONSTANT\" || that.Category == \"PARAMETER\" || that.Category == \"VARIABLE\"");
+                        "that.Category == \"CONSTANT\"\n" +
+                        "|| that.Category == \"PARAMETER\"\n" +
+                        "|| that.Category == \"VARIABLE\"");
                 }
 
                 if (that.Extensions != null)
@@ -4702,12 +4774,44 @@ namespace AasCore.Aas3
                 }
 
                 if (!(
-                    (that.EntityType == EntityType.SelfManagedEntity && (((that.GlobalAssetId != null) && (that.GlobalAssetId == null)) || ((that.GlobalAssetId == null) && (that.GlobalAssetId != null)))) || ((that.GlobalAssetId == null) && (that.SpecificAssetId == null))))
+                    (
+                        that.EntityType == EntityType.SelfManagedEntity
+                        && (
+                            (
+                                (that.GlobalAssetId != null)
+                                && (that.GlobalAssetId == null)
+                            )
+                            || (
+                                (that.GlobalAssetId == null)
+                                && (that.GlobalAssetId != null)
+                            )
+                        )
+                    )
+                    || (
+                        (that.GlobalAssetId == null)
+                        && (that.SpecificAssetId == null)
+                    )))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-014: Either the attribute global asset ID or specific asset ID must be set if entity type is set to 'SelfManagedEntity'. They are not existing otherwise.\n" +
-                        "(that.EntityType == EntityType.SelfManagedEntity && (((that.GlobalAssetId != null) && (that.GlobalAssetId == null)) || ((that.GlobalAssetId == null) && (that.GlobalAssetId != null)))) || ((that.GlobalAssetId == null) && (that.SpecificAssetId == null))");
+                        "(\n" +
+                        "    that.EntityType == EntityType.SelfManagedEntity\n" +
+                        "    && (\n" +
+                        "        (\n" +
+                        "            (that.GlobalAssetId != null)\n" +
+                        "            && (that.GlobalAssetId == null)\n" +
+                        "        )\n" +
+                        "        || (\n" +
+                        "            (that.GlobalAssetId == null)\n" +
+                        "            && (that.GlobalAssetId != null)\n" +
+                        "        )\n" +
+                        "    )\n" +
+                        ")\n" +
+                        "|| (\n" +
+                        "    (that.GlobalAssetId == null)\n" +
+                        "    && (that.SpecificAssetId == null)\n" +
+                        ")");
                 }
 
                 if (that.Extensions != null)

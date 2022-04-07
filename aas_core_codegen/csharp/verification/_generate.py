@@ -441,12 +441,34 @@ class _InvariantTranspiler(
         if isinstance(node.antecedent, no_parentheses_types_in_this_context):
             not_antecedent = f"!{antecedent}"
         else:
-            not_antecedent = f"!({antecedent})"
+            # NOTE (mristin, 2022-04-7):
+            # This is a very rudimentary heuristic for breaking the lines, and can be
+            # greatly improved by rendering into C# code. However, at this point, we
+            # lack time for more sophisticated reformatting approaches.
+            if "\n" in antecedent:
+                not_antecedent = f"""\
+!(
+{I}{indent_but_first_line(antecedent, I)}
+)"""
+            else:
+                not_antecedent = f"!({antecedent})"
 
         if not isinstance(node.consequent, no_parentheses_types_in_this_context):
-            consequent = Stripped(f"({consequent})")
+            # NOTE (mristin, 2022-04-7):
+            # This is a very rudimentary heuristic for breaking the lines, and can be
+            # greatly improved by rendering into C# code. However, at this point, we
+            # lack time for more sophisticated reformatting approaches.
+            if "\n" in consequent:
+                consequent = Stripped(
+                    f"""\
+(
+{I}{indent_but_first_line(consequent, I)}
+)"""
+                )
+            else:
+                consequent = Stripped(f"({consequent})")
 
-        return Stripped(f"{not_antecedent}\n" f"|| {consequent}"), None
+        return Stripped(f"{not_antecedent}\n|| {consequent}"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_method_call(
@@ -741,7 +763,19 @@ class _InvariantTranspiler(
             )
 
             if not isinstance(value_node, no_parentheses_types_in_this_context):
-                value = Stripped(f"({value})")
+                # NOTE (mristin, 2022-04-7):
+                # This is a very rudimentary heuristic for breaking the lines, and can
+                # be greatly improved by rendering into C# code. However, at this point,
+                # we lack time for more sophisticated reformatting approaches.
+                if "\n" in value:
+                    value = Stripped(
+                        f"""\
+(
+{I}{indent_but_first_line(value, I)}
+)"""
+                    )
+                else:
+                    value = Stripped(f"({value})")
 
             values.append(value)
 
@@ -750,9 +784,14 @@ class _InvariantTranspiler(
                 node.original_node, "Failed to transpile the conjunction", errors
             )
 
-        # BEFORE-RELEASE (mristin, 2021-12-13):
-        #  add heuristic for breaking the lines
-        return Stripped(" && ".join(values)), None
+        writer = io.StringIO()
+        for i, value in enumerate(values):
+            if i == 0:
+                writer.write(value)
+            else:
+                writer.write(f"\n&& {value}")
+
+        return Stripped(writer.getvalue()), None
 
     def transform_or(
         self, node: parse_tree.Or
@@ -777,7 +816,19 @@ class _InvariantTranspiler(
             )
 
             if not isinstance(value_node, no_parentheses_types_in_this_context):
-                value = Stripped(f"({value})")
+                # NOTE (mristin, 2022-04-7):
+                # This is a very rudimentary heuristic for breaking the lines, and can
+                # be greatly improved by rendering into C# code. However, at this point,
+                # we lack time for more sophisticated reformatting approaches.
+                if "\n" in value:
+                    value = Stripped(
+                        f"""\
+(
+{I}{indent_but_first_line(value, I)}
+)"""
+                    )
+                else:
+                    value = Stripped(f"({value})")
 
             values.append(value)
 
@@ -786,9 +837,14 @@ class _InvariantTranspiler(
                 node.original_node, "Failed to transpile the conjunction", errors
             )
 
-        # BEFORE-RELEASE (mristin, 2021-12-13):
-        #  add heuristic for breaking the lines
-        return Stripped(" || ".join(values)), None
+        writer = io.StringIO()
+        for i, value in enumerate(values):
+            if i == 0:
+                writer.write(value)
+            else:
+                writer.write(f"\n|| {value}")
+
+        return Stripped(writer.getvalue()), None
 
     def transform_joined_str(
         self, node: parse_tree.JoinedStr
@@ -877,7 +933,7 @@ class _InvariantTranspiler(
             Stripped(
                 f"""\
 {iteration}.All(
-{I}{variable} => {condition})"""
+{I}{variable} => {indent_but_first_line(condition, II)})"""
             ),
             None,
         )
