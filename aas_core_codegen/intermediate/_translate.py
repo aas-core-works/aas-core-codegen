@@ -2747,14 +2747,14 @@ def _second_pass_to_stack_constructors_in_place(
             # internal clients in the submodules.
 
             # noinspection PyFinal
-            symbol.constructor.contracts.snapshots = list(
+            symbol.constructor.contracts.snapshots = list(  # type: ignore
                 itertools.chain(
                     inherited_snapshots, symbol.constructor.contracts.snapshots
                 )
             )
 
             # noinspection PyFinal
-            symbol.constructor.contracts.postconditions = list(
+            symbol.constructor.contracts.postconditions = list(  # type: ignore
                 itertools.chain(
                     inherited_postconditions,
                     symbol.constructor.contracts.postconditions,
