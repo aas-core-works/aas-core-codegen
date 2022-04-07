@@ -631,7 +631,7 @@ class _InvariantTranspiler(
         elif isinstance(node.value, (int, float)):
             return Stripped(str(node.value)), None
         elif isinstance(node.value, str):
-            return Stripped(repr(node.value)), None
+            return Stripped(csharp_common.string_literal(node.value)), None
         else:
             assert_never(node.value)
 
