@@ -624,6 +624,28 @@ class Snapshot:
 class Contracts:
     """Represent the set of contracts for a method or a function."""
 
+    # NOTE (mristin, 2022-04-7):
+    # Common programming languages which work with contracts usually implement
+    # pre-conditions in a disjunctive normal form, *i.e.* as a disjunction of
+    # conjunctions, where at least one conjunction needs to hold. The individual
+    # conjunctions correspond to the levels of the inheritance hierarchy.
+    #
+    # However, we have not touched methods at the moment nor their proper inheritance.
+    # Therefore we leave the pre-conditions in the intermediate representation as they
+    # would appear in the code, without inheritance and hence without disjunctions.
+    # In the future, once we want to tackle the methods as a feature, we need to change
+    # the way how we model and resolve the pre-conditions through
+    # the inheritance hierarchy.
+
+    #: Pre-conditions that need to hold *before* the call
+    preconditions: Final[Sequence[Contract]]
+
+    #: Snapshots which are captured *before* the call
+    snapshots: Final[Sequence[Snapshot]]
+
+    #: Post-conditions that need to hold *after* the call
+    postconditions: Final[Sequence[Contract]]
+
     def __init__(
         self,
         preconditions: Sequence[Contract],
