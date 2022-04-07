@@ -737,7 +737,10 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
     def transform_is_none(self, node: IsNone) -> stringify.Entity:
         return stringify.Entity(
             name=IsNone.__name__,
-            properties=[stringify.Property("value", self.transform(node.value))],
+            properties=[
+                stringify.Property("value", self.transform(node.value)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
         )
 
     def transform_is_not_none(self, node: IsNotNone) -> stringify.Entity:
