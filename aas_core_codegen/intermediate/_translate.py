@@ -40,6 +40,7 @@ from aas_core_codegen.intermediate import (
     construction,
     doc,
     pattern_verification,
+    rendering,
 )
 from aas_core_codegen.intermediate._types import (
     SymbolTable,
@@ -699,7 +700,7 @@ def _to_signature_description(
         parsed=parsed,
     )
 
-    for arg_ref_in_doc, _ in _find_all_in_signature_description(
+    for arg_ref_in_doc in _find_all_in_signature_description(
         element_type=doc.ArgumentReference, signature_description=description
     ):
         assert isinstance(arg_ref_in_doc.reference, str)
@@ -1777,94 +1778,119 @@ _DocElementT = TypeVar("_DocElementT", bound=docutils.nodes.Element)
 
 def _find_all_in_symbol_description(
     element_type: Type[_DocElementT], symbol_description: SymbolDescription
-) -> Iterator[Tuple[_DocElementT, DescriptionUnion]]:
+) -> Iterator[_DocElementT]:
     """Iterate over all the fields of the description and yield the desired elements."""
-    for element in symbol_description.summary.findall(element_type):
-        yield element, symbol_description
+    yield from symbol_description.summary.findall(element_type)
 
     for remark in symbol_description.remarks:
-        for element in remark.findall(element_type):
-            yield element, symbol_description
+        yield from remark.findall(element_type)
 
     for constraint in symbol_description.constraints_by_identifier.values():
-        for element in constraint.findall(element_type):
-            yield element, symbol_description
+        yield from constraint.findall(element_type)
 
 
 def _find_all_in_enumeration_literal_description(
     element_type: Type[_DocElementT],
     enumeration_literal_description: EnumerationLiteralDescription,
-) -> Iterator[Tuple[_DocElementT, DescriptionUnion]]:
+) -> Iterator[_DocElementT]:
     """Iterate over all the fields of the description and yield the desired elements."""
-    for element in enumeration_literal_description.summary.findall(element_type):
-        yield element, enumeration_literal_description
+    yield from enumeration_literal_description.summary.findall(element_type)
 
     for remark in enumeration_literal_description.remarks:
-        for element in remark.findall(element_type):
-            yield element, enumeration_literal_description
+        yield from remark.findall(element_type)
 
 
 def _find_all_in_property_description(
     element_type: Type[_DocElementT], property_description: PropertyDescription
-) -> Iterator[Tuple[_DocElementT, DescriptionUnion]]:
+) -> Iterator[_DocElementT]:
     """Iterate over all the fields of the description and yield the desired elements."""
-    for element in property_description.summary.findall(element_type):
-        yield element, property_description
+    yield from property_description.summary.findall(element_type)
 
     for remark in property_description.remarks:
-        for element in remark.findall(element_type):
-            yield element, property_description
+        yield from remark.findall(element_type)
 
     for body in property_description.constraints_by_identifier.values():
-        for element in body.findall(element_type):
-            yield element, property_description
+        yield from body.findall(element_type)
 
 
 def _find_all_in_signature_description(
     element_type: Type[_DocElementT], signature_description: SignatureDescription
-) -> Iterator[Tuple[_DocElementT, DescriptionUnion]]:
+) -> Iterator[_DocElementT]:
     """
     Iterate over all the fields of the description and yield the desired elements.
 
     We also return the description for the client to report errors etc.
     """
-    for element in signature_description.summary.findall(element_type):
-        yield element, signature_description
-
-    for element in signature_description.summary.findall(element_type):
-        yield element, signature_description
+    yield from signature_description.summary.findall(element_type)
 
     for remark in signature_description.remarks:
-        for element in remark.findall(element_type):
-            yield element, signature_description
+        yield from remark.findall(element_type)
 
     for arg_description in signature_description.arguments_by_name.values():
-        for element in arg_description.findall(element_type):
-            yield element, signature_description
+        yield from arg_description.findall(element_type)
 
     if signature_description.returns is not None:
-        for element in signature_description.returns.findall(element_type):
-            yield element, signature_description
+        yield from signature_description.returns.findall(element_type)
 
 
 def _find_all_in_meta_model_description(
     element_type: Type[_DocElementT], meta_model_description: MetaModelDescription
-) -> Iterator[Tuple[_DocElementT, DescriptionUnion]]:
+) -> Iterator[_DocElementT]:
     """
     Iterate over all the fields of the description and yield the desired elements.
 
     We also return the description for the client to report errors etc.
     """
-    for element in meta_model_description.summary.findall(element_type):
-        yield element, meta_model_description
+    yield from meta_model_description.summary.findall(element_type)
 
     for remark in meta_model_description.remarks:
         for element in remark.findall(element_type):
-            yield element, meta_model_description
+            yield element
 
     for constraint in meta_model_description.constraints_by_identifier.values():
         for element in constraint.findall(element_type):
-            yield element, meta_model_description
+            yield element
+
+
+def _over_descriptions_and_their_symbols(
+    symbol_table: SymbolTable,
+) -> Iterator[Tuple[DescriptionUnion, Optional[Symbol]]]:
+    """
+    Iterate over the descriptions along the symbols in which they are defined.
+
+    For some descriptions, such as the descriptions of the meta-model itself, no
+    symbol exists. We yield None in those cases.
+    """
+    for symbol in symbol_table.symbols:
+        if symbol.description is not None:
+            yield symbol.description, symbol
+
+        if isinstance(symbol, Enumeration):
+            for literal in symbol.literals:
+                if literal.description is not None:
+                    yield literal.description, symbol
+
+        elif isinstance(symbol, ConstrainedPrimitive):
+            # No special sub-descriptions in the constrained primitive
+            pass
+
+        elif isinstance(symbol, (AbstractClass, ConcreteClass)):
+            for prop in symbol.properties:
+                if prop.description is not None:
+                    yield prop.description, symbol
+
+            for method in symbol.methods:
+                if method.description is not None:
+                    yield method.description, symbol
+        else:
+            assert_never(symbol)
+
+    for verification in symbol_table.verification_functions:
+        if verification.description is not None:
+            yield verification.description, None
+
+    if symbol_table.meta_model.description is not None:
+        yield symbol_table.meta_model.description, None
 
 
 def _find_all_in_descriptions(
@@ -1879,63 +1905,36 @@ def _find_all_in_descriptions(
     If there is no symbol available as a context, which is the case for example in
     verification functions, no symbol is yielded.
     """
-    for symbol in symbol_table.symbols:
-        if symbol.description is not None:
-            for element, description in _find_all_in_symbol_description(
-                element_type=element_type, symbol_description=symbol.description
+    for description, symbol in _over_descriptions_and_their_symbols(
+        symbol_table=symbol_table
+    ):
+        if isinstance(description, SymbolDescription):
+            for element in _find_all_in_symbol_description(
+                element_type=element_type, symbol_description=description
             ):
                 yield element, description, symbol
-
-        if isinstance(symbol, Enumeration):
-            for literal in symbol.literals:
-                if literal.description is not None:
-                    for (
-                        element,
-                        description,
-                    ) in _find_all_in_enumeration_literal_description(
-                        element_type=element_type,
-                        enumeration_literal_description=literal.description,
-                    ):
-                        yield element, description, symbol
-
-        elif isinstance(symbol, ConstrainedPrimitive):
-            # No special sub-descriptions in the constrained primitive
-            pass
-
-        elif isinstance(symbol, (AbstractClass, ConcreteClass)):
-            for prop in symbol.properties:
-                if prop.description is not None:
-                    for element, description in _find_all_in_property_description(
-                        element_type=element_type, property_description=prop.description
-                    ):
-                        yield element, description, symbol
-
-            for method in symbol.methods:
-                if method.description is not None:
-                    for element, description in _find_all_in_signature_description(
-                        element_type=element_type,
-                        signature_description=method.description,
-                    ):
-                        yield element, description, symbol
-        else:
-            assert_never(symbol)
-
-    for verification in symbol_table.verification_functions:
-        if verification.description is not None:
-            for element, description in _find_all_in_signature_description(
-                element_type=element_type,
-                signature_description=verification.description,
+        elif isinstance(description, EnumerationLiteralDescription):
+            for element in _find_all_in_enumeration_literal_description(
+                element_type=element_type, enumeration_literal_description=description
             ):
-                # There is no symbol in the context of a global function.
-                yield element, description, None
-
-    if symbol_table.meta_model.description is not None:
-        for element, description in _find_all_in_meta_model_description(
-            element_type=element_type,
-            meta_model_description=symbol_table.meta_model.description,
-        ):
-            # There is no symbol in the context of the whole meta-model.
-            yield element, description, None
+                yield element, description, symbol
+        elif isinstance(description, PropertyDescription):
+            for element in _find_all_in_property_description(
+                element_type=element_type, property_description=description
+            ):
+                yield element, description, symbol
+        elif isinstance(description, SignatureDescription):
+            for element in _find_all_in_signature_description(
+                element_type=element_type, signature_description=description
+            ):
+                yield element, description, symbol
+        elif isinstance(description, MetaModelDescription):
+            for element in _find_all_in_meta_model_description(
+                element_type=element_type, meta_model_description=description
+            ):
+                yield element, description, symbol
+        else:
+            assert_never(description)
 
 
 def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
@@ -3412,6 +3411,118 @@ def _verify_constraints_and_constraintrefs(symbol_table: SymbolTable) -> List[Er
     return errors
 
 
+def _verify_description_rendering_with_smoke(symbol_table: SymbolTable) -> List[Error]:
+    """Check that we can smoke-render all the descriptions."""
+
+    class DummyRenderer(rendering.DocutilsElementTransformer[bool]):
+        """Perform a smoke rendering to test that all the elements have been covered."""
+
+        def transform_text(
+            self, element: docutils.nodes.Text
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_symbol_reference_in_doc(
+            self, element: doc.SymbolReference
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_attribute_reference_in_doc(
+            self, element: doc.AttributeReference
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_argument_reference_in_doc(
+            self, element: doc.ArgumentReference
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_constraint_reference_in_doc(
+            self, element: doc.ConstraintReference
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_literal(
+            self, element: docutils.nodes.literal
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_paragraph(
+            self, element: docutils.nodes.paragraph
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_emphasis(
+            self, element: docutils.nodes.emphasis
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_list_item(
+            self, element: docutils.nodes.list_item
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_bullet_list(
+            self, element: docutils.nodes.bullet_list
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_note(
+            self, element: docutils.nodes.note
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_reference(
+            self, element: docutils.nodes.reference
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_field_body(
+            self, element: docutils.nodes.field_body
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+        def transform_document(
+            self, element: docutils.nodes.field_body
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
+    renderer = DummyRenderer()
+
+    errors_by_description = (
+        collections.OrderedDict()
+    )  # type: OrderedDict[DescriptionUnion, List[Error]]
+
+    for an_element, description, _ in _find_all_in_descriptions(
+        element_type=docutils.nodes.Element, symbol_table=symbol_table
+    ):
+        _, transformation_errors = renderer.transform(element=an_element)
+
+        if transformation_errors is not None:
+            description_errors = errors_by_description.get(description, None)
+            if description_errors is None:
+                description_errors = []
+                errors_by_description[description] = description_errors
+
+            description_errors.extend(
+                Error(description.parsed.node, error_message)
+                for error_message in transformation_errors
+            )
+
+    errors = []  # type: List[Error]
+    for description, description_errors in errors_by_description.items():
+        assert len(description_errors) > 0
+        errors.append(
+            Error(
+                description.parsed.node,
+                "Failed to test-smoke the rendering of the description",
+                description_errors,
+            )
+        )
+
+    return errors
+
+
 def _assert_interfaces_defined_correctly(
     symbol_table: SymbolTable, ontology: _hierarchy.Ontology
 ) -> None:
@@ -3506,6 +3617,8 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     )
 
     errors.extend(_verify_constraints_and_constraintrefs(symbol_table=symbol_table))
+
+    errors.extend(_verify_description_rendering_with_smoke(symbol_table=symbol_table))
 
     if len(errors) > 0:
         return errors
