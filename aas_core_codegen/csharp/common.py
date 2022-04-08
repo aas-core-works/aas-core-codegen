@@ -12,7 +12,7 @@ from aas_core_codegen.csharp import naming as csharp_naming
 
 @ensure(lambda result: result.startswith('"'))
 @ensure(lambda result: result.endswith('"'))
-def string_literal(text: str) -> str:
+def string_literal(text: str) -> Stripped:
     """Generate a C# string literal from the ``text``."""
     escaped = []  # type: List[str]
 
@@ -38,7 +38,7 @@ def string_literal(text: str) -> str:
         else:
             escaped.append(character)
 
-    return '"{}"'.format("".join(escaped))
+    return Stripped('"{}"'.format("".join(escaped)))
 
 
 def needs_escaping(text: str) -> bool:

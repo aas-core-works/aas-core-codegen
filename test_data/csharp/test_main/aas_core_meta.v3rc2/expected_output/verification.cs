@@ -1580,7 +1580,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-020: The value shall be consistent to the data type as defined in value_type.\n" +
+                        "Constraint AASd-020: The value shall be consistent to " +
+                        "the data type as defined in value_type.\n" +
                         "!(that.Value != null)\n" +
                         "|| Verification.ValueConsistentWithXsdType(that.Value, that.ValueType)");
                 }
@@ -1644,7 +1645,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -1655,7 +1657,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -1666,7 +1669,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -1678,7 +1682,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
+                        "Constraint AASd-090: For data elements category shall be " +
+                        "one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
                         "that.Category == \"CONSTANT\"\n" +
                         "|| that.Category == \"PARAMETER\"\n" +
                         "|| that.Category == \"VARIABLE\"");
@@ -1971,7 +1976,10 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-005: If version is not specified than also revision shall be unspecified. This means, a revision requires a version. If there is no version there is no revision neither. Revision is optional.\n" +
+                        "Constraint AASd-005: If version is not specified than also " +
+                        "revision shall be unspecified. This means, a revision " +
+                        "requires a version. If there is no version there is no " +
+                        "revision neither. Revision is optional.\n" +
                         "!(that.Revision != null)\n" +
                         "|| (that.Version != null)");
                 }
@@ -2027,7 +2035,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -2038,7 +2047,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -2320,7 +2330,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -2331,7 +2342,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -2342,7 +2354,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -2559,7 +2572,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -2570,7 +2584,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -2581,7 +2596,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -2599,7 +2615,9 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-107: If a first level child element has a semantic ID it shall be identical to semantic ID list element.\n" +
+                        "Constraint AASd-107: If a first level child element has " +
+                        "a semantic ID it shall be identical to semantic ID list " +
+                        "element.\n" +
                         "!(\n" +
                         "    (that.Value != null)\n" +
                         "    && (that.SemanticIdListElement != null)\n" +
@@ -2617,7 +2635,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-114: If two first level child elements have a semantic ID then they shall be identical.\n" +
+                        "Constraint AASd-114: If two first level child elements have " +
+                        "a semantic ID then they shall be identical.\n" +
                         "!(that.Value != null)\n" +
                         "|| Verification.SubmodelElementsHaveIdenticalSemanticIds(that.Value)");
                 }
@@ -2631,7 +2650,9 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-108: All first level child elements shall have the same submodel element type as specified in type value list element.\n" +
+                        "Constraint AASd-108: All first level child elements shall " +
+                        "have the same submodel element type as specified in type " +
+                        "value list element.\n" +
                         "!(that.Value != null)\n" +
                         "|| (\n" +
                         "    that.Value.All(\n" +
@@ -2654,7 +2675,10 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-109: If type value list element is equal to Property or Range value type list element shall be set and all first level child elements shall have the value type as specified in value type list element.\n" +
+                        "Constraint AASd-109: If type value list element is equal to " +
+                        "Property or Range value type list element shall be set and " +
+                        "all first level child elements shall have the value type as " +
+                        "specified in value type list element.\n" +
                         "!(\n" +
                         "    (that.Value != null)\n" +
                         "    && (\n" +
@@ -2896,7 +2920,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -2907,7 +2932,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -2918,7 +2944,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -3116,7 +3143,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -3127,7 +3155,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -3138,7 +3167,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -3150,7 +3180,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
+                        "Constraint AASd-090: For data elements category shall be " +
+                        "one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
                         "that.Category == \"CONSTANT\"\n" +
                         "|| that.Category == \"PARAMETER\"\n" +
                         "|| that.Category == \"VARIABLE\"");
@@ -3343,7 +3374,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -3354,7 +3386,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -3365,7 +3398,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -3377,7 +3411,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
+                        "Constraint AASd-090: For data elements category shall be " +
+                        "one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
                         "that.Category == \"CONSTANT\"\n" +
                         "|| that.Category == \"PARAMETER\"\n" +
                         "|| that.Category == \"VARIABLE\"");
@@ -3552,7 +3587,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -3563,7 +3599,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -3574,7 +3611,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -3586,7 +3624,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
+                        "Constraint AASd-090: For data elements category shall be " +
+                        "one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
                         "that.Category == \"CONSTANT\"\n" +
                         "|| that.Category == \"PARAMETER\"\n" +
                         "|| that.Category == \"VARIABLE\"");
@@ -3789,7 +3828,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -3800,7 +3840,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -3811,7 +3852,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -3823,7 +3865,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
+                        "Constraint AASd-090: For data elements category shall be " +
+                        "one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
                         "that.Category == \"CONSTANT\"\n" +
                         "|| that.Category == \"PARAMETER\"\n" +
                         "|| that.Category == \"VARIABLE\"");
@@ -3995,7 +4038,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -4006,7 +4050,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -4017,7 +4062,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -4029,7 +4075,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
+                        "Constraint AASd-090: For data elements category shall be " +
+                        "one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
                         "that.Category == \"CONSTANT\"\n" +
                         "|| that.Category == \"PARAMETER\"\n" +
                         "|| that.Category == \"VARIABLE\"");
@@ -4201,7 +4248,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -4212,7 +4260,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -4223,7 +4272,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -4410,7 +4460,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -4421,7 +4472,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -4432,7 +4484,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -4746,7 +4799,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -4757,7 +4811,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -4768,7 +4823,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -4794,7 +4850,9 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-014: Either the attribute global asset ID or specific asset ID must be set if entity type is set to 'SelfManagedEntity'. They are not existing otherwise.\n" +
+                        "Constraint AASd-014: Either the attribute global asset ID " +
+                        "or specific asset ID must be set if entity type is set to " +
+                        "'SelfManagedEntity'. They are not existing otherwise.\n" +
                         "(\n" +
                         "    that.EntityType == EntityType.SelfManagedEntity\n" +
                         "    && (\n" +
@@ -5010,7 +5068,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -5021,7 +5080,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -5032,7 +5092,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -5192,7 +5253,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -5203,7 +5265,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -5214,7 +5277,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -5435,7 +5499,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -5446,7 +5511,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -5457,7 +5523,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.\n" +
+                        "Constraint AASd-021: Every qualifiable can only have one " +
+                        "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
                 }
@@ -5609,7 +5676,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -5620,7 +5688,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
@@ -5631,7 +5700,11 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-051: A concept description shall have one of the following categories: 'VALUE', 'PROPERTY', 'REFERENCE', 'DOCUMENT', 'CAPABILITY',; 'RELATIONSHIP', 'COLLECTION', 'FUNCTION', 'EVENT', 'ENTITY', 'APPLICATION_CLASS', 'QUALIFIER', 'VIEW'.\n" +
+                        "Constraint AASd-051: A concept description shall have one " +
+                        "of the following categories: 'VALUE', 'PROPERTY', " +
+                        "'REFERENCE', 'DOCUMENT', 'CAPABILITY',; 'RELATIONSHIP', " +
+                        "'COLLECTION', 'FUNCTION', 'EVENT', 'ENTITY', " +
+                        "'APPLICATION_CLASS', 'QUALIFIER', 'VIEW'.\n" +
                         "!(that.Category != null)\n" +
                         "|| Verification.ConceptDescriptionCategoryIsValid(that.Category)");
                 }
@@ -5777,7 +5850,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.\n" +
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has_extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
                 }
@@ -5788,7 +5862,8 @@ namespace AasCore.Aas3
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-027: ID-short shall have a maximum length of 128 characters.\n" +
+                        "Constraint AASd-027: ID-short shall have a maximum length " +
+                        "of 128 characters.\n" +
                         "!(that.IdShort != null)\n" +
                         "|| (that.IdShort.Length <= 128)");
                 }
