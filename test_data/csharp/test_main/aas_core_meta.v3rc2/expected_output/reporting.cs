@@ -89,6 +89,57 @@ namespace AasCore.Aas3
         }
 
         /// <summary>
+        /// Escape special characters according to XML.
+        /// </summary>
+        private static string EscapeXmlCharacters(
+            string text)
+        {
+            // Mind the order, as we need to replace '&' first.
+            //
+            // For some benchmarks, see:
+            // https://stackoverflow.com/questions/1321331/replace-multiple-string-elements-in-c-sharp
+            return (
+                text
+                    .Replace("&", "&amp;")
+                    .Replace("<", "&lt;")
+                    .Replace(">", "&gt;")
+                    .Replace("\"", "&quot;")
+                    .Replace("'", "&apos;")
+            );
+        }
+
+        /// <summary>
+        /// Generate a relative XPath based on the path segments.
+        /// </summary>
+        /// <remarks>
+        /// This method leaves out the leading slash ('/'). This is helpful if
+        /// to embed the error report in a larger document with a prefix etc.
+        /// </remarks>
+        public static string GenerateRelativeXPath(
+            ICollection<Segment> segments)
+        {
+            var parts = new List<string>(segments.Count);
+            foreach(var segment in segments)
+            {
+                string? part = null;
+                switch (segment)
+                {
+                    case NameSegment nameSegment:
+                        part = EscapeXmlCharacters(nameSegment.Name);
+                        break;
+                    case IndexSegment indexSegment:
+                        part = $"*[{indexSegment.Index}]";
+                        break;
+                    default:
+                        throw new System.InvalidOperationException(
+                            $"Unexpected segment type: {segment.GetType()}");
+                }
+                parts.Add(part);
+            }
+            return string.Join("/", parts);
+        }
+
+        /// <summary>
         /// Represent an error during the deserialization or the verification.
         /// </summary>
         public class Error
