@@ -517,23 +517,8 @@ def _generate(
         )
     ]  # type: List[Identifier]
 
-    definitions["ModelTypes"] = collections.OrderedDict(
-        [("type", "string"), ("enum", model_types)]
-    )
-
     definitions["ModelType"] = collections.OrderedDict(
-        [
-            ("type", "object"),
-            (
-                "properties",
-                collections.OrderedDict(
-                    [
-                        ("name", {"$ref": "#/definitions/ModelTypes"}),
-                    ]
-                ),
-            ),
-            ("required", ["name"]),
-        ]
+        [("type", "string"), ("enum", model_types)]
     )
 
     schema["definitions"] = definitions

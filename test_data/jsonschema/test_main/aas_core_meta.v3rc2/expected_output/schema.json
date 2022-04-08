@@ -1225,7 +1225,7 @@
         "id"
       ]
     },
-    "ModelTypes": {
+    "ModelType": {
       "type": "string",
       "enum": [
         "Qualifier",
@@ -1251,17 +1251,6 @@
         "View",
         "DataSpecificationIec61360",
         "DataSpecificationPhysicalUnit"
-      ]
-    },
-    "ModelType": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "$ref": "#/definitions/ModelTypes"
-        }
-      },
-      "required": [
-        "name"
       ]
     }
   }
