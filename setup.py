@@ -48,8 +48,9 @@ setup(
             "pygments>=2,<3",
             "pyinstaller>=4,<5",
             "twine",
+            "jsonschema==3.2.0",
             "xmlschema==1.10.0",
-            "aas-core-meta==2022.4.30a2"
+            "aas-core-meta==2022.4.30a2",
         ]
     },
     # fmt: on
