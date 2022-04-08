@@ -624,7 +624,7 @@ class Snapshot:
 class Contracts:
     """Represent the set of contracts for a method or a function."""
 
-    # NOTE (mristin, 2022-04-7):
+    # NOTE (mristin, 2022-04-07):
     # Common programming languages which work with contracts usually implement
     # pre-conditions in a disjunctive normal form, *i.e.* as a disjunction of
     # conjunctions, where at least one conjunction needs to hold. The individual

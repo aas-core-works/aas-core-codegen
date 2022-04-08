@@ -441,7 +441,7 @@ class _InvariantTranspiler(
         if isinstance(node.antecedent, no_parentheses_types_in_this_context):
             not_antecedent = f"!{antecedent}"
         else:
-            # NOTE (mristin, 2022-04-7):
+            # NOTE (mristin, 2022-04-07):
             # This is a very rudimentary heuristic for breaking the lines, and can be
             # greatly improved by rendering into C# code. However, at this point, we
             # lack time for more sophisticated reformatting approaches.
@@ -454,7 +454,7 @@ class _InvariantTranspiler(
                 not_antecedent = f"!({antecedent})"
 
         if not isinstance(node.consequent, no_parentheses_types_in_this_context):
-            # NOTE (mristin, 2022-04-7):
+            # NOTE (mristin, 2022-04-07):
             # This is a very rudimentary heuristic for breaking the lines, and can be
             # greatly improved by rendering into C# code. However, at this point, we
             # lack time for more sophisticated reformatting approaches.
@@ -763,7 +763,7 @@ class _InvariantTranspiler(
             )
 
             if not isinstance(value_node, no_parentheses_types_in_this_context):
-                # NOTE (mristin, 2022-04-7):
+                # NOTE (mristin, 2022-04-07):
                 # This is a very rudimentary heuristic for breaking the lines, and can
                 # be greatly improved by rendering into C# code. However, at this point,
                 # we lack time for more sophisticated reformatting approaches.
@@ -816,7 +816,7 @@ class _InvariantTranspiler(
             )
 
             if not isinstance(value_node, no_parentheses_types_in_this_context):
-                # NOTE (mristin, 2022-04-7):
+                # NOTE (mristin, 2022-04-07):
                 # This is a very rudimentary heuristic for breaking the lines, and can
                 # be greatly improved by rendering into C# code. However, at this point,
                 # we lack time for more sophisticated reformatting approaches.
@@ -926,7 +926,7 @@ class _InvariantTranspiler(
         ):
             iteration = Stripped(f"({iteration})")
 
-        # NOTE (mristin, 2022-04-7):
+        # NOTE (mristin, 2022-04-07):
         # We can not use ``textwrap.dedent`` here since ``condition`` contains multiple
         # lines.
         return (
@@ -961,7 +961,7 @@ def _wrap_invariant_description(text: str) -> List[str]:
     if len(parts) == 1:
         return [text]
 
-    # NOTE (mristin, 2022-04-8):
+    # NOTE (mristin, 2022-04-08):
     # We do not want to cut out "the", "a" and "an" on separate lines, so we split
     # the text once more in tokens where the articles are kept in the same token as
     # the word.
@@ -989,14 +989,14 @@ def _wrap_invariant_description(text: str) -> List[str]:
     if article is not None:
         tokens.append(article)
 
-    # NOTE (mristin, 2022-04-8):
+    # NOTE (mristin, 2022-04-08):
     # We add space to the tokens so that it is easier to re-flow them.
     tokens = [
         f"{token} " if i < len(tokens) - 1 else token for i, token in enumerate(tokens)
     ]
     assert "".join(tokens) == text
 
-    # NOTE (mristin, 2022-04-8):
+    # NOTE (mristin, 2022-04-08):
     # The line width of 60 characters is an arbitrary, but plausible limit. Please
     # consider that the text will be indented, so you have to add some slack.
     line_width = 60
@@ -1097,7 +1097,7 @@ def _transpile_invariant(
 
     message_literals = []  # type: List[Stripped]
     if invariant.description is not None:
-        # NOTE (mristin, 2022-04-8):
+        # NOTE (mristin, 2022-04-08):
         # We need to wrap the description in multiple literals as a single long
         # string literal is often too much for the readability.
         invariant_description_lines = _wrap_invariant_description(invariant.description)

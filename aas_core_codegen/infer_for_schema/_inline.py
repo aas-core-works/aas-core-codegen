@@ -250,7 +250,7 @@ def infer_constraints_by_class(
         )
 
         for prop in symbol.properties:
-            # NOTE (mristin, 2022-03-3):
+            # NOTE (mristin, 2022-03-03):
             # We need to go beneath ``Optional`` as the constraints are applied even
             # if a property is optional. In cases where cardinality is affected by
             # ``Optional``, the client code needs to cover them separately.
@@ -295,7 +295,7 @@ def infer_constraints_by_class(
                 len_constraint_from_type is not None
                 and len_constraint_from_invariants is not None
             ):
-                # NOTE (mristin, 2022-03-2):
+                # NOTE (mristin, 2022-03-02):
                 # We have to make the bounds *stricter* since both
                 # the type constraints and the invariant(s) need to be satisfied.
 

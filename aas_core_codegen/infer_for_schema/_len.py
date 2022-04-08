@@ -205,7 +205,7 @@ def min_with_none(*args: Optional[int]) -> Optional[int]:
 
     >>> min_with_none(None, None)
     """
-    # NOTE (mristin, 2022-03-2):
+    # NOTE (mristin, 2022-03-02):
     # There is no one-liner in Python for this.
     # See: https://stackoverflow.com/questions/2295461/list-minimum-in-python-with-none
     minimum = None  # type: Optional[int]
@@ -228,7 +228,7 @@ def max_with_none(*args: Optional[int]) -> Optional[int]:
 
     >>> max_with_none(None, None)
     """
-    # NOTE (mristin, 2022-03-2):
+    # NOTE (mristin, 2022-03-02):
     # There is no one-liner in Python for this.
     # See: https://stackoverflow.com/questions/2295461/list-minimum-in-python-with-none
     maximum = None  # type: Optional[int]
