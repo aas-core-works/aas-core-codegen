@@ -2,13 +2,26 @@
 
 import contextlib
 import io
+import json
 import os
 import pathlib
 import tempfile
 import unittest
+import warnings
 
 import aas_core_meta.v3rc1
 import aas_core_meta.v3rc2
+
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    # NOTE (mristin, 2022-04-08):
+    # We need to disable warnings. Jsonschema package at the latest version (4.4.0) has
+    # a problem with JSON schema draft 2019-09 and crashes with an recursion error,
+    # see: https://github.com/python-jsonschema/jsonschema/issues/847.
+    #
+    # We revert back to jsonschema 3.2.0, which can not handle 2019-09, but still seems
+    # to validate correctly our examples.
+    import jsonschema
 
 import aas_core_codegen.main
 
@@ -20,14 +33,17 @@ class Test_against_recorded(unittest.TestCase):
         "on",
     )
 
+    _REPO_DIR = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
+    PARENT_CASE_DIR = _REPO_DIR / "test_data" / "jsonschema" / "test_main"
+
     def test_against_aas_core_meta(self) -> None:
-        repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
+        assert (
+            Test_against_recorded.PARENT_CASE_DIR.exists()
+            and Test_against_recorded.PARENT_CASE_DIR.is_dir()
+        ), f"{Test_against_recorded.PARENT_CASE_DIR=}"
 
-        parent_case_dir = repo_dir / "test_data" / "jsonschema" / "test_main"
-        assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
-
-        for module in [aas_core_meta.v3rc1, aas_core_meta.v3rc2]:
-            case_dir = parent_case_dir / module.__name__
+        for module in [aas_core_meta.v3rc2]:
+            case_dir = Test_against_recorded.PARENT_CASE_DIR / module.__name__
 
             assert case_dir.is_dir(), case_dir
 
@@ -118,6 +134,33 @@ class Test_against_recorded(unittest.TestCase):
                             output_pth.read_text(encoding="utf-8"),
                             f"The files {expected_pth} and {output_pth} do not match.",
                         )
+
+    def test_on_examples(self) -> None:  # pylint: disable=no-self-use
+        assert (
+            Test_against_recorded.PARENT_CASE_DIR.exists()
+            and Test_against_recorded.PARENT_CASE_DIR.is_dir()
+        ), f"{Test_against_recorded.PARENT_CASE_DIR=}"
+
+        for case_dir in Test_against_recorded.PARENT_CASE_DIR.iterdir():
+            assert case_dir.is_dir(), case_dir
+
+            schema_pth = case_dir / "expected_output" / "schema.json"
+
+            with schema_pth.open("rt", encoding="utf-8") as fid:
+                schema = json.load(fid)
+
+            for data_pth in sorted(
+                (case_dir / "examples" / "expected").glob("**/*.json")
+            ):
+                with data_pth.open("rt", encoding="utf-8") as fid:
+                    instance = json.load(fid)
+
+                try:
+                    jsonschema.validate(instance=instance, schema=schema)
+                except jsonschema.ValidationError as err:
+                    raise AssertionError(
+                        f"Failed to validate {data_pth} against {schema_pth}"
+                    ) from err
 
 
 if __name__ == "__main__":
