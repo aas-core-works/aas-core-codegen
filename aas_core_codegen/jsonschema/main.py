@@ -521,7 +521,9 @@ def _generate(
         [("type", "string"), ("enum", model_types)]
     )
 
-    schema["definitions"] = definitions
+    schema["definitions"] = collections.OrderedDict(
+        [(name, definitions[name]) for name in sorted(definitions.keys())]
+    )
 
     return Stripped(json.dumps(schema, indent=2)), None
 
