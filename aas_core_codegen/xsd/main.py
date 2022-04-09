@@ -608,7 +608,7 @@ def _retrieve_implementation_specific_elements(
                     cls.parsed.node,
                     f"Unexpected text "
                     f"in the specific implementation {implementation_key} "
-                    f"in a tag {descendant.tag!r}: {descendant.text!r}",
+                    f"in an element with tag {descendant.tag!r}: {descendant.text!r}",
                 )
             )
             continue
@@ -621,7 +621,7 @@ def _retrieve_implementation_specific_elements(
                     cls.parsed.node,
                     f"Unexpected tail text "
                     f"in the specific implementation {implementation_key} "
-                    f"in a tag {descendant.tag!r}: {descendant.tail!r}",
+                    f"in an element with tag {descendant.tag!r}: {descendant.tail!r}",
                 )
             )
             continue
@@ -635,6 +635,39 @@ def _retrieve_implementation_specific_elements(
         elements.append(child)
 
     return elements, None
+
+
+def _sort_by_tags_and_names_in_place(root: ET.Element) -> None:
+    """
+    Sort the children elements by tag and name attribute in place.
+
+    This makes diffing and searching in the schema a bit easier.
+    """
+    groups = []  # type: List[ET.Element]
+    simple_types = []  # type: List[ET.Element]
+    complex_types = []  # type: List[ET.Element]
+    miscellaneous = []  # type: List[ET.Element]
+    elements = []  # type: List[ET.Element]
+
+    for child in root:
+        if child.tag == "xs:group":
+            groups.append(child)
+        elif child.tag == "xs:simpleType":
+            simple_types.append(child)
+        elif child.tag == "xs:complexType":
+            complex_types.append(child)
+        elif child.tag == "xs:element":
+            elements.append(child)
+        else:
+            miscellaneous.append(child)
+
+    for element_list in [groups, simple_types, complex_types, miscellaneous, elements]:
+        element_list.sort(key=lambda elt: elt.attrib.get("name", ""))
+
+    children = groups + simple_types + complex_types + elements + miscellaneous
+
+    assert len(children) == len(root)
+    root[:] = children
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -669,12 +702,44 @@ def _generate(
     # NOTE (mristin, 2022-03-30):
     # We need to use minidom to extract the ``xmlns`` property as ElementTree removes
     # it.
+    # noinspection PyUnresolvedReferences
     minidom_doc = xml.dom.minidom.parseString(root_element_as_text)
     xmlns = minidom_doc.documentElement.getAttribute("xmlns")
 
     assert root is not None
 
     errors = []  # type: List[Error]
+
+    # NOTE (mristin, 2022-04-09):
+    # We remove any whitespace tail and text in all the tags, and make sure there is no
+    # unexpected text anywhere.
+    for element in root.iter():
+        if element.text is not None:
+            if _WHITESPACE_RE.fullmatch(element.text):
+                element.text = None
+            else:
+                errors.append(
+                    Error(
+                        None,
+                        f"Unexpected text in an element with tag {element.tag!r} "
+                        f"from the snippet {root_element_key!r}: {element.text!r}",
+                    )
+                )
+
+        if element.tail is not None:
+            if _WHITESPACE_RE.fullmatch(element.tail):
+                element.tail = None
+            else:
+                errors.append(
+                    Error(
+                        None,
+                        f"Unexpected tail in an element with tag {element.tag!r} "
+                        f"from the snippet {root_element_key!r}: {element.tail!r}",
+                    )
+                )
+
+    if len(errors) > 0:
+        return None, errors
 
     constraints_by_class, some_errors = infer_for_schema.infer_constraints_by_class(
         symbol_table=symbol_table
@@ -786,6 +851,8 @@ def _generate(
 
     if len(errors) > 0:
         return None, errors
+
+    _sort_by_tags_and_names_in_place(root)
 
     # NOTE (mristin, 2022-03-30):
     # For some unknown reason, ElementTree erases the xmlns property of the root
