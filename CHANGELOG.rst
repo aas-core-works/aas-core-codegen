@@ -3,6 +3,29 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.7 (2022-04-09)
+==================
+* Render the descriptions with smoke at intermediate (#142)
+
+C#
+--
+* Represent string constants as literals in C# (#136)
+* Fix formatting of multi-line invariants in C# (#137)
+* Break lines on invariants in C# (#139)
+* Wrap the invariant descriptions in C# (#140)
+
+JSON Schema
+-----------
+* Make ``modelType``'s strings in JSON schema (#143)
+
+XSD
+---
+* Write XSD generator (#126)
+* Fix interfaces in XSD (#128)
+* Fix XSD to use correct environment type (#130)
+* Undo escaping of ``\x??`` in XSD (#131)
+
+
 0.0.6 (2022-03-28)
 ==================
 * Script smoke-testing a meta-model (#119)
