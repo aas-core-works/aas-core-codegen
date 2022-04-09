@@ -3,6 +3,16 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.8 (2022-04-09)
+==================
+JSON
+----
+* Sort definitions in JSON schema (#148)
+
+XSD
+---
+* Sort schema elements by tag and name in XSD (#149)
+
 0.0.7 (2022-04-09)
 ==================
 * Render the descriptions with smoke at intermediate (#142)
