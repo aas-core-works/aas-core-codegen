@@ -43,11 +43,6 @@ namespace AasCore.Aas3
             public void Visit(Key that);
             public void Visit(LangString that);
             public void Visit(LangStringSet that);
-            public void Visit(DataSpecification that);
-            public void Visit(ValueReferencePair that);
-            public void Visit(ValueList that);
-            public void Visit(DataSpecificationIec61360 that);
-            public void Visit(DataSpecificationPhysicalUnit that);
             public void Visit(Environment that);
         }  // public interface IVisitor
 
@@ -88,11 +83,6 @@ namespace AasCore.Aas3
             public void Visit(Key that, C context);
             public void Visit(LangString that, C context);
             public void Visit(LangStringSet that, C context);
-            public void Visit(DataSpecification that, C context);
-            public void Visit(ValueReferencePair that, C context);
-            public void Visit(ValueList that, C context);
-            public void Visit(DataSpecificationIec61360 that, C context);
-            public void Visit(DataSpecificationPhysicalUnit that, C context);
             public void Visit(Environment that, C context);
         }  // public interface IVisitorWithContext
 
@@ -134,11 +124,6 @@ namespace AasCore.Aas3
             public T Transform(Key that);
             public T Transform(LangString that);
             public T Transform(LangStringSet that);
-            public T Transform(DataSpecification that);
-            public T Transform(ValueReferencePair that);
-            public T Transform(ValueList that);
-            public T Transform(DataSpecificationIec61360 that);
-            public T Transform(DataSpecificationPhysicalUnit that);
             public T Transform(Environment that);
         }  // public interface ITransformer
 
@@ -214,16 +199,6 @@ namespace AasCore.Aas3
 
             public abstract T Transform(LangStringSet that);
 
-            public abstract T Transform(DataSpecification that);
-
-            public abstract T Transform(ValueReferencePair that);
-
-            public abstract T Transform(ValueList that);
-
-            public abstract T Transform(DataSpecificationIec61360 that);
-
-            public abstract T Transform(DataSpecificationPhysicalUnit that);
-
             public abstract T Transform(Environment that);
         }  // public abstract class AbstractTransformer
 
@@ -266,11 +241,6 @@ namespace AasCore.Aas3
             public T Transform(Key that, C context);
             public T Transform(LangString that, C context);
             public T Transform(LangStringSet that, C context);
-            public T Transform(DataSpecification that, C context);
-            public T Transform(ValueReferencePair that, C context);
-            public T Transform(ValueList that, C context);
-            public T Transform(DataSpecificationIec61360 that, C context);
-            public T Transform(DataSpecificationPhysicalUnit that, C context);
             public T Transform(Environment that, C context);
         }  // public interface ITransformerWithContext
 
@@ -347,16 +317,6 @@ namespace AasCore.Aas3
             public abstract T Transform(LangString that, C context);
 
             public abstract T Transform(LangStringSet that, C context);
-
-            public abstract T Transform(DataSpecification that, C context);
-
-            public abstract T Transform(ValueReferencePair that, C context);
-
-            public abstract T Transform(ValueList that, C context);
-
-            public abstract T Transform(DataSpecificationIec61360 that, C context);
-
-            public abstract T Transform(DataSpecificationPhysicalUnit that, C context);
 
             public abstract T Transform(Environment that, C context);
         }  // public abstract class AbstractTransformerWithContext
