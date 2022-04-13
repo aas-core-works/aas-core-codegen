@@ -1583,7 +1583,7 @@ def generate(
             namespace {namespace}
             {{
             {I}/// <summary>
-            {I}/// Provide de/serialization of meta-model entities to/from JSON.
+            {I}/// Provide de/serialization of meta-model classes to/from JSON.
             {I}/// </summary>
             {I}/// <remarks>
             {I}/// We can not use one-pass deserialization for JSON since the object

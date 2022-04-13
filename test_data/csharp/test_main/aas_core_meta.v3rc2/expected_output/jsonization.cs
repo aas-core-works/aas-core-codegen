@@ -11,7 +11,7 @@ using Aas = AasCore.Aas3;
 namespace AasCore.Aas3
 {
     /// <summary>
-    /// Provide de/serialization of meta-model entities to/from JSON.
+    /// Provide de/serialization of meta-model classes to/from JSON.
     /// </summary>
     /// <remarks>
     /// We can not use one-pass deserialization for JSON since the object
