@@ -66,34 +66,43 @@ def _generate_ivisitor(symbol_table: intermediate.SymbolTable) -> Stripped:
 
 def _generate_visitor_through(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the visitor that simply iterates over the instances."""
-    blocks = []  # type: List[Stripped]
+    blocks = [
+        Stripped(
+            f"""\
+public void Visit(IClass that)
+{{
+{I}that.Accept(this);
+}}"""
+        )
+    ]  # type: List[Stripped]
 
     for symbol in symbol_table.symbols:
         if isinstance(symbol, intermediate.Enumeration):
             continue
 
         elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            # Constrained primitives are modeled as their constrainees in C#,
+            # so we do not visit them.
             continue
 
-        elif isinstance(symbol, intermediate.Interface):
+        elif isinstance(symbol, intermediate.AbstractClass):
+            # Abstract classes are modeled as interfaces in C#, so we do not transform
+            # them.
             continue
 
-        elif isinstance(symbol, intermediate.Class):
+        elif isinstance(symbol, intermediate.ConcreteClass):
             cls_name = csharp_naming.class_name(symbol.name)
             blocks.append(
                 Stripped(
-                    textwrap.dedent(
-                        f"""\
-                public void Visit({cls_name} that)
-                {{
-                    // Just descend through, do nothing with the <c>that</c>
-                    foreach (var something in that.DescendOnce())
-                    {{
-                        Visit(something);
-                    }}
-                }}
-                """
-                    )
+                    f"""\
+public void Visit({cls_name} that)
+{{
+    // Just descend through, do nothing with <c>that</c>
+    foreach (var something in that.DescendOnce())
+    {{
+        Visit(something);
+    }}
+}}"""
                 )
             )
 
@@ -102,24 +111,72 @@ def _generate_visitor_through(symbol_table: intermediate.SymbolTable) -> Strippe
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            """\
-            /// <summary>
-            /// Just descend through the instances without any action.
-            /// </summary>
-            /// <remarks>
-            /// This class is meaningless for itself. However, it is a good base if you
-            /// want to descend through instances and apply actions only on a subset of
-            /// classes.
-            /// </remarks>
-            public class VisitorThrough
-            {
-                public void Visit(IClass that)
-                {{
-                    that.Accept(this);
-                }}
-            """
+        """\
+/// <summary>
+/// Just descend through the instances without any action.
+/// </summary>
+/// <remarks>
+/// This class is meaningless for itself. However, it is a good base if you
+/// want to descend through instances and apply actions only on a subset of
+/// classes.
+/// </remarks>
+public class VisitorThrough : IVisitor
+{
+"""
+    )
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(block, I))
+
+    writer.write("\n}  // public class VisitorThrough")
+
+    return Stripped(writer.getvalue())
+
+
+def _generate_abstract_visitor(symbol_table: intermediate.SymbolTable) -> Stripped:
+    """Generate the visitor that performs double-dispatch."""
+    blocks = [
+        Stripped(
+            f"""\
+public void Visit(IClass that)
+{{
+{I}that.Accept(this);
+}}"""
         )
+    ]  # type: List[Stripped]
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, intermediate.Enumeration):
+            continue
+
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            # Constrained primitives are modeled as their constrainees in C#,
+            # so we do not visit them.
+            continue
+
+        elif isinstance(symbol, intermediate.AbstractClass):
+            # Abstract classes are modeled as interfaces in C#, so we do not transform
+            # them.
+            continue
+
+        elif isinstance(symbol, intermediate.Class):
+            cls_name = csharp_naming.class_name(symbol.name)
+            blocks.append(Stripped(f"public abstract void Visit({cls_name} that);"))
+
+        else:
+            assert_never(symbol)
+
+    writer = io.StringIO()
+    writer.write(
+        """\
+/// <summary>
+/// Perform double-dispatch to visit the concrete instances.
+/// </summary>
+public abstract class AbstractVisitor : IVisitor
+{
+"""
     )
 
     for i, block in enumerate(blocks):
@@ -127,7 +184,7 @@ def _generate_visitor_through(symbol_table: intermediate.SymbolTable) -> Strippe
             writer.write("\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write("\n}  // public class VisitorThrough")
+    writer.write("\n}  // public abstract class AbstractVisitor")
 
     return Stripped(writer.getvalue())
 
@@ -177,6 +234,67 @@ def _generate_ivisitor_with_context(symbol_table: intermediate.SymbolTable) -> S
         writer.write(textwrap.indent(block, I))
 
     writer.write("\n}  // public interface IVisitorWithContext")
+
+    return Stripped(writer.getvalue())
+
+
+def _generate_abstract_visitor_with_context(
+    symbol_table: intermediate.SymbolTable,
+) -> Stripped:
+    """Generate the visitor with context that performs double-dispatch."""
+    blocks = [
+        Stripped(
+            f"""\
+public void Visit(IClass that, C context)
+{{
+{I}that.Accept(this, context);
+}}"""
+        )
+    ]  # type: List[Stripped]
+
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, intermediate.Enumeration):
+            continue
+
+        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            # Constrained primitives are modeled as their constrainees in C#,
+            # so we do not visit them.
+            continue
+
+        elif isinstance(symbol, intermediate.AbstractClass):
+            # Abstract classes are modeled as interfaces in C#, so we do not transform
+            # them.
+            continue
+
+        elif isinstance(symbol, intermediate.Class):
+            cls_name = csharp_naming.class_name(symbol.name)
+            blocks.append(
+                Stripped(f"public abstract void Visit({cls_name} that, C context);")
+            )
+
+        else:
+            assert_never(symbol)
+
+    writer = io.StringIO()
+    writer.write(
+        f"""\
+/// <summary>
+/// Perform double-dispatch to visit the concrete instances
+/// with context.
+/// </summary>
+/// <typeparam name="C">Context type</typeparam>
+public abstract class AbstractVisitorWithContext<C>
+{I}: IVisitorWithContext<C>
+{{
+"""
+    )
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n")
+        writer.write(textwrap.indent(block, I))
+
+    writer.write("\n}  // public abstract class AbstractVisitorWithContext")
 
     return Stripped(writer.getvalue())
 
@@ -436,7 +554,10 @@ def generate(
 
     visitation_blocks = [
         _generate_ivisitor(symbol_table=symbol_table),
+        _generate_visitor_through(symbol_table=symbol_table),
+        _generate_abstract_visitor(symbol_table=symbol_table),
         _generate_ivisitor_with_context(symbol_table=symbol_table),
+        _generate_abstract_visitor_with_context(symbol_table=symbol_table),
         _generate_itransformer(symbol_table=symbol_table),
         _generate_abstract_transformer(symbol_table=symbol_table),
         _generate_itransformer_with_context(symbol_table=symbol_table),

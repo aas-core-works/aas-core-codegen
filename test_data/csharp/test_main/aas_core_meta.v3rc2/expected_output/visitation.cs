@@ -47,6 +47,343 @@ namespace AasCore.Aas3
         }  // public interface IVisitor
 
         /// <summary>
+        /// Just descend through the instances without any action.
+        /// </summary>
+        /// <remarks>
+        /// This class is meaningless for itself. However, it is a good base if you
+        /// want to descend through instances and apply actions only on a subset of
+        /// classes.
+        /// </remarks>
+        public class VisitorThrough : IVisitor
+        {
+            public void Visit(IClass that)
+            {
+                that.Accept(this);
+            }
+
+            public void Visit(Resource that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(Extension that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(AdministrativeInformation that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(Qualifier that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(AssetAdministrationShell that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(AssetInformation that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(IdentifierKeyValuePair that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(Submodel that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(SubmodelElementList that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(SubmodelElementStruct that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(Property that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(MultiLanguageProperty that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(Range that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(ReferenceElement that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(Blob that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(File that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(AnnotatedRelationshipElement that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(Entity that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(EventPayload that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(BasicEventElement that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(Operation that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(OperationVariable that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(Capability that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(ConceptDescription that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(View that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(GlobalReference that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(ModelReference that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(Key that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(LangString that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(LangStringSet that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(Environment that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+        }  // public class VisitorThrough
+
+        /// <summary>
+        /// Perform double-dispatch to visit the concrete instances.
+        /// </summary>
+        public abstract class AbstractVisitor : IVisitor
+        {
+            public void Visit(IClass that)
+            {
+                that.Accept(this);
+            }
+            public abstract void Visit(Resource that);
+            public abstract void Visit(Extension that);
+            public abstract void Visit(AdministrativeInformation that);
+            public abstract void Visit(Qualifier that);
+            public abstract void Visit(AssetAdministrationShell that);
+            public abstract void Visit(AssetInformation that);
+            public abstract void Visit(IdentifierKeyValuePair that);
+            public abstract void Visit(Submodel that);
+            public abstract void Visit(SubmodelElementList that);
+            public abstract void Visit(SubmodelElementStruct that);
+            public abstract void Visit(Property that);
+            public abstract void Visit(MultiLanguageProperty that);
+            public abstract void Visit(Range that);
+            public abstract void Visit(ReferenceElement that);
+            public abstract void Visit(Blob that);
+            public abstract void Visit(File that);
+            public abstract void Visit(AnnotatedRelationshipElement that);
+            public abstract void Visit(Entity that);
+            public abstract void Visit(EventPayload that);
+            public abstract void Visit(BasicEventElement that);
+            public abstract void Visit(Operation that);
+            public abstract void Visit(OperationVariable that);
+            public abstract void Visit(Capability that);
+            public abstract void Visit(ConceptDescription that);
+            public abstract void Visit(View that);
+            public abstract void Visit(GlobalReference that);
+            public abstract void Visit(ModelReference that);
+            public abstract void Visit(Key that);
+            public abstract void Visit(LangString that);
+            public abstract void Visit(LangStringSet that);
+            public abstract void Visit(Environment that);
+        }  // public abstract class AbstractVisitor
+
+        /// <summary>
         /// Define the interface for a visitor which visits the instances of the model.
         /// </summary>
         /// <typeparam name="C">Context type</typeparam>
@@ -85,6 +422,51 @@ namespace AasCore.Aas3
             public void Visit(LangStringSet that, C context);
             public void Visit(Environment that, C context);
         }  // public interface IVisitorWithContext
+
+        /// <summary>
+        /// Perform double-dispatch to visit the concrete instances
+        /// with context.
+        /// </summary>
+        /// <typeparam name="C">Context type</typeparam>
+        public abstract class AbstractVisitorWithContext<C>
+            : IVisitorWithContext<C>
+        {
+            public void Visit(IClass that, C context)
+            {
+                that.Accept(this, context);
+            }
+            public abstract void Visit(Resource that, C context);
+            public abstract void Visit(Extension that, C context);
+            public abstract void Visit(AdministrativeInformation that, C context);
+            public abstract void Visit(Qualifier that, C context);
+            public abstract void Visit(AssetAdministrationShell that, C context);
+            public abstract void Visit(AssetInformation that, C context);
+            public abstract void Visit(IdentifierKeyValuePair that, C context);
+            public abstract void Visit(Submodel that, C context);
+            public abstract void Visit(SubmodelElementList that, C context);
+            public abstract void Visit(SubmodelElementStruct that, C context);
+            public abstract void Visit(Property that, C context);
+            public abstract void Visit(MultiLanguageProperty that, C context);
+            public abstract void Visit(Range that, C context);
+            public abstract void Visit(ReferenceElement that, C context);
+            public abstract void Visit(Blob that, C context);
+            public abstract void Visit(File that, C context);
+            public abstract void Visit(AnnotatedRelationshipElement that, C context);
+            public abstract void Visit(Entity that, C context);
+            public abstract void Visit(EventPayload that, C context);
+            public abstract void Visit(BasicEventElement that, C context);
+            public abstract void Visit(Operation that, C context);
+            public abstract void Visit(OperationVariable that, C context);
+            public abstract void Visit(Capability that, C context);
+            public abstract void Visit(ConceptDescription that, C context);
+            public abstract void Visit(View that, C context);
+            public abstract void Visit(GlobalReference that, C context);
+            public abstract void Visit(ModelReference that, C context);
+            public abstract void Visit(Key that, C context);
+            public abstract void Visit(LangString that, C context);
+            public abstract void Visit(LangStringSet that, C context);
+            public abstract void Visit(Environment that, C context);
+        }  // public abstract class AbstractVisitorWithContext
 
         /// <summary>
         /// Define the interface for a transformer which transforms recursively
