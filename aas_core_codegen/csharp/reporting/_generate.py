@@ -130,6 +130,61 @@ public static string GenerateJsonPath(
 }}"""
         ),
         Stripped(
+            f"""\
+/// <summary>
+/// Escape special characters according to XML.
+/// </summary>
+private static string EscapeXmlCharacters(
+    string text)
+{{
+{I}// Mind the order, as we need to replace '&' first.
+{I}//
+{I}// For some benchmarks, see:
+{I}// https://stackoverflow.com/questions/1321331/replace-multiple-string-elements-in-c-sharp
+{I}return (
+{II}text
+{III}.Replace("&", "&amp;")
+{III}.Replace("<", "&lt;")
+{III}.Replace(">", "&gt;")
+{III}.Replace("\\"", "&quot;")
+{III}.Replace("'", "&apos;")
+{I});
+}}"""
+        ),
+        Stripped(
+            f"""\
+/// <summary>
+/// Generate a relative XPath based on the path segments.
+/// </summary>
+/// <remarks>
+/// This method leaves out the leading slash ('/'). This is helpful if
+/// to embed the error report in a larger document with a prefix etc.
+/// </remarks>
+public static string GenerateRelativeXPath(
+{I}ICollection<Segment> segments)
+{{
+{I}var parts = new List<string>(segments.Count);
+{I}foreach(var segment in segments)
+{I}{{
+{II}string? part = null;
+{II}switch (segment)
+{II}{{
+{III}case NameSegment nameSegment:
+{IIII}part = EscapeXmlCharacters(nameSegment.Name);
+{IIII}break;
+{III}case IndexSegment indexSegment:
+{IIII}part = $"*[{{indexSegment.Index}}]";
+{IIII}break;
+{III}default:
+{IIII}throw new System.InvalidOperationException(
+{IIIII}$"Unexpected segment type: {{segment.GetType()}}");
+{II}}}
+{II}parts.Add(part);
+{I}}}
+{I}return string.Join("/", parts);
+}}"""
+        ),
+        Stripped(
             textwrap.dedent(
                 f"""\
                 /// <summary>
