@@ -10,7 +10,7 @@ from icontract import ensure
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Error, Stripped, Identifier
 from aas_core_codegen.csharp import common as csharp_common, naming as csharp_naming
-from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II
+from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II, INDENT3 as III
 
 
 def _generate_enum_to_and_from_string(
@@ -66,15 +66,22 @@ def _generate_enum_to_and_from_string(
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? {to_str_name}(Aas.{name} that)
+        public static string? {to_str_name}(Aas.{name}? that)
         {{
-        {I}if ({to_str_map_name}.TryGetValue(that, out string? value))
+        {I}if (!that.HasValue)
         {I}{{
-        {II}return value;
+        {II}return null;
         {I}}}
         {I}else
         {I}{{
-        {II}return null;
+        {II}if ({to_str_map_name}.TryGetValue(that.Value, out string? value))
+        {II}{{
+        {III}return value;
+        {II}}}
+        {II}else
+        {II}{{
+        {III}return null;
+        {II}}}
         {I}}}
         }}"""
         )
