@@ -243,53 +243,7 @@ def _generate_deserialize_property(
     prop: intermediate.Property,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the code snippet for de-serializing the property ``prop``."""
-    # NOTE (mristin, 2022-03-10):
-    # Instead of writing here a complex but general solution with unrolling we choose
-    # to provide a simple, but limited, solution. First, the meta-model is quite
-    # limited itself at the moment, so the complexity of the general solution is not
-    # warranted. Second, we hope that there will be fewer bugs in the simple solution
-    # which is particularly important at this early adoption stage.
-    #
-    # We anticipate that in the future we will indeed need a general and complex
-    # solution. Here are just some thoughts on how to approach it:
-    # * Leave the pattern matching to produce more readable code for simple cases,
-    # * Unroll only in case of composite types and optional composite types.
-
-    type_anno = (
-        prop.type_annotation
-        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-        else prop.type_annotation.value
-    )
-
-    if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-        return None, Error(
-            prop.parsed.node,
-            "We currently implemented deserialization based on a very limited "
-            "pattern matching due to code simplicity. We did not handle "
-            "the case of nested optional values. Please contact "
-            "the developers if you need this functionality.",
-        )
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        if isinstance(type_anno.items, intermediate.OptionalTypeAnnotation):
-            return None, Error(
-                prop.parsed.node,
-                "We currently implemented deserialization based on a very limited "
-                "pattern matching due to code simplicity. We did not handle "
-                "the case of lists of optional values. Please contact "
-                "the developers if you need this functionality.",
-            )
-        elif isinstance(type_anno.items, intermediate.ListTypeAnnotation):
-            return None, Error(
-                prop.parsed.node,
-                "We currently implemented deserialization based on a very limited "
-                "pattern matching due to code simplicity. We did not handle "
-                "the case of lists of lists. Please contact "
-                "the developers if you need this functionality.",
-            )
-        else:
-            pass
-    else:
-        pass
+    type_anno = intermediate.beneath_optional(prop.type_annotation)
 
     # Prefix the variables to avoid naming conflicts
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
@@ -360,7 +314,7 @@ def _generate_deserialize_property(
             (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
         ), (
             "We chose to implement only a very limited pattern matching; "
-            "see the note above in the code."
+            "see intermediate._translate_._verify_only_simple_type_patterns"
         )
 
         item_type = csharp_common.generate_type(type_anno.items)
@@ -1100,53 +1054,7 @@ def _generate_transform_property(
     prop: intermediate.Property,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the snippet to transform a property into a JSON node."""
-    # NOTE (mristin, 2022-03-10):
-    # Instead of writing here a complex but general solution with unrolling we choose
-    # to provide a simple, but limited, solution. First, the meta-model is quite
-    # limited itself at the moment, so the complexity of the general solution is not
-    # warranted. Second, we hope that there will be fewer bugs in the simple solution
-    # which is particularly important at this early adoption stage.
-    #
-    # We anticipate that in the future we will indeed need a general and complex
-    # solution. Here are just some thoughts on how to approach it:
-    # * Leave the pattern matching to produce more readable code for simple cases,
-    # * Unroll only in case of composite types and optional composite types.
-
-    type_anno = (
-        prop.type_annotation
-        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-        else prop.type_annotation.value
-    )
-
-    if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-        return None, Error(
-            prop.parsed.node,
-            "We currently implemented serialization based on a very limited "
-            "pattern matching due to code simplicity. We did not handle "
-            "the case of nested optional values. Please contact "
-            "the developers if you need this functionality.",
-        )
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        if isinstance(type_anno.items, intermediate.OptionalTypeAnnotation):
-            return None, Error(
-                prop.parsed.node,
-                "We currently implemented serialization based on a very limited "
-                "pattern matching due to code simplicity. We did not handle "
-                "the case of lists of optional values. Please contact "
-                "the developers if you need this functionality.",
-            )
-        elif isinstance(type_anno.items, intermediate.ListTypeAnnotation):
-            return None, Error(
-                prop.parsed.node,
-                "We currently implemented serialization based on a very limited "
-                "pattern matching due to code simplicity. We did not handle "
-                "the case of lists of lists. Please contact "
-                "the developers if you need this functionality.",
-            )
-        else:
-            pass
-    else:
-        pass
+    type_anno = intermediate.beneath_optional(prop.type_annotation)
 
     stmts = []  # type: List[Stripped]
 
@@ -1183,7 +1091,7 @@ def _generate_transform_property(
             (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
         ), (
             "We chose to implement only a very limited pattern matching; "
-            "see the note above in the code."
+            "see intermediate._translate._verify_only_simple_type_patterns."
         )
 
         item_type = csharp_common.generate_type(type_anno.items)

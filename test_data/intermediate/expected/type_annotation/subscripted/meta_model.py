@@ -1,7 +1,11 @@
-class Concrete:
-    x: List[int]
+class SomeConcreteClass:
+    """Represent something."""
 
-    def __init__(self, x: List[int]) -> None:
+
+class SomeContainerClass:
+    x: List[SomeConcreteClass]
+
+    def __init__(self, x: List[SomeConcreteClass]) -> None:
         self.x = x
 
 

@@ -90,6 +90,7 @@ from aas_core_codegen.intermediate._types import (
     find_first_field_list,
     SummaryRemarksConstraintsDescription,
     MethodUnion,
+    beneath_optional,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -3523,6 +3524,68 @@ def _verify_description_rendering_with_smoke(symbol_table: SymbolTable) -> List[
     return errors
 
 
+def _verify_only_simple_type_patterns(symbol_table: SymbolTable) -> List[Error]:
+    """
+    Check that there are only simple type patterns in the meta-model.
+
+    Namely, for a lot of code generators, unrolling arbitrary type annotations is
+    quite complex. In contrast, if we can make simplifying assumptions about the types
+    in the meta-model, we can write much simpler generators.
+
+    First, the meta-model is quite limited itself at the moment, so the complexity of
+    the general solutions is not warranted. Second, we hope that there will be fewer
+    bugs in the simple solution which is particularly important at this early adoption
+    stage.
+
+    We anticipate that we will want to actually write the more complex generators
+    in the future. At this point, we restrict ourselves to the following patterns:
+
+    * Non-nested optional types, *i.e.* optional of optionals, are unexpected;
+    * Lists of optionals are unexpected; and
+    * Lists of non-classes are unexpected.
+    """
+    errors = []  # type: List[Error]
+    for symbol in symbol_table.symbols:
+        if isinstance(symbol, (AbstractClass, ConcreteClass)):
+            for prop in symbol.properties:
+                if isinstance(
+                    prop.type_annotation, OptionalTypeAnnotation
+                ) and isinstance(prop.type_annotation.value, OptionalTypeAnnotation):
+                    errors.append(
+                        Error(
+                            prop.parsed.node,
+                            "We currently support only a limited set of "
+                            "type annotation patterns. At the moment, we do not handle "
+                            "nested optionals. Please contact the developers if you "
+                            "need this functionality",
+                        )
+                    )
+
+                type_anno = beneath_optional(prop.type_annotation)
+                if isinstance(type_anno, ListTypeAnnotation):
+                    if not (
+                        isinstance(type_anno.items, OurTypeAnnotation)
+                        and isinstance(
+                            type_anno.items.symbol, (AbstractClass, ConcreteClass)
+                        )
+                    ):
+                        errors.append(
+                            Error(
+                                prop.parsed.node,
+                                f"We currently support only a limited set of "
+                                f"type annotation patterns. At the moment, we handle "
+                                f"only lists of classes (both concrete or abstract), "
+                                f"but the property {prop.name!r} "
+                                f"of the class {symbol.name!r} "
+                                f"has type: {prop.type_annotation}. "
+                                f"Please contact the developers if you need "
+                                f"this functionality",
+                            )
+                        )
+
+    return errors
+
+
 def _assert_interfaces_defined_correctly(
     symbol_table: SymbolTable, ontology: _hierarchy.Ontology
 ) -> None:
@@ -3619,6 +3682,8 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     errors.extend(_verify_constraints_and_constraintrefs(symbol_table=symbol_table))
 
     errors.extend(_verify_description_rendering_with_smoke(symbol_table=symbol_table))
+
+    errors.extend(_verify_only_simple_type_patterns(symbol_table=symbol_table))
 
     if len(errors) > 0:
         return errors
