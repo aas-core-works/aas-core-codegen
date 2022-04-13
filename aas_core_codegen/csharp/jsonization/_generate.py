@@ -822,23 +822,23 @@ def _generate_deserialize_impl(
 
             if isinstance(symbol, intermediate.ConcreteClass):
                 if symbol.is_implementation_specific:
-                    jsonization_key = specific_implementations.ImplementationKey(
-                        f"Jsonization/{symbol.name}_from.cs"
+                    implementation_key = specific_implementations.ImplementationKey(
+                        f"Jsonization/DeserializeImplementation/{symbol.name}_from.cs"
                     )
 
-                    implementation = spec_impls.get(jsonization_key, None)
+                    implementation = spec_impls.get(implementation_key, None)
                     if implementation is None:
                         errors.append(
                             Error(
                                 symbol.parsed.node,
                                 f"The jsonization snippet is missing "
                                 f"for the implementation-specific "
-                                f"class {symbol.name}: {jsonization_key}",
+                                f"class {symbol.name}: {implementation_key}",
                             )
                         )
                         continue
 
-                    blocks.append(spec_impls[jsonization_key])
+                    blocks.append(spec_impls[implementation_key])
                 else:
                     block, cls_errors = _generate_from_method_for_class(cls=symbol)
                     if cls_errors is not None:
@@ -1345,23 +1345,23 @@ def _generate_transformer(
 
         elif isinstance(symbol, intermediate.ConcreteClass):
             if symbol.is_implementation_specific:
-                jsonization_key = specific_implementations.ImplementationKey(
-                    f"Jsonization/transform_{symbol.name}.cs"
+                implementation_key = specific_implementations.ImplementationKey(
+                    f"Jsonization/Transformer/transform_{symbol.name}.cs"
                 )
 
-                implementation = spec_impls.get(jsonization_key, None)
+                implementation = spec_impls.get(implementation_key, None)
                 if implementation is None:
                     errors.append(
                         Error(
                             symbol.parsed.node,
                             f"The jsonization snippet is missing "
                             f"for the implementation-specific "
-                            f"class {symbol.name}: {jsonization_key}",
+                            f"class {symbol.name}: {implementation_key}",
                         )
                     )
                     continue
 
-                blocks.append(spec_impls[jsonization_key])
+                blocks.append(spec_impls[implementation_key])
             else:
                 block, cls_errors = _generate_transform_for_class(cls=symbol)
                 if cls_errors is not None:
