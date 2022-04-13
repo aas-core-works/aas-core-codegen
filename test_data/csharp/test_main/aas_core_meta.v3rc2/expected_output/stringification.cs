@@ -24,15 +24,22 @@ namespace AasCore.Aas3
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.ModelingKind that)
+        public static string? ToString(Aas.ModelingKind? that)
         {
-            if (_modelingKindToString.TryGetValue(that, out string? value))
+            if (!that.HasValue)
             {
-                return value;
+                return null;
             }
             else
             {
-                return null;
+                if (_modelingKindToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -76,15 +83,22 @@ namespace AasCore.Aas3
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.AssetKind that)
+        public static string? ToString(Aas.AssetKind? that)
         {
-            if (_assetKindToString.TryGetValue(that, out string? value))
+            if (!that.HasValue)
             {
-                return value;
+                return null;
             }
             else
             {
-                return null;
+                if (_assetKindToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -128,15 +142,22 @@ namespace AasCore.Aas3
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.EntityType that)
+        public static string? ToString(Aas.EntityType? that)
         {
-            if (_entityTypeToString.TryGetValue(that, out string? value))
+            if (!that.HasValue)
             {
-                return value;
+                return null;
             }
             else
             {
-                return null;
+                if (_entityTypeToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -180,15 +201,22 @@ namespace AasCore.Aas3
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.Direction that)
+        public static string? ToString(Aas.Direction? that)
         {
-            if (_directionToString.TryGetValue(that, out string? value))
+            if (!that.HasValue)
             {
-                return value;
+                return null;
             }
             else
             {
-                return null;
+                if (_directionToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -232,15 +260,22 @@ namespace AasCore.Aas3
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.StateOfEvent that)
+        public static string? ToString(Aas.StateOfEvent? that)
         {
-            if (_stateOfEventToString.TryGetValue(that, out string? value))
+            if (!that.HasValue)
             {
-                return value;
+                return null;
             }
             else
             {
-                return null;
+                if (_stateOfEventToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -285,15 +320,22 @@ namespace AasCore.Aas3
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.IdentifiableElements that)
+        public static string? ToString(Aas.IdentifiableElements? that)
         {
-            if (_identifiableElementsToString.TryGetValue(that, out string? value))
+            if (!that.HasValue)
             {
-                return value;
+                return null;
             }
             else
             {
-                return null;
+                if (_identifiableElementsToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -353,15 +395,22 @@ namespace AasCore.Aas3
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.SubmodelElementElements that)
+        public static string? ToString(Aas.SubmodelElementElements? that)
         {
-            if (_submodelElementElementsToString.TryGetValue(that, out string? value))
+            if (!that.HasValue)
             {
-                return value;
+                return null;
             }
             else
             {
-                return null;
+                if (_submodelElementElementsToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -438,15 +487,22 @@ namespace AasCore.Aas3
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.ReferableElements that)
+        public static string? ToString(Aas.ReferableElements? that)
         {
-            if (_referableElementsToString.TryGetValue(that, out string? value))
+            if (!that.HasValue)
             {
-                return value;
+                return null;
             }
             else
             {
-                return null;
+                if (_referableElementsToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -528,15 +584,22 @@ namespace AasCore.Aas3
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.KeyElements that)
+        public static string? ToString(Aas.KeyElements? that)
         {
-            if (_keyElementsToString.TryGetValue(that, out string? value))
+            if (!that.HasValue)
             {
-                return value;
+                return null;
             }
             else
             {
-                return null;
+                if (_keyElementsToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -631,15 +694,22 @@ namespace AasCore.Aas3
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.DataTypeDefXsd that)
+        public static string? ToString(Aas.DataTypeDefXsd? that)
         {
-            if (_dataTypeDefXsdToString.TryGetValue(that, out string? value))
+            if (!that.HasValue)
             {
-                return value;
+                return null;
             }
             else
             {
-                return null;
+                if (_dataTypeDefXsdToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -713,15 +783,22 @@ namespace AasCore.Aas3
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.DataTypeDefRdf that)
+        public static string? ToString(Aas.DataTypeDefRdf? that)
         {
-            if (_dataTypeDefRdfToString.TryGetValue(that, out string? value))
+            if (!that.HasValue)
             {
-                return value;
+                return null;
             }
             else
             {
-                return null;
+                if (_dataTypeDefRdfToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -796,15 +873,22 @@ namespace AasCore.Aas3
         /// <remarks>
         /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
         /// </remarks>
-        public static string? ToString(Aas.DataTypeDef that)
+        public static string? ToString(Aas.DataTypeDef? that)
         {
-            if (_dataTypeDefToString.TryGetValue(that, out string? value))
+            if (!that.HasValue)
             {
-                return value;
+                return null;
             }
             else
             {
-                return null;
+                if (_dataTypeDefToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
