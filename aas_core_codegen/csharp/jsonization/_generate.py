@@ -921,14 +921,10 @@ def _generate_deserialize_from(name: str) -> Stripped:
     )
 
 
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_deserialize(
     symbol_table: intermediate.SymbolTable,
-    spec_impls: specific_implementations.SpecificImplementations,
-) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+) -> Stripped:
     """Generate the deserializer with a deserialization method for each class."""
-    errors = []  # type: List[Error]
-
     blocks = []  # type: List[Stripped]
     for symbol in symbol_table.symbols:
         if isinstance(symbol, intermediate.Enumeration):
@@ -957,9 +953,6 @@ def _generate_deserialize(
                 )
         else:
             assert_never(symbol)
-
-    if len(errors) > 0:
-        return None, errors
 
     writer = io.StringIO()
 
@@ -1022,7 +1015,7 @@ def _generate_deserialize(
 
     writer.write("\n}  // public static class Deserialize")
 
-    return Stripped(writer.getvalue()), None
+    return Stripped(writer.getvalue())
 
 
 def _generate_serialize_primitive_value(
@@ -1536,11 +1529,7 @@ def generate(
     if deserialize_impl_errors is not None:
         errors.extend(deserialize_impl_errors)
 
-    deserialize_block, deserialize_errors = _generate_deserialize(
-        symbol_table=symbol_table, spec_impls=spec_impls
-    )
-    if deserialize_errors is not None:
-        errors.extend(deserialize_errors)
+    deserialize_block = _generate_deserialize(symbol_table=symbol_table)
 
     transformer_block, transformer_errors = _generate_transformer(
         symbol_table=symbol_table, spec_impls=spec_impls
