@@ -1,7 +1,44 @@
 SymbolTable(
   symbols=[
     ConcreteClass(
-      name='Concrete',
+      name='SomeConcreteClass',
+      inheritances=[],
+      inheritance_id_set=...,
+      is_implementation_specific=False,
+      interface=None,
+      descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=None,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=False),
+      reference_in_the_book=None,
+      description=SymbolDescription(
+        summary='<paragraph>Represent something.</paragraph>',
+        remarks=[],
+        constraints_by_identifier=[],
+        parsed=...),
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='SomeContainerClass',
       inheritances=[],
       inheritance_id_set=...,
       is_implementation_specific=False,
@@ -12,12 +49,12 @@ SymbolTable(
         Property(
           name='x',
           type_annotation=ListTypeAnnotation(
-            items=PrimitiveTypeAnnotation(
-              a_type='INT',
+            items=OurTypeAnnotation(
+              symbol='Reference to symbol SomeConcreteClass',
               parsed=...),
             parsed=...),
           description=None,
-          specified_for='Reference to ConcreteClass Concrete',
+          specified_for='Reference to ConcreteClass SomeContainerClass',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -26,8 +63,8 @@ SymbolTable(
           Argument(
             name='x',
             type_annotation=ListTypeAnnotation(
-              items=PrimitiveTypeAnnotation(
-                a_type='INT',
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol SomeConcreteClass',
                 parsed=...),
               parsed=...),
             default=None,
@@ -54,7 +91,8 @@ SymbolTable(
       methods_by_name=...,
       invariant_id_set=...)],
   symbols_topologically_sorted=[
-    'Reference to symbol Concrete'],
+    'Reference to symbol SomeConcreteClass',
+    'Reference to symbol SomeContainerClass'],
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(
