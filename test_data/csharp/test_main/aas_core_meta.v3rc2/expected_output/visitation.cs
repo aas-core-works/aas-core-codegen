@@ -37,7 +37,6 @@ namespace AasCore.Aas3
             public void Visit(OperationVariable that);
             public void Visit(Capability that);
             public void Visit(ConceptDescription that);
-            public void Visit(View that);
             public void Visit(GlobalReference that);
             public void Visit(ModelReference that);
             public void Visit(Key that);
@@ -277,15 +276,6 @@ namespace AasCore.Aas3
                 }
             }
 
-            public void Visit(View that)
-            {
-                // Just descend through, do nothing with <c>that</c>
-                foreach (var something in that.DescendOnce())
-                {
-                    Visit(something);
-                }
-            }
-
             public void Visit(GlobalReference that)
             {
                 // Just descend through, do nothing with <c>that</c>
@@ -374,7 +364,6 @@ namespace AasCore.Aas3
             public abstract void Visit(OperationVariable that);
             public abstract void Visit(Capability that);
             public abstract void Visit(ConceptDescription that);
-            public abstract void Visit(View that);
             public abstract void Visit(GlobalReference that);
             public abstract void Visit(ModelReference that);
             public abstract void Visit(Key that);
@@ -414,7 +403,6 @@ namespace AasCore.Aas3
             public void Visit(OperationVariable that, C context);
             public void Visit(Capability that, C context);
             public void Visit(ConceptDescription that, C context);
-            public void Visit(View that, C context);
             public void Visit(GlobalReference that, C context);
             public void Visit(ModelReference that, C context);
             public void Visit(Key that, C context);
@@ -459,7 +447,6 @@ namespace AasCore.Aas3
             public abstract void Visit(OperationVariable that, C context);
             public abstract void Visit(Capability that, C context);
             public abstract void Visit(ConceptDescription that, C context);
-            public abstract void Visit(View that, C context);
             public abstract void Visit(GlobalReference that, C context);
             public abstract void Visit(ModelReference that, C context);
             public abstract void Visit(Key that, C context);
@@ -500,7 +487,6 @@ namespace AasCore.Aas3
             public T Transform(OperationVariable that);
             public T Transform(Capability that);
             public T Transform(ConceptDescription that);
-            public T Transform(View that);
             public T Transform(GlobalReference that);
             public T Transform(ModelReference that);
             public T Transform(Key that);
@@ -569,8 +555,6 @@ namespace AasCore.Aas3
 
             public abstract T Transform(ConceptDescription that);
 
-            public abstract T Transform(View that);
-
             public abstract T Transform(GlobalReference that);
 
             public abstract T Transform(ModelReference that);
@@ -617,7 +601,6 @@ namespace AasCore.Aas3
             public T Transform(OperationVariable that, C context);
             public T Transform(Capability that, C context);
             public T Transform(ConceptDescription that, C context);
-            public T Transform(View that, C context);
             public T Transform(GlobalReference that, C context);
             public T Transform(ModelReference that, C context);
             public T Transform(Key that, C context);
@@ -687,8 +670,6 @@ namespace AasCore.Aas3
             public abstract T Transform(Capability that, C context);
 
             public abstract T Transform(ConceptDescription that, C context);
-
-            public abstract T Transform(View that, C context);
 
             public abstract T Transform(GlobalReference that, C context);
 

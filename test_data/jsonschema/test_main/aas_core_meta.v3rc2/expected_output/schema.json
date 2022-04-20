@@ -610,7 +610,6 @@
         "Operation",
         "Capability",
         "ConceptDescription",
-        "View",
         "GlobalReference",
         "ModelReference"
       ]
@@ -992,29 +991,6 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/SubmodelElement"
-              }
-            }
-          }
-        }
-      ]
-    },
-    "View": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/Referable"
-        },
-        {
-          "$ref": "#/definitions/HasSemantics"
-        },
-        {
-          "$ref": "#/definitions/HasDataSpecification"
-        },
-        {
-          "properties": {
-            "containedElements": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Reference"
               }
             }
           }

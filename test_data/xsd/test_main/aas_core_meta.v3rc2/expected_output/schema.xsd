@@ -310,7 +310,6 @@
       <xs:element name="submodel" type="submodel_t"/>
       <xs:element name="submodelElementList" type="submodelElementList_t"/>
       <xs:element name="submodelElementStruct" type="submodelElementStruct_t"/>
-      <xs:element name="view" type="view_t"/>
     </xs:choice>
   </xs:group>
   <xs:group name="hasExtensions">
@@ -342,7 +341,6 @@
       <xs:element name="submodel" type="submodel_t"/>
       <xs:element name="submodelElementList" type="submodelElementList_t"/>
       <xs:element name="submodelElementStruct" type="submodelElementStruct_t"/>
-      <xs:element name="view" type="view_t"/>
     </xs:choice>
   </xs:group>
   <xs:group name="hasKind">
@@ -392,7 +390,6 @@
       <xs:element name="submodel" type="submodel_t"/>
       <xs:element name="submodelElementList" type="submodelElementList_t"/>
       <xs:element name="submodelElementStruct" type="submodelElementStruct_t"/>
-      <xs:element name="view" type="view_t"/>
     </xs:choice>
   </xs:group>
   <xs:group name="identifiable">
@@ -650,7 +647,6 @@
       <xs:element name="submodel" type="submodel_t"/>
       <xs:element name="submodelElementList" type="submodelElementList_t"/>
       <xs:element name="submodelElementStruct" type="submodelElementStruct_t"/>
-      <xs:element name="view" type="view_t"/>
     </xs:choice>
   </xs:group>
   <xs:group name="reference">
@@ -780,20 +776,6 @@
       <xs:element name="submodelElementList" type="submodelElementList_t"/>
       <xs:element name="submodelElementStruct" type="submodelElementStruct_t"/>
     </xs:choice>
-  </xs:group>
-  <xs:group name="view">
-    <xs:sequence>
-      <xs:group ref="referable"/>
-      <xs:group ref="hasSemantics"/>
-      <xs:group ref="hasDataSpecification"/>
-      <xs:element name="containedElements" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:group ref="reference_choice" minOccurs="0" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
   </xs:group>
   <xs:simpleType name="assetKind_t">
     <xs:restriction base="xs:string">
@@ -1117,11 +1099,6 @@
   <xs:complexType name="submodel_t">
     <xs:sequence>
       <xs:group ref="submodel"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="view_t">
-    <xs:sequence>
-      <xs:group ref="view"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="environment" type="environment_t"/>
