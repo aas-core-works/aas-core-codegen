@@ -8,6 +8,7 @@ import tempfile
 import unittest
 
 import aas_core_meta.v3rc1
+import aas_core_meta.v3rc2
 
 import aas_core_codegen.main
 
@@ -25,7 +26,7 @@ class Test_against_recorded(unittest.TestCase):
         parent_case_dir = repo_dir / "test_data" / "rdf_shacl" / "test_main"
         assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
 
-        for module in [aas_core_meta.v3rc1]:
+        for module in [aas_core_meta.v3rc1, aas_core_meta.v3rc2]:
             case_dir = parent_case_dir / module.__name__
             assert case_dir.is_dir(), case_dir
 
