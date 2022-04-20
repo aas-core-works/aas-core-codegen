@@ -1,0 +1,15 @@
+@prefix aas: <https://admin-shell.io/aas/3/0/RC02/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@base <https://admin-shell.io/aas/3/0/RC02/> .
+
+<https://admin-shell.io/aas/3/0/RC02/> rdf:type owl:Ontology ;
+    vann:preferredNamespaceUri "https://admin-shell.io/aas/3/0/RC02/"^^xsd:anyURI ;
+    owl:versionInfo "3.0.RC02" ;
+    rdfs:comment "This ontology represents the data model for the Asset Administration Shell according to the specification 'Details of the Asset Administration Shell - Part 1 - Version 3.0.RC02'."@en ;
+    vann:preferredNamespacePrefix "aas"^^xsd:string ;
+    rdfs:isDefinedBy <https://admin-shell.io/aas/3/0/RC02/> ;
+.

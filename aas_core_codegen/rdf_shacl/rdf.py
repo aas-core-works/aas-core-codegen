@@ -85,8 +85,14 @@ def _define_for_enumeration(
 
     if len(enumeration.literals) > 0:
         writer.write(f"\n{I}owl:oneOf (\n")
-        for literal in enumeration.literals:
-            literal_name = rdf_shacl_naming.enumeration_literal(literal.name)
+
+        # NOTE (mristin, 2022-04-20):
+        # We sort by the literal names so that the URLs are sorted in the resulting
+        # schema.
+        for literal_name in sorted(
+            rdf_shacl_naming.enumeration_literal(literal.name)
+            for literal in enumeration.literals
+        ):
             writer.write(f"{II}<{url_prefix}/{cls_name}/{literal_name}>\n")
 
         writer.write(f"{I}) ;")
@@ -94,18 +100,21 @@ def _define_for_enumeration(
     writer.write("\n.")
 
     if len(enumeration.literals) > 0:
-        for literal in enumeration.literals:
-            literal_name = rdf_shacl_naming.enumeration_literal(literal.name)
+        # NOTE (mristin, 2022-04-20):
+        # We sort by the literal names so that the URLs are sorted in the resulting
+        # schema.
+        for literal_name, literal in sorted(
+            (rdf_shacl_naming.enumeration_literal(literal.name), literal)
+            for literal in enumeration.literals
+        ):
             literal_label = rdf_shacl_naming.enumeration_literal_label(literal.name)
 
             writer.write("\n\n")
             writer.write(
-                textwrap.dedent(
-                    f"""\
-                ###  {url_prefix}/{cls_name}/{literal_name}
-                <{url_prefix}/{cls_name}/{literal_name}> rdf:type aas:{cls_name} ;
-                {I}rdfs:label {rdf_shacl_common.string_literal(literal_label)}^^xsd:string ;"""
-                )
+                f"""\
+###  {url_prefix}/{cls_name}/{literal_name}
+<{url_prefix}/{cls_name}/{literal_name}> rdf:type aas:{cls_name} ;
+{I}rdfs:label {rdf_shacl_common.string_literal(literal_label)}^^xsd:string ;"""
             )
 
             if literal.description is not None:
@@ -286,7 +295,12 @@ def _define_for_class(
         assert owl_class is not None
         blocks.append(owl_class)
 
-    for prop in cls.properties:
+    # NOTE (mristin, 2022-04-20):
+    # We sort by the property names so that the URLs appear sorted in the resulting
+    # schema.
+    for _, prop in sorted(
+        (rdf_shacl_naming.property_name(prop.name), prop) for prop in cls.properties
+    ):
         if prop.specified_for is not cls:
             continue
 

@@ -1,4 +1,5 @@
 # Our own ignores
+/deleteme.sh
 /deleteme/
 /venv/
 /venv39/
