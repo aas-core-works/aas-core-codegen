@@ -18,6 +18,9 @@ with open(os.path.join(here, "README.rst"), encoding="utf-8") as fid:
 with open(os.path.join(here, "requirements.txt"), encoding="utf-8") as fid:
     install_requires = [line for line in fid.read().splitlines() if line.strip()]
 
+with open(os.path.join(here, "requirements-dev.txt"), encoding="utf-8") as fid:
+    extras_require_dev = [line for line in fid.read().splitlines() if line.strip()]
+
 setup(
     name="aas-core-codegen",
     version="0.0.8",
@@ -39,19 +42,7 @@ setup(
     install_requires=install_requires,
     # fmt: off
     extras_require={
-        "dev": [
-            "black==22.3.0",
-            "mypy==0.930",
-            "pylint==2.12.2",
-            "pydocstyle>=2.1.1,<3",
-            "coverage>=4.5.1,<5",
-            "pygments>=2,<3",
-            "pyinstaller>=4,<5",
-            "twine",
-            "jsonschema==3.2.0",
-            "xmlschema==1.10.0",
-            "aas-core-meta==2022.4.30a6",
-        ]
+        "dev": extras_require_dev
     },
     # fmt: on
     py_modules=["aas_core_codegen"],
