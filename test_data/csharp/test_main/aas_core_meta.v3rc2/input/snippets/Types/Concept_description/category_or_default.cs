@@ -4,7 +4,7 @@
 /// </summary>
 public string CategoryOrDefault()
 {
-    string result = this.Category ?? "PROPERTY";
+    string result = Category ?? "PROPERTY";
 
 #if DEBUG
     if (!Verification.ConceptDescriptionCategoryIsValid(

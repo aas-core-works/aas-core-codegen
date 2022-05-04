@@ -1,10 +1,10 @@
 # Our own ignores
-/deleteme.sh
+/deleteme*.sh
+/deleteme*.py
 /deleteme/
 /venv/
 /venv39/
 /venv310/
-/deleteme.py
 /deleteme*
 
 # Byte-compiled / optimized / DLL files

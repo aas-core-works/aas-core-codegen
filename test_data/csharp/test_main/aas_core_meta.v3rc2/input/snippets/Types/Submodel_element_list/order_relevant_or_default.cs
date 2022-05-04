@@ -4,5 +4,5 @@
 /// </summary>
 public bool OrderRelevantOrDefault()
 {
-    return this.OrderRelevant ?? true;
+    return OrderRelevant ?? true;
 }

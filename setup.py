@@ -50,7 +50,7 @@ setup(
             "twine",
             "jsonschema==3.2.0",
             "xmlschema==1.10.0",
-            "aas-core-meta==2022.5.30a1",
+            "aas-core-meta==2022.6.19",
         ]
     },
     # fmt: on

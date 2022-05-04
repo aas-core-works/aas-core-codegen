@@ -252,71 +252,41 @@ UnverifiedSymbolTable(
       properties_by_name=...,
       methods_by_name=...),
     ConcreteClass(
-      name='Resource',
+      name='Id_short',
       is_implementation_specific=False,
-      inheritances=[],
-      properties=[
-        Property(
-          name='path',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='Asset_kind',
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
+      inheritances=[
+        'str'],
+      properties=[],
+      methods=[],
+      invariants=[
+        Invariant(
+          description='Constraint AASd-027: ID-short shall have a maximum length of 128 characters.',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Name(
+                    identifier='self',
+                    original_node=...)],
+                original_node=...),
+              op='LE',
+              right=Constant(
+                value=128,
+                original_node=...),
+              original_node=...)"""),
           node=...),
-        Property(
-          name='content_type',
-          type_annotation=SubscriptedTypeAnnotation(
-            identifier='Optional',
-            subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Content_type',
-                node=...)],
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
+        Invariant(
+          description='ID-short of Referables shall only feature letters, digits, underscore (``_``); starting mandatory with a letter. *I.e.* ``[a-zA-Z][a-zA-Z0-9_]+``.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='matches_id_short',
+              args=[
+                Name(
+                  identifier='self',
+                  original_node=...)],
+              original_node=...)"""),
           node=...)],
-      methods=[
-        ConstructorToBeUnderstood(
-          name='__init__',
-          verification=False,
-          arguments=[
-            Argument(
-              name='self',
-              type_annotation=SelfTypeAnnotation(),
-              default=None,
-              node=...),
-            Argument(
-              name='path',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Asset_kind',
-                node=...),
-              default=None,
-              node=...),
-            Argument(
-              name='content_type',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Content_type',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...)],
-          returns=None,
-          description=None,
-          contracts=Contracts(
-            preconditions=[],
-            snapshots=[],
-            postconditions=[]),
-          node=...,
-          arguments_by_name=...,
-          body=...)],
-      invariants=[],
       serialization=None,
       reference_in_the_book=None,
       description=Description(
@@ -336,7 +306,24 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Global_reference',
+                identifier='Reference',
+                node=...)],
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
+          name='supplemental_semantic_ids',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='Optional',
+            subscripts=[
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Reference',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -359,7 +346,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -374,7 +377,29 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='semantic_id',
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
       serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -437,7 +462,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Model_reference',
+                identifier='Reference',
                 node=...)],
             node=...),
           description=Description(
@@ -486,7 +511,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -522,7 +563,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Model_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -612,7 +653,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Constraint AASd-077: The name of an extension within Has_extensions needs to be unique.',
+          description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -657,12 +698,25 @@ UnverifiedSymbolTable(
         'Has_extensions'],
       properties=[
         Property(
-          name='id_short',
+          name='category',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Non_empty_string',
+                node=...)],
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
+          name='id_short',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='Optional',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='Id_short',
                 node=...)],
             node=...),
           description=Description(
@@ -676,19 +730,6 @@ UnverifiedSymbolTable(
             subscripts=[
               AtomicTypeAnnotation(
                 identifier='Lang_string_set',
-                node=...)],
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        Property(
-          name='category',
-          type_annotation=SubscriptedTypeAnnotation(
-            identifier='Optional',
-            subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Non_empty_string',
                 node=...)],
             node=...),
           description=Description(
@@ -748,12 +789,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -766,18 +819,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -816,37 +857,7 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[
-        Invariant(
-          description='Constraint AASd-027: ID-short shall have a maximum length of 128 characters.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='id_short',
-                  original_node=...),
-                original_node=...),
-              consequent=Comparison(
-                left=FunctionCall(
-                  name='len',
-                  args=[
-                    Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='id_short',
-                      original_node=...)],
-                  original_node=...),
-                op='LE',
-                right=Constant(
-                  value=128,
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          node=...)],
+      invariants=[],
       serialization=Serialization(
         with_model_type=True),
       reference_in_the_book=ReferenceInTheBook(
@@ -870,15 +881,6 @@ UnverifiedSymbolTable(
         'Referable'],
       properties=[
         Property(
-          name='ID',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='Identifier',
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        Property(
           name='administration',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
@@ -886,6 +888,15 @@ UnverifiedSymbolTable(
               AtomicTypeAnnotation(
                 identifier='Administrative_information',
                 node=...)],
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
+          name='id',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Identifier',
             node=...),
           description=Description(
             document=...,
@@ -902,7 +913,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='ID',
+              name='id',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Identifier',
                 node=...),
@@ -925,12 +936,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -943,18 +966,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -1027,14 +1038,14 @@ UnverifiedSymbolTable(
       literals=[
         EnumerationLiteral(
           name='Template',
-          value='TEMPLATE',
+          value='Template',
           description=Description(
             document=...,
             node=...),
           node=...),
         EnumerationLiteral(
           name='Instance',
-          value='INSTANCE',
+          value='Instance',
           description=Description(
             document=...,
             node=...),
@@ -1150,7 +1161,7 @@ UnverifiedSymbolTable(
                 identifier='List',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...)],
             node=...),
@@ -1177,7 +1188,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -1260,7 +1271,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -1302,7 +1313,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Constraint AASd-005: If version is not specified than also revision shall be unspecified. This means, a revision requires a version. If there is no version there is no revision neither. Revision is optional.',
+          description='Constraint AASd-005: If version is not specified then also revision shall be unspecified. This means, a revision requires a version. If there is no version there is no revision either. Revision is optional.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1436,12 +1447,63 @@ UnverifiedSymbolTable(
       node=...,
       properties_by_name=...,
       methods_by_name=...),
+    Enumeration(
+      name='Qualifier_kind',
+      is_superset_of=[],
+      literals=[
+        EnumerationLiteral(
+          name='Value_qualifier',
+          value='ValueQualifier',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Concept_qualifier',
+          value='ConceptQualifier',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Template_qualifier',
+          value='TemplateQualifier',
+          description=Description(
+            document=...,
+            node=...),
+          node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          2,
+          8],
+        index=1,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      literals_by_name=...),
     ConcreteClass(
       name='Qualifier',
       is_implementation_specific=False,
       inheritances=[
         'Has_semantics'],
       properties=[
+        Property(
+          name='kind',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='Optional',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='Qualifier_kind',
+                node=...)],
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
         Property(
           name='type',
           type_annotation=AtomicTypeAnnotation(
@@ -1479,7 +1541,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Global_reference',
+                identifier='Reference',
                 node=...)],
             node=...),
           description=Description(
@@ -1487,6 +1549,25 @@ UnverifiedSymbolTable(
             node=...),
           node=...)],
       methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          verification=False,
+          arguments=[
+            Argument(
+              name='self',
+              type_annotation=SelfTypeAnnotation(),
+              default=None,
+              node=...)],
+          returns=AtomicTypeAnnotation(
+            identifier='Qualifier_kind',
+            node=...),
+          description=None,
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          node=...,
+          arguments_by_name=...),
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
@@ -1516,7 +1597,35 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='kind',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Qualifier_kind',
                     node=...)],
                 node=...),
               default=Default(
@@ -1540,7 +1649,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -1557,7 +1666,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Constraint AASd-020: The value shall be consistent to the data type as defined in value_type.',
+          description='Constraint AASd-020: The value shall be consistent to the data type as defined in value type.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1586,8 +1695,7 @@ UnverifiedSymbolTable(
                 original_node=...),
               original_node=...)"""),
           node=...)],
-      serialization=Serialization(
-        with_model_type=True),
+      serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -1610,6 +1718,19 @@ UnverifiedSymbolTable(
         'Has_data_specification'],
       properties=[
         Property(
+          name='derived_from',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='Optional',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='Reference',
+                node=...)],
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
           name='asset_information',
           type_annotation=AtomicTypeAnnotation(
             identifier='Asset_information',
@@ -1627,21 +1748,8 @@ UnverifiedSymbolTable(
                 identifier='List',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Model_reference',
+                    identifier='Reference',
                     node=...)],
-                node=...)],
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        Property(
-          name='derived_from',
-          type_annotation=SubscriptedTypeAnnotation(
-            identifier='Optional',
-            subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Model_reference',
                 node=...)],
             node=...),
           description=Description(
@@ -1659,7 +1767,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='ID',
+              name='id',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Identifier',
                 node=...),
@@ -1689,12 +1797,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -1707,18 +1827,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -1769,8 +1877,20 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='derived_from',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -1785,20 +1905,8 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Model_reference',
+                        identifier='Reference',
                         node=...)],
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='derived_from',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Model_reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -1837,7 +1945,7 @@ UnverifiedSymbolTable(
                     original_node=...),
                   Member(
                     instance=Name(
-                      identifier='Key_elements',
+                      identifier='Key_types',
                       original_node=...),
                     name='Asset_administration_shell',
                     original_node=...)],
@@ -1876,7 +1984,7 @@ UnverifiedSymbolTable(
                       original_node=...),
                     Member(
                       instance=Name(
-                        identifier='Key_elements',
+                        identifier='Key_types',
                         original_node=...),
                       name='Submodel',
                       original_node=...)],
@@ -1884,8 +1992,7 @@ UnverifiedSymbolTable(
                 original_node=...),
               original_node=...)"""),
           node=...)],
-      serialization=Serialization(
-        with_model_type=True),
+      serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -1919,7 +2026,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Global_reference',
+                identifier='Reference',
                 node=...)],
             node=...),
           description=Description(
@@ -1932,7 +2039,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Identifier_key_value_pair',
+                identifier='Specific_asset_id',
                 node=...)],
             node=...),
           description=Description(
@@ -1975,7 +2082,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -1987,7 +2094,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Identifier_key_value_pair',
+                    identifier='Specific_asset_id',
                     node=...)],
                 node=...),
               default=Default(
@@ -2029,6 +2136,86 @@ UnverifiedSymbolTable(
       node=...,
       properties_by_name=...,
       methods_by_name=...),
+    ConcreteClass(
+      name='Resource',
+      is_implementation_specific=False,
+      inheritances=[],
+      properties=[
+        Property(
+          name='path',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Path_type',
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
+          name='content_type',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='Optional',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='Content_type',
+                node=...)],
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...)],
+      methods=[
+        ConstructorToBeUnderstood(
+          name='__init__',
+          verification=False,
+          arguments=[
+            Argument(
+              name='self',
+              type_annotation=SelfTypeAnnotation(),
+              default=None,
+              node=...),
+            Argument(
+              name='path',
+              type_annotation=AtomicTypeAnnotation(
+                identifier='Path_type',
+                node=...),
+              default=None,
+              node=...),
+            Argument(
+              name='content_type',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Content_type',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...)],
+          returns=None,
+          description=None,
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          node=...,
+          arguments_by_name=...,
+          body=...)],
+      invariants=[],
+      serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          4],
+        index=1,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      properties_by_name=...,
+      methods_by_name=...),
     Enumeration(
       name='Asset_kind',
       is_superset_of=[],
@@ -2060,13 +2247,13 @@ UnverifiedSymbolTable(
       node=...,
       literals_by_name=...),
     ConcreteClass(
-      name='Identifier_key_value_pair',
+      name='Specific_asset_id',
       is_implementation_specific=False,
       inheritances=[
         'Has_semantics'],
       properties=[
         Property(
-          name='key',
+          name='name',
           type_annotation=AtomicTypeAnnotation(
             identifier='Non_empty_string',
             node=...),
@@ -2085,12 +2272,8 @@ UnverifiedSymbolTable(
           node=...),
         Property(
           name='external_subject_id',
-          type_annotation=SubscriptedTypeAnnotation(
-            identifier='Optional',
-            subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Global_reference',
-                node=...)],
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Reference',
             node=...),
           description=Description(
             document=...,
@@ -2107,7 +2290,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='key',
+              name='name',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Non_empty_string',
                 node=...),
@@ -2121,24 +2304,35 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
+              name='external_subject_id',
+              type_annotation=AtomicTypeAnnotation(
+                identifier='Reference',
+                node=...),
+              default=None,
+              node=...),
+            Argument(
               name='semantic_id',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
                 node=...),
               node=...),
             Argument(
-              name='external_subject_id',
+              name='supplemental_semantic_ids',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -2206,7 +2400,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='ID',
+              name='id',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Identifier',
                 node=...),
@@ -2229,12 +2423,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -2247,18 +2453,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -2318,7 +2512,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -2349,7 +2559,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -2383,7 +2593,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Short IDs need to be defined for all the submodel elements.',
+          description='ID-shorts need to be defined for all the submodel elements.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2418,7 +2628,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description=None,
+          description='Constraint AASd-120: ID-short of non-identifiable referables shall be unique in its namespace.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2438,6 +2648,68 @@ UnverifiedSymbolTable(
                       original_node=...),
                     name='submodel_elements',
                     original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=Comparison(
+                left=MethodCall(
+                  member=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='kind_or_default',
+                    original_node=...),
+                  args=[],
+                  original_node=...),
+                op='EQ',
+                right=Member(
+                  instance=Name(
+                    identifier='Modeling_kind',
+                    original_node=...),
+                  name='Template',
+                  original_node=...),
+                original_node=...),
+              consequent=Implication(
+                antecedent=IsNotNone(
+                  value=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='qualifiers',
+                    original_node=...),
+                  original_node=...),
+                consequent=All(
+                  for_each=ForEach(
+                    variable=Name(
+                      identifier='qualifier',
+                      original_node=...),
+                    iteration=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...),
+                    original_node=...),
+                  condition=Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='qualifier',
+                        original_node=...),
+                      name='kind',
+                      original_node=...),
+                    op='EQ',
+                    right=Member(
+                      instance=Name(
+                        identifier='Qualifier_kind',
+                        original_node=...),
+                      name='Template_qualifier',
+                      original_node=...),
+                    original_node=...),
+                  original_node=...),
                 original_node=...),
               original_node=...)"""),
           node=...)],
@@ -2492,12 +2764,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -2510,18 +2794,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -2569,7 +2841,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -2600,7 +2888,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -2616,7 +2904,69 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=Comparison(
+                left=MethodCall(
+                  member=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='kind_or_default',
+                    original_node=...),
+                  args=[],
+                  original_node=...),
+                op='EQ',
+                right=Member(
+                  instance=Name(
+                    identifier='Modeling_kind',
+                    original_node=...),
+                  name='Template',
+                  original_node=...),
+                original_node=...),
+              consequent=Implication(
+                antecedent=IsNotNone(
+                  value=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='qualifiers',
+                    original_node=...),
+                  original_node=...),
+                consequent=All(
+                  for_each=ForEach(
+                    variable=Name(
+                      identifier='qualifier',
+                      original_node=...),
+                    iteration=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...),
+                    original_node=...),
+                  condition=Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='qualifier',
+                        original_node=...),
+                      name='kind',
+                      original_node=...),
+                    op='EQ',
+                    right=Member(
+                      instance=Name(
+                        identifier='Qualifier_kind',
+                        original_node=...),
+                      name='Template_qualifier',
+                      original_node=...),
+                    original_node=...),
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
       serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -2631,7 +2981,7 @@ UnverifiedSymbolTable(
       node=...,
       properties_by_name=...,
       methods_by_name=...),
-    AbstractClass(
+    ConcreteClass(
       name='Relationship_element',
       is_implementation_specific=False,
       inheritances=[
@@ -2696,12 +3046,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -2714,18 +3076,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -2773,7 +3123,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -2804,7 +3170,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -2827,7 +3193,7 @@ UnverifiedSymbolTable(
           5,
           7,
           7,
-          16],
+          14],
         index=0,
         fragment=None),
       description=Description(
@@ -2842,15 +3208,6 @@ UnverifiedSymbolTable(
       inheritances=[
         'Submodel_element'],
       properties=[
-        Property(
-          name='type_value_list_element',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='Submodel_element_elements',
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
         Property(
           name='order_relevant',
           type_annotation=SubscriptedTypeAnnotation(
@@ -2887,8 +3244,17 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Global_reference',
+                identifier='Reference',
                 node=...)],
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
+          name='type_value_list_element',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='AAS_submodel_elements',
             node=...),
           description=Description(
             document=...,
@@ -2939,7 +3305,7 @@ UnverifiedSymbolTable(
             Argument(
               name='type_value_list_element',
               type_annotation=AtomicTypeAnnotation(
-                identifier='Submodel_element_elements',
+                identifier='AAS_submodel_elements',
                 node=...),
               default=None,
               node=...),
@@ -2960,12 +3326,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -2978,18 +3356,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -3037,7 +3403,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -3068,7 +3450,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -3109,7 +3491,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -3290,7 +3672,7 @@ UnverifiedSymbolTable(
                         op='EQ',
                         right=Member(
                           instance=Name(
-                            identifier='Submodel_element_elements',
+                            identifier='AAS_submodel_elements',
                             original_node=...),
                           name='Property',
                           original_node=...),
@@ -3305,7 +3687,7 @@ UnverifiedSymbolTable(
                         op='EQ',
                         right=Member(
                           instance=Name(
-                            identifier='Submodel_element_elements',
+                            identifier='AAS_submodel_elements',
                             original_node=...),
                           name='Range',
                           original_node=...),
@@ -3342,7 +3724,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Short IDs need to be defined for all the elements.',
+          description='Constraint AASd-120: ID-shorts of submodel elements within a SubmodelElementList shall not be specified.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -3365,7 +3747,7 @@ UnverifiedSymbolTable(
                     name='value',
                     original_node=...),
                   original_node=...),
-                condition=IsNotNone(
+                condition=IsNone(
                   value=Member(
                     instance=Name(
                       identifier='element',
@@ -3375,30 +3757,6 @@ UnverifiedSymbolTable(
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
-          node=...),
-        Invariant(
-          description=None,
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='value',
-                  original_node=...),
-                original_node=...),
-              consequent=FunctionCall(
-                name='id_shorts_are_unique',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='value',
-                    original_node=...)],
-                original_node=...),
-              original_node=...)"""),
           node=...)],
       serialization=None,
       reference_in_the_book=ReferenceInTheBook(
@@ -3406,7 +3764,7 @@ UnverifiedSymbolTable(
           5,
           7,
           7,
-          17],
+          16],
         index=0,
         fragment=None),
       description=Description(
@@ -3416,7 +3774,7 @@ UnverifiedSymbolTable(
       properties_by_name=...,
       methods_by_name=...),
     ConcreteClass(
-      name='Submodel_element_struct',
+      name='Submodel_element_collection',
       is_implementation_specific=False,
       inheritances=[
         'Submodel_element'],
@@ -3465,12 +3823,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -3483,18 +3853,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -3542,7 +3900,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -3573,7 +3947,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -3607,7 +3981,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Short IDs need to be defined for all the elements.',
+          description='ID-shorts need to be defined for all the elements.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -3671,7 +4045,7 @@ UnverifiedSymbolTable(
           5,
           7,
           7,
-          18],
+          15],
         index=0,
         fragment=None),
       description=Description(
@@ -3713,12 +4087,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -3731,18 +4117,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -3790,7 +4164,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -3821,7 +4211,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -3836,7 +4226,26 @@ UnverifiedSymbolTable(
             postconditions=[]),
           node=...,
           arguments_by_name=...,
-          body=...)],
+          body=...),
+        ImplementationSpecificMethod(
+          name='category_or_default',
+          verification=False,
+          arguments=[
+            Argument(
+              name='self',
+              type_annotation=SelfTypeAnnotation(),
+              default=None,
+              node=...)],
+          returns=AtomicTypeAnnotation(
+            identifier='str',
+            node=...),
+          description=None,
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          node=...,
+          arguments_by_name=...)],
       invariants=[
         Invariant(
           description='Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE',
@@ -3940,7 +4349,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Global_reference',
+                identifier='Reference',
                 node=...)],
             node=...),
           description=Description(
@@ -3981,12 +4390,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -3999,18 +4420,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -4058,7 +4467,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -4089,7 +4514,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -4114,7 +4539,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -4166,7 +4591,7 @@ UnverifiedSymbolTable(
           5,
           7,
           7,
-          13],
+          11],
         index=0,
         fragment=None),
       description=Description(
@@ -4200,7 +4625,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Global_reference',
+                identifier='Reference',
                 node=...)],
             node=...),
           description=Description(
@@ -4234,12 +4659,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -4252,18 +4689,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -4311,7 +4736,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -4342,7 +4783,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -4367,7 +4808,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -4389,7 +4830,7 @@ UnverifiedSymbolTable(
           5,
           7,
           7,
-          11],
+          9],
         index=0,
         fragment=None),
       description=Description(
@@ -4473,12 +4914,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -4491,18 +4944,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -4550,7 +4991,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -4581,7 +5038,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -4688,7 +5145,7 @@ UnverifiedSymbolTable(
           5,
           7,
           7,
-          14],
+          12],
         index=0,
         fragment=None),
       description=Description(
@@ -4743,12 +5200,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -4761,18 +5230,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -4820,7 +5277,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -4851,7 +5324,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -4902,15 +5375,6 @@ UnverifiedSymbolTable(
         'Data_element'],
       properties=[
         Property(
-          name='MIME_type',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='Content_type',
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        Property(
           name='value',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
@@ -4922,216 +5386,11 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
-          node=...)],
-      methods=[
-        ConstructorToBeUnderstood(
-          name='__init__',
-          verification=False,
-          arguments=[
-            Argument(
-              name='self',
-              type_annotation=SelfTypeAnnotation(),
-              default=None,
-              node=...),
-            Argument(
-              name='MIME_type',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Content_type',
-                node=...),
-              default=None,
-              node=...),
-            Argument(
-              name='extensions',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  SubscriptedTypeAnnotation(
-                    identifier='List',
-                    subscripts=[
-                      AtomicTypeAnnotation(
-                        identifier='Extension',
-                        node=...)],
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='id_short',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='display_name',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='description',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='checksum',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='kind',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Modeling_kind',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='semantic_id',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Global_reference',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='qualifiers',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  SubscriptedTypeAnnotation(
-                    identifier='List',
-                    subscripts=[
-                      AtomicTypeAnnotation(
-                        identifier='Qualifier',
-                        node=...)],
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='data_specifications',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  SubscriptedTypeAnnotation(
-                    identifier='List',
-                    subscripts=[
-                      AtomicTypeAnnotation(
-                        identifier='Global_reference',
-                        node=...)],
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='value',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Blob_type',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...)],
-          returns=None,
-          description=None,
-          contracts=Contracts(
-            preconditions=[],
-            snapshots=[],
-            postconditions=[]),
-          node=...,
-          arguments_by_name=...,
-          body=...)],
-      invariants=[],
-      serialization=None,
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          4],
-        index=0,
-        fragment=None),
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      properties_by_name=...,
-      methods_by_name=...),
-    ConcreteClass(
-      name='File',
-      is_implementation_specific=False,
-      inheritances=[
-        'Data_element'],
-      properties=[
+          node=...),
         Property(
           name='content_type',
           type_annotation=AtomicTypeAnnotation(
             identifier='Content_type',
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        Property(
-          name='value',
-          type_annotation=SubscriptedTypeAnnotation(
-            identifier='Optional',
-            subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Path_type',
-                node=...)],
             node=...),
           description=Description(
             document=...,
@@ -5171,12 +5430,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -5189,18 +5460,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -5248,7 +5507,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -5279,7 +5554,237 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
+                        node=...)],
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='value',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Blob_type',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...)],
+          returns=None,
+          description=None,
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          node=...,
+          arguments_by_name=...,
+          body=...)],
+      invariants=[],
+      serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          7,
+          3],
+        index=0,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      properties_by_name=...,
+      methods_by_name=...),
+    ConcreteClass(
+      name='File',
+      is_implementation_specific=False,
+      inheritances=[
+        'Data_element'],
+      properties=[
+        Property(
+          name='value',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='Optional',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='Path_type',
+                node=...)],
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
+          name='content_type',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Content_type',
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...)],
+      methods=[
+        ConstructorToBeUnderstood(
+          name='__init__',
+          verification=False,
+          arguments=[
+            Argument(
+              name='self',
+              type_annotation=SelfTypeAnnotation(),
+              default=None,
+              node=...),
+            Argument(
+              name='content_type',
+              type_annotation=AtomicTypeAnnotation(
+                identifier='Content_type',
+                node=...),
+              default=None,
+              node=...),
+            Argument(
+              name='extensions',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Extension',
+                        node=...)],
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='category',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='display_name',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Lang_string_set',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='description',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Lang_string_set',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='checksum',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='kind',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Modeling_kind',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='semantic_id',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='qualifiers',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Qualifier',
+                        node=...)],
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='data_specifications',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -5330,7 +5835,7 @@ UnverifiedSymbolTable(
         'Relationship_element'],
       properties=[
         Property(
-          name='annotation',
+          name='annotations',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
@@ -5387,12 +5892,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -5405,18 +5922,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -5464,7 +5969,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -5495,7 +6016,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -5503,7 +6024,7 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='annotation',
+              name='annotations',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
@@ -5549,14 +6070,14 @@ UnverifiedSymbolTable(
       literals=[
         EnumerationLiteral(
           name='Co_managed_entity',
-          value='COMANAGEDENTITY',
+          value='CoManagedEntity',
           description=Description(
             document=...,
             node=...),
           node=...),
         EnumerationLiteral(
           name='Self_managed_entity',
-          value='SELFMANAGEDENTITY',
+          value='SelfManagedEntity',
           description=Description(
             document=...,
             node=...),
@@ -5581,15 +6102,6 @@ UnverifiedSymbolTable(
         'Submodel_element'],
       properties=[
         Property(
-          name='entity_type',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='Entity_type',
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        Property(
           name='statements',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
@@ -5601,6 +6113,15 @@ UnverifiedSymbolTable(
                     identifier='Submodel_element',
                     node=...)],
                 node=...)],
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
+          name='entity_type',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Entity_type',
             node=...),
           description=Description(
             document=...,
@@ -5625,7 +6146,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Identifier_key_value_pair',
+                identifier='Specific_asset_id',
                 node=...)],
             node=...),
           description=Description(
@@ -5666,12 +6187,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -5684,18 +6217,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -5743,7 +6264,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -5774,7 +6311,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -5815,7 +6352,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Identifier_key_value_pair',
+                    identifier='Specific_asset_id',
                     node=...)],
                 node=...),
               default=Default(
@@ -5936,14 +6473,14 @@ UnverifiedSymbolTable(
       is_superset_of=[],
       literals=[
         EnumerationLiteral(
-          name='input',
+          name='Input',
           value='INPUT',
           description=Description(
             document=...,
             node=...),
           node=...),
         EnumerationLiteral(
-          name='output',
+          name='Output',
           value='OUTPUT',
           description=Description(
             document=...,
@@ -5967,14 +6504,14 @@ UnverifiedSymbolTable(
       is_superset_of=[],
       literals=[
         EnumerationLiteral(
-          name='on',
+          name='On',
           value='ON',
           description=Description(
             document=...,
             node=...),
           node=...),
         EnumerationLiteral(
-          name='off',
+          name='Off',
           value='OFF',
           description=Description(
             document=...,
@@ -6001,7 +6538,7 @@ UnverifiedSymbolTable(
         Property(
           name='source',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Model_reference',
+            identifier='Reference',
             node=...),
           description=Description(
             document=...,
@@ -6013,7 +6550,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Global_reference',
+                identifier='Reference',
                 node=...)],
             node=...),
           description=Description(
@@ -6023,7 +6560,7 @@ UnverifiedSymbolTable(
         Property(
           name='observable_reference',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Model_reference',
+            identifier='Reference',
             node=...),
           description=Description(
             document=...,
@@ -6035,7 +6572,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Global_reference',
+                identifier='Reference',
                 node=...)],
             node=...),
           description=Description(
@@ -6061,7 +6598,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Global_reference',
+                identifier='Reference',
                 node=...)],
             node=...),
           description=Description(
@@ -6103,14 +6640,14 @@ UnverifiedSymbolTable(
             Argument(
               name='source',
               type_annotation=AtomicTypeAnnotation(
-                identifier='Model_reference',
+                identifier='Reference',
                 node=...),
               default=None,
               node=...),
             Argument(
               name='observable_reference',
               type_annotation=AtomicTypeAnnotation(
-                identifier='Model_reference',
+                identifier='Reference',
                 node=...),
               default=None,
               node=...),
@@ -6127,7 +6664,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -6139,7 +6676,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -6163,7 +6700,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -6190,7 +6727,47 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description=None,
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='is_model_reference_to',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='source',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='Key_types',
+                    original_node=...),
+                  name='Referable',
+                  original_node=...)],
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description=None,
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='is_model_reference_to',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='observable_reference',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='Key_types',
+                    original_node=...),
+                  name='Referable',
+                  original_node=...)],
+              original_node=...)"""),
+          node=...)],
       serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -6239,12 +6816,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -6257,18 +6846,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -6316,7 +6893,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -6347,7 +6940,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -6388,7 +6981,7 @@ UnverifiedSymbolTable(
         Property(
           name='observed',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Model_reference',
+            identifier='Reference',
             node=...),
           description=Description(
             document=...,
@@ -6431,7 +7024,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Model_reference',
+                identifier='Reference',
                 node=...)],
             node=...),
           description=Description(
@@ -6490,7 +7083,7 @@ UnverifiedSymbolTable(
             Argument(
               name='observed',
               type_annotation=AtomicTypeAnnotation(
-                identifier='Model_reference',
+                identifier='Reference',
                 node=...),
               default=None,
               node=...),
@@ -6525,12 +7118,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -6543,18 +7148,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -6602,7 +7195,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -6633,7 +7242,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -6658,7 +7267,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Model_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -6709,7 +7318,86 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Max. interval is not applicable for input direction',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=Comparison(
+                left=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='direction',
+                  original_node=...),
+                op='EQ',
+                right=Member(
+                  instance=Name(
+                    identifier='Direction',
+                    original_node=...),
+                  name='Input',
+                  original_node=...),
+                original_node=...),
+              consequent=IsNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='max_interval',
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description=None,
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='is_model_reference_to',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='observed',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='Key_types',
+                    original_node=...),
+                  name='Referable',
+                  original_node=...)],
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description=None,
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='message_broker',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='is_model_reference_to',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='message_broker',
+                    original_node=...),
+                  Member(
+                    instance=Name(
+                      identifier='Key_types',
+                      original_node=...),
+                    name='Referable',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
       serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -6809,12 +7497,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -6827,18 +7527,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -6886,7 +7574,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -6917,7 +7621,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -6988,7 +7692,7 @@ UnverifiedSymbolTable(
           5,
           7,
           7,
-          12],
+          10],
         index=0,
         fragment=None),
       description=Description(
@@ -7044,7 +7748,7 @@ UnverifiedSymbolTable(
           5,
           7,
           7,
-          13],
+          10],
         index=1,
         fragment=None),
       description=Description(
@@ -7086,12 +7790,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -7104,18 +7820,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -7163,7 +7867,23 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='supplemental_semantic_ids',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Reference',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -7194,7 +7914,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -7242,7 +7962,7 @@ UnverifiedSymbolTable(
                 identifier='List',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...)],
             node=...),
@@ -7286,7 +8006,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='ID',
+              name='id',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Identifier',
                 node=...),
@@ -7309,12 +8029,24 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='id_short',
+              name='category',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Non_empty_string',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='id_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Id_short',
                     node=...)],
                 node=...),
               default=Default(
@@ -7327,18 +8059,6 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Lang_string_set',
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='category',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Non_empty_string',
                     node=...)],
                 node=...),
               default=Default(
@@ -7389,7 +8109,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -7405,7 +8125,7 @@ UnverifiedSymbolTable(
                     identifier='List',
                     subscripts=[
                       AtomicTypeAnnotation(
-                        identifier='Global_reference',
+                        identifier='Reference',
                         node=...)],
                     node=...)],
                 node=...),
@@ -7446,8 +8166,7 @@ UnverifiedSymbolTable(
                 original_node=...),
               original_node=...)"""),
           node=...)],
-      serialization=Serialization(
-        with_model_type=True),
+      serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -7461,39 +8180,72 @@ UnverifiedSymbolTable(
       node=...,
       properties_by_name=...,
       methods_by_name=...),
-    AbstractClass(
-      name='Reference',
-      is_implementation_specific=False,
-      inheritances=[],
-      properties=[],
-      methods=[],
-      invariants=[],
-      serialization=Serialization(
-        with_model_type=True),
+    Enumeration(
+      name='Reference_types',
+      is_superset_of=[],
+      literals=[
+        EnumerationLiteral(
+          name='Global_reference',
+          value='GlobalReference',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Model_reference',
+          value='ModelReference',
+          description=Description(
+            document=...,
+            node=...),
+          node=...)],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
           7,
           10,
-          4],
-        index=0,
+          2],
+        index=1,
         fragment=None),
       description=Description(
         document=...,
         node=...),
       node=...,
-      properties_by_name=...,
-      methods_by_name=...),
+      literals_by_name=...),
     ConcreteClass(
-      name='Global_reference',
+      name='Reference',
       is_implementation_specific=False,
-      inheritances=[
-        'Reference'],
+      inheritances=[],
       properties=[
         Property(
-          name='value',
+          name='type',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Identifier',
+            identifier='Reference_types',
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
+          name='referred_semantic_id',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='Optional',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='Reference',
+                node=...)],
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
+          name='keys',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='List',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='Key',
+                node=...)],
             node=...),
           description=Description(
             document=...,
@@ -7510,78 +8262,10 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='value',
+              name='type',
               type_annotation=AtomicTypeAnnotation(
-                identifier='Identifier',
+                identifier='Reference_types',
                 node=...),
-              default=None,
-              node=...)],
-          returns=None,
-          description=None,
-          contracts=Contracts(
-            preconditions=[],
-            snapshots=[],
-            postconditions=[]),
-          node=...,
-          arguments_by_name=...,
-          body=...)],
-      invariants=[],
-      serialization=Serialization(
-        with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          2],
-        index=0,
-        fragment=None),
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      properties_by_name=...,
-      methods_by_name=...),
-    ConcreteClass(
-      name='Model_reference',
-      is_implementation_specific=False,
-      inheritances=[
-        'Reference'],
-      properties=[
-        Property(
-          name='keys',
-          type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
-            subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Key',
-                node=...)],
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        Property(
-          name='referred_semantic_id',
-          type_annotation=SubscriptedTypeAnnotation(
-            identifier='Optional',
-            subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Global_reference',
-                node=...)],
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
-          node=...)],
-      methods=[
-        ConstructorToBeUnderstood(
-          name='__init__',
-          verification=False,
-          arguments=[
-            Argument(
-              name='self',
-              type_annotation=SelfTypeAnnotation(),
               default=None,
               node=...),
             Argument(
@@ -7601,7 +8285,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Global_reference',
+                    identifier='Reference',
                     node=...)],
                 node=...),
               default=Default(
@@ -7637,14 +8321,13 @@ UnverifiedSymbolTable(
                 original_node=...),
               original_node=...)"""),
           node=...)],
-      serialization=Serialization(
-        with_model_type=True),
+      serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
           7,
           10,
-          3],
+          2],
         index=0,
         fragment=None),
       description=Description(
@@ -7661,7 +8344,7 @@ UnverifiedSymbolTable(
         Property(
           name='type',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Key_elements',
+            identifier='Key_types',
             node=...),
           description=Description(
             document=...,
@@ -7689,7 +8372,7 @@ UnverifiedSymbolTable(
             Argument(
               name='type',
               type_annotation=AtomicTypeAnnotation(
-                identifier='Key_elements',
+                identifier='Key_types',
                 node=...),
               default=None,
               node=...),
@@ -7726,7 +8409,53 @@ UnverifiedSymbolTable(
       properties_by_name=...,
       methods_by_name=...),
     Enumeration(
-      name='Identifiable_elements',
+      name='Generic_fragment_keys',
+      is_superset_of=[],
+      literals=[
+        EnumerationLiteral(
+          name='Fragment_reference',
+          value='FragmentReference',
+          description=Description(
+            document=...,
+            node=...),
+          node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=6,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      literals_by_name=...),
+    Enumeration(
+      name='Generic_globally_identifiables',
+      is_superset_of=[],
+      literals=[
+        EnumerationLiteral(
+          name='Global_reference',
+          value='GlobalReference',
+          description=None,
+          node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=8,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      literals_by_name=...),
+    Enumeration(
+      name='AAS_identifiables',
       is_superset_of=[],
       literals=[
         EnumerationLiteral(
@@ -7750,7 +8479,7 @@ UnverifiedSymbolTable(
           7,
           10,
           3],
-        index=5,
+        index=7,
         fragment=None),
       description=Description(
         document=...,
@@ -7758,7 +8487,7 @@ UnverifiedSymbolTable(
       node=...,
       literals_by_name=...),
     Enumeration(
-      name='Submodel_element_elements',
+      name='AAS_submodel_elements',
       is_superset_of=[],
       literals=[
         EnumerationLiteral(
@@ -7858,8 +8587,129 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         EnumerationLiteral(
-          name='Submodel_element_struct',
-          value='SubmodelElementStruct',
+          name='Submodel_element_collection',
+          value='SubmodelElementCollection',
+          description=Description(
+            document=...,
+            node=...),
+          node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=5,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      literals_by_name=...),
+    Enumeration(
+      name='AAS_referable_non_identifiables',
+      is_superset_of=[
+        'AAS_submodel_elements'],
+      literals=[
+        EnumerationLiteral(
+          name='Annotated_relationship_element',
+          value='AnnotatedRelationshipElement',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Basic_event_element',
+          value='BasicEventElement',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Blob',
+          value='Blob',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Capability',
+          value='Capability',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Data_element',
+          value='DataElement',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Entity',
+          value='Entity',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Event_element',
+          value='EventElement',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='File',
+          value='File',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Multi_language_property',
+          value='MultiLanguageProperty',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Operation',
+          value='Operation',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Property',
+          value='Property',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Range',
+          value='Range',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Reference_element',
+          value='ReferenceElement',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Relationship_element',
+          value='RelationshipElement',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Submodel_element',
+          value='SubmodelElement',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Submodel_element_collection',
+          value='SubmodelElementCollection',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Submodel_element_list',
+          value='SubmodelElementList',
           description=Description(
             document=...,
             node=...),
@@ -7878,11 +8728,57 @@ UnverifiedSymbolTable(
       node=...,
       literals_by_name=...),
     Enumeration(
-      name='Referable_elements',
+      name='Globally_identifiables',
       is_superset_of=[
-        'Submodel_element_elements',
-        'Identifiable_elements'],
+        'AAS_identifiables',
+        'Generic_globally_identifiables'],
       literals=[
+        EnumerationLiteral(
+          name='Global_reference',
+          value='GlobalReference',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Asset_administration_shell',
+          value='AssetAdministrationShell',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Concept_description',
+          value='ConceptDescription',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Submodel',
+          value='Submodel',
+          description=None,
+          node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=3,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      literals_by_name=...),
+    Enumeration(
+      name='Fragment_keys',
+      is_superset_of=[
+        'AAS_referable_non_identifiables',
+        'Generic_fragment_keys'],
+      literals=[
+        EnumerationLiteral(
+          name='Fragment_reference',
+          value='FragmentReference',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
         EnumerationLiteral(
           name='Annotated_relationship_element',
           value='AnnotatedRelationshipElement',
@@ -7995,8 +8891,8 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         EnumerationLiteral(
-          name='Submodel_element_struct',
-          value='SubmodelElementStruct',
+          name='Submodel_element_collection',
+          value='SubmodelElementCollection',
           description=Description(
             document=...,
             node=...),
@@ -8007,7 +8903,7 @@ UnverifiedSymbolTable(
           7,
           10,
           3],
-        index=3,
+        index=2,
         fragment=None),
       description=Description(
         document=...,
@@ -8015,9 +8911,10 @@ UnverifiedSymbolTable(
       node=...,
       literals_by_name=...),
     Enumeration(
-      name='Key_elements',
+      name='Key_types',
       is_superset_of=[
-        'Referable_elements'],
+        'Fragment_keys',
+        'Globally_identifiables'],
       literals=[
         EnumerationLiteral(
           name='Fragment_reference',
@@ -8110,6 +9007,11 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         EnumerationLiteral(
+          name='Referable',
+          value='Referable',
+          description=None,
+          node=...),
+        EnumerationLiteral(
           name='Reference_element',
           value='ReferenceElement',
           description=Description(
@@ -8143,8 +9045,8 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         EnumerationLiteral(
-          name='Submodel_element_struct',
-          value='SubmodelElementStruct',
+          name='Submodel_element_collection',
+          value='SubmodelElementCollection',
           description=Description(
             document=...,
             node=...),
@@ -8155,7 +9057,7 @@ UnverifiedSymbolTable(
           7,
           10,
           3],
-        index=2,
+        index=1,
         fragment=None),
       description=Description(
         document=...,
@@ -8727,6 +9629,148 @@ UnverifiedSymbolTable(
       node=...,
       properties_by_name=...,
       methods_by_name=...),
+    AbstractClass(
+      name='Data_specification_content',
+      is_implementation_specific=False,
+      inheritances=[],
+      properties=[],
+      methods=[],
+      invariants=[],
+      serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          2,
+          1,
+          1],
+        index=1,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      properties_by_name=...,
+      methods_by_name=...),
+    AbstractClass(
+      name='Data_specification',
+      is_implementation_specific=False,
+      inheritances=[],
+      properties=[
+        Property(
+          name='id',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Identifier',
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
+          name='data_specification_content',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Data_specification_content',
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
+          name='administration',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='Optional',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='Administrative_information',
+                node=...)],
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
+          name='description',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='Optional',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='Lang_string_set',
+                node=...)],
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...)],
+      methods=[
+        ConstructorToBeUnderstood(
+          name='__init__',
+          verification=False,
+          arguments=[
+            Argument(
+              name='self',
+              type_annotation=SelfTypeAnnotation(),
+              default=None,
+              node=...),
+            Argument(
+              name='id',
+              type_annotation=AtomicTypeAnnotation(
+                identifier='Identifier',
+                node=...),
+              default=None,
+              node=...),
+            Argument(
+              name='data_specification_content',
+              type_annotation=AtomicTypeAnnotation(
+                identifier='Data_specification_content',
+                node=...),
+              default=None,
+              node=...),
+            Argument(
+              name='administration',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Administrative_information',
+                    node=...)],
+                node=...),
+              default=None,
+              node=...),
+            Argument(
+              name='description',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Lang_string_set',
+                    node=...)],
+                node=...),
+              default=None,
+              node=...)],
+          returns=None,
+          description=None,
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          node=...,
+          arguments_by_name=...,
+          body=...)],
+      invariants=[],
+      serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          2,
+          1,
+          1],
+        index=0,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      properties_by_name=...,
+      methods_by_name=...),
     ConcreteClass(
       name='Environment',
       is_implementation_specific=False,
@@ -8776,6 +9820,23 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Concept_description',
+                    node=...)],
+                node=...)],
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        Property(
+          name='data_specifications',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='Optional',
+            subscripts=[
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Data_specification',
                     node=...)],
                 node=...)],
             node=...),
@@ -8840,6 +9901,22 @@ UnverifiedSymbolTable(
                 node=...),
               default=Default(
                 node=...),
+              node=...),
+            Argument(
+              name='data_specifications',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Data_specification',
+                        node=...)],
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
               node=...)],
           returns=None,
           description=None,
@@ -8866,6 +9943,55 @@ UnverifiedSymbolTable(
       properties_by_name=...,
       methods_by_name=...)],
   verification_functions=[
+    UnderstoodMethod(
+      name='matches_id_short',
+      verification=True,
+      arguments=[
+        Argument(
+          name='text',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='str',
+            node=...),
+          default=None,
+          node=...)],
+      returns=AtomicTypeAnnotation(
+        identifier='bool',
+        node=...),
+      description=Description(
+        document=...,
+        node=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      body=[
+        textwrap.dedent("""\
+          Assignment(
+            target=Name(
+              identifier='pattern',
+              original_node=...),
+            value=JoinedStr(
+              values=[
+                '^[a-zA-Z][a-zA-Z0-9_]+$'],
+              original_node=...),
+            original_node=...)"""),
+        textwrap.dedent("""\
+          Return(
+            value=IsNotNone(
+              value=FunctionCall(
+                name='match',
+                args=[
+                  Name(
+                    identifier='pattern',
+                    original_node=...),
+                  Name(
+                    identifier='text',
+                    original_node=...)],
+                original_node=...),
+              original_node=...),
+            original_node=...)""")],
+      node=...,
+      arguments_by_name=...),
     UnderstoodMethod(
       name='matches_xs_date_time_stamp_utc',
       verification=True,
@@ -10373,7 +11499,7 @@ UnverifiedSymbolTable(
               identifier='ucschar',
               original_node=...),
             value=Constant(
-              value='[\\\\xa0-\\\\ud7ff\\\\uf900-\\\\ufdcf\\\\ufdf0-\\\\uffef\\\\u10000-\\\\u1fffd\\\\u20000-\\\\u2fffd\\\\u30000-\\\\u3fffd\\\\u40000-\\\\u4fffd\\\\u50000-\\\\u5fffd\\\\u60000-\\\\u6fffd\\\\u70000-\\\\u7fffd\\\\u80000-\\\\u8fffd\\\\u90000-\\\\u9fffd\\\\ua0000-\\\\uafffd\\\\ub0000-\\\\ubfffd\\\\uc0000-\\\\ucfffd\\\\ud0000-\\\\udfffd\\\\ue1000-\\\\uefffd]',
+              value='[\\\\xa0-\\\\ud7ff\\\\uf900-\\\\ufdcf\\\\ufdf0-\\\\uffef\\\\U00010000-\\\\U0001fffd\\\\U00020000-\\\\U0002fffd\\\\U00030000-\\\\U0003fffd\\\\U00040000-\\\\U0004fffd\\\\U00050000-\\\\U0005fffd\\\\U00060000-\\\\U0006fffd\\\\U00070000-\\\\U0007fffd\\\\U00080000-\\\\U0008fffd\\\\U00090000-\\\\U0009fffd\\\\U000a0000-\\\\U000afffd\\\\U000b0000-\\\\U000bfffd\\\\U000c0000-\\\\U000cfffd\\\\U000d0000-\\\\U000dfffd\\\\U000e1000-\\\\U000efffd]',
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\
@@ -11014,7 +12140,7 @@ UnverifiedSymbolTable(
               identifier='iprivate',
               original_node=...),
             value=Constant(
-              value='[\\\\ue000-\\\\uf8ff\\\\uf0000-\\\\uffffd\\\\u100000-\\\\u10fffd]',
+              value='[\\\\ue000-\\\\uf8ff\\\\U000f0000-\\\\U000ffffd\\\\U00100000-\\\\U0010fffd]',
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\
@@ -13370,7 +14496,7 @@ UnverifiedSymbolTable(
               identifier='long_rep',
               original_node=...),
             value=Constant(
-              value='[\\\\-+]?[0-9]+',
+              value='[\\\\-+]?0*[0-9]{1,20}',
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\
@@ -13434,7 +14560,7 @@ UnverifiedSymbolTable(
               identifier='int_rep',
               original_node=...),
             value=Constant(
-              value='[\\\\-+]?[0-9]+',
+              value='[\\\\-+]?0*[0-9]{1,10}',
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\
@@ -13498,7 +14624,7 @@ UnverifiedSymbolTable(
               identifier='short_rep',
               original_node=...),
             value=Constant(
-              value='[\\\\-+]?[0-9]+',
+              value='[\\\\-+]?0*[0-9]{1,5}',
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\
@@ -13562,7 +14688,7 @@ UnverifiedSymbolTable(
               identifier='byte_rep',
               original_node=...),
             value=Constant(
-              value='[\\\\-+]?[0-9]+',
+              value='[\\\\-+]?0*[0-9]{1,3}',
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\
@@ -13754,7 +14880,7 @@ UnverifiedSymbolTable(
               identifier='unsigned_long_rep',
               original_node=...),
             value=Constant(
-              value='(-0|\\\\+?[0-9]+)',
+              value='(-0|\\\\+?0*[0-9]{1,20})',
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\
@@ -13818,7 +14944,7 @@ UnverifiedSymbolTable(
               identifier='unsigned_int_rep',
               original_node=...),
             value=Constant(
-              value='(-0|\\\\+?[0-9]+)',
+              value='(-0|\\\\+?0*[0-9]{1,10})',
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\
@@ -13882,7 +15008,7 @@ UnverifiedSymbolTable(
               identifier='unsigned_short_rep',
               original_node=...),
             value=Constant(
-              value='(-0|\\\\+?[0-9]+)',
+              value='(-0|\\\\+?0*[0-9]{1,5})',
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\
@@ -13946,7 +15072,7 @@ UnverifiedSymbolTable(
               identifier='unsigned_byte_rep',
               original_node=...),
             value=Constant(
-              value='(-0|\\\\+?[0-9]+)',
+              value='(-0|\\\\+?0*[0-9]{1,3})',
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\
@@ -14110,6 +15236,54 @@ UnverifiedSymbolTable(
             original_node=...)""")],
       node=...,
       arguments_by_name=...),
+    UnderstoodMethod(
+      name='matches_xs_string',
+      verification=True,
+      arguments=[
+        Argument(
+          name='text',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='str',
+            node=...),
+          default=None,
+          node=...)],
+      returns=AtomicTypeAnnotation(
+        identifier='bool',
+        node=...),
+      description=Description(
+        document=...,
+        node=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      body=[
+        textwrap.dedent("""\
+          Assignment(
+            target=Name(
+              identifier='pattern',
+              original_node=...),
+            value=Constant(
+              value='^[\\\\u0001-\\\\uD7FF\\\\uE000-\\\\uFFFD\\\\U00010000-\\\\U0010FFFF]*$',
+              original_node=...),
+            original_node=...)"""),
+        textwrap.dedent("""\
+          Return(
+            value=IsNotNone(
+              value=FunctionCall(
+                name='match',
+                args=[
+                  Name(
+                    identifier='pattern',
+                    original_node=...),
+                  Name(
+                    identifier='text',
+                    original_node=...)],
+                original_node=...),
+              original_node=...),
+            original_node=...)""")],
+      node=...,
+      arguments_by_name=...),
     ImplementationSpecificMethod(
       name='value_consistent_with_xsd_type',
       verification=True,
@@ -14140,6 +15314,54 @@ UnverifiedSymbolTable(
         postconditions=[]),
       node=...,
       arguments_by_name=...),
+    UnderstoodMethod(
+      name='matches_global_asset_id_literally',
+      verification=True,
+      arguments=[
+        Argument(
+          name='text',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='str',
+            node=...),
+          default=None,
+          node=...)],
+      returns=AtomicTypeAnnotation(
+        identifier='bool',
+        node=...),
+      description=Description(
+        document=...,
+        node=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      body=[
+        textwrap.dedent("""\
+          Assignment(
+            target=Name(
+              identifier='pattern',
+              original_node=...),
+            value=Constant(
+              value='^[gG][lL][oO][bB][aA][lL][aA][sS][sS][eE][tT][iI][dD]$',
+              original_node=...),
+            original_node=...)"""),
+        textwrap.dedent("""\
+          Return(
+            value=IsNotNone(
+              value=FunctionCall(
+                name='match',
+                args=[
+                  Name(
+                    identifier='pattern',
+                    original_node=...),
+                  Name(
+                    identifier='text',
+                    original_node=...)],
+                original_node=...),
+              original_node=...),
+            original_node=...)""")],
+      node=...,
+      arguments_by_name=...),
     ImplementationSpecificMethod(
       name='is_model_reference_to',
       verification=True,
@@ -14147,14 +15369,14 @@ UnverifiedSymbolTable(
         Argument(
           name='reference',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Model_reference',
+            identifier='Reference',
             node=...),
           default=None,
           node=...),
         Argument(
           name='expected_type',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Key_elements',
+            identifier='Key_types',
             node=...),
           default=None,
           node=...)],
@@ -14265,7 +15487,7 @@ UnverifiedSymbolTable(
         Argument(
           name='element_type',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Submodel_element_elements',
+            identifier='AAS_submodel_elements',
             node=...),
           default=None,
           node=...)],

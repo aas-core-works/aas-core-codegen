@@ -6,7 +6,7 @@
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
 using System.Collections.Generic;  // can't alias
 
-namespace AasCore.Aas3
+namespace AasCore.Aas3_0_RC02
 {
 
     /// <summary>
@@ -55,101 +55,38 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// Resource represents an address to a file (a locator). The value is an URI that
-    /// can represent an absolute or relative path
+    /// Element that can have a semantic definition plus some supplemental semantic
+    /// definitions.
     /// </summary>
-    public class Resource : IClass
-    {
-        /// <summary>
-        /// Path and name of the resource (with file extension).
-        /// The path can be absolute or relative.
-        /// </summary>
-        public AssetKind Path { get; set; }
-
-        /// <summary>
-        /// Content type of the content of the file.
-        /// The content type states which file extensions the file can have.
-        /// </summary>
-        public string? ContentType { get; set; }
-
-        /// <summary>
-        /// Iterate over all the class instances referenced from this instance
-        /// without further recursion.
-        /// </summary>
-        public IEnumerable<IClass> DescendOnce()
-        {
-            // No descendable properties
-            yield break;
-        }
-
-        /// <summary>
-        /// Iterate recursively over all the class instances referenced from this instance.
-        /// </summary>
-        public IEnumerable<IClass> Descend()
-        {
-            // No descendable properties
-            yield break;
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance
-        /// for double dispatch.
-        /// </summary>
-        public void Accept(Visitation.IVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch
-        /// with the <paramref name="context" />.
-        /// </summary>
-        public void Accept<TContext>(
-            Visitation.IVisitorWithContext<TContext> visitor,
-            TContext context)
-        {
-            visitor.Visit(this, context);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance
-        /// for double dispatch.
-        /// </summary>
-        public T Transform<T>(Visitation.ITransformer<T> transformer)
-        {
-            return transformer.Transform(this);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance
-        /// for double dispatch with the <paramref name="context" />.
-        /// </summary>
-        public T Transform<TContext, T>(
-            Visitation.ITransformerWithContext<TContext, T> transformer,
-            TContext context)
-        {
-            return transformer.Transform(this, context);
-        }
-
-        public Resource(
-            AssetKind path,
-            string? contentType = null)
-        {
-            Path = path;
-            ContentType = contentType;
-        }
-    }
-
-    /// <summary>
-    /// Element that can have a semantic definition.
-    /// </summary>
+    /// <remarks>
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-118:
+    ///     If there are ID <see cref="IHasSemantics.SupplementalSemanticIds" /> defined
+    ///     then there shall be also a main semantic ID <see cref="IHasSemantics.SemanticId" />.
+    ///     </li>
+    /// </ul>
+    /// </remarks>
     public interface IHasSemantics : IClass
     {
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
     }
 
     /// <summary>
@@ -159,9 +96,21 @@ namespace AasCore.Aas3
     {
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Name of the extension.
@@ -181,7 +130,7 @@ namespace AasCore.Aas3
         /// Type of the value of the extension.
         /// </summary>
         /// <remarks>
-        /// Default: xsd:string
+        /// Default: <see cref="DataTypeDefXsd.String" />
         /// </remarks>
         public DataTypeDefXsd? ValueType { get; set; }
 
@@ -193,7 +142,7 @@ namespace AasCore.Aas3
         /// <summary>
         /// Reference to an element the extension refers to.
         /// </summary>
-        public ModelReference? RefersTo { get; set; }
+        public Reference? RefersTo { get; set; }
 
         /// <summary>
         /// Return the <see cref="Extension.ValueType" /> or the default value
@@ -201,7 +150,7 @@ namespace AasCore.Aas3
         /// </summary>
         public DataTypeDefXsd ValueTypeOrDefault()
         {
-            return this.ValueType ?? DataTypeDefXsd.String;
+            return ValueType ?? DataTypeDefXsd.String;
         }
 
         /// <summary>
@@ -213,6 +162,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (RefersTo != null)
@@ -234,6 +191,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -291,12 +262,14 @@ namespace AasCore.Aas3
 
         public Extension(
             string name,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             DataTypeDefXsd? valueType = null,
             string? value = null,
-            ModelReference? refersTo = null)
+            Reference? refersTo = null)
         {
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Name = name;
             ValueType = valueType;
             Value = value;
@@ -308,7 +281,7 @@ namespace AasCore.Aas3
     /// Element that can be extended by proprietary extensions.
     /// </summary>
     /// <remarks>
-    /// Note: Extensions are proprietary, i.e. they do not support global interoperability.
+    /// Extensions are proprietary, i.e. they do not support global interoperability.
     /// </remarks>
     public interface IHasExtensions : IClass
     {
@@ -322,29 +295,34 @@ namespace AasCore.Aas3
     /// An element that is referable by its <see cref="IReferable.IdShort" />.
     /// </summary>
     /// <remarks>
-    /// This identifier is not globally unique.
-    /// This identifier is unique within the name space of the element.
+    /// This ID is not globally unique.
+    /// This ID is unique within the name space of the element.
     /// </remarks>
     public interface IReferable : IHasExtensions
     {
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -370,21 +348,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -393,7 +356,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -419,11 +382,6 @@ namespace AasCore.Aas3
     public interface IIdentifiable : IReferable
     {
         /// <summary>
-        /// The globally unique identification of the element.
-        /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
         /// Administrative information of an identifiable element.
         /// </summary>
         /// <remarks>
@@ -431,6 +389,11 @@ namespace AasCore.Aas3
         /// be part of the identification.
         /// </remarks>
         public AdministrativeInformation? Administration { get; set; }
+
+        /// <summary>
+        /// The globally unique identification of the element.
+        /// </summary>
+        public string Id { get; set; }
     }
 
     /// <summary>
@@ -445,7 +408,7 @@ namespace AasCore.Aas3
         /// <remarks>
         /// [SOURCE: IEC TR 62390:2005-01, 3.1.25] modified
         /// </remarks>
-        [EnumMember(Value = "TEMPLATE")]
+        [EnumMember(Value = "Template")]
         Template,
 
         /// <summary>
@@ -460,7 +423,7 @@ namespace AasCore.Aas3
         ///
         /// [SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV]  modified
         /// </remarks>
-        [EnumMember(Value = "INSTANCE")]
+        [EnumMember(Value = "Instance")]
         Instance
     }
 
@@ -477,7 +440,7 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -497,7 +460,10 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
     }
 
     /// <summary>
@@ -509,7 +475,7 @@ namespace AasCore.Aas3
     /// <ul>
     ///     <li>
     ///     Constraint AASd-005:
-    ///     If <see cref="AdministrativeInformation.Version" /> is not specified than also <see cref="AdministrativeInformation.Revision" /> shall be
+    ///     If <see cref="AdministrativeInformation.Version" /> is not specified then also <see cref="AdministrativeInformation.Revision" /> shall be
     ///     unspecified. This means, a revision requires a version. If there is no version
     ///     there is no revision neither. Revision is optional.
     ///     </li>
@@ -520,7 +486,10 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// Version of the element.
@@ -608,7 +577,7 @@ namespace AasCore.Aas3
         }
 
         public AdministrativeInformation(
-            List<GlobalReference>? dataSpecifications = null,
+            List<Reference>? dataSpecifications = null,
             string? version = null,
             string? revision = null)
         {
@@ -620,8 +589,20 @@ namespace AasCore.Aas3
 
     /// <summary>
     /// The value of a qualifiable element may be further qualified by one or more
-    /// qualifiers or complex formulas.
+    /// qualifiers.
     /// </summary>
+    /// <remarks>
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-119:
+    ///     If any <see cref="Qualifier.Kind" /> value of <see cref="IQualifiable.Qualifiers" /> is
+    ///     equal to <see cref="QualifierKind.TemplateQualifier" /> and the qualified element
+    ///     inherits from <see cref="IHasKind" /> then the qualified element shell be of
+    ///     kind Template (<see cref="IHasKind.Kind" /> = <see cref="ModelingKind.Template" />).
+    ///     </li>
+    /// </ul>
+    /// </remarks>
     public interface IQualifiable : IClass
     {
         /// <summary>
@@ -641,7 +622,40 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// A qualifier is a type-value-pair that makes additional statements w.r.t.  the value
+    /// Enumeration for kinds of qualifiers.
+    /// </summary>
+    public enum QualifierKind
+    {
+        /// <summary>
+        /// qualifies the value of the element and can change during run-time.
+        /// </summary>
+        /// <remarks>
+        /// Value qualifiers are only applicable to elements with kind
+        /// <see cref="ModelingKind.Instance" />.
+        /// </remarks>
+        [EnumMember(Value = "ValueQualifier")]
+        ValueQualifier,
+
+        /// <summary>
+        /// qualifies the semantic definition the element is referring to
+        /// (<see cref="IHasSemantics.SemanticId" />)
+        /// </summary>
+        [EnumMember(Value = "ConceptQualifier")]
+        ConceptQualifier,
+
+        /// <summary>
+        /// qualifies the elements within a specific submodel on concept level.
+        /// </summary>
+        /// <remarks>
+        /// Template qualifiers are only applicable to elements with kind
+        /// <see cref="ModelingKind.Template" />.
+        /// </remarks>
+        [EnumMember(Value = "TemplateQualifier")]
+        TemplateQualifier
+    }
+
+    /// <summary>
+    /// A qualifier is a type-value-pair that makes additional statements w.r.t. the value
     /// of the element.
     /// </summary>
     /// <remarks>
@@ -665,12 +679,33 @@ namespace AasCore.Aas3
     {
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
 
         /// <summary>
-        /// The qualifier type describes the type of the qualifier that is applied to
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
+
+        /// <summary>
+        /// The qualifier kind describes the kind of the qualifier that is applied to the
+        /// element.
+        /// </summary>
+        /// <remarks>
+        /// Default: <see cref="QualifierKind.ConceptQualifier" />
+        /// </remarks>
+        public QualifierKind? Kind { get; set; }
+
+        /// <summary>
+        /// The qualifier <em>type</em> describes the type of the qualifier that is applied to
         /// the element.
         /// </summary>
         public string Type { get; set; }
@@ -688,7 +723,19 @@ namespace AasCore.Aas3
         /// <summary>
         /// Reference to the global unique ID of a coded value.
         /// </summary>
-        public GlobalReference? ValueId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? ValueId { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="Qualifier.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public QualifierKind KindOrDefault()
+        {
+            return Kind ?? QualifierKind.ConceptQualifier;
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -699,6 +746,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (ValueId != null)
@@ -720,6 +775,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -778,13 +847,17 @@ namespace AasCore.Aas3
         public Qualifier(
             string type,
             DataTypeDefXsd valueType,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
+            QualifierKind? kind = null,
             string? value = null,
-            GlobalReference? valueId = null)
+            Reference? valueId = null)
         {
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Type = type;
             ValueType = valueType;
+            Kind = kind;
             Value = value;
             ValueId = valueId;
         }
@@ -803,23 +876,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -845,21 +923,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -868,7 +931,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -888,11 +951,6 @@ namespace AasCore.Aas3
         public string? Checksum { get; set; }
 
         /// <summary>
-        /// The globally unique identification of the element.
-        /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
         /// Administrative information of an identifiable element.
         /// </summary>
         /// <remarks>
@@ -902,9 +960,22 @@ namespace AasCore.Aas3
         public AdministrativeInformation? Administration { get; set; }
 
         /// <summary>
+        /// The globally unique identification of the element.
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
+
+        /// <summary>
+        /// The reference to the AAS the AAS was derived from.
+        /// </summary>
+        public Reference? DerivedFrom { get; set; }
 
         /// <summary>
         /// Meta-information about the asset the AAS is representing.
@@ -916,15 +987,12 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// A submodel is a description of an aspect of the asset the AAS is representing.
+        ///
         /// The asset of an AAS is typically described by one or more submodels.
+        ///
         /// Temporarily no submodel might be assigned to the AAS.
         /// </remarks>
-        public List<ModelReference>? Submodels { get; set; }
-
-        /// <summary>
-        /// The reference to the AAS the AAS was derived from.
-        /// </summary>
-        public ModelReference? DerivedFrom { get; set; }
+        public List<Reference>? Submodels { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -963,6 +1031,11 @@ namespace AasCore.Aas3
                 }
             }
 
+            if (DerivedFrom != null)
+            {
+                yield return DerivedFrom;
+            }
+
             yield return AssetInformation;
 
             if (Submodels != null)
@@ -971,11 +1044,6 @@ namespace AasCore.Aas3
                 {
                     yield return anItem;
                 }
-            }
-
-            if (DerivedFrom != null)
-            {
-                yield return DerivedFrom;
             }
         }
 
@@ -1045,6 +1113,17 @@ namespace AasCore.Aas3
                 }
             }
 
+            if (DerivedFrom != null)
+            {
+                yield return DerivedFrom;
+
+                // Recurse
+                foreach (var anItem in DerivedFrom.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
             yield return AssetInformation;
 
             // Recurse
@@ -1064,17 +1143,6 @@ namespace AasCore.Aas3
                     {
                         yield return anotherItem;
                     }
-                }
-            }
-
-            if (DerivedFrom != null)
-            {
-                yield return DerivedFrom;
-
-                // Recurse
-                foreach (var anItem in DerivedFrom.Descend())
-                {
-                    yield return anItem;
                 }
             }
         }
@@ -1123,15 +1191,15 @@ namespace AasCore.Aas3
             string id,
             AssetInformation assetInformation,
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             AdministrativeInformation? administration = null,
-            List<GlobalReference>? dataSpecifications = null,
-            List<ModelReference>? submodels = null,
-            ModelReference? derivedFrom = null)
+            List<Reference>? dataSpecifications = null,
+            Reference? derivedFrom = null,
+            List<Reference>? submodels = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -1154,41 +1222,51 @@ namespace AasCore.Aas3
     /// </summary>
     /// <remarks>
     /// The asset may either represent an asset type or an asset instance.
+    ///
     /// The asset has a globally unique identifier plus – if needed – additional domain
     /// specific (proprietary) identifiers. However, to support the corner case of very
     /// first phase of lifecycle where a stabilised/constant global asset identifier does
-    /// not already exist, the corresponding attribute
-    /// <see cref="AssetInformation.GlobalAssetId" /> is optional.
+    /// not already exist, the corresponding attribute <see cref="AssetInformation.GlobalAssetId" /> is optional.
+    ///
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-116:
+    ///     <c>globalAssetId</c> (case-insensitive) is a reserved key. If used as value for
+    ///     <see cref="SpecificAssetId.Name" /> then <see cref="SpecificAssetId.Value" /> shall be
+    ///     identical to <see cref="AssetInformation.GlobalAssetId" />.
+    ///     </li>
+    /// </ul>
     /// </remarks>
     public class AssetInformation : IClass
     {
         /// <summary>
-        /// Denotes whether the Asset is of kind "Type" or "Instance".
+        /// Denotes whether the Asset is of kind <see cref="AssetKind.Type" /> or
+        /// <see cref="AssetKind.Instance" />.
         /// </summary>
         public AssetKind AssetKind { get; set; }
 
         /// <summary>
-        /// Reference to either an Asset object or a global reference to the asset the AAS is
-        /// representing.
+        /// Global identifier of the asset the AAS is representing.
         /// </summary>
         /// <remarks>
         /// This attribute is required as soon as the AAS is exchanged via partners in the life
         /// cycle of the asset. In a first phase of the life cycle the asset might not yet have
         /// a global ID but already an internal identifier. The internal identifier would be
         /// modelled via <see cref="AssetInformation.SpecificAssetId" />.
+        ///
+        /// This is a global reference.
         /// </remarks>
-        public GlobalReference? GlobalAssetId { get; set; }
+        public Reference? GlobalAssetId { get; set; }
 
         /// <summary>
-        /// Additional domain-specific, typically proprietary, Identifier for the asset.
+        /// Additional domain-specific, typically proprietary identifier for the asset like
+        /// e.g., serial number etc.
         /// </summary>
-        /// <remarks>
-        /// For example, serial number.
-        /// </remarks>
-        public IdentifierKeyValuePair? SpecificAssetId { get; set; }
+        public SpecificAssetId? SpecificAssetId { get; set; }
 
         /// <summary>
-        /// Thumbnail of the asset represented by the asset administration shell.
+        /// Thumbnail of the asset represented by the Asset Administration Shell.
         /// </summary>
         /// <remarks>
         /// Used as default.
@@ -1298,8 +1376,8 @@ namespace AasCore.Aas3
 
         public AssetInformation(
             AssetKind assetKind,
-            GlobalReference? globalAssetId = null,
-            IdentifierKeyValuePair? specificAssetId = null,
+            Reference? globalAssetId = null,
+            SpecificAssetId? specificAssetId = null,
             Resource? defaultThumbnail = null)
         {
             AssetKind = assetKind;
@@ -1310,7 +1388,97 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// Enumeration for denoting whether an element is a type or an instance.
+    /// Resource represents an address to a file (a locator). The value is an URI that
+    /// can represent an absolute or relative path
+    /// </summary>
+    public class Resource : IClass
+    {
+        /// <summary>
+        /// Path and name of the resource (with file extension).
+        /// </summary>
+        /// <remarks>
+        /// The path can be absolute or relative.
+        /// </remarks>
+        public string Path { get; set; }
+
+        /// <summary>
+        /// Content type of the content of the file.
+        /// </summary>
+        /// <remarks>
+        /// The content type states which file extensions the file can have.
+        /// </remarks>
+        public string? ContentType { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public Resource(
+            string path,
+            string? contentType = null)
+        {
+            Path = path;
+            ContentType = contentType;
+        }
+    }
+
+    /// <summary>
+    /// Enumeration for denoting whether an asset is a type asset or an instance asset.
     /// </summary>
     public enum AssetKind
     {
@@ -1341,31 +1509,49 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// An <see cref="IdentifierKeyValuePair" /> describes a generic identifier as
-    /// key-value pair.
+    /// A specific asset ID describes a generic supplementary identifying attribute of the
+    /// asset.
     /// </summary>
-    public class IdentifierKeyValuePair : IHasSemantics
+    /// <remarks>
+    /// The specific asset ID is not necessarily globally unique.
+    /// </remarks>
+    public class SpecificAssetId : IHasSemantics
     {
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
 
         /// <summary>
-        /// Key of the identifier
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
         /// </summary>
-        public string Key { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
-        /// The value of the identifier with the corresponding key.
+        /// Name of the identifier
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// The value of the specific asset identifier with the corresponding name.
         /// </summary>
         public string Value { get; set; }
 
         /// <summary>
         /// The (external) subject the key belongs to or has meaning to.
         /// </summary>
-        public GlobalReference? ExternalSubjectId { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public Reference ExternalSubjectId { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -1378,10 +1564,15 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
-            if (ExternalSubjectId != null)
+            if (SupplementalSemanticIds != null)
             {
-                yield return ExternalSubjectId;
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
+
+            yield return ExternalSubjectId;
         }
 
         /// <summary>
@@ -1400,15 +1591,26 @@ namespace AasCore.Aas3
                 }
             }
 
-            if (ExternalSubjectId != null)
+            if (SupplementalSemanticIds != null)
             {
-                yield return ExternalSubjectId;
-
-                // Recurse
-                foreach (var anItem in ExternalSubjectId.Descend())
+                foreach (var anItem in SupplementalSemanticIds)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
+            }
+
+            yield return ExternalSubjectId;
+
+            // Recurse
+            foreach (var anItem in ExternalSubjectId.Descend())
+            {
+                yield return anItem;
             }
         }
 
@@ -1452,14 +1654,16 @@ namespace AasCore.Aas3
             return transformer.Transform(this, context);
         }
 
-        public IdentifierKeyValuePair(
-            string key,
+        public SpecificAssetId(
+            string name,
             string value,
-            GlobalReference? semanticId = null,
-            GlobalReference? externalSubjectId = null)
+            Reference externalSubjectId,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null)
         {
             SemanticId = semanticId;
-            Key = key;
+            SupplementalSemanticIds = supplementalSemanticIds;
+            Name = name;
             Value = value;
             ExternalSubjectId = externalSubjectId;
         }
@@ -1487,23 +1691,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -1529,21 +1738,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -1552,7 +1746,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -1572,11 +1766,6 @@ namespace AasCore.Aas3
         public string? Checksum { get; set; }
 
         /// <summary>
-        /// The globally unique identification of the element.
-        /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
         /// Administrative information of an identifiable element.
         /// </summary>
         /// <remarks>
@@ -1586,18 +1775,35 @@ namespace AasCore.Aas3
         public AdministrativeInformation? Administration { get; set; }
 
         /// <summary>
+        /// The globally unique identification of the element.
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -1617,7 +1823,10 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// A submodel consists of zero or more submodel elements.
@@ -1625,12 +1834,12 @@ namespace AasCore.Aas3
         public List<ISubmodelElement>? SubmodelElements { get; set; }
 
         /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
+            return Kind ?? ModelingKind.Instance;
         }
 
         /// <summary>
@@ -1665,6 +1874,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Qualifiers != null)
@@ -1755,6 +1972,20 @@ namespace AasCore.Aas3
                 }
             }
 
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
             if (Qualifiers != null)
             {
                 foreach (var anItem in Qualifiers)
@@ -1841,16 +2072,17 @@ namespace AasCore.Aas3
         public Submodel(
             string id,
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             AdministrativeInformation? administration = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null,
+            List<Reference>? dataSpecifications = null,
             List<ISubmodelElement>? submodelElements = null)
         {
             Extensions = extensions;
@@ -1863,6 +2095,7 @@ namespace AasCore.Aas3
             Administration = administration;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
             SubmodelElements = submodelElements;
@@ -1874,7 +2107,7 @@ namespace AasCore.Aas3
     /// assets.
     /// </summary>
     /// <remarks>
-    /// It is recommended to add a semantic ID to a submodel element.
+    /// It is recommended to add a <see cref="IHasSemantics.SemanticId" /> to a submodel element.
     /// </remarks>
     public interface ISubmodelElement :
             IReferable,
@@ -1895,54 +2128,21 @@ namespace AasCore.Aas3
         /// <summary>
         /// Reference to the first element in the relationship taking the role of the subject.
         /// </summary>
-        public IReference First { get; set; }
+        public Reference First { get; set; }
 
         /// <summary>
         /// Reference to the second element in the relationship taking the role of the object.
         /// </summary>
-        public IReference Second { get; set; }
+        public Reference Second { get; set; }
     }
 
     /// <summary>
-    /// A submodel element list is an ordered collection of submodel elements.
+    /// A relationship element is used to define a relationship between two elements
+    /// being either referable (model reference) or external (global reference).
     /// </summary>
-    /// <remarks>
-    /// Constraints:
-    /// <ul>
-    ///     <li>
-    ///     Constraint AASd-107:
-    ///     If a first level child element in a <see cref="SubmodelElementList" /> has
-    ///     a <see cref="ISubmodelElement.SemanticId" /> it
-    ///     shall be identical to <see cref="SubmodelElementList.SemanticIdListElement" />.
-    ///     </li>
-    ///     <li>
-    ///     Constraint AASd-114:
-    ///     If two first level child elements in a <see cref="SubmodelElementList" /> have
-    ///     a <see cref="ISubmodelElement.SemanticId" /> then they shall be identical.
-    ///     </li>
-    ///     <li>
-    ///     Constraint AASd-115:
-    ///     If a first level child element in a <see cref="SubmodelElementList" /> does not
-    ///     specify a <see cref="ISubmodelElement.SemanticId" /> then the value is assumed to be
-    ///     identical to <see cref="SubmodelElementList.SemanticIdListElement" />.
-    ///     </li>
-    ///     <li>
-    ///     Constraint AASd-108:
-    ///     All first level child elements in a <see cref="SubmodelElementList" /> shall have
-    ///     the same submodel element type as specified in <see cref="SubmodelElementList.TypeValueListElement" />.
-    ///     </li>
-    ///     <li>
-    ///     Constraint AASd-109:
-    ///     If <see cref="SubmodelElementList.TypeValueListElement" /> is equal to
-    ///     <see cref="SubmodelElementElements.Property" /> or
-    ///     <see cref="SubmodelElementElements.Range" />
-    ///     <see cref="SubmodelElementList.ValueTypeListElement" /> shall be set and all first
-    ///     level child elements in the <see cref="SubmodelElementList" /> shall have
-    ///     the value type as specified in <see cref="SubmodelElementList.ValueTypeListElement" />.
-    ///     </li>
-    /// </ul>
-    /// </remarks>
-    public class SubmodelElementList : ISubmodelElement
+    public class RelationshipElement :
+            ISubmodelElement,
+            IRelationshipElement
     {
         /// <summary>
         /// An extension of the element.
@@ -1950,23 +2150,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -1992,21 +2197,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -2015,7 +2205,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -2038,15 +2228,27 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -2066,54 +2268,28 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
-
-        /// <summary>
-        /// The submodel element type of the submodel elements contained in the list.
-        /// </summary>
-        public SubmodelElementElements TypeValueListElement { get; set; }
-
-        /// <summary>
-        /// Defines whether order in list is relevant. If <see cref="SubmodelElementList.OrderRelevant" /> = <c>False</c>
-        /// then the list is representing a set or a bag.
-        /// </summary>
         /// <remarks>
-        /// Default: <c>True</c>
+        /// This is a global reference.
         /// </remarks>
-        public bool? OrderRelevant { get; set; }
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
-        /// Submodel element contained in the list.
-        /// The list is ordered.
+        /// Reference to the first element in the relationship taking the role of the subject.
         /// </summary>
-        public List<ISubmodelElement>? Value { get; set; }
+        public Reference First { get; set; }
 
         /// <summary>
-        /// The submodel element type of the submodel elements contained in the list.
+        /// Reference to the second element in the relationship taking the role of the object.
         /// </summary>
-        public GlobalReference? SemanticIdListElement { get; set; }
+        public Reference Second { get; set; }
 
         /// <summary>
-        /// The value type of the submodel element contained in the list.
-        /// </summary>
-        public DataTypeDefXsd? ValueTypeListElement { get; set; }
-
-        /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
-        }
-
-        /// <summary>
-        /// Return the <see cref="SubmodelElementList.OrderRelevant" /> or the default value
-        /// if it has not been set.
-        /// </summary>
-        public bool OrderRelevantOrDefault()
-        {
-            return this.OrderRelevant ?? true;
+            return Kind ?? ModelingKind.Instance;
         }
 
         /// <summary>
@@ -2143,6 +2319,479 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (Qualifiers != null)
+            {
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DataSpecifications != null)
+            {
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+                }
+            }
+
+            yield return First;
+
+            yield return Second;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            if (Extensions != null)
+            {
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+
+                // Recurse
+                foreach (var anItem in DisplayName.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (SemanticId != null)
+            {
+                yield return SemanticId;
+
+                // Recurse
+                foreach (var anItem in SemanticId.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (Qualifiers != null)
+            {
+                foreach (var anItem in Qualifiers)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DataSpecifications != null)
+            {
+                foreach (var anItem in DataSpecifications)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            yield return First;
+
+            // Recurse
+            foreach (var anItem in First.Descend())
+            {
+                yield return anItem;
+            }
+
+            yield return Second;
+
+            // Recurse
+            foreach (var anItem in Second.Descend())
+            {
+                yield return anItem;
+            }
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public RelationshipElement(
+            Reference first,
+            Reference second,
+            List<Extension>? extensions = null,
+            string? category = null,
+            string? idShort = null,
+            LangStringSet? displayName = null,
+            LangStringSet? description = null,
+            string? checksum = null,
+            ModelingKind? kind = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
+            List<Qualifier>? qualifiers = null,
+            List<Reference>? dataSpecifications = null)
+        {
+            Extensions = extensions;
+            IdShort = idShort;
+            DisplayName = displayName;
+            Category = category;
+            Description = description;
+            Checksum = checksum;
+            Kind = kind;
+            SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
+            Qualifiers = qualifiers;
+            DataSpecifications = dataSpecifications;
+            First = first;
+            Second = second;
+        }
+    }
+
+    /// <summary>
+    /// A submodel element list is an ordered list of submodel elements.
+    /// </summary>
+    /// <remarks>
+    /// The numbering starts with zero (0).
+    ///
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-107:
+    ///     If a first level child element in a <see cref="SubmodelElementList" /> has
+    ///     a <see cref="ISubmodelElement.SemanticId" /> it
+    ///     shall be identical to <see cref="SubmodelElementList.SemanticIdListElement" />.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-114:
+    ///     If two first level child elements in a <see cref="SubmodelElementList" /> have
+    ///     a <see cref="ISubmodelElement.SemanticId" /> then they shall be identical.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-115:
+    ///     If a first level child element in a <see cref="SubmodelElementList" /> does not
+    ///     specify a <see cref="ISubmodelElement.SemanticId" /> then the value is assumed to be
+    ///     identical to <see cref="SubmodelElementList.SemanticIdListElement" />.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-108:
+    ///     All first level child elements in a <see cref="SubmodelElementList" /> shall have
+    ///     the same submodel element type as specified in <see cref="SubmodelElementList.TypeValueListElement" />.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-109:
+    ///     If <see cref="SubmodelElementList.TypeValueListElement" /> is equal to
+    ///     <see cref="AasSubmodelElements.Property" /> or
+    ///     <see cref="AasSubmodelElements.Range" />
+    ///     <see cref="SubmodelElementList.ValueTypeListElement" /> shall be set and all first
+    ///     level child elements in the <see cref="SubmodelElementList" /> shall have
+    ///     the value type as specified in <see cref="SubmodelElementList.ValueTypeListElement" />.
+    ///     </li>
+    /// </ul>
+    /// </remarks>
+    public class SubmodelElementList : ISubmodelElement
+    {
+        /// <summary>
+        /// An extension of the element.
+        /// </summary>
+        public List<Extension>? Extensions { get; set; }
+
+        /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
+        /// In case of identifiables this attribute is a short name of the element.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
+        /// </summary>
+        /// <remarks>
+        /// In case the element is a property and the property has a semantic definition
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// </remarks>
+        public string? IdShort { get; set; }
+
+        /// <summary>
+        /// Display name. Can be provided in several languages.
+        /// </summary>
+        /// <remarks>
+        /// If no display name is defined in the language requested by the application,
+        /// then the display name is selected in the following order if available:
+        ///
+        /// <ul>
+        /// <li>the preferred name in the requested language of the concept description defining
+        /// the semantics of the element</li>
+        /// <li>If there is a default language list defined in the application,
+        /// then the corresponding preferred name in the language is chosen
+        /// according to this order.</li>
+        /// <li>the English preferred name of the concept description defining
+        /// the semantics of the element</li>
+        /// <li>the short name of the concept description</li>
+        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// </ul>
+        /// </remarks>
+        public LangStringSet? DisplayName { get; set; }
+
+        /// <summary>
+        /// Description or comments on the element.
+        /// </summary>
+        /// <remarks>
+        /// The description can be provided in several languages.
+        ///
+        /// If no description is defined, then the definition of the concept
+        /// description that defines the semantics of the element is used.
+        ///
+        /// Additional information can be provided, e.g., if the element is
+        /// qualified and which qualifier types can be expected in which
+        /// context or which additional data specification templates are
+        /// provided.
+        /// </remarks>
+        public LangStringSet? Description { get; set; }
+
+        /// <summary>
+        /// Checksum to be used to determine if an Referable (including its
+        /// aggregated child elements) has changed.
+        /// </summary>
+        /// <remarks>
+        /// The checksum is calculated by the user's tool environment.
+        /// The checksum has no semantic meaning for an asset administration
+        /// shell model and there is no requirement for asset administration
+        /// shell tools to manage the checksum
+        /// </remarks>
+        public string? Checksum { get; set; }
+
+        /// <summary>
+        /// Kind of the element: either type or instance.
+        /// </summary>
+        /// <remarks>
+        /// Default: <see cref="ModelingKind.Instance" />
+        /// </remarks>
+        public ModelingKind? Kind { get; set; }
+
+        /// <summary>
+        /// Identifier of the semantic definition of the element. It is called semantic ID
+        /// of the element or also main semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
+
+        /// <summary>
+        /// Additional qualification of a qualifiable element.
+        /// </summary>
+        /// <remarks>
+        /// Constraints:
+        /// <ul>
+        ///     <li>
+        ///     Constraint AASd-021:
+        ///     Every qualifiable can only have one qualifier with the same
+        ///     <see cref="Qualifier.Type" />.
+        ///     </li>
+        /// </ul>
+        /// </remarks>
+        public List<Qualifier>? Qualifiers { get; set; }
+
+        /// <summary>
+        /// Global reference to the data specification template used by the element.
+        /// </summary>
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
+
+        /// <summary>
+        /// Defines whether order in list is relevant. If <see cref="SubmodelElementList.OrderRelevant" /> = <c>False</c>
+        /// then the list is representing a set or a bag.
+        /// </summary>
+        /// <remarks>
+        /// Default: <c>True</c>
+        /// </remarks>
+        public bool? OrderRelevant { get; set; }
+
+        /// <summary>
+        /// Submodel element contained in the list.
+        /// </summary>
+        /// <remarks>
+        /// The list is ordered.
+        /// </remarks>
+        public List<ISubmodelElement>? Value { get; set; }
+
+        /// <summary>
+        /// Semantic ID the submodel elements contained in the list match to.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticIdListElement { get; set; }
+
+        /// <summary>
+        /// The submodel element type of the submodel elements contained in the list.
+        /// </summary>
+        public AasSubmodelElements TypeValueListElement { get; set; }
+
+        /// <summary>
+        /// The value type of the submodel element contained in the list.
+        /// </summary>
+        public DataTypeDefXsd? ValueTypeListElement { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return Kind ?? ModelingKind.Instance;
+        }
+
+        /// <summary>
+        /// Return the <see cref="SubmodelElementList.OrderRelevant" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public bool OrderRelevantOrDefault()
+        {
+            return OrderRelevant ?? true;
+        }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            if (Extensions != null)
+            {
+                foreach (var anItem in Extensions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DisplayName != null)
+            {
+                yield return DisplayName;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+            }
+
+            if (SemanticId != null)
+            {
+                yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Qualifiers != null)
@@ -2224,6 +2873,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -2322,20 +2985,21 @@ namespace AasCore.Aas3
         }
 
         public SubmodelElementList(
-            SubmodelElementElements typeValueListElement,
+            AasSubmodelElements typeValueListElement,
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null,
+            List<Reference>? dataSpecifications = null,
             bool? orderRelevant = null,
             List<ISubmodelElement>? value = null,
-            GlobalReference? semanticIdListElement = null,
+            Reference? semanticIdListElement = null,
             DataTypeDefXsd? valueTypeListElement = null)
         {
             Extensions = extensions;
@@ -2346,6 +3010,7 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
             TypeValueListElement = typeValueListElement;
@@ -2357,10 +3022,10 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// A submodel element struct is is a logical encapsulation of multiple values. It has
-    /// a number of of submodel elements.
+    /// A submodel element collection is a kind of struct, i.e. a a logical encapsulation
+    /// of multiple named values. It has a fixed number of submodel elements.
     /// </summary>
-    public class SubmodelElementStruct : ISubmodelElement
+    public class SubmodelElementCollection : ISubmodelElement
     {
         /// <summary>
         /// An extension of the element.
@@ -2368,23 +3033,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -2410,21 +3080,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -2433,7 +3088,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -2456,15 +3111,27 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -2484,20 +3151,23 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
-        /// Submodel element contained in the struct.
+        /// Submodel element contained in the collection.
         /// </summary>
         public List<ISubmodelElement>? Value { get; set; }
 
         /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
+            return Kind ?? ModelingKind.Instance;
         }
 
         /// <summary>
@@ -2527,6 +3197,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Qualifiers != null)
@@ -2603,6 +3281,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -2689,17 +3381,18 @@ namespace AasCore.Aas3
             return transformer.Transform(this, context);
         }
 
-        public SubmodelElementStruct(
+        public SubmodelElementCollection(
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null,
+            List<Reference>? dataSpecifications = null,
             List<ISubmodelElement>? value = null)
         {
             Extensions = extensions;
@@ -2710,6 +3403,7 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
             Value = value;
@@ -2724,21 +3418,20 @@ namespace AasCore.Aas3
     /// A data element is a submodel element that has a value. The type of value differs
     /// for different subtypes of data elements.
     ///
-    /// A controlled value is a value whose meaning is given in an external source
-    /// (see “ISO/TS 29002-10:2009(E)”).
-    ///
     /// Constraints:
     /// <ul>
     ///     <li>
     ///     Constraint AASd-090:
-    ///     For data elements <see cref="IDataElement.Category" /> shall be one of the following
-    ///     values: <c>CONSTANT</c>, <c>PARAMETER</c> or <c>VARIABLE</c>.
+    ///     For data elements <see cref="IDataElement.Category" /> (inherited by <see cref="IReferable" />) shall be
+    ///     one of the following values: <c>CONSTANT</c>, <c>PARAMETER</c> or <c>VARIABLE</c>.
+    ///
+    ///     Default: <c>VARIABLE</c>
     ///     </li>
     /// </ul>
     /// </remarks>
     public interface IDataElement : ISubmodelElement
     {
-        // Intentionally empty.
+        public string CategoryOrDefault();
     }
 
     /// <summary>
@@ -2763,23 +3456,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -2805,21 +3503,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -2828,7 +3511,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -2851,15 +3534,27 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -2879,7 +3574,10 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// Data type of the value
@@ -2894,15 +3592,31 @@ namespace AasCore.Aas3
         /// <summary>
         /// Reference to the global unique ID of a coded value.
         /// </summary>
-        public GlobalReference? ValueId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? ValueId { get; set; }
 
         /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
+            return Kind ?? ModelingKind.Instance;
+        }
+
+        /// <summary>
+        /// Return the <see cref="IDataElement.Category" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public string CategoryOrDefault()
+        {
+            string result = Category ?? "VARIABLE";
+
+            // TODO: add the post-condition
+
+            return result;
         }
 
         /// <summary>
@@ -2932,6 +3646,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Qualifiers != null)
@@ -3005,6 +3727,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -3091,17 +3827,18 @@ namespace AasCore.Aas3
         public Property(
             DataTypeDefXsd valueType,
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null,
+            List<Reference>? dataSpecifications = null,
             string? value = null,
-            GlobalReference? valueId = null)
+            Reference? valueId = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -3111,6 +3848,7 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
             ValueType = valueType;
@@ -3141,23 +3879,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -3183,21 +3926,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -3206,7 +3934,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -3229,15 +3957,27 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -3257,7 +3997,10 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// The value of the property instance.
@@ -3267,15 +4010,31 @@ namespace AasCore.Aas3
         /// <summary>
         /// Reference to the global unique ID of a coded value.
         /// </summary>
-        public GlobalReference? ValueId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? ValueId { get; set; }
 
         /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
+            return Kind ?? ModelingKind.Instance;
+        }
+
+        /// <summary>
+        /// Return the <see cref="IDataElement.Category" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public string CategoryOrDefault()
+        {
+            string result = Category ?? "VARIABLE";
+
+            // TODO: add the post-condition
+
+            return result;
         }
 
         /// <summary>
@@ -3305,6 +4064,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Qualifiers != null)
@@ -3383,6 +4150,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -3479,17 +4260,18 @@ namespace AasCore.Aas3
 
         public MultiLanguageProperty(
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null,
+            List<Reference>? dataSpecifications = null,
             LangStringSet? value = null,
-            GlobalReference? valueId = null)
+            Reference? valueId = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -3499,6 +4281,7 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
             Value = value;
@@ -3517,23 +4300,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -3559,21 +4347,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -3582,7 +4355,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -3605,15 +4378,27 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -3633,7 +4418,10 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// Data type of the min und max
@@ -3642,23 +4430,40 @@ namespace AasCore.Aas3
 
         /// <summary>
         /// The minimum value of the range.
-        /// If the min value is missing, then the value is assumed to be negative infinite.
         /// </summary>
+        /// <remarks>
+        /// If the min value is missing, then the value is assumed to be negative infinite.
+        /// </remarks>
         public string? Min { get; set; }
 
         /// <summary>
         /// The maximum value of the range.
-        /// If the max value is missing,  then the value is assumed to be positive infinite.
         /// </summary>
+        /// <remarks>
+        /// If the max value is missing,  then the value is assumed to be positive infinite.
+        /// </remarks>
         public string? Max { get; set; }
 
         /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
+            return Kind ?? ModelingKind.Instance;
+        }
+
+        /// <summary>
+        /// Return the <see cref="IDataElement.Category" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public string CategoryOrDefault()
+        {
+            string result = Category ?? "VARIABLE";
+
+            // TODO: add the post-condition
+
+            return result;
         }
 
         /// <summary>
@@ -3688,6 +4493,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Qualifiers != null)
@@ -3756,6 +4569,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -3831,15 +4658,16 @@ namespace AasCore.Aas3
         public Range(
             DataTypeDefXsd valueType,
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null,
+            List<Reference>? dataSpecifications = null,
             string? min = null,
             string? max = null)
         {
@@ -3851,6 +4679,7 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
             ValueType = valueType;
@@ -3872,23 +4701,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -3914,21 +4748,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -3937,7 +4756,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -3960,15 +4779,27 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -3988,22 +4819,38 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// Global reference to an external object or entity or a logical reference to
         /// another element within the same or another AAS (i.e. a model reference to
         /// a Referable).
         /// </summary>
-        public IReference? Value { get; set; }
+        public Reference? Value { get; set; }
 
         /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
+            return Kind ?? ModelingKind.Instance;
+        }
+
+        /// <summary>
+        /// Return the <see cref="IDataElement.Category" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public string CategoryOrDefault()
+        {
+            string result = Category ?? "VARIABLE";
+
+            // TODO: add the post-condition
+
+            return result;
         }
 
         /// <summary>
@@ -4033,6 +4880,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Qualifiers != null)
@@ -4106,6 +4961,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -4191,16 +5060,17 @@ namespace AasCore.Aas3
 
         public ReferenceElement(
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null,
-            IReference? value = null)
+            List<Reference>? dataSpecifications = null,
+            Reference? value = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -4210,6 +5080,7 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
             Value = value;
@@ -4228,23 +5099,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -4270,21 +5146,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -4293,7 +5154,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -4316,15 +5177,27 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -4344,17 +5217,10 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
-
-        /// <summary>
-        /// MIME type of the content of the <see cref="Blob" />.
-        /// </summary>
         /// <remarks>
-        /// The MIME type states which file extensions the file can have.
-        /// Valid values are e.g. <c>application/json</c>, <c>application/xls</c>, <c>image/jpg</c>.
-        /// The allowed values are defined as in RFC2046.
+        /// This is a global reference.
         /// </remarks>
-        public string MimeType { get; set; }
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// The value of the <see cref="Blob" /> instance of a blob data element.
@@ -4366,12 +5232,38 @@ namespace AasCore.Aas3
         public byte[]? Value { get; set; }
 
         /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Content type of the content of the <see cref="Blob" />.
+        /// </summary>
+        /// <remarks>
+        /// The content type (MIME type) states which file extensions the file can have.
+        ///
+        /// Valid values are content types like e.g. <c>application/json</c>, <c>application/xls</c>,
+        /// <c>image/jpg</c>.
+        ///
+        /// The allowed values are defined as in RFC2046.
+        /// </remarks>
+        public string ContentType { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
+            return Kind ?? ModelingKind.Instance;
+        }
+
+        /// <summary>
+        /// Return the <see cref="IDataElement.Category" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public string CategoryOrDefault()
+        {
+            string result = Category ?? "VARIABLE";
+
+            // TODO: add the post-condition
+
+            return result;
         }
 
         /// <summary>
@@ -4401,6 +5293,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Qualifiers != null)
@@ -4469,6 +5369,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -4542,17 +5456,18 @@ namespace AasCore.Aas3
         }
 
         public Blob(
-            string mimeType,
+            string contentType,
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null,
+            List<Reference>? dataSpecifications = null,
             byte[]? value = null)
         {
             Extensions = extensions;
@@ -4563,15 +5478,16 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
-            MimeType = mimeType;
+            ContentType = contentType;
             Value = value;
         }
     }
 
     /// <summary>
-    /// A File is a data element that represents an address to a file.
+    /// A File is a data element that represents an address to a file (a locator).
     /// </summary>
     /// <remarks>
     /// The value is an URI that can represent an absolute or relative path.
@@ -4584,23 +5500,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -4626,21 +5547,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -4649,7 +5555,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -4672,15 +5578,27 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -4700,7 +5618,18 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
+
+        /// <summary>
+        /// Path and name of the referenced file (with file extension).
+        /// </summary>
+        /// <remarks>
+        /// The path can be absolute or relative.
+        /// </remarks>
+        public string? Value { get; set; }
 
         /// <summary>
         /// Content type of the content of the file.
@@ -4711,18 +5640,25 @@ namespace AasCore.Aas3
         public string ContentType { get; set; }
 
         /// <summary>
-        /// Path and name of the referenced file (with file extension).
-        /// The path can be absolute or relative.
-        /// </summary>
-        public string? Value { get; set; }
-
-        /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
+            return Kind ?? ModelingKind.Instance;
+        }
+
+        /// <summary>
+        /// Return the <see cref="IDataElement.Category" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public string CategoryOrDefault()
+        {
+            string result = Category ?? "VARIABLE";
+
+            // TODO: add the post-condition
+
+            return result;
         }
 
         /// <summary>
@@ -4752,6 +5688,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Qualifiers != null)
@@ -4820,6 +5764,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -4895,15 +5853,16 @@ namespace AasCore.Aas3
         public File(
             string contentType,
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null,
+            List<Reference>? dataSpecifications = null,
             string? value = null)
         {
             Extensions = extensions;
@@ -4914,6 +5873,7 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
             ContentType = contentType;
@@ -4933,23 +5893,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -4975,21 +5940,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -4998,7 +5948,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -5021,15 +5971,27 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -5049,31 +6011,34 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// Reference to the first element in the relationship taking the role of the subject.
         /// </summary>
-        public IReference First { get; set; }
+        public Reference First { get; set; }
 
         /// <summary>
         /// Reference to the second element in the relationship taking the role of the object.
         /// </summary>
-        public IReference Second { get; set; }
+        public Reference Second { get; set; }
 
         /// <summary>
         /// A data element that represents an annotation that holds for the relationship
         /// between the two elements
         /// </summary>
-        public List<IDataElement>? Annotation { get; set; }
+        public List<IDataElement>? Annotations { get; set; }
 
         /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
+            return Kind ?? ModelingKind.Instance;
         }
 
         /// <summary>
@@ -5105,6 +6070,14 @@ namespace AasCore.Aas3
                 yield return SemanticId;
             }
 
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
+            }
+
             if (Qualifiers != null)
             {
                 foreach (var anItem in Qualifiers)
@@ -5125,9 +6098,9 @@ namespace AasCore.Aas3
 
             yield return Second;
 
-            if (Annotation != null)
+            if (Annotations != null)
             {
-                foreach (var anItem in Annotation)
+                foreach (var anItem in Annotations)
                 {
                     yield return anItem;
                 }
@@ -5186,6 +6159,20 @@ namespace AasCore.Aas3
                 }
             }
 
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
             if (Qualifiers != null)
             {
                 foreach (var anItem in Qualifiers)
@@ -5230,9 +6217,9 @@ namespace AasCore.Aas3
                 yield return anItem;
             }
 
-            if (Annotation != null)
+            if (Annotations != null)
             {
-                foreach (var anItem in Annotation)
+                foreach (var anItem in Annotations)
                 {
                     yield return anItem;
 
@@ -5286,19 +6273,20 @@ namespace AasCore.Aas3
         }
 
         public AnnotatedRelationshipElement(
-            IReference first,
-            IReference second,
+            Reference first,
+            Reference second,
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null,
-            List<IDataElement>? annotation = null)
+            List<Reference>? dataSpecifications = null,
+            List<IDataElement>? annotations = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -5308,11 +6296,12 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
             First = first;
             Second = second;
-            Annotation = annotation;
+            Annotations = annotations;
         }
     }
 
@@ -5326,15 +6315,17 @@ namespace AasCore.Aas3
         /// For co-managed entities there is no separate AAS. Co-managed entities need to be
         /// part of a self-managed entity.
         /// </summary>
-        [EnumMember(Value = "COMANAGEDENTITY")]
+        [EnumMember(Value = "CoManagedEntity")]
         CoManagedEntity,
 
         /// <summary>
         /// Self-Managed Entities have their own AAS but can be part of the bill of material of
-        /// a composite self-managed entity. The asset of an I4.0 Component is a self-managed
-        /// entity per definition."
+        /// a composite self-managed entity.
         /// </summary>
-        [EnumMember(Value = "SELFMANAGEDENTITY")]
+        /// <remarks>
+        /// The asset of an I4.0 Component is a self-managed entity per definition."
+        /// </remarks>
+        [EnumMember(Value = "SelfManagedEntity")]
         SelfManagedEntity
     }
 
@@ -5348,7 +6339,7 @@ namespace AasCore.Aas3
     ///     Constraint AASd-014:
     ///     Either the attribute <see cref="Entity.GlobalAssetId" /> or <see cref="Entity.SpecificAssetId" />
     ///     of an <see cref="Entity" /> must be set if <see cref="Entity.EntityType" /> is set to
-    ///     <c>SelfManagedEntity</c>. They are not existing otherwise.
+    ///     <see cref="EntityType.SelfManagedEntity" />. They are not existing otherwise.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -5360,23 +6351,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -5402,21 +6398,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -5425,7 +6406,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -5448,15 +6429,27 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -5476,12 +6469,10 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
-
-        /// <summary>
-        /// Describes whether the entity is a co- managed entity or a self-managed entity.
-        /// </summary>
-        public EntityType EntityType { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// Describes statements applicable to the entity by a set of submodel elements,
@@ -5490,23 +6481,31 @@ namespace AasCore.Aas3
         public List<ISubmodelElement>? Statements { get; set; }
 
         /// <summary>
-        /// Reference to the asset the entity is representing.
+        /// Describes whether the entity is a co-managed entity or a self-managed entity.
         /// </summary>
-        public IReference? GlobalAssetId { get; set; }
+        public EntityType EntityType { get; set; }
 
         /// <summary>
-        /// Reference to an identifier key value pair representing a specific identifier
-        /// of the asset represented by the asset administration shell.
+        /// Global identifier of the asset the entity is representing.
         /// </summary>
-        public IdentifierKeyValuePair? SpecificAssetId { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public Reference? GlobalAssetId { get; set; }
 
         /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Reference to a specific asset ID representing a supplementary identifier
+        /// of the asset represented by the Asset Administration Shell.
+        /// </summary>
+        public SpecificAssetId? SpecificAssetId { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
+            return Kind ?? ModelingKind.Instance;
         }
 
         /// <summary>
@@ -5536,6 +6535,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Qualifiers != null)
@@ -5622,6 +6629,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -5733,18 +6754,19 @@ namespace AasCore.Aas3
         public Entity(
             EntityType entityType,
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null,
+            List<Reference>? dataSpecifications = null,
             List<ISubmodelElement>? statements = null,
-            IReference? globalAssetId = null,
-            IdentifierKeyValuePair? specificAssetId = null)
+            Reference? globalAssetId = null,
+            SpecificAssetId? specificAssetId = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -5754,6 +6776,7 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
             Statements = statements;
@@ -5802,10 +6825,6 @@ namespace AasCore.Aas3
     /// <summary>
     /// Defines the necessary information of an event instance sent out or received.
     /// </summary>
-    /// <remarks>
-    /// The payload is not part of the information model as exchanged via
-    /// the AASX package format but used in re-active Asset Administration Shells.
-    /// </remarks>
     public class EventPayload : IClass
     {
         /// <summary>
@@ -5813,12 +6832,15 @@ namespace AasCore.Aas3
         /// <see cref="AssetAdministrationShell" />, <see cref="Submodel" />,
         /// <see cref="ISubmodelElement" />'s.
         /// </summary>
-        public ModelReference Source { get; set; }
+        public Reference Source { get; set; }
 
         /// <summary>
         /// <see cref="IHasSemantics.SemanticId" /> of the source event element, if available
         /// </summary>
-        public GlobalReference? SourceSemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SourceSemanticId { get; set; }
 
         /// <summary>
         /// Reference to the referable, which defines the scope of the event.
@@ -5827,13 +6849,16 @@ namespace AasCore.Aas3
         /// Can be <see cref="AssetAdministrationShell" />, <see cref="Submodel" /> or
         /// <see cref="ISubmodelElement" />.
         /// </remarks>
-        public ModelReference ObservableReference { get; set; }
+        public Reference ObservableReference { get; set; }
 
         /// <summary>
         /// <see cref="IHasSemantics.SemanticId" /> of the referable which defines the scope of
         /// the event, if available.
         /// </summary>
-        public GlobalReference? ObservableSemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? ObservableSemanticId { get; set; }
 
         /// <summary>
         /// Information for the outer message infrastructure for scheduling the event to
@@ -5844,7 +6869,10 @@ namespace AasCore.Aas3
         /// <summary>
         /// Subject, who/which initiated the creation.
         /// </summary>
-        public GlobalReference? SubjectId { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public Reference? SubjectId { get; set; }
 
         /// <summary>
         /// Timestamp in UTC, when this event was triggered.
@@ -5978,13 +7006,13 @@ namespace AasCore.Aas3
         }
 
         public EventPayload(
-            ModelReference source,
-            ModelReference observableReference,
+            Reference source,
+            Reference observableReference,
             string timeStamp,
-            GlobalReference? sourceSemanticId = null,
-            GlobalReference? observableSemanticId = null,
+            Reference? sourceSemanticId = null,
+            Reference? observableSemanticId = null,
             string? topic = null,
-            GlobalReference? subjectId = null,
+            Reference? subjectId = null,
             string? payload = null)
         {
             Source = source;
@@ -6017,23 +7045,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -6059,21 +7092,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -6082,7 +7100,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -6105,15 +7123,27 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -6133,26 +7163,36 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// Reference to the <see cref="IReferable" />, which defines the scope of the event.
         /// Can be <see cref="AssetAdministrationShell" />, <see cref="Submodel" />, or
-        /// <see cref="ISubmodelElement" />. Reference to a referable, e.g. a data element or
-        /// a submodel, that is being observed.
+        /// <see cref="ISubmodelElement" />.
         /// </summary>
-        public ModelReference Observed { get; set; }
+        /// <remarks>
+        /// Reference to a referable, e.g., a data element or
+        /// a submodel, that is being observed.
+        /// </remarks>
+        public Reference Observed { get; set; }
 
         /// <summary>
         /// Direction of event.
-        /// Can be <c>{ Input, Output }</c>.
         /// </summary>
+        /// <remarks>
+        /// Can be <c>{ Input, Output }</c>.
+        /// </remarks>
         public Direction Direction { get; set; }
 
         /// <summary>
         /// State of event.
-        /// Can be <c>{ On, Off }</c>.
         /// </summary>
+        /// <remarks>
+        /// Can be <c>{ On, Off }</c>.
+        /// </remarks>
         public StateOfEvent State { get; set; }
 
         /// <summary>
@@ -6163,18 +7203,16 @@ namespace AasCore.Aas3
 
         /// <summary>
         /// Information, which outer message infrastructure shall handle messages for
-        /// the <see cref="IEventElement" />.
+        /// the <see cref="IEventElement" />. Refers to a <see cref="Submodel" />,
+        /// <see cref="SubmodelElementList" />, <see cref="SubmodelElementCollection" /> or
+        /// <see cref="Entity" />, which contains <see cref="IDataElement" />'s describing
+        /// the proprietary specification for the message broker.
         /// </summary>
         /// <remarks>
-        /// Refers to a <see cref="Submodel" />, <see cref="SubmodelElementList" />,
-        /// <see cref="SubmodelElementStruct" /> or <see cref="Entity" />, which contains
-        /// <see cref="IDataElement" />'s describing the proprietary specification for
-        /// the message broker.
-        ///
-        /// For different message infrastructure, e.g. OPC UA or MQTT or AMQP, these
+        /// For different message infrastructure, e.g., OPC UA or MQTT or AMQP, this
         /// proprietary specification could be standardized by having respective Submodels.
         /// </remarks>
-        public ModelReference? MessageBroker { get; set; }
+        public Reference? MessageBroker { get; set; }
 
         /// <summary>
         /// Timestamp in UTC, when the last event was received (input direction) or sent
@@ -6184,27 +7222,35 @@ namespace AasCore.Aas3
 
         /// <summary>
         /// For input direction, reports on the maximum frequency, the software entity behind
-        /// the respective Referable can handle input events. For output events, specifies
-        /// the maximum frequency of outputting this event to an outer infrastructure.
-        /// Might be not specified, that is, there is no minimum interval.
+        /// the respective Referable can handle input events.
         /// </summary>
+        /// <remarks>
+        /// For output events, specifies the maximum frequency of outputting this event to
+        /// an outer infrastructure.
+        ///
+        /// Might be not specified, that is, there is no minimum interval.
+        /// </remarks>
         public string? MinInterval { get; set; }
 
         /// <summary>
         /// For input direction: not applicable.
+        /// </summary>
+        /// <remarks>
         /// For output direction: maximum interval in time, the respective Referable shall send
         /// an update of the status of the event, even if no other trigger condition for
-        /// the event was not met. Might be not specified, that is, there is no maximum interval.
-        /// </summary>
+        /// the event was not met.
+        ///
+        /// Might be not specified, that is, there is no maximum interval
+        /// </remarks>
         public string? MaxInterval { get; set; }
 
         /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
+            return Kind ?? ModelingKind.Instance;
         }
 
         /// <summary>
@@ -6234,6 +7280,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Qualifiers != null)
@@ -6309,6 +7363,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -6401,21 +7469,22 @@ namespace AasCore.Aas3
         }
 
         public BasicEventElement(
-            ModelReference observed,
+            Reference observed,
             Direction direction,
             StateOfEvent state,
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null,
+            List<Reference>? dataSpecifications = null,
             string? messageTopic = null,
-            ModelReference? messageBroker = null,
+            Reference? messageBroker = null,
             string? lastUpdate = null,
             string? minInterval = null,
             string? maxInterval = null)
@@ -6428,6 +7497,7 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
             Observed = observed;
@@ -6452,23 +7522,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -6494,21 +7569,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -6517,7 +7577,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -6540,15 +7600,27 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -6568,7 +7640,10 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
         /// Input parameter of the operation.
@@ -6586,12 +7661,12 @@ namespace AasCore.Aas3
         public List<OperationVariable>? InoutputVariables { get; set; }
 
         /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
+            return Kind ?? ModelingKind.Instance;
         }
 
         /// <summary>
@@ -6621,6 +7696,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Qualifiers != null)
@@ -6713,6 +7796,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -6829,15 +7926,16 @@ namespace AasCore.Aas3
 
         public Operation(
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null,
+            List<Reference>? dataSpecifications = null,
             List<OperationVariable>? inputVariables = null,
             List<OperationVariable>? outputVariables = null,
             List<OperationVariable>? inoutputVariables = null)
@@ -6850,6 +7948,7 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
             InputVariables = inputVariables;
@@ -6859,17 +7958,13 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// An operation variable is a submodel element that is used as input or output variable
-    /// of an operation.
+    /// The value of an operation variable is a submodel element that is used as input
+    /// and/or output variable of an operation.
     /// </summary>
-    /// <remarks>
-    /// <see cref="OperationVariable" /> is introduced as separate class to enable future
-    /// extensions, e.g. for adding a default value, cardinality (option/mandatory).
-    /// </remarks>
     public class OperationVariable : IClass
     {
         /// <summary>
-        /// Describes the needed argument for an operation via a submodel element
+        /// Describes an argument or result of an operation via a submodel element
         /// </summary>
         public ISubmodelElement Value { get; set; }
 
@@ -6958,23 +8053,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -7000,21 +8100,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -7023,7 +8108,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -7046,15 +8131,27 @@ namespace AasCore.Aas3
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default Value = Instance
+        /// Default: <see cref="ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
-        /// of the element.
+        /// of the element or also main semantic ID of the element.
         /// </summary>
-        public GlobalReference? SemanticId { get; set; }
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticId { get; set; }
+
+        /// <summary>
+        /// Identifier of a supplemental semantic definition of the element.
+        /// It is called supplemental semantic ID of the element.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public List<Reference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -7074,15 +8171,18 @@ namespace AasCore.Aas3
         /// <summary>
         /// Global reference to the data specification template used by the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
-        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
         public ModelingKind KindOrDefault()
         {
-            return this.Kind ?? ModelingKind.Instance;
+            return Kind ?? ModelingKind.Instance;
         }
 
         /// <summary>
@@ -7112,6 +8212,14 @@ namespace AasCore.Aas3
             if (SemanticId != null)
             {
                 yield return SemanticId;
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Qualifiers != null)
@@ -7180,6 +8288,20 @@ namespace AasCore.Aas3
                 foreach (var anItem in SemanticId.Descend())
                 {
                     yield return anItem;
+                }
+            }
+
+            if (SupplementalSemanticIds != null)
+            {
+                foreach (var anItem in SupplementalSemanticIds)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -7254,15 +8376,16 @@ namespace AasCore.Aas3
 
         public Capability(
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            GlobalReference? semanticId = null,
+            Reference? semanticId = null,
+            List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<GlobalReference>? dataSpecifications = null)
+            List<Reference>? dataSpecifications = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -7272,6 +8395,7 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Kind = kind;
             SemanticId = semanticId;
+            SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
         }
@@ -7279,10 +8403,12 @@ namespace AasCore.Aas3
 
     /// <summary>
     /// The semantics of a property or other elements that may have a semantic description
-    /// is defined by a concept description. The description of the concept should follow a
-    /// standardized schema (realized as data specification template).
+    /// is defined by a concept description.
     /// </summary>
     /// <remarks>
+    /// The description of the concept should follow a standardized schema (realized as
+    /// data specification template).
+    ///
     /// Constraints:
     /// <ul>
     ///     <li>
@@ -7306,23 +8432,28 @@ namespace AasCore.Aas3
         public List<Extension>? Extensions { get; set; }
 
         /// <summary>
+        /// The category is a value that gives further meta information
+        /// w.r.t. to the class of the element.
+        /// It affects the expected existence of attributes and the applicability of
+        /// constraints.
+        /// </summary>
+        /// <remarks>
+        /// The category is not identical to the semantic definition
+        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// the element is a measurement value whereas the semantic definition of
+        /// the element would denote that it is the measured temperature.
+        /// </remarks>
+        public string? Category { get; set; }
+
+        /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of
-        /// the element within its name space.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics" />) conformant to IEC61360 the <see cref="IReferable.IdShort" />
-        /// is typically identical to the short name in English.
-        ///
-        /// Constraints:
-        /// <ul>
-        ///     <li>
-        ///     Constraint AASd-027:
-        ///     <see cref="IReferable.IdShort" /> of <see cref="IReferable" />'s shall have a maximum length
-        ///     of 128 characters.
-        ///     </li>
-        /// </ul>
+        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -7348,21 +8479,6 @@ namespace AasCore.Aas3
         public LangStringSet? DisplayName { get; set; }
 
         /// <summary>
-        /// The category is a value that gives further meta information
-        /// w.r.t. to the class of the element.
-        /// It affects the expected existence of attributes and the applicability of
-        /// constraints.
-        /// </summary>
-        /// <remarks>
-        /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category
-        /// <em>e.g.</em> could denote that the element is a measurement value whereas the
-        /// semantic definition of the element would
-        /// denote that it is the measured temperature.
-        /// </remarks>
-        public string? Category { get; set; }
-
-        /// <summary>
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
@@ -7371,7 +8487,7 @@ namespace AasCore.Aas3
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
         ///
-        /// Additional information can be provided, <em>e.g.</em>, if the element is
+        /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
@@ -7391,11 +8507,6 @@ namespace AasCore.Aas3
         public string? Checksum { get; set; }
 
         /// <summary>
-        /// The globally unique identification of the element.
-        /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
         /// Administrative information of an identifiable element.
         /// </summary>
         /// <remarks>
@@ -7405,17 +8516,28 @@ namespace AasCore.Aas3
         public AdministrativeInformation? Administration { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// The globally unique identification of the element.
         /// </summary>
-        public List<GlobalReference>? DataSpecifications { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
-        /// Reference to an external definition the concept is compatible to or was derived from
+        /// Global reference to the data specification template used by the element.
         /// </summary>
         /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public List<Reference>? DataSpecifications { get; set; }
+
+        /// <summary>
+        /// Reference to an external definition the concept is compatible to or was derived
+        /// from.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        ///
         /// Compare to is-case-of relationship in ISO 13584-32 &amp; IEC EN 61360"
         /// </remarks>
-        public List<GlobalReference>? IsCaseOf { get; set; }
+        public List<Reference>? IsCaseOf { get; set; }
 
         /// <summary>
         /// Return the <see cref="ConceptDescription.Category" /> or the default value
@@ -7423,7 +8545,7 @@ namespace AasCore.Aas3
         /// </summary>
         public string CategoryOrDefault()
         {
-            string result = this.Category ?? "PROPERTY";
+            string result = Category ?? "PROPERTY";
 
         #if DEBUG
             if (!Verification.ConceptDescriptionCategoryIsValid(
@@ -7608,14 +8730,14 @@ namespace AasCore.Aas3
         public ConceptDescription(
             string id,
             List<Extension>? extensions = null,
+            string? category = null,
             string? idShort = null,
             LangStringSet? displayName = null,
-            string? category = null,
             LangStringSet? description = null,
             string? checksum = null,
             AdministrativeInformation? administration = null,
-            List<GlobalReference>? dataSpecifications = null,
-            List<GlobalReference>? isCaseOf = null)
+            List<Reference>? dataSpecifications = null,
+            List<Reference>? isCaseOf = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -7631,127 +8753,146 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
-    /// Reference to either a model element of the same or another AAs or to an external
+    /// ReferenceTypes
+    /// </summary>
+    public enum ReferenceTypes
+    {
+        /// <summary>
+        /// GlobalReference.
+        /// </summary>
+        [EnumMember(Value = "GlobalReference")]
+        GlobalReference,
+
+        /// <summary>
+        /// ModelReference
+        /// </summary>
+        [EnumMember(Value = "ModelReference")]
+        ModelReference
+    }
+
+    /// <summary>
+    /// Reference to either a model element of the same or another AAS or to an external
     /// entity.
     /// </summary>
-    public interface IReference : IClass
-    {
-        // Intentionally empty.
-    }
-
-    /// <summary>
-    /// Reference to an external entity.
-    /// </summary>
-    public class GlobalReference : IReference
+    /// <remarks>
+    /// A reference is an ordered list of keys.
+    ///
+    /// A model reference is an ordered list of keys, each key referencing an element. The
+    /// complete list of keys may for example be concatenated to a path that then gives
+    /// unique access to an element.
+    ///
+    /// A global reference is a reference to an external entity.
+    ///
+    /// Constraints:
+    /// <ul>
+    ///     <li>
+    ///     Constraint AASd-121:
+    ///     For <see cref="Reference" />'s the <see cref="Key.Type" /> of the first key of
+    ///     <see cref="Reference.Keys" /> shall be one of <see cref="GloballyIdentifiables" />.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-122:
+    ///     For global references, i.e. <see cref="Reference" />'s with
+    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.GlobalReference" />, the type
+    ///     of the first key of <see cref="Reference.Keys" /> shall be one of
+    ///     <see cref="GenericGloballyIdentifiables" />.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-123:
+    ///     For model references, i.e. <see cref="Reference" />'s with
+    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.ModelReference" />, the type
+    ///     of the first key of <see cref="Reference.Keys" /> shall be one of
+    ///     <see cref="AasIdentifiables" />.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-124:
+    ///     For global references, i.e. <see cref="Reference" />'s with
+    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.GlobalReference" />, the last
+    ///     key of <see cref="Reference.Keys" /> shall be either one of
+    ///     <see cref="GenericGloballyIdentifiables" /> or one of
+    ///     <see cref="GenericFragmentKeys" />.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-125:
+    ///     For model references, i.e. <see cref="Reference" />'s with
+    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Reference.Keys" /> the type of the keys following the first
+    ///     key of  <see cref="Reference.Keys" /> shall be one of <see cref="FragmentKeys" />.
+    ///
+    ///     Constraint AASd-125 ensures that the shortest path is used.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-126:
+    ///     For model references, i.e. <see cref="Reference" />'s with
+    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Reference.Keys" /> the type of the last key in the
+    ///     reference key chain may be one of <see cref="GenericFragmentKeys" /> or no key
+    ///     at all shall have a value out of <see cref="GenericFragmentKeys" />.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-127:
+    ///     For model references, i.e. <see cref="Reference" />'s with
+    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Reference.Keys" /> a key with <see cref="Key.Type" />
+    ///     <see cref="KeyTypes.FragmentReference" /> shall be preceded by a key with
+    ///     <see cref="Key.Type" /> <see cref="KeyTypes.File" /> or <see cref="KeyTypes.Blob" />. All other
+    ///     AAS fragments, i.e. type values out of <see cref="AasSubmodelElements" />, do not
+    ///     support fragments.
+    ///
+    ///     Which kind of fragments are supported depends on the content type and the
+    ///     specification of allowed fragment identifiers for the corrsponding resource
+    ///     being referenced via the reference.
+    ///     </li>
+    ///     <li>
+    ///     Constraint AASd-128:
+    ///     For model references, i.e. <see cref="Reference" />'s with
+    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.ModelReference" />, the
+    ///     <see cref="Key.Value" /> of a <see cref="Key" /> preceded by a <see cref="Key" /> with
+    ///     <see cref="Key.Type" /> = <see cref="KeyTypes.SubmodelElementList" /> is an integer
+    ///     number denoting the position in the array of the submodel element list.
+    ///     </li>
+    /// </ul>
+    /// </remarks>
+    public class Reference : IClass
     {
         /// <summary>
-        /// Unique identifier
+        /// Type of the reference.
         /// </summary>
         /// <remarks>
-        /// The identifier can be a concatenation of different identifiers, for example
-        /// representing an IRDI path etc.
+        /// Denotes, whether reference is a global reference or a model reference.
         /// </remarks>
-        public string Value { get; set; }
+        public ReferenceTypes Type { get; set; }
 
         /// <summary>
-        /// Iterate over all the class instances referenced from this instance
-        /// without further recursion.
+        /// <see cref="IHasSemantics.SemanticId" /> of the referenced model element
+        /// (<see cref="Reference.Type" /> = <see cref="ReferenceTypes.ModelReference" />).
         /// </summary>
-        public IEnumerable<IClass> DescendOnce()
-        {
-            // No descendable properties
-            yield break;
-        }
+        /// <remarks>
+        /// For global references there typically is no semantic ID.
+        ///
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? ReferredSemanticId { get; set; }
 
-        /// <summary>
-        /// Iterate recursively over all the class instances referenced from this instance.
-        /// </summary>
-        public IEnumerable<IClass> Descend()
-        {
-            // No descendable properties
-            yield break;
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance
-        /// for double dispatch.
-        /// </summary>
-        public void Accept(Visitation.IVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch
-        /// with the <paramref name="context" />.
-        /// </summary>
-        public void Accept<TContext>(
-            Visitation.IVisitorWithContext<TContext> visitor,
-            TContext context)
-        {
-            visitor.Visit(this, context);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance
-        /// for double dispatch.
-        /// </summary>
-        public T Transform<T>(Visitation.ITransformer<T> transformer)
-        {
-            return transformer.Transform(this);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance
-        /// for double dispatch with the <paramref name="context" />.
-        /// </summary>
-        public T Transform<TContext, T>(
-            Visitation.ITransformerWithContext<TContext, T> transformer,
-            TContext context)
-        {
-            return transformer.Transform(this, context);
-        }
-
-        public GlobalReference(string value)
-        {
-            Value = value;
-        }
-    }
-
-    /// <summary>
-    /// Reference to a model element of the same or another AAS.
-    /// </summary>
-    /// <remarks>
-    /// A model reference is an ordered list of keys, each key referencing an element.
-    /// The complete list of keys may for example be concatenated to a path that then gives
-    /// unique access to an element.
-    /// </remarks>
-    public class ModelReference : IReference
-    {
         /// <summary>
         /// Unique references in their name space.
         /// </summary>
         public List<Key> Keys { get; set; }
 
         /// <summary>
-        /// <see cref="IHasSemantics.SemanticId" /> of the referenced model element.
-        /// </summary>
-        public GlobalReference? ReferredSemanticId { get; set; }
-
-        /// <summary>
         /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Keys)
-            {
-                yield return anItem;
-            }
-
             if (ReferredSemanticId != null)
             {
                 yield return ReferredSemanticId;
+            }
+
+            foreach (var anItem in Keys)
+            {
+                yield return anItem;
             }
         }
 
@@ -7760,17 +8901,6 @@ namespace AasCore.Aas3
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Keys)
-            {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
-                {
-                    yield return anotherItem;
-                }
-            }
-
             if (ReferredSemanticId != null)
             {
                 yield return ReferredSemanticId;
@@ -7781,6 +8911,17 @@ namespace AasCore.Aas3
                     yield return anItem;
                 }
             }
+
+            foreach (var anItem in Keys)
+            {
+                yield return anItem;
+
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
+                }
+            }
         }
 
         /// <summary>
@@ -7823,10 +8964,12 @@ namespace AasCore.Aas3
             return transformer.Transform(this, context);
         }
 
-        public ModelReference(
+        public Reference(
+            ReferenceTypes type,
             List<Key> keys,
-            GlobalReference? referredSemanticId = null)
+            Reference? referredSemanticId = null)
         {
+            Type = type;
             Keys = keys;
             ReferredSemanticId = referredSemanticId;
         }
@@ -7838,16 +8981,17 @@ namespace AasCore.Aas3
     public class Key : IClass
     {
         /// <summary>
-        /// Denote which kind of entity is referenced.
+        /// Denotes which kind of entity is referenced.
         /// </summary>
         /// <remarks>
-        /// In case type = FragmentReference the key represents a bookmark or a similar local
-        /// identifier within its parent element as specified by the key that precedes this key.
+        /// In case <see cref="Key.Type" /> = <see cref="KeyTypes.FragmentReference" /> the key represents
+        /// a bookmark or a similar local identifier within its parent element as specified
+        /// by the key that precedes this key.
         ///
         /// In all other cases the key references a model element of the same or of another AAS.
         /// The name of the model element is explicitly listed.
         /// </remarks>
-        public KeyElements Type { get; set; }
+        public KeyTypes Type { get; set; }
 
         /// <summary>
         /// The key value, for example an IRDI or an URI
@@ -7914,7 +9058,7 @@ namespace AasCore.Aas3
         }
 
         public Key(
-            KeyElements type,
+            KeyTypes type,
             string value)
         {
             Type = type;
@@ -7925,7 +9069,28 @@ namespace AasCore.Aas3
     /// <summary>
     /// Enumeration of all identifiable elements within an asset administration shell.
     /// </summary>
-    public enum IdentifiableElements
+    public enum GenericFragmentKeys
+    {
+        /// <summary>
+        /// Bookmark or a similar local identifier of a subordinate part of a primary resource
+        /// </summary>
+        [EnumMember(Value = "FragmentReference")]
+        FragmentReference
+    }
+
+    /// <summary>
+    /// Enumeration of different key value types within a key.
+    /// </summary>
+    public enum GenericGloballyIdentifiables
+    {
+        [EnumMember(Value = "GlobalReference")]
+        GlobalReference
+    }
+
+    /// <summary>
+    /// Enumeration of different key value types within a key.
+    /// </summary>
+    public enum AasIdentifiables
     {
         [EnumMember(Value = "AssetAdministrationShell")]
         AssetAdministrationShell,
@@ -7940,7 +9105,7 @@ namespace AasCore.Aas3
     /// <summary>
     /// Enumeration of all referable elements within an asset administration shell.
     /// </summary>
-    public enum SubmodelElementElements
+    public enum AasSubmodelElements
     {
         [EnumMember(Value = "AnnotatedRelationshipElement")]
         AnnotatedRelationshipElement,
@@ -7958,7 +9123,7 @@ namespace AasCore.Aas3
         /// Data Element.
         /// </summary>
         /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="SubmodelElementElements.DataElement" />
+        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="AasSubmodelElements.DataElement" />
         /// the reference may be a <see cref="Property" />, a <see cref="File" /> etc.
         /// </remarks>
         [EnumMember(Value = "DataElement")]
@@ -8014,7 +9179,7 @@ namespace AasCore.Aas3
         /// </summary>
         /// <remarks>
         /// Submodel Element is abstract, i.e. if a key uses
-        /// <see cref="SubmodelElementElements.SubmodelElement" /> the reference may be a <see cref="Property" />,
+        /// <see cref="AasSubmodelElements.SubmodelElement" /> the reference may be a <see cref="Property" />,
         /// a <see cref="SubmodelElementList" />, an <see cref="Operation" /> etc.
         /// </remarks>
         [EnumMember(Value = "SubmodelElement")]
@@ -8029,15 +9194,136 @@ namespace AasCore.Aas3
         /// <summary>
         /// Struct of Submodel Elements
         /// </summary>
-        [EnumMember(Value = "SubmodelElementStruct")]
-        SubmodelElementStruct
+        [EnumMember(Value = "SubmodelElementCollection")]
+        SubmodelElementCollection
+    }
+
+    /// <summary>
+    /// Enumeration of all referable elements within an asset administration shell.
+    /// </summary>
+    public enum AasReferableNonIdentifiables
+    {
+        [EnumMember(Value = "AnnotatedRelationshipElement")]
+        AnnotatedRelationshipElement,
+
+        [EnumMember(Value = "BasicEventElement")]
+        BasicEventElement,
+
+        [EnumMember(Value = "Blob")]
+        Blob,
+
+        [EnumMember(Value = "Capability")]
+        Capability,
+
+        /// <summary>
+        /// Data Element.
+        /// </summary>
+        /// <remarks>
+        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="AasReferableNonIdentifiables.DataElement" />
+        /// the reference may be a <see cref="Property" />, a <see cref="File" /> etc.
+        /// </remarks>
+        [EnumMember(Value = "DataElement")]
+        DataElement,
+
+        [EnumMember(Value = "Entity")]
+        Entity,
+
+        /// <summary>
+        /// Event element
+        /// </summary>
+        /// <remarks>
+        /// <see cref="IEventElement" /> is abstract.
+        /// </remarks>
+        [EnumMember(Value = "EventElement")]
+        EventElement,
+
+        [EnumMember(Value = "File")]
+        File,
+
+        /// <summary>
+        /// Property with a value that can be provided in multiple languages
+        /// </summary>
+        [EnumMember(Value = "MultiLanguageProperty")]
+        MultiLanguageProperty,
+
+        [EnumMember(Value = "Operation")]
+        Operation,
+
+        [EnumMember(Value = "Property")]
+        Property,
+
+        /// <summary>
+        /// Range with min and max
+        /// </summary>
+        [EnumMember(Value = "Range")]
+        Range,
+
+        /// <summary>
+        /// Reference
+        /// </summary>
+        [EnumMember(Value = "ReferenceElement")]
+        ReferenceElement,
+
+        /// <summary>
+        /// Relationship
+        /// </summary>
+        [EnumMember(Value = "RelationshipElement")]
+        RelationshipElement,
+
+        /// <summary>
+        /// Submodel Element
+        /// </summary>
+        /// <remarks>
+        /// Submodel Element is abstract, i.e. if a key uses
+        /// <see cref="AasReferableNonIdentifiables.SubmodelElement" /> the reference may be a <see cref="Property" />,
+        /// a <see cref="SubmodelElementList" />, an <see cref="Operation" /> etc.
+        /// </remarks>
+        [EnumMember(Value = "SubmodelElement")]
+        SubmodelElement,
+
+        /// <summary>
+        /// Struct of Submodel Elements
+        /// </summary>
+        [EnumMember(Value = "SubmodelElementCollection")]
+        SubmodelElementCollection,
+
+        /// <summary>
+        /// List of Submodel Elements
+        /// </summary>
+        [EnumMember(Value = "SubmodelElementList")]
+        SubmodelElementList
     }
 
     /// <summary>
     /// Enumeration of all referable elements within an asset administration shell
     /// </summary>
-    public enum ReferableElements
+    public enum GloballyIdentifiables
     {
+        [EnumMember(Value = "GlobalReference")]
+        GlobalReference,
+
+        [EnumMember(Value = "AssetAdministrationShell")]
+        AssetAdministrationShell,
+
+        [EnumMember(Value = "ConceptDescription")]
+        ConceptDescription,
+
+        [EnumMember(Value = "Submodel")]
+        Submodel
+    }
+
+    /// <summary>
+    /// Enumeration of different key value types within a key.
+    /// </summary>
+    public enum FragmentKeys
+    {
+        /// <summary>
+        /// Bookmark or a similar local identifier of a subordinate part of
+        /// a primary resource
+        /// </summary>
+        [EnumMember(Value = "FragmentReference")]
+        FragmentReference,
+
         [EnumMember(Value = "AnnotatedRelationshipElement")]
         AnnotatedRelationshipElement,
 
@@ -8060,8 +9346,8 @@ namespace AasCore.Aas3
         /// Data element.
         /// </summary>
         /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="ReferableElements.DataElement" />
-        /// the reference may be a <see cref="Property" />, a <see cref="File" /> <em>etc.</em>
+        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="FragmentKeys.DataElement" />
+        /// the reference may be a Property, a File etc.
         /// </remarks>
         [EnumMember(Value = "DataElement")]
         DataElement,
@@ -8118,8 +9404,8 @@ namespace AasCore.Aas3
         /// Submodel Element
         /// </summary>
         /// <remarks>
-        /// Submodel Element is abstract, <em>i.e.</em> if a key uses <see cref="ReferableElements.SubmodelElement" />
-        /// the reference may be a <see cref="Property" />, an <see cref="Operation" /> <em>etc.</em>
+        /// Submodel Element is abstract, <em>i.e.</em> if a key uses <see cref="FragmentKeys.SubmodelElement" />
+        /// the reference may be a <see cref="Property" />, an <see cref="Operation" /> etc.
         /// </remarks>
         [EnumMember(Value = "SubmodelElement")]
         SubmodelElement,
@@ -8133,14 +9419,14 @@ namespace AasCore.Aas3
         /// <summary>
         /// Struct of Submodel Elements
         /// </summary>
-        [EnumMember(Value = "SubmodelElementStruct")]
-        SubmodelElementStruct
+        [EnumMember(Value = "SubmodelElementCollection")]
+        SubmodelElementCollection
     }
 
     /// <summary>
     /// Enumeration of different key value types within a key.
     /// </summary>
-    public enum KeyElements
+    public enum KeyTypes
     {
         /// <summary>
         /// Bookmark or a similar local identifier of a subordinate part of
@@ -8174,8 +9460,8 @@ namespace AasCore.Aas3
         /// Data element.
         /// </summary>
         /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="KeyElements.DataElement" />
-        /// the reference may be a Property, a File <em>etc.</em>
+        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="KeyTypes.DataElement" />
+        /// the reference may be a Property, a File etc.
         /// </remarks>
         [EnumMember(Value = "DataElement")]
         DataElement,
@@ -8213,6 +9499,9 @@ namespace AasCore.Aas3
         [EnumMember(Value = "Range")]
         Range,
 
+        [EnumMember(Value = "Referable")]
+        Referable,
+
         /// <summary>
         /// Reference
         /// </summary>
@@ -8232,8 +9521,8 @@ namespace AasCore.Aas3
         /// Submodel Element
         /// </summary>
         /// <remarks>
-        /// Submodel Element is abstract, <em>i.e.</em> if a key uses <see cref="KeyElements.SubmodelElement" />
-        /// the reference may be a <see cref="Property" />, an <see cref="Operation" /> <em>etc.</em>
+        /// Submodel Element is abstract, <em>i.e.</em> if a key uses <see cref="KeyTypes.SubmodelElement" />
+        /// the reference may be a <see cref="Property" />, an <see cref="Operation" /> etc.
         /// </remarks>
         [EnumMember(Value = "SubmodelElement")]
         SubmodelElement,
@@ -8247,8 +9536,8 @@ namespace AasCore.Aas3
         /// <summary>
         /// Struct of Submodel Elements
         /// </summary>
-        [EnumMember(Value = "SubmodelElementStruct")]
-        SubmodelElementStruct
+        [EnumMember(Value = "SubmodelElementCollection")]
+        SubmodelElementCollection
     }
 
     /// <summary>
@@ -8660,6 +9949,47 @@ namespace AasCore.Aas3
     }
 
     /// <summary>
+    /// Data specification content is part of a data specification template and defines
+    /// which additional attributes shall be added to the element instance that references
+    /// the data specification template and meta information about the template itself.
+    /// </summary>
+    public interface IDataSpecificationContent : IClass
+    {
+        // Intentionally empty.
+    }
+
+    /// <summary>
+    /// Data Specification Template
+    /// </summary>
+    public interface IDataSpecification : IClass
+    {
+        /// <summary>
+        /// The globally unique identification of the element.
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
+        /// The content of the template without meta data
+        /// </summary>
+        public IDataSpecificationContent DataSpecificationContent { get; set; }
+
+        /// <summary>
+        /// Administrative information of an identifiable element.
+        /// </summary>
+        /// <remarks>
+        /// Some of the administrative information like the version number might need to
+        /// be part of the identification.
+        /// </remarks>
+        public AdministrativeInformation? Administration { get; set; }
+
+        /// <summary>
+        /// Description how and in which context the data specification template is applicable.
+        /// The description can be provided in several languages.
+        /// </summary>
+        public LangStringSet? Description { get; set; }
+    }
+
+    /// <summary>
     /// Container for the sets of different identifiables.
     /// </summary>
     /// <remarks>
@@ -8683,6 +10013,11 @@ namespace AasCore.Aas3
         /// Concept description
         /// </summary>
         public List<ConceptDescription>? ConceptDescriptions { get; set; }
+
+        /// <summary>
+        /// Data specification
+        /// </summary>
+        public List<IDataSpecification>? DataSpecifications { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -8709,6 +10044,14 @@ namespace AasCore.Aas3
             if (ConceptDescriptions != null)
             {
                 foreach (var anItem in ConceptDescriptions)
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (DataSpecifications != null)
+            {
+                foreach (var anItem in DataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -8751,6 +10094,20 @@ namespace AasCore.Aas3
             if (ConceptDescriptions != null)
             {
                 foreach (var anItem in ConceptDescriptions)
+                {
+                    yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
+                }
+            }
+
+            if (DataSpecifications != null)
+            {
+                foreach (var anItem in DataSpecifications)
                 {
                     yield return anItem;
 
@@ -8806,15 +10163,17 @@ namespace AasCore.Aas3
         public Environment(
             List<AssetAdministrationShell>? assetAdministrationShells = null,
             List<Submodel>? submodels = null,
-            List<ConceptDescription>? conceptDescriptions = null)
+            List<ConceptDescription>? conceptDescriptions = null,
+            List<IDataSpecification>? dataSpecifications = null)
         {
             AssetAdministrationShells = assetAdministrationShells;
             Submodels = submodels;
             ConceptDescriptions = conceptDescriptions;
+            DataSpecifications = dataSpecifications;
         }
     }
 
-}  // namespace AasCore.Aas3
+}  // namespace AasCore.Aas3_0_RC02
 
 /*
  * This code has been automatically generated by aas-core-codegen.
