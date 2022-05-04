@@ -1,6 +1,5 @@
 """Generate the RDF ontology based on the meta-model."""
 import io
-import textwrap
 from typing import Tuple, Optional, List
 
 from icontract import ensure, require
@@ -60,11 +59,9 @@ def _define_for_enumeration(
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-        ###  {url_prefix}/{cls_name}
-        aas:{cls_name} rdf:type owl:Class ;"""
-        )
+        f"""\
+###  {url_prefix}/{cls_name}
+aas:{cls_name} rdf:type owl:Class ;"""
     )
 
     writer.write(
@@ -247,14 +244,12 @@ def _define_property(
     url = f"{url_prefix}/{cls_name}/{prop_name}"
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-        ###  {url}
-        <{url}> rdf:type {rdf_type} ;
-        {I}rdfs:label {rdf_shacl_common.string_literal(prop_label)}^^xsd:string ;
-        {I}rdfs:domain {rdfs_domain} ;
-        {I}rdfs:range {rdfs_range} ;"""
-        )
+        f"""\
+###  {url}
+<{url}> rdf:type {rdf_type} ;
+{I}rdfs:label {rdf_shacl_common.string_literal(prop_label)}^^xsd:string ;
+{I}rdfs:domain {rdfs_domain} ;
+{I}rdfs:range {rdfs_range} ;"""
     )
 
     if prop.description:

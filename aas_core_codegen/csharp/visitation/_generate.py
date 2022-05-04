@@ -42,16 +42,14 @@ def _generate_ivisitor(symbol_table: intermediate.SymbolTable) -> Stripped:
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-            /// <summary>
-            /// Define the interface for a visitor which visits the instances of the model.
-            /// </summary>
-            public interface IVisitor
-            {{
-            {I}public void Visit(IClass that);
-            """
-        )
+        f"""\
+/// <summary>
+/// Define the interface for a visitor which visits the instances of the model.
+/// </summary>
+public interface IVisitor
+{{
+{I}public void Visit(IClass that);
+"""
     )
 
     for i, block in enumerate(blocks):
@@ -215,17 +213,15 @@ def _generate_ivisitor_with_context(symbol_table: intermediate.SymbolTable) -> S
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-            /// <summary>
-            /// Define the interface for a visitor which visits the instances of the model.
-            /// </summary>
-            /// <typeparam name="C">Context type</typeparam>
-            public interface IVisitorWithContext<C>
-            {{
-            {I}public void Visit(IClass that, C context);
-            """
-        )
+        f"""\
+/// <summary>
+/// Define the interface for a visitor which visits the instances of the model.
+/// </summary>
+/// <typeparam name="C">Context type</typeparam>
+public interface IVisitorWithContext<C>
+{{
+{I}public void Visit(IClass that, C context);
+"""
     )
 
     for i, block in enumerate(blocks):
@@ -326,18 +322,16 @@ def _generate_itransformer(symbol_table: intermediate.SymbolTable) -> Stripped:
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-            /// <summary>
-            /// Define the interface for a transformer which transforms recursively
-            /// the instances into something else.
-            /// </summary>
-            /// <typeparam name="T">The type of the transformation result</typeparam>
-            public interface ITransformer<T>
-            {{
-            {I}public T Transform(IClass that);
-            """
-        )
+        f"""\
+/// <summary>
+/// Define the interface for a transformer which transforms recursively
+/// the instances into something else.
+/// </summary>
+/// <typeparam name="T">The type of the transformation result</typeparam>
+public interface ITransformer<T>
+{{
+{I}public T Transform(IClass that);
+"""
     )
 
     for i, block in enumerate(blocks):
@@ -354,13 +348,11 @@ def _generate_abstract_transformer(symbol_table: intermediate.SymbolTable) -> St
     """Generate the most abstract transformer that merely double-dispatches."""
     blocks = [
         Stripped(
-            textwrap.dedent(
-                f"""\
-                public T Transform(IClass that)
-                {{
-                {I}return that.Transform(this);
-                }}"""
-            )
+            f"""\
+public T Transform(IClass that)
+{{
+{I}return that.Transform(this);
+}}"""
         )
     ]  # type: List[Stripped]
 
@@ -387,17 +379,15 @@ def _generate_abstract_transformer(symbol_table: intermediate.SymbolTable) -> St
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            """\
-            /// <summary>
-            /// Perform double-dispatch to transform recursively
-            /// the instances into something else.
-            /// </summary>
-            /// <typeparam name="T">The type of the transformation result</typeparam>
-            public abstract class AbstractTransformer<T> : ITransformer<T>
-            {
-            """
-        )
+        """\
+/// <summary>
+/// Perform double-dispatch to transform recursively
+/// the instances into something else.
+/// </summary>
+/// <typeparam name="T">The type of the transformation result</typeparam>
+public abstract class AbstractTransformer<T> : ITransformer<T>
+{
+"""
     )
 
     for i, block in enumerate(blocks):
@@ -439,19 +429,17 @@ def _generate_itransformer_with_context(
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-            /// <summary>
-            /// Define the interface for a transformer which recursively transforms
-            /// the instances into something else while the context is passed along.
-            /// </summary>
-            /// <typeparam name="C">Type of the transformation context</typeparam>
-            /// <typeparam name="T">The type of the transformation result</typeparam>
-            public interface ITransformerWithContext<C, T>
-            {{
-            {I}public T Transform(IClass that, C context);
-            """
-        )
+        f"""\
+/// <summary>
+/// Define the interface for a transformer which recursively transforms
+/// the instances into something else while the context is passed along.
+/// </summary>
+/// <typeparam name="C">Type of the transformation context</typeparam>
+/// <typeparam name="T">The type of the transformation result</typeparam>
+public interface ITransformerWithContext<C, T>
+{{
+{I}public T Transform(IClass that, C context);
+"""
     )
 
     for i, block in enumerate(blocks):
@@ -470,13 +458,11 @@ def _generate_abstract_transformer_with_context(
     """Generate the most abstract transformer that merely double-dispatches."""
     blocks = [
         Stripped(
-            textwrap.dedent(
-                f"""\
-                public T Transform(IClass that, C context)
-                {{
-                {I}return that.Transform(this, context);
-                }}"""
-            )
+            f"""\
+public T Transform(IClass that, C context)
+{{
+{I}return that.Transform(this, context);
+}}"""
         )
     ]  # type: List[Stripped]
 
@@ -505,19 +491,17 @@ def _generate_abstract_transformer_with_context(
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-            /// <summary>
-            /// Perform double-dispatch to transform recursively
-            /// the instances into something else.
-            /// </summary>
-            /// <typeparam name="C">The type of the transformation context</typeparam>
-            /// <typeparam name="T">The type of the transformation result</typeparam>
-            public abstract class AbstractTransformerWithContext<C, T>
-            {I}: ITransformerWithContext<C, T>
-            {{
-            """
-        )
+        f"""\
+/// <summary>
+/// Perform double-dispatch to transform recursively
+/// the instances into something else.
+/// </summary>
+/// <typeparam name="C">The type of the transformation context</typeparam>
+/// <typeparam name="T">The type of the transformation result</typeparam>
+public abstract class AbstractTransformerWithContext<C, T>
+{I}: ITransformerWithContext<C, T>
+{{
+"""
     )
 
     for i, block in enumerate(blocks):

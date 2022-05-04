@@ -159,12 +159,10 @@ def _transpile_pattern_verification(
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-        private static Regex {construct_name}()
-        {{
-        """
-        )
+        f"""\
+private static Regex {construct_name}()
+{{
+"""
     )
 
     defined_variables = set()  # type: Set[Identifier]
@@ -256,13 +254,11 @@ def _transpile_pattern_verification(
     method_name = csharp_naming.method_name(verification.name)
 
     writer.write(
-        textwrap.dedent(
-            f"""\
-            public static bool {method_name}(string {arg_name})
-            {{
-            {I}return {regex_name}.IsMatch({arg_name});
-            }}"""
-        )
+        f"""\
+public static bool {method_name}(string {arg_name})
+{{
+{I}return {regex_name}.IsMatch({arg_name});
+}}"""
     )
 
     blocks.append(Stripped(writer.getvalue()))
@@ -1085,12 +1081,10 @@ def _transpile_invariant(
 
     writer.write(
         textwrap.indent(
-            textwrap.dedent(
-                f"""\
-                yield return new Reporting.Error(
-                {I}"Invariant violated:\\n" +
-                """
-            ),
+            f"""\
+yield return new Reporting.Error(
+{I}"Invariant violated:\\n" +
+""",
             I,
         )
     )
@@ -1163,15 +1157,13 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            """\
-        /// <summary>
-        /// Hash allowed enum values for efficient validation of enums.
-        /// </summary>
-        internal static class EnumValueSet
-        {
-        """
-        )
+        """\
+/// <summary>
+/// Hash allowed enum values for efficient validation of enums.
+/// </summary>
+internal static class EnumValueSet
+{
+"""
     )
     for i, block in enumerate(blocks):
         if i > 0:
@@ -1463,23 +1455,19 @@ def _generate_transform_for_class(
     if len(blocks) == 0:
         blocks.append(
             Stripped(
-                textwrap.dedent(
-                    f"""\
-                    // No verification has been defined for {name}.
-                    yield break;"""
-                )
+                f"""\
+// No verification has been defined for {name}.
+yield break;"""
             )
         )
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-            public override IEnumerable<Reporting.Error> Transform(
-            {I}Aas.{name} that)
-            {{
-            """
-        )
+        f"""\
+public override IEnumerable<Reporting.Error> Transform(
+{I}Aas.{name} that)
+{{
+"""
     )
 
     for i, stmt in enumerate(blocks):
@@ -1552,13 +1540,11 @@ def _generate_transformer(
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-            private class Transformer
-            {I}: Visitation.AbstractTransformer<IEnumerable<Reporting.Error>>
-            {{
-            """
-        )
+        f"""\
+private class Transformer
+{I}: Visitation.AbstractTransformer<IEnumerable<Reporting.Error>>
+{{
+"""
     )
 
     for i, block in enumerate(blocks):
@@ -1576,22 +1562,20 @@ def _generate_verify_enumeration(enumeration: intermediate.Enumeration) -> Strip
     name = csharp_naming.enum_name(enumeration.name)
 
     return Stripped(
-        textwrap.dedent(
-            f"""\
-            /// <summary>
-            /// Verify that <paramref name="that" /> is a valid enumeration value.
-            /// </summary>
-            public static IEnumerable<Reporting.Error> Verify{name}(
-            {I}Aas.{name} that)
-            {{
-            {I}if (!EnumValueSet.For{name}.Contains(
-            {II}(int)that))
-            {I}{{
-            {II}yield return new Reporting.Error(
-            {III}$"Invalid {name}: {{that}}");
-            {I}}}
-            }}"""
-        )
+        f"""\
+/// <summary>
+/// Verify that <paramref name="that" /> is a valid enumeration value.
+/// </summary>
+public static IEnumerable<Reporting.Error> Verify{name}(
+{I}Aas.{name} that)
+{{
+{I}if (!EnumValueSet.For{name}.Contains(
+{II}(int)that))
+{I}{{
+{II}yield return new Reporting.Error(
+{III}$"Invalid {name}: {{that}}");
+{I}}}
+}}"""
     )
 
 
@@ -1634,11 +1618,9 @@ def _generate_verify_constrained_primitive(
     if len(blocks) == 0:
         blocks.append(
             Stripped(
-                textwrap.dedent(
-                    """\
-                    // There is no verification specified.
-                    yield break;"""
-                )
+                """\
+// There is no verification specified.
+yield break;"""
             )
         )
 
@@ -1651,16 +1633,14 @@ def _generate_verify_constrained_primitive(
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-            /// <summary>
-            /// Verify the constraints of <paramref name="that" />.
-            /// </summary>
-            public static IEnumerable<Reporting.Error> Verify{name} (
-            {I}{that_type} that)
-            {{
-            """
-        )
+        f"""\
+/// <summary>
+/// Verify the constraints of <paramref name="that" />.
+/// </summary>
+public static IEnumerable<Reporting.Error> Verify{name} (
+{I}{that_type} that)
+{{
+"""
     )
 
     for i, block in enumerate(blocks):
@@ -1750,11 +1730,9 @@ using Visitation = {namespace}.Visitation;"""
 
     verification_blocks.append(
         Stripped(
-            textwrap.dedent(
-                f"""\
-                private static readonly Verification.Transformer _transformer = (
-                {I}new Verification.Transformer());"""
-            )
+            f"""\
+private static readonly Verification.Transformer _transformer = (
+{I}new Verification.Transformer());"""
         )
     )
 
@@ -1771,22 +1749,20 @@ using Visitation = {namespace}.Visitation;"""
 
     verification_blocks.append(
         Stripped(
-            textwrap.dedent(
-                f"""\
-                /// <summary>
-                /// Verify the constraints of <paramref name="that" /> recursively.
-                /// </summary>
-                /// <param name="that">
-                /// The instance of the meta-model to be verified
-                /// </param>
-                public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
-                {{
-                {I}foreach (var error in _transformer.Transform(that))
-                {I}{{
-                {II}yield return error;
-                {I}}}
-                }}"""
-            )
+            f"""\
+/// <summary>
+/// Verify the constraints of <paramref name="that" /> recursively.
+/// </summary>
+/// <param name="that">
+/// The instance of the meta-model to be verified
+/// </param>
+public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
+{{
+{I}foreach (var error in _transformer.Transform(that))
+{I}{{
+{II}yield return error;
+{I}}}
+}}"""
         )
     )
 
@@ -1822,15 +1798,13 @@ using Visitation = {namespace}.Visitation;"""
 
     verification_writer = io.StringIO()
     verification_writer.write(
-        textwrap.dedent(
-            f"""\
-            namespace {namespace}
-            {{
-            {I}/// <summary>
-            {I}/// Verify that the instances of the meta-model satisfy the invariants.
-            {I}/// </summary>
-            """
-        )
+        f"""\
+namespace {namespace}
+{{
+{I}/// <summary>
+{I}/// Verify that the instances of the meta-model satisfy the invariants.
+{I}/// </summary>
+"""
     )
 
     # region Write an example usage
