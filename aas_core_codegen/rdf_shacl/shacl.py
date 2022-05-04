@@ -227,11 +227,9 @@ def _define_for_class(
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-        aas:{shape_name} a sh:NodeShape ;
-        {I}sh:targetClass aas:{cls_name} ;"""
-        )
+        f"""\
+aas:{shape_name} a sh:NodeShape ;
+{I}sh:targetClass aas:{cls_name} ;"""
     )
 
     for inheritance in cls.inheritances:
@@ -246,21 +244,19 @@ def _define_for_class(
         # pylint: disable=line-too-long
         writer.write(
             textwrap.indent(
-                textwrap.dedent(
-                    f'''\
-                    sh:sparql [
-                    {I}a sh:SPARQLConstraint ;
-                    {I}sh:message "({shape_name}): An aas:{cls_name} is a abstract class. Please use one of the subclasses for the generation of instances."@en ;
-                    {I}sh:prefixes aas: ;
-                    {I}sh:select """
-                    {II}SELECT ?this ?type
-                    {II}WHERE {{
-                    {III}?this rdf:type ?type .
-                    {III}FILTER (?type = aas:{cls_name})
-                    {II}}}
-                    {I}""" ;
-                    ] ;'''
-                ),
+                f'''\
+sh:sparql [
+{I}a sh:SPARQLConstraint ;
+{I}sh:message "({shape_name}): An aas:{cls_name} is a abstract class. Please use one of the subclasses for the generation of instances."@en ;
+{I}sh:prefixes aas: ;
+{I}sh:select """
+{II}SELECT ?this ?type
+{II}WHERE {{
+{III}?this rdf:type ?type .
+{III}FILTER (?type = aas:{cls_name})
+{II}}}
+{I}""" ;
+] ;''',
                 I,
             )
         )

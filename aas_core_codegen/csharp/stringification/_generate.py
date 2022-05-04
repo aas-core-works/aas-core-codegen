@@ -58,33 +58,31 @@ def _generate_enum_to_and_from_string(
 
     to_str_writer = io.StringIO()
     to_str_writer.write(
-        textwrap.dedent(
-            f"""\
-        /// <summary>
-        /// Retrieve the string representation of <paramref name="that" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
-        /// </remarks>
-        public static string? {to_str_name}(Aas.{name}? that)
-        {{
-        {I}if (!that.HasValue)
-        {I}{{
-        {II}return null;
-        {I}}}
-        {I}else
-        {I}{{
-        {II}if ({to_str_map_name}.TryGetValue(that.Value, out string? value))
-        {II}{{
-        {III}return value;
-        {II}}}
-        {II}else
-        {II}{{
-        {III}return null;
-        {II}}}
-        {I}}}
-        }}"""
-        )
+        f"""\
+/// <summary>
+/// Retrieve the string representation of <paramref name="that" />.
+/// </summary>
+/// <remarks>
+/// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
+/// </remarks>
+public static string? {to_str_name}(Aas.{name}? that)
+{{
+{I}if (!that.HasValue)
+{I}{{
+{II}return null;
+{I}}}
+{I}else
+{I}{{
+{II}if ({to_str_map_name}.TryGetValue(that.Value, out string? value))
+{II}{{
+{III}return value;
+{II}}}
+{II}else
+{II}{{
+{III}return null;
+{II}}}
+{I}}}
+}}"""
     )
 
     blocks.append(Stripped(to_str_writer.getvalue()))
@@ -130,28 +128,26 @@ def _generate_enum_to_and_from_string(
 
     from_str_writer = io.StringIO()
     from_str_writer.write(
-        textwrap.dedent(
-            f"""\
-        /// <summary>
-        /// Parse the string representation of <see cref={xml.sax.saxutils.quoteattr(name)} />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="text" /> is not a valid string representation
-        /// of a literal of <see cref={xml.sax.saxutils.quoteattr(name)} />,
-        /// return <c>null</c>.
-        /// </remarks>
-        public static Aas.{name}? {from_str_name}(string text)
-        {{
-        {I}if ({from_str_map_name}.TryGetValue(text, out {name} value))
-        {I}{{
-        {II}return value;
-        {I}}}
-        {I}else
-        {I}{{
-        {II}return null;
-        {I}}}
-        }}"""
-        )
+        f"""\
+/// <summary>
+/// Parse the string representation of <see cref={xml.sax.saxutils.quoteattr(name)} />.
+/// </summary>
+/// <remarks>
+/// If <paramref name="text" /> is not a valid string representation
+/// of a literal of <see cref={xml.sax.saxutils.quoteattr(name)} />,
+/// return <c>null</c>.
+/// </remarks>
+public static Aas.{name}? {from_str_name}(string text)
+{{
+{I}if ({from_str_map_name}.TryGetValue(text, out {name} value))
+{I}{{
+{II}return value;
+{I}}}
+{I}else
+{I}{{
+{II}return null;
+{I}}}
+}}"""
     )
 
     blocks.append(Stripped(from_str_writer.getvalue()))
@@ -180,12 +176,10 @@ def generate(
     blocks = [
         csharp_common.WARNING,
         Stripped(
-            textwrap.dedent(
-                f"""\
-            using System.Collections.Generic;  // can't alias
+            f"""\
+using System.Collections.Generic;  // can't alias
 
-            using Aas = {namespace};"""
-            )
+using Aas = {namespace};"""
         ),
     ]
 
@@ -201,14 +195,12 @@ def generate(
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-        namespace {namespace}
-        {{
-        {I}public static class Stringification
-        {I}{{
-        """
-        )
+        f"""\
+namespace {namespace}
+{{
+{I}public static class Stringification
+{I}{{
+"""
     )
 
     for i, stringification_block in enumerate(stringification_blocks):

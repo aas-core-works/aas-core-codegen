@@ -36,47 +36,39 @@ def generate(namespace: csharp_common.NamespaceIdentifier) -> str:
     """
     blocks = [
         Stripped(
-            textwrap.dedent(
-                f"""\
-                /// <summary>
-                /// Capture a path segment of a value in a model.
-                /// </summary
-                public abstract class Segment {{
-                {I}// Intentionally empty.
-                }}"""
-            )
+            f"""\
+/// <summary>
+/// Capture a path segment of a value in a model.
+/// </summary
+public abstract class Segment {{
+{I}// Intentionally empty.
+}}"""
         ),
         Stripped(
-            textwrap.dedent(
-                f"""\
-                public class NameSegment : Segment {{
-                {I}internal readonly string Name;
-                {I}internal NameSegment(string name)
-                {I}{{
-                {II}Name = name;
-                {I}}}
-                }}"""
-            )
+            f"""\
+public class NameSegment : Segment {{
+{I}internal readonly string Name;
+{I}internal NameSegment(string name)
+{I}{{
+{II}Name = name;
+{I}}}
+}}"""
         ),
         Stripped(
-            textwrap.dedent(
-                f"""\
-                public class IndexSegment : Segment {{
-                {I}internal readonly int Index;
-                {I}internal IndexSegment(int index)
-                {I}{{
-                {II}Index = index;
-                {I}}}
-                }}"""
-            )
+            f"""\
+public class IndexSegment : Segment {{
+{I}internal readonly int Index;
+{I}internal IndexSegment(int index)
+{I}{{
+{II}Index = index;
+{I}}}
+}}"""
         ),
         Stripped(
-            textwrap.dedent(
-                f"""\
-                internal static System.Text.RegularExpressions.Regex VariableNameRe = (
-                {I}new  System.Text.RegularExpressions.Regex(
-                {II}@"^[a-zA-Z_][a-zA-Z_0-9]*$"));"""
-            )
+            f"""\
+internal static System.Text.RegularExpressions.Regex VariableNameRe = (
+{I}new  System.Text.RegularExpressions.Regex(
+{II}@"^[a-zA-Z_][a-zA-Z_0-9]*$"));"""
         ),
         # We have to indent a lot so we do not use textwrap.dedent for better
         # readability.
@@ -185,40 +177,36 @@ public static string GenerateRelativeXPath(
 }}"""
         ),
         Stripped(
-            textwrap.dedent(
-                f"""\
-                /// <summary>
-                /// Represent an error during the deserialization or the verification.
-                /// </summary>
-                public class Error
-                {{
-                {I}internal LinkedList<Segment> _pathSegments = new LinkedList<Segment>();
-                {I}public readonly string Cause;
-                {I}public ICollection<Segment> PathSegments {{
-                {II}get {{ return _pathSegments; }}
-                {I}}}
-                {I}internal Error(string cause)
-                {I}{{
-                {II}Cause = cause;
-                {I}}}
-                }}"""
-            )
+            f"""\
+/// <summary>
+/// Represent an error during the deserialization or the verification.
+/// </summary>
+public class Error
+{{
+{I}internal LinkedList<Segment> _pathSegments = new LinkedList<Segment>();
+{I}public readonly string Cause;
+{I}public ICollection<Segment> PathSegments {{
+{II}get {{ return _pathSegments; }}
+{I}}}
+{I}internal Error(string cause)
+{I}{{
+{II}Cause = cause;
+{I}}}
+}}"""
         ),
     ]
 
     writer = io.StringIO()
     writer.write(
-        textwrap.dedent(
-            f"""\
-            namespace {namespace}
-            {{
-            {I}/// <summary>
-            {I}/// Provide reporting for de/serialization and verification.
-            {I}/// </summary>
-            {I}public static class Reporting
-            {I}{{
-            """
-        )
+        f"""\
+namespace {namespace}
+{{
+{I}/// <summary>
+{I}/// Provide reporting for de/serialization and verification.
+{I}/// </summary>
+{I}public static class Reporting
+{I}{{
+"""
     )
 
     for i, deserialize_block in enumerate(blocks):

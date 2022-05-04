@@ -921,66 +921,58 @@ def _generate_class(
 
     blocks.append(
         Stripped(
-            textwrap.dedent(
-                f"""\
-        /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance
-        /// for double dispatch.
-        /// </summary>
-        public void Accept(Visitation.IVisitor visitor)
-        {{
-        {I}visitor.Visit(this);
-        }}"""
-            )
+            f"""\
+/// <summary>
+/// Accept the <paramref name="visitor" /> to visit this instance
+/// for double dispatch.
+/// </summary>
+public void Accept(Visitation.IVisitor visitor)
+{{
+{I}visitor.Visit(this);
+}}"""
         )
     )
 
     blocks.append(
         Stripped(
-            textwrap.dedent(
-                f"""\
-        /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch
-        /// with the <paramref name="context" />.
-        /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
-        {{
-        {I}visitor.Visit(this, context);
-        }}"""
-            )
+            f"""\
+/// <summary>
+/// Accept the visitor to visit this instance for double dispatch
+/// with the <paramref name="context" />.
+/// </summary>
+public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+{{
+{I}visitor.Visit(this, context);
+}}"""
         )
     )
 
     blocks.append(
         Stripped(
-            textwrap.dedent(
-                f"""\
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance
-        /// for double dispatch.
-        /// </summary>
-        public T Transform<T>(Visitation.ITransformer<T> transformer)
-        {{
-        {I}return transformer.Transform(this);
-        }}"""
-            )
+            f"""\
+/// <summary>
+/// Accept the <paramref name="transformer" /> to transform this instance
+/// for double dispatch.
+/// </summary>
+public T Transform<T>(Visitation.ITransformer<T> transformer)
+{{
+{I}return transformer.Transform(this);
+}}"""
         )
     )
 
     blocks.append(
         Stripped(
-            textwrap.dedent(
-                f"""\
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance
-        /// for double dispatch with the <paramref name="context" />.
-        /// </summary>
-        public T Transform<C, T>(
-        {I}Visitation.ITransformerWithContext<C, T> transformer, C context)
-        {{
-        {I}return transformer.Transform(this, context);
-        }}"""
-            )
+            f"""\
+/// <summary>
+/// Accept the <paramref name="transformer" /> to visit this instance
+/// for double dispatch with the <paramref name="context" />.
+/// </summary>
+public T Transform<C, T>(
+{I}Visitation.ITransformerWithContext<C, T> transformer, C context)
+{{
+{I}return transformer.Transform(this, context);
+}}"""
         )
     )
 
@@ -1066,50 +1058,48 @@ def generate(
     blocks.append(
         Rstripped(
             textwrap.indent(
-                textwrap.dedent(
-                    f"""\
-        /// <summary>
-        /// Represent a general class of an AAS model.
-        /// </summary>
-        public interface IClass
-        {{
-        {I}/// <summary>
-        {I}/// Iterate over all the class instances referenced from this instance
-        {I}/// without further recursion.
-        {I}/// </summary>
-        {I}public IEnumerable<IClass> DescendOnce();
+                f"""\
+/// <summary>
+/// Represent a general class of an AAS model.
+/// </summary>
+public interface IClass
+{{
+{I}/// <summary>
+{I}/// Iterate over all the class instances referenced from this instance
+{I}/// without further recursion.
+{I}/// </summary>
+{I}public IEnumerable<IClass> DescendOnce();
 
-        {I}/// <summary>
-        {I}/// Iterate recursively over all the class instances referenced from this instance.
-        {I}/// </summary>
-        {I}public IEnumerable<IClass> Descend();
+{I}/// <summary>
+{I}/// Iterate recursively over all the class instances referenced from this instance.
+{I}/// </summary>
+{I}public IEnumerable<IClass> Descend();
 
-        {I}/// <summary>
-        {I}/// Accept the <paramref name="visitor" /> to visit this instance
-        {I}/// for double dispatch.
-        {I}/// </summary>
-        {I}public void Accept(Visitation.IVisitor visitor);
+{I}/// <summary>
+{I}/// Accept the <paramref name="visitor" /> to visit this instance
+{I}/// for double dispatch.
+{I}/// </summary>
+{I}public void Accept(Visitation.IVisitor visitor);
 
-        {I}/// <summary>
-        {I}/// Accept the visitor to visit this instance for double dispatch
-        {I}/// with the <paramref name="context" />.
-        {I}/// </summary>
-        {I}public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context);
+{I}/// <summary>
+{I}/// Accept the visitor to visit this instance for double dispatch
+{I}/// with the <paramref name="context" />.
+{I}/// </summary>
+{I}public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context);
 
-        {I}/// <summary>
-        {I}/// Accept the <paramref name="transformer" /> to transform this instance
-        {I}/// for double dispatch.
-        {I}/// </summary>
-        {I}public T Transform<T>(Visitation.ITransformer<T> transformer);
+{I}/// <summary>
+{I}/// Accept the <paramref name="transformer" /> to transform this instance
+{I}/// for double dispatch.
+{I}/// </summary>
+{I}public T Transform<T>(Visitation.ITransformer<T> transformer);
 
-        {I}/// <summary>
-        {I}/// Accept the <paramref name="transformer" /> to visit this instance
-        {I}/// for double dispatch with the <paramref name="context" />.
-        {I}/// </summary>
-        {I}public T Transform<C, T>(
-        {II}Visitation.ITransformerWithContext<C, T> transformer, C context);
-        }}"""
-                ),
+{I}/// <summary>
+{I}/// Accept the <paramref name="transformer" /> to visit this instance
+{I}/// for double dispatch with the <paramref name="context" />.
+{I}/// </summary>
+{I}public T Transform<C, T>(
+{II}Visitation.ITransformerWithContext<C, T> transformer, C context);
+}}""",
                 I,
             )
         )
