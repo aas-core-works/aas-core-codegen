@@ -43,13 +43,13 @@ def _generate_ivisitor(symbol_table: intermediate.SymbolTable) -> Stripped:
     writer = io.StringIO()
     writer.write(
         textwrap.dedent(
-            """\
+            f"""\
             /// <summary>
             /// Define the interface for a visitor which visits the instances of the model.
             /// </summary>
             public interface IVisitor
-            {
-                public void Visit(IClass that);
+            {{
+            {I}public void Visit(IClass that);
             """
         )
     )
@@ -97,11 +97,11 @@ public void Visit(IClass that)
                     f"""\
 public void Visit({cls_name} that)
 {{
-    // Just descend through, do nothing with <c>that</c>
-    foreach (var something in that.DescendOnce())
-    {{
-        Visit(something);
-    }}
+{I}// Just descend through, do nothing with <c>that</c>
+{I}foreach (var something in that.DescendOnce())
+{I}{{
+{II}Visit(something);
+{I}}}
 }}"""
                 )
             )
@@ -216,14 +216,14 @@ def _generate_ivisitor_with_context(symbol_table: intermediate.SymbolTable) -> S
     writer = io.StringIO()
     writer.write(
         textwrap.dedent(
-            """\
+            f"""\
             /// <summary>
             /// Define the interface for a visitor which visits the instances of the model.
             /// </summary>
             /// <typeparam name="C">Context type</typeparam>
             public interface IVisitorWithContext<C>
-            {
-                public void Visit(IClass that, C context);
+            {{
+            {I}public void Visit(IClass that, C context);
             """
         )
     )
@@ -327,15 +327,15 @@ def _generate_itransformer(symbol_table: intermediate.SymbolTable) -> Stripped:
     writer = io.StringIO()
     writer.write(
         textwrap.dedent(
-            """\
+            f"""\
             /// <summary>
             /// Define the interface for a transformer which transforms recursively
             /// the instances into something else.
             /// </summary>
             /// <typeparam name="T">The type of the transformation result</typeparam>
             public interface ITransformer<T>
-            {
-                public T Transform(IClass that);
+            {{
+            {I}public T Transform(IClass that);
             """
         )
     )
@@ -440,7 +440,7 @@ def _generate_itransformer_with_context(
     writer = io.StringIO()
     writer.write(
         textwrap.dedent(
-            """\
+            f"""\
             /// <summary>
             /// Define the interface for a transformer which recursively transforms
             /// the instances into something else while the context is passed along.
@@ -448,8 +448,8 @@ def _generate_itransformer_with_context(
             /// <typeparam name="C">Type of the transformation context</typeparam>
             /// <typeparam name="T">The type of the transformation result</typeparam>
             public interface ITransformerWithContext<C, T>
-            {
-                public T Transform(IClass that, C context);
+            {{
+            {I}public T Transform(IClass that, C context);
             """
         )
     )
