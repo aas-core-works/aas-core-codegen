@@ -138,24 +138,20 @@ def _generate_from_method_for_interface(
         model_type = naming.json_model_type(implementer.name)
         implementer_name = csharp_naming.class_name(implementer.name)
         switch_writer.write(
-            textwrap.dedent(
-                f"""\
-                {I}case {csharp_common.string_literal(model_type)}:
-                {II}return {implementer_name}From(
-                {III}node, out error);
-                """
-            )
+            f"""\
+{I}case {csharp_common.string_literal(model_type)}:
+{II}return {implementer_name}From(
+{III}node, out error);
+"""
         )
 
     switch_writer.write(
-        textwrap.dedent(
-            f"""\
-            {I}default:
-            {II}error = new Reporting.Error(
-            {III}$"Unexpected model type for {name}: {{modelType}}");
-            {II}return null;
-            }}"""
-        )
+        f"""\
+{I}default:
+{II}error = new Reporting.Error(
+{III}$"Unexpected model type for {name}: {{modelType}}");
+{II}return null;
+}}"""
     )
     blocks.append(Stripped(switch_writer.getvalue()))
 
