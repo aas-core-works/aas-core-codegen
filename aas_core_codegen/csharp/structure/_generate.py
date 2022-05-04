@@ -1073,41 +1073,41 @@ def generate(
         /// </summary>
         public interface IClass
         {{
-            /// <summary>
-            /// Iterate over all the class instances referenced from this instance
-            /// without further recursion.
-            /// </summary>
-            public IEnumerable<IClass> DescendOnce();
+        {I}/// <summary>
+        {I}/// Iterate over all the class instances referenced from this instance
+        {I}/// without further recursion.
+        {I}/// </summary>
+        {I}public IEnumerable<IClass> DescendOnce();
 
-            /// <summary>
-            /// Iterate recursively over all the class instances referenced from this instance.
-            /// </summary>
-            public IEnumerable<IClass> Descend();
+        {I}/// <summary>
+        {I}/// Iterate recursively over all the class instances referenced from this instance.
+        {I}/// </summary>
+        {I}public IEnumerable<IClass> Descend();
 
-            /// <summary>
-            /// Accept the <paramref name="visitor" /> to visit this instance
-            /// for double dispatch.
-            /// </summary>
-            public void Accept(Visitation.IVisitor visitor);
+        {I}/// <summary>
+        {I}/// Accept the <paramref name="visitor" /> to visit this instance
+        {I}/// for double dispatch.
+        {I}/// </summary>
+        {I}public void Accept(Visitation.IVisitor visitor);
 
-            /// <summary>
-            /// Accept the visitor to visit this instance for double dispatch
-            /// with the <paramref name="context" />.
-            /// </summary>
-            public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context);
+        {I}/// <summary>
+        {I}/// Accept the visitor to visit this instance for double dispatch
+        {I}/// with the <paramref name="context" />.
+        {I}/// </summary>
+        {I}public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context);
 
-            /// <summary>
-            /// Accept the <paramref name="transformer" /> to transform this instance
-            /// for double dispatch.
-            /// </summary>
-            public T Transform<T>(Visitation.ITransformer<T> transformer);
+        {I}/// <summary>
+        {I}/// Accept the <paramref name="transformer" /> to transform this instance
+        {I}/// for double dispatch.
+        {I}/// </summary>
+        {I}public T Transform<T>(Visitation.ITransformer<T> transformer);
 
-            /// <summary>
-            /// Accept the <paramref name="transformer" /> to visit this instance
-            /// for double dispatch with the <paramref name="context" />.
-            /// </summary>
-            public T Transform<C, T>(
-            {I}Visitation.ITransformerWithContext<C, T> transformer, C context);
+        {I}/// <summary>
+        {I}/// Accept the <paramref name="transformer" /> to visit this instance
+        {I}/// for double dispatch with the <paramref name="context" />.
+        {I}/// </summary>
+        {I}public T Transform<C, T>(
+        {II}Visitation.ITransformerWithContext<C, T> transformer, C context);
         }}"""
                 ),
                 I,
