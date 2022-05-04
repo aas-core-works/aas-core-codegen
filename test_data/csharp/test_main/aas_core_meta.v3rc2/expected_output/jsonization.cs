@@ -313,57 +313,57 @@ namespace AasCore.Aas3
 
                 switch (modelType)
                 {
-                case "AnnotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFrom(
-                        node, out error);
-                case "BasicEventElement":
-                    return BasicEventElementFrom(
-                        node, out error);
-                case "Blob":
-                    return BlobFrom(
-                        node, out error);
-                case "Capability":
-                    return CapabilityFrom(
-                        node, out error);
-                case "Entity":
-                    return EntityFrom(
-                        node, out error);
-                case "Extension":
-                    return ExtensionFrom(
-                        node, out error);
-                case "File":
-                    return FileFrom(
-                        node, out error);
-                case "IdentifierKeyValuePair":
-                    return IdentifierKeyValuePairFrom(
-                        node, out error);
-                case "MultiLanguageProperty":
-                    return MultiLanguagePropertyFrom(
-                        node, out error);
-                case "Operation":
-                    return OperationFrom(
-                        node, out error);
-                case "Property":
-                    return PropertyFrom(
-                        node, out error);
-                case "Qualifier":
-                    return QualifierFrom(
-                        node, out error);
-                case "Range":
-                    return RangeFrom(
-                        node, out error);
-                case "ReferenceElement":
-                    return ReferenceElementFrom(
-                        node, out error);
-                case "Submodel":
-                    return SubmodelFrom(
-                        node, out error);
-                case "SubmodelElementList":
-                    return SubmodelElementListFrom(
-                        node, out error);
-                case "SubmodelElementStruct":
-                    return SubmodelElementStructFrom(
-                        node, out error);
+                    case "AnnotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFrom(
+                            node, out error);
+                    case "BasicEventElement":
+                        return BasicEventElementFrom(
+                            node, out error);
+                    case "Blob":
+                        return BlobFrom(
+                            node, out error);
+                    case "Capability":
+                        return CapabilityFrom(
+                            node, out error);
+                    case "Entity":
+                        return EntityFrom(
+                            node, out error);
+                    case "Extension":
+                        return ExtensionFrom(
+                            node, out error);
+                    case "File":
+                        return FileFrom(
+                            node, out error);
+                    case "IdentifierKeyValuePair":
+                        return IdentifierKeyValuePairFrom(
+                            node, out error);
+                    case "MultiLanguageProperty":
+                        return MultiLanguagePropertyFrom(
+                            node, out error);
+                    case "Operation":
+                        return OperationFrom(
+                            node, out error);
+                    case "Property":
+                        return PropertyFrom(
+                            node, out error);
+                    case "Qualifier":
+                        return QualifierFrom(
+                            node, out error);
+                    case "Range":
+                        return RangeFrom(
+                            node, out error);
+                    case "ReferenceElement":
+                        return ReferenceElementFrom(
+                            node, out error);
+                    case "Submodel":
+                        return SubmodelFrom(
+                            node, out error);
+                    case "SubmodelElementList":
+                        return SubmodelElementListFrom(
+                            node, out error);
+                    case "SubmodelElementStruct":
+                        return SubmodelElementStructFrom(
+                            node, out error);
                     default:
                         error = new Reporting.Error(
                             $"Unexpected model type for IHasSemantics: {modelType}");
@@ -553,54 +553,54 @@ namespace AasCore.Aas3
 
                 switch (modelType)
                 {
-                case "AnnotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFrom(
-                        node, out error);
-                case "AssetAdministrationShell":
-                    return AssetAdministrationShellFrom(
-                        node, out error);
-                case "BasicEventElement":
-                    return BasicEventElementFrom(
-                        node, out error);
-                case "Blob":
-                    return BlobFrom(
-                        node, out error);
-                case "Capability":
-                    return CapabilityFrom(
-                        node, out error);
-                case "ConceptDescription":
-                    return ConceptDescriptionFrom(
-                        node, out error);
-                case "Entity":
-                    return EntityFrom(
-                        node, out error);
-                case "File":
-                    return FileFrom(
-                        node, out error);
-                case "MultiLanguageProperty":
-                    return MultiLanguagePropertyFrom(
-                        node, out error);
-                case "Operation":
-                    return OperationFrom(
-                        node, out error);
-                case "Property":
-                    return PropertyFrom(
-                        node, out error);
-                case "Range":
-                    return RangeFrom(
-                        node, out error);
-                case "ReferenceElement":
-                    return ReferenceElementFrom(
-                        node, out error);
-                case "Submodel":
-                    return SubmodelFrom(
-                        node, out error);
-                case "SubmodelElementList":
-                    return SubmodelElementListFrom(
-                        node, out error);
-                case "SubmodelElementStruct":
-                    return SubmodelElementStructFrom(
-                        node, out error);
+                    case "AnnotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFrom(
+                            node, out error);
+                    case "AssetAdministrationShell":
+                        return AssetAdministrationShellFrom(
+                            node, out error);
+                    case "BasicEventElement":
+                        return BasicEventElementFrom(
+                            node, out error);
+                    case "Blob":
+                        return BlobFrom(
+                            node, out error);
+                    case "Capability":
+                        return CapabilityFrom(
+                            node, out error);
+                    case "ConceptDescription":
+                        return ConceptDescriptionFrom(
+                            node, out error);
+                    case "Entity":
+                        return EntityFrom(
+                            node, out error);
+                    case "File":
+                        return FileFrom(
+                            node, out error);
+                    case "MultiLanguageProperty":
+                        return MultiLanguagePropertyFrom(
+                            node, out error);
+                    case "Operation":
+                        return OperationFrom(
+                            node, out error);
+                    case "Property":
+                        return PropertyFrom(
+                            node, out error);
+                    case "Range":
+                        return RangeFrom(
+                            node, out error);
+                    case "ReferenceElement":
+                        return ReferenceElementFrom(
+                            node, out error);
+                    case "Submodel":
+                        return SubmodelFrom(
+                            node, out error);
+                    case "SubmodelElementList":
+                        return SubmodelElementListFrom(
+                            node, out error);
+                    case "SubmodelElementStruct":
+                        return SubmodelElementStructFrom(
+                            node, out error);
                     default:
                         error = new Reporting.Error(
                             $"Unexpected model type for IHasExtensions: {modelType}");
@@ -654,54 +654,54 @@ namespace AasCore.Aas3
 
                 switch (modelType)
                 {
-                case "AnnotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFrom(
-                        node, out error);
-                case "AssetAdministrationShell":
-                    return AssetAdministrationShellFrom(
-                        node, out error);
-                case "BasicEventElement":
-                    return BasicEventElementFrom(
-                        node, out error);
-                case "Blob":
-                    return BlobFrom(
-                        node, out error);
-                case "Capability":
-                    return CapabilityFrom(
-                        node, out error);
-                case "ConceptDescription":
-                    return ConceptDescriptionFrom(
-                        node, out error);
-                case "Entity":
-                    return EntityFrom(
-                        node, out error);
-                case "File":
-                    return FileFrom(
-                        node, out error);
-                case "MultiLanguageProperty":
-                    return MultiLanguagePropertyFrom(
-                        node, out error);
-                case "Operation":
-                    return OperationFrom(
-                        node, out error);
-                case "Property":
-                    return PropertyFrom(
-                        node, out error);
-                case "Range":
-                    return RangeFrom(
-                        node, out error);
-                case "ReferenceElement":
-                    return ReferenceElementFrom(
-                        node, out error);
-                case "Submodel":
-                    return SubmodelFrom(
-                        node, out error);
-                case "SubmodelElementList":
-                    return SubmodelElementListFrom(
-                        node, out error);
-                case "SubmodelElementStruct":
-                    return SubmodelElementStructFrom(
-                        node, out error);
+                    case "AnnotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFrom(
+                            node, out error);
+                    case "AssetAdministrationShell":
+                        return AssetAdministrationShellFrom(
+                            node, out error);
+                    case "BasicEventElement":
+                        return BasicEventElementFrom(
+                            node, out error);
+                    case "Blob":
+                        return BlobFrom(
+                            node, out error);
+                    case "Capability":
+                        return CapabilityFrom(
+                            node, out error);
+                    case "ConceptDescription":
+                        return ConceptDescriptionFrom(
+                            node, out error);
+                    case "Entity":
+                        return EntityFrom(
+                            node, out error);
+                    case "File":
+                        return FileFrom(
+                            node, out error);
+                    case "MultiLanguageProperty":
+                        return MultiLanguagePropertyFrom(
+                            node, out error);
+                    case "Operation":
+                        return OperationFrom(
+                            node, out error);
+                    case "Property":
+                        return PropertyFrom(
+                            node, out error);
+                    case "Range":
+                        return RangeFrom(
+                            node, out error);
+                    case "ReferenceElement":
+                        return ReferenceElementFrom(
+                            node, out error);
+                    case "Submodel":
+                        return SubmodelFrom(
+                            node, out error);
+                    case "SubmodelElementList":
+                        return SubmodelElementListFrom(
+                            node, out error);
+                    case "SubmodelElementStruct":
+                        return SubmodelElementStructFrom(
+                            node, out error);
                     default:
                         error = new Reporting.Error(
                             $"Unexpected model type for IReferable: {modelType}");
@@ -755,15 +755,15 @@ namespace AasCore.Aas3
 
                 switch (modelType)
                 {
-                case "AssetAdministrationShell":
-                    return AssetAdministrationShellFrom(
-                        node, out error);
-                case "ConceptDescription":
-                    return ConceptDescriptionFrom(
-                        node, out error);
-                case "Submodel":
-                    return SubmodelFrom(
-                        node, out error);
+                    case "AssetAdministrationShell":
+                        return AssetAdministrationShellFrom(
+                            node, out error);
+                    case "ConceptDescription":
+                        return ConceptDescriptionFrom(
+                            node, out error);
+                    case "Submodel":
+                        return SubmodelFrom(
+                            node, out error);
                     default:
                         error = new Reporting.Error(
                             $"Unexpected model type for IIdentifiable: {modelType}");
@@ -847,48 +847,48 @@ namespace AasCore.Aas3
 
                 switch (modelType)
                 {
-                case "AnnotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFrom(
-                        node, out error);
-                case "BasicEventElement":
-                    return BasicEventElementFrom(
-                        node, out error);
-                case "Blob":
-                    return BlobFrom(
-                        node, out error);
-                case "Capability":
-                    return CapabilityFrom(
-                        node, out error);
-                case "Entity":
-                    return EntityFrom(
-                        node, out error);
-                case "File":
-                    return FileFrom(
-                        node, out error);
-                case "MultiLanguageProperty":
-                    return MultiLanguagePropertyFrom(
-                        node, out error);
-                case "Operation":
-                    return OperationFrom(
-                        node, out error);
-                case "Property":
-                    return PropertyFrom(
-                        node, out error);
-                case "Range":
-                    return RangeFrom(
-                        node, out error);
-                case "ReferenceElement":
-                    return ReferenceElementFrom(
-                        node, out error);
-                case "Submodel":
-                    return SubmodelFrom(
-                        node, out error);
-                case "SubmodelElementList":
-                    return SubmodelElementListFrom(
-                        node, out error);
-                case "SubmodelElementStruct":
-                    return SubmodelElementStructFrom(
-                        node, out error);
+                    case "AnnotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFrom(
+                            node, out error);
+                    case "BasicEventElement":
+                        return BasicEventElementFrom(
+                            node, out error);
+                    case "Blob":
+                        return BlobFrom(
+                            node, out error);
+                    case "Capability":
+                        return CapabilityFrom(
+                            node, out error);
+                    case "Entity":
+                        return EntityFrom(
+                            node, out error);
+                    case "File":
+                        return FileFrom(
+                            node, out error);
+                    case "MultiLanguageProperty":
+                        return MultiLanguagePropertyFrom(
+                            node, out error);
+                    case "Operation":
+                        return OperationFrom(
+                            node, out error);
+                    case "Property":
+                        return PropertyFrom(
+                            node, out error);
+                    case "Range":
+                        return RangeFrom(
+                            node, out error);
+                    case "ReferenceElement":
+                        return ReferenceElementFrom(
+                            node, out error);
+                    case "Submodel":
+                        return SubmodelFrom(
+                            node, out error);
+                    case "SubmodelElementList":
+                        return SubmodelElementListFrom(
+                            node, out error);
+                    case "SubmodelElementStruct":
+                        return SubmodelElementStructFrom(
+                            node, out error);
                     default:
                         error = new Reporting.Error(
                             $"Unexpected model type for IHasKind: {modelType}");
@@ -942,57 +942,57 @@ namespace AasCore.Aas3
 
                 switch (modelType)
                 {
-                case "AdministrativeInformation":
-                    return AdministrativeInformationFrom(
-                        node, out error);
-                case "AnnotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFrom(
-                        node, out error);
-                case "AssetAdministrationShell":
-                    return AssetAdministrationShellFrom(
-                        node, out error);
-                case "BasicEventElement":
-                    return BasicEventElementFrom(
-                        node, out error);
-                case "Blob":
-                    return BlobFrom(
-                        node, out error);
-                case "Capability":
-                    return CapabilityFrom(
-                        node, out error);
-                case "ConceptDescription":
-                    return ConceptDescriptionFrom(
-                        node, out error);
-                case "Entity":
-                    return EntityFrom(
-                        node, out error);
-                case "File":
-                    return FileFrom(
-                        node, out error);
-                case "MultiLanguageProperty":
-                    return MultiLanguagePropertyFrom(
-                        node, out error);
-                case "Operation":
-                    return OperationFrom(
-                        node, out error);
-                case "Property":
-                    return PropertyFrom(
-                        node, out error);
-                case "Range":
-                    return RangeFrom(
-                        node, out error);
-                case "ReferenceElement":
-                    return ReferenceElementFrom(
-                        node, out error);
-                case "Submodel":
-                    return SubmodelFrom(
-                        node, out error);
-                case "SubmodelElementList":
-                    return SubmodelElementListFrom(
-                        node, out error);
-                case "SubmodelElementStruct":
-                    return SubmodelElementStructFrom(
-                        node, out error);
+                    case "AdministrativeInformation":
+                        return AdministrativeInformationFrom(
+                            node, out error);
+                    case "AnnotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFrom(
+                            node, out error);
+                    case "AssetAdministrationShell":
+                        return AssetAdministrationShellFrom(
+                            node, out error);
+                    case "BasicEventElement":
+                        return BasicEventElementFrom(
+                            node, out error);
+                    case "Blob":
+                        return BlobFrom(
+                            node, out error);
+                    case "Capability":
+                        return CapabilityFrom(
+                            node, out error);
+                    case "ConceptDescription":
+                        return ConceptDescriptionFrom(
+                            node, out error);
+                    case "Entity":
+                        return EntityFrom(
+                            node, out error);
+                    case "File":
+                        return FileFrom(
+                            node, out error);
+                    case "MultiLanguageProperty":
+                        return MultiLanguagePropertyFrom(
+                            node, out error);
+                    case "Operation":
+                        return OperationFrom(
+                            node, out error);
+                    case "Property":
+                        return PropertyFrom(
+                            node, out error);
+                    case "Range":
+                        return RangeFrom(
+                            node, out error);
+                    case "ReferenceElement":
+                        return ReferenceElementFrom(
+                            node, out error);
+                    case "Submodel":
+                        return SubmodelFrom(
+                            node, out error);
+                    case "SubmodelElementList":
+                        return SubmodelElementListFrom(
+                            node, out error);
+                    case "SubmodelElementStruct":
+                        return SubmodelElementStructFrom(
+                            node, out error);
                     default:
                         error = new Reporting.Error(
                             $"Unexpected model type for IHasDataSpecification: {modelType}");
@@ -1164,48 +1164,48 @@ namespace AasCore.Aas3
 
                 switch (modelType)
                 {
-                case "AnnotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFrom(
-                        node, out error);
-                case "BasicEventElement":
-                    return BasicEventElementFrom(
-                        node, out error);
-                case "Blob":
-                    return BlobFrom(
-                        node, out error);
-                case "Capability":
-                    return CapabilityFrom(
-                        node, out error);
-                case "Entity":
-                    return EntityFrom(
-                        node, out error);
-                case "File":
-                    return FileFrom(
-                        node, out error);
-                case "MultiLanguageProperty":
-                    return MultiLanguagePropertyFrom(
-                        node, out error);
-                case "Operation":
-                    return OperationFrom(
-                        node, out error);
-                case "Property":
-                    return PropertyFrom(
-                        node, out error);
-                case "Range":
-                    return RangeFrom(
-                        node, out error);
-                case "ReferenceElement":
-                    return ReferenceElementFrom(
-                        node, out error);
-                case "Submodel":
-                    return SubmodelFrom(
-                        node, out error);
-                case "SubmodelElementList":
-                    return SubmodelElementListFrom(
-                        node, out error);
-                case "SubmodelElementStruct":
-                    return SubmodelElementStructFrom(
-                        node, out error);
+                    case "AnnotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFrom(
+                            node, out error);
+                    case "BasicEventElement":
+                        return BasicEventElementFrom(
+                            node, out error);
+                    case "Blob":
+                        return BlobFrom(
+                            node, out error);
+                    case "Capability":
+                        return CapabilityFrom(
+                            node, out error);
+                    case "Entity":
+                        return EntityFrom(
+                            node, out error);
+                    case "File":
+                        return FileFrom(
+                            node, out error);
+                    case "MultiLanguageProperty":
+                        return MultiLanguagePropertyFrom(
+                            node, out error);
+                    case "Operation":
+                        return OperationFrom(
+                            node, out error);
+                    case "Property":
+                        return PropertyFrom(
+                            node, out error);
+                    case "Range":
+                        return RangeFrom(
+                            node, out error);
+                    case "ReferenceElement":
+                        return ReferenceElementFrom(
+                            node, out error);
+                    case "Submodel":
+                        return SubmodelFrom(
+                            node, out error);
+                    case "SubmodelElementList":
+                        return SubmodelElementListFrom(
+                            node, out error);
+                    case "SubmodelElementStruct":
+                        return SubmodelElementStructFrom(
+                            node, out error);
                     default:
                         error = new Reporting.Error(
                             $"Unexpected model type for IQualifiable: {modelType}");
@@ -2477,45 +2477,45 @@ namespace AasCore.Aas3
 
                 switch (modelType)
                 {
-                case "AnnotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFrom(
-                        node, out error);
-                case "BasicEventElement":
-                    return BasicEventElementFrom(
-                        node, out error);
-                case "Blob":
-                    return BlobFrom(
-                        node, out error);
-                case "Capability":
-                    return CapabilityFrom(
-                        node, out error);
-                case "Entity":
-                    return EntityFrom(
-                        node, out error);
-                case "File":
-                    return FileFrom(
-                        node, out error);
-                case "MultiLanguageProperty":
-                    return MultiLanguagePropertyFrom(
-                        node, out error);
-                case "Operation":
-                    return OperationFrom(
-                        node, out error);
-                case "Property":
-                    return PropertyFrom(
-                        node, out error);
-                case "Range":
-                    return RangeFrom(
-                        node, out error);
-                case "ReferenceElement":
-                    return ReferenceElementFrom(
-                        node, out error);
-                case "SubmodelElementList":
-                    return SubmodelElementListFrom(
-                        node, out error);
-                case "SubmodelElementStruct":
-                    return SubmodelElementStructFrom(
-                        node, out error);
+                    case "AnnotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFrom(
+                            node, out error);
+                    case "BasicEventElement":
+                        return BasicEventElementFrom(
+                            node, out error);
+                    case "Blob":
+                        return BlobFrom(
+                            node, out error);
+                    case "Capability":
+                        return CapabilityFrom(
+                            node, out error);
+                    case "Entity":
+                        return EntityFrom(
+                            node, out error);
+                    case "File":
+                        return FileFrom(
+                            node, out error);
+                    case "MultiLanguageProperty":
+                        return MultiLanguagePropertyFrom(
+                            node, out error);
+                    case "Operation":
+                        return OperationFrom(
+                            node, out error);
+                    case "Property":
+                        return PropertyFrom(
+                            node, out error);
+                    case "Range":
+                        return RangeFrom(
+                            node, out error);
+                    case "ReferenceElement":
+                        return ReferenceElementFrom(
+                            node, out error);
+                    case "SubmodelElementList":
+                        return SubmodelElementListFrom(
+                            node, out error);
+                    case "SubmodelElementStruct":
+                        return SubmodelElementStructFrom(
+                            node, out error);
                     default:
                         error = new Reporting.Error(
                             $"Unexpected model type for ISubmodelElement: {modelType}");
@@ -2569,9 +2569,9 @@ namespace AasCore.Aas3
 
                 switch (modelType)
                 {
-                case "AnnotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFrom(
-                        node, out error);
+                    case "AnnotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFrom(
+                            node, out error);
                     default:
                         error = new Reporting.Error(
                             $"Unexpected model type for IRelationshipElement: {modelType}");
@@ -3485,24 +3485,24 @@ namespace AasCore.Aas3
 
                 switch (modelType)
                 {
-                case "Blob":
-                    return BlobFrom(
-                        node, out error);
-                case "File":
-                    return FileFrom(
-                        node, out error);
-                case "MultiLanguageProperty":
-                    return MultiLanguagePropertyFrom(
-                        node, out error);
-                case "Property":
-                    return PropertyFrom(
-                        node, out error);
-                case "Range":
-                    return RangeFrom(
-                        node, out error);
-                case "ReferenceElement":
-                    return ReferenceElementFrom(
-                        node, out error);
+                    case "Blob":
+                        return BlobFrom(
+                            node, out error);
+                    case "File":
+                        return FileFrom(
+                            node, out error);
+                    case "MultiLanguageProperty":
+                        return MultiLanguagePropertyFrom(
+                            node, out error);
+                    case "Property":
+                        return PropertyFrom(
+                            node, out error);
+                    case "Range":
+                        return RangeFrom(
+                            node, out error);
+                    case "ReferenceElement":
+                        return ReferenceElementFrom(
+                            node, out error);
                     default:
                         error = new Reporting.Error(
                             $"Unexpected model type for IDataElement: {modelType}");
@@ -7040,9 +7040,9 @@ namespace AasCore.Aas3
 
                 switch (modelType)
                 {
-                case "BasicEventElement":
-                    return BasicEventElementFrom(
-                        node, out error);
+                    case "BasicEventElement":
+                        return BasicEventElementFrom(
+                            node, out error);
                     default:
                         error = new Reporting.Error(
                             $"Unexpected model type for IEventElement: {modelType}");
@@ -8820,12 +8820,12 @@ namespace AasCore.Aas3
 
                 switch (modelType)
                 {
-                case "GlobalReference":
-                    return GlobalReferenceFrom(
-                        node, out error);
-                case "ModelReference":
-                    return ModelReferenceFrom(
-                        node, out error);
+                    case "GlobalReference":
+                        return GlobalReferenceFrom(
+                            node, out error);
+                    case "ModelReference":
+                        return ModelReferenceFrom(
+                            node, out error);
                     default:
                         error = new Reporting.Error(
                             $"Unexpected model type for IReference: {modelType}");
