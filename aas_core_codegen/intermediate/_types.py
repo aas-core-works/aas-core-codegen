@@ -14,6 +14,7 @@ from typing import (
     Set,
     Tuple,
     OrderedDict,
+    List,
 )
 
 import docutils.nodes
@@ -1218,6 +1219,29 @@ class Class(DBC):
     def inheritance_id_set(self) -> FrozenSet[int]:
         """Collect IDs (with :py:func:`id`) of the inheritance objects in a set."""
         return self._inheritance_id_set
+
+    def is_subclass_of(self, cls: "ClassUnion") -> bool:
+        """
+        Check recursively whether this class is a sub-class of ``cls``.
+
+        Every class is a sub-class of itself.
+        """
+        # NOTE (mristin, 2022-05-13):
+        # This function is not used by the aas-core-codegen, but by downstream clients
+        # such as aas-core3.0rc02-testgen.
+
+        if id(cls) == id(self):
+            return True
+
+        queue = [self]  # type: List[Class]
+        while len(queue) > 0:
+            top = queue.pop()
+            if id(cls) in top.inheritance_id_set:
+                return True
+
+            queue.extend(top.inheritances)
+
+        return False
 
     # endregion
 
