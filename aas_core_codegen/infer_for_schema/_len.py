@@ -11,6 +11,7 @@ from aas_core_codegen.common import (
     assert_union_of_descendants_exhaustive,
 )
 from aas_core_codegen.infer_for_schema import _common as infer_for_schema_common
+from aas_core_codegen.infer_for_schema._types import LenConstraint
 from aas_core_codegen.parse import tree as parse_tree
 
 
@@ -240,35 +241,6 @@ def max_with_none(*args: Optional[int]) -> Optional[int]:
                 maximum = max(arg, maximum)
 
     return maximum
-
-
-class LenConstraint:
-    """
-    Represent the inferred constraint on the ``len`` of something.
-
-    Both bounds are inclusive: ``min_value ≤ len ≤ max_value``.
-    """
-
-    # fmt: off
-    @require(
-        lambda min_value, max_value:
-        not (min_value is not None and max_value is not None)
-        or 0 < min_value <= max_value
-    )
-    # fmt: on
-    def __init__(self, min_value: Optional[int], max_value: Optional[int]) -> None:
-        """Initialize with the given values."""
-        self.min_value = min_value
-        self.max_value = max_value
-
-    def copy(self) -> "LenConstraint":
-        """Create a copy of the self."""
-        return LenConstraint(min_value=self.min_value, max_value=self.max_value)
-
-    def __str__(self) -> str:
-        return (
-            f"LenConstraint(min_value={self.min_value!r}, max_value={self.max_value!r})"
-        )
 
 
 class _LenConstraintOnProperty:

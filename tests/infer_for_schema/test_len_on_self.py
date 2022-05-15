@@ -2,58 +2,48 @@
 
 import textwrap
 import unittest
-from typing import Tuple, Optional, MutableMapping, List
-
-from icontract import ensure
 
 import tests.common
-from aas_core_codegen import intermediate, infer_for_schema
-from aas_core_codegen.infer_for_schema import _len as infer_for_schema_len
-from aas_core_codegen.common import Identifier, Error
-
-
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def infer_constraints_on_self_of_class_something(
-    source: str,
-) -> Tuple[Optional[infer_for_schema_len.LenConstraint], Optional[List[Error]]]:
-    """Translate the ``source`` into inferred constraints on the class ``Something``."""
-    symbol_table, error = tests.common.translate_source_to_intermediate(source=source)
-    assert error is None, tests.common.most_underlying_messages(error)
-    assert symbol_table is not None
-    symbol = symbol_table.must_find(Identifier("Something"))
-    assert isinstance(symbol, intermediate.ConstrainedPrimitive)
-
-    result = infer_for_schema_len.infer_len_constraint_of_self(
-        constrained_primitive=symbol
-    )
-
-    return result
+import tests.infer_for_schema.common
+from aas_core_codegen import infer_for_schema
 
 
 class Test_expected(unittest.TestCase):
     def test_no_constraints(self) -> None:
         source = textwrap.dedent(
             """\
-            class Something(str):
+            class Some_constrained_primitive(str):
                 pass
+
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
+
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             """
         )
 
-        constraint, errors = infer_constraints_on_self_of_class_something(source=source)
+        (
+            _,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
 
-        assert errors is None, tests.common.most_underlying_messages(errors)
-        assert constraint is not None
-
-        text = infer_for_schema.dump(constraint)
+        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             textwrap.dedent(
                 """\
-                LenConstraint(
-                  min_value=None,
-                  max_value=None)"""
+                ConstraintsByProperty(
+                  len_constraints_by_property={},
+                  patterns_by_property={})"""
             ),
             text,
         )
@@ -62,26 +52,41 @@ class Test_expected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @invariant(lambda self: 10 < len(self))
-            class Something(str):
+            class Some_constrained_primitive(str):
                 pass
+
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
+
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             """
         )
 
-        constraint, errors = infer_constraints_on_self_of_class_something(source=source)
+        (
+            _,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
 
-        assert errors is None, tests.common.most_underlying_messages(errors)
-        assert constraint is not None
-
-        text = infer_for_schema.dump(constraint)
+        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             textwrap.dedent(
                 """\
-                LenConstraint(
-                  min_value=11,
-                  max_value=None)"""
+                ConstraintsByProperty(
+                  len_constraints_by_property={
+                    'some_property': LenConstraint(
+                      min_value=11,
+                      max_value=None)},
+                  patterns_by_property={})"""
             ),
             text,
         )
@@ -90,26 +95,41 @@ class Test_expected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @invariant(lambda self: len(self) > 10)
-            class Something(str):
+            class Some_constrained_primitive(str):
                 pass
+
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
+
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             """
         )
 
-        constraint, errors = infer_constraints_on_self_of_class_something(source=source)
+        (
+            _,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
 
-        assert errors is None, tests.common.most_underlying_messages(errors)
-        assert constraint is not None
-
-        text = infer_for_schema.dump(constraint)
+        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             textwrap.dedent(
                 """\
-                LenConstraint(
-                  min_value=11,
-                  max_value=None)"""
+                ConstraintsByProperty(
+                  len_constraints_by_property={
+                    'some_property': LenConstraint(
+                      min_value=11,
+                      max_value=None)},
+                  patterns_by_property={})"""
             ),
             text,
         )
@@ -118,26 +138,41 @@ class Test_expected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @invariant(lambda self: len(self) < 10)
-            class Something(str):
+            class Some_constrained_primitive(str):
                 pass
+
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
+
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             """
         )
 
-        constraint, errors = infer_constraints_on_self_of_class_something(source=source)
+        (
+            _,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
 
-        assert errors is None, tests.common.most_underlying_messages(errors)
-        assert constraint is not None
-
-        text = infer_for_schema.dump(constraint)
+        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             textwrap.dedent(
                 """\
-                LenConstraint(
-                  min_value=None,
-                  max_value=9)"""
+                ConstraintsByProperty(
+                  len_constraints_by_property={
+                    'some_property': LenConstraint(
+                      min_value=None,
+                      max_value=9)},
+                  patterns_by_property={})"""
             ),
             text,
         )
@@ -146,26 +181,41 @@ class Test_expected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @invariant(lambda self: 10 > len(self))
-            class Something(str):
+            class Some_constrained_primitive(str):
                 pass
+
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
+
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             """
         )
 
-        constraint, errors = infer_constraints_on_self_of_class_something(source=source)
+        (
+            _,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
 
-        assert errors is None, tests.common.most_underlying_messages(errors)
-        assert constraint is not None
-
-        text = infer_for_schema.dump(constraint)
+        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             textwrap.dedent(
                 """\
-                LenConstraint(
-                  min_value=None,
-                  max_value=9)"""
+                ConstraintsByProperty(
+                  len_constraints_by_property={
+                    'some_property': LenConstraint(
+                      min_value=None,
+                      max_value=9)},
+                  patterns_by_property={})"""
             ),
             text,
         )
@@ -174,26 +224,41 @@ class Test_expected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @invariant(lambda self: 10 == len(self))
-            class Something(str):
+            class Some_constrained_primitive(str):
                 pass
+
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
+
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             """
         )
 
-        constraint, errors = infer_constraints_on_self_of_class_something(source=source)
+        (
+            _,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
 
-        assert errors is None, tests.common.most_underlying_messages(errors)
-        assert constraint is not None
-
-        text = infer_for_schema.dump(constraint)
+        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             textwrap.dedent(
                 """\
-                        LenConstraint(
-                          min_value=10,
-                          max_value=10)"""
+                ConstraintsByProperty(
+                  len_constraints_by_property={
+                    'some_property': LenConstraint(
+                      min_value=10,
+                      max_value=10)},
+                  patterns_by_property={})"""
             ),
             text,
         )
@@ -202,41 +267,63 @@ class Test_expected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @invariant(lambda self: len(self) == 10)
-            class Something(str):
+            class Some_constrained_primitive(str):
                 pass
+
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
+
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             """
         )
 
-        constraint, errors = infer_constraints_on_self_of_class_something(source=source)
+        (
+            _,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
 
-        assert errors is None, tests.common.most_underlying_messages(errors)
-        assert constraint is not None
-
-        text = infer_for_schema.dump(constraint)
+        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             textwrap.dedent(
                 """\
-                LenConstraint(
-                  min_value=10,
-                  max_value=10)"""
+                ConstraintsByProperty(
+                  len_constraints_by_property={
+                    'some_property': LenConstraint(
+                      min_value=10,
+                      max_value=10)},
+                  patterns_by_property={})"""
             ),
             text,
         )
 
-    def test_inheritance(self) -> None:
+    def test_inheritance_between_constrained_primitives_by_default(self) -> None:
         source = textwrap.dedent(
             """\
             @invariant(lambda self: len(self) > 3)
-            class Parent(str):
+            class Parent_constrained_primitive(str):
                 pass
 
 
-            @invariant(lambda self: len(self) > 5)
-            class Something(Parent):
+            @invariant(lambda self: len(self) < 6)
+            class Some_constrained_primitive(Parent_constrained_primitive):
                 pass
+
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
 
 
             __book_url__ = "dummy"
@@ -244,23 +331,29 @@ class Test_expected(unittest.TestCase):
             """
         )
 
-        constraint, errors = infer_constraints_on_self_of_class_something(source=source)
+        # NOTE (mristin, 2022-05-15):
+        # In contrast to classes, we do inherit the constraints among the constrained
+        # primitives as we in-line them later in the schema classes.
 
-        assert errors is None, tests.common.most_underlying_messages(errors)
-        assert constraint is not None
+        (
+            _,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
 
-        # NOTE (mristin, 2022-01-02):
-        # We infer only the constraints as specified in the class itself, and
-        # ignore the constraints of the ancestors in *this particular kind of
-        # inference*.
-
-        text = infer_for_schema.dump(constraint)
+        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             textwrap.dedent(
                 """\
-                LenConstraint(
-                  min_value=6,
-                  max_value=None)"""
+                ConstraintsByProperty(
+                  len_constraints_by_property={
+                    'some_property': LenConstraint(
+                      min_value=4,
+                      max_value=5)},
+                  patterns_by_property={})"""
             ),
             text,
         )
@@ -272,8 +365,15 @@ class Test_unexpected(unittest.TestCase):
             """\
             @invariant(lambda self: len(self) > 10)
             @invariant(lambda self: len(self) < 3)
-            class Something(str):
+            class Some_constrained_primitive(str):
                 pass
+
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
 
 
             __book_url__ = "dummy"
@@ -281,13 +381,22 @@ class Test_unexpected(unittest.TestCase):
             """
         )
 
-        _, errors = infer_constraints_on_self_of_class_something(source=source)
+        (
+            symbol_table,
+            _,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls(
+            source=source
+        )
 
-        assert errors is not None
+        _, error = infer_for_schema.infer_constraints_by_class(
+            symbol_table=symbol_table
+        )
+
+        assert error is not None
         self.assertEqual(
             "There are conflicting invariants on the length: "
             "the minimum length, 11, contradicts the maximum length 2.",
-            tests.common.most_underlying_messages(errors),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_conflicting_min_and_exact(self) -> None:
@@ -295,8 +404,15 @@ class Test_unexpected(unittest.TestCase):
             """\
             @invariant(lambda self: len(self) > 10)
             @invariant(lambda self: len(self) == 3)
-            class Something(str):
+            class Some_constrained_primitive(str):
                 pass
+
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
 
 
             __book_url__ = "dummy"
@@ -304,13 +420,22 @@ class Test_unexpected(unittest.TestCase):
             """
         )
 
-        _, errors = infer_constraints_on_self_of_class_something(source=source)
+        (
+            symbol_table,
+            _,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls(
+            source=source
+        )
 
-        assert errors is not None
+        _, error = infer_for_schema.infer_constraints_by_class(
+            symbol_table=symbol_table
+        )
+
+        assert error is not None
         self.assertEqual(
             "There are conflicting invariants on the length: "
             "the minimum length, 11, contradicts the exactly expected length 3.",
-            tests.common.most_underlying_messages(errors),
+            tests.common.most_underlying_messages(error),
         )
 
     def test_conflicting_max_and_exact(self) -> None:
@@ -318,21 +443,38 @@ class Test_unexpected(unittest.TestCase):
             """\
             @invariant(lambda self: len(self) < 10)
             @invariant(lambda self: len(self) == 30)
-            class Something(str):
+            class Some_constrained_primitive(str):
                 pass
+
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
+
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             """
         )
 
-        _, errors = infer_constraints_on_self_of_class_something(source=source)
+        (
+            symbol_table,
+            _,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls(
+            source=source
+        )
 
-        assert errors is not None
+        _, error = infer_for_schema.infer_constraints_by_class(
+            symbol_table=symbol_table
+        )
+
+        assert error is not None
         self.assertEqual(
             "There are conflicting invariants on the length: "
             "the maximum length, 9, contradicts the exactly expected length 30.",
-            tests.common.most_underlying_messages(errors),
+            tests.common.most_underlying_messages(error),
         )
 
 

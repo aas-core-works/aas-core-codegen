@@ -14,6 +14,7 @@ from icontract import require
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Identifier
 from aas_core_codegen.infer_for_schema import _common as infer_for_schema_common
+from aas_core_codegen.infer_for_schema._types import PatternConstraint
 from aas_core_codegen.parse import tree as parse_tree
 
 
@@ -65,14 +66,6 @@ def map_pattern_verifications_by_name(
             result[verification.name] = verification
 
     return PatternVerificationsByName(result)
-
-
-class PatternConstraint:
-    """Constrain a string to comply to a regular expression."""
-
-    def __init__(self, pattern: str) -> None:
-        """Initialize with the given values."""
-        self.pattern = pattern
 
 
 class _ConstraintOnProperty:

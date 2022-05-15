@@ -22,6 +22,8 @@ Stringifiable = Union[
     PrimitiveStringifiable,
     Sequence[PrimitiveStringifiable],
     Sequence[Sequence[PrimitiveStringifiable]],
+    Mapping[str, PrimitiveStringifiable],
+    Mapping[str, Sequence[PrimitiveStringifiable]],
 ]
 
 
@@ -126,6 +128,25 @@ def dump(stringifiable: Stringifiable) -> str:
 
                 if i == len(stringifiable) - 1:
                     writer.write("]")
+                else:
+                    writer.write(",\n")
+
+            return writer.getvalue()
+
+    elif isinstance(stringifiable, collections.abc.Mapping):
+        if len(stringifiable) == 0:
+            return "{}"
+        else:
+            writer = io.StringIO()
+            writer.write("{\n")
+            for i, (key, value) in enumerate(stringifiable.items()):
+                key_str = dump(key)
+
+                value_str = dump(value)
+                writer.write(textwrap.indent(f"{key_str}: {value_str}", "  "))
+
+                if i == len(stringifiable) - 1:
+                    writer.write("}")
                 else:
                     writer.write(",\n")
 
