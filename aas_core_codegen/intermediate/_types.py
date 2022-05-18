@@ -1803,6 +1803,7 @@ class Interface:
                 parsed=method.parsed,
             )
             for method in base.methods
+            if method.specified_for is base
         ]
 
         self.description = base.description

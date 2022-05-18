@@ -141,17 +141,6 @@ SymbolTable(
             parsed=...)],
         signatures=[
           Signature(
-            name='some_func',
-            arguments=[],
-            returns=None,
-            description=None,
-            contracts=Contracts(
-              preconditions=[],
-              snapshots=[],
-              postconditions=[]),
-            parsed=...,
-            arguments_by_name=...),
-          Signature(
             name='another_func',
             arguments=[],
             returns=None,

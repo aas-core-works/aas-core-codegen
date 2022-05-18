@@ -360,7 +360,7 @@ def _generate_interface(
 
     # endregion
 
-    # region Methods
+    # region Signatures
 
     for signature in interface.signatures:
         signature_blocks = []  # type: List[Stripped]
@@ -882,12 +882,16 @@ def _generate_class(
     errors = []  # type: List[Error]
 
     for method in cls.methods:
-        if method.specified_for is not cls:
-            continue
-
         if isinstance(method, intermediate.ImplementationSpecificMethod):
+            # NOTE (mristin, 2022-05-18):
+            # We have to repeat the implementation of the method in all the descendants
+            # since we share only interfaces between the classes, but not
+            # the implementations.
+            #
+            # This makes the code a bit larger, but the class hierarchy is much simpler
+            # and the individual classes are much easier to grasp.
             implementation_key = specific_implementations.ImplementationKey(
-                f"Types/{cls.name}/{method.name}.cs"
+                f"Types/{method.specified_for.name}/{method.name}.cs"
             )
 
             implementation = spec_impls.get(implementation_key, None)
