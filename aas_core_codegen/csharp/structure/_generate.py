@@ -884,7 +884,7 @@ def _generate_class(
     for method in cls.methods:
         if isinstance(method, intermediate.ImplementationSpecificMethod):
             implementation_key = specific_implementations.ImplementationKey(
-                f"{cls.name}/{method.name}.cs"
+                f"Types/{cls.name}/{method.name}.cs"
             )
 
             implementation = spec_impls.get(implementation_key, None)
@@ -982,7 +982,7 @@ public T Transform<C, T>(
 
     if cls.constructor.is_implementation_specific:
         implementation_key = specific_implementations.ImplementationKey(
-            f"{cls.name}/{cls.name}.cs"
+            f"Types/{cls.name}/{cls.name}.cs"
         )
         implementation = spec_impls.get(implementation_key, None)
 
@@ -1118,7 +1118,7 @@ public interface IClass
             and something.is_implementation_specific
         ):
             implementation_key = specific_implementations.ImplementationKey(
-                f"{something.name}.cs"
+                f"Types/{something.name}.cs"
             )
 
             code = spec_impls.get(implementation_key, None)
