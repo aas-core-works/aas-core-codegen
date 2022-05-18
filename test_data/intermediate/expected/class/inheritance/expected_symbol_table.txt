@@ -89,7 +89,16 @@ SymbolTable(
               args=[
                 'some_property'],
               description=None,
-              body="Comparison(\n  left=Name(\n    identifier='some_property',\n    original_node=...),\n  op='GT',\n  right=Constant(\n    value=0,\n    original_node=...),\n  original_node=...)",
+              body=textwrap.dedent("""\
+                Comparison(
+                  left=Name(
+                    identifier='some_property',
+                    original_node=...),
+                  op='GT',
+                  right=Constant(
+                    value=0,
+                    original_node=...),
+                  original_node=...)"""),
               parsed=...)],
           snapshots=[],
           postconditions=[]),
@@ -97,7 +106,11 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
-          "AssignArgument(\n  name='some_property',\n  argument='some_property',\n  default=None)"]),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_property',
+              argument='some_property',
+              default=None)""")]),
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
@@ -255,7 +268,16 @@ SymbolTable(
               args=[
                 'another_property'],
               description=None,
-              body="Comparison(\n  left=Name(\n    identifier='another_property',\n    original_node=...),\n  op='GT',\n  right=Constant(\n    value=0,\n    original_node=...),\n  original_node=...)",
+              body=textwrap.dedent("""\
+                Comparison(
+                  left=Name(
+                    identifier='another_property',
+                    original_node=...),
+                  op='GT',
+                  right=Constant(
+                    value=0,
+                    original_node=...),
+                  original_node=...)"""),
               parsed=...)],
           snapshots=[],
           postconditions=[]),
@@ -263,8 +285,16 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
-          "AssignArgument(\n  name='some_property',\n  argument='some_property',\n  default=None)",
-          "AssignArgument(\n  name='another_property',\n  argument='another_property',\n  default=None)"]),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_property',
+              argument='some_property',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='another_property',
+              argument='another_property',
+              default=None)""")]),
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
@@ -393,7 +423,16 @@ SymbolTable(
               args=[
                 'yet_another_property'],
               description=None,
-              body="Comparison(\n  left=Name(\n    identifier='yet_another_property',\n    original_node=...),\n  op='GT',\n  right=Constant(\n    value=0,\n    original_node=...),\n  original_node=...)",
+              body=textwrap.dedent("""\
+                Comparison(
+                  left=Name(
+                    identifier='yet_another_property',
+                    original_node=...),
+                  op='GT',
+                  right=Constant(
+                    value=0,
+                    original_node=...),
+                  original_node=...)"""),
               parsed=...)],
           snapshots=[],
           postconditions=[]),
@@ -401,9 +440,21 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
-          "AssignArgument(\n  name='some_property',\n  argument='some_property',\n  default=None)",
-          "AssignArgument(\n  name='another_property',\n  argument='another_property',\n  default=None)",
-          "AssignArgument(\n  name='yet_another_property',\n  argument='yet_another_property',\n  default=None)"]),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_property',
+              argument='some_property',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='another_property',
+              argument='another_property',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='yet_another_property',
+              argument='yet_another_property',
+              default=None)""")]),
       invariants=[],
       serialization=Serialization(
         with_model_type=False),

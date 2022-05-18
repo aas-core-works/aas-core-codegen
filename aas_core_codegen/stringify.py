@@ -71,8 +71,21 @@ class Entity:
 
 def dump(stringifiable: Stringifiable) -> str:
     """Produce a string representation of ``stringifiable`` for debugging or testing."""
-    if isinstance(stringifiable, (bool, int, float, str)):
+    if isinstance(stringifiable, (bool, int, float)):
         return repr(stringifiable)
+
+    elif isinstance(stringifiable, str):
+        if "\n" not in stringifiable or "\r" in stringifiable or '"""' in stringifiable:
+            return repr(stringifiable)
+
+        # NOTE (mristin, 2022-05-18):
+        # A multi-line string literal is much more readable when it comes to diffing.
+
+        escaped = stringifiable.replace("\\", "\\\\")
+
+        indented = "\n".join(f"  {line}" for line in escaped.splitlines())
+
+        return f'textwrap.dedent("""\\\n{indented}""")'
 
     elif isinstance(stringifiable, Entity):
         if len(stringifiable.properties) == 0:

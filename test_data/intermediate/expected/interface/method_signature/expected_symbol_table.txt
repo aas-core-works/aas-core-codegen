@@ -32,7 +32,16 @@ SymbolTable(
                   args=[
                     'x'],
                   description=None,
-                  body="Comparison(\n  left=Name(\n    identifier='x',\n    original_node=...),\n  op='GT',\n  right=Constant(\n    value=0,\n    original_node=...),\n  original_node=...)",
+                  body=textwrap.dedent("""\
+                    Comparison(
+                      left=Name(
+                        identifier='x',
+                        original_node=...),
+                      op='GT',
+                      right=Constant(
+                        value=0,
+                        original_node=...),
+                      original_node=...)"""),
                   parsed=...)],
               snapshots=[],
               postconditions=[]),
@@ -66,7 +75,16 @@ SymbolTable(
                 args=[
                   'x'],
                 description=None,
-                body="Comparison(\n  left=Name(\n    identifier='x',\n    original_node=...),\n  op='GT',\n  right=Constant(\n    value=0,\n    original_node=...),\n  original_node=...)",
+                body=textwrap.dedent("""\
+                  Comparison(
+                    left=Name(
+                      identifier='x',
+                      original_node=...),
+                    op='GT',
+                    right=Constant(
+                      value=0,
+                      original_node=...),
+                    original_node=...)"""),
                 parsed=...)],
             snapshots=[],
             postconditions=[]),
