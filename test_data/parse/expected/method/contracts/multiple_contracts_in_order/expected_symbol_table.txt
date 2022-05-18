@@ -52,7 +52,10 @@ UnverifiedSymbolTable(
                 args=[
                   'x'],
                 name='double_x',
-                body="Name(\n  identifier='x',\n  original_node=...)",
+                body=textwrap.dedent("""\
+                  Name(
+                    identifier='x',
+                    original_node=...)"""),
                 node=...)],
             postconditions=[
               Contract(

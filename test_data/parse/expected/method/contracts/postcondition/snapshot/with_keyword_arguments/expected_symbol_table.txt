@@ -35,7 +35,16 @@ UnverifiedSymbolTable(
                 args=[
                   'lst'],
                 name='lst',
-                body="MethodCall(\n  member=Member(\n    instance=Name(\n      identifier='lst',\n      original_node=...),\n    name='copy',\n    original_node=...),\n  args=[],\n  original_node=...)",
+                body=textwrap.dedent("""\
+                  MethodCall(
+                    member=Member(
+                      instance=Name(
+                        identifier='lst',
+                        original_node=...),
+                      name='copy',
+                      original_node=...),
+                    args=[],
+                    original_node=...)"""),
                 node=...)],
             postconditions=[
               Contract(

@@ -43,13 +43,34 @@ SymbolTable(
                 args=[
                   'number'],
                 description=None,
-                body="Comparison(\n  left=Name(\n    identifier='number',\n    original_node=...),\n  op='GT',\n  right=Constant(\n    value=0,\n    original_node=...),\n  original_node=...)",
+                body=textwrap.dedent("""\
+                  Comparison(
+                    left=Name(
+                      identifier='number',
+                      original_node=...),
+                    op='GT',
+                    right=Constant(
+                      value=0,
+                      original_node=...),
+                    original_node=...)"""),
                 parsed=...),
               Contract(
                 args=[
                   'self'],
                 description=None,
-                body="Comparison(\n  left=Member(\n    instance=Name(\n      identifier='self',\n      original_node=...),\n    name='x',\n    original_node=...),\n  op='GT',\n  right=Constant(\n    value=2,\n    original_node=...),\n  original_node=...)",
+                body=textwrap.dedent("""\
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='x',
+                      original_node=...),
+                    op='GT',
+                    right=Constant(
+                      value=2,
+                      original_node=...),
+                    original_node=...)"""),
                 parsed=...)],
             snapshots=[],
             postconditions=[]),
@@ -74,7 +95,16 @@ SymbolTable(
               args=[
                 'x'],
               description=None,
-              body="Comparison(\n  left=Name(\n    identifier='x',\n    original_node=...),\n  op='GT',\n  right=Constant(\n    value=0,\n    original_node=...),\n  original_node=...)",
+              body=textwrap.dedent("""\
+                Comparison(
+                  left=Name(
+                    identifier='x',
+                    original_node=...),
+                  op='GT',
+                  right=Constant(
+                    value=0,
+                    original_node=...),
+                  original_node=...)"""),
               parsed=...)],
           snapshots=[],
           postconditions=[]),
@@ -82,7 +112,11 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
-          "AssignArgument(\n  name='x',\n  argument='x',\n  default=None)"]),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='x',
+              argument='x',
+              default=None)""")]),
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
