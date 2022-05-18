@@ -882,6 +882,9 @@ def _generate_class(
     errors = []  # type: List[Error]
 
     for method in cls.methods:
+        if method.specified_for is not cls:
+            continue
+
         if isinstance(method, intermediate.ImplementationSpecificMethod):
             implementation_key = specific_implementations.ImplementationKey(
                 f"Types/{cls.name}/{method.name}.cs"

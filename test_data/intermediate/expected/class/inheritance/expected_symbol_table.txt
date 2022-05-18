@@ -64,6 +64,7 @@ SymbolTable(
             arguments_by_name=[],
             returns=None,
             parsed=...),
+          specified_for='Reference to AbstractClass VeryAbstract',
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
@@ -219,6 +220,7 @@ SymbolTable(
             arguments_by_name=[],
             returns=None,
             parsed=...),
+          specified_for='Reference to AbstractClass VeryAbstract',
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
@@ -236,6 +238,7 @@ SymbolTable(
             arguments_by_name=[],
             returns=None,
             parsed=...),
+          specified_for='Reference to AbstractClass Abstract',
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
@@ -350,6 +353,7 @@ SymbolTable(
             arguments_by_name=[],
             returns=None,
             parsed=...),
+          specified_for='Reference to AbstractClass VeryAbstract',
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
@@ -367,6 +371,7 @@ SymbolTable(
             arguments_by_name=[],
             returns=None,
             parsed=...),
+          specified_for='Reference to AbstractClass Abstract',
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
@@ -384,6 +389,7 @@ SymbolTable(
             arguments_by_name=[],
             returns=None,
             parsed=...),
+          specified_for='Reference to ConcreteClass Concrete',
           contracts=Contracts(
             preconditions=[],
             snapshots=[],

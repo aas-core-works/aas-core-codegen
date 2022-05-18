@@ -52,6 +52,7 @@ SymbolTable(
           arguments=[],
           returns=None,
           description=None,
+          specified_for='Reference to AbstractClass Abstract',
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
