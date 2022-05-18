@@ -760,6 +760,12 @@ class Method(SignatureLike):
 
     parsed: parse.Method
 
+    #: The original class where this method is specified.
+    #: We stack all the methods over the ancestors, so using ``specified_for``
+    #: you can distinguish between inherited methods and genuine methods of
+    #: a class.
+    specified_for: Final["Class"]
+
     # fmt: off
     @require(
         lambda name:
@@ -798,6 +804,7 @@ class Method(SignatureLike):
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
         description: Optional[SignatureDescription],
+        specified_for: "Class",
         contracts: Contracts,
         parsed: parse.Method,
     ) -> None:
@@ -811,6 +818,8 @@ class Method(SignatureLike):
             contracts=contracts,
             parsed=parsed,
         )
+
+        self.specified_for = specified_for
 
     @abc.abstractmethod
     def __repr__(self) -> str:
@@ -866,6 +875,7 @@ class UnderstoodMethod(Method):
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
         description: Optional[SignatureDescription],
+        specified_for: "Class",
         contracts: Contracts,
         body: Sequence[parse_tree.Node],
         parsed: parse.Method,
@@ -877,6 +887,7 @@ class UnderstoodMethod(Method):
             arguments=arguments,
             returns=returns,
             description=description,
+            specified_for=specified_for,
             contracts=contracts,
             parsed=parsed,
         )

@@ -24,7 +24,6 @@ from aas_core_codegen.intermediate._types import (
     Invariant,
     ListTypeAnnotation,
     MetaModel,
-    Method,
     OptionalTypeAnnotation,
     OurTypeAnnotation,
     PatternVerification,
@@ -394,10 +393,6 @@ def _stringify_a_signature_like(that: SignatureLike) -> stringify.Entity:
     return result
 
 
-def _stringify_method(that: Method) -> stringify.Entity:
-    return _stringify_a_signature_like(that)
-
-
 def _stringify_implementation_specific_method(
     that: ImplementationSpecificMethod,
 ) -> stringify.Entity:
@@ -408,6 +403,11 @@ def _stringify_implementation_specific_method(
             stringify.Property("arguments", list(map(_stringify, that.arguments))),
             stringify.Property("returns", _stringify(that.returns)),
             stringify.Property("description", _stringify(that.description)),
+            stringify.Property(
+                "specified_for",
+                f"Reference to {that.specified_for.__class__.__name__} "
+                f"{that.specified_for.name}",
+            ),
             stringify.Property("contracts", _stringify(that.contracts)),
             stringify.PropertyEllipsis("parsed", that.parsed),
             stringify.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
@@ -427,6 +427,11 @@ def _stringify_understood_method(
             stringify.Property("arguments", list(map(_stringify, that.arguments))),
             stringify.Property("returns", _stringify(that.returns)),
             stringify.Property("description", _stringify(that.description)),
+            stringify.Property(
+                "specified_for",
+                f"Reference to {that.specified_for.__class__.__name__} "
+                f"{that.specified_for.name}",
+            ),
             stringify.Property("contracts", _stringify(that.contracts)),
             stringify.PropertyEllipsis("parsed", that.parsed),
             stringify.Property("body", [parse_tree.dump(stmt) for stmt in that.body]),

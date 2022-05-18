@@ -930,7 +930,7 @@ def _to_arguments(parsed: Sequence[parse.Argument]) -> List[Argument]:
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _to_property(
-    parsed: parse.Property, cls: parse.Class
+    parsed: parse.Property, parsed_cls: parse.Class
 ) -> Tuple[Optional[Property], Optional[List[Error]]]:
     """Translate a parsed property of a class to an intermediate one."""
     description = None  # type: Optional[PropertyDescription]
@@ -950,7 +950,7 @@ def _to_property(
             # We can only resolve the ``specified_for`` when the class is actually
             # created. Therefore, we assign here a placeholder and fix it later in a second
             # pass.
-            specified_for=_PlaceholderSymbol(cls.name),  # type: ignore
+            specified_for=_PlaceholderSymbol(parsed_cls.name),  # type: ignore
             parsed=parsed,
         ),
         None,
@@ -1008,7 +1008,8 @@ def _to_contracts(parsed: parse.Contracts) -> Contracts:
 )
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _to_method(
-        parsed: Union[parse.UnderstoodMethod, parse.ImplementationSpecificMethod]
+        parsed: Union[parse.UnderstoodMethod, parse.ImplementationSpecificMethod],
+        parsed_cls: parse.Class
 ) -> Tuple[
     Optional[Union[UnderstoodMethod, ImplementationSpecificMethod]],
     Optional[List[Error]]
@@ -1033,23 +1034,33 @@ def _to_method(
         if description_errors is not None:
             return None, description_errors
 
+    # NOTE (mristin, 2021-12-26):
+    # We can only resolve the ``specified_for`` when the class is actually
+    # created. Therefore, we assign here a placeholder and fix it later in a second
+    # pass.
+    specified_for_placeholder = _PlaceholderSymbol(parsed_cls.name)
+
     contracts = _to_contracts(parsed.contracts)
 
     if isinstance(parsed, parse.ImplementationSpecificMethod):
+        # noinspection PyTypeChecker
         return ImplementationSpecificMethod(
             name=parsed.name,
             arguments=arguments,
             returns=returns,
             description=description,
+            specified_for=specified_for_placeholder,  # type: ignore
             contracts=contracts,
             parsed=parsed,
         ), None
     elif isinstance(parsed, parse.UnderstoodMethod):
+        # noinspection PyTypeChecker
         return UnderstoodMethod(
             name=parsed.name,
             arguments=arguments,
             returns=returns,
             description=description,
+            specified_for=specified_for_placeholder,  # type: ignore
             contracts=contracts,
             body=parsed.body,
             parsed=parsed,
@@ -1462,7 +1473,7 @@ def _to_class(
 
     properties = []  # type: List[Property]
     for parsed_prop in parsed.properties:
-        prop, prop_errors = _to_property(parsed=parsed_prop, cls=parsed)
+        prop, prop_errors = _to_property(parsed=parsed_prop, parsed_cls=parsed)
         if prop_errors is not None:
             errors.append(
                 Error(
@@ -1495,7 +1506,7 @@ def _to_class(
             # :py:class:`Constructors`.
             continue
 
-        method, method_errors = _to_method(parsed=parsed_method)
+        method, method_errors = _to_method(parsed=parsed_method, parsed_cls=parsed)
         if method_errors is not None:
             errors.append(
                 Error(
@@ -2180,7 +2191,11 @@ def _second_pass_to_resolve_supersets_of_enumerations_in_place(
 def _second_pass_to_resolve_resulting_class_of_specified_for(
     symbol_table: SymbolTable,
 ) -> None:
-    """Resolve the resulting class of the ``specified_for`` in a property in-place."""
+    """
+    Resolve the resulting class of the ``specified_for`` in-place.
+
+    This is done both for properties and for methods.
+    """
     for symbol in symbol_table.symbols:
         if isinstance(symbol, Enumeration):
             continue
@@ -2201,10 +2216,33 @@ def _second_pass_to_resolve_resulting_class_of_specified_for(
                 # this context is meant for the users of the translation phase, not
                 # the translation phase itself.
 
-                # noinspection PyFinal
-                prop.specified_for = symbol_table.must_find(
+                specified_for = symbol_table.must_find(
                     Identifier(prop.specified_for.name)
                 )
+                assert isinstance(specified_for, Class)
+
+                # noinspection PyFinal
+                prop.specified_for = specified_for
+
+            for method in symbol.methods:
+                assert isinstance(method.specified_for, _PlaceholderSymbol), (
+                    f"Expected the placeholder symbol for ``specified_for`` in "
+                    f"the method {method} of {symbol}, but got: {method.specified_for}"
+                )
+
+                # NOTE (mristin, 2022-01-02):
+                # We have to override the ``specified_for`` as we could not set it
+                # during the first pass of the translation phase. The ``Final`` in
+                # this context is meant for the users of the translation phase, not
+                # the translation phase itself.
+
+                specified_for = symbol_table.must_find(
+                    name=Identifier(method.specified_for.name)
+                )
+                assert isinstance(specified_for, Class)
+
+                # noinspection PyFinal
+                method.specified_for = specified_for
         else:
             assert_never(symbol)
 

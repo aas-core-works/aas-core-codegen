@@ -37,6 +37,7 @@ SymbolTable(
             arguments_by_name=[],
             returns=None,
             parsed=...),
+          specified_for='Reference to ConcreteClass Concrete',
           contracts=Contracts(
             preconditions=[
               Contract(

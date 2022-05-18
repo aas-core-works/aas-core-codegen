@@ -24,6 +24,7 @@ SymbolTable(
             a_type='INT',
             parsed=...),
           description=None,
+          specified_for='Reference to ConcreteClass Concrete',
           contracts=Contracts(
             preconditions=[],
             snapshots=[],

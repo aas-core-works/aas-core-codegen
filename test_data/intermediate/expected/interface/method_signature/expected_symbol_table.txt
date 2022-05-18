@@ -69,6 +69,7 @@ SymbolTable(
             a_type='BOOL',
             parsed=...),
           description=None,
+          specified_for='Reference to AbstractClass Abstract',
           contracts=Contracts(
             preconditions=[
               Contract(
