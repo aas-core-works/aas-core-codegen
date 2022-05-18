@@ -1,15 +1,18 @@
 """Infer constraints representable in common schemas such as JSON Schema or XSD."""
 
-from aas_core_codegen.infer_for_schema import _len, _pattern, _inline, _stringify
+from aas_core_codegen.infer_for_schema import (
+    _len,
+    _pattern,
+    _inline,
+    _stringify,
+    _types,
+)
 
-LenConstraint = _len.LenConstraint
+LenConstraint = _types.LenConstraint
+PatternConstraint = _types.PatternConstraint
+ConstraintsByProperty = _types.ConstraintsByProperty
 
-PatternConstraint = _pattern.PatternConstraint
-
-ConstraintsByProperty = _inline.ConstraintsByProperty
 infer_constraints_by_class = _inline.infer_constraints_by_class
+merge_constraints_with_ancestors = _inline.merge_constraints_with_ancestors
 
 dump = _stringify.dump
-dump_len_constraints_by_properties = _stringify.dump_len_constraints_by_properties
-dump_patterns = _stringify.dump_patterns
-dump_patterns_by_properties = _stringify.dump_patterns_by_properties

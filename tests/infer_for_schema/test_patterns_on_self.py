@@ -2,42 +2,25 @@
 
 import textwrap
 import unittest
-from typing import MutableMapping, List
 
 import tests.common
-from aas_core_codegen import intermediate, infer_for_schema
-from aas_core_codegen.infer_for_schema import _pattern as infer_for_schema_pattern
-from aas_core_codegen.common import Identifier
-
-
-def infer_patterns_on_self_of_class_something(
-    source: str,
-) -> List[infer_for_schema_pattern.PatternConstraint]:
-    """Translate the ``source`` into inferred constraints of the class ``Something``."""
-    symbol_table, error = tests.common.translate_source_to_intermediate(source=source)
-    assert error is None, tests.common.most_underlying_messages(error)
-    assert symbol_table is not None
-    symbol = symbol_table.must_find(Identifier("Something"))
-    assert isinstance(symbol, intermediate.ConstrainedPrimitive)
-
-    pattern_verifications_by_name = (
-        infer_for_schema_pattern.map_pattern_verifications_by_name(
-            verifications=symbol_table.verification_functions
-        )
-    )
-
-    return infer_for_schema_pattern.infer_patterns_on_self(
-        constrained_primitive=symbol,
-        pattern_verifications_by_name=pattern_verifications_by_name,
-    )
+import tests.infer_for_schema.common
+from aas_core_codegen import infer_for_schema
 
 
 class Test_expected(unittest.TestCase):
     def test_no_pattern(self) -> None:
         source = textwrap.dedent(
             """\
-            class Something(str):
+            class Some_constrained_primitive(str):
                 pass
+
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
 
 
             __book_url__ = "dummy"
@@ -45,10 +28,25 @@ class Test_expected(unittest.TestCase):
             """
         )
 
-        patterns = infer_patterns_on_self_of_class_something(source=source)
+        (
+            _,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
 
-        text = infer_for_schema.dump_patterns(patterns)
-        self.assertEqual("[]", text)
+        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints_by_props)
+        self.assertEqual(
+            textwrap.dedent(
+                """\
+                ConstraintsByProperty(
+                  len_constraints_by_property={},
+                  patterns_by_property={})"""
+            ),
+            text,
+        )
 
     def test_single_pattern(self) -> None:
         source = textwrap.dedent(
@@ -60,8 +58,14 @@ class Test_expected(unittest.TestCase):
 
 
             @invariant(lambda self: is_something(self))
-            class Something(str):
+            class Some_constrained_primitive(str):
                 pass
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
 
 
             __book_url__ = "dummy"
@@ -69,16 +73,25 @@ class Test_expected(unittest.TestCase):
             """
         )
 
-        patterns = infer_patterns_on_self_of_class_something(source=source)
+        (
+            _,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
 
-        text = infer_for_schema.dump_patterns(patterns)
+        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             textwrap.dedent(
                 """\
-                [
-                  PatternConstraint(
-                    pattern='something-[a-zA-Z]+')
-                ]"""
+                ConstraintsByProperty(
+                  len_constraints_by_property={},
+                  patterns_by_property={
+                    'some_property': [
+                      PatternConstraint(
+                        pattern='something-[a-zA-Z]+')]})"""
             ),
             text,
         )
@@ -97,8 +110,14 @@ class Test_expected(unittest.TestCase):
 
             @invariant(lambda self: is_acme(self))
             @invariant(lambda self: is_something(self))
-            class Something(str):
+            class Some_constrained_primitive(str):
                 pass
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
 
 
             __book_url__ = "dummy"
@@ -106,23 +125,32 @@ class Test_expected(unittest.TestCase):
             """
         )
 
-        patterns = infer_patterns_on_self_of_class_something(source=source)
+        (
+            _,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
 
-        text = infer_for_schema.dump_patterns(patterns)
+        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             textwrap.dedent(
                 """\
-                [
-                  PatternConstraint(
-                    pattern='something-[a-zA-Z]+'),
-                  PatternConstraint(
-                    pattern='.*acme.*')
-                ]"""
+                ConstraintsByProperty(
+                  len_constraints_by_property={},
+                  patterns_by_property={
+                    'some_property': [
+                      PatternConstraint(
+                        pattern='something-[a-zA-Z]+'),
+                      PatternConstraint(
+                        pattern='.*acme.*')]})"""
             ),
             text,
         )
 
-    def test_inheritance(self) -> None:
+    def test_inheritance_between_constrained_primitives_by_default(self) -> None:
         source = textwrap.dedent(
             """\
             @verification
@@ -134,34 +162,50 @@ class Test_expected(unittest.TestCase):
                 return match(".*acme.*", text) is not None
 
             @invariant(lambda self: is_something(self))
-            class Parent(str):
+            class Parent_constrained_primitive(str):
                 pass
 
             @invariant(lambda self: is_acme(self))
-            class Something(Parent):
+            class Some_constrained_primitive(Parent_constrained_primitive):
                 pass
+
+            class Something:
+                some_property: Some_constrained_primitive
+
+                def __init__(self, some_property: Some_constrained_primitive) -> None:
+                    self.some_property = some_property
+
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
             """
         )
 
-        patterns = infer_patterns_on_self_of_class_something(source=source)
+        # NOTE (mristin, 2022-05-15):
+        # In contrast to classes, we do inherit the constraints among the constrained
+        # primitives as we in-line them later in the schema classes.
 
-        text = infer_for_schema.dump_patterns(patterns)
+        (
+            _,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
 
-        # NOTE (mristin, 2022-01-02):
-        # We infer only the constraints as specified in the class itself, and
-        # ignore the constraints of the ancestors in *this particular kind of
-        # inference*.
-
+        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             textwrap.dedent(
                 """\
-                [
-                  PatternConstraint(
-                    pattern='.*acme.*')
-                ]"""
+                ConstraintsByProperty(
+                  len_constraints_by_property={},
+                  patterns_by_property={
+                    'some_property': [
+                      PatternConstraint(
+                        pattern='something-[a-zA-Z]+'),
+                      PatternConstraint(
+                        pattern='.*acme.*')]})"""
             ),
             text,
         )
