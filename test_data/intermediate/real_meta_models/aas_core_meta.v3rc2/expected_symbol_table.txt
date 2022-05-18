@@ -668,7 +668,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Extension',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='value_type_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Data_type_def_XSD',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Extension',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -2122,7 +2136,20 @@ SymbolTable(
               parsed=...),
             specified_for='Reference to AbstractClass Has_kind',
             parsed=...)],
-        signatures=[],
+        signatures=[
+          Signature(
+            name='kind_or_default',
+            arguments=[],
+            returns=OurTypeAnnotation(
+              symbol='Reference to symbol Modeling_kind',
+              parsed=...),
+            description=None,
+            contracts=Contracts(
+              preconditions=[],
+              snapshots=[],
+              postconditions=[]),
+            parsed=...,
+            arguments_by_name=...)],
         description=SymbolDescription(
           summary=textwrap.dedent("""\
             <paragraph>An element with a kind is an element that can either represent a template or an
@@ -2166,7 +2193,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -2195,10 +2236,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))""")]),
+              default=None)""")]),
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
@@ -4173,7 +4211,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -4378,10 +4430,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -5033,7 +5082,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -5197,10 +5260,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -5799,7 +5859,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to AbstractClass Relationship_element',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -5977,10 +6051,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -6396,7 +6467,35 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_list',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...),
+        ImplementationSpecificMethod(
+          name='order_relevant_or_default',
+          arguments=[],
+          returns=PrimitiveTypeAnnotation(
+            a_type='BOOL',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Submodel_element_list',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -6613,10 +6712,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -7286,7 +7382,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_struct',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -7463,10 +7573,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -8104,7 +8211,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -8268,10 +8389,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -8372,44 +8490,54 @@ SymbolTable(
         Invariant(
           description='Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE',
           body=textwrap.dedent("""\
-            Or(
-              values=[
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='CONSTANT',
-                    original_node=...),
+                  name='category',
                   original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                original_node=...),
+              consequent=Or(
+                values=[
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
                       original_node=...),
-                    name='category',
-                    original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='PARAMETER',
-                    original_node=...),
-                  original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                    op='EQ',
+                    right=Constant(
+                      value='CONSTANT',
                       original_node=...),
-                    name='category',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='VARIABLE',
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='PARAMETER',
+                      original_node=...),
                     original_node=...),
-                  original_node=...)],
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='VARIABLE',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
           parsed=...)],
@@ -8697,7 +8825,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Property',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -8890,10 +9032,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -9009,44 +9148,54 @@ SymbolTable(
         Invariant(
           description='Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE',
           body=textwrap.dedent("""\
-            Or(
-              values=[
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='CONSTANT',
-                    original_node=...),
+                  name='category',
                   original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                original_node=...),
+              consequent=Or(
+                values=[
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
                       original_node=...),
-                    name='category',
-                    original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='PARAMETER',
-                    original_node=...),
-                  original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                    op='EQ',
+                    right=Constant(
+                      value='CONSTANT',
                       original_node=...),
-                    name='category',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='VARIABLE',
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='PARAMETER',
+                      original_node=...),
                     original_node=...),
-                  original_node=...)],
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='VARIABLE',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
           parsed=...),
@@ -9346,7 +9495,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Multi_language_property',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -9532,10 +9695,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -9646,44 +9806,54 @@ SymbolTable(
         Invariant(
           description='Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE',
           body=textwrap.dedent("""\
-            Or(
-              values=[
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='CONSTANT',
-                    original_node=...),
+                  name='category',
                   original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                original_node=...),
+              consequent=Or(
+                values=[
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
                       original_node=...),
-                    name='category',
-                    original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='PARAMETER',
-                    original_node=...),
-                  original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                    op='EQ',
+                    right=Constant(
+                      value='CONSTANT',
                       original_node=...),
-                    name='category',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='VARIABLE',
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='PARAMETER',
+                      original_node=...),
                     original_node=...),
-                  original_node=...)],
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='VARIABLE',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
           parsed=...)],
@@ -9968,7 +10138,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Range',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -10161,10 +10345,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -10280,44 +10461,54 @@ SymbolTable(
         Invariant(
           description='Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE',
           body=textwrap.dedent("""\
-            Or(
-              values=[
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='CONSTANT',
-                    original_node=...),
+                  name='category',
                   original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                original_node=...),
+              consequent=Or(
+                values=[
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
                       original_node=...),
-                    name='category',
-                    original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='PARAMETER',
-                    original_node=...),
-                  original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                    op='EQ',
+                    right=Constant(
+                      value='CONSTANT',
                       original_node=...),
-                    name='category',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='VARIABLE',
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='PARAMETER',
+                      original_node=...),
                     original_node=...),
-                  original_node=...)],
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='VARIABLE',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
           parsed=...),
@@ -10631,7 +10822,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Reference_element',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -10806,10 +11011,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -10915,44 +11117,54 @@ SymbolTable(
         Invariant(
           description='Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE',
           body=textwrap.dedent("""\
-            Or(
-              values=[
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='CONSTANT',
-                    original_node=...),
+                  name='category',
                   original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                original_node=...),
+              consequent=Or(
+                values=[
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
                       original_node=...),
-                    name='category',
-                    original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='PARAMETER',
-                    original_node=...),
-                  original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                    op='EQ',
+                    right=Constant(
+                      value='CONSTANT',
                       original_node=...),
-                    name='category',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='VARIABLE',
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='PARAMETER',
+                      original_node=...),
                     original_node=...),
-                  original_node=...)],
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='VARIABLE',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
           parsed=...)],
@@ -11223,7 +11435,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Blob',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -11405,10 +11631,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -11519,44 +11742,54 @@ SymbolTable(
         Invariant(
           description='Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE',
           body=textwrap.dedent("""\
-            Or(
-              values=[
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='CONSTANT',
-                    original_node=...),
+                  name='category',
                   original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                original_node=...),
+              consequent=Or(
+                values=[
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
                       original_node=...),
-                    name='category',
-                    original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='PARAMETER',
-                    original_node=...),
-                  original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                    op='EQ',
+                    right=Constant(
+                      value='CONSTANT',
                       original_node=...),
-                    name='category',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='VARIABLE',
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='PARAMETER',
+                      original_node=...),
                     original_node=...),
-                  original_node=...)],
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='VARIABLE',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
           parsed=...)],
@@ -11822,7 +12055,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass File',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -12004,10 +12251,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -12118,44 +12362,54 @@ SymbolTable(
         Invariant(
           description='Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE',
           body=textwrap.dedent("""\
-            Or(
-              values=[
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='CONSTANT',
-                    original_node=...),
+                  name='category',
                   original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                original_node=...),
+              consequent=Or(
+                values=[
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
                       original_node=...),
-                    name='category',
-                    original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='PARAMETER',
-                    original_node=...),
-                  original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                    op='EQ',
+                    right=Constant(
+                      value='CONSTANT',
                       original_node=...),
-                    name='category',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='VARIABLE',
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='PARAMETER',
+                      original_node=...),
                     original_node=...),
-                  original_node=...)],
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='VARIABLE',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
           parsed=...)],
@@ -12433,7 +12687,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Annotated_relationship_element',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -12624,10 +12892,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -13076,7 +13341,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Entity',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -13282,10 +13561,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -13442,7 +13718,7 @@ SymbolTable(
                                 instance=Name(
                                   identifier='self',
                                   original_node=...),
-                                name='global_asset_id',
+                                name='specific_asset_id',
                                 original_node=...),
                               original_node=...)],
                           original_node=...),
@@ -13461,7 +13737,7 @@ SymbolTable(
                                 instance=Name(
                                   identifier='self',
                                   original_node=...),
-                                name='global_asset_id',
+                                name='specific_asset_id',
                                 original_node=...),
                               original_node=...)],
                           original_node=...)],
@@ -14295,7 +14571,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -14459,10 +14749,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -14927,7 +15214,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -15167,10 +15468,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -15587,7 +15885,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Operation',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -15790,10 +16102,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -16210,7 +16519,21 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          arguments=[],
+          returns=OurTypeAnnotation(
+            symbol='Reference to symbol Modeling_kind',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Has_kind',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -16374,10 +16697,7 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
-              default=DefaultEnumLiteral(
-                node=...,
-                enum='Reference to Enumeration Modeling_kind',
-                literal='Reference to EnumerationLiteral Instance'))"""),
+              default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -16706,7 +17026,34 @@ SymbolTable(
             parsed=...),
           specified_for='Reference to ConcreteClass Concept_description',
           parsed=...)],
-      methods=[],
+      methods=[
+        ImplementationSpecificMethod(
+          name='category_or_default',
+          arguments=[],
+          returns=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Concept_description',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[
+              Contract(
+                args=[
+                  'result'],
+                description=None,
+                body=textwrap.dedent("""\
+                  FunctionCall(
+                    name='concept_description_category_is_valid',
+                    args=[
+                      Name(
+                        identifier='result',
+                        original_node=...)],
+                    original_node=...)"""),
+                parsed=...)]),
+          parsed=...,
+          arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
         arguments=[
@@ -19933,7 +20280,7 @@ SymbolTable(
       name='id_shorts_are_unique',
       arguments=[
         Argument(
-          name='namespace',
+          name='referables',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
               symbol='Reference to symbol Referable',
@@ -19946,7 +20293,7 @@ SymbolTable(
         parsed=...),
       description=SignatureDescription(
         summary=textwrap.dedent("""\
-          <paragraph>Check that the <AttributeReference refuri="~Referable.id_short">~Referable.id_short</AttributeReference>'s in the <ArgumentReference refuri="namespace">namespace</ArgumentReference> are
+          <paragraph>Check that the <AttributeReference refuri="~Referable.id_short">~Referable.id_short</AttributeReference>'s among the <ArgumentReference refuri="referables">referables</ArgumentReference> are
           unique.</paragraph>"""),
         remarks=[],
         arguments_by_name=[],

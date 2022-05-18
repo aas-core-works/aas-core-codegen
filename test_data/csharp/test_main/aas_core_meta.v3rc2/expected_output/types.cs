@@ -192,6 +192,15 @@ namespace AasCore.Aas3
         public ModelReference? RefersTo { get; set; }
 
         /// <summary>
+        /// Return the <see cref="Extension.ValueType" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public DataTypeDefXsd ValueTypeOrDefault()
+        {
+            return this.ValueType ?? DataTypeDefXsd.String;
+        }
+
+        /// <summary>
         /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
@@ -468,6 +477,8 @@ namespace AasCore.Aas3
         /// Default Value = Instance
         /// </remarks>
         public ModelingKind? Kind { get; set; }
+
+        public ModelingKind KindOrDefault();
     }
 
     /// <summary>
@@ -1604,6 +1615,15 @@ namespace AasCore.Aas3
         public List<ISubmodelElement>? SubmodelElements { get; set; }
 
         /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
+
+        /// <summary>
         /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
@@ -1828,7 +1848,7 @@ namespace AasCore.Aas3
             Checksum = checksum;
             Id = id;
             Administration = administration;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -2071,6 +2091,24 @@ namespace AasCore.Aas3
         public DataTypeDefXsd? ValueTypeListElement { get; set; }
 
         /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
+
+        /// <summary>
+        /// Return the <see cref="SubmodelElementList.OrderRelevant" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public bool OrderRelevantOrDefault()
+        {
+            return this.OrderRelevant ?? true;
+        }
+
+        /// <summary>
         /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
@@ -2295,7 +2333,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             Checksum = checksum;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -2443,6 +2481,15 @@ namespace AasCore.Aas3
         /// Submodel element contained in the struct.
         /// </summary>
         public List<ISubmodelElement>? Value { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -2649,7 +2696,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             Checksum = checksum;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -2840,6 +2887,15 @@ namespace AasCore.Aas3
         /// Reference to the global unique ID of a coded value.
         /// </summary>
         public GlobalReference? ValueId { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -3042,7 +3098,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             Checksum = checksum;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -3203,6 +3259,15 @@ namespace AasCore.Aas3
         /// Reference to the global unique ID of a coded value.
         /// </summary>
         public GlobalReference? ValueId { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -3420,7 +3485,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             Checksum = checksum;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -3576,6 +3641,15 @@ namespace AasCore.Aas3
         /// If the max value is missing,  then the value is assumed to be positive infinite.
         /// </summary>
         public string? Max { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -3762,7 +3836,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             Checksum = checksum;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -3911,6 +3985,15 @@ namespace AasCore.Aas3
         /// a Referable).
         /// </summary>
         public IReference? Value { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -4111,7 +4194,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             Checksum = checksum;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -4269,6 +4352,15 @@ namespace AasCore.Aas3
         /// in the <see cref="Blob" /> data element.
         /// </remarks>
         public byte[]? Value { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -4454,7 +4546,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             Checksum = checksum;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -4610,6 +4702,15 @@ namespace AasCore.Aas3
         /// The path can be absolute or relative.
         /// </summary>
         public string? Value { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -4795,7 +4896,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             Checksum = checksum;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -4951,6 +5052,15 @@ namespace AasCore.Aas3
         /// between the two elements
         /// </summary>
         public List<IDataElement>? Annotation { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -5179,7 +5289,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             Checksum = checksum;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -5374,6 +5484,15 @@ namespace AasCore.Aas3
         /// of the asset represented by the asset administration shell.
         /// </summary>
         public IdentifierKeyValuePair? SpecificAssetId { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -5615,7 +5734,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             Checksum = checksum;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -6063,6 +6182,15 @@ namespace AasCore.Aas3
         public string? MaxInterval { get; set; }
 
         /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
+
+        /// <summary>
         /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
@@ -6278,7 +6406,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             Checksum = checksum;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -6438,6 +6566,15 @@ namespace AasCore.Aas3
         /// Parameter that is input and output of the operation.
         /// </summary>
         public List<OperationVariable>? InoutputVariables { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -6690,7 +6827,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             Checksum = checksum;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -6918,6 +7055,15 @@ namespace AasCore.Aas3
         public List<GlobalReference>? DataSpecifications { get; set; }
 
         /// <summary>
+        /// Return the <see cref="ModelingKind.Kind" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public ModelingKind KindOrDefault()
+        {
+            return this.Kind ?? ModelingKind.Instance;
+        }
+
+        /// <summary>
         /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
@@ -7099,7 +7245,7 @@ namespace AasCore.Aas3
             Category = category;
             Description = description;
             Checksum = checksum;
-            Kind = ModelingKind.Instance;
+            Kind = kind;
             SemanticId = semanticId;
             Qualifiers = qualifiers;
             DataSpecifications = dataSpecifications;
@@ -7246,6 +7392,27 @@ namespace AasCore.Aas3
         /// Compare to is-case-of relationship in ISO 13584-32 &amp; IEC EN 61360"
         /// </remarks>
         public List<GlobalReference>? IsCaseOf { get; set; }
+
+        /// <summary>
+        /// Return the <see cref="ConceptDescription.Category" /> or the default value
+        /// if it has not been set.
+        /// </summary>
+        public string CategoryOrDefault()
+        {
+            string result = this.Category ?? "PROPERTY";
+
+        #if DEBUG
+            if (!Verification.ConceptDescriptionCategoryIsValid(
+                    result))
+            {
+                throw new System.InvalidOperationException(
+                    $"Unexpected default category: {result}"
+                );
+            }
+        #endif
+
+            return result;
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance

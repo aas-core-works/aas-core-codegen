@@ -1,10 +1,8 @@
 /// <summary>
-/// Return the <see cref="Aas.Extension.ValueType" /> or the default value
+/// Return the <see cref="Extension.ValueType" /> or the default value
 /// if it has not been set.
 /// </summary>
-public Aas.DataTypeDefXsd ValueTypeOrDefault()
+public DataTypeDefXsd ValueTypeOrDefault()
 {
-    return (this.valueType != null)
-        ? this.valueType
-        : Aas.DataTypeDefXsd.String;
+    return this.ValueType ?? DataTypeDefXsd.String;
 }
