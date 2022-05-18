@@ -3997,6 +3997,9 @@ def errors_if_contracts_for_functions_or_methods_defined(
     """
     Generate an error if one or more contracts for functions or methods defined.
 
+    This does *not* apply to implementation-specific functions as they are going to
+    be manually implemented and we do not have to transpile them.
+
     We added some support for the pre-conditions, post-conditions and snapshots
     already and keep maintaining it as it is only a matter of time when we will
     introduce their transpilation. Introducing them "after the fact" would have been
@@ -4011,6 +4014,15 @@ def errors_if_contracts_for_functions_or_methods_defined(
             or len(signature_like.contracts.postconditions) > 0
             or len(signature_like.contracts.snapshots) > 0
         ):
+            # NOTE (mristin, 2022-05-18):
+            # We allow implementation-specific methods to have pre- and post-conditions
+            # as they are used only for documentation, but are not transpiled.
+            if isinstance(
+                signature_like,
+                (ImplementationSpecificVerification, ImplementationSpecificMethod),
+            ):
+                continue
+
             original_node = None  # type: Optional[ast.AST]
 
             if signature_like.parsed is not None:
