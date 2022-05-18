@@ -1490,9 +1490,7 @@ def _to_class(
 
     methods = []  # type: List[MethodUnion]
     for parsed_method in parsed.methods:
-        if not isinstance(
-            parsed_method, (parse.UnderstoodMethod, ImplementationSpecificMethod)
-        ):
+        if isinstance(parsed_method, parse.ConstructorToBeUnderstood):
             # Constructors are handled in a different way through
             # :py:class:`Constructors`.
             continue
