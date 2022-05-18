@@ -1,12 +1,10 @@
 /// <summary>
-/// Return the <see cref="Aas.ConceptDescription.Category" /> or the default value
+/// Return the <see cref="ConceptDescription.Category" /> or the default value
 /// if it has not been set.
 /// </summary>
 public string CategoryOrDefault()
 {
-    string result = (this.category != null)
-        ? this.category
-        : "PROPERTY";
+    string result = this.Category ?? "PROPERTY";
 
 #if DEBUG
     if (!Verification.ConceptDescriptionCategoryIsValid(
@@ -17,4 +15,6 @@ public string CategoryOrDefault()
         );
     }
 #endif
+
+    return result;
 }

@@ -445,6 +445,25 @@ UnverifiedSymbolTable(
             node=...),
           node=...)],
       methods=[
+        ImplementationSpecificMethod(
+          name='value_type_or_default',
+          verification=False,
+          arguments=[
+            Argument(
+              name='self',
+              type_annotation=SelfTypeAnnotation(),
+              default=None,
+              node=...)],
+          returns=AtomicTypeAnnotation(
+            identifier='Data_type_def_XSD',
+            node=...),
+          description=None,
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          node=...,
+          arguments_by_name=...),
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
@@ -1052,6 +1071,25 @@ UnverifiedSymbolTable(
             node=...),
           node=...)],
       methods=[
+        ImplementationSpecificMethod(
+          name='kind_or_default',
+          verification=False,
+          arguments=[
+            Argument(
+              name='self',
+              type_annotation=SelfTypeAnnotation(),
+              default=None,
+              node=...)],
+          returns=AtomicTypeAnnotation(
+            identifier='Modeling_kind',
+            node=...),
+          description=None,
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          node=...,
+          arguments_by_name=...),
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
@@ -2870,6 +2908,25 @@ UnverifiedSymbolTable(
             node=...),
           node=...)],
       methods=[
+        ImplementationSpecificMethod(
+          name='order_relevant_or_default',
+          verification=False,
+          arguments=[
+            Argument(
+              name='self',
+              type_annotation=SelfTypeAnnotation(),
+              default=None,
+              node=...)],
+          returns=AtomicTypeAnnotation(
+            identifier='bool',
+            node=...),
+          description=None,
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          node=...,
+          arguments_by_name=...),
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
@@ -3784,44 +3841,54 @@ UnverifiedSymbolTable(
         Invariant(
           description='Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE',
           body=textwrap.dedent("""\
-            Or(
-              values=[
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='CONSTANT',
-                    original_node=...),
+                  name='category',
                   original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                original_node=...),
+              consequent=Or(
+                values=[
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
                       original_node=...),
-                    name='category',
-                    original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='PARAMETER',
-                    original_node=...),
-                  original_node=...),
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                    op='EQ',
+                    right=Constant(
+                      value='CONSTANT',
                       original_node=...),
-                    name='category',
                     original_node=...),
-                  op='EQ',
-                  right=Constant(
-                    value='VARIABLE',
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='PARAMETER',
+                      original_node=...),
                     original_node=...),
-                  original_node=...)],
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='VARIABLE',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
               original_node=...)"""),
           node=...)],
       serialization=None,
@@ -5803,7 +5870,7 @@ UnverifiedSymbolTable(
                                 instance=Name(
                                   identifier='self',
                                   original_node=...),
-                                name='global_asset_id',
+                                name='specific_asset_id',
                                 original_node=...),
                               original_node=...)],
                           original_node=...),
@@ -5822,7 +5889,7 @@ UnverifiedSymbolTable(
                                 instance=Name(
                                   identifier='self',
                                   original_node=...),
-                                name='global_asset_id',
+                                name='specific_asset_id',
                                 original_node=...),
                               original_node=...)],
                           original_node=...)],
@@ -7184,6 +7251,31 @@ UnverifiedSymbolTable(
             node=...),
           node=...)],
       methods=[
+        ImplementationSpecificMethod(
+          name='category_or_default',
+          verification=False,
+          arguments=[
+            Argument(
+              name='self',
+              type_annotation=SelfTypeAnnotation(),
+              default=None,
+              node=...)],
+          returns=AtomicTypeAnnotation(
+            identifier='str',
+            node=...),
+          description=None,
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[
+              Contract(
+                args=[
+                  'result'],
+                description=None,
+                body=...,
+                node=...)]),
+          node=...,
+          arguments_by_name=...),
         ConstructorToBeUnderstood(
           name='__init__',
           verification=False,
@@ -14083,7 +14175,7 @@ UnverifiedSymbolTable(
       verification=True,
       arguments=[
         Argument(
-          name='namespace',
+          name='referables',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='List',
             subscripts=[
