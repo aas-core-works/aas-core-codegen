@@ -3,6 +3,34 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.9 (2022-05-24)
+==================
+* Verify the limitedness of type annotations (#156)
+* Allow for subclass checks in intermediate (#164)
+* Make stringify output multi-line string (#165)
+* Fix stacking of inferred schema constraints (#166)
+* Fix methods ignored in intermediate (#167)
+* Allow contracts for impl.-specific methods (#168)
+* Introduce ``specified_for`` for methods (#170)
+* Re-visit inheritance of methods and signatures (#171)
+* Add experimental support for ``any`` in invariants (#173)
+
+C#
+--
+* Implement a practical set of visitors in C# (#151)
+* Allow null enums in C# stringification (#152)
+* Remove unused arguments in C# jsonization (#153)
+* Specify more implementation keys in C# jsonization (#154)
+* Fix documentation about classes in C# jsonization (#155)
+* Write xmlization for C# (#157)
+* Fix unspecified indention in C# (#161)
+* Fix indention in snippets of C# jsonization (#162)
+* Expect C# snippets for types in a directory (#169)
+
+RDF+SHACL
+---------
+* Adapt RDF and SHACL to match aas-specs V3RC02 (#159)
+
 0.0.8 (2022-04-09)
 ==================
 JSON
