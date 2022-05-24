@@ -75,39 +75,39 @@ class _ParseComparison(_Parse):
         return tree.Comparison(left=left, op=op, right=right, original_node=node), None
 
 
-class _ParseAll(_Parse):
+class _ParseAnyOrAll(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return (
             isinstance(node, ast.Call)
             and isinstance(node.func, ast.Name)
-            and node.func.id == "all"
+            and node.func.id in ("any", "all")
         )
 
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert (
             isinstance(node, ast.Call)
             and isinstance(node.func, ast.Name)
-            and node.func.id == "all"
+            and node.func.id in ("any", "all")
         )
 
         if len(node.keywords) > 0:
             return None, Error(
                 node,
-                "Expected no keyword arguments in ``all``, "
+                f"Expected no keyword arguments in ``{node.func.id}``, "
                 f"but got {len(node.keywords)}",
             )
 
         if len(node.args) != 1:
             return None, Error(
                 node,
-                "Expected exactly one argument in ``all``, "
+                f"Expected exactly one argument in ``{node.func.id}``, "
                 f"but got {len(node.args)}",
             )
 
         if not isinstance(node.args[0], ast.GeneratorExp):
             return None, Error(
                 node,
-                "Expected a generator expression in ``all``, "
+                f"Expected a generator expression in ``{node.func.id}``, "
                 f"but got: {ast.dump(node)}",
             )
 
@@ -122,7 +122,7 @@ class _ParseAll(_Parse):
         if len(generator_exp.generators) != 1:
             return None, Error(
                 node,
-                "Expected exactly one generator in ``all``, "
+                f"Expected exactly one generator in ``{node.func.id}``, "
                 f"but got {len(generator_exp.generators)}",
             )
 
@@ -150,8 +150,16 @@ class _ParseAll(_Parse):
 
         assert isinstance(an_iter, tree.Expression), f"{an_iter=}"
 
+        factory_to_use = None  # type: Optional[Union[Type[tree.Any], Type[tree.All]]]
+        if node.func.id == "any":
+            factory_to_use = tree.Any
+        elif node.func.id == "all":
+            factory_to_use = tree.All
+        else:
+            raise AssertionError(f"Unexpected {node.func.id=}")
+
         return (
-            tree.All(
+            factory_to_use(
                 for_each=tree.ForEach(
                     variable=variable, iteration=an_iter, original_node=generator
                 ),
@@ -485,7 +493,7 @@ class _ParseReturn(_Parse):
 
 _CHAIN_OF_RULES = [
     _ParseComparison(),
-    _ParseAll(),
+    _ParseAnyOrAll(),
     _ParseCall(),
     _ParseConstant(),
     _ParseImplication(),

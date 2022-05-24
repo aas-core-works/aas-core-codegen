@@ -341,6 +341,26 @@ class ForEach(Node):
         visitor.visit_for_each(self)
 
 
+class Any(Expression):
+    """Represent an ``any(...)`` expression."""
+
+    def __init__(
+        self, for_each: ForEach, condition: Expression, original_node: ast.AST
+    ) -> None:
+        """Initialize with the given values."""
+        Expression.__init__(self, original_node=original_node)
+        self.for_each = for_each
+        self.condition = condition
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_any(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_any(self)
+
+
 class All(Expression):
     """Represent an ``all(...)`` expression."""
 
@@ -479,6 +499,11 @@ class Visitor(DBC):
         """Visit an ``for`` in an generator."""
         self.visit(node.iteration)
 
+    def visit_any(self, node: Any) -> None:
+        """Visit an ``any(...)`` expression."""
+        self.visit(node.for_each)
+        self.visit(node.condition)
+
     def visit_all(self, node: All) -> None:
         """Visit an ``all(...)`` expression."""
         self.visit(node.for_each)
@@ -573,6 +598,11 @@ class Transformer(Generic[T], DBC):
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
+    def transform_any(self, node: Any) -> T:
+        """Transform an ``any(...)`` into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
     def transform_all(self, node: All) -> T:
         """Transform an ``all(...)`` into something."""
         raise NotImplementedError(f"{node=}")
@@ -650,6 +680,10 @@ class RestrictedTransformer(Transformer[T], DBC):
 
     def transform_for_each(self, node: ForEach) -> T:
         """Transform an ``for`` in an generator expression into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_any(self, node: Any) -> T:
+        """Transform an ``any(...)`` expression into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
     def transform_all(self, node: All) -> T:
@@ -819,6 +853,16 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             properties=[
                 stringify.Property("variable", self.transform(node.variable)),
                 stringify.Property("iteration", self.transform(node.iteration)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
+    def transform_any(self, node: Any) -> stringify.Entity:
+        return stringify.Entity(
+            name=Any.__name__,
+            properties=[
+                stringify.Property("for_each", self.transform(node.for_each)),
+                stringify.Property("condition", self.transform(node.condition)),
                 stringify.PropertyEllipsis("original_node", node.original_node),
             ],
         )
