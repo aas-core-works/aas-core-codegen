@@ -908,7 +908,9 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         self.type_map[node] = result
         return result
 
-    def transform_all(self, node: parse_tree.All) -> Optional["TypeAnnotationUnion"]:
+    def _transform_any_or_all(
+        self, node: Union[parse_tree.Any, parse_tree.All]
+    ) -> Optional["TypeAnnotationUnion"]:
         a_type = self.transform(node.for_each)
         if a_type is None:
             return None
@@ -920,6 +922,12 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
         self.type_map[node] = result
         return result
+
+    def transform_any(self, node: parse_tree.Any) -> Optional["TypeAnnotationUnion"]:
+        return self._transform_any_or_all(node)
+
+    def transform_all(self, node: parse_tree.All) -> Optional["TypeAnnotationUnion"]:
+        return self._transform_any_or_all(node)
 
     def transform_assignment(
         self, node: parse_tree.Assignment

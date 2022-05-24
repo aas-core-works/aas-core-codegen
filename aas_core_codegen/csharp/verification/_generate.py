@@ -8,6 +8,7 @@ from typing import (
     Sequence,
     Set,
     Mapping,
+    Union,
 )
 
 from icontract import ensure
@@ -884,8 +885,8 @@ class _InvariantTranspiler(
 
         return Stripped(writer.getvalue()), None
 
-    def transform_all(
-        self, node: parse_tree.All
+    def _transform_any_or_all(
+        self, node: Union[parse_tree.Any, parse_tree.All]
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
@@ -922,17 +923,32 @@ class _InvariantTranspiler(
         ):
             iteration = Stripped(f"({iteration})")
 
-        # NOTE (mristin, 2022-04-07):
-        # We can not use ``textwrap.dedent`` here since ``condition`` contains multiple
-        # lines.
+        qualifier_function = None  # type: Optional[str]
+        if isinstance(node, parse_tree.Any):
+            qualifier_function = "Any"
+        elif isinstance(node, parse_tree.All):
+            qualifier_function = "All"
+        else:
+            assert_never(node)
+
         return (
             Stripped(
                 f"""\
-{iteration}.All(
+{iteration}.{qualifier_function}(
 {I}{variable} => {indent_but_first_line(condition, II)})"""
             ),
             None,
         )
+
+    def transform_any(
+        self, node: parse_tree.Any
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        return self._transform_any_or_all(node)
+
+    def transform_all(
+        self, node: parse_tree.All
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        return self._transform_any_or_all(node)
 
 
 # noinspection PyProtectedMember,PyProtectedMember
