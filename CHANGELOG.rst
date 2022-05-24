@@ -3,6 +3,10 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.10 (2022-05-24)
+===================
+* Move ``requirements-dev`` back to ``setup.py`` (#175)
+
 0.0.9 (2022-05-24)
 ==================
 * Verify the limitedness of type annotations (#156)
