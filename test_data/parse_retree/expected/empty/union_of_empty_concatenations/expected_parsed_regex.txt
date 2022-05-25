@@ -1,0 +1,7 @@
+Regex(
+  union=UnionExpr(
+    uniates=[
+      Concatenation(
+        concatenants=[]),
+      Concatenation(
+        concatenants=[])]))

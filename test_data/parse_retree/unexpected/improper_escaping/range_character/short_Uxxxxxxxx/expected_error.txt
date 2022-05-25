@@ -1,0 +1,3 @@
+Expected eight hexadecimal digits after \U
+[\U12345]
+   ^

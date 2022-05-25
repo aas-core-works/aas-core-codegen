@@ -1,0 +1,3 @@
+Expected four hexadecimal digits after \u
+\uabc
+  ^

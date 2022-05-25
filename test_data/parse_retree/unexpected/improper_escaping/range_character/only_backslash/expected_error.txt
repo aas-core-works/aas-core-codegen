@@ -1,0 +1,3 @@
+Expected a closing bracket for the character set (``]``), but reached the end of input.
+[a\]
+    ^

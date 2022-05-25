@@ -1,0 +1,20 @@
+Regex(
+  union=UnionExpr(
+    uniates=[
+      Concatenation(
+        concatenants=[
+          Term(
+            value=Group(
+              union=UnionExpr(
+                uniates=[
+                  Concatenation(
+                    concatenants=[
+                      Term(
+                        value=Char(
+                          character='a',
+                          explicitly_encoded=False),
+                        quantifier=None)])])),
+            quantifier=Quantifier(
+              non_greedy=False,
+              minimum=0,
+              maximum=None))])]))

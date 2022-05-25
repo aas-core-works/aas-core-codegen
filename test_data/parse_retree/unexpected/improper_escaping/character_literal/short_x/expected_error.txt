@@ -1,0 +1,3 @@
+Expected two hexadecimal digits after \x
+\x3
+  ^

@@ -1,0 +1,3 @@
+Expected closing ``}`` for the quantifier
+a{3,
+    ^

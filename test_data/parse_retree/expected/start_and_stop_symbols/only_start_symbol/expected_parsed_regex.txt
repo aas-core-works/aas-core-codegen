@@ -1,0 +1,9 @@
+Regex(
+  union=UnionExpr(
+    uniates=[
+      Concatenation(
+        concatenants=[
+          Term(
+            value=Symbol(
+              kind='^'),
+            quantifier=None)])]))

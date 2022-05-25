@@ -1,0 +1,13 @@
+Regex(
+  union=UnionExpr(
+    uniates=[
+      Concatenation(
+        concatenants=[
+          Term(
+            value=Symbol(
+              kind='$'),
+            quantifier=None),
+          Term(
+            value=Symbol(
+              kind='$'),
+            quantifier=None)])]))

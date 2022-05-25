@@ -36,7 +36,7 @@ namespace AasCore.Aas3
         {
             var digit = "[0-9]";
             var yearFrag = $"-?(([1-9]{digit}{digit}{digit}+)|(0{digit}{digit}{digit}))";
-            var monthFrag = $"((0[1-9])|(1[0-2]))";
+            var monthFrag = "((0[1-9])|(1[0-2]))";
             var dayFrag = $"((0[1-9])|([12]{digit})|(3[01]))";
             var hourFrag = $"(([01]{digit})|(2[0-3]))";
             var minuteFrag = $"[0-5]{digit}";
@@ -85,10 +85,10 @@ namespace AasCore.Aas3
             var token = $"({tchar})+";
             var type = $"{token}";
             var subtype = $"{token}";
-            var ows = "[ \t]*";
+            var ows = "[ \\t]*";
             var obsText = "[\\x80-\\xff]";
-            var qdText = $"([\t !#-\\[\\]-~]|{obsText})";
-            var quotedPair = $"\\\\([\t !-~]|{obsText})";
+            var qdText = $"([\\t !#-\\[\\]-~]|{obsText})";
+            var quotedPair = $"\\\\([\\t !-~]|{obsText})";
             var quotedString = $"\"({qdText}|{quotedPair})*\"";
             var parameter = $"{token}=({token}|{quotedString})";
             var mediaType = $"^{type}/{subtype}({ows};{ows}{parameter})*$";
@@ -249,8 +249,8 @@ namespace AasCore.Aas3
             var isegmentNzNc = $"({iunreserved}|{pctEncoded}|{subDelims}|@)+";
             var ipathNoscheme = $"{isegmentNzNc}(/{isegment})*";
             var irelativePart = $"(//{iauthority}{ipathAbempty}|{ipathAbsolute}|{ipathNoscheme}|{ipathEmpty})";
-            var irelativeRef = $"{irelativePart}(\\?{iquery})?(\\#{ifragment})?";
-            var iri = $"{scheme}:{ihierPart}(\\?{iquery})?(\\#{ifragment})?";
+            var irelativeRef = $"{irelativePart}(\\?{iquery})?(#{ifragment})?";
+            var iri = $"{scheme}:{ihierPart}(\\?{iquery})?(#{ifragment})?";
             var iriReference = $"({iri}|{irelativeRef})";
             var pattern = $"^{iriReference}$";
 
@@ -345,7 +345,7 @@ namespace AasCore.Aas3
         {
             var digit = "[0-9]";
             var yearFrag = $"-?(([1-9]{digit}{digit}{digit}+)|(0{digit}{digit}{digit}))";
-            var monthFrag = $"((0[1-9])|(1[0-2]))";
+            var monthFrag = "((0[1-9])|(1[0-2]))";
             var dayFrag = $"((0[1-9])|([12]{digit})|(3[01]))";
             var minuteFrag = $"[0-5]{digit}";
             var timezoneFrag = $"(Z|(\\+|-)(0{digit}|1[0-3]):{minuteFrag}|14:00)";
@@ -378,7 +378,7 @@ namespace AasCore.Aas3
         {
             var digit = "[0-9]";
             var yearFrag = $"-?(([1-9]{digit}{digit}{digit}+)|(0{digit}{digit}{digit}))";
-            var monthFrag = $"((0[1-9])|(1[0-2]))";
+            var monthFrag = "((0[1-9])|(1[0-2]))";
             var dayFrag = $"((0[1-9])|([12]{digit})|(3[01]))";
             var hourFrag = $"(([01]{digit})|(2[0-3]))";
             var minuteFrag = $"[0-5]{digit}";
@@ -414,7 +414,7 @@ namespace AasCore.Aas3
         {
             var digit = "[0-9]";
             var yearFrag = $"-?(([1-9]{digit}{digit}{digit}+)|(0{digit}{digit}{digit}))";
-            var monthFrag = $"((0[1-9])|(1[0-2]))";
+            var monthFrag = "((0[1-9])|(1[0-2]))";
             var dayFrag = $"((0[1-9])|([12]{digit})|(3[01]))";
             var hourFrag = $"(([01]{digit})|(2[0-3]))";
             var minuteFrag = $"[0-5]{digit}";
@@ -805,7 +805,7 @@ namespace AasCore.Aas3
 
         private static Regex _constructMatchesXsInteger()
         {
-            var integerRep = "[\\-+]?[0-9]+";
+            var integerRep = "[-+]?[0-9]+";
             var pattern = $"^{integerRep}$";
 
             return new Regex(pattern);
@@ -832,7 +832,7 @@ namespace AasCore.Aas3
 
         private static Regex _constructMatchesXsLong()
         {
-            var longRep = "[\\-+]?[0-9]+";
+            var longRep = "[-+]?[0-9]+";
             var pattern = $"^{longRep}$";
 
             return new Regex(pattern);
@@ -859,7 +859,7 @@ namespace AasCore.Aas3
 
         private static Regex _constructMatchesXsInt()
         {
-            var intRep = "[\\-+]?[0-9]+";
+            var intRep = "[-+]?[0-9]+";
             var pattern = $"^{intRep}$";
 
             return new Regex(pattern);
@@ -886,7 +886,7 @@ namespace AasCore.Aas3
 
         private static Regex _constructMatchesXsShort()
         {
-            var shortRep = "[\\-+]?[0-9]+";
+            var shortRep = "[-+]?[0-9]+";
             var pattern = $"^{shortRep}$";
 
             return new Regex(pattern);
@@ -913,7 +913,7 @@ namespace AasCore.Aas3
 
         private static Regex _constructMatchesXsByte()
         {
-            var byteRep = "[\\-+]?[0-9]+";
+            var byteRep = "[-+]?[0-9]+";
             var pattern = $"^{byteRep}$";
 
             return new Regex(pattern);

@@ -3,14 +3,35 @@
 import argparse
 import pathlib
 import sys
-from typing import TextIO
+from typing import TextIO, List
 
 import aas_core_codegen
 from aas_core_codegen import parse, run, intermediate, infer_for_schema
-from aas_core_codegen.common import LinenoColumner
+from aas_core_codegen.parse import retree as parse_retree, tree as parse_tree
+from aas_core_codegen.common import LinenoColumner, Error
 import aas_core_codegen.smoke
 
 assert __doc__ == aas_core_codegen.smoke.__doc__
+
+
+class _ParsePatternVisitor(parse_tree.Visitor):
+    """Check that all the patterns could be successfully parsed."""
+
+    def __init__(self) -> None:
+        self.errors = []  # type: List[parse_retree.Error]
+
+    def visit_joined_str(self, node: parse_tree.JoinedStr) -> None:
+        """Check that the joined string is a valid regular expression."""
+        _, error = parse_retree.parse(values=node.values)
+        if error is not None:
+            self.errors.append(error)
+
+    def visit_constant(self, node: parse_tree.Constant) -> None:
+        """Visit a constant."""
+        if isinstance(node.value, str):
+            _, error = parse_retree.parse(values=[node.value])
+            if error is not None:
+                self.errors.append(error)
 
 
 def execute(model_path: pathlib.Path, stderr: TextIO) -> int:
@@ -80,6 +101,41 @@ def execute(model_path: pathlib.Path, stderr: TextIO) -> int:
     if errors is not None:
         run.write_error_report(
             message=f"Failed to infer the constraints by class for the schemas "
+            f"based on {model_path}",
+            errors=[lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
+
+        return 1
+
+    errors = []
+    for verification in ir_symbol_table.verification_functions:
+        if isinstance(verification, intermediate.PatternVerification):
+            for stmt in verification.parsed.body:
+                visitor = _ParsePatternVisitor()
+                visitor.visit(stmt)
+
+                if len(visitor.errors) > 0:
+                    for visitor_error in visitor.errors:
+                        regex_line, pointer_line = parse_retree.render_pointer(
+                            visitor_error.cursor
+                        )
+
+                        errors.append(
+                            Error(
+                                stmt.original_node,
+                                (
+                                    f"{visitor_error.message}\n"
+                                    f"{regex_line}\n"
+                                    f"{pointer_line}"
+                                ),
+                            )
+                        )
+
+    if len(errors) > 0:
+        run.write_error_report(
+            message=f"Failed to parse the regular expressions "
+            f"in one or more pattern verification functions "
             f"based on {model_path}",
             errors=[lineno_columner.error_message(error) for error in errors],
             stderr=stderr,

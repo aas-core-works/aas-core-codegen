@@ -1,0 +1,3 @@
+Invalid character range, start is smaller than end
+[z-a]
+    ^
