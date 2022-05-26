@@ -259,11 +259,12 @@ def _generate_xs_element_for_a_list_property(
         elif isinstance(
             symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            if isinstance(symbol, intermediate.AbstractClass) or (
-                isinstance(symbol, intermediate.ConcreteClass)
-                and len(symbol.concrete_descendants) > 0
-            ):
-
+            # NOTE (mristin, 2022-05-26):
+            # We need to check for the concrete descendants. If there are no concrete
+            # descendants, there is no choice group either. Notably, this not only
+            # applies to concrete classes, but there is no choice group for the abstract
+            # classes without descendants either.
+            if len(symbol.concrete_descendants) > 0:
                 choice_group_name = xsd_naming.choice_group_name(symbol.name)
                 xs_group = ET.Element(
                     "xs:group",
@@ -285,9 +286,6 @@ def _generate_xs_element_for_a_list_property(
                 )
                 xs_element.append(xs_complex_type)
             else:
-                assert isinstance(symbol, intermediate.ConcreteClass)
-                assert len(symbol.concrete_descendants) == 0
-
                 xs_element_inner = ET.Element(
                     "xs:element",
                     {
@@ -369,10 +367,15 @@ def _generate_xs_element_for_a_property(
         elif isinstance(
             symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            if isinstance(symbol, intermediate.AbstractClass) or (
-                isinstance(symbol, intermediate.ConcreteClass)
-                and len(symbol.concrete_descendants) > 0
-            ):
+            # NOTE (mristin, 2022-05-26):
+            # We generate choices only if there are at least one concrete descendant.
+            # Otherwise, the choice is not generated. Hence we need to reference
+            # a choice only if there is actually one.
+            #
+            # This is especially necessary for abstract classes with no descendants
+            # which we still want to include in the schema. We simply generate an empty
+            # element in the schema for such abstract classes without descendants.
+            if len(symbol.concrete_descendants) > 0:
                 xs_sequence = ET.Element("xs:sequence")
                 xs_sequence.append(
                     ET.Element(
@@ -388,11 +391,6 @@ def _generate_xs_element_for_a_property(
                 )
                 xs_element.append(xs_complex_type)
             else:
-                assert (
-                    isinstance(symbol, intermediate.ConcreteClass)
-                    and len(symbol.concrete_descendants) == 0
-                )
-
                 xs_element = ET.Element(
                     "xs:element",
                     {
