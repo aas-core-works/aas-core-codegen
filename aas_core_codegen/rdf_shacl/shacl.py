@@ -247,7 +247,7 @@ aas:{shape_name} a sh:NodeShape ;
                 f'''\
 sh:sparql [
 {I}a sh:SPARQLConstraint ;
-{I}sh:message "({shape_name}): An aas:{cls_name} is a abstract class. Please use one of the subclasses for the generation of instances."@en ;
+{I}sh:message "({shape_name}): An aas:{cls_name} is an abstract class. Please use one of the subclasses for the generation of instances."@en ;
 {I}sh:prefixes aas: ;
 {I}sh:select """
 {II}SELECT ?this ?type
