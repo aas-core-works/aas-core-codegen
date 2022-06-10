@@ -240,7 +240,7 @@ def assert_compares_against_dict(entity: Entity, obj: object) -> None:
 def assert_all_public_types_listed_as_dumpables(
     dumpable: Any, types_module: Any
 ) -> None:
-    """Make sure that all classes in :py:mod:`_types` are listed as dumpables."""
+    """Make sure that all classes in ``types_modules`` are listed as dumpables."""
 
     dumpable_set = set()  # type: Set[str]
 
@@ -250,6 +250,13 @@ def assert_all_public_types_listed_as_dumpables(
     module_set = set()  # type: Set[str]
 
     for identifier, cls in inspect.getmembers(types_module, inspect.isclass):
+        module_name = getattr(cls, "__module__", None)
+        if module_name is None:
+            continue
+
+        if module_name != types_module.__name__:
+            continue
+
         if identifier.startswith("_"):
             continue
 
