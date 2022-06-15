@@ -12,14 +12,10 @@ import aas_core_meta.v3rc2
 
 from aas_core_codegen.smoke import main as smoke_main
 
+import tests.common
+
 
 class Test_against_recorded(unittest.TestCase):
-    RERECORD = os.environ.get("AAS_CORE_CODEGEN_RERECORD", "").lower() in (
-        "1",
-        "true",
-        "on",
-    )
-
     def test_cases(self) -> None:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
@@ -79,7 +75,7 @@ class Test_against_recorded(unittest.TestCase):
                 str(model_pth), f"<{model_pth.name}>"
             )
 
-            if Test_against_recorded.RERECORD:
+            if tests.common.RERECORD:
                 stderr_pth.write_text(normalized_stderr, encoding="utf-8")
             else:
                 self.assertEqual(

@@ -13,6 +13,8 @@ import aas_core_meta.v3rc2
 import aas_core_codegen.main
 from aas_core_codegen.xsd import main as xsd_main
 
+import tests.common
+
 
 class Test_undo_escaping_x(unittest.TestCase):
     def test_empty(self) -> None:
@@ -68,12 +70,6 @@ class Test_undo_escaping_x(unittest.TestCase):
 
 
 class Test_against_recorded(unittest.TestCase):
-    RERECORD = os.environ.get("AAS_CORE_CODEGEN_RERECORD", "").lower() in (
-        "1",
-        "true",
-        "on",
-    )
-
     _REPO_DIR = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
     PARENT_CASE_DIR = _REPO_DIR / "test_data" / "xsd" / "test_main"
 
@@ -99,7 +95,7 @@ class Test_against_recorded(unittest.TestCase):
             expected_output_dir = case_dir / "expected_output"
 
             with contextlib.ExitStack() as exit_stack:
-                if Test_against_recorded.RERECORD:
+                if tests.common.RERECORD:
                     output_dir = expected_output_dir
                     expected_output_dir.mkdir(exist_ok=True, parents=True)
                 else:
@@ -141,7 +137,7 @@ class Test_against_recorded(unittest.TestCase):
                     str(output_dir), "<output dir>"
                 )
 
-                if Test_against_recorded.RERECORD:
+                if tests.common.RERECORD:
                     stdout_pth.write_text(normalized_stdout, encoding="utf-8")
                 else:
                     self.assertEqual(
@@ -163,7 +159,7 @@ class Test_against_recorded(unittest.TestCase):
                             f"The output file is missing: {output_pth}"
                         )
 
-                    if Test_against_recorded.RERECORD:
+                    if tests.common.RERECORD:
                         expected_pth.write_text(
                             output_pth.read_text(encoding="utf-8"), encoding="utf-8"
                         )

@@ -11,14 +11,10 @@ import aas_core_meta.v3rc2
 
 import aas_core_codegen.main
 
+import tests.common
+
 
 class Test_against_recorded(unittest.TestCase):
-    RERECORD = os.environ.get("AAS_CORE_CODEGEN_RERECORD", "").lower() in (
-        "1",
-        "true",
-        "on",
-    )
-
     def test_cases(self) -> None:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
@@ -41,7 +37,7 @@ class Test_against_recorded(unittest.TestCase):
             expected_output_dir = case_dir / "expected_output"
 
             with contextlib.ExitStack() as exit_stack:
-                if Test_against_recorded.RERECORD:
+                if tests.common.RERECORD:
                     output_dir = expected_output_dir
                     expected_output_dir.mkdir(exist_ok=True, parents=True)
                 else:
@@ -84,7 +80,7 @@ class Test_against_recorded(unittest.TestCase):
                     str(output_dir), "<output dir>"
                 )
 
-                if Test_against_recorded.RERECORD:
+                if tests.common.RERECORD:
                     stdout_pth.write_text(normalized_stdout, encoding="utf-8")
                 else:
                     self.assertEqual(
@@ -119,7 +115,7 @@ class Test_against_recorded(unittest.TestCase):
                             f"Failed to read the output from {output_pth}"
                         ) from exception
 
-                    if Test_against_recorded.RERECORD:
+                    if tests.common.RERECORD:
                         expected_pth.write_text(output, encoding="utf-8")
                     else:
                         try:

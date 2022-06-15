@@ -16,9 +16,10 @@ import docutils.nodes
 
 import aas_core_meta.v3rc2
 
-import tests.common
 from aas_core_codegen import parse
 from aas_core_codegen.common import Error, Identifier
+
+import tests.common
 
 
 class Test_parsing_AST(unittest.TestCase):
@@ -360,12 +361,6 @@ class Test_parse_type_annotation_fail(unittest.TestCase):
 
 
 class Test_against_recorded(unittest.TestCase):
-    RERECORD = os.environ.get("AAS_CORE_CODEGEN_RERECORD", "").lower() in (
-        "1",
-        "true",
-        "on",
-    )
-
     def test_cases(self) -> None:
         this_dir = pathlib.Path(os.path.realpath(__file__)).parent
         test_cases_dir = this_dir.parent.parent / "test_data/parse"
@@ -429,7 +424,7 @@ class Test_against_recorded(unittest.TestCase):
 
                 error_str = tests.common.most_underlying_messages(error)
 
-                if Test_against_recorded.RERECORD:
+                if tests.common.RERECORD:
                     expected_error_pth.write_text(error_str, encoding="utf-8")
                 else:
                     expected_error_str = expected_error_pth.read_text(encoding="utf-8")
@@ -446,7 +441,7 @@ class Test_against_recorded(unittest.TestCase):
 
                 symbol_table_str = parse.dump(symbol_table)
 
-                if Test_against_recorded.RERECORD:
+                if tests.common.RERECORD:
                     expected_symbol_table_pth.write_text(
                         symbol_table_str, encoding="utf-8"
                     )
@@ -499,7 +494,7 @@ class Test_against_recorded(unittest.TestCase):
 
             symbol_table_str = parse.dump(symbol_table)
 
-            if Test_against_recorded.RERECORD:
+            if tests.common.RERECORD:
                 expected_symbol_table_pth.write_text(symbol_table_str, encoding="utf-8")
             else:
                 expected_symbol_table_str = expected_symbol_table_pth.read_text(

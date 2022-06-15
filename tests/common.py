@@ -1,4 +1,5 @@
 """Provide common functionality across different tests."""
+import os
 from typing import List, Tuple, Optional, Union, Sequence
 
 import asttokens
@@ -88,3 +89,12 @@ def translate_source_to_intermediate(
     assert parsed_symbol_table is not None
 
     return intermediate.translate(parsed_symbol_table=parsed_symbol_table, atok=atok)
+
+
+#: If set, this environment variable indicates that the golden files should be
+#: re-recorded instead of checked against.
+RERECORD = os.environ.get("AAS_CORE_CODEGEN_RERECORD", "").lower() in (
+    "1",
+    "true",
+    "on",
+)

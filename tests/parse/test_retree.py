@@ -11,13 +11,14 @@ from typing import Tuple, List, Union, Sequence
 
 import asttokens
 
-import tests.common
 from aas_core_codegen.common import assert_never
 from aas_core_codegen.parse import (
     tree as parse_tree,
     _rules as parse_rules,
     retree as parse_retree,
 )
+
+import tests.common
 
 
 def parse_values_from_source(
@@ -136,12 +137,6 @@ class Test_cursor(unittest.TestCase):
 
 
 class Test_against_recorded(unittest.TestCase):
-    RERECORD = os.environ.get("AAS_CORE_CODEGEN_RERECORD", "").lower() in (
-        "1",
-        "true",
-        "on",
-    )
-
     def test_cases(self) -> None:
         this_dir = pathlib.Path(os.path.realpath(__file__)).parent
         test_cases_dir = this_dir.parent.parent / "test_data/parse_retree"
@@ -215,7 +210,7 @@ class Test_against_recorded(unittest.TestCase):
                 regex_line, pointer_line = parse_retree.render_pointer(error.cursor)
                 error_str = f"{error.message}\n" f"{regex_line}\n" f"{pointer_line}\n"
 
-                if Test_against_recorded.RERECORD:
+                if tests.common.RERECORD:
                     expected_error_pth.write_text(error_str, encoding="utf-8")
                 else:
                     expected_error_str = expected_error_pth.read_text(encoding="utf-8")
@@ -242,7 +237,7 @@ class Test_against_recorded(unittest.TestCase):
                         assert_never(value)
                 rendered_regex_str = "".join(rendered_parts)
 
-                if Test_against_recorded.RERECORD:
+                if tests.common.RERECORD:
                     expected_parsed_regex_pth.write_text(
                         parsed_regex_str, encoding="utf-8"
                     )

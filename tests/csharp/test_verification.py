@@ -11,6 +11,8 @@ from aas_core_codegen.csharp import (
 )
 from aas_core_codegen import parse
 
+import tests.common
+
 
 class Test_wrap_invariant_description(unittest.TestCase):
     def test_empty(self) -> None:
@@ -100,12 +102,6 @@ class Test_wrap_invariant_description(unittest.TestCase):
 
 
 class Test_pattern_translation_against_recorded(unittest.TestCase):
-    RERECORD = os.environ.get("AAS_CORE_CODEGEN_RERECORD", "").lower() in (
-        "1",
-        "true",
-        "on",
-    )
-
     def test_cases(self) -> None:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
@@ -158,7 +154,7 @@ class Test_pattern_translation_against_recorded(unittest.TestCase):
             assert code is not None
 
             expected_pth = model_pth.parent / "expected_verification.cs"
-            if Test_pattern_translation_against_recorded.RERECORD:
+            if tests.common.RERECORD:
                 expected_pth.write_text(code, encoding="utf-8")
             else:
                 try:
