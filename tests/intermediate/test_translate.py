@@ -8,10 +8,11 @@ from typing import List, Tuple
 
 import aas_core_meta.v3rc2
 
-import tests.common
 from aas_core_codegen import intermediate
 from aas_core_codegen.intermediate import doc as intermediate_doc
 from aas_core_codegen.common import Identifier
+
+import tests.common
 
 
 class Test_in_lining_of_constructor_statements(unittest.TestCase):
@@ -154,12 +155,6 @@ class Test_parsing_docstrings(unittest.TestCase):
 
 
 class Test_against_recorded(unittest.TestCase):
-    RERECORD = os.environ.get("AAS_CORE_CODEGEN_RERECORD", "").lower() in (
-        "1",
-        "true",
-        "on",
-    )
-
     def test_cases(self) -> None:
         this_dir = pathlib.Path(os.path.realpath(__file__)).parent
         repo_root = this_dir.parent.parent
@@ -231,7 +226,7 @@ class Test_against_recorded(unittest.TestCase):
 
                 error_str = tests.common.most_underlying_messages(error)
 
-                if Test_against_recorded.RERECORD:
+                if tests.common.RERECORD:
                     expected_error_pth.write_text(error_str, encoding="utf-8")
                 else:
                     expected_error_str = expected_error_pth.read_text(encoding="utf-8")
@@ -248,7 +243,7 @@ class Test_against_recorded(unittest.TestCase):
 
                 symbol_table_str = intermediate.dump(symbol_table)
 
-                if Test_against_recorded.RERECORD:
+                if tests.common.RERECORD:
                     expected_symbol_table_pth.write_text(
                         symbol_table_str, encoding="utf-8"
                     )
@@ -312,7 +307,7 @@ class Test_against_recorded(unittest.TestCase):
 
             symbol_table_str = intermediate.dump(symbol_table)
 
-            if Test_against_recorded.RERECORD:
+            if tests.common.RERECORD:
                 expected_symbol_table_pth.write_text(symbol_table_str, encoding="utf-8")
             else:
                 try:
