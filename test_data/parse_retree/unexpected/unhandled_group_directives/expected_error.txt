@@ -1,0 +1,3 @@
+At this moment (2022-06-09), we did not have time to implement the support for the directives in the groups (``?``). Please inform the developers if you need this feature.
+(?:abc)
+  ^

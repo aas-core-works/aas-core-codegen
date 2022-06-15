@@ -1,0 +1,17 @@
+Regex(
+  union=UnionExpr(
+    uniates=[
+      Concatenation(
+        concatenants=[
+          Term(
+            value=Char(
+              character='a',
+              explicitly_encoded=False),
+            quantifier=None)]),
+      Concatenation(
+        concatenants=[
+          Term(
+            value=Char(
+              character='b',
+              explicitly_encoded=False),
+            quantifier=None)])]))

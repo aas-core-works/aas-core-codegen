@@ -1,7 +1,4 @@
 """Parse the meta model."""
-from typing import Tuple, Optional
-
-import asttokens
 
 from aas_core_codegen.parse import _types, _translate, _stringify
 
@@ -44,13 +41,3 @@ check_expected_imports = _translate.check_expected_imports
 atok_to_symbol_table = _translate.atok_to_symbol_table
 
 dump = _stringify.dump
-
-# BEFORE-RELEASE (mristin, 2021-12-13):
-#  integrate __book_version__ and __book_url__ into parsed and intermediate types,
-#  and add them to comments in the generated code
-
-# BEFORE-RELEASE (mristin, 2021-12-13):
-#  parse markers reference_in_the_book and integrate them in the generated code
-
-# BEFORE-RELEASE (mristin, 2021-12-13):
-#  handle constrained primitive types

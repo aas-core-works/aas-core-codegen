@@ -1,0 +1,14 @@
+Regex(
+  union=UnionExpr(
+    uniates=[
+      Concatenation(
+        concatenants=[
+          Term(
+            value=Group(
+              union=UnionExpr(
+                uniates=[
+                  Concatenation(
+                    concatenants=[]),
+                  Concatenation(
+                    concatenants=[])])),
+            quantifier=None)])]))

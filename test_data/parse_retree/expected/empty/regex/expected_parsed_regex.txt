@@ -1,0 +1,3 @@
+Regex(
+  union=UnionExpr(
+    uniates=[]))

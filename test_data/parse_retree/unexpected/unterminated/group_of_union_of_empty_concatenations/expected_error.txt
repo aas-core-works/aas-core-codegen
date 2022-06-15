@@ -1,0 +1,3 @@
+Expected a closing bracket for the group, but found none.
+(|
+  ^

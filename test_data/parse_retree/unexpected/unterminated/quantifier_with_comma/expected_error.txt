@@ -1,0 +1,3 @@
+Encountered an opening ``{`` for a quantifier, but both minimum and the maximum could not be parsed
+a{,
+   ^

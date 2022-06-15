@@ -11,7 +11,7 @@ from typing import (
     Union,
 )
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen import intermediate, specific_implementations, naming
 from aas_core_codegen.common import (
@@ -33,7 +33,7 @@ from aas_core_codegen.csharp.common import (
     INDENT4 as IIII,
 )
 from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
-from aas_core_codegen.parse import tree as parse_tree
+from aas_core_codegen.parse import tree as parse_tree, retree as parse_retree
 
 
 # region Verify
@@ -71,7 +71,405 @@ def verify(
 # region Generate
 
 
-class _PatternVerificationTranspiler(parse_tree.RestrictedTransformer[Stripped]):
+class _FixForUTF16Regex(parse_retree.BaseVisitor):
+    """
+    Modify the pattern in-place such that UTF-32 can be dealt by C# regex engine.
+
+    Specifically, we need to split UTF-32 characters in the two surrogates since
+    C# regex engine only works with UTF-16.
+
+    The characters in the range ``\\uD800`` to ``\\uDFFF`` are reserved so they can
+    be used as high surrogates. However, it is still valid to use them as standalone
+    characters. Hence, if you use them in your pattern, and the pattern also involves
+    UTF-32 characters, the transformed pattern might be more permissive than
+    the original one.
+
+    For the problem, see:
+
+    * https://stackoverflow.com/questions/364009/c-sharp-regular-expressions-with-uxxxxxxxx-characters-in-the-pattern
+    * https://stackoverflow.com/questions/47605037/unicode-character-range-not-being-consumed-by-regex
+
+    For the UTF-16 specs, ranges and computation of low/high surrogates, see:
+
+    * https://en.wikipedia.org/wiki/UTF-16#Description
+    * http://www.russellcottrell.com/greek/utilities/surrogatepaircalculator.htm
+    """
+
+    _SUPPLEMENTARY_PLANE_START = 0x00010000
+    _SUPPLEMENTARY_PLANE_END = 0x0010FFFF
+
+    # fmt: off
+    @staticmethod
+    @require(
+        lambda code:
+        _FixForUTF16Regex._SUPPLEMENTARY_PLANE_START
+        <= code <=
+        _FixForUTF16Regex._SUPPLEMENTARY_PLANE_END
+
+    )
+    @ensure(
+        lambda result:
+        0xD800 <= result[0] <= 0xDBFF
+        and 0xDC00 <= result[1] <= 0xDFFF,
+        "High and low surrogates in the expected range"
+    )
+    # fmt: on
+    def _convert_to_surrogates(code: int) -> Tuple[int, int]:
+        """Convert a UTF-32 character into its surrogates."""
+        high_surrogate = (code - 0x10000) // 0x400 + 0xD800
+        low_surrogate = (code - 0x10000) % 0x400 + 0xDC00
+
+        return high_surrogate, low_surrogate
+
+    @staticmethod
+    @require(lambda term: isinstance(term.value, parse_retree.Char))
+    def _expand_character_literal_to_surrogates_if_necessary(
+        term: parse_retree.Term,
+    ) -> List[parse_retree.Term]:
+        """Expand the character literal to two surrogate characters if necessary."""
+        # NOTE (mristin, 2022-06-10):
+        # This assertion is needed for mypy.
+        assert isinstance(term.value, parse_retree.Char)
+
+        if ord(term.value.character) < _FixForUTF16Regex._SUPPLEMENTARY_PLANE_START:
+            return [term]
+
+        high_surrogate, low_surrogate = _FixForUTF16Regex._convert_to_surrogates(
+            code=ord(term.value.character)
+        )
+
+        # NOTE (mristin, 2022-06-10):
+        # We explicitly encode the character since otherwise this split can not be
+        # traced back meaningfully.
+        high_surrogate_char = parse_retree.Char(
+            character=chr(high_surrogate), explicitly_encoded=True
+        )
+        low_surrogate_char = parse_retree.Char(
+            character=chr(low_surrogate), explicitly_encoded=True
+        )
+
+        output = []  # type: List[parse_retree.Term]
+
+        if term.quantifier is not None:
+            # NOTE (mristin, 2022-06-10):
+            # We need to put the surrogates in a group so that the quantifier
+            # applies to both.
+            value = parse_retree.Group(
+                union=parse_retree.UnionExpr(
+                    uniates=[
+                        parse_retree.Concatenation(
+                            concatenants=[
+                                parse_retree.Term(
+                                    value=high_surrogate_char, quantifier=None
+                                ),
+                                parse_retree.Term(
+                                    value=low_surrogate_char, quantifier=None
+                                ),
+                            ]
+                        )
+                    ]
+                )
+            )
+
+            output.append(parse_retree.Term(value=value, quantifier=term.quantifier))
+        else:
+            # NOTE (mristin, 2022-06-10):
+            # When there is no quantifier, we can simply inject the surrogates
+            # as character literals.
+            output.append(parse_retree.Term(value=high_surrogate_char, quantifier=None))
+            output.append(parse_retree.Term(value=low_surrogate_char, quantifier=None))
+
+        return output
+
+    @staticmethod
+    def _produce_concatenation_char_char(
+        first_code: int, second_code: int
+    ) -> parse_retree.Concatenation:
+        """
+        Produce a concatenation as ``{u(code)}{u(code)}``.
+
+        This method helped us to make
+        :method:`~_expand_char_set_to_surrogates_if_necessary` somewhat manageable since
+        we struggled with the complexity of its code.
+        """
+        return parse_retree.Concatenation(
+            concatenants=[
+                parse_retree.Term(
+                    value=parse_retree.Char(
+                        character=chr(first_code), explicitly_encoded=True
+                    ),
+                    quantifier=None,
+                ),
+                parse_retree.Term(
+                    value=parse_retree.Char(
+                        character=chr(second_code), explicitly_encoded=True
+                    ),
+                    quantifier=None,
+                ),
+            ]
+        )
+
+    @staticmethod
+    def _produce_concatenation_char_char_set(
+        code: int, range_start: int, range_end: int
+    ) -> parse_retree.Concatenation:
+        """
+        Produce a concatenation as ``{u(code)}[{u(range_start)-u(range_end)}]``.
+
+        This method helped us to make
+        :method:`~_expand_char_set_to_surrogates_if_necessary` somewhat manageable since
+        we struggled with the complexity of its code.
+        """
+        return parse_retree.Concatenation(
+            concatenants=[
+                parse_retree.Term(
+                    value=parse_retree.Char(
+                        character=chr(code), explicitly_encoded=True
+                    ),
+                    quantifier=None,
+                ),
+                parse_retree.Term(
+                    value=parse_retree.CharSet(
+                        complementing=False,
+                        ranges=[
+                            parse_retree.Range(
+                                start=parse_retree.Char(
+                                    character=chr(range_start), explicitly_encoded=True
+                                ),
+                                end=parse_retree.Char(
+                                    character=chr(range_end), explicitly_encoded=True
+                                ),
+                            )
+                        ],
+                    ),
+                    quantifier=None,
+                ),
+            ]
+        )
+
+    @staticmethod
+    def _produce_concatenation_char_set_char_set(
+        first_range_start: int,
+        first_range_end: int,
+        second_range_start: int,
+        second_range_end: int,
+    ) -> parse_retree.Concatenation:
+        """
+        Produce a concatenation of the character sets.
+
+        This method helped us to make
+        :method:`~_expand_char_set_to_surrogates_if_necessary` somewhat manageable since
+        we struggled with the complexity of its code.
+        """
+        return parse_retree.Concatenation(
+            concatenants=[
+                parse_retree.Term(
+                    value=parse_retree.CharSet(
+                        complementing=False,
+                        ranges=[
+                            parse_retree.Range(
+                                start=parse_retree.Char(
+                                    character=chr(first_range_start),
+                                    explicitly_encoded=True,
+                                ),
+                                end=parse_retree.Char(
+                                    character=chr(first_range_end),
+                                    explicitly_encoded=True,
+                                ),
+                            )
+                        ],
+                    ),
+                    quantifier=None,
+                ),
+                parse_retree.Term(
+                    value=parse_retree.CharSet(
+                        complementing=False,
+                        ranges=[
+                            parse_retree.Range(
+                                start=parse_retree.Char(
+                                    character=chr(second_range_start),
+                                    explicitly_encoded=True,
+                                ),
+                                end=parse_retree.Char(
+                                    character=chr(second_range_end),
+                                    explicitly_encoded=True,
+                                ),
+                            )
+                        ],
+                    ),
+                    quantifier=None,
+                ),
+            ]
+        )
+
+    @staticmethod
+    @require(lambda term: isinstance(term.value, parse_retree.CharSet))
+    def _expand_char_set_to_surrogates_if_necessary(
+        term: parse_retree.Term,
+    ) -> List[parse_retree.Term]:
+        """Extend the set with surrogates or expand it to a union, if necessary."""
+        ranges_wo_utf32 = []  # type: List[parse_retree.Range]
+        ranges_w_utf32 = []  # type: List[parse_retree.Range]
+
+        # Needed for mypy
+        assert isinstance(term.value, parse_retree.CharSet)
+
+        for a_range in term.value.ranges:
+            if (
+                ord(a_range.start.character)
+                < _FixForUTF16Regex._SUPPLEMENTARY_PLANE_START
+            ) and (
+                a_range.end is None
+                or (
+                    ord(a_range.end.character)
+                    < _FixForUTF16Regex._SUPPLEMENTARY_PLANE_START
+                )
+            ):
+                ranges_wo_utf32.append(a_range)
+            else:
+                ranges_w_utf32.append(a_range)
+
+        if len(ranges_w_utf32) == 0:
+            return [term]
+
+        assert not term.value.complementing, (
+            "Complementing character sets with one or more ranges "
+            "involving UTF-32 characters can not be supported, "
+            "since we can not represent them relying "
+            "on an UTF-16-only regex engine.\n"
+            "\n"
+            "This should have been detected before and returned as an error.",
+        )
+
+        # NOTE (mristin, 2022-06-11):
+        # Expand the character set into a union of:
+        # 1) A character set without any UTF-32 characters
+        # 2) One or more character sets representing the ranges involving
+        #    UTF-32 characters.
+
+        # noinspection PyListCreation
+        uniates = []  # type: List[parse_retree.Concatenation]
+
+        if len(ranges_wo_utf32) > 0:
+            uniates.append(
+                parse_retree.Concatenation(
+                    concatenants=[
+                        parse_retree.Term(
+                            value=parse_retree.CharSet(
+                                complementing=False, ranges=ranges_wo_utf32
+                            ),
+                            quantifier=None,
+                        )
+                    ]
+                )
+            )
+
+        for a_range in ranges_w_utf32:
+            high_start, low_start = _FixForUTF16Regex._convert_to_surrogates(
+                code=ord(a_range.start.character)
+            )
+
+            if (a_range.end is None) or (
+                a_range.start.character == a_range.end.character
+            ):
+                uniates.append(
+                    _FixForUTF16Regex._produce_concatenation_char_char(
+                        first_code=high_start, second_code=low_start
+                    )
+                )
+            else:
+                assert ord(a_range.start.character) < ord(a_range.end.character), (
+                    "Start of a range must be smaller than its end.\n"
+                    "\n"
+                    "This is expected to be detected at the parse stage."
+                )
+
+                high_end, low_end = _FixForUTF16Regex._convert_to_surrogates(
+                    code=ord(a_range.end.character)
+                )
+
+                # noinspection SpellCheckingInspection
+                if high_start == high_end:
+                    # {high start}[{low start}-{low end}]
+                    uniates.append(
+                        _FixForUTF16Regex._produce_concatenation_char_char_set(
+                            code=high_start, range_start=low_start, range_end=low_end
+                        )
+                    )
+                else:
+                    # {high start}[{low start}-\uDFFF]
+                    uniates.append(
+                        _FixForUTF16Regex._produce_concatenation_char_char_set(
+                            code=high_start, range_start=low_start, range_end=0xDFFF
+                        )
+                    )
+
+                    if high_end - high_start > 1:
+                        # noinspection SpellCheckingInspection
+                        if high_start + 1 == high_end - 1:
+                            # {high start + 1}[\uDC00-\uDFFF]
+                            uniates.append(
+                                _FixForUTF16Regex._produce_concatenation_char_char_set(
+                                    code=high_start + 1,
+                                    range_start=0xDC00,
+                                    range_end=0xDFFF,
+                                )
+                            )
+                        else:
+                            # [{high start + 1}-{high end - 1}][\uDC00-\uDFFF]
+                            uniates.append(
+                                _FixForUTF16Regex._produce_concatenation_char_set_char_set(
+                                    first_range_start=high_start + 1,
+                                    first_range_end=high_end - 1,
+                                    second_range_start=0xDC00,
+                                    second_range_end=0xDFFF,
+                                )
+                            )
+
+                    uniates.append(
+                        _FixForUTF16Regex._produce_concatenation_char_char_set(
+                            code=high_end, range_start=0xDC00, range_end=low_end
+                        )
+                    )
+
+        return [
+            parse_retree.Term(
+                value=parse_retree.Group(union=parse_retree.UnionExpr(uniates=uniates)),
+                quantifier=term.quantifier,
+            )
+        ]
+
+    def visit_concatenation(self, node: parse_retree.Concatenation) -> None:
+        """Convert character literals to UTF-16, where appropriate."""
+        new_concatenants = []  # type: List[parse_retree.Term]
+
+        for concatenant in node.concatenants:
+            if isinstance(concatenant.value, parse_retree.Char):
+                new_concatenants.extend(
+                    _FixForUTF16Regex._expand_character_literal_to_surrogates_if_necessary(
+                        term=concatenant
+                    )
+                )
+            elif isinstance(concatenant.value, parse_retree.CharSet):
+                new_concatenants.extend(
+                    _FixForUTF16Regex._expand_char_set_to_surrogates_if_necessary(
+                        term=concatenant
+                    )
+                )
+            else:
+                new_concatenants.append(concatenant)
+
+        node.concatenants = new_concatenants
+        for concatenant in new_concatenants:
+            self.visit(concatenant)
+
+
+_FIX_FOR_UTF16_REGEX = _FixForUTF16Regex()
+
+
+class _PatternVerificationTranspiler(
+    parse_tree.RestrictedTransformer[Tuple[Optional[Stripped], Optional[Error]]]
+):
     """Transpile a statement of a pattern verification into C#."""
 
     def __init__(self, defined_variables: Set[Identifier]) -> None:
@@ -85,18 +483,57 @@ class _PatternVerificationTranspiler(parse_tree.RestrictedTransformer[Stripped])
         """
         self.defined_variables = defined_variables
 
-    def transform_constant(self, node: parse_tree.Constant) -> Stripped:
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_constant(
+        self, node: parse_tree.Constant
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
         if isinstance(node.value, str):
-            return Stripped(csharp_common.string_literal(node.value))
+            # NOTE (mristin, 2022-06-11):
+            # We assume that all the string constants are valid regular expressions.
+
+            regex, parse_error = parse_retree.parse(values=[node.value])
+            if parse_error is not None:
+                regex_line, pointer_line = parse_retree.render_pointer(
+                    parse_error.cursor
+                )
+
+                return (
+                    None,
+                    Error(
+                        node.original_node,
+                        f"The string constant could not be parsed "
+                        f"as a regular expression: \n"
+                        f"{parse_error.message}\n"
+                        f"{regex_line}\n"
+                        f"{pointer_line}",
+                    ),
+                )
+
+            assert regex is not None
+            _FIX_FOR_UTF16_REGEX.visit(regex)
+
+            # NOTE (mristin, 2022-06-11):
+            # Strictly speaking, this is a joined string with a single value, a string
+            # literal.
+            return self._transform_joined_str_values(
+                values=parse_retree.render(regex=regex)
+            )
         else:
             raise AssertionError(f"Unexpected {node=}")
 
-    def transform_name(self, node: parse_tree.Name) -> Stripped:
-        return Stripped(csharp_naming.variable_name(node.identifier))
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_joined_str_values(
+        self, values: Sequence[Union[str, parse_tree.FormattedValue]]
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """Transform the values of a joined string to a C# string literal."""
+        if all(isinstance(value, str) for value in values):
+            return (
+                Stripped(csharp_common.string_literal("".join(values))),  # type: ignore
+                None,
+            )
 
-    def transform_joined_str(self, node: parse_tree.JoinedStr) -> Stripped:
         parts = []  # type: List[str]
-        for value in node.values:
+        for value in values:
             if isinstance(value, str):
                 string_literal = csharp_common.string_literal(
                     value.replace("{", "{{").replace("}", "}}")
@@ -111,7 +548,11 @@ class _PatternVerificationTranspiler(parse_tree.RestrictedTransformer[Stripped])
                 parts.append(string_literal_wo_quotes)
 
             elif isinstance(value, parse_tree.FormattedValue):
-                code = self.transform(value.value)
+                code, error = self.transform(value.value)
+                if error is not None:
+                    return None, error
+                assert code is not None
+
                 assert (
                     "\n" not in code
                 ), f"New-lines are not expected in formatted values, but got: {code}"
@@ -127,19 +568,57 @@ class _PatternVerificationTranspiler(parse_tree.RestrictedTransformer[Stripped])
 
         writer.write('"')
 
-        return Stripped(writer.getvalue())
+        return Stripped(writer.getvalue()), None
 
-    def transform_assignment(self, node: parse_tree.Assignment) -> Stripped:
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_name(
+        self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        return Stripped(csharp_naming.variable_name(node.identifier)), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_joined_str(
+        self, node: parse_tree.JoinedStr
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        regex, parse_error = parse_retree.parse(values=node.values)
+        if parse_error is not None:
+            regex_line, pointer_line = parse_retree.render_pointer(parse_error.cursor)
+
+            return (
+                None,
+                Error(
+                    node.original_node,
+                    f"The joined string could not be parsed "
+                    f"as a regular expression: \n"
+                    f"{parse_error.message}\n"
+                    f"{regex_line}\n"
+                    f"{pointer_line}",
+                ),
+            )
+
+        assert regex is not None
+        _FIX_FOR_UTF16_REGEX.visit(regex)
+
+        return self._transform_joined_str_values(
+            values=parse_retree.render(regex=regex)
+        )
+
+    def transform_assignment(
+        self, node: parse_tree.Assignment
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
         assert isinstance(node.target, parse_tree.Name)
         variable = csharp_naming.variable_name(node.target.identifier)
-        code = self.transform(node.value)
+        code, error = self.transform(node.value)
+        if error is not None:
+            return None, error
+        assert code is not None
 
         if node.target.identifier in self.defined_variables:
-            return Stripped(f"{variable} = {code};")
+            return Stripped(f"{variable} = {code};"), None
 
         else:
             self.defined_variables.add(node.target.identifier)
-            return Stripped(f"var {variable} = {code};")
+            return Stripped(f"var {variable} = {code};"), None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -173,7 +652,11 @@ private static Regex {construct_name}()
         if i == len(verification.parsed.body) - 1:
             break
 
-        code = transpiler.transform(stmt)
+        code, error = transpiler.transform(stmt)
+        if error is not None:
+            return None, error
+        assert code is not None
+
         writer.write(textwrap.indent(code, I))
         writer.write("\n")
 
@@ -199,7 +682,10 @@ private static Regex {construct_name}()
     assert match_call.name.identifier == "match"
 
     assert isinstance(match_call.args[0], parse_tree.Expression)
-    pattern_expr = transpiler.transform(match_call.args[0])
+    pattern_expr, error = transpiler.transform(match_call.args[0])
+    if error is not None:
+        return None, error
+    assert pattern_expr is not None
 
     # A pragmatic heuristics for breaking lines
     if len(pattern_expr) < 50:

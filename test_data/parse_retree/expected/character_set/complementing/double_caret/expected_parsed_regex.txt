@@ -1,0 +1,15 @@
+Regex(
+  union=UnionExpr(
+    uniates=[
+      Concatenation(
+        concatenants=[
+          Term(
+            value=CharSet(
+              complementing=True,
+              ranges=[
+                Range(
+                  start=Char(
+                    character='^',
+                    explicitly_encoded=False),
+                  end=None)]),
+            quantifier=None)])]))

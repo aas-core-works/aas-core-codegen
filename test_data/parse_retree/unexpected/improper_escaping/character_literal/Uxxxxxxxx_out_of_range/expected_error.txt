@@ -1,0 +1,3 @@
+Expected the character code in the range \U00010000-\U0010FFFF, but got \U0020ffff; the code can not be represented with high/low surrogates in UTF-16
+\U0020FFFF
+          ^

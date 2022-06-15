@@ -1,0 +1,155 @@
+Regex(
+  union=UnionExpr(
+    uniates=[
+      Concatenation(
+        concatenants=[
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character='«',
+              explicitly_encoded=True),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character='샞',
+              explicitly_encoded=True),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character='\U0010ffff',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character='?',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character='*',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character='+',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character='(',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=')',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character='[',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=']',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character='^',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character='$',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character='\\',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character='.',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character=' ',
+              explicitly_encoded=False),
+            quantifier=None),
+          Term(
+            value=Char(
+              character='#',
+              explicitly_encoded=False),
+            quantifier=None)])]))

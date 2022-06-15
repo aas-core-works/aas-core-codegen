@@ -1,0 +1,11 @@
+Regex(
+  union=UnionExpr(
+    uniates=[
+      Concatenation(
+        concatenants=[
+          Term(
+            value='<formatted value>',
+            quantifier=Quantifier(
+              non_greedy=False,
+              minimum=0,
+              maximum=None))])]))
