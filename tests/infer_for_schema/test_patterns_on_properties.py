@@ -446,6 +446,137 @@ class Test_stacking(unittest.TestCase):
             text,
         )
 
+    def test_merge_with_parent_and_grand_parent(self) -> None:
+        source = textwrap.dedent(
+            """\
+            @verification
+            def matches_something(text: str) -> bool:
+                return match("something-[a-zA-Z]+", text) is not None
+
+            @invariant(lambda self: matches_something(self.some_property))
+            class GrandParent:
+                some_property: str
+
+                def __init__(self, some_property: str) -> None:
+                    self.some_property = some_property
+
+            class Parent(GrandParent):
+                def __init__(self, some_property: str) -> None:
+                    GrandParent.__init__(self, some_property=some_property)
+
+            class Something(Parent):
+                def __init__(self, some_property: str) -> None:
+                    Parent.__init__(self, some_property=some_property)
+
+
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            """
+        )
+
+        # NOTE (mristin, 2022-05-18):
+        # This definition here is necessary for mypy.
+        constraints_by_class: Optional[
+            MutableMapping[
+                intermediate.ClassUnion, infer_for_schema.ConstraintsByProperty
+            ]
+        ] = None
+
+        (
+            symbol_table,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
+
+        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
+            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert constraints_by_class is not None
+
+        constraints_by_props = constraints_by_class[something_cls]
+
+        text = infer_for_schema.dump(constraints_by_props)
+        self.assertEqual(
+            textwrap.dedent(
+                """\
+                ConstraintsByProperty(
+                  len_constraints_by_property={},
+                  patterns_by_property={
+                    'some_property': [
+                      PatternConstraint(
+                        pattern='something-[a-zA-Z]+')]})"""
+            ),
+            text,
+        )
+
+    def test_merge_with_parent_over_constrained_primitive(self) -> None:
+        source = textwrap.dedent(
+            """\
+            @verification
+            def matches_something(text: str) -> bool:
+                return match("something-[a-zA-Z]+", text) is not None
+
+            @invariant(lambda self: matches_something(self))
+            class SomeConstrainedPrimitive(str):
+                pass
+
+            class Parent:
+                some_property: SomeConstrainedPrimitive
+
+                def __init__(self, some_property: SomeConstrainedPrimitive) -> None:
+                    self.some_property = some_property
+
+            class Something(Parent):
+                def __init__(self, some_property: SomeConstrainedPrimitive) -> None:
+                    Parent.__init__(self, some_property=some_property)
+
+
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            """
+        )
+
+        # NOTE (mristin, 2022-05-18):
+        # This definition here is necessary for mypy.
+        constraints_by_class: Optional[
+            MutableMapping[
+                intermediate.ClassUnion, infer_for_schema.ConstraintsByProperty
+            ]
+        ] = None
+
+        (
+            symbol_table,
+            something_cls,
+            constraints_by_class,
+        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+            source=source
+        )
+
+        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
+            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert constraints_by_class is not None
+
+        constraints_by_props = constraints_by_class[something_cls]
+
+        text = infer_for_schema.dump(constraints_by_props)
+        self.assertEqual(
+            textwrap.dedent(
+                """\
+                ConstraintsByProperty(
+                  len_constraints_by_property={},
+                  patterns_by_property={
+                    'some_property': [
+                      PatternConstraint(
+                        pattern='something-[a-zA-Z]+')]})"""
+            ),
+            text,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
