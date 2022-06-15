@@ -42,6 +42,13 @@ class PatternConstraint:
         """Initialize with the given values."""
         self.pattern = pattern
 
+    def __repr__(self) -> str:
+        """Represent the constraint with the pattern."""
+        return (
+            f"<{PatternConstraint.__name__} at 0x{id(self):x} "
+            f"with pattern={self.pattern!r}>"
+        )
+
 
 class ConstraintsByProperty:
     """

@@ -421,8 +421,8 @@ def merge_constraints_with_ancestors(
 
             for parent in symbol.inheritances:
                 # NOTE (mristin, 2022-05-15):
-                # Assume here that all the ancestors already inherited their constraints due to
-                # the topological order in the iteration.
+                # Assume here that all the ancestors already inherited their constraints
+                # due to the topological order in the iteration.
                 that_constraints_by_props = new_constraints_by_class[parent]
 
                 that_len_constraint = (
@@ -484,10 +484,16 @@ def merge_constraints_with_ancestors(
             if this_patterns is not None:
                 patterns.extend(this_patterns)
 
+            set_of_this_patterns = (
+                set()
+                if this_patterns is None
+                else set(this_pattern.pattern for this_pattern in this_patterns)
+            )
+
             for parent in symbol.inheritances:
                 # NOTE (mristin, 2022-05-15):
-                # Assume here that all the ancestors already inherited their constraints due to
-                # the topological order in the iteration.
+                # Assume here that all the ancestors already inherited their constraints
+                # due to the topological order in the iteration.
                 that_constraints_by_props = new_constraints_by_class[parent]
 
                 that_patterns = that_constraints_by_props.patterns_by_property.get(
@@ -495,7 +501,19 @@ def merge_constraints_with_ancestors(
                 )
 
                 if that_patterns is not None:
-                    patterns.extend(that_patterns)
+                    for that_pattern in that_patterns:
+                        # NOTE (mristin, 2022-06-15):
+                        # We have to make sure that we do not inherit the same pattern
+                        # from the parent.
+                        #
+                        # This is particularly important if the inherited property is a
+                        # constrained primitive. In that case, if we didn't check for
+                        # the duplicates, we would inherit the same pattern multiple
+                        # times as we can not distinguish whether the pattern
+                        # comes from an invariant of the parent or an invariant of
+                        # the constrained primitive.
+                        if that_pattern.pattern not in set_of_this_patterns:
+                            patterns.append(that_pattern)
 
             if len(patterns) > 0:
                 new_patterns_by_property[prop] = patterns
