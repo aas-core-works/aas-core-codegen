@@ -9,6 +9,7 @@
       <w>atok</w>
       <w>braunisch</w>
       <w>bytearray</w>
+      <w>canonicalizer</w>
       <w>cardinalities</w>
       <w>classdef</w>
       <w>clses</w>
@@ -69,6 +70,8 @@
       <w>nameof</w>
       <w>netcore</w>
       <w>nist</w>
+      <w>nullies</w>
+      <w>nullness</w>
       <w>opcode</w>
       <w>paramref</w>
       <w>pathed</w>
@@ -84,6 +87,7 @@
       <w>recursing</w>
       <w>referables</w>
       <w>reformattable</w>
+      <w>representer</w>
       <w>retree</w>
       <w>ristin</w>
       <w>rstripped</w>

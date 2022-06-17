@@ -8,10 +8,11 @@ track ``parsed`` as the types are inferred in the intermediate stage, but can no
 be traced back to the parse stage.
 """
 import abc
+import contextlib
 import enum
 from typing import Mapping, MutableMapping, Optional, List, Final, Union, get_args
 
-from icontract import DBC, ensure
+from icontract import DBC, ensure, require
 
 from aas_core_codegen.common import (
     Identifier,
@@ -503,8 +504,299 @@ class MutableEnvironment(Environment):
         self._mapping[identifier] = type_annotation
 
 
+class Canonicalizer(parse_tree.RestrictedTransformer[str]):
+    """Represent the nodes as canonical strings so that they can be used in look-ups."""
+
+    #: Track of the canonical representations
+    representation_map: Final[MutableMapping[parse_tree.Node, str]]
+
+    def __init__(self) -> None:
+        """Initialize with the given values."""
+        self.representation_map = dict()
+
+    @ensure(lambda self, node: node in self.representation_map)
+    def transform(self, node: parse_tree.Node) -> str:
+        return super().transform(node)
+
+    @staticmethod
+    def _needs_no_brackets(node: parse_tree.Node) -> bool:
+        """
+        Check if the representation needs brackets for unambiguity.
+
+        While we could always put brackets, they harm readability in later debugging so
+        we try to make the representation as readable as possible.
+        """
+        return isinstance(
+            node,
+            (
+                parse_tree.Member,
+                parse_tree.MethodCall,
+                parse_tree.Name,
+                parse_tree.FunctionCall,
+                parse_tree.Constant,
+                parse_tree.JoinedStr,
+                parse_tree.Any,
+                parse_tree.All,
+            ),
+        )
+
+    def transform_member(self, node: parse_tree.Member) -> str:
+        instance_repr = self.transform(node.instance)
+
+        if Canonicalizer._needs_no_brackets(node.instance):
+            result = f"{instance_repr}.{node.name}"
+        else:
+            result = f"({instance_repr}).{node.name}"
+
+        self.representation_map[node] = result
+        return result
+
+    def transform_comparison(self, node: parse_tree.Comparison) -> str:
+        left = self.transform(node.left)
+        if not Canonicalizer._needs_no_brackets(node.left):
+            left = f"({left})"
+
+        right = self.transform(node.right)
+        if not Canonicalizer._needs_no_brackets(node.right):
+            right = f"({right})"
+
+        result = f"{left} {node.op.value} {right}"
+        self.representation_map[node] = result
+        return result
+
+    def transform_implication(self, node: parse_tree.Implication) -> str:
+        antecedent = self.transform(node.antecedent)
+        if not Canonicalizer._needs_no_brackets(node.antecedent):
+            antecedent = f"({antecedent})"
+
+        consequent = self.transform(node.consequent)
+        if not Canonicalizer._needs_no_brackets(node.consequent):
+            consequent = f"({consequent})"
+
+        result = f"{antecedent} ⇒ {consequent}"
+        self.representation_map[node] = result
+        return result
+
+    def transform_method_call(self, node: parse_tree.MethodCall) -> str:
+        member = self.transform(node.member)
+
+        args = [self.transform(arg) for arg in node.args]
+
+        args_joined = ", ".join(args)
+        result = f"{member}({args_joined})"
+        self.representation_map[node] = result
+        return result
+
+    def transform_function_call(self, node: parse_tree.FunctionCall) -> str:
+        name = self.transform(node.name)
+
+        args = [self.transform(arg) for arg in node.args]
+
+        args_joined = ", ".join(args)
+        result = f"{name}({args_joined})"
+        self.representation_map[node] = result
+        return result
+
+    def transform_constant(self, node: parse_tree.Constant) -> str:
+        result = repr(node.value)
+        self.representation_map[node] = result
+        return result
+
+    def transform_is_none(self, node: parse_tree.IsNone) -> str:
+        value = self.transform(node.value)
+        if not Canonicalizer._needs_no_brackets(node.value):
+            value = f"({value})"
+
+        result = f"{value} is None"
+        self.representation_map[node] = result
+        return result
+
+    def transform_is_not_none(self, node: parse_tree.IsNotNone) -> str:
+        value = self.transform(node.value)
+        if not Canonicalizer._needs_no_brackets(node.value):
+            value = f"({value})"
+
+        result = f"{value} is not None"
+        self.representation_map[node] = result
+        return result
+
+    def transform_name(self, node: parse_tree.Name) -> str:
+        result = node.identifier
+        self.representation_map[node] = result
+        return result
+
+    def transform_and(self, node: parse_tree.And) -> str:
+        values = []  # type: List[str]
+        for value_node in node.values:
+            value = self.transform(value_node)
+            if not Canonicalizer._needs_no_brackets(value_node):
+                value = f"({value})"
+
+            values.append(value)
+
+        result = " and ".join(values)
+        self.representation_map[node] = result
+        return result
+
+    def transform_or(self, node: parse_tree.Or) -> str:
+        values = []  # type: List[str]
+        for value_node in node.values:
+            value = self.transform(value_node)
+            if not Canonicalizer._needs_no_brackets(value_node):
+                value = f"({value})"
+
+            values.append(value)
+
+        result = " or ".join(values)
+        self.representation_map[node] = result
+        return result
+
+    def transform_formatted_value(self, node: parse_tree.FormattedValue) -> str:
+        result = self.transform(node.value)
+        self.representation_map[node] = result
+        return result
+
+    def transform_joined_str(self, node: parse_tree.JoinedStr) -> str:
+        parts = []  # type: List[str]
+        for value in node.values:
+            if isinstance(value, str):
+                parts.append(repr(value))
+            elif isinstance(value, parse_tree.FormattedValue):
+                transformed_value = self.transform(value)
+                parts.append(f"{{{transformed_value}}}")
+            else:
+                assert_never(value)
+
+        result = "".join(parts)
+        self.representation_map[node] = result
+        return result
+
+    def transform_for_each(self, node: parse_tree.ForEach) -> str:
+        variable = self.transform(node.variable)
+        iteration = self.transform(node.iteration)
+        if not Canonicalizer._needs_no_brackets(node.iteration):
+            iteration = f"({iteration})"
+
+        result = f"for {variable} in {iteration}"
+        self.representation_map[node] = result
+        return result
+
+    def _transform_any_or_all(self, node: Union[parse_tree.Any, parse_tree.All]) -> str:
+        for_each = self.transform(node.for_each)
+
+        condition = self.transform(node.condition)
+        if not Canonicalizer._needs_no_brackets(node.condition):
+            condition = f"({condition})"
+
+        if isinstance(node, parse_tree.Any):
+            result = f"any({condition} {for_each})"
+        elif isinstance(node, parse_tree.All):
+            result = f"all({condition} {for_each})"
+        else:
+            assert_never(node)
+
+        self.representation_map[node] = result
+        return result
+
+    def transform_any(self, node: parse_tree.Any) -> str:
+        return self._transform_any_or_all(node)
+
+    def transform_all(self, node: parse_tree.All) -> str:
+        return self._transform_any_or_all(node)
+
+    def transform_assignment(self, node: parse_tree.Assignment) -> str:
+        target = self.transform(node.target)
+        if not Canonicalizer._needs_no_brackets(node.target):
+            target = f"({target})"
+
+        # NOTE (mristin, 2022-06-17):
+        # Nested assignments are not possible in Python, but who knows where our
+        # intermediate representation will take us. Therefore, we handle this edge case
+        # even though it seems nonsensical at the moment.
+        value = self.transform(node.value)
+        if isinstance(node.value, parse_tree.Assignment):
+            value = f"({value})"
+
+        result = f"{target} = {value}"
+
+        self.representation_map[node] = result
+        return result
+
+    def transform_return(self, node: parse_tree.Return) -> str:
+        if node.value is not None:
+            value = self.transform(node.value)
+
+            # NOTE (mristin, 2022-06-17):
+            # Nested returns are not possible in Python, but who knows where our
+            # intermediate representation will take us. Therefore, we handle this edge case
+            # even though it seems nonsensical at the moment.
+            if isinstance(node.value, parse_tree.Return):
+                value = f"({value})"
+
+            result = f"return {value}"
+        else:
+            result = "return"
+
+        self.representation_map[node] = result
+        return result
+
+
+class _CountingMap:
+    """Provide a map to track multiple counters."""
+
+    def __init__(self) -> None:
+        self._counts = dict()  # type: MutableMapping[str, int]
+
+    def increment(self, key: str) -> None:
+        """Increment the counter for the ``key``."""
+        count = self._counts.get(key, None)
+        if count is None:
+            self._counts[key] = 1
+        else:
+            self._counts[key] = count + 1
+
+    @ensure(lambda self, key, result: not result or self.count(key) > 0)
+    @ensure(lambda self, key, result: result or self.count(key) == 0)
+    def at_least_once(self, key: str) -> bool:
+        """Return ``True`` if the ``key`` is tracked and the count is at least 1."""
+        count = self.count(key)
+        return count >= 1
+
+    @ensure(lambda result: result >= 0)
+    def count(self, key: str) -> int:
+        """Return the number of stacked ``key``'s."""
+        result = self._counts.get(key, None)
+        return 0 if result is None else result
+
+    # fmt: off
+    @require(
+        lambda self, key:
+        self.at_least_once(key),
+        "Can not decrement past 1"
+    )
+    # fmt: on
+    def decrement(self, key: str) -> None:
+        """Decrement the counter for the ``key``."""
+        count = self._counts.get(key, None)
+
+        if count is None or count == 0:
+            raise AssertionError(f"Unexpected count == 0 for key {key!r}")
+        elif count < 0:
+            raise AssertionError(f"Unexpected count < 0 for key {key!r}")
+        elif count == 1:
+            del self._counts[key]
+        else:
+            self._counts[key] = count - 1
+
+
 class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]):
-    """Infer the types of the given parse tree."""
+    """
+    Infer the types of the given parse tree.
+
+    Since we also handle non-nullness, you need to pre-compute the canonical
+    representation of the nodes that you want to infer the types for. To that end,
+    use :class:`~CanonicalRepresenter`.
+    """
 
     #: Track of the inferred types
     type_map: Final[MutableMapping[parse_tree.Node, "TypeAnnotationUnion"]]
@@ -516,19 +808,63 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         self,
         symbol_table: _types.SymbolTable,
         environment: "Environment",
+        representation_map: Mapping[parse_tree.Node, str],
     ) -> None:
         """Initialize with the given values."""
+        self._symbol_table = symbol_table
+
         # We need to create our own child environment so that we can introduce new
         # entries without affecting the variables from the outer scopes.
         self._environment = MutableEnvironment(parent=environment)
 
-        self._symbol_table = symbol_table
+        self._representation_map = representation_map
+
+        # NOTE (mristin, 2022-06-17):
+        # We need to keep track of the expressions that can be assumed to be non-null.
+        # This member is stateful! It will constantly change, depending on the position
+        # of the iteration through the tree.
+        #
+        # We use canonical representation from ``representation_map`` to associate
+        # non-null assumptions with the expressions.
+        self._non_null = _CountingMap()
 
         self.type_map = dict()
         self.errors = []
 
+    def _strip_optional_if_non_null(
+        self, node: parse_tree.Node, type_annotation: "TypeAnnotationUnion"
+    ) -> "TypeAnnotationUnion":
+        """
+        Remove ``Optional`` from the ``type_annotation`` if the ``node`` is non-null.
+
+        The ``type_annotation`` refers to the type inferred for the ``node``.
+
+        We keep track of the non-nullness over the iteration in :attr:`._non_null`.
+        Using the canonical representation of the ``node``, we can check whether
+        the type of the ``node`` is non-null.
+        """
+        if not isinstance(type_annotation, OptionalTypeAnnotation):
+            return type_annotation
+
+        canonical_repr = self._representation_map[node]
+        if self._non_null.at_least_once(canonical_repr):
+            return type_annotation.value
+
+        return type_annotation
+
     @ensure(lambda self, result: not (result is None) or len(self.errors) > 0)
     def transform(self, node: parse_tree.Node) -> Optional["TypeAnnotationUnion"]:
+        # NOTE (mristin, 2022-06-17):
+        # We can not write the following as the pre-condition as it would break
+        # behavioral subtyping since the parent class expects no pre-conditions.
+        #
+        # However, in this case, we check that the supplied dependency,
+        # ``representation_map``, is correct.
+        assert node in self._representation_map, (
+            f"The node {parse_tree.dump(node)} at 0x{id(node):x} could not be found "
+            f"in the supplied representation_map."
+        )
+
         return super().transform(node)
 
     def transform_member(
@@ -550,12 +886,20 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
                 result = _type_annotation_to_inferred_type_annotation(
                     prop.type_annotation
                 )
+
+                result = self._strip_optional_if_non_null(
+                    node=node, type_annotation=result
+                )
                 self.type_map[node] = result
                 return result
 
             method = cls.methods_by_name.get(node.name, None)
             if method is not None:
                 result = MethodTypeAnnotation(method=method)
+
+                result = self._strip_optional_if_non_null(
+                    node=node, type_annotation=result
+                )
                 self.type_map[node] = result
                 return result
 
@@ -572,6 +916,10 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             literal = enumeration.literals_by_name.get(node.name, None)
             if literal is not None:
                 result = OurTypeAnnotation(symbol=enumeration)
+
+                result = self._strip_optional_if_non_null(
+                    node=node, type_annotation=result
+                )
                 self.type_map[node] = result
                 return result
 
@@ -613,14 +961,53 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
     def transform_implication(
         self, node: parse_tree.Implication
     ) -> Optional["TypeAnnotationUnion"]:
-        # Just recurse to fill ``type_map`` on ``antecedent`` and ``consequent`` even
-        # though we know the type in advance
-        success = (self.transform(node.antecedent) is not None) and (
-            self.transform(node.consequent) is not None
-        )
-
-        if not success:
+        # NOTE (mristin, 2022-06-17):
+        # Just recurse to fill ``type_map`` on ``antecedent`` even though we know the
+        # type in advance
+        if self.transform(node.antecedent) is None:
             return None
+
+        # region Recurse into consequent while considering any non-nullness
+
+        # NOTE (mristin, 2022-06-17):
+        # We are very lax here and ignore the fact that calls to methods and functions
+        # can actually alter the value assumed to be non-null, and actually violate
+        # its non-nullness by setting it to null.
+        #
+        # This lack of conservatism works for now. If the bugs related to nullness
+        # start to surface, we should re-think our approach here.
+
+        with contextlib.ExitStack() as exit_stack:
+            if isinstance(node.antecedent, parse_tree.IsNotNone):
+                canonical_repr = self._representation_map[node.antecedent.value]
+                self._non_null.increment(canonical_repr)
+
+                exit_stack.callback(
+                    lambda a_canonical_repr=canonical_repr: self._non_null.decrement(
+                        a_canonical_repr
+                    )
+                )
+
+            elif isinstance(node.antecedent, parse_tree.And):
+                for value in node.antecedent.values:
+                    if isinstance(value, parse_tree.IsNotNone):
+                        canonical_repr = self._representation_map[value.value]
+                        self._non_null.increment(canonical_repr)
+
+                        exit_stack.callback(
+                            lambda a_canonical_repr=canonical_repr: self._non_null.decrement(
+                                a_canonical_repr
+                            )
+                        )
+            else:
+                # NOTE (mristin, 2022-06-17):
+                # We do not know how to infer any non-nullness in this case.
+                pass
+
+            success = self.transform(node.consequent) is not None
+
+            if not success:
+                return None
 
         result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
         self.type_map[node] = result
@@ -665,6 +1052,8 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             )
 
         assert result is not None
+
+        result = self._strip_optional_if_non_null(node=node, type_annotation=result)
         self.type_map[node] = result
         return result
 
@@ -738,6 +1127,8 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             return None
 
         assert result is not None
+
+        result = self._strip_optional_if_non_null(node=node, type_annotation=result)
         self.type_map[node] = result
         return result
 
@@ -805,18 +1196,41 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             )
             return None
 
-        self.type_map[node] = type_in_env
-        return type_in_env
+        result = type_in_env
+
+        result = self._strip_optional_if_non_null(node=node, type_annotation=result)
+        self.type_map[node] = result
+        return result
 
     def transform_and(self, node: parse_tree.And) -> Optional["TypeAnnotationUnion"]:
-        # Just recurse to fill ``type_map`` on ``values`` even though we know the type
-        # in advance
-        success = all(
-            self.transform(value_node) is not None for value_node in node.values
-        )
+        # NOTE (mristin, 2022-06-17):
+        # We need to iterate and recurse into ``values`` to fill the ``type_map``.
+        # In the process, we have to consider the non-nullness and how it applies
+        # to the remainder of the conjunction.
 
-        if not success:
-            return None
+        # NOTE (mristin, 2022-06-17):
+        # We are very lax here and ignore the fact that calls to methods and functions
+        # can actually alter the value assumed to be non-null, and actually violate
+        # its non-nullness by setting it to null.
+        #
+        # This lack of conservatism works for now. If the bugs related to nullness
+        # start to surface, we should re-think our approach here.
+
+        with contextlib.ExitStack() as exit_stack:
+            for value in node.values:
+                success = self.transform(value) is not None
+                if not success:
+                    return None
+
+                if isinstance(value, parse_tree.IsNotNone):
+                    canonical_repr = self._representation_map[value.value]
+                    self._non_null.increment(canonical_repr)
+
+                    exit_stack.callback(
+                        lambda a_canonical_repr=canonical_repr: self._non_null.decrement(
+                            a_canonical_repr
+                        )
+                    )
 
         result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
         self.type_map[node] = result

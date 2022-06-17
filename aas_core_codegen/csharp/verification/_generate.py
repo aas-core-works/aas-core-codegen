@@ -1541,10 +1541,17 @@ def _transpile_invariant(
     # of languages, we hope to have a much better understanding about the necessary
     # abstractions.
 
+    canonicalizer = intermediate_type_inference.Canonicalizer()
+    _ = canonicalizer.transform(invariant.body)
+
     type_inferrer = intermediate_type_inference.Inferrer(
-        symbol_table=symbol_table, environment=environment
+        symbol_table=symbol_table,
+        environment=environment,
+        representation_map=canonicalizer.representation_map,
     )
+
     _ = type_inferrer.transform(invariant.body)
+
     if len(type_inferrer.errors):
         return None, Error(
             invariant.parsed.node,
